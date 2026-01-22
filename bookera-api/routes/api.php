@@ -52,14 +52,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('books/{book}/copies', [BookCopyController::class, 'store']);
         Route::delete('book-copies/{bookCopy}', [BookCopyController::class, 'destroy']);
+        
+        Route::get('loans', [LoanController::class, 'index']);
     });
 
     Route::apiResource('books', BookController::class)->only(['index', 'show']);
 
     Route::apiResource('categories', CategoryController::class)->only('index');
 
-    Route::get('loans', [LoanController::class, 'index']);
     Route::post('loans', [LoanController::class, 'store']);
+    Route::get('loans/{loan}', [LoanController::class, 'show']);
+    Route::get('my-loans', [LoanController::class, 'getLoanByUser']);
 
     Route::post('loans/{loan}/return', [BookReturnController::class, 'store']);
 

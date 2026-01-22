@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Sidebar,
@@ -15,12 +16,14 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
+import BookeraLogo from "@/assets/logo/bookera-logo.png";
+import { LogOut, Settings, User, Book, HomeIcon } from "lucide-react";
 
 const menus = [
-  { title: "Dashboard", href: "/admin" },
-  { title: "Books", href: "/admin/books" },
-  { title: "Users", href: "/admin/users" },
-  { title: "Loans", href: "/admin/loans" },
+  { title: "Dashboard", href: "/admin", icon: HomeIcon },
+  { title: "Books", href: "/admin/books", icon: Book },
+  { title: "Users", href: "/admin/users", icon: User },
+  { title: "Loans", href: "/admin/loans", icon: Settings },
 ];
 
 export function AdminSidebar() {
@@ -29,10 +32,25 @@ export function AdminSidebar() {
   const { user, logout } = useAuthStore();
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar variant="floating" collapsible="icon" className="p-4">
       {/* HEADER */}
       <SidebarHeader>
-        <div className="px-2 text-lg font-bold">Admin Panel</div>
+        <Link href="/admin" className="flex items-center space-x-2">
+          <Image
+            src={BookeraLogo}
+            alt="Bookera Logo"
+            width={32}
+            height={32}
+            className="h-15 w-15 object-cover"
+          />
+          <div>
+            <span className="font-bold">Bookera</span>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-green-500"></div>
+              <span className="text-xs font-bold">Admin</span>
+            </div>
+          </div>
+        </Link>
       </SidebarHeader>
 
       {/* MENU */}
@@ -41,7 +59,11 @@ export function AdminSidebar() {
           {menus.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton asChild isActive={pathname === item.href}>
-                <Link href={item.href}>{item.title}</Link>
+                <Link href={item.href}>
+                  {" "}
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.title}
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
@@ -64,7 +86,7 @@ export function AdminSidebar() {
         </div>
 
         <Button
-          variant="outline"
+          variant="destructive"
           size="sm"
           className="mx-2 mb-2"
           onClick={() => {
@@ -72,6 +94,7 @@ export function AdminSidebar() {
             router.push("/");
           }}
         >
+          <LogOut className="mr-2 h-4 w-4" />
           Logout
         </Button>
       </SidebarFooter>

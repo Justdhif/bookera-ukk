@@ -47,4 +47,21 @@ class LoanController extends Controller
             return $loan->load('details.bookCopy.book');
         });
     }
+
+    public function show(Loan $loan)
+    {
+        return $loan->load('details.bookCopy.book','user');
+    }
+
+    public function getLoanByUser(Request $request)
+    {
+        $user = $request->user();
+
+        $loans = Loan::with('details.bookCopy.book')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
+        return $loans;
+    }
 }
