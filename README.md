@@ -1,6 +1,6 @@
-# 📚 Bookera - Modern Library Management System
-
 <div align="center">
+
+# 📚 Bookera - Modern Library Management System
 
 ![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=flat-square&logo=laravel&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js&logoColor=white)
