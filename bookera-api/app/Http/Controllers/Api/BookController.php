@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ApiResponse;
 use App\Models\Book;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,14 @@ class BookController extends Controller
 {
     public function index()
     {
-        return Book::with(['categories', 'copies'])->latest()->get();
+        $books = Book::with(['categories', 'copies'])
+            ->latest()
+            ->get();
+
+        return ApiResponse::successResponse(
+            'Data buku berhasil diambil',
+            $books
+        );
     }
 
     public function store(Request $request)
@@ -22,7 +30,8 @@ class BookController extends Controller
             'publication_year' => 'nullable|integer',
             'isbn' => 'nullable|string|unique:books,isbn',
             'description' => 'nullable|string',
-            'category_ids' => 'array'
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'integer|exists:categories,id',
         ]);
 
         $book = Book::create($data);
@@ -31,12 +40,23 @@ class BookController extends Controller
             $book->categories()->sync($data['category_ids']);
         }
 
-        return response()->json($book->load('categories'), 201);
+        $book->load(['categories', 'copies']);
+
+        return ApiResponse::successResponse(
+            'Buku berhasil ditambahkan',
+            $book,
+            201
+        );
     }
 
     public function show(Book $book)
     {
-        return $book->load(['categories', 'copies']);
+        $book->load(['categories', 'copies']);
+
+        return ApiResponse::successResponse(
+            'Detail buku',
+            $book
+        );
     }
 
     public function update(Request $request, Book $book)
@@ -48,21 +68,31 @@ class BookController extends Controller
             'publication_year' => 'nullable|integer',
             'isbn' => 'nullable|string|unique:books,isbn,' . $book->id,
             'description' => 'nullable|string',
-            'category_ids' => 'array'
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'integer|exists:categories,id',
         ]);
 
         $book->update($data);
 
-        if (isset($data['category_ids'])) {
+        if (array_key_exists('category_ids', $data)) {
             $book->categories()->sync($data['category_ids']);
         }
 
-        return $book->load('categories');
+        $book->load(['categories', 'copies']);
+
+        return ApiResponse::successResponse(
+            'Buku berhasil diperbarui',
+            $book
+        );
     }
 
     public function destroy(Book $book)
     {
         $book->delete();
-        return response()->json(['message' => 'Book deleted']);
+
+        return ApiResponse::successResponse(
+            'Buku berhasil dihapus',
+            null
+        );
     }
 }

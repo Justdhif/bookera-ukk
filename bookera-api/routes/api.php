@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\BookCopyController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\BookReturnController;
 
 /*
@@ -41,7 +42,14 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:admin')->prefix('admin')->group(function () {
-        
+
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/totals', [DashboardController::class, 'totals']);
+            Route::get('/loan-monthly-chart', [DashboardController::class, 'loanMonthlyChart']);
+            Route::get('/loan-status-chart', [DashboardController::class, 'loanStatusChart']);
+            Route::get('/latest', [DashboardController::class, 'latest']);
+        });
+
         Route::apiResource('/students', StudentController::class);
         Route::apiResource('/teachers', TeacherController::class);
         Route::apiResource('/staffs', StaffController::class);
@@ -52,7 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('books/{book}/copies', [BookCopyController::class, 'store']);
         Route::delete('book-copies/{bookCopy}', [BookCopyController::class, 'destroy']);
-        
+
         Route::get('loans', [LoanController::class, 'index']);
     });
 
@@ -65,5 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('my-loans', [LoanController::class, 'getLoanByUser']);
 
     Route::post('loans/{loan}/return', [BookReturnController::class, 'store']);
+    Route::get('loans/{loan}/returns', [BookReturnController::class, 'index']);
+    Route::get('book-returns/{bookReturn}', [BookReturnController::class, 'show']);
 
 });

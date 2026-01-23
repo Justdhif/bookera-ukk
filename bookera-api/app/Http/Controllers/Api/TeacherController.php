@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ApiResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,74 +13,136 @@ class TeacherController extends Controller
 {
     public function index()
     {
-        return User::with(['profile', 'teacherDetail'])
+        $teachers = User::with(['profile', 'teacherDetail'])
             ->where('role', 'teacher')
+            ->latest()
             ->get();
+
+        return ApiResponse::successResponse(
+            'Data guru berhasil diambil',
+            $teachers
+        );
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'full_name' => 'required',
-            'employee_number' => 'required|unique:teacher_details,employee_number',
+
+            'full_name' => 'required|string',
+            'gender' => 'nullable|string',
+            'phone_number' => 'nullable|string',
+            'address' => 'nullable|string',
+
+            'employee_number' => 'required|string|unique:teacher_details,employee_number',
+            'subject' => 'nullable|string',
         ]);
 
-        return DB::transaction(function () use ($request) {
+        $teacher = DB::transaction(function () use ($data) {
+
             $user = User::create([
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
                 'role' => 'teacher',
+                'is_active' => true,
             ]);
 
             $user->profile()->create([
-                'full_name' => $request->full_name,
-                'gender' => $request->gender,
-                'phone_number' => $request->phone_number,
-                'address' => $request->address,
+                'full_name' => $data['full_name'],
+                'gender' => $data['gender'] ?? null,
+                'phone_number' => $data['phone_number'] ?? null,
+                'address' => $data['address'] ?? null,
             ]);
 
             $user->teacherDetail()->create([
-                'employee_number' => $request->employee_number,
-                'subject' => $request->subject,
+                'employee_number' => $data['employee_number'],
+                'subject' => $data['subject'] ?? null,
             ]);
 
-            return response()->json($user->load(['profile', 'teacherDetail']), 201);
+            $user->load(['profile', 'teacherDetail']);
+
+            return $user;
         });
+
+        return ApiResponse::successResponse(
+            'Guru berhasil ditambahkan',
+            $teacher,
+            201
+        );
     }
 
     public function show($id)
     {
-        return User::with(['profile', 'teacherDetail'])
+        $teacher = User::with(['profile', 'teacherDetail'])
             ->where('role', 'teacher')
             ->findOrFail($id);
+
+        return ApiResponse::successResponse(
+            'Detail guru',
+            $teacher
+        );
     }
 
     public function update(Request $request, $id)
     {
-        $user = User::where('role', 'teacher')->findOrFail($id);
+        $teacher = User::where('role', 'teacher')->findOrFail($id);
 
-        return DB::transaction(function () use ($request, $user) {
-            $user->profile->update($request->only([
-                'full_name',
-                'gender',
-                'phone_number',
-                'address'
-            ]));
+        $data = $request->validate([
+            'password' => 'nullable|min:6',
 
-            $user->teacherDetail->update($request->only([
-                'employee_number',
-                'subject'
-            ]));
+            'full_name' => 'required|string',
+            'gender' => 'nullable|string',
+            'phone_number' => 'nullable|string',
+            'address' => 'nullable|string',
 
-            return response()->json($user->load(['profile', 'teacherDetail']));
+            'employee_number' => 'required|string|unique:teacher_details,employee_number,' . $teacher->teacherDetail->id,
+            'subject' => 'nullable|string',
+        ]);
+
+        $updatedTeacher = DB::transaction(function () use ($teacher, $data) {
+
+            if (!empty($data['password'])) {
+                $teacher->update([
+                    'password' => Hash::make($data['password']),
+                ]);
+            }
+
+            $teacher->profile->update([
+                'full_name' => $data['full_name'],
+                'gender' => $data['gender'] ?? null,
+                'phone_number' => $data['phone_number'] ?? null,
+                'address' => $data['address'] ?? null,
+            ]);
+
+            $teacher->teacherDetail->update([
+                'employee_number' => $data['employee_number'],
+                'subject' => $data['subject'] ?? null,
+            ]);
+
+            $teacher->load(['profile', 'teacherDetail']);
+
+            return $teacher;
         });
+
+        return ApiResponse::successResponse(
+            'Data guru berhasil diperbarui',
+            $updatedTeacher
+        );
     }
 
     public function destroy($id)
     {
-        User::where('role', 'teacher')->findOrFail($id)->delete();
-        return response()->json(['message' => 'Teacher deleted']);
+        $teacher = User::where('role', 'teacher')->findOrFail($id);
+        $deletedTeacherId = $teacher->id;
+
+        $teacher->delete();
+
+        return ApiResponse::successResponse(
+            'Guru berhasil dihapus',
+            [
+                'deleted_teacher_id' => $deletedTeacherId
+            ]
+        );
     }
 }

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -20,15 +20,19 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
+            return ApiResponse::unauthorizedResponse(
+                'Email atau password salah',
+                null,
+                401
+            );
         }
 
         if (!$user->is_active) {
-            return response()->json([
-                'message' => 'Account is inactive'
-            ], 403);
+            return ApiResponse::forbiddenResponse(
+                'Akun tidak aktif',
+                null,
+                403
+            );
         }
 
         $token = $user->createToken('api-token')->plainTextToken;
@@ -37,35 +41,46 @@ class AuthController extends Controller
             'last_login_at' => now()
         ]);
 
-        return response()->json([
-            'token' => $token,
-            'user' => $user->load([
-                'profile',
-                'studentDetail',
-                'teacherDetail',
-                'staffDetail'
-            ])
+        $user->load([
+            'profile',
+            'studentDetail',
+            'teacherDetail',
+            'staffDetail'
         ]);
+
+        return ApiResponse::successResponse(
+            'Login berhasil',
+            [
+                'token' => $token,
+                'user' => $user
+            ]
+        );
     }
-    
+
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'message' => 'Logged out successfully'
-        ]);
+        return ApiResponse::successResponse(
+            'Logout berhasil',
+            null
+        );
     }
 
     public function me(Request $request)
     {
-        return response()->json([
-            'user' => $request->user()->load([
-                'profile',
-                'studentDetail',
-                'teacherDetail',
-                'staffDetail'
-            ])
+        $user = $request->user()->load([
+            'profile',
+            'studentDetail',
+            'teacherDetail',
+            'staffDetail'
         ]);
+
+        return ApiResponse::successResponse(
+            'Data user',
+            [
+                'user' => $user
+            ]
+        );
     }
 }

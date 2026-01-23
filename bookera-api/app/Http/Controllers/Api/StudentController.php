@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ApiResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,89 +13,144 @@ class StudentController extends Controller
 {
     public function index()
     {
-        return User::with(['profile', 'studentDetail'])
+        $students = User::with(['profile', 'studentDetail'])
             ->where('role', 'student')
+            ->latest()
             ->get();
+
+        return ApiResponse::successResponse(
+            'Data siswa berhasil diambil',
+            $students
+        );
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'full_name' => 'required',
-            'student_number' => 'required|unique:student_details,student_number',
-            'class' => 'required',
+
+            'full_name' => 'required|string',
+            'gender' => 'nullable|string',
+            'phone_number' => 'nullable|string',
+            'address' => 'nullable|string',
+
+            'student_number' => 'required|string|unique:student_details,student_number',
+            'class' => 'required|string',
+            'major' => 'nullable|string',
+            'enrollment_year' => 'nullable|integer',
         ]);
 
-        return DB::transaction(function () use ($request) {
+        $student = DB::transaction(function () use ($data) {
+
             $user = User::create([
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
                 'role' => 'student',
                 'is_active' => true,
             ]);
 
             $user->profile()->create([
-                'full_name' => $request->full_name,
-                'gender' => $request->gender,
-                'phone_number' => $request->phone_number,
-                'address' => $request->address,
+                'full_name' => $data['full_name'],
+                'gender' => $data['gender'] ?? null,
+                'phone_number' => $data['phone_number'] ?? null,
+                'address' => $data['address'] ?? null,
             ]);
 
             $user->studentDetail()->create([
-                'student_number' => $request->student_number,
-                'class' => $request->class,
-                'major' => $request->major,
-                'enrollment_year' => $request->enrollment_year,
+                'student_number' => $data['student_number'],
+                'class' => $data['class'],
+                'major' => $data['major'] ?? null,
+                'enrollment_year' => $data['enrollment_year'] ?? null,
             ]);
 
-            return response()->json($user->load(['profile', 'studentDetail']), 201);
+            $user->load(['profile', 'studentDetail']);
+
+            return $user;
         });
+
+        return ApiResponse::successResponse(
+            'Siswa berhasil ditambahkan',
+            $student,
+            201
+        );
     }
 
     public function show($id)
     {
-        return User::with(['profile', 'studentDetail'])
+        $student = User::with(['profile', 'studentDetail'])
             ->where('role', 'student')
             ->findOrFail($id);
+
+        return ApiResponse::successResponse(
+            'Detail siswa',
+            $student
+        );
     }
 
     public function update(Request $request, $id)
     {
-        $user = User::where('role', 'student')->findOrFail($id);
+        $student = User::where('role', 'student')->findOrFail($id);
 
-        return DB::transaction(function () use ($request, $user) {
+        $data = $request->validate([
+            'password' => 'nullable|min:6',
 
-            if ($request->filled('password')) {
-                $user->update([
-                    'password' => Hash::make($request->password),
+            'full_name' => 'required|string',
+            'gender' => 'nullable|string',
+            'phone_number' => 'nullable|string',
+            'address' => 'nullable|string',
+
+            'student_number' => 'required|string|unique:student_details,student_number,' . $student->studentDetail->id,
+            'class' => 'required|string',
+            'major' => 'nullable|string',
+            'enrollment_year' => 'nullable|integer',
+        ]);
+
+        $updatedStudent = DB::transaction(function () use ($student, $data) {
+
+            if (!empty($data['password'])) {
+                $student->update([
+                    'password' => Hash::make($data['password']),
                 ]);
             }
 
-            $user->profile->update($request->only([
-                'full_name',
-                'gender',
-                'phone_number',
-                'address'
-            ]));
+            $student->profile->update([
+                'full_name' => $data['full_name'],
+                'gender' => $data['gender'] ?? null,
+                'phone_number' => $data['phone_number'] ?? null,
+                'address' => $data['address'] ?? null,
+            ]);
 
-            $user->studentDetail->update($request->only([
-                'student_number',
-                'class',
-                'major',
-                'enrollment_year'
-            ]));
+            $student->studentDetail->update([
+                'student_number' => $data['student_number'],
+                'class' => $data['class'],
+                'major' => $data['major'] ?? null,
+                'enrollment_year' => $data['enrollment_year'] ?? null,
+            ]);
 
-            return response()->json($user->load(['profile', 'studentDetail']));
+            $student->load(['profile', 'studentDetail']);
+
+            return $student;
         });
+
+        return ApiResponse::successResponse(
+            'Data siswa berhasil diperbarui',
+            $updatedStudent
+        );
     }
 
     public function destroy($id)
     {
-        $user = User::where('role', 'student')->findOrFail($id);
-        $user->delete();
+        $student = User::where('role', 'student')->findOrFail($id);
+        $deletedStudentId = $student->id;
 
-        return response()->json(['message' => 'Student deleted']);
+        $student->delete();
+
+        return ApiResponse::successResponse(
+            'Siswa berhasil dihapus',
+            [
+                'deleted_student_id' => $deletedStudentId
+            ]
+        );
     }
-}   
+}

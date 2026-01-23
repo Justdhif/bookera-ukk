@@ -21,12 +21,12 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      await login(email, password);
+      const message = await login(email, password);
 
-      toast.success("Login berhasil");
+      toast.success(message || "Login berhasil");
 
-      const role = getCookie('role');
-      router.push(role ? "/admin" : "/");
+      const role = getCookie("role");
+      router.push(role === "admin" ? "/admin" : "/");
     } catch (err: any) {
       toast.error(err.response?.data?.message ?? "Login gagal");
     }

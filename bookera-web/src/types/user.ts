@@ -14,9 +14,11 @@ export interface User {
   email: string;
   role: "admin" | "student" | "teacher" | "staff";
   is_active: boolean;
-  last_login_at: string;
+  last_login_at: string | null;
+
   profile: UserProfile;
-  student_detail: any;
-  teacher_detail: any;
-  staff_detail: any;
+
+  student_detail?: any;
+  teacher_detail?: any;
+  staff_detail?: any;
 }
