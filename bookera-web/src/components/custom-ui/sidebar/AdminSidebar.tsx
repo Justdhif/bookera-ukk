@@ -16,7 +16,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
-import BookeraLogo from "@/assets/logo/bookera-logo.png";
+import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import { LogOut, Settings, User, Book, HomeIcon } from "lucide-react";
 
 const menus = [
