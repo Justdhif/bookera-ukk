@@ -6,9 +6,26 @@ import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { getCookie } from "cookies-next";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  ArrowRight,
+  ShieldCheck,
+  BookOpen,
+  GraduationCap,
+  Users,
+  Globe,
+} from "lucide-react";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import Image from "next/image";
 
@@ -37,88 +54,185 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-primary/5 to-gray-50 p-4">
-      <Card className="w-full max-w-md shadow-lg border-0">
-        <CardHeader className="space-y-2 text-center">
-          <div className="mx-auto flex items-center justify-center rounded-full bg-brand-primary/10">
-            <Image src={BookeraLogo} alt="Bookera Logo" className="w-36" />
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-brand-primary/10 via-white to-brand-primary-light/5">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-brand-primary/5 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-brand-primary-dark/5 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative w-full max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-12">
+        {/* Left side - Brand showcase untuk Perpustakaan Digital */}
+        <div className="w-full lg:w-1/2 text-center lg:text-left space-y-8">
+          <div className="flex flex-col items-center lg:items-start space-y-4">
+            <div className="relative">
+              <Image
+                src={BookeraLogo}
+                alt="Bookera Logo"
+                className="w-48 lg:w-56 brightness-0 invert-[0.1]"
+                priority
+              />
+            </div>
+            <div className="space-y-3">
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                Perpustakaan Digital
+                <span className="block text-brand-primary">Sekolah Modern</span>
+              </h1>
+              <p className="text-gray-600 text-lg max-w-md">
+                Akses ribuan buku digital, materi pembelajaran, dan sumber
+                edukasi dari mana saja. Platform terintegrasi untuk siswa, guru,
+                dan staf sekolah.
+              </p>
+            </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900">
-            Selamat Datang
-          </CardTitle>
-          <p className="text-sm text-gray-500">
-            Masuk ke akun Anda untuk melanjutkan
-          </p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+
+          {/* Features list untuk pendidikan */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto lg:mx-0">
+            <div className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-brand-primary" />
+              </div>
+              <span className="text-sm font-medium text-gray-700">
+                Ribuan Buku Digital
+              </span>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
+                <GraduationCap className="w-4 h-4 text-brand-primary" />
+              </div>
+              <span className="text-sm font-medium text-gray-700">
+                Materi Pembelajaran
+              </span>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
+                <Users className="w-4 h-4 text-brand-primary" />
+              </div>
+              <span className="text-sm font-medium text-gray-700">
+                Kolaborasi Siswa
+              </span>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
+                <Globe className="w-4 h-4 text-brand-primary" />
+              </div>
+              <span className="text-sm font-medium text-gray-700">
+                Akses 24/7
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right side - Login Form */}
+        <Card className="w-full max-w-md border-0 shadow-2xl backdrop-blur-sm bg-white/95">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-1.5 bg-gradient-to-r from-brand-primary to-brand-primary-light rounded-full"></div>
+
+          <CardHeader className="space-y-4 text-center pb-6">
+            <div className="flex items-center justify-center gap-2">
+              <GraduationCap className="w-6 h-6 text-brand-primary" />
+              <CardTitle className="text-2xl font-bold text-gray-900">
+                Akses Akun Bookera
+              </CardTitle>
+            </div>
+            <CardDescription className="text-gray-600">
+              Login menggunakan akun sekolah Anda
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-6">
+              {/* Email Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  Email Sekolah
+                </label>
                 <Input
-                  placeholder="nama@email.com"
+                  placeholder="nisn@sekolah.sch.id"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="pl-10"
+                  className="h-12 px-4 transition-all duration-200 border-gray-300 hover:border-brand-primary/50 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
                   disabled={loading}
                 />
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="text-sm font-medium text-gray-700">
+              {/* Password Input */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Lock className="w-4 h-4" />
                   Password
                 </label>
+                <div className="relative">
+                  <Input
+                    placeholder="••••••••"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="h-12 px-4 pr-12 transition-all duration-200 border-gray-300 hover:border-brand-primary/50 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-primary transition-colors"
+                    disabled={loading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember me & Forgot password */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="remember"
+                    className="w-4 h-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary/50"
+                    disabled={loading}
+                  />
+                  <label htmlFor="remember" className="text-sm text-gray-600">
+                    Ingat perangkat ini
+                  </label>
+                </div>
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-xs text-brand-primary hover:text-brand-primary-dark"
-                >
-                  {showPassword ? "Sembunyikan" : "Tampilkan"}
-                </button>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <Input
-                  placeholder="••••••••"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="pl-10 pr-10"
+                  onClick={() => router.push("/forgot-password")}
+                  className="text-sm font-medium text-brand-primary hover:text-brand-primary-dark transition-colors"
                   disabled={loading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  Lupa password?
                 </button>
               </div>
-            </div>
 
-            <Button
-              type="submit"
-              variant="submit"
-              loading={loading}
-              className="w-full h-11 text-base font-medium"
-              spinnerClassName="text-white"
-            >
-              {loading ? "Memproses..." : "Masuk"}
-            </Button>
-
-          </form>
-        </CardContent>
-      </Card>
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                variant="submit"
+                loading={loading}
+                className="w-full h-12 text-base font-semibold rounded-lg bg-gradient-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
+                spinnerClassName="text-white"
+              >
+                {loading ? (
+                  "Mengakses..."
+                ) : (
+                  <>
+                    Masuk ke Perpustakaan
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
