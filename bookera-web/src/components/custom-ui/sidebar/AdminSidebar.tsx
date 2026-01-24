@@ -54,7 +54,7 @@ export function AdminSidebar() {
       </SidebarHeader>
 
       {/* MENU */}
-      <SidebarContent>
+      <SidebarContent className="p-2">
         <SidebarMenu>
           {menus.map((item) => (
             <SidebarMenuItem key={item.href}>

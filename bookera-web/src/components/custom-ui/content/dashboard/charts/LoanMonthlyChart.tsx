@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { LoanMonthly } from "@/types/dashboard";
 
 const MONTH_LABEL: Record<number, string> = {
@@ -37,15 +38,38 @@ export default function LoanMonthlyChart({ data }: { data: LoanMonthly[] }) {
   return (
     <Card>
       <CardHeader>Peminjaman Bulanan</CardHeader>
-      <CardContent className="h-[300px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="total" strokeWidth={2} />
-          </LineChart>
-        </ResponsiveContainer>
+
+      <CardContent>
+        <Tabs defaultValue="line" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="line">Line</TabsTrigger>
+            <TabsTrigger value="bar">Bar</TabsTrigger>
+          </TabsList>
+
+          {/* LINE */}
+          <TabsContent value="line" className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="total" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </TabsContent>
+
+          {/* BAR */}
+          <TabsContent value="bar" className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="total" />
+              </BarChart>
+            </ResponsiveContainer>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
