@@ -506,7 +506,11 @@ function SidebarMenuButton({
 }: React.ComponentProps<"button"> & {
   asChild?: boolean;
   isActive?: boolean;
-  tooltip?: string | React.ComponentProps<typeof TooltipContent>;
+  tooltip?:
+    | string
+    | (React.ComponentProps<typeof TooltipContent> & {
+        content?: string;
+      });
 } & VariantProps<typeof sidebarMenuButtonVariants>) {
   const Comp = asChild ? Slot : "button";
   const { isMobile, state } = useSidebar();
@@ -526,11 +530,28 @@ function SidebarMenuButton({
     return button;
   }
 
+  // Jika tooltip adalah string
   if (typeof tooltip === "string") {
-    tooltip = {
-      children: tooltip,
-    };
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipContent
+          side="right"
+          align="center"
+          hidden={state !== "collapsed" || isMobile}
+          gradient="from-emerald-600 to-teal-600"
+        >
+          {tooltip}
+        </TooltipContent>
+      </Tooltip>
+    );
   }
+
+  const {
+    content,
+    gradient = "from-emerald-600 to-teal-600",
+    ...tooltipProps
+  } = tooltip;
 
   return (
     <Tooltip>
@@ -539,8 +560,11 @@ function SidebarMenuButton({
         side="right"
         align="center"
         hidden={state !== "collapsed" || isMobile}
-        {...tooltip}
-      />
+        gradient={gradient}
+        {...tooltipProps}
+      >
+        {content || tooltipProps.children}
+      </TooltipContent>
     </Tooltip>
   );
 }

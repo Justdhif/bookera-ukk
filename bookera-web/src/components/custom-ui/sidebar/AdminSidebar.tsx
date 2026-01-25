@@ -168,7 +168,11 @@ export function AdminSidebar() {
                         <SidebarMenuButton
                           isActive={isActive}
                           onClick={() => handleNavigation(item.href)}
-                          tooltip={item.title}
+                          tooltip={{
+                            content: item.title,
+                            gradient: item.gradient,
+                            className: "font-medium",
+                          }}
                           className={`group/item ${!open && "justify-center px-0 mx-auto"}`}
                         >
                           <div
@@ -205,7 +209,11 @@ export function AdminSidebar() {
             <SidebarMenuButton
               onClick={() => handleNavigation("/admin/settings")}
               isActive={pathname === "/admin/settings"}
-              tooltip="Settings"
+              tooltip={{
+                content: "Settings",
+                gradient: "from-slate-600 to-gray-600",
+                className: "font-medium",
+              }}
               className={`group/settings ${!open && "justify-center px-0 mx-auto"}`}
             >
               <div
@@ -228,7 +236,11 @@ export function AdminSidebar() {
               className={`group/logout hover:bg-gradient-to-r hover:from-red-50 hover:to-rose-50 dark:hover:from-red-950/20 dark:hover:to-rose-950/20 transition-all ${
                 !open && "justify-center px-0 mx-auto"
               }`}
-              tooltip="Logout"
+              tooltip={{
+                content: "Logout",
+                gradient: "from-red-600 to-rose-600",
+                className: "font-medium",
+              }}
             >
               <div
                 className={`${
@@ -277,7 +289,11 @@ export function AdminSidebar() {
                 className={`h-auto py-3 hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-teal-50/50 dark:hover:from-emerald-950/20 dark:hover:to-teal-950/20 transition-all group/profile rounded-xl ${
                   !open && "justify-center"
                 }`}
-                tooltip={user?.profile?.full_name || user?.email}
+                tooltip={{
+                  content: user?.profile?.full_name || user?.email || "Profile",
+                  gradient: "from-emerald-600 to-teal-600",
+                  className: "font-medium truncate max-w-[200px]",
+                }}
               >
                 <div
                   className={`flex items-center w-full ${open ? "gap-3" : "justify-center"}`}
