@@ -27,6 +27,7 @@ export default function CategoryFormDialog({
 }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setName(category?.name ?? "");
@@ -34,6 +35,7 @@ export default function CategoryFormDialog({
   }, [category]);
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     try {
       if (category) {
         await categoryService.update(category.id, {
@@ -51,6 +53,7 @@ export default function CategoryFormDialog({
 
       setOpen(false);
       onSuccess();
+      setIsLoading(false);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Terjadi kesalahan");
     }
@@ -78,7 +81,20 @@ export default function CategoryFormDialog({
             onChange={(e) => setDescription(e.target.value)}
           />
 
-          <Button onClick={handleSubmit}>Simpan</Button>
+          <Button
+            onClick={handleSubmit}
+            variant="submit"
+            disabled={isLoading}
+            loading={isLoading}
+          >
+            {isLoading
+              ? category
+                ? "Menyimpan..."
+                : "Menambahkan..."
+              : category
+                ? "Simpan"
+                : "Tambah"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

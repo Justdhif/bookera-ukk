@@ -43,7 +43,9 @@ export default function CategoryTable({
       <TableHeader>
         <TableRow>
           <TableHead>No</TableHead>
+          <TableHead>Slug</TableHead>
           <TableHead>Nama</TableHead>
+          <TableHead>Deskripsi</TableHead>
           <TableHead className="text-right">Aksi</TableHead>
         </TableRow>
       </TableHeader>
@@ -52,7 +54,9 @@ export default function CategoryTable({
         {data.map((item, index) => (
           <TableRow key={item.id}>
             <TableCell>{index + 1}</TableCell>
+            <TableCell>{item.slug}</TableCell>
             <TableCell>{item.name}</TableCell>
+            <TableCell>{item.description || "-"}</TableCell>
             <TableCell className="text-right space-x-2">
               <Button size="sm" variant="outline" onClick={() => onEdit(item)}>
                 Edit

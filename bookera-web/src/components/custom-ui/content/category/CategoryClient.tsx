@@ -51,6 +51,7 @@ export default function CategoryClient() {
             setEditing(null);
             setOpen(true);
           }}
+          variant="brand"
         >
           Tambah Kategori
         </Button>
