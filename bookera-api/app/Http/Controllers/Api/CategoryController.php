@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Helpers\ApiResponse;
+use App\Helpers\SlugGenerator;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
@@ -23,7 +24,10 @@ class CategoryController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|unique:categories,name',
+            'description' => 'nullable|string',
         ]);
+
+        $data['slug'] = SlugGenerator::generate('categories', 'name', $data['name']);
 
         $category = Category::create($data);
 
@@ -38,7 +42,10 @@ class CategoryController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|unique:categories,name,' . $category->id,
+            'description' => 'nullable|string',
         ]);
+
+        $data['slug'] = SlugGenerator::generate('categories', 'name', $data['name']);
 
         $category->update($data);
 
