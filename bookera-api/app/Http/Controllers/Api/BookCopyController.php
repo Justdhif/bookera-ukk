@@ -14,6 +14,7 @@ class BookCopyController extends Controller
     {
         $data = $request->validate([
             'copy_code' => 'required|string|unique:book_copies,copy_code',
+            'status' => 'nullable|string|default:available',
         ]);
 
         $copy = $book->copies()->create($data);

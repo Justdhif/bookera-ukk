@@ -24,7 +24,7 @@ import {
   LogOut,
   Settings,
   User,
-  Book,
+  BookOpen,
   HomeIcon,
   Folder,
   Crown,
@@ -56,7 +56,7 @@ const menuGroups = [
       {
         title: "Books",
         href: "/admin/books",
-        icon: Book,
+        icon: BookOpen,
         gradient: "from-orange-500 to-red-500",
       },
     ],

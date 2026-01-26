@@ -54,7 +54,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('/teachers', TeacherController::class);
         Route::apiResource('/staffs', StaffController::class);
 
-        Route::apiResource('books', BookController::class)->except(['index', 'show']);
+        Route::post('books', [BookController::class, 'store']);
+        Route::put('books/{book}', [BookController::class, 'update']);
+        Route::delete('books/{book}', [BookController::class, 'destroy']);
 
         Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
 
@@ -64,7 +66,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('loans', [LoanController::class, 'index']);
     });
 
-    Route::apiResource('books', BookController::class)->only(['index', 'show']);
+    Route::get('books', [BookController::class, 'index']);
+    Route::get('books/{id}', [BookController::class, 'show']);
 
     Route::apiResource('categories', CategoryController::class)->only('index');
 
