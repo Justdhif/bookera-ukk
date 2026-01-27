@@ -1,4 +1,4 @@
-import BookDetailClient from "@/components/custom-ui/content/book/BookDetailClient";
+import BookDetailClient from "@/components/custom-ui/content/public/book-detail/BookDetailClient";
 
 export default async function BookDetailPage({
   params,

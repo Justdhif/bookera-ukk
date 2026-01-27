@@ -14,7 +14,7 @@ class LoanController extends Controller
     public function index()
     {
         $loans = Loan::with([
-            'details.bookCopy.book',
+            'loanDetails.bookCopy.book',
             'user'
         ])
             ->latest()
@@ -50,7 +50,7 @@ class LoanController extends Controller
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                $loan->details()->create([
+                $loan->loanDetails()->create([
                     'book_copy_id' => $copy->id,
                 ]);
 
@@ -60,7 +60,7 @@ class LoanController extends Controller
             }
 
             $loan->load([
-                'details.bookCopy.book',
+                'loanDetails.bookCopy.book',
                 'user',
             ]);
 
@@ -77,7 +77,7 @@ class LoanController extends Controller
     public function show(Loan $loan)
     {
         $loan->load([
-            'details.bookCopy.book',
+            'loanDetails.bookCopy.book',
             'user',
         ]);
 
@@ -87,12 +87,56 @@ class LoanController extends Controller
         );
     }
 
+    public function update(Request $request, Loan $loan)
+    {
+        $data = $request->validate([
+            'book_copy_ids' => 'array|min:1',
+            'book_copy_ids.*' => 'integer|exists:book_copies,id',
+            'due_date' => 'date|after_or_equal:today',
+        ]);
+
+        $loan = DB::transaction(function () use ($loan, $data) {
+
+            $loan->update([
+                'due_date' => $data['due_date'],
+            ]);
+
+            foreach ($data['book_copy_ids'] as $copyId) {
+
+                $copy = BookCopy::where('id', $copyId)
+                    ->where('status', 'available')
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $loan->loanDetails()->create([
+                    'book_copy_id' => $copy->id,
+                ]);
+
+                $copy->update([
+                    'status' => 'borrowed',
+                ]);
+            }
+
+            $loan->load([
+                'loanDetails.bookCopy.book',
+                'user',
+            ]);
+
+            return $loan;
+        });
+
+        return ApiResponse::successResponse(
+            'Peminjaman berhasil diupdate',
+            $loan
+        );
+    }
+
     public function getLoanByUser(Request $request)
     {
         $user = $request->user();
 
         $loans = Loan::with([
-            'details.bookCopy.book',
+            'loanDetails.bookCopy.book',
         ])
             ->where('user_id', $user->id)
             ->latest()

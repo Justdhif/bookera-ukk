@@ -1,12 +1,13 @@
-export default function HomePage() {
+import BannerCarousel from "@/components/custom-ui/content/public/BannerCarousel";
+import SpeakerMarquee from "@/components/custom-ui/content/public/SpeakerMarquee";
+import PublicPageClient from "@/components/custom-ui/content/public/PublicPageClient";
+
+export default function PublicPage() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold">
-        Selamat Datang di Web Library
-      </h1>
-      <p className="mt-2 text-muted-foreground">
-        Cari, baca, dan pinjam buku secara online
-      </p>
+    <div className="space-y-8 pb-10">
+      <BannerCarousel />
+      <SpeakerMarquee />
+      <PublicPageClient />
     </div>
-  )
+  );
 }

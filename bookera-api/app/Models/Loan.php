@@ -15,6 +15,11 @@ class Loan extends Model
         'status',
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function loanDetails()
     {
         return $this->hasMany(LoanDetail::class);

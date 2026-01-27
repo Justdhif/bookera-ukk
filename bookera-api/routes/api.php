@@ -66,11 +66,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('loans', [LoanController::class, 'index']);
     });
 
-    Route::get('books', [BookController::class, 'index']);
-    Route::get('books/{id}', [BookController::class, 'show']);
-
-    Route::apiResource('categories', CategoryController::class)->only('index');
-
     Route::post('loans', [LoanController::class, 'store']);
     Route::get('loans/{loan}', [LoanController::class, 'show']);
     Route::get('my-loans', [LoanController::class, 'getLoanByUser']);
@@ -80,3 +75,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('book-returns/{bookReturn}', [BookReturnController::class, 'show']);
 
 });
+
+Route::get('books', [BookController::class, 'index']);
+Route::get('books/{id}', [BookController::class, 'show']);
+
+Route::apiResource('categories', CategoryController::class)->only('index');
