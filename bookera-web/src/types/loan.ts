@@ -19,7 +19,7 @@ export interface Loan {
   status: "borrowed" | "returned" | "overdue";
 
   user?: User;
-  details: LoanDetail[];
+  loan_details: LoanDetail[];
 
   created_at: string;
   updated_at: string;

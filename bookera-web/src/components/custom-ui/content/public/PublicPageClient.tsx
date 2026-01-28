@@ -6,6 +6,7 @@ import CategoryBubble from "./CategoryBubble";
 import BookList from "./BookList";
 import { bookService } from "@/services/book.service";
 import { Book } from "@/types/book";
+import MyLoanHighlight from "./MyLoanHighlight";
 
 export default function PublicPageClient() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -33,6 +34,7 @@ export default function PublicPageClient() {
 
   return (
     <div className="container space-y-6">
+      <MyLoanHighlight />
       <BookSearchBar
         search={search}
         onSearch={setSearch}

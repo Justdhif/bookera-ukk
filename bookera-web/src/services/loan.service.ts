@@ -23,5 +23,5 @@ export const loanService = {
   /**
    * USER - MY LOANS
    */
-  myLoans: () => api.get<ApiResponse<Loan[]>>("/loans/user"),
+  getMyLoans: () => api.get<ApiResponse<Loan[]>>("/my-loans"),
 };
