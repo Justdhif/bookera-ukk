@@ -1,17 +1,15 @@
 "use client";
 
 import {
-  LineChart,
-  Line,
   BarChart,
   Bar,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoanMonthly } from "@/types/dashboard";
 
 const MONTH_LABEL: Record<number, string> = {
@@ -29,47 +27,88 @@ const MONTH_LABEL: Record<number, string> = {
   12: "Des",
 };
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-xl border-2 border-gray-100 dark:border-gray-800">
+        <p className="font-semibold text-gray-900 dark:text-white mb-2">{label}</p>
+        {payload.map((entry: any, index: number) => (
+          <div key={index} className="flex items-center gap-2">
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              Total:
+            </span>
+            <span className="text-sm font-bold text-gray-900 dark:text-white">
+              {entry.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function LoanMonthlyChart({ data }: { data: LoanMonthly[] }) {
-  const chartData = data.map((item) => ({
-    month: MONTH_LABEL[item.month],
-    total: item.total,
-  }));
+  const allMonths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  
+  const chartData = allMonths.map((month) => {
+    const existingData = data.find((item) => item.month === month);
+    return {
+      month: MONTH_LABEL[month],
+      total: existingData ? existingData.total : 0,
+    };
+  });
+
+  const hasData = chartData && chartData.length > 0;
 
   return (
-    <Card>
-      <CardHeader>Peminjaman Bulanan</CardHeader>
+    <Card className="border-0 shadow-lg bg-white dark:bg-gray-900">
+      <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
+        <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <div className="w-1 h-6 bg-gradient-to-b from-emerald-500 to-teal-500 rounded-full" />
+          Peminjaman Bulanan
+        </CardTitle>
+      </CardHeader>
 
-      <CardContent>
-        <Tabs defaultValue="line" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="line">Line</TabsTrigger>
-            <TabsTrigger value="bar">Bar</TabsTrigger>
-          </TabsList>
-
-          {/* LINE */}
-          <TabsContent value="line" className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="total" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </TabsContent>
-
-          {/* BAR */}
-          <TabsContent value="bar" className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="total" />
-              </BarChart>
-            </ResponsiveContainer>
-          </TabsContent>
-        </Tabs>
+      <CardContent className="pt-6">
+        {hasData ? (
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={chartData}>
+              <defs>
+                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#14b8a6" stopOpacity={0.8} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-800" />
+              <XAxis
+                dataKey="month"
+                tick={{ fill: "#6b7280", fontSize: 12 }}
+                axisLine={{ stroke: "#d1d5db" }}
+              />
+              <YAxis
+                tick={{ fill: "#6b7280", fontSize: 12 }}
+                axisLine={{ stroke: "#d1d5db" }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar
+                dataKey="total"
+                fill="url(#barGradient)"
+                radius={[8, 8, 0, 0]}
+                animationBegin={0}
+                animationDuration={800}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[350px] text-muted-foreground">
+            Tidak ada data
+          </div>
+        )}
       </CardContent>
     </Card>
   );

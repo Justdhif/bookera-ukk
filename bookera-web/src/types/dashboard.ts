@@ -15,8 +15,24 @@ export interface LoanStatus {
   total: number;
 }
 
-export interface DashboardLatest {
-  users: any[];
-  books: any[];
-  loans: any[];
+export interface LatestLoan {
+  id: number;
+  user_id: number;
+  loan_date: string;
+  due_date: string;
+  status: string;
+  user?: {
+    id: number;
+    email: string;
+    profile?: {
+      full_name: string;
+    };
+  };
+  loan_details?: {
+    book_copy?: {
+      book?: {
+        title: string;
+      };
+    };
+  }[];
 }

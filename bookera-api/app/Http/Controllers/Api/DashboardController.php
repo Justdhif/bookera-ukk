@@ -83,17 +83,16 @@ class DashboardController extends Controller
     */
     public function latest()
     {
-        $data = [
-            'users' => User::latest()->limit(5)->get(),
-            'books' => Book::latest()->limit(5)->get(),
-            'loans' => Loan::with('user')
-                ->latest()
-                ->limit(5)
-                ->get(),
-        ];
+        $data = Loan::with([
+            'user.profile',
+            'loanDetails.bookCopy.book'
+        ])
+            ->latest()
+            ->limit(5)
+            ->get();
 
         return ApiResponse::successResponse(
-            'Data terbaru dashboard',
+            'Data peminjaman terbaru',
             $data
         );
     }

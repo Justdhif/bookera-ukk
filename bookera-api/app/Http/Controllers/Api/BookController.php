@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
 use App\Helpers\SlugGenerator;
 use App\Models\Book;
@@ -11,9 +12,6 @@ use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
-    /**
-     * LIST BOOKS (WITH FILTER)
-     */
     public function index(Request $request)
     {
         $books = Book::query()
@@ -53,9 +51,6 @@ class BookController extends Controller
         );
     }
 
-    /**
-     * STORE BOOK
-     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -80,7 +75,6 @@ class BookController extends Controller
             $data['title']
         );
 
-        // ✅ HANDLE FILE UPLOAD
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = $request
                 ->file('cover_image')
@@ -96,6 +90,13 @@ class BookController extends Controller
         $book->load(['categories', 'copies']);
         $book->cover_image_url = storage_image($book->cover_image);
 
+        ActivityLogger::log(
+            'create',
+            'book',
+            "Created book: {$book->title}",
+            $book->toArray()
+        );
+
         return ApiResponse::successResponse(
             'Buku berhasil ditambahkan',
             $book,
@@ -103,9 +104,6 @@ class BookController extends Controller
         );
     }
 
-    /**
-     * SHOW BOOK BY ID
-     */
     public function show($id)
     {
         $book = Book::find($id);
@@ -129,9 +127,6 @@ class BookController extends Controller
         );
     }
 
-    /**
-     * UPDATE BOOK
-     */
     public function update(Request $request, Book $book)
     {
         if (!$book) {
@@ -163,7 +158,6 @@ class BookController extends Controller
             );
         }
 
-        // ✅ HANDLE FILE UPDATE
         if ($request->hasFile('cover_image')) {
             if ($book->cover_image) {
                 Storage::disk('public')->delete($book->cover_image);
@@ -174,6 +168,8 @@ class BookController extends Controller
                 ->store('books/covers', 'public');
         }
 
+        $oldData = $book->toArray();
+
         $book->update($data);
 
         if (array_key_exists('category_ids', $data)) {
@@ -183,15 +179,20 @@ class BookController extends Controller
         $book->load(['categories', 'copies']);
         $book->cover_image_url = storage_image($book->cover_image);
 
+        ActivityLogger::log(
+            'update',
+            'book',
+            "Updated book: {$book->title}",
+            $book->toArray(),
+            $oldData
+        );
+
         return ApiResponse::successResponse(
             'Buku berhasil diperbarui',
             $book
         );
     }
 
-    /**
-     * DELETE BOOK
-     */
     public function destroy($id)
     {
         $book = Book::find($id);
@@ -200,7 +201,18 @@ class BookController extends Controller
             return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
         }
 
+        $bookData = $book->toArray();
+        $bookTitle = $book->title;
+
         $book->delete();
+
+        ActivityLogger::log(
+            'delete',
+            'book',
+            "Deleted book: {$bookTitle}",
+            null,
+            $bookData
+        );
 
         return ApiResponse::successResponse(
             'Buku berhasil dihapus',

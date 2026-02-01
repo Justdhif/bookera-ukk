@@ -4,7 +4,7 @@ import {
   DashboardTotals,
   LoanMonthly,
   LoanStatus,
-  DashboardLatest,
+  LatestLoan,
 } from "@/types/dashboard";
 
 export const dashboardService = {
@@ -16,5 +16,6 @@ export const dashboardService = {
   loanStatusChart: () =>
     api.get<ApiResponse<LoanStatus[]>>("/admin/dashboard/loan-status-chart"),
 
-  latest: () => api.get<ApiResponse<DashboardLatest>>("/admin/dashboard/latest"),
+  latestLoans: () =>
+    api.get<ApiResponse<LatestLoan[]>>("/admin/dashboard/latest"),
 };

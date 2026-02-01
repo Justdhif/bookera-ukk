@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -66,6 +67,13 @@ class StudentController extends Controller
 
             $user->load(['profile', 'studentDetail']);
 
+            ActivityLogger::log(
+                'create',
+                'student',
+                "Created student: {$user->profile->full_name} ({$user->email})",
+                $user->toArray()
+            );
+
             return $user;
         });
 
@@ -108,6 +116,11 @@ class StudentController extends Controller
 
         $updatedStudent = DB::transaction(function () use ($student, $data) {
 
+            $oldData = [
+                'profile' => $student->profile->toArray(),
+                'detail' => $student->studentDetail->toArray(),
+            ];
+
             if (!empty($data['password'])) {
                 $student->update([
                     'password' => Hash::make($data['password']),
@@ -130,6 +143,14 @@ class StudentController extends Controller
 
             $student->load(['profile', 'studentDetail']);
 
+            ActivityLogger::log(
+                'update',
+                'student',
+                "Updated student: {$student->profile->full_name} ({$student->email})",
+                $student->toArray(),
+                $oldData
+            );
+
             return $student;
         });
 
@@ -142,9 +163,19 @@ class StudentController extends Controller
     public function destroy($id)
     {
         $student = User::where('role', 'student')->findOrFail($id);
+        $student->load(['profile', 'studentDetail']);
         $deletedStudentId = $student->id;
+        $oldData = $student->toArray();
 
         $student->delete();
+
+        ActivityLogger::log(
+            'delete',
+            'student',
+            "Deleted student: {$oldData['profile']['full_name']} ({$oldData['email']})",
+            null,
+            $oldData
+        );
 
         return ApiResponse::successResponse(
             'Siswa berhasil dihapus',

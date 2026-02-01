@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth:sanctum' => \Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
         ]);
     })
+    ->withProviders([
+        App\Providers\EventServiceProvider::class,
+    ])
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

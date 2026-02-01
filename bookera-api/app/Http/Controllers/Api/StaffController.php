@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -62,6 +63,13 @@ class StaffController extends Controller
 
             $user->load(['profile', 'staffDetail']);
 
+            ActivityLogger::log(
+                'create',
+                'staff',
+                "Created staff: {$user->profile->full_name} ({$user->email})",
+                $user->toArray()
+            );
+
             return $user;
         });
 
@@ -101,6 +109,11 @@ class StaffController extends Controller
 
         $updatedStaff = DB::transaction(function () use ($staff, $data) {
 
+            $oldData = [
+                'profile' => $staff->profile->toArray(),
+                'detail' => $staff->staffDetail->toArray(),
+            ];
+
             $staff->profile->update([
                 'full_name' => $data['full_name'],
                 'gender' => $data['gender'] ?? null,
@@ -116,6 +129,14 @@ class StaffController extends Controller
 
             $staff->load(['profile', 'staffDetail']);
 
+            ActivityLogger::log(
+                'update',
+                'staff',
+                "Updated staff: {$staff->profile->full_name} ({$staff->email})",
+                $staff->toArray(),
+                $oldData
+            );
+
             return $staff;
         });
 
@@ -128,9 +149,19 @@ class StaffController extends Controller
     public function destroy($id)
     {
         $staff = User::where('role', 'staff')->findOrFail($id);
+        $staff->load(['profile', 'staffDetail']);
         $deletedStaffId = $staff->id;
+        $oldData = $staff->toArray();
 
         $staff->delete();
+
+        ActivityLogger::log(
+            'delete',
+            'staff',
+            "Deleted staff: {$oldData['profile']['full_name']} ({$oldData['email']})",
+            null,
+            $oldData
+        );
 
         return ApiResponse::successResponse(
             'Staff berhasil dihapus',

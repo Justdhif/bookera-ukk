@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
 use App\Models\Loan;
 use App\Models\BookCopy;
@@ -43,6 +44,8 @@ class LoanController extends Controller
                 'status' => 'borrowed',
             ]);
 
+            $borrowedCopies = [];
+
             foreach ($data['book_copy_ids'] as $copyId) {
 
                 $copy = BookCopy::where('id', $copyId)
@@ -54,6 +57,12 @@ class LoanController extends Controller
                     'book_copy_id' => $copy->id,
                 ]);
 
+                $borrowedCopies[] = [
+                    'copy_id' => $copy->id,
+                    'book_title' => $copy->book->title ?? 'Unknown',
+                    'old_status' => $copy->status,
+                ];
+
                 $copy->update([
                     'status' => 'borrowed',
                 ]);
@@ -63,6 +72,28 @@ class LoanController extends Controller
                 'loanDetails.bookCopy.book',
                 'user',
             ]);
+
+            ActivityLogger::log(
+                'create',
+                'loan',
+                "Created loan #{$loan->id} for user {$loan->user->email} with " . count($borrowedCopies) . " book(s)",
+                [
+                    'loan_id' => $loan->id,
+                    'user' => $loan->user->email,
+                    'due_date' => $loan->due_date,
+                    'borrowed_copies' => $borrowedCopies,
+                ]
+            );
+
+            foreach ($borrowedCopies as $copInfo) {
+                ActivityLogger::log(
+                    'update',
+                    'book_copy',
+                    "Book copy #{$copInfo['copy_id']} ({$copInfo['book_title']}) status changed from {$copInfo['old_status']} to borrowed",
+                    ['copy_id' => $copInfo['copy_id'], 'new_status' => 'borrowed'],
+                    ['copy_id' => $copInfo['copy_id'], 'old_status' => $copInfo['old_status']]
+                );
+            }
 
             return $loan;
         });
@@ -97,9 +128,13 @@ class LoanController extends Controller
 
         $loan = DB::transaction(function () use ($loan, $data) {
 
+            $oldDueDate = $loan->due_date;
+
             $loan->update([
                 'due_date' => $data['due_date'],
             ]);
+
+            $addedCopies = [];
 
             foreach ($data['book_copy_ids'] as $copyId) {
 
@@ -112,6 +147,11 @@ class LoanController extends Controller
                     'book_copy_id' => $copy->id,
                 ]);
 
+                $addedCopies[] = [
+                    'copy_id' => $copy->id,
+                    'book_title' => $copy->book->title ?? 'Unknown',
+                ];
+
                 $copy->update([
                     'status' => 'borrowed',
                 ]);
@@ -121,6 +161,31 @@ class LoanController extends Controller
                 'loanDetails.bookCopy.book',
                 'user',
             ]);
+
+            ActivityLogger::log(
+                'update',
+                'loan',
+                "Updated loan #{$loan->id} - added " . count($addedCopies) . " book(s)",
+                [
+                    'loan_id' => $loan->id,
+                    'new_due_date' => $loan->due_date,
+                    'added_copies' => $addedCopies,
+                ],
+                [
+                    'loan_id' => $loan->id,
+                    'old_due_date' => $oldDueDate,
+                ]
+            );
+
+            foreach ($addedCopies as $copInfo) {
+                ActivityLogger::log(
+                    'update',
+                    'book_copy',
+                    "Book copy #{$copInfo['copy_id']} ({$copInfo['book_title']}) status changed to borrowed (added to loan #{$loan->id})",
+                    ['copy_id' => $copInfo['copy_id'], 'new_status' => 'borrowed', 'loan_id' => $loan->id],
+                    ['copy_id' => $copInfo['copy_id'], 'old_status' => 'available']
+                );
+            }
 
             return $loan;
         });

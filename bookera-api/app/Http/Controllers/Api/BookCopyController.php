@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
 use App\Models\Book;
 use App\Models\BookCopy;
@@ -20,6 +21,13 @@ class BookCopyController extends Controller
         $copy = $book->copies()->create($data);
 
         $copy->load('book');
+
+        ActivityLogger::log(
+            'create',
+            'book_copy',
+            "Created book copy {$copy->copy_code} for book: {$book->title}",
+            $copy->toArray()
+        );
 
         return ApiResponse::successResponse(
             'Salinan buku berhasil ditambahkan',
@@ -39,8 +47,17 @@ class BookCopyController extends Controller
         }
 
         $deletedCopyId = $bookCopy->id;
+        $oldData = $bookCopy->toArray();
 
         $bookCopy->delete();
+
+        ActivityLogger::log(
+            'delete',
+            'book_copy',
+            "Deleted book copy {$oldData['copy_code']}",
+            null,
+            $oldData
+        );
 
         return ApiResponse::successResponse(
             'Salinan buku berhasil dihapus',

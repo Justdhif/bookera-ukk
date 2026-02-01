@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\LoanController;
 use App\Http\Controllers\Api\StaffController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\TeacherController;
+use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\BookCopyController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DashboardController;
@@ -29,6 +30,9 @@ Route::get('/test', function () {
         'message' => 'API is working'
     ]);
 });
+
+Route::get('/activity-logs', [ActivityController::class, 'index']);
+Route::get('/activity-logs/{id}', [ActivityController::class, 'show']);
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);

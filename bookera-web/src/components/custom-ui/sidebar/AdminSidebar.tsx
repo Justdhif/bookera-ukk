@@ -29,6 +29,7 @@ import {
   Folder,
   Crown,
   ChevronRight,
+  Activity,
 } from "lucide-react";
 
 // Menu items grouped by categories
@@ -75,6 +76,12 @@ const menuGroups = [
         href: "/admin/loans",
         icon: Settings,
         gradient: "from-teal-500 to-cyan-500",
+      },
+      {
+        title: "Activity Logs",
+        href: "/admin/activity-logs",
+        icon: Activity,
+        gradient: "from-purple-500 to-pink-500",
       },
     ],
   },

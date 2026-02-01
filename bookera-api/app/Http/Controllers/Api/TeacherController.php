@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -62,6 +63,13 @@ class TeacherController extends Controller
 
             $user->load(['profile', 'teacherDetail']);
 
+            ActivityLogger::log(
+                'create',
+                'teacher',
+                "Created teacher: {$user->profile->full_name} ({$user->email})",
+                $user->toArray()
+            );
+
             return $user;
         });
 
@@ -102,6 +110,11 @@ class TeacherController extends Controller
 
         $updatedTeacher = DB::transaction(function () use ($teacher, $data) {
 
+            $oldData = [
+                'profile' => $teacher->profile->toArray(),
+                'detail' => $teacher->teacherDetail->toArray(),
+            ];
+
             if (!empty($data['password'])) {
                 $teacher->update([
                     'password' => Hash::make($data['password']),
@@ -122,6 +135,14 @@ class TeacherController extends Controller
 
             $teacher->load(['profile', 'teacherDetail']);
 
+            ActivityLogger::log(
+                'update',
+                'teacher',
+                "Updated teacher: {$teacher->profile->full_name} ({$teacher->email})",
+                $teacher->toArray(),
+                $oldData
+            );
+
             return $teacher;
         });
 
@@ -134,9 +155,19 @@ class TeacherController extends Controller
     public function destroy($id)
     {
         $teacher = User::where('role', 'teacher')->findOrFail($id);
+        $teacher->load(['profile', 'teacherDetail']);
         $deletedTeacherId = $teacher->id;
+        $oldData = $teacher->toArray();
 
         $teacher->delete();
+
+        ActivityLogger::log(
+            'delete',
+            'teacher',
+            "Deleted teacher: {$oldData['profile']['full_name']} ({$oldData['email']})",
+            null,
+            $oldData
+        );
 
         return ApiResponse::successResponse(
             'Guru berhasil dihapus',
