@@ -8,25 +8,40 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Category } from "@/types/category";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { FolderOpen } from "lucide-react";
+import {
+  FolderOpen,
+  Edit,
+  Trash2,
+  MoreVertical,
+  Tag,
+  ChevronRight,
+  CheckCircle2,
+  XCircle,
+  Search,
+} from "lucide-react";
 
 export default function CategoryTable({
   data,
-  loading,
   onEdit,
   onDelete,
 }: {
   data: Category[];
-  loading: boolean;
   onEdit: (category: Category) => void;
   onDelete: (id: number) => void;
 }) {
-  if (loading) return <p>Loading...</p>;
-
-  if (!loading && data.length === 0) {
+  if (data.length === 0) {
     return (
       <EmptyState
         title="Belum ada kategori"
@@ -41,33 +56,63 @@ export default function CategoryTable({
   return (
     <Table>
       <TableHeader>
-        <TableRow>
-          <TableHead>No</TableHead>
-          <TableHead>Slug</TableHead>
-          <TableHead>Nama</TableHead>
-          <TableHead>Deskripsi</TableHead>
-          <TableHead className="text-right">Aksi</TableHead>
+        <TableRow className="bg-muted/50 hover:bg-muted/50">
+          <TableHead className="w-16 text-center">#</TableHead>
+          <TableHead className="font-semibold">Kategori</TableHead>
+          <TableHead className="font-semibold">Slug</TableHead>
+          <TableHead className="font-semibold">Deskripsi</TableHead>
+          <TableHead className="font-semibold text-right">Aksi</TableHead>
         </TableRow>
       </TableHeader>
 
       <TableBody>
         {data.map((item, index) => (
-          <TableRow key={item.id}>
-            <TableCell>{index + 1}</TableCell>
-            <TableCell>{item.slug}</TableCell>
-            <TableCell>{item.name}</TableCell>
-            <TableCell>{item.description || "-"}</TableCell>
-            <TableCell className="text-right space-x-2">
-              <Button size="sm" variant="outline" onClick={() => onEdit(item)}>
-                Edit
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => onDelete(item.id)}
-              >
-                Hapus
-              </Button>
+          <TableRow
+            key={item.id}
+            className="group hover:bg-primary/5 transition-colors border-b last:border-b-0"
+          >
+            <TableCell className="font-medium text-center text-muted-foreground">
+              {index + 1}
+            </TableCell>
+
+            <TableCell>
+              <span className="font-medium text-foreground">{item.name}</span>
+            </TableCell>
+
+            <TableCell>
+              <Badge variant="outline" className="font-mono text-xs">
+                /{item.slug}
+              </Badge>
+            </TableCell>
+
+            <TableCell>
+              <span className="font-medium text-foreground">
+                {item.description ? item.description : "-"}
+              </span>
+            </TableCell>
+
+            <TableCell>
+              <div className="flex justify-end items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="brand"
+                  onClick={() => onEdit(item)}
+                  className="h-8 gap-1"
+                >
+                  <Edit className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Edit</span>
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => onDelete(item.id)}
+                  className="h-8 gap-1"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Hapus</span>
+                </Button>
+              </div>
             </TableCell>
           </TableRow>
         ))}

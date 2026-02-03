@@ -12,92 +12,122 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Book } from "@/types/book";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { BookOpen, Eye } from "lucide-react";
+import { BookOpen, Eye, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface Props {
   data: Book[];
-  loading: boolean;
   onEdit: (book: Book) => void;
   onDelete: (id: number) => void;
 }
 
-export function BookTable({ data, loading, onEdit, onDelete }: Props) {
+export function BookTable({ data, onEdit, onDelete }: Props) {
   const router = useRouter();
 
-  if (loading) return <p>Loading...</p>;
-
-  if (!loading && data.length === 0) {
+  if (data.length === 0) {
     return (
       <EmptyState
         title="Belum ada buku"
-        description="Silakan tambahkan buku terlebih dahulu"
-        actionLabel="Tambah Buku"
-        onAction={() => onEdit({} as Book)}
+        description="Buku akan muncul setelah kamu menambahkannya."
         icon={<BookOpen className="h-10 w-10" />}
       />
     );
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>No</TableHead>
-          <TableHead>Cover</TableHead>
-          <TableHead>ID</TableHead>
-          <TableHead>Judul</TableHead>
-          <TableHead>Penulis</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="text-right">Aksi</TableHead>
-        </TableRow>
-      </TableHeader>
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-muted/50 hover:bg-muted/50">
+            <TableHead className="w-16 text-center font-semibold">#</TableHead>
+            <TableHead className="w-24 font-semibold">Cover</TableHead>
+            <TableHead className="font-semibold">Judul</TableHead>
+            <TableHead className="font-semibold">Penulis</TableHead>
+            <TableHead className="font-semibold">ISBN</TableHead>
+            <TableHead className="font-semibold">Penerbit</TableHead>
+            <TableHead className="font-semibold">Tahun</TableHead>
+            <TableHead className="font-semibold">Status</TableHead>
+            <TableHead className="font-semibold text-right pr-6">Aksi</TableHead>
+          </TableRow>
+        </TableHeader>
 
-      <TableBody>
-        {data.map((book, index) => (
-          <TableRow key={book.id}>
-            <TableCell>{index + 1}</TableCell>
+        <TableBody>
+          {data.map((book, index) => (
+            <TableRow 
+              key={book.id}
+              className="group hover:bg-primary/5 transition-colors border-b last:border-b-0"
+            >
+            <TableCell className="font-medium text-center text-muted-foreground">
+              {index + 1}
+            </TableCell>
             <TableCell>
               {book.cover_image_url ? (
                 <img
                   src={book.cover_image_url}
-                  className="w-10 h-14 object-cover rounded"
+                  alt={book.title}
+                  className="w-12 h-16 object-cover rounded shadow-sm"
                 />
               ) : (
-                "-"
+                <div className="w-12 h-16 bg-muted rounded flex items-center justify-center">
+                  <BookOpen className="h-5 w-5 text-muted-foreground" />
+                </div>
               )}
             </TableCell>
-            <TableCell>{book.id}</TableCell>
-            <TableCell>{book.title}</TableCell>
-            <TableCell>{book.author}</TableCell>
             <TableCell>
-              <Badge variant={book.is_active ? "default" : "secondary"}>
+              <span className="font-medium text-foreground">{book.title}</span>
+            </TableCell>
+            <TableCell>
+              <span className="text-muted-foreground">{book.author}</span>
+            </TableCell>
+            <TableCell>
+              <span className="text-muted-foreground font-mono text-sm">
+                {book.isbn || "-"}
+              </span>
+            </TableCell>
+            <TableCell>
+              <span className="text-muted-foreground">
+                {book.publisher || "-"}
+              </span>
+            </TableCell>
+            <TableCell>
+              <span className="text-muted-foreground">
+                {book.publication_year || "-"}
+              </span>
+            </TableCell>
+            <TableCell>
+              <Badge 
+                variant={book.is_active ? "default" : "secondary"}
+                className={book.is_active ? "bg-green-600 hover:bg-green-700" : "bg-gray-500 hover:bg-gray-600"}
+              >
                 {book.is_active ? "Aktif" : "Nonaktif"}
               </Badge>
             </TableCell>
-            <TableCell className="text-right space-x-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => router.push(`/admin/books/${book.id}`)}
-              >
-                <Eye className="h-4 w-4 mr-1" />
-                Detail
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => onEdit(book)}>
-                Edit
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={() => onDelete(book.id)}
-              >
-                Hapus
-              </Button>
+            <TableCell className="pr-6">
+              <div className="flex justify-end items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => router.push(`/admin/books/${book.id}`)}
+                  className="h-8 gap-1"
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Detail</span>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => onDelete(book.id)}
+                  className="h-8 gap-1"
+                >
+                  <Trash className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Hapus</span>
+                </Button>
+              </div>
             </TableCell>
           </TableRow>
         ))}
       </TableBody>
     </Table>
+    </div>
   );
 }

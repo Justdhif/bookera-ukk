@@ -7,7 +7,7 @@ export function ActivityStatisticsSkeleton() {
       {Array.from({ length: 4 }).map((_, index) => (
         <Card
           key={index}
-          className="group relative overflow-hidden border transition-all duration-300"
+          className="group relative overflow-hidden border-none transition-all duration-300"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-transparent pointer-events-none" />
           <div className="absolute top-0 right-0 w-16 h-16 rounded-bl-full transition-opacity" />

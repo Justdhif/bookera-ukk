@@ -21,7 +21,7 @@ export default function AdminLayout({
       <SidebarInset>
         <AdminHeader />
         <main
-          className={`p-6 relative ${initialLoading ? "h-[80vh]" : "min-h-screen"}`}
+          className="p-6 relative min-h-[90vh]"
         >
           {initialLoading ? <ContentLoadingScreen /> : children}
         </main>

@@ -23,9 +23,13 @@ class BookController extends Controller
                         ->orWhere('isbn', 'like', "%{$request->search}%");
                 });
             })
-            ->when($request->category_id, function ($q) use ($request) {
-                $q->whereHas('categories', function ($cat) use ($request) {
-                    $cat->where('categories.id', $request->category_id);
+            ->when($request->category_ids, function ($q) use ($request) {
+                $categoryIds = is_array($request->category_ids)
+                    ? $request->category_ids
+                    : explode(',', $request->category_ids);
+
+                $q->whereHas('categories', function ($cat) use ($categoryIds) {
+                    $cat->whereIn('categories.id', $categoryIds);
                 });
             })
             ->when($request->status, function ($q) use ($request) {

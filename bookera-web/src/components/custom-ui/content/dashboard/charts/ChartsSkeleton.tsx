@@ -39,14 +39,13 @@ export function LoanStatusChartSkeleton() {
       </CardHeader>
 
       <CardContent className="pt-6">
-        <div className="flex items-center justify-center h-[350px] gap-8">
+        <div className="flex flex-col items-center justify-center h-[350px] gap-8">
           <Skeleton className="h-64 w-64 rounded-full" />
-          <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-2">
+          <div className="space-x-2 flex">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-1">
                 <Skeleton className="h-3 w-3 rounded-full" />
                 <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-12" />
               </div>
             ))}
           </div>
