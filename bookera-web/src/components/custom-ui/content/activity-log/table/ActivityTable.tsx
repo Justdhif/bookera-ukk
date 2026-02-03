@@ -21,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ContentLoadingScreen } from "@/components/ui/ContentLoadingScreen";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import {
   Pagination,
@@ -48,7 +47,6 @@ interface ActivityTableProps {
   };
   onRowClick: (id: number) => void;
   onPageChange: (page: number) => void;
-  loading?: boolean;
   filters: ActivityLogFilters;
   onFilterChange: (filters: ActivityLogFilters) => void;
 }
@@ -58,7 +56,6 @@ export default function ActivityTable({
   pagination,
   onRowClick,
   onPageChange,
-  loading,
   filters,
   onFilterChange,
 }: ActivityTableProps) {
@@ -217,15 +214,7 @@ export default function ActivityTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-64 p-0 relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <ContentLoadingScreen />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : logs.length === 0 ? (
+              {logs.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="p-0">
                     <EmptyState

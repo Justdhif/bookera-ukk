@@ -12,6 +12,9 @@ import DashboardCards from "./cards/DashboardCards";
 import LoanMonthlyChart from "./charts/LoanMonthlyChart";
 import LoanStatusChart from "./charts/LoanStatusChart";
 import LatestLoansTable from "./table/LatestLoansTable";
+import { DashboardCardsSkeleton } from "./cards/DashboardCardsSkeleton";
+import { LoanMonthlyChartSkeleton, LoanStatusChartSkeleton } from "./charts/ChartsSkeleton";
+import { LatestLoansTableSkeleton } from "./table/LatestLoansTableSkeleton";
 import { toast } from "sonner";
 
 export default function DashboardClient() {
@@ -19,8 +22,10 @@ export default function DashboardClient() {
   const [monthly, setMonthly] = useState<LoanMonthly[]>([]);
   const [status, setStatus] = useState<LoanStatus[]>([]);
   const [latestLoans, setLatestLoans] = useState<LatestLoan[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
       dashboardService.totals(),
       dashboardService.loanMonthlyChart(),
@@ -35,21 +40,22 @@ export default function DashboardClient() {
       })
       .catch(() => {
         toast.error("Gagal memuat dashboard");
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
-  if (!totals) return null;
-
   return (
     <div className="space-y-6">
-      <DashboardCards data={totals} />
+      {loading ? <DashboardCardsSkeleton /> : <DashboardCards data={totals!} />}
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <LoanStatusChart data={status} />
-        <LatestLoansTable data={latestLoans} />
+        {loading ? <LoanStatusChartSkeleton /> : <LoanStatusChart data={status} />}
+        {loading ? <LatestLoansTableSkeleton /> : <LatestLoansTable data={latestLoans} />}
       </div>
 
-      <LoanMonthlyChart data={monthly} />
+      {loading ? <LoanMonthlyChartSkeleton /> : <LoanMonthlyChart data={monthly} />}
     </div>
   );
 }

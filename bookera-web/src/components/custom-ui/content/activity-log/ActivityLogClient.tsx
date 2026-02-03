@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { activityLogService } from "@/services/activity-log.service";
 import { ActivityLogIndexResponse, ActivityLogFilters } from "@/types/activity-log";
 import { toast } from "sonner";
-import { ContentLoadingScreen } from "@/components/ui/ContentLoadingScreen";
 import ActivityStatistics from "./statistics/ActivityStatistics";
 import ActivityCharts from "./charts/ActivityCharts";
 import ActivityTable from "./table/ActivityTable";
 import ActivityDetailDialog from "./dialog/ActivityDetailDialog";
+import { ActivityStatisticsSkeleton } from "./statistics/ActivityStatisticsSkeleton";
+import { ActivityChartsSkeleton } from "./charts/ActivityChartsSkeleton";
+import { ActivityTableSkeleton } from "./table/ActivityTableSkeleton";
 
 export default function ActivityLogClient() {
   const [data, setData] = useState<ActivityLogIndexResponse | null>(null);
@@ -45,12 +47,6 @@ export default function ActivityLogClient() {
     setFilters({ ...filters, page });
   };
 
-  if (loading && !data) {
-    return <ContentLoadingScreen />;
-  }
-
-  if (!data) return null;
-
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -64,19 +60,32 @@ export default function ActivityLogClient() {
         </div>
       </div>
 
-      <ActivityStatistics statistics={data.statistics} />
+      {loading ? (
+        <ActivityStatisticsSkeleton />
+      ) : (
+        data && <ActivityStatistics statistics={data.statistics} />
+      )}
 
-      <ActivityCharts charts={data.charts} />
+      {loading ? (
+        <ActivityChartsSkeleton />
+      ) : (
+        data && <ActivityCharts charts={data.charts} />
+      )}
 
-      <ActivityTable
-        logs={data.logs.data}
-        pagination={data.logs}
-        onRowClick={handleRowClick}
-        onPageChange={handlePageChange}
-        loading={loading}
-        filters={filters}
-        onFilterChange={setFilters}
-      />
+      {loading ? (
+        <ActivityTableSkeleton />
+      ) : (
+        data && (
+          <ActivityTable
+            logs={data.logs.data}
+            pagination={data.logs}
+            onRowClick={handleRowClick}
+            onPageChange={handlePageChange}
+            filters={filters}
+            onFilterChange={setFilters}
+          />
+        )
+      )}
 
       <ActivityDetailDialog
         activityId={selectedId}
