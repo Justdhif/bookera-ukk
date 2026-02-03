@@ -9,16 +9,19 @@ interface AuthState {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
+  initialLoading: boolean;
 
   login: (email: string, password: string) => Promise<string>;
   fetchUser: () => Promise<void>;
   logout: () => Promise<void>;
+  setInitialLoadingComplete: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: false,
   isAuthenticated: false,
+  initialLoading: true,
 
   login: async (email, password) => {
     try {
@@ -56,6 +59,11 @@ export const useAuthStore = create<AuthState>((set) => ({
         user: null,
         isAuthenticated: false,
       });
+    } finally {
+      // Add delay before hiding loading to ensure smooth transition
+      setTimeout(() => {
+        set({ initialLoading: false });
+      }, 800);
     }
   },
 
@@ -71,5 +79,9 @@ export const useAuthStore = create<AuthState>((set) => ({
         isAuthenticated: false,
       });
     }
+  },
+
+  setInitialLoadingComplete: () => {
+    set({ initialLoading: false });
   },
 }));

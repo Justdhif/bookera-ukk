@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import DataLoading from "@/components/ui/data-loading";
+import { ContentLoadingScreen } from "@/components/ui/ContentLoadingScreen";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import {
   Pagination,
@@ -219,8 +219,10 @@ export default function ActivityTable({
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-64">
-                    <DataLoading message="Loading activity logs..." size="md" />
+                  <TableCell colSpan={7} className="h-64 p-0 relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <ContentLoadingScreen />
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : logs.length === 0 ? (

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { activityLogService } from "@/services/activity-log.service";
 import { ActivityLogIndexResponse, ActivityLogFilters } from "@/types/activity-log";
 import { toast } from "sonner";
-import DataLoading from "@/components/ui/data-loading";
+import { ContentLoadingScreen } from "@/components/ui/ContentLoadingScreen";
 import ActivityStatistics from "./statistics/ActivityStatistics";
 import ActivityCharts from "./charts/ActivityCharts";
 import ActivityTable from "./table/ActivityTable";
@@ -46,11 +46,7 @@ export default function ActivityLogClient() {
   };
 
   if (loading && !data) {
-    return (
-      <div className="flex items-center justify-center min-h-[80vh]">
-        <DataLoading message="Loading activity logs..." size="lg" />
-      </div>
-    );
+    return <ContentLoadingScreen />;
   }
 
   if (!data) return null;

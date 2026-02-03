@@ -1,25 +1,30 @@
-import type { Metadata } from "next";
+"use client";
+
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/custom-ui/sidebar/AdminSidebar";
 import AdminHeader from "@/components/custom-ui/navbar/AdminHeader";
+import { useAuthStore } from "@/store/auth.store";
+import { ContentLoadingScreen } from "@/components/ui/ContentLoadingScreen";
 import "@/app/globals.css";
 
-export const metadata: Metadata = {
-  title: "Bookera - Admin Dashboard",
-  description: "Admin Dashboard for Bookera Library Management System",
-};
-
-export default function AdminLayout({ children,
+export default function AdminLayout({
+  children,
 }: {
   children: React.ReactNode;
 }) {
+  const initialLoading = useAuthStore((s) => s.initialLoading);
+
   return (
     <SidebarProvider>
       <AdminSidebar />
 
       <SidebarInset>
         <AdminHeader />
-        <main className="p-6">{children}</main>
+        <main
+          className={`p-6 relative ${initialLoading ? "h-[80vh]" : "min-h-screen"}`}
+        >
+          {initialLoading ? <ContentLoadingScreen /> : children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );
