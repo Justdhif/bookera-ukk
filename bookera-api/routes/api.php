@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\BookCopyController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\BookReturnController;
+use App\Http\Controllers\Api\ApprovalController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +60,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('/teachers', TeacherController::class);
         Route::apiResource('/staffs', StaffController::class);
 
+        Route::get('users', [UserController::class, 'index']);
+        Route::get('users/{user}', [UserController::class, 'show']);
+
         Route::post('books', [BookController::class, 'store']);
         Route::put('books/{book}', [BookController::class, 'update']);
         Route::delete('books/{book}', [BookController::class, 'destroy']);
@@ -68,6 +73,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('book-copies/{bookCopy}', [BookCopyController::class, 'destroy']);
 
         Route::get('loans', [LoanController::class, 'index']);
+        Route::post('loans', [LoanController::class, 'storeAdminLoan']); // Admin creates direct loan
+
+        // Approval routes
+        Route::prefix('approvals')->group(function () {
+            Route::get('loans/pending', [ApprovalController::class, 'getPendingLoans']);
+            Route::get('loans/approved', [ApprovalController::class, 'getApprovedLoans']);
+            Route::post('loans/{loan}/approve', [ApprovalController::class, 'approveLoan']);
+            Route::post('loans/{loan}/reject', [ApprovalController::class, 'rejectLoan']);
+            Route::post('loans/{loan}/mark-borrowed', [ApprovalController::class, 'markAsBorrowed']);
+
+            Route::get('returns', [ApprovalController::class, 'getAllReturns']);
+            Route::get('returns/pending', [ApprovalController::class, 'getPendingReturns']);
+            Route::post('returns/{bookReturn}/approve', [ApprovalController::class, 'approveReturn']);
+            Route::post('returns/{bookReturn}/reject', [ApprovalController::class, 'rejectReturn']);
+        });
     });
 
     Route::post('loans', [LoanController::class, 'store']);

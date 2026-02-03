@@ -42,6 +42,7 @@ class BookReturnController extends Controller
             $return = BookReturn::create([
                 'loan_id' => $loan->id,
                 'return_date' => now(),
+                'approval_status' => 'pending',
             ]);
 
             $returnedCopies = [];
@@ -62,24 +63,17 @@ class BookReturnController extends Controller
 
                 $newStatus = ($copy['condition'] ?? 'good') === 'lost'
                     ? 'lost'
-                    : 'available';
-
-                $bookCopy->update([
-                    'status' => $newStatus,
-                ]);
+                    : $oldCopyStatus; // Tidak ubah status dulu, menunggu approval
 
                 $returnedCopies[] = [
                     'copy_id' => $bookCopy->id,
                     'book_title' => $bookCopy->book->title ?? 'Unknown',
                     'old_status' => $oldCopyStatus,
-                    'new_status' => $newStatus,
                     'condition' => $copy['condition'] ?? 'good',
                 ];
             }
 
-            $loan->update([
-                'status' => 'returned',
-            ]);
+            // Status loan tidak diubah dulu, menunggu approval
 
             $return->load([
                 'details.bookCopy.book',
@@ -88,38 +82,21 @@ class BookReturnController extends Controller
             ActivityLogger::log(
                 'create',
                 'book_return',
-                "Processed return for loan #{$loan->id} with " . count($returnedCopies) . " book(s)",
+                "Processed return request for loan #{$loan->id} with " . count($returnedCopies) . " book(s) - Waiting for approval",
                 [
                     'return_id' => $return->id,
                     'loan_id' => $loan->id,
                     'return_date' => $return->return_date,
+                    'approval_status' => 'pending',
                     'returned_copies' => $returnedCopies,
                 ]
-            );
-
-            foreach ($returnedCopies as $copInfo) {
-                ActivityLogger::log(
-                    'update',
-                    'book_copy',
-                    "Book copy #{$copInfo['copy_id']} ({$copInfo['book_title']}) returned with condition '{$copInfo['condition']}' - status changed to {$copInfo['new_status']}",
-                    ['copy_id' => $copInfo['copy_id'], 'new_status' => $copInfo['new_status'], 'condition' => $copInfo['condition']],
-                    ['copy_id' => $copInfo['copy_id'], 'old_status' => $copInfo['old_status']]
-                );
-            }
-
-            ActivityLogger::log(
-                'update',
-                'loan',
-                "Loan #{$loan->id} status changed from {$oldLoanStatus} to returned",
-                ['loan_id' => $loan->id, 'new_status' => 'returned'],
-                ['loan_id' => $loan->id, 'old_status' => $oldLoanStatus]
             );
 
             return $return;
         });
 
         return ApiResponse::successResponse(
-            'Pengembalian buku berhasil diproses',
+            'Permintaan pengembalian buku berhasil dibuat dan menunggu persetujuan admin',
             $bookReturn,
             201
         );

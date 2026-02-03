@@ -5,6 +5,7 @@ import { bookCopyService } from "@/services/book-copy.service";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export default function BookCopyList({
   book,
@@ -13,9 +14,12 @@ export default function BookCopyList({
   book: Book;
   onChange: () => void;
 }) {
+  const [copyCode, setCopyCode] = useState("");
+
   const handleAdd = async (copy_code: string) => {
     await bookCopyService.create(book.id, copy_code);
     toast.success("Salinan ditambahkan");
+    setCopyCode(""); // Reset input setelah berhasil
     onChange();
   };
 
@@ -30,8 +34,12 @@ export default function BookCopyList({
       <h2 className="font-semibold">Salinan Buku</h2>
 
       <div className="flex gap-2">
-        <Input placeholder="Kode salinan" />
-        <Button onClick={() => handleAdd("COPY-001")}>Tambah</Button>
+        <Input 
+          placeholder="Kode salinan" 
+          value={copyCode}
+          onChange={(e) => setCopyCode(e.target.value)}
+        />
+        <Button onClick={() => handleAdd(copyCode)}>Tambah</Button>
       </div>
 
       <ul className="space-y-2">

@@ -27,9 +27,12 @@ const formatDate = (dateString: string) => {
 };
 
 const statusColorMap: Record<string, string> = {
+  pending: "bg-gray-500/10 text-gray-700 dark:text-gray-400 border border-gray-500/20",
+  waiting: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border border-yellow-500/20",
   borrowed: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/20",
   returned: "bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/20",
-  overdue: "bg-orange-500/10 text-orange-700 dark:text-orange-400 border border-orange-500/20",
+  rejected: "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/20",
+  late: "bg-orange-500/10 text-orange-700 dark:text-orange-400 border border-orange-500/20",
 };
 
 export default function LatestLoansTable({ data }: LatestLoansTableProps) {

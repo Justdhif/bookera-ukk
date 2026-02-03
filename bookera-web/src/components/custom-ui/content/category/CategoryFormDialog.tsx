@@ -51,11 +51,15 @@ export default function CategoryFormDialog({
         toast.success("Kategori berhasil ditambahkan");
       }
 
+      // Reset form inputs setelah berhasil
+      setName("");
+      setDescription("");
       setOpen(false);
       onSuccess();
       setIsLoading(false);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Terjadi kesalahan");
+      setIsLoading(false);
     }
   };
 

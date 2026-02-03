@@ -30,6 +30,8 @@ import {
   Crown,
   ChevronRight,
   Activity,
+  Package,
+  PackageCheck,
 } from "lucide-react";
 
 // Menu items grouped by categories
@@ -74,8 +76,14 @@ const menuGroups = [
       {
         title: "Loans",
         href: "/admin/loans",
-        icon: Settings,
+        icon: Package,
         gradient: "from-teal-500 to-cyan-500",
+      },
+      {
+        title: "Returns",
+        href: "/admin/returns",
+        icon: PackageCheck,
+        gradient: "from-cyan-500 to-blue-500",
       },
       {
         title: "Activity Logs",

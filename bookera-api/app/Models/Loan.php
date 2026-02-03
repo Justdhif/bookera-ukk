@@ -13,6 +13,7 @@ class Loan extends Model
         'loan_date',
         'due_date',
         'status',
+        'approval_status',
     ];
 
     public function user()
@@ -23,5 +24,15 @@ class Loan extends Model
     public function loanDetails()
     {
         return $this->hasMany(LoanDetail::class);
+    }
+
+    public function details()
+    {
+        return $this->loanDetails();
+    }
+
+    public function bookReturns()
+    {
+        return $this->hasMany(BookReturn::class);
     }
 }

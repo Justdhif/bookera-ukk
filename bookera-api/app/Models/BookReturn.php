@@ -11,6 +11,7 @@ class BookReturn extends Model
     protected $fillable = [
         'loan_id',
         'return_date',
+        'approval_status',
     ];
 
     public function loan()
@@ -21,5 +22,10 @@ class BookReturn extends Model
     public function bookReturnDetails()
     {
         return $this->hasMany(BookReturnDetail::class);
+    }
+
+    public function details()
+    {
+        return $this->bookReturnDetails();
     }
 }
