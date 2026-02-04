@@ -10,14 +10,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import Image from "next/image";
 
 
 export default function PublicHeader() {
   const router = useRouter();
-  const { user, logout, isAuthenticated } = useAuthStore();
+  const { user, logout, isAuthenticated, initialLoading } = useAuthStore();
 
   return (
     <header className="border-b">
@@ -39,12 +40,18 @@ export default function PublicHeader() {
         </Link>
 
         {/* RIGHT */}
-        {!isAuthenticated ? (
+        {initialLoading ? (
+          <Skeleton className="h-10 w-10 rounded-full" />
+        ) : !isAuthenticated ? (
           <Button onClick={() => router.push("/login")}>Login</Button>
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Avatar>
+                <AvatarImage 
+                  src={user?.profile?.avatar} 
+                  alt={user?.profile?.full_name || user?.email || "User"}
+                />
                 <AvatarFallback>{user?.profile?.full_name?.[0]}</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
@@ -54,7 +61,7 @@ export default function PublicHeader() {
                 {user?.profile?.full_name}
               </DropdownMenuItem>
 
-              {user?.role === "admin" && (
+              {(user?.role === "admin" || user?.role === "officer") && (
                 <DropdownMenuItem onClick={() => router.push("/admin")}>
                   Dashboard
                 </DropdownMenuItem>

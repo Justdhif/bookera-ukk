@@ -33,6 +33,7 @@ export function DatePicker({
   minDate,
   maxDate,
 }: DatePickerProps) {
+  const [open, setOpen] = React.useState(false);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -48,8 +49,13 @@ export function DatePicker({
     return undefined;
   }, [maxDate, dateMode, today]);
 
+  const handleSelect = (date: Date | undefined) => {
+    onChange?.(date);
+    setOpen(false); // Close popover after selection
+  };
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
@@ -67,7 +73,7 @@ export function DatePicker({
         <Calendar
           mode="single"
           selected={value}
-          onSelect={onChange}
+          onSelect={handleSelect}
           disabled={(date) => {
             if (effectiveMinDate && date < effectiveMinDate) return true;
             if (effectiveMaxDate && date > effectiveMaxDate) return true;

@@ -6,7 +6,7 @@ export function middleware(req: NextRequest) {
   const role = req.cookies.get("role")?.value;
 
   if (req.nextUrl.pathname.startsWith("/admin")) {
-    if (!token || role !== "admin") {
+    if (!token || (role !== "admin" && role !== "officer")) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
   }

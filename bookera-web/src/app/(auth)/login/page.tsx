@@ -47,7 +47,7 @@ export default function LoginPage() {
       toast.success(message || "Login berhasil");
 
       const role = getCookie("role");
-      router.push(role === "admin" ? "/admin" : "/");
+      router.push(role === "admin" || role === "officer" ? "/admin" : "/");
     } catch (err: any) {
       toast.error(err.response?.data?.message ?? "Login gagal");
     }

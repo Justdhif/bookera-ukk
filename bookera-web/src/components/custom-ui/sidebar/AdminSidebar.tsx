@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthStore } from "@/store/auth.store";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import {
@@ -98,7 +98,7 @@ const menuGroups = [
 export function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout, loading } = useAuthStore();
+  const { user, logout, initialLoading } = useAuthStore();
   const { open } = useSidebar();
 
   const handleNavigation = (href: string) => {
@@ -217,6 +217,31 @@ export function AdminSidebar() {
       {/* FOOTER */}
       <SidebarFooter className="border-t bg-gradient-to-br from-slate-50/50 to-gray-50/50 dark:from-slate-950/20 dark:to-gray-950/20">
         <SidebarMenu className={!open ? "flex flex-col items-center" : ""}>
+          {/* Home/Public Button */}
+          <SidebarMenuItem
+            className={!open ? "w-full flex justify-center" : ""}
+          >
+            <SidebarMenuButton
+              onClick={() => handleNavigation("/")}
+              isActive={pathname === "/"}
+              tooltip={{
+                content: "Public Page",
+                gradient: "from-blue-600 to-indigo-600",
+                className: "font-medium",
+              }}
+              className={`group/home ${!open && "justify-center px-0 mx-auto"}`}
+            >
+              <div
+                className={`${
+                  open ? "p-1.5" : "p-2"
+                } rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-sm group-hover/home:shadow-md transition-shadow`}
+              >
+                <HomeIcon className="h-3.5 w-3.5" />
+              </div>
+              {open && <span className="font-medium">Public Page</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
           {/* Settings Button */}
           <SidebarMenuItem
             className={!open ? "w-full flex justify-center" : ""}
@@ -274,7 +299,7 @@ export function AdminSidebar() {
 
           {/* User Profile - Loading Skeleton */}
           <SidebarMenuItem>
-            {loading ? (
+            {initialLoading ? (
               <div
                 className={`h-auto py-3 px-2 ${!open && "flex justify-center"}`}
               >
@@ -315,6 +340,10 @@ export function AdminSidebar() {
                 >
                   <div className="relative shrink-0">
                     <Avatar className="h-9 w-9 ring-2 ring-emerald-200/50 dark:ring-emerald-800/50 group-hover/profile:ring-emerald-400/70 dark:group-hover/profile:ring-emerald-600/70 transition-all group-hover/profile:scale-105 shadow-md">
+                      <AvatarImage 
+                        src={user?.profile?.avatar} 
+                        alt={user?.profile?.full_name || user?.email || "User"}
+                      />
                       <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white font-semibold">
                         {user?.profile?.full_name?.[0]?.toUpperCase() ||
                           user?.email?.[0]?.toUpperCase() ||

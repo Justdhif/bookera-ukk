@@ -16,6 +16,13 @@ export default function AdminHeader() {
   const pathname = usePathname();
   const segments = pathname.replace("/admin", "").split("/").filter(Boolean);
 
+  // Format segment untuk breadcrumb
+  const formatSegment = (seg: string) => {
+    // Capitalize first letter
+    const formatted = seg.charAt(0).toUpperCase() + seg.slice(1);
+    return formatted;
+  };
+
   return (
     <header className="flex h-14 items-center gap-4 border-b px-4">
       <SidebarTrigger />
@@ -33,11 +40,13 @@ export default function AdminHeader() {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   {idx === segments.length - 1 ? (
-                    <BreadcrumbPage className="capitalize">
-                      {seg}
+                    <BreadcrumbPage>
+                      {formatSegment(seg)}
                     </BreadcrumbPage>
                   ) : (
-                    <BreadcrumbLink href={href}>{seg}</BreadcrumbLink>
+                    <BreadcrumbLink href={href}>
+                      {formatSegment(seg)}
+                    </BreadcrumbLink>
                   )}
                 </BreadcrumbItem>
               </React.Fragment>

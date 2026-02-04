@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Helpers\AvatarHelper;
 
 class UserSeeder extends Seeder
 {
@@ -13,11 +14,6 @@ class UserSeeder extends Seeder
     {
         DB::transaction(function () {
 
-            /*
-            |--------------------------------------------------------------------------
-            | ADMIN
-            |--------------------------------------------------------------------------
-            */
             $admin = User::create([
                 'email' => 'admin@school.test',
                 'password' => Hash::make('password'),
@@ -30,81 +26,87 @@ class UserSeeder extends Seeder
                 'gender' => 'male',
                 'phone_number' => '0811111111',
                 'address' => 'School Office',
+                'bio' => 'System administrator managing the library system',
+                'identification_number' => 'ADM-001',
+                'occupation' => 'Administrator',
+                'institution' => 'School Administration',
+                'avatar' => AvatarHelper::generateDefaultAvatar($admin->id),
             ]);
 
-            /*
-            |--------------------------------------------------------------------------
-            | STUDENT
-            |--------------------------------------------------------------------------
-            */
+            $officer = User::create([
+                'email' => 'officer@school.test',
+                'password' => Hash::make('password'),
+                'role' => 'officer',
+                'is_active' => true,
+            ]);
+
+            $officer->profile()->create([
+                'full_name' => 'Library Officer',
+                'gender' => 'female',
+                'phone_number' => '0822222222',
+                'address' => 'Library Office',
+                'bio' => 'Library officer managing book loans and returns',
+                'identification_number' => 'LIB-001',
+                'occupation' => 'Librarian',
+                'institution' => 'School Library',
+                'avatar' => AvatarHelper::generateDefaultAvatar($officer->id),
+            ]);
+
             $student = User::create([
                 'email' => 'student@school.test',
                 'password' => Hash::make('password'),
-                'role' => 'student',
+                'role' => 'user',
                 'is_active' => true,
             ]);
 
             $student->profile()->create([
                 'full_name' => 'John Student',
                 'gender' => 'male',
-                'phone_number' => '0822222222',
+                'phone_number' => '0833333333',
                 'address' => 'Student Dormitory',
+                'bio' => 'Student member of the library',
+                'identification_number' => 'SIS-001',
+                'occupation' => 'Student',
+                'institution' => 'XI RPL 1 - Software Engineering',
+                'avatar' => AvatarHelper::generateDefaultAvatar($student->id),
             ]);
 
-            $student->studentDetail()->create([
-                'student_number' => 'SIS-001',
-                'class' => 'XI RPL 1',
-                'major' => 'Software Engineering',
-                'enrollment_year' => 2023,
-            ]);
-
-            /*
-            |--------------------------------------------------------------------------
-            | TEACHER
-            |--------------------------------------------------------------------------
-            */
             $teacher = User::create([
                 'email' => 'teacher@school.test',
                 'password' => Hash::make('password'),
-                'role' => 'teacher',
+                'role' => 'user',
                 'is_active' => true,
             ]);
 
             $teacher->profile()->create([
                 'full_name' => 'Jane Teacher',
                 'gender' => 'female',
-                'phone_number' => '0833333333',
+                'phone_number' => '0844444444',
                 'address' => 'Teacher Housing',
+                'bio' => 'Mathematics teacher',
+                'identification_number' => 'TCH-001',
+                'occupation' => 'Teacher',
+                'institution' => 'Mathematics Department',
+                'avatar' => AvatarHelper::generateDefaultAvatar($teacher->id),
             ]);
 
-            $teacher->teacherDetail()->create([
-                'employee_number' => 'EMP-001',
-                'subject' => 'Mathematics',
-            ]);
-
-            /*
-            |--------------------------------------------------------------------------
-            | STAFF / LIBRARIAN
-            |--------------------------------------------------------------------------
-            */
-            $staff = User::create([
-                'email' => 'librarian@school.test',
+            $member = User::create([
+                'email' => 'member@school.test',
                 'password' => Hash::make('password'),
-                'role' => 'staff',
+                'role' => 'user',
                 'is_active' => true,
             ]);
 
-            $staff->profile()->create([
-                'full_name' => 'Library Staff',
-                'gender' => 'female',
-                'phone_number' => '0844444444',
-                'address' => 'Library Office',
-            ]);
-
-            $staff->staffDetail()->create([
-                'staff_number' => 'STF-001',
-                'position' => 'Librarian',
-                'department' => 'Library',
+            $member->profile()->create([
+                'full_name' => 'General Member',
+                'gender' => 'prefer_not_to_say',
+                'phone_number' => '0855555555',
+                'address' => 'General Address',
+                'bio' => 'General library member',
+                'identification_number' => 'MEM-001',
+                'occupation' => 'Public',
+                'institution' => 'General Public',
+                'avatar' => AvatarHelper::generateDefaultAvatar($member->id),
             ]);
         });
     }

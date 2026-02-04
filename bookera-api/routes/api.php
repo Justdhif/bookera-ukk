@@ -4,9 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookController;
 use App\Http\Controllers\Api\LoanController;
-use App\Http\Controllers\Api\StaffController;
-use App\Http\Controllers\Api\StudentController;
-use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\BookCopyController;
 use App\Http\Controllers\Api\CategoryController;
@@ -56,12 +53,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/latest', [DashboardController::class, 'latest']);
         });
 
-        Route::apiResource('/students', StudentController::class);
-        Route::apiResource('/teachers', TeacherController::class);
-        Route::apiResource('/staffs', StaffController::class);
-
         Route::get('users', [UserController::class, 'index']);
+        Route::post('users', [UserController::class, 'store']);
+        Route::get('users/identification/{identificationNumber}', [UserController::class, 'showByIdentification']);
         Route::get('users/{user}', [UserController::class, 'show']);
+        Route::put('users/{user}', [UserController::class, 'update']);
+        Route::patch('users/{user}', [UserController::class, 'update']);
+        Route::delete('users/{user}', [UserController::class, 'destroy']);
 
         Route::post('books', [BookController::class, 'store']);
         Route::put('books/{book}', [BookController::class, 'update']);

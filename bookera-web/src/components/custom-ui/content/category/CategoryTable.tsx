@@ -47,8 +47,6 @@ export default function CategoryTable({
         title="Belum ada kategori"
         description="Kategori akan muncul setelah kamu menambahkannya."
         icon={<FolderOpen className="h-10 w-10" />}
-        actionLabel="Tambah Kategori"
-        onAction={() => onEdit(null as any)}
       />
     );
   }

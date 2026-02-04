@@ -16,7 +16,7 @@ return new class extends Migration {
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->string('full_name')->nullable();
+            $table->string('full_name');
             $table->enum('gender', ['male', 'female', 'prefer_not_to_say'])->nullable();
             $table->date('birth_date')->nullable();
 
@@ -24,6 +24,12 @@ return new class extends Migration {
             $table->string('phone_number')->nullable();
             $table->text('address')->nullable();
             $table->text('bio')->nullable();
+
+            // Additional fields for identification
+            $table->string('identification_number')->nullable()->unique();
+            $table->string('occupation')->nullable(); // Student, Teacher, Staff, etc
+            $table->string('institution')->nullable(); // School name, department, etc
+
             $table->timestamps();
         });
     }

@@ -44,12 +44,7 @@ class AuthController extends Controller
             'last_login_at' => now()
         ]);
 
-        $user->load([
-            'profile',
-            'studentDetail',
-            'teacherDetail',
-            'staffDetail'
-        ]);
+        $user->load('profile');
 
         return ApiResponse::successResponse(
             'Login berhasil',
@@ -76,12 +71,7 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        $user = $request->user()->load([
-            'profile',
-            'studentDetail',
-            'teacherDetail',
-            'staffDetail'
-        ]);
+        $user = $request->user()->load('profile');
 
         return ApiResponse::successResponse(
             'Data user',
