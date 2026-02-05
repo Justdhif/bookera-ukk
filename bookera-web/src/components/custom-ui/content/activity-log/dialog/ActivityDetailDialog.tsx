@@ -63,7 +63,7 @@ export default function ActivityDetailDialog({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader className="border-b pb-4">
-          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-brand-primary to-brand-primary-dark bg-clip-text text-transparent">
+          <DialogTitle className="text-2xl font-bold bg-linear-to-r from-brand-primary to-brand-primary-dark bg-clip-text text-transparent">
             Detail Activity Log
           </DialogTitle>
         </DialogHeader>
@@ -76,7 +76,7 @@ export default function ActivityDetailDialog({
         ) : detail ? (
           <div className="space-y-6">
             {/* User Info */}
-            <div className="bg-gradient-to-br from-brand-primary/5 to-brand-primary-dark/5 dark:from-brand-primary/10 dark:to-brand-primary-dark/10 p-5 rounded-xl border border-brand-primary/20">
+            <div className="bg-linear-to-br from-brand-primary/5 to-brand-primary-dark/5 dark:from-brand-primary/10 dark:to-brand-primary-dark/10 p-5 rounded-xl border border-brand-primary/20">
               <div className="flex items-center gap-2 mb-4">
                 <div className="p-2 bg-brand-primary/10 rounded-lg">
                   <User className="h-5 w-5 text-brand-primary" />
@@ -180,7 +180,7 @@ export default function ActivityDetailDialog({
                     <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
                     Data Lama
                   </h3>
-                  <pre className="bg-gradient-to-br from-muted/50 to-muted p-4 rounded-xl text-xs overflow-x-auto border-2 border-red-200 dark:border-red-900/50">
+                  <pre className="bg-linear-to-br from-muted/50 to-muted p-4 rounded-xl text-xs overflow-x-auto border-2 border-red-200 dark:border-red-900/50">
                     {JSON.stringify(detail.old_data, null, 2)}
                   </pre>
                 </div>
@@ -196,7 +196,7 @@ export default function ActivityDetailDialog({
                     <div className="h-1.5 w-1.5 rounded-full bg-brand-primary" />
                     Data Baru
                   </h3>
-                  <pre className="bg-gradient-to-br from-muted/50 to-muted p-4 rounded-xl text-xs overflow-x-auto border-2 border-brand-primary/30">
+                  <pre className="bg-linear-to-br from-muted/50 to-muted p-4 rounded-xl text-xs overflow-x-auto border-2 border-brand-primary/30">
                     {JSON.stringify(detail.new_data, null, 2)}
                   </pre>
                 </div>
@@ -218,7 +218,7 @@ export default function ActivityDetailDialog({
                       <Badge variant="outline">{detail.subject_type}</Badge>
                     </div>
                   </div>
-                  <pre className="bg-gradient-to-br from-muted/50 to-muted p-4 rounded-xl text-xs overflow-x-auto border-2 border-purple-200 dark:border-purple-900/50">
+                  <pre className="bg-linear-to-br from-muted/50 to-muted p-4 rounded-xl text-xs overflow-x-auto border-2 border-purple-200 dark:border-purple-900/50">
                     {JSON.stringify(detail.subject, null, 2)}
                   </pre>
                 </div>

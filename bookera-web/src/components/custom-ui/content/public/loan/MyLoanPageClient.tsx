@@ -168,7 +168,7 @@ export default function MyLoanPageClient() {
                     variant="submit"
                     size="sm"
                     onClick={() => setReturnDialog({ open: true, loan })}
-                    className="flex items-center gap-2 flex-shrink-0"
+                    className="flex items-center gap-2 shrink-0"
                   >
                     <PackageX className="h-4 w-4" />
                     Request Pengembalian
@@ -186,7 +186,7 @@ export default function MyLoanPageClient() {
                       key={detail.id}
                       className="flex items-start gap-3 border rounded-lg p-3 bg-muted/20"
                     >
-                      <BookOpen className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <BookOpen className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">
                           {detail.book_copy.book.title}

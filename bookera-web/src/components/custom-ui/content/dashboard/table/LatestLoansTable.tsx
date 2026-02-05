@@ -42,7 +42,7 @@ export default function LatestLoansTable({ data }: LatestLoansTableProps) {
     <Card className="border-0 shadow-lg bg-white dark:bg-gray-900">
       <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
         <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <div className="w-1 h-6 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full" />
+          <div className="w-1 h-6 bg-linear-to-b from-purple-500 to-pink-500 rounded-full" />
           Peminjaman Terbaru
         </CardTitle>
       </CardHeader>
@@ -74,7 +74,7 @@ export default function LatestLoansTable({ data }: LatestLoansTableProps) {
                   >
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <div className="h-8 w-8 rounded-full bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                           <User className="h-4 w-4 text-white" />
                         </div>
                         <div className="flex flex-col">

@@ -9,7 +9,7 @@ export function ActivityStatisticsSkeleton() {
           key={index}
           className="group relative overflow-hidden border-none transition-all duration-300"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-br from-transparent via-transparent to-transparent pointer-events-none" />
           <div className="absolute top-0 right-0 w-16 h-16 rounded-bl-full transition-opacity" />
           <div className="absolute top-3 right-3">
             <Skeleton className="h-2 w-2 rounded-full" />

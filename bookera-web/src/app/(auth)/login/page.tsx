@@ -54,7 +54,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-brand-primary/10 via-white to-brand-primary-light/5">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-linear-to-br from-brand-primary/10 via-white to-brand-primary-light/5">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-brand-primary/5 rounded-full blur-3xl"></div>
@@ -89,7 +89,7 @@ export default function LoginPage() {
           {/* Features list untuk pendidikan */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto lg:mx-0">
             <div className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
+              <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
                 <BookOpen className="w-4 h-4 text-brand-primary" />
               </div>
               <span className="text-sm font-medium text-gray-700">
@@ -97,7 +97,7 @@ export default function LoginPage() {
               </span>
             </div>
             <div className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
+              <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
                 <GraduationCap className="w-4 h-4 text-brand-primary" />
               </div>
               <span className="text-sm font-medium text-gray-700">
@@ -105,7 +105,7 @@ export default function LoginPage() {
               </span>
             </div>
             <div className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
+              <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
                 <Users className="w-4 h-4 text-brand-primary" />
               </div>
               <span className="text-sm font-medium text-gray-700">
@@ -113,7 +113,7 @@ export default function LoginPage() {
               </span>
             </div>
             <div className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
+              <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
                 <Globe className="w-4 h-4 text-brand-primary" />
               </div>
               <span className="text-sm font-medium text-gray-700">
@@ -125,7 +125,7 @@ export default function LoginPage() {
 
         {/* Right side - Login Form */}
         <Card className="w-full max-w-md border-0 shadow-2xl backdrop-blur-sm bg-white/95">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-1.5 bg-gradient-to-r from-brand-primary to-brand-primary-light rounded-full"></div>
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-1.5 bg-linear-to-r from-brand-primary to-brand-primary-light rounded-full"></div>
 
           <CardHeader className="space-y-4 text-center pb-6">
             <div className="flex items-center justify-center gap-2">
@@ -217,7 +217,7 @@ export default function LoginPage() {
                 type="submit"
                 variant="submit"
                 loading={loading}
-                className="w-full h-12 text-base font-semibold rounded-lg bg-gradient-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
+                className="w-full h-12 text-base font-semibold rounded-lg bg-linear-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
                 spinnerClassName="text-white"
               >
                 {loading ? (

@@ -7,7 +7,7 @@ export function ContentLoadingScreen() {
         {/* Combined design from LoadingScreen */}
         <div className="relative">
           {/* Outer gradient ring with pulse effect */}
-          <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500 opacity-30 blur-md animate-pulse" />
+          <div className="absolute -inset-4 rounded-full bg-linear-to-r from-emerald-500 via-teal-500 to-emerald-500 opacity-30 blur-md animate-pulse" />
 
           {/* Outer rotating ring - clockwise */}
           <div
@@ -25,7 +25,7 @@ export function ContentLoadingScreen() {
 
           {/* Center icon with book */}
           <div className="relative flex h-20 w-20 items-center justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/30">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/30">
               <svg
                 className="h-7 w-7 text-white"
                 fill="none"
@@ -44,7 +44,7 @@ export function ContentLoadingScreen() {
         </div>
 
         {/* Brand name */}
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 bg-clip-text text-transparent">
+        <h2 className="text-2xl font-bold bg-linear-to-r from-emerald-600 via-teal-600 to-emerald-600 bg-clip-text text-transparent">
           Bookera
         </h2>
 
@@ -70,7 +70,7 @@ export function ContentLoadingScreen() {
         {/* Progress bar */}
         <div className="w-64 h-1 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
+            className="h-full bg-linear-to-r from-emerald-500 to-teal-500 rounded-full"
             style={{
               animation: "progress 1.5s ease-in-out infinite",
             }}

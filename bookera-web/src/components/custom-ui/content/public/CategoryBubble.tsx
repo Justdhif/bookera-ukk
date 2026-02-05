@@ -72,12 +72,12 @@ export default function CategoryBubble({
       {/* Container dengan overflow scroll dan custom scrollbar */}
       <div className="relative">
         {/* Fade effect di ujung kanan */}
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent dark:from-gray-900 z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-linear-to-l from-white to-transparent dark:from-gray-900 z-10 pointer-events-none" />
 
         {/* Scroll container */}
         <div className="flex gap-2 overflow-x-auto py-2 scrollbar-hide scroll-smooth px-1">
           {/* Badge "Semua" */}
-          <div id="category-null" className="flex-shrink-0">
+          <div id="category-null" className="shrink-0">
             <Badge
               variant={active === null ? "default" : "outline"}
               className={`
@@ -86,7 +86,7 @@ export default function CategoryBubble({
                  hover:shadow-md
                 ${
                   active === null
-                    ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-500"
+                    ? "bg-linear-to-r from-emerald-500 to-emerald-600 text-white border-emerald-500"
                     : "border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
                 }
                 group relative overflow-hidden
@@ -107,7 +107,7 @@ export default function CategoryBubble({
 
               {/* Active background effect */}
               {active === null && (
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-emerald-600/20" />
+                <div className="absolute inset-0 bg-linear-to-r from-emerald-400/20 to-emerald-600/20" />
               )}
             </Badge>
           </div>
@@ -117,7 +117,7 @@ export default function CategoryBubble({
             <div
               key={cat.id}
               id={`category-${cat.id}`}
-              className="flex-shrink-0"
+              className="shrink-0"
             >
               <Badge
                 variant={active === cat.id ? "default" : "outline"}
@@ -127,7 +127,7 @@ export default function CategoryBubble({
                    hover:shadow-md
                   ${
                     active === cat.id
-                      ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-emerald-500"
+                      ? "bg-linear-to-r from-emerald-500 to-emerald-600 text-white border-emerald-500"
                       : "border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
                   }
                   group relative overflow-hidden
@@ -148,7 +148,7 @@ export default function CategoryBubble({
 
                 {/* Active background effect */}
                 {active === cat.id && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-emerald-600/20" />
+                  <div className="absolute inset-0 bg-linear-to-r from-emerald-400/20 to-emerald-600/20" />
                 )}
               </Badge>
             </div>

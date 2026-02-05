@@ -117,20 +117,20 @@ export function AdminSidebar() {
   return (
     <Sidebar collapsible="icon" variant="floating" className="p-4">
       {/* HEADER */}
-      <SidebarHeader className="border-b bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/20 dark:to-teal-950/20">
+      <SidebarHeader className="border-b bg-linear-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/20 dark:to-teal-950/20">
         <div
           className={`flex items-center gap-3 py-4 ${open ? "px-4" : "justify-center"}`}
         >
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 text-white shrink-0 shadow-lg shadow-emerald-500/30 ring-2 ring-emerald-100 dark:ring-emerald-900/50">
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-emerald-600 via-emerald-500 to-teal-500 text-white shrink-0 shadow-lg shadow-emerald-500/30 ring-2 ring-emerald-100 dark:ring-emerald-900/50">
             <Crown className="h-5 w-5" />
           </div>
           {open && (
             <div className="flex flex-col flex-1 gap-1.5">
-              <span className="text-lg font-bold bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+              <span className="text-lg font-bold bg-linear-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
                 Bookera
               </span>
               {/* Admin Status Badge */}
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-all w-fit bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-950/50 dark:to-teal-950/50 ring-1 ring-emerald-200 dark:ring-emerald-900">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-all w-fit bg-linear-to-r from-emerald-100 to-teal-100 dark:from-emerald-950/50 dark:to-teal-950/50 ring-1 ring-emerald-200 dark:ring-emerald-900">
                 <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
                   Admin
@@ -160,7 +160,7 @@ export function AdminSidebar() {
                     groupIndex > 0 && (
                       <div className="flex items-center justify-center w-full py-3">
                         <div
-                          className={`h-0.5 w-8 bg-gradient-to-r from-transparent ${
+                          className={`h-0.5 w-8 bg-linear-to-r from-transparent ${
                             groupIndex === 1
                               ? "via-amber-500/40"
                               : groupIndex === 2
@@ -193,7 +193,7 @@ export function AdminSidebar() {
                           <div
                             className={`${
                               open ? "p-1.5" : "p-2"
-                            } rounded-lg bg-gradient-to-br ${item.gradient} text-white shadow-sm group-hover/item:shadow-md transition-shadow`}
+                            } rounded-lg bg-linear-to-br ${item.gradient} text-white shadow-sm group-hover/item:shadow-md transition-shadow`}
                           >
                             <item.icon className="h-3.5 w-3.5" />
                           </div>
@@ -215,7 +215,7 @@ export function AdminSidebar() {
       </SidebarContent>
 
       {/* FOOTER */}
-      <SidebarFooter className="border-t bg-gradient-to-br from-slate-50/50 to-gray-50/50 dark:from-slate-950/20 dark:to-gray-950/20">
+      <SidebarFooter className="border-t bg-linear-to-br from-slate-50/50 to-gray-50/50 dark:from-slate-950/20 dark:to-gray-950/20">
         <SidebarMenu className={!open ? "flex flex-col items-center" : ""}>
           {/* Home/Public Button */}
           <SidebarMenuItem
@@ -234,7 +234,7 @@ export function AdminSidebar() {
               <div
                 className={`${
                   open ? "p-1.5" : "p-2"
-                } rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-sm group-hover/home:shadow-md transition-shadow`}
+                } rounded-lg bg-linear-to-br from-blue-600 to-indigo-600 text-white shadow-sm group-hover/home:shadow-md transition-shadow`}
               >
                 <HomeIcon className="h-3.5 w-3.5" />
               </div>
@@ -259,7 +259,7 @@ export function AdminSidebar() {
               <div
                 className={`${
                   open ? "p-1.5" : "p-2"
-                } rounded-lg bg-gradient-to-br from-slate-600 to-gray-600 text-white shadow-sm group-hover/settings:shadow-md transition-shadow`}
+                } rounded-lg bg-linear-to-br from-slate-600 to-gray-600 text-white shadow-sm group-hover/settings:shadow-md transition-shadow`}
               >
                 <Settings className="h-3.5 w-3.5" />
               </div>
@@ -273,7 +273,7 @@ export function AdminSidebar() {
           >
             <SidebarMenuButton
               onClick={handleLogout}
-              className={`group/logout hover:bg-gradient-to-r hover:from-red-50 hover:to-rose-50 dark:hover:from-red-950/20 dark:hover:to-rose-950/20 transition-all ${
+              className={`group/logout hover:bg-linear-to-r hover:from-red-50 hover:to-rose-50 dark:hover:from-red-950/20 dark:hover:to-rose-950/20 transition-all ${
                 !open && "justify-center px-0 mx-auto"
               }`}
               tooltip={{
@@ -285,7 +285,7 @@ export function AdminSidebar() {
               <div
                 className={`${
                   open ? "p-1.5" : "p-2"
-                } rounded-lg bg-gradient-to-br from-red-500 to-rose-500 text-white shadow-sm group-hover/logout:shadow-md group-hover/logout:scale-105 transition-all`}
+                } rounded-lg bg-linear-to-br from-red-500 to-rose-500 text-white shadow-sm group-hover/logout:shadow-md group-hover/logout:scale-105 transition-all`}
               >
                 <LogOut className="h-3.5 w-3.5" />
               </div>
@@ -326,7 +326,7 @@ export function AdminSidebar() {
             ) : (
               <SidebarMenuButton
                 onClick={handleProfileClick}
-                className={`h-auto py-3 hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-teal-50/50 dark:hover:from-emerald-950/20 dark:hover:to-teal-950/20 transition-all group/profile rounded-xl ${
+                className={`h-auto py-3 hover:bg-linear-to-r hover:from-emerald-50/50 hover:to-teal-50/50 dark:hover:from-emerald-950/20 dark:hover:to-teal-950/20 transition-all group/profile rounded-xl ${
                   !open && "justify-center"
                 }`}
                 tooltip={{
@@ -344,13 +344,13 @@ export function AdminSidebar() {
                         src={user?.profile?.avatar} 
                         alt={user?.profile?.full_name || user?.email || "User"}
                       />
-                      <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white font-semibold">
+                      <AvatarFallback className="bg-linear-to-br from-emerald-500 to-teal-500 text-white font-semibold">
                         {user?.profile?.full_name?.[0]?.toUpperCase() ||
                           user?.email?.[0]?.toUpperCase() ||
                           "A"}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 border-2 border-background shadow-sm animate-pulse" />
+                    <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-linear-to-br from-green-400 to-emerald-500 border-2 border-background shadow-sm animate-pulse" />
                   </div>
                   {open && (
                     <>

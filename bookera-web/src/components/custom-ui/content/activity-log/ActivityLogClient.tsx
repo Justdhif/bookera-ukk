@@ -51,7 +51,7 @@ export default function ActivityLogClient() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <h1 className="text-4xl font-black bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 dark:from-white dark:via-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-black bg-linear-to-r from-gray-900 via-gray-800 to-gray-700 dark:from-white dark:via-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
             Activity Logs
           </h1>
           <p className="text-base text-gray-600 dark:text-gray-400">

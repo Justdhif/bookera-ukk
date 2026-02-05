@@ -81,7 +81,7 @@ export default function ActivityCharts({ charts }: ActivityChartsProps) {
       <Card className="border-0 shadow-lg bg-white dark:bg-gray-900">
         <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
           <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-cyan-500 rounded-full" />
+            <div className="w-1 h-6 bg-linear-to-b from-blue-500 to-cyan-500 rounded-full" />
             Distribusi per Modul
           </CardTitle>
         </CardHeader>
@@ -131,7 +131,7 @@ export default function ActivityCharts({ charts }: ActivityChartsProps) {
       <Card className="border-0 shadow-lg bg-white dark:bg-gray-900">
         <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
           <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <div className="w-1 h-6 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full" />
+            <div className="w-1 h-6 bg-linear-to-b from-purple-500 to-pink-500 rounded-full" />
             Tren Aktivitas Harian
           </CardTitle>
         </CardHeader>
