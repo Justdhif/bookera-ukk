@@ -120,7 +120,7 @@ export default function LatestLoansTable({ data }: LatestLoansTableProps) {
             </Table>
           </div>
         ) : (
-          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+          <div className="flex items-center justify-center h-75 text-muted-foreground">
             Tidak ada data peminjaman
           </div>
         )}

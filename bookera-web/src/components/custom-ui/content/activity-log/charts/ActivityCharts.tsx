@@ -120,7 +120,7 @@ export default function ActivityCharts({ charts }: ActivityChartsProps) {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[350px] text-muted-foreground">
+            <div className="flex items-center justify-center h-87.5 text-muted-foreground">
               Tidak ada data
             </div>
           )}
@@ -170,7 +170,7 @@ export default function ActivityCharts({ charts }: ActivityChartsProps) {
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[350px] text-muted-foreground">
+            <div className="flex items-center justify-center h-87.5 text-muted-foreground">
               Tidak ada data
             </div>
           )}

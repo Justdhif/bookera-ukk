@@ -105,7 +105,7 @@ export default function LoanMonthlyChart({ data }: { data: LoanMonthly[] }) {
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex items-center justify-center h-[350px] text-muted-foreground">
+          <div className="flex items-center justify-center h-87.5 text-muted-foreground">
             Tidak ada data
           </div>
         )}

@@ -93,7 +93,7 @@ export default function LoanStatusChart({ data }: { data: LoanStatus[] }) {
             </PieChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex items-center justify-center h-[350px] text-muted-foreground">
+          <div className="flex items-center justify-center h-87.5 text-muted-foreground">
             Tidak ada data
           </div>
         )}
