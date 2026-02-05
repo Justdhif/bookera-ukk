@@ -98,7 +98,9 @@ class BookController extends Controller
             'create',
             'book',
             "Created book: {$book->title}",
-            $book->toArray()
+            $book->toArray(),
+            null,
+            $book
         );
 
         return ApiResponse::successResponse(
@@ -111,6 +113,29 @@ class BookController extends Controller
     public function show($id)
     {
         $book = Book::find($id);
+        if (!$book) {
+            return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
+        }
+
+        $book->load([
+            'categories',
+            'copies' => function ($q) {
+                $q->orderBy('status')
+                    ->orderBy('created_at');
+            }
+        ]);
+
+        $book->cover_image_url = storage_image($book->cover_image);
+
+        return ApiResponse::successResponse(
+            'Detail buku',
+            $book
+        );
+    }
+
+    public function showBySlug($slug)
+    {
+        $book = Book::where('slug', $slug)->first();
         if (!$book) {
             return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
         }
@@ -188,7 +213,8 @@ class BookController extends Controller
             'book',
             "Updated book: {$book->title}",
             $book->toArray(),
-            $oldData
+            $oldData,
+            $book
         );
 
         return ApiResponse::successResponse(
@@ -215,7 +241,8 @@ class BookController extends Controller
             'book',
             "Deleted book: {$bookTitle}",
             null,
-            $bookData
+            $bookData,
+            null
         );
 
         return ApiResponse::successResponse(

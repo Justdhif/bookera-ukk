@@ -89,7 +89,9 @@ class BookReturnController extends Controller
                     'return_date' => $return->return_date,
                     'approval_status' => 'pending',
                     'returned_copies' => $returnedCopies,
-                ]
+                ],
+                null,
+                $return
             );
 
             return $return;

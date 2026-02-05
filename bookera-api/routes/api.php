@@ -99,6 +99,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::get('books', [BookController::class, 'index']);
+Route::get('books/slug/{slug}', [BookController::class, 'showBySlug']);
 Route::get('books/{id}', [BookController::class, 'show']);
 
 Route::apiResource('categories', CategoryController::class)->only('index');

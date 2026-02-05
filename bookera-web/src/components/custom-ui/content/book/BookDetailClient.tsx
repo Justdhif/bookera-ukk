@@ -1,296 +1,241 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { bookService } from "@/services/book.service";
+import { categoryService } from "@/services/category.service";
 import { Book } from "@/types/book";
-import { BookFormDialog } from "./BookFormDialog";
+import { Category } from "@/types/category";
 import BookCopyList from "./BookCopyList";
+import BookCoverCard from "./BookCoverCard";
+import BookDetailForm from "./BookDetailForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import {
-  CalendarDays,
-  User,
-  Building,
-  Globe,
-  BookOpen,
-  Hash,
-  CheckCircle,
-  XCircle,
-  Image as ImageIcon,
-} from "lucide-react";
+import { ArrowLeft, Save, X, Edit2 } from "lucide-react";
 import { format } from "date-fns";
 import { id as indonesianLocale } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
-export default function BookDetailClient({ id }: { id: number }) {
+export default function BookDetailClient() {
+  const router = useRouter();
+  const params = useParams();
+  const slug = params.slug as string;
+
   const [book, setBook] = useState<Book | null>(null);
-  const [open, setOpen] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [formData, setFormData] = useState<any>({});
+  const [coverPreview, setCoverPreview] = useState<string>("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchBook();
+    fetchCategories();
+  }, [slug]);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await categoryService.getAll();
+      setCategories(res.data.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   const fetchBook = async () => {
     try {
       setLoading(true);
-      const res = await bookService.show(id);
+      const res = await bookService.showBySlug(slug);
       setBook(res.data.data);
-    } catch (error) {
-      console.error("Error fetching book details:", error);
+      setFormData({
+        title: res.data.data.title,
+        author: res.data.data.author,
+        publisher: res.data.data.publisher || "",
+        publication_year: res.data.data.publication_year?.toString() || "",
+        isbn: res.data.data.isbn || "",
+        language: res.data.data.language || "",
+        description: res.data.data.description || "",
+        is_active: res.data.data.is_active,
+        category_ids: res.data.data.categories?.map((c) => c.id) || [],
+      });
+      setCoverPreview(res.data.data.cover_image_url || "");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Gagal mengambil data buku");
+      router.push("/admin/books");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (!id || isNaN(id)) return;
-    fetchBook();
-  }, [id]);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!book) return;
+
+    try {
+      setSubmitting(true);
+      const data = new FormData();
+
+      data.append("title", formData.title.trim());
+      data.append("author", formData.author.trim());
+      data.append("publisher", formData.publisher.trim());
+      data.append("language", formData.language.trim());
+      data.append("description", formData.description.trim());
+      data.append("is_active", formData.is_active ? "1" : "0");
+
+      if (formData.isbn) {
+        data.append("isbn", formData.isbn.trim());
+      }
+
+      if (formData.publication_year) {
+        data.append("publication_year", formData.publication_year);
+      }
+
+      formData.category_ids.forEach((id: number) =>
+        data.append("category_ids[]", String(id))
+      );
+
+      if (formData.cover_image) {
+        data.append("cover_image", formData.cover_image);
+      }
+
+      await bookService.update(book.id, data);
+      toast.success("Buku berhasil diupdate");
+      setIsEditMode(false);
+      fetchBook();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Gagal mengupdate buku");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    if (book) {
+      setFormData({
+        title: book.title,
+        author: book.author,
+        publisher: book.publisher || "",
+        publication_year: book.publication_year?.toString() || "",
+        isbn: book.isbn || "",
+        language: book.language || "",
+        description: book.description || "",
+        is_active: book.is_active,
+        category_ids: book.categories?.map((c) => c.id) || [],
+      });
+      setCoverPreview(book.cover_image_url || "");
+    }
+    setIsEditMode(false);
+  };
 
   if (loading) {
-    return <BookDetailSkeleton />;
-  }
-
-  if (!book) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-        <BookOpen className="h-16 w-16 text-muted-foreground" />
-        <p className="text-lg text-muted-foreground">Buku tidak ditemukan</p>
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-8 w-8" />
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+        </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Skeleton className="h-96" />
+          <Skeleton className="lg:col-span-2 h-96" />
+        </div>
       </div>
     );
   }
 
+  if (!book) return null;
+
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), "dd MMMM yyyy HH:mm", { locale: indonesianLocale });
+      return format(new Date(dateString), "dd MMMM yyyy HH:mm", {
+        locale: indonesianLocale,
+      });
     } catch {
       return dateString;
     }
   };
 
   return (
-    <div className="space-y-8">
-      {/* Header Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{book.title}</h1>
-          <div className="flex items-center gap-2 mt-2">
-            <Badge variant={book.is_active ? "default" : "secondary"}>
-              {book.is_active ? (
-                <>
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  Aktif
-                </>
-              ) : (
-                <>
-                  <XCircle className="h-3 w-3 mr-1" />
-                  Tidak Aktif
-                </>
-              )}
-            </Badge>
-            <Badge variant="outline" className="text-xs">
-              {book.slug}
-            </Badge>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push("/admin/books")}
+            className="h-8 w-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Detail Buku</h1>
+            <p className="text-muted-foreground">
+              {isEditMode ? "Edit informasi buku" : "Lihat detail buku"}
+            </p>
           </div>
         </div>
-        <Button onClick={() => setOpen(true)} className="gap-2">
-          Edit Buku
-        </Button>
+        {isEditMode ? (
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCancelEdit}
+              disabled={submitting}
+              className="h-8"
+            >
+              <X className="h-3.5 w-3.5 mr-1.5" />
+              Batal
+            </Button>
+            <Button
+              type="submit"
+              form="book-form"
+              variant="submit"
+              disabled={submitting || !formData.title || !formData.author}
+              loading={submitting}
+              className="h-8"
+            >
+              {submitting ? "Menyimpan..." : "Simpan Perubahan"}
+            </Button>
+          </div>
+        ) : (
+          <Button
+            onClick={() => setIsEditMode(true)}
+            variant="brand"
+            className="h-8 gap-1"
+          >
+            <Edit2 className="h-3.5 w-3.5" />
+            Edit Buku
+          </Button>
+        )}
       </div>
 
-      <BookFormDialog
-        open={open}
-        setOpen={setOpen}
-        book={book}
-        onSuccess={fetchBook}
-      />
+      <form id="book-form" onSubmit={handleSubmit}>
+        <div className="grid gap-6 lg:grid-cols-3">
+          <BookCoverCard
+            book={book}
+            coverPreview={coverPreview}
+            isEditMode={isEditMode}
+            formData={formData}
+            setFormData={setFormData}
+            setCoverPreview={setCoverPreview}
+          />
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column - Book Cover & Basic Info */}
-        <div className="lg:col-span-1 space-y-6">
-          {/* Book Cover */}
-          <Card className="overflow-hidden">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <ImageIcon className="h-5 w-5" />
-                Sampul Buku
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="aspect-[3/4] relative overflow-hidden rounded-lg border bg-muted">
-                {book.cover_image_url ? (
-                  <img
-                    src={book.cover_image_url}
-                    alt={`Sampul ${book.title}`}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <BookOpen className="h-16 w-16 text-muted-foreground" />
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Basic Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Informasi Dasar</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Hash className="h-4 w-4" />
-                  <span>ID Buku</span>
-                </div>
-                <p className="font-medium">{book.id}</p>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Hash className="h-4 w-4" />
-                  <span>ISBN</span>
-                </div>
-                <p className="font-medium">{book.isbn || "-"}</p>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CalendarDays className="h-4 w-4" />
-                  <span>Tahun Terbit</span>
-                </div>
-                <p className="font-medium">{book.publication_year}</p>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Globe className="h-4 w-4" />
-                  <span>Bahasa</span>
-                </div>
-                <p className="font-medium capitalize">{book.language}</p>
-              </div>
-            </CardContent>
-          </Card>
+          <BookDetailForm
+            book={book}
+            isEditMode={isEditMode}
+            formData={formData}
+            setFormData={setFormData}
+            categories={categories}
+          />
         </div>
-
-        {/* Right Column - Detailed Information */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Author & Publisher */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  Penulis
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-lg font-medium">{book.author}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Building className="h-5 w-5" />
-                  Penerbit
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-lg font-medium">{book.publisher}</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Description */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Deskripsi</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="prose prose-sm max-w-none">
-                <p className="whitespace-pre-line text-muted-foreground leading-relaxed">
-                  {book.description || "Tidak ada deskripsi tersedia"}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Categories */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Kategori</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {book.categories && book.categories.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {book.categories.map((category) => (
-                    <Badge key={category.id} variant="secondary">
-                      {category.name}
-                    </Badge>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground">Tidak ada kategori</p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Metadata */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Metadata</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-sm text-muted-foreground">Dibuat Pada</p>
-                  <p className="font-medium">{formatDate(book.created_at)}</p>
-                </div>
-                <Separator />
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Diperbarui Pada
-                  </p>
-                  <p className="font-medium">{formatDate(book.updated_at)}</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Statistics */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Statistik</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Total Salinan</span>
-                  <span className="text-2xl font-bold">
-                    {book.copies?.length || 0}
-                  </span>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Kategori</span>
-                  <span className="text-2xl font-bold">
-                    {book.categories?.length || 0}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
+      </form>
 
       {/* Book Copies Section */}
-      <div className="mt-8">
+      {!isEditMode && (
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Salinan Buku</CardTitle>
@@ -299,91 +244,26 @@ export default function BookDetailClient({ id }: { id: number }) {
             <BookCopyList book={book} onChange={fetchBook} />
           </CardContent>
         </Card>
-      </div>
-    </div>
-  );
-}
+      )}
 
-// Skeleton Loader Component
-function BookDetailSkeleton() {
-  return (
-    <div className="space-y-8">
-      {/* Header Skeleton */}
-      <div className="flex justify-between items-center">
-        <div className="space-y-2">
-          <Skeleton className="h-9 w-64" />
-          <Skeleton className="h-6 w-32" />
-        </div>
-        <Skeleton className="h-10 w-32" />
-      </div>
-
-      {/* Main Content Grid Skeleton */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column Skeleton */}
-        <div className="lg:col-span-1 space-y-6">
-          <Card>
-            <CardHeader className="pb-3">
-              <Skeleton className="h-6 w-32" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="aspect-[3/4] w-full rounded-lg" />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-40" />
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="space-y-2">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-5 w-full" />
-                  {i < 4 && <Separator />}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right Column Skeleton */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[1, 2].map((i) => (
-              <Card key={i}>
-                <CardHeader className="pb-3">
-                  <Skeleton className="h-6 w-24" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-7 w-full" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-32" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-20 w-full" />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-24" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-2">
-                {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-6 w-16 rounded-full" />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      {/* Metadata Section */}
+      {!isEditMode && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Metadata</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <p className="text-sm text-muted-foreground">Dibuat Pada</p>
+              <p className="font-medium">{formatDate(book.created_at)}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Diperbarui Pada</p>
+              <p className="font-medium">{formatDate(book.updated_at)}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

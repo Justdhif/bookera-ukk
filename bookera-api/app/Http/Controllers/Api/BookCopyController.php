@@ -26,7 +26,9 @@ class BookCopyController extends Controller
             'create',
             'book_copy',
             "Created book copy {$copy->copy_code} for book: {$book->title}",
-            $copy->toArray()
+            $copy->toArray(),
+            null,
+            $copy
         );
 
         return ApiResponse::successResponse(
@@ -56,7 +58,8 @@ class BookCopyController extends Controller
             'book_copy',
             "Deleted book copy {$oldData['copy_code']}",
             null,
-            $oldData
+            $oldData,
+            null
         );
 
         return ApiResponse::successResponse(

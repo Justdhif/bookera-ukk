@@ -11,7 +11,7 @@ export default function BookCard({ book }: { book: Book }) {
     <div className="border rounded-lg p-3 space-y-3">
       <img
         src={book.cover_image_url ?? "/placeholder.png"}
-        className="aspect-[3/4] object-cover rounded"
+        className="aspect-3/4 object-cover rounded"
       />
 
       <div>
@@ -22,7 +22,7 @@ export default function BookCard({ book }: { book: Book }) {
       <Button
         size="sm"
         variant="outline"
-        onClick={() => router.push(`/books/${book.id}`)}
+        onClick={() => router.push(`/books/${book.slug}`)}
       >
         Detail
       </Button>

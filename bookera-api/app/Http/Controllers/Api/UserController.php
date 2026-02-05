@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -142,6 +143,15 @@ class UserController extends Controller
 
             $user->load('profile');
 
+            ActivityLogger::log(
+                'create',
+                'user',
+                "Created user: {$user->email} (Role: {$user->role})",
+                $user->toArray(),
+                null,
+                $user
+            );
+
             return ApiResponse::successResponse(
                 'User berhasil dibuat',
                 $user,
@@ -253,6 +263,15 @@ class UserController extends Controller
 
             $user->load('profile');
 
+            ActivityLogger::log(
+                'update',
+                'user',
+                "Updated user: {$user->email} (Role: {$user->role})",
+                $user->toArray(),
+                $userData,
+                $user
+            );
+
             return ApiResponse::successResponse(
                 'User berhasil diupdate',
                 $user
@@ -276,6 +295,9 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         try {
+            $userData = $user->toArray();
+            $userEmail = $user->email;
+
             // Delete avatar if exists
             if ($user->profile && $user->profile->getRawOriginal('avatar')) {
                 Storage::disk('public')->delete($user->profile->getRawOriginal('avatar'));
@@ -283,6 +305,15 @@ class UserController extends Controller
 
             // Delete user (profile will be cascade deleted)
             $user->delete();
+
+            ActivityLogger::log(
+                'delete',
+                'user',
+                "Deleted user: {$userEmail}",
+                null,
+                $userData,
+                null
+            );
 
             return ApiResponse::successResponse(
                 'User berhasil dihapus',

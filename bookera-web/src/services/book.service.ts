@@ -7,6 +7,8 @@ export const bookService = {
 
   show: (id: number) => api.get<ApiResponse<Book>>(`/books/${id}`),
 
+  showBySlug: (slug: string) => api.get<ApiResponse<Book>>(`/books/slug/${slug}`),
+
   create: (data: FormData) =>
     api.post<ApiResponse<Book>>("/admin/books", data, {
       headers: {

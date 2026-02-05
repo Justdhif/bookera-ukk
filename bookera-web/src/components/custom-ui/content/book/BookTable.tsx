@@ -17,11 +17,10 @@ import { useRouter } from "next/navigation";
 
 interface Props {
   data: Book[];
-  onEdit: (book: Book) => void;
   onDelete: (id: number) => void;
 }
 
-export function BookTable({ data, onEdit, onDelete }: Props) {
+export function BookTable({ data, onDelete }: Props) {
   const router = useRouter();
 
   if (data.length === 0) {
@@ -107,7 +106,7 @@ export function BookTable({ data, onEdit, onDelete }: Props) {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => router.push(`/admin/books/${book.id}`)}
+                  onClick={() => router.push(`/admin/books/${book.slug}`)}
                   className="h-8 gap-1"
                 >
                   <Eye className="h-3.5 w-3.5" />

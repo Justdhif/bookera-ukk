@@ -31,6 +31,7 @@ import {
   XCircle,
   Search,
 } from "lucide-react";
+import { getIconByName } from "@/lib/icons";
 
 export default function CategoryTable({
   data,
@@ -56,6 +57,7 @@ export default function CategoryTable({
       <TableHeader>
         <TableRow className="bg-muted/50 hover:bg-muted/50">
           <TableHead className="w-16 text-center">#</TableHead>
+          <TableHead className="w-16 text-center font-semibold">Icon</TableHead>
           <TableHead className="font-semibold">Kategori</TableHead>
           <TableHead className="font-semibold">Slug</TableHead>
           <TableHead className="font-semibold">Deskripsi</TableHead>
@@ -64,20 +66,35 @@ export default function CategoryTable({
       </TableHeader>
 
       <TableBody>
-        {data.map((item, index) => (
-          <TableRow
-            key={item.id}
-            className="group hover:bg-primary/5 transition-colors border-b last:border-b-0"
-          >
-            <TableCell className="font-medium text-center text-muted-foreground">
-              {index + 1}
-            </TableCell>
+        {data.map((item, index) => {
+          const IconComponent = item.icon ? getIconByName(item.icon) : null;
+          
+          return (
+            <TableRow
+              key={item.id}
+              className="group hover:bg-primary/5 transition-colors border-b last:border-b-0"
+            >
+              <TableCell className="font-medium text-center text-muted-foreground">
+                {index + 1}
+              </TableCell>
 
-            <TableCell>
-              <span className="font-medium text-foreground">{item.name}</span>
-            </TableCell>
+              <TableCell className="text-center">
+                <div className="flex justify-center">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    {IconComponent ? (
+                      <IconComponent className="h-4 w-4 text-primary" />
+                    ) : (
+                      <Tag className="h-4 w-4 text-primary" />
+                    )}
+                  </div>
+                </div>
+              </TableCell>
 
-            <TableCell>
+              <TableCell>
+                <span className="font-medium text-foreground">{item.name}</span>
+              </TableCell>
+
+              <TableCell>
               <Badge variant="outline" className="font-mono text-xs">
                 /{item.slug}
               </Badge>
@@ -113,7 +130,8 @@ export default function CategoryTable({
               </div>
             </TableCell>
           </TableRow>
-        ))}
+        );
+      })}
       </TableBody>
     </Table>
   );

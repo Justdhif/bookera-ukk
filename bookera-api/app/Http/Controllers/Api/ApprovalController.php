@@ -71,7 +71,8 @@ class ApprovalController extends Controller
                     'loan_id' => $loan->id,
                     'old_status' => $oldStatus,
                     'old_approval_status' => 'pending',
-                ]
+                ],
+                $loan
             );
 
             $loan->load([
@@ -119,7 +120,9 @@ class ApprovalController extends Controller
                 'approval_status' => 'rejected',
                 'status' => 'rejected',
                 'reason' => $data['rejection_reason'] ?? 'No reason provided',
-            ]
+            ],
+            null,
+            $loan
         );
 
         $loan->load([
@@ -180,7 +183,8 @@ class ApprovalController extends Controller
                     'book_copy',
                     "Book copy #{$copy->id} ({$copy->book->title}) returned with condition '{$detail->condition}' - status changed to {$newStatus}",
                     ['copy_id' => $copy->id, 'new_status' => $newStatus, 'condition' => $detail->condition],
-                    ['copy_id' => $copy->id, 'old_status' => $oldStatus]
+                    ['copy_id' => $copy->id, 'old_status' => $oldStatus],
+                    $copy
                 );
             }
 
@@ -198,7 +202,9 @@ class ApprovalController extends Controller
                     'loan_id' => $loan->id,
                     'approval_status' => 'approved',
                     'returned_copies' => $returnedCopies,
-                ]
+                ],
+                null,
+                $bookReturn
             );
 
             ActivityLogger::log(
@@ -206,7 +212,8 @@ class ApprovalController extends Controller
                 'loan',
                 "Loan #{$loan->id} status changed from {$oldLoanStatus} to returned",
                 ['loan_id' => $loan->id, 'new_status' => 'returned'],
-                ['loan_id' => $loan->id, 'old_status' => $oldLoanStatus]
+                ['loan_id' => $loan->id, 'old_status' => $oldLoanStatus],
+                $loan
             );
 
             $bookReturn->load([
@@ -252,7 +259,9 @@ class ApprovalController extends Controller
                 'return_id' => $bookReturn->id,
                 'approval_status' => 'rejected',
                 'reason' => $data['rejection_reason'] ?? 'No reason provided',
-            ]
+            ],
+            null,
+            $bookReturn
         );
 
         $bookReturn->load([
@@ -389,7 +398,8 @@ class ApprovalController extends Controller
                     'book_copy',
                     "Book copy #{$copy->id} ({$copy->book->title}) status changed to borrowed (loan #{$loan->id} handed over)",
                     ['copy_id' => $copy->id, 'new_status' => 'borrowed', 'loan_id' => $loan->id],
-                    ['copy_id' => $copy->id, 'old_status' => $oldCopyStatus]
+                    ['copy_id' => $copy->id, 'old_status' => $oldCopyStatus],
+                    $copy
                 );
             }
 
@@ -405,7 +415,8 @@ class ApprovalController extends Controller
                 [
                     'loan_id' => $loan->id,
                     'old_status' => $oldStatus,
-                ]
+                ],
+                $loan
             );
 
             $loan->load([

@@ -99,7 +99,9 @@ class LoanController extends Controller
                     'due_date' => $loan->due_date,
                     'approval_status' => 'pending',
                     'borrowed_copies' => $borrowedCopies,
-                ]
+                ],
+                null,
+                $loan
             );
 
             return $loan;
@@ -165,7 +167,8 @@ class LoanController extends Controller
                     'book_copy',
                     "Book copy #{$copy->id} ({$copy->book->title}) status changed to borrowed (admin loan #{$loan->id})",
                     ['copy_id' => $copy->id, 'new_status' => 'borrowed', 'loan_id' => $loan->id],
-                    ['copy_id' => $copy->id, 'old_status' => 'available']
+                    ['copy_id' => $copy->id, 'old_status' => 'available'],
+                    $copy
                 );
             }
 
@@ -186,7 +189,9 @@ class LoanController extends Controller
                     'status' => 'borrowed',
                     'borrowed_copies' => $borrowedCopies,
                     'admin' => $request->user()->email,
-                ]
+                ],
+                null,
+                $loan
             );
 
             return $loan;
@@ -268,16 +273,19 @@ class LoanController extends Controller
                 [
                     'loan_id' => $loan->id,
                     'old_due_date' => $oldDueDate,
-                ]
+                ],
+                $loan
             );
 
             foreach ($addedCopies as $copInfo) {
+                $copy = BookCopy::find($copInfo['copy_id']);
                 ActivityLogger::log(
                     'update',
                     'book_copy',
                     "Book copy #{$copInfo['copy_id']} ({$copInfo['book_title']}) status changed to borrowed (added to loan #{$loan->id})",
                     ['copy_id' => $copInfo['copy_id'], 'new_status' => 'borrowed', 'loan_id' => $loan->id],
-                    ['copy_id' => $copInfo['copy_id'], 'old_status' => 'available']
+                    ['copy_id' => $copInfo['copy_id'], 'old_status' => 'available'],
+                    $copy
                 );
             }
 

@@ -1,18 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { bookService } from "@/services/book.service";
 import { Book } from "@/types/book";
 import BookCopyList from "./BookCopyList";
 
-export default function BookDetailClient({ id }: { id: number }) {
+export default function BookDetailClient() {
+  const params = useParams();
+  const slug = params.slug as string;
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchBook = async () => {
     try {
       setLoading(true);
-      const res = await bookService.show(id);
+      const res = await bookService.showBySlug(slug);
       setBook(res.data.data);
     } catch (error) {
       console.error("Error fetching book details:", error);
@@ -22,9 +25,9 @@ export default function BookDetailClient({ id }: { id: number }) {
   };
 
   useEffect(() => {
-    if (!id || isNaN(id)) return;
+    if (!slug) return;
     fetchBook();
-  }, [id]);
+  }, [slug]);
 
   if (loading) return <div>Loading...</div>;
   if (!book) return null;

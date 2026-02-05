@@ -109,7 +109,7 @@ export function BookFilter({ categories, onChange }: Props) {
                 rounded-md border
                 ${
                   isAllActive
-                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                    ? "bg-brand-primary text-primary-foreground border-brand-primary shadow-sm"
                     : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
                 }
               `}
@@ -138,7 +138,7 @@ export function BookFilter({ categories, onChange }: Props) {
                     rounded-md border
                     ${
                       isActive
-                        ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                        ? "bg-brand-primary text-primary-foreground border-brand-primary shadow-sm"
                         : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
                     }
                   `}

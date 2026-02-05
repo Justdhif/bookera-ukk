@@ -25,6 +25,7 @@ class CategoryController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|unique:categories,name',
+            'icon' => 'nullable|string',
             'description' => 'nullable|string',
         ]);
 
@@ -36,7 +37,9 @@ class CategoryController extends Controller
             'create',
             'category',
             "Created category: {$category->name}",
-            $category->toArray()
+            $category->toArray(),
+            null,
+            $category
         );
 
         return ApiResponse::successResponse(
@@ -50,6 +53,7 @@ class CategoryController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|unique:categories,name,' . $category->id,
+            'icon' => 'nullable|string',
             'description' => 'nullable|string',
         ]);
 
@@ -64,7 +68,8 @@ class CategoryController extends Controller
             'category',
             "Updated category: {$category->name}",
             $category->toArray(),
-            $oldData
+            $oldData,
+            $category
         );
 
         return ApiResponse::successResponse(
@@ -86,7 +91,8 @@ class CategoryController extends Controller
             'category',
             "Deleted category: {$categoryName}",
             null,
-            $categoryData
+            $categoryData,
+            null
         );
 
         return ApiResponse::successResponse(

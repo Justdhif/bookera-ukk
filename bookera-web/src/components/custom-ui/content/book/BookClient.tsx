@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { bookService } from "@/services/book.service";
 import { Book } from "@/types/book";
-import { BookFormDialog } from "./BookFormDialog";
 import { BookTable } from "./BookTable";
 import { BookFilter } from "./BookFilter";
 import { Button } from "@/components/ui/button";
@@ -15,12 +15,11 @@ import { Plus } from "lucide-react";
 import { BookTableSkeleton } from "./BookTableSkeleton";
 
 export default function BookClient() {
+  const router = useRouter();
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<Book | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const [filters, setFilters] = useState<{
@@ -102,10 +101,7 @@ export default function BookClient() {
           </p>
         </div>
         <Button
-          onClick={() => {
-            setEditing(null);
-            setOpen(true);
-          }}
+          onClick={() => router.push("/admin/books/add")}
           variant="brand"
           className="h-8 gap-1"
         >
@@ -131,21 +127,9 @@ export default function BookClient() {
       ) : (
         <BookTable
           data={books}
-          onEdit={(book) => {
-            setEditing(book);
-            setOpen(true);
-          }}
           onDelete={(id) => setDeleteId(id)}
         />
       )}
-
-      {/* FORM */}
-      <BookFormDialog
-        open={open}
-        setOpen={setOpen}
-        book={editing}
-        onSuccess={fetchBooks}
-      />
 
       {/* DELETE CONFIRM */}
       <DeleteConfirmDialog
