@@ -277,6 +277,150 @@ class ActivityLogSeeder extends Seeder
             ActivityLog::create($activity);
         }
 
-        $this->command->info('Created ' . count($activities) . ' activity logs.');
+        $this->command->info('Created ' . count($activities) . ' activity logs for current period.');
+
+        $this->seed2025Activities($users, $books, $loans, $bookCopies, $categories, $bookReturns, $ipAddresses, $userAgents);
+    }
+
+    private function seed2025Activities($users, $books, $loans, $bookCopies, $categories, $bookReturns, $ipAddresses, $userAgents)
+    {
+        $activities2025 = [];
+
+        for ($month = 1; $month <= 12; $month++) {
+            $baseDate = Carbon::create(2025, $month, 15, 12, 0, 0);
+
+            $activitiesPerMonth = rand(15, 30);
+
+            for ($i = 0; $i < $activitiesPerMonth; $i++) {
+                $randomUser = $users->random();
+                $day = rand(1, 28);
+                $hour = rand(8, 18);
+                $minute = rand(0, 59);
+                $activityDate = Carbon::create(2025, $month, $day, $hour, $minute, 0);
+
+                $modules = ['auth', 'book', 'loan', 'user', 'category', 'book_copy', 'book_return'];
+                $module = $modules[array_rand($modules)];
+                $action = ['login', 'logout', 'create', 'update', 'delete'][array_rand(['login', 'logout', 'create', 'update', 'delete'])];
+
+                if ($module === 'auth') {
+                    $action = ['login', 'logout'][array_rand(['login', 'logout'])];
+                    $activities2025[] = [
+                        'user_id' => $randomUser->id,
+                        'action' => $action,
+                        'module' => $module,
+                        'description' => "User {$action}",
+                        'subject_type' => User::class,
+                        'subject_id' => $randomUser->id,
+                        'old_data' => null,
+                        'new_data' => null,
+                        'ip_address' => $ipAddresses[array_rand($ipAddresses)],
+                        'user_agent' => $userAgents[array_rand($userAgents)],
+                        'created_at' => $activityDate,
+                        'updated_at' => $activityDate,
+                    ];
+                } elseif ($module === 'book' && $books->isNotEmpty()) {
+                    $book = $books->random();
+                    $activities2025[] = [
+                        'user_id' => $randomUser->id,
+                        'action' => ['create', 'update'][array_rand(['create', 'update'])],
+                        'module' => $module,
+                        'description' => "{$action} book: {$book->title}",
+                        'subject_type' => Book::class,
+                        'subject_id' => $book->id,
+                        'old_data' => $action === 'update' ? json_encode(['title' => 'Old Title']) : null,
+                        'new_data' => json_encode(['title' => $book->title, 'author' => $book->author]),
+                        'ip_address' => $ipAddresses[array_rand($ipAddresses)],
+                        'user_agent' => $userAgents[array_rand($userAgents)],
+                        'created_at' => $activityDate,
+                        'updated_at' => $activityDate,
+                    ];
+                } elseif ($module === 'loan' && $loans->isNotEmpty()) {
+                    $loan = $loans->random();
+                    $activities2025[] = [
+                        'user_id' => $randomUser->id,
+                        'action' => ['create', 'update'][array_rand(['create', 'update'])],
+                        'module' => $module,
+                        'description' => "{$action} loan request #{$loan->id}",
+                        'subject_type' => Loan::class,
+                        'subject_id' => $loan->id,
+                        'old_data' => $action === 'update' ? json_encode(['status' => 'pending']) : null,
+                        'new_data' => json_encode(['status' => $loan->status]),
+                        'ip_address' => $ipAddresses[array_rand($ipAddresses)],
+                        'user_agent' => $userAgents[array_rand($userAgents)],
+                        'created_at' => $activityDate,
+                        'updated_at' => $activityDate,
+                    ];
+                } elseif ($module === 'user') {
+                    $activities2025[] = [
+                        'user_id' => $randomUser->id,
+                        'action' => 'update',
+                        'module' => $module,
+                        'description' => "Updated user profile: {$randomUser->email}",
+                        'subject_type' => User::class,
+                        'subject_id' => $randomUser->id,
+                        'old_data' => json_encode(['phone_number' => '0800000000']),
+                        'new_data' => json_encode(['phone_number' => $randomUser->profile->phone_number ?? '08123456789']),
+                        'ip_address' => $ipAddresses[array_rand($ipAddresses)],
+                        'user_agent' => $userAgents[array_rand($userAgents)],
+                        'created_at' => $activityDate,
+                        'updated_at' => $activityDate,
+                    ];
+                } elseif ($module === 'category' && $categories->isNotEmpty()) {
+                    $category = $categories->random();
+                    $activities2025[] = [
+                        'user_id' => $randomUser->id,
+                        'action' => ['create', 'update'][array_rand(['create', 'update'])],
+                        'module' => $module,
+                        'description' => "{$action} category: {$category->name}",
+                        'subject_type' => Category::class,
+                        'subject_id' => $category->id,
+                        'old_data' => $action === 'update' ? json_encode(['name' => 'Old Name']) : null,
+                        'new_data' => json_encode(['name' => $category->name]),
+                        'ip_address' => $ipAddresses[array_rand($ipAddresses)],
+                        'user_agent' => $userAgents[array_rand($userAgents)],
+                        'created_at' => $activityDate,
+                        'updated_at' => $activityDate,
+                    ];
+                } elseif ($module === 'book_copy' && $bookCopies->isNotEmpty()) {
+                    $bookCopy = $bookCopies->random();
+                    $activities2025[] = [
+                        'user_id' => $randomUser->id,
+                        'action' => 'update',
+                        'module' => $module,
+                        'description' => "Updated book copy #{$bookCopy->id} status",
+                        'subject_type' => BookCopy::class,
+                        'subject_id' => $bookCopy->id,
+                        'old_data' => json_encode(['status' => 'available']),
+                        'new_data' => json_encode(['status' => $bookCopy->status]),
+                        'ip_address' => $ipAddresses[array_rand($ipAddresses)],
+                        'user_agent' => $userAgents[array_rand($userAgents)],
+                        'created_at' => $activityDate,
+                        'updated_at' => $activityDate,
+                    ];
+                } elseif ($module === 'book_return' && $bookReturns->isNotEmpty()) {
+                    $bookReturn = $bookReturns->random();
+                    $activities2025[] = [
+                        'user_id' => $randomUser->id,
+                        'action' => ['create', 'update'][array_rand(['create', 'update'])],
+                        'module' => $module,
+                        'description' => "{$action} book return #{$bookReturn->id}",
+                        'subject_type' => BookReturn::class,
+                        'subject_id' => $bookReturn->id,
+                        'old_data' => $action === 'update' ? json_encode(['approval_status' => 'pending']) : null,
+                        'new_data' => json_encode(['approval_status' => $bookReturn->approval_status]),
+                        'ip_address' => $ipAddresses[array_rand($ipAddresses)],
+                        'user_agent' => $userAgents[array_rand($userAgents)],
+                        'created_at' => $activityDate,
+                        'updated_at' => $activityDate,
+                    ];
+                }
+            }
+        }
+
+        foreach ($activities2025 as $activity) {
+            ActivityLog::create($activity);
+        }
+
+        $this->command->info('Created ' . count($activities2025) . ' activity logs for year 2025.');
     }
 }

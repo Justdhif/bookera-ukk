@@ -38,9 +38,10 @@ export interface ActivityLogIndexResponse {
     total: number;
   };
   charts: {
-    by_module: ChartData[];
-    by_action: ChartData[];
-    daily: DailyChartData[];
+    monthly: MonthlyChartData[];
+    modules: string[];
+    current_year: number;
+    available_years: number[];
   };
   statistics: {
     today: number;
@@ -55,9 +56,9 @@ export interface ChartData {
   value: number;
 }
 
-export interface DailyChartData {
-  date: string;
-  count: number;
+export interface MonthlyChartData {
+  month: string;
+  [module: string]: number | string;
 }
 
 export interface ActivityLogFilters {
@@ -69,4 +70,5 @@ export interface ActivityLogFilters {
   start_date?: string;
   end_date?: string;
   search?: string;
+  year?: number;
 }

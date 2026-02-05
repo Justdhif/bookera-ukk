@@ -1,14 +1,18 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -16,28 +20,29 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { ChartData, DailyChartData } from "@/types/activity-log";
+import { MonthlyChartData } from "@/types/activity-log";
 
 const COLORS = [
-  "#3b82f6", // blue
-  "#10b981", // emerald
-  "#8b5cf6", // purple
-  "#f59e0b", // amber
-  "#ef4444", // red
-  "#ec4899", // pink
-  "#06b6d4", // cyan
-  "#6366f1", // indigo
+  "#06b6d4",
+  "#ec4899",
+  "#8b5cf6",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#3b82f6",
+  "#6366f1",
 ];
 
 interface ActivityChartsProps {
   charts: {
-    by_module: ChartData[];
-    by_action: ChartData[];
-    daily: DailyChartData[];
+    monthly: MonthlyChartData[];
+    modules: string[];
+    current_year: number;
+    available_years: number[];
   };
+  onYearChange: (year: number) => void;
 }
 
-// Custom Tooltip Component
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -63,119 +68,150 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-// Custom Pie Label
-const renderCustomLabel = (entry: any) => {
-  const percent = entry.percent ? (entry.percent * 100).toFixed(0) : 0;
-  return `${percent}%`;
-};
+export default function ActivityCharts({ charts, onYearChange }: ActivityChartsProps) {
+  const hasData = charts.monthly && charts.monthly.length > 0;
+  
+  const handlePrevYear = () => {
+    onYearChange(charts.current_year - 1);
+  };
 
-export default function ActivityCharts({ charts }: ActivityChartsProps) {
-  // Check if data exists and has items
-  const hasModuleData = charts.by_module && charts.by_module.length > 0;
-  const hasActionData = charts.by_action && charts.by_action.length > 0;
-  const hasDailyData = charts.daily && charts.daily.length > 0;
+  const handleNextYear = () => {
+    onYearChange(charts.current_year + 1);
+  };
+
+  const handleYearSelect = (value: string) => {
+    onYearChange(parseInt(value));
+  };
+
+  const currentYear = new Date().getFullYear();
+  const allYears = Array.from(
+    { length: 21 },
+    (_, i) => currentYear - 10 + i
+  );
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Pie Chart - By Module */}
-      <Card className="border-0 shadow-lg bg-white dark:bg-gray-900">
-        <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
+    <Card className="border-0 shadow-lg bg-white dark:bg-gray-900">
+      <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
+        <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <div className="w-1 h-6 bg-linear-to-b from-blue-500 to-cyan-500 rounded-full" />
-            Distribusi per Modul
+            <div className="w-1 h-6 bg-linear-to-b from-cyan-500 to-pink-500 rounded-full" />
+            Perbandingan Aktivitas per Modul
           </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-6">
-          {hasModuleData ? (
-            <ResponsiveContainer width="100%" height={350}>
-              <PieChart>
-                <Pie
-                  data={charts.by_module}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomLabel}
-                  outerRadius={120}
-                  fill="#8884d8"
-                  dataKey="value"
-                  animationBegin={0}
-                  animationDuration={800}
-                >
-                  {charts.by_module.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                      className="hover:opacity-80 transition-opacity cursor-pointer"
-                    />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  verticalAlign="bottom"
-                  height={36}
-                  iconType="circle"
-                  wrapperStyle={{ paddingTop: "20px" }}
-                  formatter={(value) => <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{value}</span>}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex items-center justify-center h-87.5 text-muted-foreground">
-              Tidak ada data
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Line Chart - Daily */}
-      <Card className="border-0 shadow-lg bg-white dark:bg-gray-900">
-        <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
-          <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <div className="w-1 h-6 bg-linear-to-b from-purple-500 to-pink-500 rounded-full" />
-            Tren Aktivitas Harian
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-6">
-          {hasDailyData ? (
-            <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={charts.daily}>
-                <defs>
-                  <linearGradient id="colorLine" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+          
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handlePrevYear}
+              className="h-8 w-8"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            <Select value={charts.current_year.toString()} onValueChange={handleYearSelect}>
+              <SelectTrigger className="w-24 h-8 border-2 border-gray-200 dark:border-gray-700 font-bold">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {allYears.map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleNextYear}
+              className="h-8 w-8"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-6">
+        {hasData ? (
+          <ResponsiveContainer width="100%" height={400}>
+            <AreaChart data={charts.monthly}>
+              <defs>
+                {charts.modules.map((module, index) => (
+                  <linearGradient key={module} id={`gradient${module}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0.4} />
+                    <stop offset="95%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0.05} />
                   </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-800" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fill: "#6b7280", fontSize: 12 }}
-                  axisLine={{ stroke: "#d1d5db" }}
-                />
-                <YAxis
-                  tick={{ fill: "#6b7280", fontSize: 12 }}
-                  axisLine={{ stroke: "#d1d5db" }}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Line
+                ))}
+              </defs>
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke="#e5e7eb" 
+                className="dark:stroke-gray-800"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="month"
+                tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                axisLine={{ stroke: "#e5e7eb" }}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                axisLine={{ stroke: "#e5e7eb" }}
+                tickLine={false}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                verticalAlign="bottom"
+                height={50}
+                iconType="line"
+                wrapperStyle={{ 
+                  paddingTop: "24px",
+                  fontSize: "14px",
+                  fontWeight: 500
+                }}
+                formatter={(value) => (
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">
+                    {value}
+                  </span>
+                )}
+              />
+              {charts.modules.map((module, index) => (
+                <Area
+                  key={module}
                   type="monotone"
-                  dataKey="count"
-                  stroke="#8b5cf6"
-                  strokeWidth={3}
-                  fill="url(#colorLine)"
-                  dot={{ fill: "#8b5cf6", r: 5, strokeWidth: 2, stroke: "#fff" }}
-                  activeDot={{ r: 7, strokeWidth: 3 }}
+                  dataKey={module}
+                  stroke={COLORS[index % COLORS.length]}
+                  strokeWidth={2.5}
+                  fill={`url(#gradient${module})`}
+                  fillOpacity={1}
+                  dot={{ 
+                    fill: COLORS[index % COLORS.length], 
+                    r: 4.5, 
+                    strokeWidth: 2.5, 
+                    stroke: "#fff",
+                    className: "drop-shadow-sm"
+                  }}
+                  activeDot={{ 
+                    r: 6.5, 
+                    strokeWidth: 3,
+                    stroke: "#fff",
+                    className: "drop-shadow-md" 
+                  }}
                   animationBegin={0}
                   animationDuration={800}
+                  animationEasing="ease-in-out"
                 />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex items-center justify-center h-87.5 text-muted-foreground">
-              Tidak ada data
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+              ))}
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-100 text-muted-foreground">
+            Tidak ada data
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

@@ -20,6 +20,7 @@ export default function ActivityLogClient() {
   const [filters, setFilters] = useState<ActivityLogFilters>({
     page: 1,
     per_page: 15,
+    year: new Date().getFullYear(),
   });
 
   useEffect(() => {
@@ -47,6 +48,10 @@ export default function ActivityLogClient() {
     setFilters({ ...filters, page });
   };
 
+  const handleYearChange = (year: number) => {
+    setFilters({ ...filters, year, page: 1 });
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -69,7 +74,7 @@ export default function ActivityLogClient() {
       {loading ? (
         <ActivityChartsSkeleton />
       ) : (
-        data && <ActivityCharts charts={data.charts} />
+        data && <ActivityCharts charts={data.charts} onYearChange={handleYearChange} />
       )}
 
       {loading ? (

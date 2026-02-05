@@ -59,9 +59,10 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
-        $request->user()->currentAccessToken()->delete();
+        if ($user && $user->currentAccessToken()) {
+            $user->currentAccessToken()->delete();
+        }
 
-        Auth::logout();
 
         return ApiResponse::successResponse(
             'Logout berhasil',
