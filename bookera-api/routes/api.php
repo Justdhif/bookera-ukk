@@ -11,6 +11,9 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\BookReturnController;
 use App\Http\Controllers\Api\ApprovalController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ContentPageController;
+use App\Http\Controllers\Api\TermsOfServiceController;
+use App\Http\Controllers\Api\PrivacyPolicyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,6 +89,26 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('returns/{bookReturn}/approve', [ApprovalController::class, 'approveReturn']);
             Route::post('returns/{bookReturn}/reject', [ApprovalController::class, 'rejectReturn']);
         });
+
+        // Content Pages routes (admin)
+        Route::get('content-pages', [ContentPageController::class, 'adminIndex']);
+        Route::put('content-pages/{slug}', [ContentPageController::class, 'update']);
+
+        // Terms of Service routes (admin - write operations)
+        Route::prefix('terms-of-services')->group(function () {
+            Route::post('/', [TermsOfServiceController::class, 'store']);
+            Route::put('/{termsOfService}', [TermsOfServiceController::class, 'update']);
+            Route::delete('/{termsOfService}', [TermsOfServiceController::class, 'destroy']);
+            Route::post('/{termsOfService}/activate', [TermsOfServiceController::class, 'activate']);
+        });
+
+        // Privacy Policy routes (admin - write operations)
+        Route::prefix('privacy-policies')->group(function () {
+            Route::post('/', [PrivacyPolicyController::class, 'store']);
+            Route::put('/{privacyPolicy}', [PrivacyPolicyController::class, 'update']);
+            Route::delete('/{privacyPolicy}', [PrivacyPolicyController::class, 'destroy']);
+            Route::post('/{privacyPolicy}/activate', [PrivacyPolicyController::class, 'activate']);
+        });
     });
 
     Route::post('loans', [LoanController::class, 'store']);
@@ -103,3 +126,17 @@ Route::get('books/slug/{slug}', [BookController::class, 'showBySlug']);
 Route::get('books/{id}', [BookController::class, 'show']);
 
 Route::apiResource('categories', CategoryController::class)->only('index');
+
+// Content Pages routes (public)
+Route::get('content-pages', [ContentPageController::class, 'index']);
+Route::get('content-pages/{slug}', [ContentPageController::class, 'show']);
+
+// Terms of Service routes (public - read operations)
+Route::get('terms-of-services/active', [TermsOfServiceController::class, 'getActive']);
+Route::get('terms-of-services', [TermsOfServiceController::class, 'index']);
+Route::get('terms-of-services/{termsOfService}', [TermsOfServiceController::class, 'show']);
+
+// Privacy Policy routes (public - read operations)
+Route::get('privacy-policies/active', [PrivacyPolicyController::class, 'getActive']);
+Route::get('privacy-policies', [PrivacyPolicyController::class, 'index']);
+Route::get('privacy-policies/{privacyPolicy}', [PrivacyPolicyController::class, 'show']);

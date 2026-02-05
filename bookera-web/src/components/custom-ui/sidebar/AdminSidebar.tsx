@@ -32,6 +32,8 @@ import {
   Activity,
   Package,
   PackageCheck,
+  FileText,
+  Shield,
 } from "lucide-react";
 
 // Menu items grouped by categories
@@ -90,6 +92,23 @@ const menuGroups = [
         href: "/admin/activity-logs",
         icon: Activity,
         gradient: "from-purple-500 to-pink-500",
+      },
+    ],
+  },
+  {
+    title: "Settings",
+    items: [
+      {
+        title: "Terms of Service",
+        href: "/admin/terms-of-service",
+        icon: FileText,
+        gradient: "from-indigo-500 to-purple-500",
+      },
+      {
+        title: "Privacy Policy",
+        href: "/admin/privacy-policy",
+        icon: Shield,
+        gradient: "from-violet-500 to-purple-500",
       },
     ],
   },

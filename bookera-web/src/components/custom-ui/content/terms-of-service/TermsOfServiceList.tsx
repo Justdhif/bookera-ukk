@@ -1,0 +1,127 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { TermsOfService } from "@/types/terms-of-service";
+import EmptyState from "@/components/custom-ui/EmptyState";
+import { FileText, Edit, Trash2, Calendar, Clock } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+export default function TermsOfServiceList({
+  data,
+  onEdit,
+  onDelete,
+}: {
+  data: TermsOfService[];
+  onEdit: (item: TermsOfService) => void;
+  onDelete: (id: number) => void;
+}) {
+  if (data.length === 0) {
+    return (
+      <EmptyState
+        title="Belum ada Terms of Service"
+        description="Terms of Service akan muncul setelah kamu menambahkannya."
+        icon={<FileText className="h-10 w-10" />}
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {data.map((item, index) => (
+        <div
+          key={item.id}
+          className="border-l-4 border-brand-primary/30 pl-4 py-4 bg-white rounded-lg border border-border hover:shadow-md transition-shadow duration-200"
+        >
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 space-y-3">
+              <h2 className="text-lg font-semibold text-brand-primary-dark">
+                {item.title}
+              </h2>
+              
+              <div
+                className="text-gray-700 space-y-2 prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: item.content }}
+              />
+
+              <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span>
+                    Dibuat:{" "}
+                    {new Date(item.created_at).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5" />
+                  <span>
+                    Diperbarui:{" "}
+                    {new Date(item.updated_at).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => onEdit(item)}
+                className="h-9 w-9"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Hapus Terms of Service</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Apakah Anda yakin ingin menghapus &quot;{item.title}
+                      &quot;? Tindakan ini tidak dapat dibatalkan.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => onDelete(item.id)}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Hapus
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

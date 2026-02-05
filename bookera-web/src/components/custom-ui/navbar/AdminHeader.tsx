@@ -40,9 +40,7 @@ export default function AdminHeader() {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   {idx === segments.length - 1 ? (
-                    <BreadcrumbPage>
-                      {formatSegment(seg)}
-                    </BreadcrumbPage>
+                    <BreadcrumbPage>{formatSegment(seg)}</BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink href={href}>
                       {formatSegment(seg)}

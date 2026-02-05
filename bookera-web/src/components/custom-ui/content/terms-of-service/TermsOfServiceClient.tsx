@@ -1,0 +1,90 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { TermsOfService } from "@/types/terms-of-service";
+import { termsOfServiceService } from "@/services/terms-of-service.service";
+import TermsOfServiceList from "./TermsOfServiceList";
+import TermsOfServiceFormDialog from "./TermsOfServiceFormDialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { TermsOfServiceTableSkeleton } from "./TermsOfServiceTableSkeleton";
+import { Plus } from "lucide-react";
+
+export default function TermsOfServiceClient() {
+  const [items, setItems] = useState<TermsOfService[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<TermsOfService | null>(null);
+
+  const handleDelete = async (id: number) => {
+    try {
+      await termsOfServiceService.delete(id);
+      toast.success("Terms of Service berhasil dihapus");
+      fetchData();
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Gagal menghapus Terms of Service",
+      );
+    }
+  };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await termsOfServiceService.getAll();
+      setItems(res.data.data);
+    } catch (error) {
+      toast.error("Gagal memuat data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Terms of Service</h1>
+          <p className="text-muted-foreground">
+            Kelola Terms of Service untuk pengguna platform
+          </p>
+        </div>
+        <Button
+          onClick={() => {
+            setEditing(null);
+            setOpen(true);
+          }}
+          variant="brand"
+          className="h-8 gap-1"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          Tambah Terms of Service
+        </Button>
+      </div>
+
+      {loading ? (
+        <TermsOfServiceTableSkeleton />
+      ) : (
+        <TermsOfServiceList
+          data={items}
+          onEdit={(item) => {
+            setEditing(item);
+            setOpen(true);
+          }}
+          onDelete={handleDelete}
+        />
+      )}
+
+      <TermsOfServiceFormDialog
+        open={open}
+        setOpen={setOpen}
+        item={editing}
+        onSuccess={fetchData}
+      />
+    </div>
+  );
+}

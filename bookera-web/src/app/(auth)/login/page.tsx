@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import Image from "next/image";
+import { LegalModal } from "@/components/custom-ui/modal/LegalModal";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,6 +38,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [legalModalOpen, setLegalModalOpen] = useState(false);
+  const [legalModalType, setLegalModalType] = useState<"terms" | "privacy">("terms");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -229,10 +232,48 @@ export default function LoginPage() {
                   </>
                 )}
               </Button>
+
+              {/* Terms of Service & Privacy Policy */}
+              <div className="text-center text-xs text-gray-500 space-y-1">
+                <p>Dengan melanjutkan, Anda menyetujui</p>
+                <div className="flex items-center justify-center gap-1 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLegalModalType("terms");
+                      setLegalModalOpen(true);
+                    }}
+                    className="text-brand-primary hover:text-brand-primary-dark font-medium hover:underline transition-colors"
+                    disabled={loading}
+                  >
+                    Terms of Service
+                  </button>
+                  <span>dan</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLegalModalType("privacy");
+                      setLegalModalOpen(true);
+                    }}
+                    className="text-brand-primary hover:text-brand-primary-dark font-medium hover:underline transition-colors"
+                    disabled={loading}
+                  >
+                    Privacy Policy
+                  </button>
+                  <span>kami</span>
+                </div>
+              </div>
             </form>
           </CardContent>
         </Card>
       </div>
+
+      {/* Legal Modal */}
+      <LegalModal
+        open={legalModalOpen}
+        onOpenChange={setLegalModalOpen}
+        type={legalModalType}
+      />
     </div>
   );
 }

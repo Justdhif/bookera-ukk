@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
             LoanSeeder::class,
             BookReturnSeeder::class,
             ActivityLogSeeder::class,
+            TermsOfServiceSeeder::class,
+            PrivacyPolicySeeder::class,
         ]);
     }
 }
