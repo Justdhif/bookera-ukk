@@ -7,7 +7,7 @@ import TermsOfServiceList from "./TermsOfServiceList";
 import TermsOfServiceFormDialog from "./TermsOfServiceFormDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { TermsOfServiceTableSkeleton } from "./TermsOfServiceTableSkeleton";
+import { TermsOfServiceListSkeleton } from "./TermsOfServiceListSkeleton";
 import { Plus } from "lucide-react";
 
 export default function TermsOfServiceClient() {
@@ -67,7 +67,7 @@ export default function TermsOfServiceClient() {
       </div>
 
       {loading ? (
-        <TermsOfServiceTableSkeleton />
+        <TermsOfServiceListSkeleton />
       ) : (
         <TermsOfServiceList
           data={items}

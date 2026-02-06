@@ -1,11 +1,15 @@
+"use client";
+
 import { Book } from "@/types/book";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BookOpen } from "lucide-react";
+import { useTranslations } from 'next-intl';
 
 export default function BookCard({ book }: { book: Book }) {
   const router = useRouter();
+  const t = useTranslations('books');
 
   return (
     <div className="border rounded-lg p-3 space-y-3">
@@ -24,7 +28,7 @@ export default function BookCard({ book }: { book: Book }) {
         variant="outline"
         onClick={() => router.push(`/books/${book.slug}`)}
       >
-        Detail
+        {t('detail')}
       </Button>
     </div>
   );

@@ -7,61 +7,70 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent } from "@/components/ui/card";
 
 export function CategoryTableSkeleton() {
   return (
-    <Card className="overflow-hidden border-0 shadow-lg bg-white dark:bg-gray-900">
-      <CardContent className="p-0">
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-50/50 dark:hover:bg-gray-800/50">
-                <TableHead className="w-[80px]">
-                  <Skeleton className="h-4 w-8" />
-                </TableHead>
-                <TableHead>
-                  <Skeleton className="h-4 w-12" />
-                </TableHead>
-                <TableHead>
-                  <Skeleton className="h-4 w-16" />
-                </TableHead>
-                <TableHead>
-                  <Skeleton className="h-4 w-20" />
-                </TableHead>
-                <TableHead className="text-right w-[200px]">
-                  <Skeleton className="h-4 w-12 ml-auto" />
-                </TableHead>
-              </TableRow>
-            </TableHeader>
+    <Table>
+      <TableHeader>
+        <TableRow className="bg-muted/50 hover:bg-muted/50">
+          <TableHead className="w-16 text-center font-semibold">
+            <Skeleton className="h-4 w-4 mx-auto" />
+          </TableHead>
+          <TableHead className="w-16 text-center font-semibold">
+            <Skeleton className="h-4 w-8 mx-auto" />
+          </TableHead>
+          <TableHead className="font-semibold">
+            <Skeleton className="h-4 w-20" />
+          </TableHead>
+          <TableHead className="font-semibold">
+            <Skeleton className="h-4 w-16" />
+          </TableHead>
+          <TableHead className="font-semibold">
+            <Skeleton className="h-4 w-24" />
+          </TableHead>
+          <TableHead className="font-semibold text-right">
+            <Skeleton className="h-4 w-12 ml-auto" />
+          </TableHead>
+        </TableRow>
+      </TableHeader>
 
-            <TableBody>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Skeleton className="h-4 w-8" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-5 w-32 rounded-full" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-40" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-4 w-64" />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Skeleton className="h-8 w-16 rounded-md" />
-                      <Skeleton className="h-8 w-20 rounded-md" />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+      <TableBody>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <TableRow
+            key={index}
+            className="hover:bg-primary/5 transition-colors border-b last:border-b-0"
+          >
+            <TableCell className="text-center">
+              <Skeleton className="h-4 w-4 mx-auto" />
+            </TableCell>
+
+            <TableCell className="text-center">
+              <div className="flex justify-center">
+                <Skeleton className="h-8 w-8 rounded-lg" />
+              </div>
+            </TableCell>
+
+            <TableCell>
+              <Skeleton className="h-4 w-32" />
+            </TableCell>
+
+            <TableCell>
+              <Skeleton className="h-5 w-24 rounded-full" />
+            </TableCell>
+
+            <TableCell>
+              <Skeleton className="h-4 w-48" />
+            </TableCell>
+
+            <TableCell>
+              <div className="flex justify-end items-center gap-2">
+                <Skeleton className="h-8 w-16 rounded-md" />
+                <Skeleton className="h-8 w-20 rounded-md" />
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }

@@ -40,16 +40,16 @@ export default function TermsOfServiceList({
       {data.map((item, index) => (
         <div
           key={item.id}
-          className="border-l-4 border-brand-primary/30 pl-4 py-4 bg-white rounded-lg border border-border hover:shadow-md transition-shadow duration-200"
+          className="border-l-4 border-brand-primary/30 pl-4 py-4 bg-white dark:bg-gray-800 rounded-lg border border-border hover:shadow-md transition-shadow duration-200"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 space-y-3">
-              <h2 className="text-lg font-semibold text-brand-primary-dark">
+              <h2 className="text-lg font-semibold text-brand-primary-dark dark:text-brand-primary-light">
                 {item.title}
               </h2>
               
               <div
-                className="text-gray-700 space-y-2 prose prose-sm max-w-none"
+                className="text-gray-700 dark:text-gray-300 space-y-2 prose prose-sm dark:prose-invert max-w-none"
                 dangerouslySetInnerHTML={{ __html: item.content }}
               />
 
@@ -79,7 +79,7 @@ export default function TermsOfServiceList({
               </div>
             </div>
 
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-2 pr-2">
               <Button
                 variant="outline"
                 size="icon"

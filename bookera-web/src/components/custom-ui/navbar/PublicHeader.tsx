@@ -14,65 +14,159 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import Image from "next/image";
-
+import { Facebook, Instagram, Twitter, Bell, Moon, Sun } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { useState, useEffect, useTransition } from "react";
+import { Badge } from "@/components/ui/badge";
+import { useTranslations } from 'next-intl';
+import { useTheme } from "next-themes";
+import LocaleSwitcher from "../LocaleSwitcher";
+import { Locale } from "@/i18n/config";
+import { setUserLocale } from "@/services/locale";
 
 export default function PublicHeader() {
   const router = useRouter();
   const { user, logout, isAuthenticated, initialLoading } = useAuthStore();
+  const t = useTranslations('header');
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [locale, setLocale] = useState<Locale | undefined>();
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (locale) {
+      startTransition(() => {
+        setUserLocale(locale);
+      });
+    }
+  }, [locale]);
+
+  const toggleDarkMode = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   return (
-    <header className="border-b">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        {/* LEFT */}
-        <Link href="/" className="flex items-center space-x-2">
-          <Image
-            src={BookeraLogo}
-            alt="Bookera Logo"
-            className="h-15 w-15 object-cover"
-          />
-          <div>
-            <span className="font-bold">Bookera</span>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-500"></div>
-              <span className="text-xs font-bold">Library System Management</span>
-            </div>
+    <header className="border-b sticky top-0 bg-white dark:bg-gray-900 z-50 shadow-sm transition-colors duration-300">
+      <div className="mx-auto max-w-7xl px-6 py-4 space-y-2">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-sm hover:text-brand-primary hover:underline cursor-pointer">
+              {t('termsOfService')}
+            </h3>
+
+            <div className="h-2 w-2 rounded-full bg-brand-primary "></div>
+
+            <h3 className="font-semibold text-sm hover:text-brand-primary hover:underline cursor-pointer">
+              {t('privacyPolicy')}
+            </h3>
+
+            <div className="h-2 w-2 rounded-full bg-brand-primary "></div>
+
+            <h3 className="font-semibold text-sm">{t('followUs')}</h3>
+            <Link
+              href="https://www.facebook.com/bookera.library"
+              target="_blank"
+            >
+              <Facebook className="w-4 h-4 text-brand-primary" />
+            </Link>
+            <Link
+              href="https://www.instagram.com/bookera.library"
+              target="_blank"
+            >
+              <Instagram className="h-4 w-4 text-brand-primary" />
+            </Link>
+
+            <Link href="https://www.twitter.com/@bookera.library" target="_blank">
+              <Twitter className="h-4 w-4 text-brand-primary" />
+            </Link>
           </div>
-        </Link>
 
-        {/* RIGHT */}
-        {initialLoading ? (
-          <Skeleton className="h-10 w-10 rounded-full" />
-        ) : !isAuthenticated ? (
-          <Button onClick={() => router.push("/login")}>Login</Button>
-        ) : (
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Avatar>
-                <AvatarImage 
-                  src={user?.profile?.avatar} 
-                  alt={user?.profile?.full_name || user?.email || "User"}
-                />
-                <AvatarFallback>{user?.profile?.full_name?.[0]}</AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              className="relative flex items-center gap-2 h-9 px-3"
+              title={t('notifications')}
+            >
+              <Bell className="h-4 w-4" />
+              <span className="text-sm font-medium">{t('notifications')}</span>
+              <Badge 
+                variant="destructive" 
+                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+              >
+                3
+              </Badge>
+            </Button>
 
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem disabled>
-                {user?.profile?.full_name}
-              </DropdownMenuItem>
+            <LocaleSwitcher setLocale={setLocale} />
 
-              {(user?.role === "admin" || user?.role === "officer") && (
-                <DropdownMenuItem onClick={() => router.push("/admin")}>
-                  Dashboard
-                </DropdownMenuItem>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleDarkMode}
+              suppressHydrationWarning
+            >
+              {!mounted ? (
+                <Moon className="h-5 w-5 transition-all duration-300" />
+              ) : theme === "dark" ? (
+                <Sun className="h-5 w-5 transition-all duration-300" />
+              ) : (
+                <Moon className="h-5 w-5 transition-all duration-300" />
               )}
+            </Button>
+          </div>
+        </div>
+        <div className="flex justify-between items-center gap-4">
+          <Link href="/" className="flex items-center">
+            <Image
+              src={BookeraLogo}
+              alt="Bookera Logo"
+              className="h-15 w-15 object-cover"
+            />
+            <div>
+              <span className="font-bold text-3xl">Bookera</span>
+            </div>
+          </Link>
 
-              <DropdownMenuItem className="text-red-600" onClick={logout}>
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+          {initialLoading ? (
+            <Skeleton className="h-10 w-10 rounded-full" />
+          ) : !isAuthenticated ? (
+            <Button onClick={() => router.push("/login")}>{t('login')}</Button>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Avatar>
+                  <AvatarImage
+                    src={user?.profile?.avatar}
+                    alt={user?.profile?.full_name || user?.email || "User"}
+                  />
+                  <AvatarFallback>
+                    {user?.profile?.full_name?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem disabled>
+                  {user?.profile?.full_name}
+                </DropdownMenuItem>
+
+                {(user?.role === "admin" || user?.role === "officer") && (
+                  <DropdownMenuItem onClick={() => router.push("/admin")}>
+                    {t('dashboard')}
+                  </DropdownMenuItem>
+                )}
+
+                <DropdownMenuItem className="text-red-600" onClick={logout}>
+                  {t('logout')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
     </header>
   );

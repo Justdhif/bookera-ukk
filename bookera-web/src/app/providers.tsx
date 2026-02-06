@@ -10,5 +10,5 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     fetchUser();
   }, [fetchUser]);
 
-  return children;
+  return <>{children}</>;
 }

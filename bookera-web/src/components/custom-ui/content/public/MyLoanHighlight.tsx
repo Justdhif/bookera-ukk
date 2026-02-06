@@ -16,12 +16,14 @@ import { Badge } from "@/components/ui/badge";
 import { BookOpenCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from 'next-intl';
 
 export default function MyLoanHighlight() {
   const { isAuthenticated } = useAuthStore();
   const [loans, setLoans] = useState<Loan[]>([]);
   const [selected, setSelected] = useState<Loan | null>(null);
   const router = useRouter();
+  const t = useTranslations('loans');
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -41,24 +43,24 @@ export default function MyLoanHighlight() {
         <CardHeader className="flex flex-row items-center justify-between">
           <div className="flex items-center gap-2">
             <BookOpenCheck className="h-5 w-5 text-primary" />
-            <h3 className="font-semibold">Peminjaman Saya</h3>
+            <h3 className="font-semibold">{t('myLoans')}</h3>
           </div>
 
           <Button
             variant="brand"
             onClick={() => router.push(`/my-loans`)}
           >
-            Lihat Semua
+            {t('viewAll')}
           </Button>
         </CardHeader>
 
         <CardContent className="flex items-center justify-between">
           <div className="space-y-1">
             <p className="text-sm text-muted-foreground">
-              {activeLoan.loan_details.length} buku dipinjam
+              {activeLoan.loan_details.length} {t('booksBorrowed')}
             </p>
             <p className="text-xs">
-              Jatuh tempo:{" "}
+              {t('dueDate')}:{" "}
               <span className="font-medium">
                 {new Date(activeLoan.due_date).toLocaleDateString()}
               </span>
@@ -68,7 +70,7 @@ export default function MyLoanHighlight() {
           <div className="flex items-center gap-2">
             <Badge>{activeLoan.status}</Badge>
             <Button size="sm" onClick={() => setSelected(activeLoan)}>
-              Detail
+              {t('detail')}
             </Button>
           </div>
         </CardContent>
@@ -78,13 +80,13 @@ export default function MyLoanHighlight() {
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Detail Peminjaman</DialogTitle>
+            <DialogTitle>{t('loanDetail')}</DialogTitle>
           </DialogHeader>
 
           {selected && (
             <div className="space-y-3">
               <p className="text-sm">
-                Jatuh Tempo:{" "}
+                {t('dueDate')}:{" "}
                 <strong>
                   {new Date(selected.due_date).toLocaleDateString()}
                 </strong>
@@ -99,7 +101,7 @@ export default function MyLoanHighlight() {
                     <div>
                       <p className="font-medium">{d.book_copy.book.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        Copy: {d.book_copy.copy_code}
+                        {t('copy')}: {d.book_copy.copy_code}
                       </p>
                     </div>
                   </div>
@@ -111,7 +113,7 @@ export default function MyLoanHighlight() {
                 variant="brand"
                 onClick={() => router.push(`/my-loans`)}
               >
-                Lihat Semua
+                {t('viewAll')}
               </Button>
             </div>
           )}

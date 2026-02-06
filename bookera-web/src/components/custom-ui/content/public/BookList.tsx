@@ -5,6 +5,7 @@ import BookCard from "./BookCard";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { BookOpen } from "lucide-react";
 import BookListSkeleton from "./BookListSkeleton";
+import { useTranslations } from 'next-intl';
 
 interface Props {
   books: Book[];
@@ -12,13 +13,15 @@ interface Props {
 }
 
 export default function BookList({ books, loading }: Props) {
+  const t = useTranslations('books');
+  
   if (loading) return <BookListSkeleton />;
 
   if (!books.length) {
     return (
       <EmptyState
-        title="Buku tidak ditemukan"
-        description="Coba kata kunci atau kategori lain"
+        title={t('notFound')}
+        description={t('notFoundDesc')}
         icon={<BookOpen className="h-10 w-10" />}
       />
     );

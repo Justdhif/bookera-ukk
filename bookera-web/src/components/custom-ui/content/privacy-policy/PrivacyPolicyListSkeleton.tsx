@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function PrivacyPolicyTableSkeleton() {
+export function PrivacyPolicyListSkeleton() {
   return (
     <div className="space-y-4">
       {[...Array(5)].map((_, i) => (

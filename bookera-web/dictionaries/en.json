@@ -1,0 +1,63 @@
+{
+  "header": {
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "followUs": "Follow us on",
+    "notifications": "Notifications",
+    "language": "Language",
+    "indonesian": "Indonesia",
+    "english": "English",
+    "login": "Login",
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "librarySystem": "Library System Management"
+  },
+  "search": {
+    "placeholder": "Search title, author, or ISBN...",
+    "refresh": "Refresh"
+  },
+  "books": {
+    "notFound": "Books not found",
+    "notFoundDesc": "Try different keywords or categories",
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "borrowed": "Borrowed",
+    "copiesAvailable": "Available",
+    "detail": "Detail"
+  },
+  "loans": {
+    "myLoans": "My Loans",
+    "viewAll": "View All",
+    "booksBorrowed": "books borrowed",
+    "dueDate": "Due date",
+    "detail": "Detail",
+    "loanDetail": "Loan Detail",
+    "copy": "Copy",
+    "manageLoans": "Manage your book loans",
+    "noLoans": "No Loans Yet",
+    "noLoansDesc": "You don't have any loan history yet. Request a loan through the library admin.",
+    "loanNumber": "Loan #",
+    "due": "Due",
+    "requestReturn": "Request Return",
+    "borrowedBooks": "Borrowed Books",
+    "code": "Code",
+    "status": "Status",
+    "returnWaitingApproval": "Return Awaiting Approval"
+  },
+  "status": {
+    "pending": "Pending",
+    "waiting": "Waiting for Handover",
+    "borrowed": "Borrowed",
+    "returned": "Returned",
+    "rejected": "Rejected",
+    "late": "Late",
+    "waitingApproval": "⏳ Awaiting Approval",
+    "approved": "✓ Approved",
+    "statusRejected": "✕ Rejected"
+  },
+  "LocaleSwitcher": {
+    "label": "Language",
+    "en": "English",
+    "id": "Indonesia"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "header": {
+    "termsOfService": "Ketentuan Layanan",
+    "privacyPolicy": "Kebijakan Privasi",
+    "followUs": "Ikuti kami di",
+    "notifications": "Notifikasi",
+    "language": "Bahasa",
+    "indonesian": "Indonesia",
+    "english": "English",
+    "login": "Masuk",
+    "dashboard": "Dasbor",
+    "logout": "Keluar",
+    "librarySystem": "Sistem Manajemen Perpustakaan"
+  },
+  "search": {
+    "placeholder": "Cari judul, penulis, atau ISBN...",
+    "refresh": "Refresh"
+  },
+  "books": {
+    "notFound": "Buku tidak ditemukan",
+    "notFoundDesc": "Coba kata kunci atau kategori lain",
+    "available": "Tersedia",
+    "unavailable": "Tidak Tersedia",
+    "borrowed": "Dipinjam",
+    "copiesAvailable": "Tersedia",
+    "detail": "Detail"
+  },
+  "loans": {
+    "myLoans": "Peminjaman Saya",
+    "viewAll": "Lihat Semua",
+    "booksBorrowed": "buku dipinjam",
+    "dueDate": "Jatuh tempo",
+    "detail": "Detail",
+    "loanDetail": "Detail Peminjaman",
+    "copy": "Copy",
+    "manageLoans": "Kelola peminjaman buku Anda",
+    "noLoans": "Belum Ada Peminjaman",
+    "noLoansDesc": "Anda belum memiliki riwayat peminjaman buku. Ajukan peminjaman melalui admin perpustakaan.",
+    "loanNumber": "Loan #",
+    "due": "Due",
+    "requestReturn": "Request Pengembalian",
+    "borrowedBooks": "Buku yang Dipinjam",
+    "code": "Kode",
+    "status": "Status",
+    "returnWaitingApproval": "Pengembalian Menunggu Approval"
+  },
+  "status": {
+    "pending": "Pending",
+    "waiting": "Menunggu Penyerahan",
+    "borrowed": "Dipinjam",
+    "returned": "Dikembalikan",
+    "rejected": "Ditolak",
+    "late": "Terlambat",
+    "waitingApproval": "⏳ Menunggu Approval",
+    "approved": "✓ Disetujui",
+    "statusRejected": "✕ Ditolak"
+  },
+  "LocaleSwitcher": {
+    "label": "Bahasa",
+    "en": "English",
+    "id": "Indonesia"
+  }
+}

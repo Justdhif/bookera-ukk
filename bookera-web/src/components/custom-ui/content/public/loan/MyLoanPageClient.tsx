@@ -10,6 +10,7 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import { ReturnDialog } from "./ReturnDialog";
 import { PackageX, BookOpen, Clock, Calendar, User } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslations } from 'next-intl';
 
 export default function MyLoanPageClient() {
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -18,6 +19,8 @@ export default function MyLoanPageClient() {
     open: boolean;
     loan: Loan | null;
   }>({ open: false, loan: null });
+  const tLoans = useTranslations('loans');
+  const tStatus = useTranslations('status');
 
   useEffect(() => {
     fetchLoans();
@@ -40,12 +43,12 @@ export default function MyLoanPageClient() {
       Loan["status"],
       { variant: any; label: string; className?: string }
     > = {
-      pending: { variant: "secondary", label: "Pending", className: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100" },
-      waiting: { variant: "default", label: "Menunggu Penyerahan", className: "bg-blue-100 text-blue-800 hover:bg-blue-100" },
-      borrowed: { variant: "default", label: "Dipinjam", className: "bg-green-100 text-green-800 hover:bg-green-100" },
-      returned: { variant: "outline", label: "Dikembalikan", className: "bg-gray-100 text-gray-800 hover:bg-gray-100" },
-      rejected: { variant: "destructive", label: "Ditolak" },
-      late: { variant: "destructive", label: "Terlambat" },
+      pending: { variant: "secondary", label: tStatus('pending'), className: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100" },
+      waiting: { variant: "default", label: tStatus('waiting'), className: "bg-blue-100 text-blue-800 hover:bg-blue-100" },
+      borrowed: { variant: "default", label: tStatus('borrowed'), className: "bg-green-100 text-green-800 hover:bg-green-100" },
+      returned: { variant: "outline", label: tStatus('returned'), className: "bg-gray-100 text-gray-800 hover:bg-gray-100" },
+      rejected: { variant: "destructive", label: tStatus('rejected') },
+      late: { variant: "destructive", label: tStatus('late') },
     };
 
     return (
@@ -60,9 +63,9 @@ export default function MyLoanPageClient() {
       Loan["approval_status"],
       { variant: any; label: string; className?: string } | null
     > = {
-      pending: { variant: "secondary", label: "⏳ Menunggu Approval", className: "bg-orange-100 text-orange-800 hover:bg-orange-100" },
-      approved: { variant: "default", label: "✓ Disetujui", className: "bg-emerald-100 text-emerald-800 hover:bg-emerald-100" },
-      rejected: { variant: "destructive", label: "✕ Ditolak" },
+      pending: { variant: "secondary", label: tStatus('waitingApproval'), className: "bg-orange-100 text-orange-800 hover:bg-orange-100" },
+      approved: { variant: "default", label: tStatus('approved'), className: "bg-emerald-100 text-emerald-800 hover:bg-emerald-100" },
+      rejected: { variant: "destructive", label: tStatus('statusRejected') },
     };
 
     const config = approvalConfig[loan.approval_status];
@@ -120,9 +123,9 @@ export default function MyLoanPageClient() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Peminjaman Saya</h1>
+          <h1 className="text-2xl font-bold">{tLoans('myLoans')}</h1>
           <p className="text-sm text-muted-foreground">
-            Kelola peminjaman buku Anda
+            {tLoans('manageLoans')}
           </p>
         </div>
       </div>
@@ -130,8 +133,8 @@ export default function MyLoanPageClient() {
       {loans.length === 0 ? (
         <EmptyState
           icon={<BookOpen className="h-16 w-16" />}
-          title="Belum Ada Peminjaman"
-          description="Anda belum memiliki riwayat peminjaman buku. Ajukan peminjaman melalui admin perpustakaan."
+          title={tLoans('noLoans')}
+          description={tLoans('noLoansDesc')}
         />
       ) : (
         <div className="grid gap-4">
@@ -141,14 +144,14 @@ export default function MyLoanPageClient() {
                 <div className="space-y-2 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-base font-semibold">
-                      Loan #{loan.id}
+                      {tLoans('loanNumber')}{loan.id}
                     </span>
                     {getStatusBadge(loan)}
                     {getApprovalBadge(loan)}
                     {hasPendingReturn(loan) && (
                       <Badge variant="secondary" className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        Pengembalian Menunggu Approval
+                        {tLoans('returnWaitingApproval')}
                       </Badge>
                     )}
                   </div>
@@ -159,7 +162,7 @@ export default function MyLoanPageClient() {
                     </span>
                     <span className="flex items-center gap-1 text-destructive">
                       <Calendar className="h-3 w-3" />
-                      Due: {new Date(loan.due_date).toLocaleDateString("id-ID")}
+                      {tLoans('due')}: {new Date(loan.due_date).toLocaleDateString("id-ID")}
                     </span>
                   </div>
                 </div>
@@ -171,14 +174,14 @@ export default function MyLoanPageClient() {
                     className="flex items-center gap-2 shrink-0"
                   >
                     <PackageX className="h-4 w-4" />
-                    Request Pengembalian
+                    {tLoans('requestReturn')}
                   </Button>
                 )}
               </CardHeader>
 
               <CardContent className="pt-4 space-y-2">
                 <div className="text-sm font-medium text-muted-foreground mb-3">
-                  Buku yang Dipinjam ({loan.loan_details.length}):
+                  {tLoans('borrowedBooks')} ({loan.loan_details.length}):
                 </div>
                 <div className="grid gap-2">
                   {loan.loan_details.map((detail) => (
@@ -192,7 +195,7 @@ export default function MyLoanPageClient() {
                           {detail.book_copy.book.title}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          Kode: {detail.book_copy.copy_code} • Status: {detail.book_copy.status}
+                          {tLoans('code')}: {detail.book_copy.copy_code} • {tLoans('status')}: {detail.book_copy.status}
                         </p>
                       </div>
                     </div>

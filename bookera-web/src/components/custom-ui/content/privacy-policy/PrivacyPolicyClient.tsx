@@ -7,7 +7,7 @@ import PrivacyPolicyList from "./PrivacyPolicyList";
 import PrivacyPolicyFormDialog from "./PrivacyPolicyFormDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { PrivacyPolicyTableSkeleton } from "./PrivacyPolicyTableSkeleton";
+import { PrivacyPolicyListSkeleton } from "./PrivacyPolicyListSkeleton";
 import { Plus } from "lucide-react";
 
 export default function PrivacyPolicyClient() {
@@ -67,7 +67,7 @@ export default function PrivacyPolicyClient() {
       </div>
 
       {loading ? (
-        <PrivacyPolicyTableSkeleton />
+        <PrivacyPolicyListSkeleton />
       ) : (
         <PrivacyPolicyList
           data={items}
