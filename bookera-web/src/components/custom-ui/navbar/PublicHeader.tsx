@@ -14,7 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import Image from "next/image";
-import { Facebook, Instagram, Twitter, Bell, Moon, Sun } from "lucide-react";
+import { Facebook, Instagram, Twitter, Bell, Moon, Sun, Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useState, useEffect, useTransition } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +23,7 @@ import { useTheme } from "next-themes";
 import LocaleSwitcher from "../LocaleSwitcher";
 import { Locale } from "@/i18n/config";
 import { setUserLocale } from "@/services/locale";
+import { Input } from "@/components/ui/input";
 
 export default function PublicHeader() {
   const router = useRouter();
@@ -32,6 +33,7 @@ export default function PublicHeader() {
   const [mounted, setMounted] = useState(false);
   const [locale, setLocale] = useState<Locale | undefined>();
   const [isPending, startTransition] = useTransition();
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -47,6 +49,13 @@ export default function PublicHeader() {
 
   const toggleDarkMode = () => {
     setTheme(theme === "dark" ? "light" : "dark");
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
 
   return (
@@ -119,8 +128,8 @@ export default function PublicHeader() {
             </Button>
           </div>
         </div>
-        <div className="flex justify-between items-center gap-4">
-          <Link href="/" className="flex items-center">
+        <div className="flex justify-between items-center space-x-7">
+          <Link href="/" className="flex items-center shrink-0">
             <Image
               src={BookeraLogo}
               alt="Bookera Logo"
@@ -131,41 +140,55 @@ export default function PublicHeader() {
             </div>
           </Link>
 
-          {initialLoading ? (
-            <Skeleton className="h-10 w-10 rounded-full" />
-          ) : !isAuthenticated ? (
-            <Button onClick={() => router.push("/login")}>{t('login')}</Button>
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Avatar>
-                  <AvatarImage
-                    src={user?.profile?.avatar}
-                    alt={user?.profile?.full_name || user?.email || "User"}
-                  />
-                  <AvatarFallback>
-                    {user?.profile?.full_name?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
+          {/* Search Bar - Centered */}
+          <form onSubmit={handleSearch} className="relative flex-1 w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Cari buku..."
+              className="pl-10 pr-4 h-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </form>
 
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem disabled>
-                  {user?.profile?.full_name}
-                </DropdownMenuItem>
+          {/* User Section */}
+          <div className="shrink-0">
+            {initialLoading ? (
+              <Skeleton className="h-10 w-10 rounded-full" />
+            ) : !isAuthenticated ? (
+              <Button onClick={() => router.push("/login")}>{t('login')}</Button>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Avatar>
+                    <AvatarImage
+                      src={user?.profile?.avatar}
+                      alt={user?.profile?.full_name || user?.email || "User"}
+                    />
+                    <AvatarFallback>
+                      {user?.profile?.full_name?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
 
-                {(user?.role === "admin" || user?.role === "officer") && (
-                  <DropdownMenuItem onClick={() => router.push("/admin")}>
-                    {t('dashboard')}
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem disabled>
+                    {user?.profile?.full_name}
                   </DropdownMenuItem>
-                )}
 
-                <DropdownMenuItem className="text-red-600" onClick={logout}>
-                  {t('logout')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+                  {(user?.role === "admin" || user?.role === "officer") && (
+                    <DropdownMenuItem onClick={() => router.push("/admin")}>
+                      {t('dashboard')}
+                    </DropdownMenuItem>
+                  )}
+
+                  <DropdownMenuItem className="text-red-600" onClick={logout}>
+                    {t('logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
       </div>
     </header>

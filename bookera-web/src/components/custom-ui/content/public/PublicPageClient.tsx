@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import BookSearchBar from "./BookSearchBar";
 import CategoryBubble from "./CategoryBubble";
 import BookList from "./BookList";
 import { bookService } from "@/services/book.service";
@@ -12,14 +11,12 @@ export default function PublicPageClient() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState<number | null>(null);
 
   const fetchBooks = async () => {
     setLoading(true);
 
     const res = await bookService.getAll({
-      search,
       category_id: categoryId ?? undefined,
       status: "active",
     });
@@ -30,18 +27,21 @@ export default function PublicPageClient() {
 
   useEffect(() => {
     fetchBooks();
-  }, [search, categoryId]);
+  }, [categoryId]);
 
   return (
     <div className="container space-y-6">
       <MyLoanHighlight />
-      <BookSearchBar
-        search={search}
-        onSearch={setSearch}
-        onRefresh={fetchBooks}
-      />
-
-      <CategoryBubble active={categoryId} onChange={setCategoryId} />
+      
+      {/* Category Section with Title */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+            KATEGORI
+          </h2>
+        </div>
+        <CategoryBubble active={categoryId} onChange={setCategoryId} />
+      </div>
 
       <BookList books={books} loading={loading} />
     </div>
