@@ -57,11 +57,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-linear-to-br from-brand-primary/10 via-white to-brand-primary-light/5">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-linear-to-br from-brand-primary/10 via-white to-brand-primary-light/5 dark:from-brand-primary/5 dark:via-gray-950 dark:to-brand-primary-dark/10 transition-colors duration-300">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-brand-primary/5 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-brand-primary-dark/5 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-brand-primary/5 dark:bg-brand-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-brand-primary-dark/5 dark:bg-brand-primary-dark/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative w-full max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-12">
@@ -77,11 +77,11 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-3">
-              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight transition-colors">
                 Perpustakaan Digital
                 <span className="block text-brand-primary">Sekolah Modern</span>
               </h1>
-              <p className="text-gray-600 text-lg max-w-md">
+              <p className="text-gray-600 dark:text-gray-300 text-lg max-w-md transition-colors">
                 Akses ribuan buku digital, materi pembelajaran, dan sumber
                 edukasi dari mana saja. Platform terintegrasi untuk siswa, guru,
                 dan staf sekolah.
@@ -91,35 +91,35 @@ export default function LoginPage() {
 
           {/* Features list untuk pendidikan */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto lg:mx-0">
-            <div className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100">
-              <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
+            <div className="flex items-center gap-3 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg border border-gray-100 dark:border-gray-700 transition-colors">
+              <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 dark:bg-brand-primary/20 flex items-center justify-center">
                 <BookOpen className="w-4 h-4 text-brand-primary" />
               </div>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors">
                 Ribuan Buku Digital
               </span>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100">
-              <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
+            <div className="flex items-center gap-3 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg border border-gray-100 dark:border-gray-700 transition-colors">
+              <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 dark:bg-brand-primary/20 flex items-center justify-center">
                 <GraduationCap className="w-4 h-4 text-brand-primary" />
               </div>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors">
                 Materi Pembelajaran
               </span>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100">
-              <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
+            <div className="flex items-center gap-3 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg border border-gray-100 dark:border-gray-700 transition-colors">
+              <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 dark:bg-brand-primary/20 flex items-center justify-center">
                 <Users className="w-4 h-4 text-brand-primary" />
               </div>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors">
                 Kolaborasi Siswa
               </span>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-100">
-              <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center">
+            <div className="flex items-center gap-3 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg border border-gray-100 dark:border-gray-700 transition-colors">
+              <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 dark:bg-brand-primary/20 flex items-center justify-center">
                 <Globe className="w-4 h-4 text-brand-primary" />
               </div>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors">
                 Akses 24/7
               </span>
             </div>
@@ -127,17 +127,17 @@ export default function LoginPage() {
         </div>
 
         {/* Right side - Login Form */}
-        <Card className="w-full max-w-md border-0 shadow-2xl backdrop-blur-sm bg-white/95">
+        <Card className="w-full max-w-md border-0 dark:border dark:border-gray-700 shadow-2xl backdrop-blur-sm bg-white/95 dark:bg-gray-900/95 transition-colors">
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-1.5 bg-linear-to-r from-brand-primary to-brand-primary-light rounded-full"></div>
 
           <CardHeader className="space-y-4 text-center pb-6">
             <div className="flex items-center justify-center gap-2">
               <GraduationCap className="w-6 h-6 text-brand-primary" />
-              <CardTitle className="text-2xl font-bold text-gray-900">
+              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
                 Akses Akun Bookera
               </CardTitle>
             </div>
-            <CardDescription className="text-gray-600">
+            <CardDescription className="text-gray-600 dark:text-gray-300 transition-colors">
               Login menggunakan akun sekolah Anda
             </CardDescription>
           </CardHeader>
@@ -146,7 +146,7 @@ export default function LoginPage() {
             <form onSubmit={handleLogin} className="space-y-6">
               {/* Email Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2 transition-colors">
                   <Mail className="w-4 h-4" />
                   Email Sekolah
                 </label>
@@ -156,14 +156,14 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-12 px-4 transition-all duration-200 border-gray-300 hover:border-brand-primary/50 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
+                  className="h-12 px-4 transition-all duration-200 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white hover:border-brand-primary/50 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
                   disabled={loading}
                 />
               </div>
 
               {/* Password Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2 transition-colors">
                   <Lock className="w-4 h-4" />
                   Password
                 </label>
@@ -174,13 +174,13 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="h-12 px-4 pr-12 transition-all duration-200 border-gray-300 hover:border-brand-primary/50 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
+                    className="h-12 px-4 pr-12 transition-all duration-200 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white hover:border-brand-primary/50 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
                     disabled={loading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-primary transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-brand-primary transition-colors"
                     disabled={loading}
                   >
                     {showPassword ? (
@@ -198,10 +198,10 @@ export default function LoginPage() {
                   <input
                     type="checkbox"
                     id="remember"
-                    className="w-4 h-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary/50"
+                    className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-brand-primary focus:ring-brand-primary/50"
                     disabled={loading}
                   />
-                  <label htmlFor="remember" className="text-sm text-gray-600">
+                  <label htmlFor="remember" className="text-sm text-gray-600 dark:text-gray-300 transition-colors">
                     Ingat perangkat ini
                   </label>
                 </div>
@@ -220,7 +220,7 @@ export default function LoginPage() {
                 type="submit"
                 variant="submit"
                 loading={loading}
-                className="w-full h-12 text-base font-semibold rounded-lg bg-linear-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
+                className="w-full h-12 text-base font-semibold rounded-lg bg-gradient-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
                 spinnerClassName="text-white"
               >
                 {loading ? (
@@ -234,7 +234,7 @@ export default function LoginPage() {
               </Button>
 
               {/* Terms of Service & Privacy Policy */}
-              <div className="text-center text-xs text-gray-500 space-y-1">
+              <div className="text-center text-xs text-gray-500 dark:text-gray-400 space-y-1 transition-colors">
                 <p>Dengan melanjutkan, Anda menyetujui</p>
                 <div className="flex items-center justify-center gap-1 flex-wrap">
                   <button
