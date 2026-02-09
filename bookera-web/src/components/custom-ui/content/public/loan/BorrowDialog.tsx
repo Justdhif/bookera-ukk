@@ -224,7 +224,7 @@ export function BorrowDialog({
           {selectedBook && availableCopies.length > 0 && (
             <div className="space-y-2">
               <Label>Pilih Copy Buku ({availableCopies.length} tersedia)</Label>
-              <div className="border rounded-md p-4 space-y-3 max-h-[200px] overflow-y-auto">
+              <div className="border rounded-md p-4 space-y-3 max-h-50 overflow-y-auto">
                 {availableCopies.map((copy) => (
                   <div key={copy.id} className="flex items-center space-x-3">
                     <Checkbox

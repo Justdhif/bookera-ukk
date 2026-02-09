@@ -12,8 +12,6 @@ import BookDetailForm from "./BookDetailForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Save, X, Edit2 } from "lucide-react";
-import { format } from "date-fns";
-import { id as indonesianLocale } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
@@ -134,10 +132,7 @@ export default function BookDetailClient() {
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Skeleton className="h-8 w-8" />
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-64" />
-          </div>
+          <Skeleton className="h-8 w-64" />
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
           <Skeleton className="h-96" />
@@ -148,16 +143,6 @@ export default function BookDetailClient() {
   }
 
   if (!book) return null;
-
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), "dd MMMM yyyy HH:mm", {
-        locale: indonesianLocale,
-      });
-    } catch {
-      return dateString;
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -242,25 +227,6 @@ export default function BookDetailClient() {
           </CardHeader>
           <CardContent>
             <BookCopyList book={book} onChange={fetchBook} />
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Metadata Section */}
-      {!isEditMode && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Metadata</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <p className="text-sm text-muted-foreground">Dibuat Pada</p>
-              <p className="font-medium">{formatDate(book.created_at)}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Diperbarui Pada</p>
-              <p className="font-medium">{formatDate(book.updated_at)}</p>
-            </div>
           </CardContent>
         </Card>
       )}

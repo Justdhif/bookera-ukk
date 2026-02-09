@@ -106,59 +106,43 @@ export default function BookCoverCard({
         </div>
 
         {/* Info Cards */}
-        <div className="space-y-3">
-          <div className="rounded-lg border p-3 bg-muted/30">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label className="text-sm font-medium">Status</Label>
-                <p className="text-xs text-muted-foreground">
-                  {isEditMode
-                    ? formData.is_active
-                      ? "Aktif"
-                      : "Nonaktif"
-                    : book.is_active
-                      ? "Aktif"
-                      : "Nonaktif"}
-                </p>
-              </div>
-              {isEditMode ? (
-                <Switch
-                  checked={formData.is_active}
-                  onCheckedChange={(value) =>
-                    setFormData({ ...formData, is_active: value })
-                  }
-                />
-              ) : (
-                <Badge variant={book.is_active ? "default" : "secondary"}>
-                  {book.is_active ? (
-                    <>
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Aktif
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="h-3 w-3 mr-1" />
-                      Tidak Aktif
-                    </>
-                  )}
-                </Badge>
-              )}
+        <div className="rounded-lg border p-3 bg-muted/30">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-sm font-medium">Status</Label>
+              <p className="text-xs text-muted-foreground">
+                {isEditMode
+                  ? formData.is_active
+                    ? "Aktif"
+                    : "Nonaktif"
+                  : book.is_active
+                    ? "Aktif"
+                    : "Nonaktif"}
+              </p>
             </div>
+            {isEditMode ? (
+              <Switch
+                checked={formData.is_active}
+                onCheckedChange={(value) =>
+                  setFormData({ ...formData, is_active: value })
+                }
+              />
+            ) : (
+              <Badge variant={book.is_active ? "default" : "secondary"}>
+                {book.is_active ? (
+                  <>
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Aktif
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-3 w-3 mr-1" />
+                    Tidak Aktif
+                  </>
+                )}
+              </Badge>
+            )}
           </div>
-
-          {!isEditMode && (
-            <>
-              <div className="rounded-lg border p-3 bg-muted/30">
-                <p className="text-sm text-muted-foreground mb-1">Total Salinan</p>
-                <p className="text-2xl font-bold">{book.copies?.length || 0}</p>
-              </div>
-
-              <div className="rounded-lg border p-3 bg-muted/30">
-                <p className="text-sm text-muted-foreground mb-1">Slug</p>
-                <p className="text-sm font-mono">{book.slug}</p>
-              </div>
-            </>
-          )}
         </div>
       </CardContent>
     </Card>

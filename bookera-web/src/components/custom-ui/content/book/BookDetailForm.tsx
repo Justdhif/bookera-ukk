@@ -80,6 +80,14 @@ export default function BookDetailForm({
                 <p className="text-sm text-muted-foreground">Bahasa</p>
                 <p className="font-medium">{book.language || "-"}</p>
               </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Slug</p>
+                <p className="font-medium font-mono text-sm">{book.slug}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Salinan</p>
+                <p className="font-medium">{book.copies?.length || 0}</p>
+              </div>
             </div>
           </div>
 

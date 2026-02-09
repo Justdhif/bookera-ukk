@@ -32,7 +32,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { Check, ChevronsUpDown, BookOpen, Loader2, X, User as UserIcon } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  BookOpen,
+  Loader2,
+  X,
+  User as UserIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DatePicker } from "@/components/ui/date-picker";
 
@@ -122,7 +129,7 @@ export function AdminBorrowDialog({
       });
       toast.success(
         response.data.message ||
-          "Peminjaman berhasil dibuat dengan status approved & borrowed"
+          "Peminjaman berhasil dibuat dengan status approved & borrowed",
       );
       onOpenChange(false);
       setSelectedUser(null);
@@ -131,9 +138,7 @@ export function AdminBorrowDialog({
       setDueDate(undefined);
       onSuccess();
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || "Gagal membuat peminjaman"
-      );
+      toast.error(error.response?.data?.message || "Gagal membuat peminjaman");
     } finally {
       setLoading(false);
     }
@@ -143,7 +148,7 @@ export function AdminBorrowDialog({
     setSelectedCopies((prev) =>
       prev.includes(copyId)
         ? prev.filter((id) => id !== copyId)
-        : [...prev, copyId]
+        : [...prev, copyId],
     );
   };
 
@@ -164,9 +169,8 @@ export function AdminBorrowDialog({
     return user ? user.profile.full_name || user.email : null;
   };
 
-  const availableCopies = selectedBook?.copies?.filter(
-    (copy) => copy.status === "available"
-  ) || [];
+  const availableCopies =
+    selectedBook?.copies?.filter((copy) => copy.status === "available") || [];
 
   const isFormValid = selectedUser && selectedCopies.length > 0 && dueDate;
 
@@ -200,9 +204,7 @@ export function AdminBorrowDialog({
                   className="w-full justify-between"
                 >
                   <span className="truncate">
-                    {selectedUser
-                      ? getSelectedUserName()
-                      : "Pilih user..."}
+                    {selectedUser ? getSelectedUserName() : "Pilih user..."}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -213,35 +215,38 @@ export function AdminBorrowDialog({
                   <CommandEmpty>Tidak ada user ditemukan.</CommandEmpty>
                   <CommandList>
                     <CommandGroup>
-                      {Array.isArray(users) && users
-                        .filter((user) => user.is_active && user.role !== "admin")
-                        .map((user) => (
-                          <CommandItem
-                            key={user.id}
-                            value={`${user.profile.full_name}-${user.email}`}
-                            onSelect={() => {
-                              setSelectedUser(user.id);
-                              setUserPopoverOpen(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                selectedUser === user.id
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            <div className="flex-1">
-                              <p className="font-medium">
-                                {user.profile.full_name || user.email}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {user.email} • {user.role}
-                              </p>
-                            </div>
-                          </CommandItem>
-                        ))}
+                      {Array.isArray(users) &&
+                        users
+                          .filter(
+                            (user) => user.is_active && user.role !== "admin",
+                          )
+                          .map((user) => (
+                            <CommandItem
+                              key={user.id}
+                              value={`${user.profile.full_name}-${user.email}`}
+                              onSelect={() => {
+                                setSelectedUser(user.id);
+                                setUserPopoverOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  selectedUser === user.id
+                                    ? "opacity-100"
+                                    : "opacity-0",
+                                )}
+                              />
+                              <div className="flex-1">
+                                <p className="font-medium">
+                                  {user.profile.full_name || user.email}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {user.email} • {user.role}
+                                </p>
+                              </div>
+                            </CommandItem>
+                          ))}
                     </CommandGroup>
                   </CommandList>
                 </Command>
@@ -261,9 +266,7 @@ export function AdminBorrowDialog({
                   className="w-full justify-between"
                 >
                   <span className="truncate">
-                    {selectedBook
-                      ? selectedBook.title
-                      : "Pilih buku..."}
+                    {selectedBook ? selectedBook.title : "Pilih buku..."}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -274,40 +277,56 @@ export function AdminBorrowDialog({
                   <CommandEmpty>Tidak ada buku ditemukan.</CommandEmpty>
                   <CommandList>
                     <CommandGroup>
-                      {Array.isArray(books) && books.map((book) => {
-                        const availableCopies = Array.isArray(book.copies) 
-                          ? book.copies.filter((copy) => copy.status === "available")
-                          : [];
-                        
-                        if (availableCopies.length === 0) return null;
-                        
-                        return (
-                          <CommandItem
-                            key={book.id}
-                            value={book.title}
-                            onSelect={() => {
-                              setSelectedBook(book);
-                              setSelectedCopies([]);
-                              setBookPopoverOpen(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                selectedBook?.id === book.id
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            <div className="flex-1">
-                              <p className="font-medium">{book.title}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {availableCopies.length} copy tersedia
-                              </p>
-                            </div>
-                          </CommandItem>
-                        );
-                      })}
+                      {Array.isArray(books) &&
+                        books.map((book) => {
+                          const availableCopies = Array.isArray(book.copies)
+                            ? book.copies.filter(
+                                (copy) => copy.status === "available",
+                              )
+                            : [];
+
+                          if (availableCopies.length === 0) return null;
+
+                          return (
+                            <CommandItem
+                              key={book.id}
+                              value={book.title}
+                              onSelect={() => {
+                                setSelectedBook(book);
+                                setSelectedCopies([]);
+                                setBookPopoverOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  selectedBook?.id === book.id
+                                    ? "opacity-100"
+                                    : "opacity-0",
+                                )}
+                              />
+                              <div className="flex items-center">
+                                {book.cover_image_url ? (
+                                  <img
+                                    src={book.cover_image_url}
+                                    alt={book.title}
+                                    className="w-12 h-16 object-cover rounded shadow-sm"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-16 bg-muted rounded flex items-center justify-center">
+                                    <BookOpen className="h-5 w-5 text-muted-foreground" />
+                                  </div>
+                                )}
+                                <div className="flex-1 ml-3">
+                                  <p className="font-medium">{book.title}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {availableCopies.length} copy tersedia
+                                  </p>
+                                </div>
+                              </div>
+                            </CommandItem>
+                          );
+                        })}
                     </CommandGroup>
                   </CommandList>
                 </Command>
@@ -319,7 +338,7 @@ export function AdminBorrowDialog({
           {selectedBook && availableCopies.length > 0 && (
             <div className="space-y-2">
               <Label>Pilih Copy Buku ({availableCopies.length} tersedia)</Label>
-              <div className="border rounded-md p-4 space-y-3 max-h-[200px] overflow-y-auto">
+              <div className="border rounded-md p-4 space-y-3 max-h-50 overflow-y-auto">
                 {availableCopies.map((copy) => (
                   <div key={copy.id} className="flex items-center space-x-3">
                     <Checkbox
@@ -391,9 +410,9 @@ export function AdminBorrowDialog({
           >
             Batal
           </Button>
-          <Button 
-            variant="submit" 
-            onClick={handleSubmit} 
+          <Button
+            variant="submit"
+            onClick={handleSubmit}
             disabled={loading || !isFormValid}
           >
             {loading ? (
