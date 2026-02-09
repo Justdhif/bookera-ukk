@@ -131,8 +131,18 @@ export default function BookDetailClient() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Skeleton className="h-8 w-8" />
-          <Skeleton className="h-8 w-64" />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push("/admin/books")}
+            className="h-8 w-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Detail Buku</h1>
+            <p className="text-muted-foreground">Memuat data buku...</p>
+          </div>
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
           <Skeleton className="h-96" />

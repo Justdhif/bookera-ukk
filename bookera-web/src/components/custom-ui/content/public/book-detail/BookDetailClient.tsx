@@ -38,7 +38,20 @@ export default function BookDetailClient() {
   if (loading) {
     return (
       <div className="container py-8 space-y-6">
-        <Skeleton className="h-10 w-64" />
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="h-8 w-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Detail Buku</h1>
+            <p className="text-muted-foreground">Memuat data buku...</p>
+          </div>
+        </div>
         <div className="grid gap-6 lg:grid-cols-3">
           <Skeleton className="h-96" />
           <Skeleton className="lg:col-span-2 h-96" />

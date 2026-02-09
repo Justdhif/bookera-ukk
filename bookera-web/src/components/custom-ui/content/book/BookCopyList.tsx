@@ -48,7 +48,7 @@ export default function BookCopyList({
           value={copyCode}
           onChange={(e) => setCopyCode(e.target.value)}
         />
-        <Button onClick={() => handleAdd(copyCode)}>Tambah</Button>
+        <Button variant="submit" onClick={() => handleAdd(copyCode)}>Tambah Salinan</Button>
       </div>
 
       <ul className="space-y-2">
