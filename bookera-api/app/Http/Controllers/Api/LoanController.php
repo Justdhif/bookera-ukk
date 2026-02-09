@@ -21,7 +21,8 @@ class LoanController extends Controller
             'loanDetails.bookCopy.book',
             'user.profile',
             'bookReturns.details.bookCopy.book',
-            'fines.fineType'
+            'fines.fineType',
+            'lostBooks.bookCopy.book'
         ]);
 
         // Search functionality
@@ -309,9 +310,9 @@ class LoanController extends Controller
 
         $loans = Loan::with([
             'loanDetails.bookCopy.book',
-            // 'bookReturns' => function ($query) {
-            //     $query->where('approval_status', 'pending');
-            // },
+            'bookReturns.details',
+            'fines.fineType',
+            'lostBooks.bookCopy.book'
         ])
             ->where('user_id', $user->id)
             ->latest()

@@ -8,6 +8,8 @@ use App\Helpers\ApiResponse;
 use App\Models\Loan;
 use App\Models\LostBook;
 use App\Models\BookCopy;
+use App\Models\Fine;
+use App\Models\FineType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,6 +22,7 @@ class LostBookController extends Controller
     {
         $query = LostBook::with([
             'loan.user.profile',
+            'loan.fines.fineType',
             'bookCopy.book',
         ]);
 
@@ -106,10 +109,36 @@ class LostBookController extends Controller
             // Update book copy status to lost
             $bookCopy = BookCopy::find($data['book_copy_id']);
             $oldStatus = $bookCopy->status;
-            
+
             $bookCopy->update([
                 'status' => 'lost',
             ]);
+
+            // Create fine for lost book
+            $lostFineType = FineType::where('type', 'lost')->first();
+            if ($lostFineType) {
+                $fine = Fine::create([
+                    'loan_id' => $loan->id,
+                    'fine_type_id' => $lostFineType->id,
+                    'amount' => $lostFineType->amount,
+                    'status' => 'unpaid',
+                    'notes' => 'Denda buku hilang: ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')',
+                ]);
+
+                ActivityLogger::log(
+                    'create',
+                    'fine',
+                    "Fine created for lost book in loan #{$loan->id}",
+                    [
+                        'fine_id' => $fine->id,
+                        'loan_id' => $loan->id,
+                        'amount' => $fine->amount,
+                        'fine_type' => 'lost',
+                    ],
+                    null,
+                    $fine
+                );
+            }
 
             ActivityLogger::log(
                 'update',
@@ -127,35 +156,20 @@ class LostBookController extends Controller
                 $bookCopy
             );
 
-            // Check if all books from this loan are processed
-            $totalLoanedBooks = $loan->details()->count();
-            $totalReturnedBooks = $loan->bookReturns()
-                ->with('details')
-                ->get()
-                ->pluck('details')
-                ->flatten()
-                ->pluck('book_copy_id')
-                ->unique()
-                ->count();
-            $totalLostBooks = $loan->lostBook ? 1 : 0;
+            // Update loan status to 'checking' - waiting for admin approval/verification
+            $oldLoanStatus = $loan->status;
+            $loan->update([
+                'status' => 'checking',
+            ]);
 
-            $allBooksProcessed = ($totalReturnedBooks + $totalLostBooks) >= $totalLoanedBooks;
-
-            if ($allBooksProcessed) {
-                $oldLoanStatus = $loan->status;
-                $loan->update([
-                    'status' => 'returned',
-                ]);
-
-                ActivityLogger::log(
-                    'update',
-                    'loan',
-                    "Loan #{$loan->id} status changed to returned - all books processed (including lost books)",
-                    ['loan_id' => $loan->id, 'new_status' => 'returned'],
-                    ['loan_id' => $loan->id, 'old_status' => $oldLoanStatus],
-                    $loan
-                );
-            }
+            ActivityLogger::log(
+                'update',
+                'loan',
+                "Loan #{$loan->id} status changed to 'checking' - lost book reported, awaiting admin verification",
+                ['loan_id' => $loan->id, 'new_status' => 'checking'],
+                ['loan_id' => $loan->id, 'old_status' => $oldLoanStatus],
+                $loan
+            );
 
             ActivityLogger::log(
                 'create',
@@ -235,7 +249,7 @@ class LostBookController extends Controller
     public function destroy(LostBook $lostBook)
     {
         $bookCopy = $lostBook->bookCopy;
-        
+
         ActivityLogger::log(
             'delete',
             'lost_book',
@@ -258,6 +272,56 @@ class LostBookController extends Controller
 
         return ApiResponse::successResponse(
             'Record buku hilang berhasil dihapus'
+        );
+    }
+
+    /**
+     * Finish lost book process (update loan status to lost)
+     */
+    public function finish(LostBook $lostBook)
+    {
+        $loan = $lostBook->loan;
+
+        // Check if all fines are paid
+        $unpaidFines = $loan->fines()->where('status', 'unpaid')->count();
+        if ($unpaidFines > 0) {
+            return ApiResponse::errorResponse(
+                'Tidak dapat menyelesaikan proses buku hilang. Masih ada denda yang belum dibayar.',
+                null,
+                400
+            );
+        }
+
+        DB::transaction(function () use ($loan, $lostBook) {
+            $oldStatus = $loan->status;
+
+            // Update loan status to lost
+            $loan->update([
+                'status' => 'lost',
+            ]);
+
+            ActivityLogger::log(
+                'update',
+                'loan',
+                "Loan #{$loan->id} marked as lost (finished lost book process)",
+                [
+                    'loan_id' => $loan->id,
+                    'new_status' => 'lost',
+                    'lost_book_id' => $lostBook->id,
+                ],
+                [
+                    'loan_id' => $loan->id,
+                    'old_status' => $oldStatus,
+                ],
+                $loan
+            );
+        });
+
+        $lostBook->load(['loan.user.profile', 'bookCopy.book']);
+
+        return ApiResponse::successResponse(
+            'Proses buku hilang telah selesai. Status peminjaman diubah menjadi lost.',
+            $lostBook
         );
     }
 }

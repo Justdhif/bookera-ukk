@@ -34,6 +34,7 @@ import {
   FileText,
   Shield,
   DollarSign,
+  AlertCircle,
 } from "lucide-react";
 
 // Menu items grouped by categories
@@ -92,6 +93,12 @@ const menuGroups = [
         href: "/admin/fines",
         icon: DollarSign,
         gradient: "from-rose-500 to-red-500",
+      },
+      {
+        title: "Lost Books",
+        href: "/admin/lost-books",
+        icon: AlertCircle,
+        gradient: "from-red-500 to-rose-600",
       },
       {
         title: "Activity Logs",

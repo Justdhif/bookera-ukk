@@ -29,7 +29,6 @@ interface ReturnCardProps {
   loan: Loan;
   showActions?: boolean;
   actionLoading: number | null;
-  onApprove?: (returnId: number) => void;
   onFinished?: (returnId: number) => void;
 }
 
@@ -38,7 +37,6 @@ export function ReturnCard({
   loan,
   showActions = true,
   actionLoading,
-  onApprove,
   onFinished,
 }: ReturnCardProps) {
   const router = useRouter();
@@ -93,6 +91,12 @@ export function ReturnCard({
         variant: "destructive",
         label: "Late",
         icon: <AlertTriangle className="h-3 w-3 mr-1" />,
+        className: "bg-red-100 text-red-800 hover:bg-red-100",
+      },
+      lost: {
+        variant: "destructive",
+        label: "Lost",
+        icon: <XCircleIcon className="h-3 w-3 mr-1" />,
         className: "bg-red-100 text-red-800 hover:bg-red-100",
       },
     };
@@ -155,7 +159,9 @@ export function ReturnCard({
   
   // Check fine status - only for loans with fines
   const unpaidFines = loan.fines?.filter((f) => f.status === "unpaid") || [];
-  const allFinesPaid = loan.fines && loan.fines.length > 0 && unpaidFines.length === 0;
+  const hasFines = loan.fines && loan.fines.length > 0;
+  const hasUnpaidFines = unpaidFines.length > 0;
+  const allFinesPaid = hasFines && unpaidFines.length === 0;
 
   return (
     <Card className="overflow-hidden">
@@ -181,24 +187,8 @@ export function ReturnCard({
           </div>
           {showActions && loan.status === "checking" && (
             <div className="flex gap-2">
-              {allGoodCondition && (
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={() => onApprove?.(bookReturn.id)}
-                  disabled={actionLoading === bookReturn.id}
-                >
-                  {actionLoading === bookReturn.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <CheckCircle2 className="h-4 w-4 mr-1" />
-                  )}
-                  Approve Return
-                </Button>
-              )}
-              
-              {/* Show Process Fine button when has damaged/lost books AND fines not all paid */}
-              {hasDamagedOrLostBooks && !allFinesPaid && (
+              {/* Show Process Fine button when there are unpaid fines */}
+              {hasUnpaidFines && (
                 <Button
                   size="sm"
                   variant="secondary"
@@ -209,20 +199,8 @@ export function ReturnCard({
                 </Button>
               )}
               
-              {/* Show Report Lost Book button when has lost books */}
-              {hasLostBooks && (
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => router.push(`/admin/lost-books?loan_id=${loan.id}`)}
-                >
-                  <AlertCircle className="h-4 w-4 mr-1" />
-                  Report Lost Book
-                </Button>
-              )}
-              
-              {/* Show Finished button when has damaged/lost books AND all fines paid */}
-              {hasDamagedOrLostBooks && allFinesPaid && (
+              {/* Show Finished button when no unpaid fines (either no fines or all paid) */}
+              {!hasUnpaidFines && (
                 <Button
                   size="sm"
                   variant="submit"

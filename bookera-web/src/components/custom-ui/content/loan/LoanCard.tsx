@@ -89,6 +89,12 @@ export function LoanCard({
         label: "Late",
         icon: <AlertCircle className="h-3 w-3 mr-1" />,
       },
+      lost: {
+        variant: "destructive",
+        label: "Lost",
+        icon: <XCircleIcon className="h-3 w-3 mr-1" />,
+        className: "bg-red-100 text-white hover:bg-red-100",
+      },
     };
 
     return (

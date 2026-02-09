@@ -37,19 +37,42 @@ export default function BookCopyList({ copies }: { copies: BookCopy[] }) {
             <div className="flex items-center gap-2">
               <p className="font-medium">Kode: {copy.copy_code}</p>
               <Badge 
-                variant={copy.status === "borrowed" ? "destructive" : "default"}
+                variant={
+                  copy.status === "available" 
+                    ? "default" 
+                    : copy.status === "borrowed" 
+                    ? "destructive" 
+                    : "secondary"
+                }
+                className={
+                  copy.status === "available"
+                    ? "bg-green-100 text-green-800 hover:bg-green-100"
+                    : copy.status === "borrowed"
+                    ? "bg-orange-800 text-white hover:bg-orange-700"
+                    : copy.status === "lost"
+                    ? "bg-red-800 text-white hover:bg-red-700"
+                    : "bg-gray-100 text-gray-800 hover:bg-gray-100"
+                }
               >
-                {copy.status === "borrowed" ? "Dipinjam" : "Tersedia"}
+                {copy.status === "available" 
+                  ? "Tersedia" 
+                  : copy.status === "borrowed" 
+                  ? "Dipinjam" 
+                  : copy.status === "lost"
+                  ? "Hilang"
+                  : copy.status === "damaged"
+                  ? "Rusak"
+                  : copy.status}
               </Badge>
             </div>
-            {copy.condition && (
+            {copy.status && (
               <p className="text-sm text-muted-foreground">
-                Kondisi: {copy.condition}
+                Kondisi: {copy.status}
               </p>
             )}
           </div>
 
-          {copy.status !== "borrowed" && (
+          {copy.status === "available" && (
             <Button
               onClick={() => {
                 if (!isAuthenticated) {

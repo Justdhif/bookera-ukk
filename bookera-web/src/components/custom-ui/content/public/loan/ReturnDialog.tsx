@@ -38,7 +38,7 @@ export function ReturnDialog({
 }: ReturnDialogProps) {
   const [loading, setLoading] = useState(false);
   const [bookConditions, setBookConditions] = useState<
-    Record<number, "good" | "damaged" | "lost">
+    Record<number, "good" | "damaged">
   >({});
 
   const handleSubmit = async () => {
@@ -81,7 +81,7 @@ export function ReturnDialog({
   const handleConditionChange = (bookCopyId: number, condition: string) => {
     setBookConditions((prev) => ({
       ...prev,
-      [bookCopyId]: condition as "good" | "damaged" | "lost",
+      [bookCopyId]: condition as "good" | "damaged",
     }));
   };
 
@@ -95,7 +95,8 @@ export function ReturnDialog({
           </DialogTitle>
           <DialogDescription>
             Pilih kondisi buku yang akan dikembalikan. Pastikan kondisi sesuai
-            dengan keadaan buku saat ini.
+            dengan keadaan buku saat ini. Jika buku hilang, gunakan tombol
+            "Laporkan Kehilangan" pada daftar peminjaman.
           </DialogDescription>
         </DialogHeader>
 
@@ -136,12 +137,6 @@ export function ReturnDialog({
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2 rounded-full bg-yellow-500" />
                         <span>Rusak - Ada kerusakan ringan</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="lost">
-                      <div className="flex items-center gap-2">
-                        <div className="h-2 w-2 rounded-full bg-red-500" />
-                        <span>Hilang - Buku hilang/tidak dapat dikembalikan</span>
                       </div>
                     </SelectItem>
                   </SelectContent>

@@ -113,6 +113,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [LostBookController::class, 'index']);
             Route::get('/{lostBook}', [LostBookController::class, 'show']);
             Route::put('/{lostBook}', [LostBookController::class, 'update']);
+            Route::post('/{lostBook}/finish', [LostBookController::class, 'finish']);
             Route::delete('/{lostBook}', [LostBookController::class, 'destroy']);
         });
 

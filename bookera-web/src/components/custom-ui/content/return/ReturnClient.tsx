@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { bookReturnService } from "@/services/book-return.service";
 import { loanService } from "@/services/loan.service";
+import { lostBookService } from "@/services/lost-book.service";
 import { Loan } from "@/types/loan";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -43,30 +44,32 @@ export default function ReturnClient() {
     fetchAllData();
   };
 
-  const handleApprove = async (returnId: number) => {
-    setActionLoading(returnId);
-    try {
-      const response = await bookReturnService.approveReturn(returnId);
-      toast.success(
-        response.data.message || "Pengembalian berhasil di-approve",
-      );
-      fetchAllData();
-    } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || "Gagal approve pengembalian",
-      );
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
   const handleFinished = async (returnId: number) => {
     setActionLoading(returnId);
     try {
-      const response = await bookReturnService.approveReturn(returnId);
-      toast.success(
-        response.data.message || "Pengembalian berhasil diselesaikan",
+      // Find the loan for this return
+      const loan = allLoans.find((l) => 
+        l.book_returns?.some((r) => r.id === returnId)
       );
+      
+      // Check if this loan has any lost books
+      const hasLostBooks = loan?.lost_books && loan.lost_books.length > 0;
+      
+      if (hasLostBooks && loan?.lost_books) {
+        // Use lost book finish endpoint to update loan status to "lost"
+        const lostBookId = loan.lost_books[0].id;
+        const response = await lostBookService.finish(lostBookId);
+        toast.success(
+          response.data.message || "Proses buku hilang berhasil diselesaikan. Status peminjaman diubah menjadi lost.",
+        );
+      } else {
+        // Normal return approval - updates loan status to "returned"
+        const response = await bookReturnService.approveReturn(returnId);
+        toast.success(
+          response.data.message || "Pengembalian berhasil diselesaikan",
+        );
+      }
+      
       fetchAllData();
     } catch (error: any) {
       toast.error(
@@ -107,7 +110,6 @@ export default function ReturnClient() {
               loan={loan}
               showActions={showActions}
               actionLoading={actionLoading}
-              onApprove={handleApprove}
               onFinished={handleFinished}
             />
           );

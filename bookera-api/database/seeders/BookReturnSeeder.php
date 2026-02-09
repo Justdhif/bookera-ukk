@@ -18,7 +18,7 @@ class BookReturnSeeder extends Seeder
     {
         // Get returned loans
         $returnedLoans = Loan::whereIn('status', ['returned'])->with('loanDetails.bookCopy')->get();
-        
+
         if ($returnedLoans->isEmpty()) {
             $this->command->warn('No returned loans found. Please run LoanSeeder first.');
             return;
@@ -31,7 +31,7 @@ class BookReturnSeeder extends Seeder
             $loanDate = Carbon::parse($loan->loan_date);
             $dueDate = Carbon::parse($loan->due_date);
             $returnDate = $loanDate->copy()->addDays(rand(7, 14));
-            
+
             if ($returnDate->greaterThan($dueDate)) {
                 $daysLate = $returnDate->diffInDays($dueDate);
             }
@@ -39,7 +39,6 @@ class BookReturnSeeder extends Seeder
             $bookReturn = BookReturn::create([
                 'loan_id' => $loan->id,
                 'return_date' => $returnDate,
-                'approval_status' => 'approved',
             ]);
 
             // Create return details for each loaned book copy
