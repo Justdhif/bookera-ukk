@@ -28,7 +28,8 @@ import {
 } from "lucide-react";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import Image from "next/image";
-import { LegalModal } from "@/components/custom-ui/modal/LegalModal";
+import { TermsOfServiceModal } from "@/components/custom-ui/modal/TermsOfServiceModal";
+import { PrivacyPolicyModal } from "@/components/custom-ui/modal/PrivacyPolicyModal";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,8 +39,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [legalModalOpen, setLegalModalOpen] = useState(false);
-  const [legalModalType, setLegalModalType] = useState<"terms" | "privacy">("terms");
+  const [tosModalOpen, setTosModalOpen] = useState(false);
+  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -220,7 +221,7 @@ export default function LoginPage() {
                 type="submit"
                 variant="submit"
                 loading={loading}
-                className="w-full h-12 text-base font-semibold rounded-lg bg-gradient-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
+                className="w-full h-12 text-base font-semibold rounded-lg bg-linear-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
                 spinnerClassName="text-white"
               >
                 {loading ? (
@@ -239,10 +240,7 @@ export default function LoginPage() {
                 <div className="flex items-center justify-center gap-1 flex-wrap">
                   <button
                     type="button"
-                    onClick={() => {
-                      setLegalModalType("terms");
-                      setLegalModalOpen(true);
-                    }}
+                    onClick={() => setTosModalOpen(true)}
                     className="text-brand-primary hover:text-brand-primary-dark font-medium hover:underline transition-colors"
                     disabled={loading}
                   >
@@ -251,10 +249,7 @@ export default function LoginPage() {
                   <span>dan</span>
                   <button
                     type="button"
-                    onClick={() => {
-                      setLegalModalType("privacy");
-                      setLegalModalOpen(true);
-                    }}
+                    onClick={() => setPrivacyModalOpen(true)}
                     className="text-brand-primary hover:text-brand-primary-dark font-medium hover:underline transition-colors"
                     disabled={loading}
                   >
@@ -268,12 +263,9 @@ export default function LoginPage() {
         </Card>
       </div>
 
-      {/* Legal Modal */}
-      <LegalModal
-        open={legalModalOpen}
-        onOpenChange={setLegalModalOpen}
-        type={legalModalType}
-      />
+      {/* Legal Modals */}
+      <TermsOfServiceModal open={tosModalOpen} onOpenChange={setTosModalOpen} />
+      <PrivacyPolicyModal open={privacyModalOpen} onOpenChange={setPrivacyModalOpen} />
     </div>
   );
 }
