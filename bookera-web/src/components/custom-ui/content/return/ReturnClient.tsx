@@ -27,7 +27,7 @@ export default function ReturnClient() {
     setLoading(true);
     try {
       // Get all loans with status "checking" or "returned"
-      const loansRes = await loanService.getAll();
+      const loansRes = await loanService.getAll(searchQuery);
       const filteredLoans = loansRes.data.data.filter(
         (loan) => loan.status === "checking" || loan.status === "returned"
       );

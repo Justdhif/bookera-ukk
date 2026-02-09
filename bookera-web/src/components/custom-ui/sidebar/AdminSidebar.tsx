@@ -22,7 +22,6 @@ import { useAuthStore } from "@/store/auth.store";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import {
   LogOut,
-  Settings,
   User,
   BookOpen,
   HomeIcon,
@@ -99,23 +98,6 @@ const menuGroups = [
         href: "/admin/activity-logs",
         icon: Activity,
         gradient: "from-purple-500 to-pink-500",
-      },
-    ],
-  },
-  {
-    title: "Settings",
-    items: [
-      {
-        title: "Terms of Service",
-        href: "/admin/terms-of-service",
-        icon: FileText,
-        gradient: "from-indigo-500 to-purple-500",
-      },
-      {
-        title: "Privacy Policy",
-        href: "/admin/privacy-policy",
-        icon: Shield,
-        gradient: "from-violet-500 to-purple-500",
       },
     ],
   },
@@ -265,31 +247,6 @@ export function AdminSidebar() {
                 <HomeIcon className="h-3.5 w-3.5" />
               </div>
               {open && <span className="font-medium">Public Page</span>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          {/* Settings Button */}
-          <SidebarMenuItem
-            className={!open ? "w-full flex justify-center" : ""}
-          >
-            <SidebarMenuButton
-              onClick={() => handleNavigation("/admin/settings")}
-              isActive={pathname === "/admin/settings"}
-              tooltip={{
-                content: "Settings",
-                gradient: "from-slate-600 to-gray-600",
-                className: "font-medium",
-              }}
-              className={`group/settings ${!open && "justify-center px-0 mx-auto"}`}
-            >
-              <div
-                className={`${
-                  open ? "p-1.5" : "p-2"
-                } rounded-lg bg-linear-to-br from-slate-600 to-gray-600 text-white shadow-sm group-hover/settings:shadow-md transition-shadow`}
-              >
-                <Settings className="h-3.5 w-3.5" />
-              </div>
-              {open && <span className="font-medium">Settings</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
 

@@ -5,22 +5,39 @@ import { notificationService } from "@/services/notification.service";
 import { Notification } from "@/types/notification";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Bell, CheckCheck, Loader2, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { CheckCheck, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
+import NotificationList from "./NotificationList";
+import NotificationDetail from "./NotificationDetail";
 
 export default function NotificationPageClient() {
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [selectedNotif, setSelectedNotif] = useState<Notification | null>(null);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isMarkingAll, setIsMarkingAll] = useState(false);
+  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchNotifications();
     fetchUnreadCount();
+  }, []);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedNotif(null);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
   const fetchNotifications = async () => {
@@ -48,7 +65,8 @@ export default function NotificationPageClient() {
   };
 
   const handleNotificationClick = async (notif: Notification) => {
-    // Mark as read if not read yet
+    setSelectedNotif(notif);
+
     if (!notif.read_at) {
       try {
         await notificationService.markAsRead(notif.id);
@@ -62,12 +80,13 @@ export default function NotificationPageClient() {
         console.error("Failed to mark as read:", error);
       }
     }
+  };
 
-    // Navigate based on notification type
+  const handleNavigateToDetail = (notif: Notification) => {
     if (notif.module === "loan" && notif.data?.loan_id) {
-      router.push(`/loans/${notif.data.loan_id}`);
+      router.push(`/admin/loans`);
     } else if (notif.module === "return" && notif.data?.return_id) {
-      router.push(`/loans/${notif.data.loan_id}`);
+      router.push(`/admin/returns`);
     }
   };
 
@@ -86,151 +105,72 @@ export default function NotificationPageClient() {
     }
   };
 
-  const handleDeleteNotification = async (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    
     try {
-      await notificationService.deleteNotification(id);
-      setNotifications(notifications.filter((n) => n.id !== id));
+      await notificationService.deleteNotification(deleteId);
+      setNotifications(notifications.filter((n) => n.id !== deleteId));
       toast.success("Notification deleted");
       fetchUnreadCount();
+      setDeleteId(null);
+      if (selectedNotif?.id === deleteId) {
+        setSelectedNotif(null);
+      }
     } catch (error) {
       toast.error("Failed to delete notification");
       console.error("Failed to delete notification:", error);
     }
   };
 
-  const getNotificationIcon = (type: string | null) => {
-    switch (type) {
-      case "approved":
-        return "✅";
-      case "rejected":
-        return "❌";
-      case "borrow_request":
-      case "return_request":
-        return "📝";
-      default:
-        return "🔔";
-    }
-  };
+  const filteredNotifications = notifications.filter((notif) => {
+    const matchesSearch =
+      searchQuery === "" ||
+      notif.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      notif.message?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      (statusFilter === "read" && notif.read_at) ||
+      (statusFilter === "unread" && !notif.read_at);
+
+    return matchesSearch && matchesStatus;
+  });
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Bell className="h-8 w-8 text-brand-primary" />
-            <div>
-              <h1 className="text-3xl font-bold">Notifications</h1>
-              <p className="text-muted-foreground">
-                View and manage all your notifications
-              </p>
-            </div>
-          </div>
-
-          {unreadCount > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleMarkAllAsRead}
-              disabled={isMarkingAll}
-            >
-              {isMarkingAll ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <CheckCheck className="h-4 w-4 mr-2" />
-              )}
-              Mark all as read
-            </Button>
-          )}
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-5">
+          <NotificationList
+            notifications={filteredNotifications}
+            loading={loading}
+            selectedId={selectedNotif?.id || null}
+            unreadCount={unreadCount}
+            onSelectNotification={handleNotificationClick}
+            onSearchChange={setSearchQuery}
+            onStatusChange={setStatusFilter}
+            onMarkAllAsRead={handleMarkAllAsRead}
+            isMarkingAll={isMarkingAll}
+          />
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border">
-          <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
-            <h3 className="font-semibold text-lg">All Notifications</h3>
-            {unreadCount > 0 && (
-              <Badge variant="secondary">{unreadCount} unread</Badge>
-            )}
-          </div>
-
-          <div className="max-h-150 overflow-y-auto">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              </div>
-            ) : notifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                <Bell className="h-12 w-12 text-muted-foreground mb-3" />
-                <p className="text-lg font-medium mb-1">No notifications</p>
-                <p className="text-sm text-muted-foreground">
-                  You don't have any notifications yet
-                </p>
-              </div>
-            ) : (
-              <div className="divide-y dark:divide-gray-700">
-                {notifications.map((notif) => (
-                  <div
-                    key={notif.id}
-                    onClick={() => handleNotificationClick(notif)}
-                    className={cn(
-                      "p-4 hover:bg-muted/50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors",
-                      !notif.read_at && "bg-blue-50/50 dark:bg-blue-950/20"
-                    )}
-                  >
-                    <div className="flex gap-3">
-                      <div className="text-2xl shrink-0">
-                        {getNotificationIcon(notif.type)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <div className="flex items-center gap-2">
-                            <p className="font-medium text-sm">
-                              {notif.title}
-                            </p>
-                            {!notif.read_at && (
-                              <Badge variant="default" className="text-xs">
-                                New
-                              </Badge>
-                            )}
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 shrink-0"
-                            onClick={(e) => handleDeleteNotification(notif.id, e)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        {notif.message && (
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {notif.message}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                          <span>
-                            {format(
-                              new Date(notif.created_at),
-                              "MMM dd, yyyy • HH:mm"
-                            )}
-                          </span>
-                          {notif.module && (
-                            <>
-                              <span>•</span>
-                              <Badge variant="secondary" className="text-xs">
-                                {notif.module}
-                              </Badge>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="lg:col-span-7">
+          <NotificationDetail
+            notification={selectedNotif}
+            onClose={() => setSelectedNotif(null)}
+            onNavigate={handleNavigateToDetail}
+            onDelete={setDeleteId}
+          />
         </div>
       </div>
+      
+      <DeleteConfirmDialog
+        open={deleteId !== null}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        title="Delete Notification"
+        description="Are you sure you want to delete this notification? This action cannot be undone."
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

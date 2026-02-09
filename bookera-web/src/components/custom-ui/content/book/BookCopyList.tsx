@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
+import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 
 export default function BookCopyList({
   book,
@@ -15,6 +16,7 @@ export default function BookCopyList({
   onChange: () => void;
 }) {
   const [copyCode, setCopyCode] = useState("");
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const handleAdd = async (copy_code: string) => {
     await bookCopyService.create(book.id, copy_code);
@@ -23,10 +25,17 @@ export default function BookCopyList({
     onChange();
   };
 
-  const handleDelete = async (id: number) => {
-    await bookCopyService.delete(id);
-    toast.success("Salinan dihapus");
-    onChange();
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    
+    try {
+      await bookCopyService.delete(deleteId);
+      toast.success("Salinan dihapus");
+      onChange();
+      setDeleteId(null);
+    } catch (error) {
+      toast.error("Gagal menghapus salinan");
+    }
   };
 
   return (
@@ -51,13 +60,21 @@ export default function BookCopyList({
             <Button
               size="sm"
               variant="destructive"
-              onClick={() => handleDelete(copy.id)}
+              onClick={() => setDeleteId(copy.id)}
             >
               Hapus
             </Button>
           </li>
         ))}
       </ul>
+      
+      <DeleteConfirmDialog
+        open={deleteId !== null}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        title="Hapus Salinan Buku"
+        description="Apakah kamu yakin ingin menghapus salinan buku ini? Data yang dihapus tidak dapat dikembalikan."
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

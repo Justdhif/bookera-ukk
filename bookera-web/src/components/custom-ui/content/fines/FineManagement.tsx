@@ -138,7 +138,6 @@ export default function FineManagement() {
           data={fines}
           onDelete={(id) => setDeleteId(id)}
           onMarkAsPaid={handleMarkAsPaid}
-          onWaive={handleWaive}
         />
       )}
 

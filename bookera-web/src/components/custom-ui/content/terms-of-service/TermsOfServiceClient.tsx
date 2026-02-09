@@ -9,18 +9,23 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { TermsOfServiceListSkeleton } from "./TermsOfServiceListSkeleton";
 import { Plus } from "lucide-react";
+import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 
 export default function TermsOfServiceClient() {
   const [items, setItems] = useState<TermsOfService[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<TermsOfService | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  const handleDelete = async (id: number) => {
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    
     try {
-      await termsOfServiceService.delete(id);
+      await termsOfServiceService.delete(deleteId);
       toast.success("Terms of Service berhasil dihapus");
       fetchData();
+      setDeleteId(null);
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || "Gagal menghapus Terms of Service",
@@ -75,7 +80,7 @@ export default function TermsOfServiceClient() {
             setEditing(item);
             setOpen(true);
           }}
-          onDelete={handleDelete}
+          onDelete={(id) => setDeleteId(id)}
         />
       )}
 
@@ -84,6 +89,14 @@ export default function TermsOfServiceClient() {
         setOpen={setOpen}
         item={editing}
         onSuccess={fetchData}
+      />
+      
+      <DeleteConfirmDialog
+        open={deleteId !== null}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        title="Hapus Terms of Service"
+        description="Apakah kamu yakin ingin menghapus Terms of Service ini? Data yang dihapus tidak dapat dikembalikan."
+        onConfirm={confirmDelete}
       />
     </div>
   );

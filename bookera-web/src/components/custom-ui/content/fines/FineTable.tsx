@@ -45,12 +45,10 @@ export default function FineTable({
   data,
   onDelete,
   onMarkAsPaid,
-  onWaive,
 }: {
   data: Fine[];
   onDelete: (id: number) => void;
   onMarkAsPaid: (id: number) => void;
-  onWaive: (id: number) => void;
 }) {
   if (data.length === 0) {
     return (
@@ -144,27 +142,15 @@ export default function FineTable({
               <TableCell>
                 <div className="flex justify-end items-center gap-2">
                   {item.status === "unpaid" && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => onMarkAsPaid(item.id)}
-                        className="h-8 gap-1 text-green-600 border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
-                      >
-                        <CheckCircle className="h-3.5 w-3.5" />
-                        <span className="hidden lg:inline">Bayar</span>
-                      </Button>
-
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => onWaive(item.id)}
-                        className="h-8 gap-1"
-                      >
-                        <XCircle className="h-3.5 w-3.5" />
-                        <span className="hidden lg:inline">Batalkan</span>
-                      </Button>
-                    </>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => onMarkAsPaid(item.id)}
+                      className="h-8 gap-1 text-green-600 border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
+                    >
+                      <CheckCircle className="h-3.5 w-3.5" />
+                      <span className="hidden lg:inline">Selesaikan</span>
+                    </Button>
                   )}
 
                   <DropdownMenu>

@@ -13,7 +13,13 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Bell, Settings, FileText, Shield } from "lucide-react";
 import { notificationService } from "@/services/notification.service";
 
 export default function AdminHeader() {
@@ -75,7 +81,31 @@ export default function AdminHeader() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-2">
+        {/* Settings Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative">
+              <Settings className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => router.push("/admin/settings")}>
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/admin/terms-of-service")}>
+              <FileText className="h-4 w-4 mr-2" />
+              Terms of Service
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/admin/privacy-policy")}>
+              <Shield className="h-4 w-4 mr-2" />
+              Privacy Policy
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Notifications */}
         <Button
           variant="ghost"
           size="icon"

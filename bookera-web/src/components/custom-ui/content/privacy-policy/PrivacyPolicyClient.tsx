@@ -9,18 +9,23 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { PrivacyPolicyListSkeleton } from "./PrivacyPolicyListSkeleton";
 import { Plus } from "lucide-react";
+import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 
 export default function PrivacyPolicyClient() {
   const [items, setItems] = useState<PrivacyPolicy[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<PrivacyPolicy | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  const handleDelete = async (id: number) => {
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    
     try {
-      await privacyPolicyService.delete(id);
+      await privacyPolicyService.delete(deleteId);
       toast.success("Privacy Policy berhasil dihapus");
       fetchData();
+      setDeleteId(null);
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || "Gagal menghapus Privacy Policy",
@@ -75,7 +80,7 @@ export default function PrivacyPolicyClient() {
             setEditing(item);
             setOpen(true);
           }}
-          onDelete={handleDelete}
+          onDelete={(id) => setDeleteId(id)}
         />
       )}
 
@@ -84,6 +89,14 @@ export default function PrivacyPolicyClient() {
         setOpen={setOpen}
         item={editing}
         onSuccess={fetchData}
+      />
+      
+      <DeleteConfirmDialog
+        open={deleteId !== null}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        title="Hapus Privacy Policy"
+        description="Apakah kamu yakin ingin menghapus Privacy Policy ini? Data yang dihapus tidak dapat dikembalikan."
+        onConfirm={confirmDelete}
       />
     </div>
   );
