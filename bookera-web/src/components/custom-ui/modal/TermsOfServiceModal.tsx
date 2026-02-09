@@ -63,7 +63,7 @@ export function TermsOfServiceModal({
             </div>
           ) : contents.length > 0 ? (
             <div className="space-y-6 pr-4">
-              <div className="p-4 bg-gradient-to-r from-brand-primary/5 to-brand-primary/10 dark:from-brand-primary/10 dark:to-brand-primary/20 rounded-lg border border-brand-primary/20 dark:border-brand-primary/30">
+              <div className="p-4 bg-linear-to-r from-brand-primary/5 to-brand-primary/10 dark:from-brand-primary/10 dark:to-brand-primary/20 rounded-lg border border-brand-primary/20 dark:border-brand-primary/30">
                 <p className="text-sm text-gray-700 dark:text-gray-300">
                   Terakhir diperbarui:{" "}
                   {new Date(
