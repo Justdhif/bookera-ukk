@@ -29,22 +29,10 @@ export const bookReturnService = {
     api.get<ApiResponse<BookReturn>>(`/book-returns/${id}`),
 
   /**
-   * ADMIN - APPROVAL ENDPOINTS
+   * ADMIN - APPROVE RETURN (set loan to returned & book_copy to available)
    */
-  getAllReturns: (search?: string) =>
-    api.get<ApiResponse<BookReturn[]>>("/admin/approvals/returns", { params: { search } }),
-
-  getPendingReturns: (search?: string) =>
-    api.get<ApiResponse<BookReturn[]>>("/admin/approvals/returns/pending", { params: { search } }),
-
   approveReturn: (id: number) =>
     api.post<ApiResponse<BookReturn>>(
-      `/admin/approvals/returns/${id}/approve`
-    ),
-
-  rejectReturn: (id: number, data?: { rejection_reason?: string }) =>
-    api.post<ApiResponse<BookReturn>>(
-      `/admin/approvals/returns/${id}/reject`,
-      data
+      `/admin/book-returns/${id}/approve`
     ),
 };

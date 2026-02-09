@@ -18,7 +18,6 @@ export interface BookReturn {
   id: number;
   loan_id: number;
   return_date: string;
-  approval_status: "pending" | "approved" | "rejected";
   
   loan: Loan;
   details: BookReturnDetail[];

@@ -67,6 +67,12 @@ export function LoanCard({
         icon: <PackageCheck className="h-3 w-3 mr-1" />,
         className: "bg-green-100 text-green-800 hover:bg-green-100",
       },
+      checking: {
+        variant: "secondary",
+        label: "Checking",
+        icon: <AlertCircle className="h-3 w-3 mr-1" />,
+        className: "bg-purple-100 text-purple-800 hover:bg-purple-100",
+      },
       returned: {
         variant: "outline",
         label: "Returned",

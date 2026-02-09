@@ -1,4 +1,5 @@
 import { BookReturn } from "@/types/book-return";
+import { Loan } from "@/types/loan";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import {
   CheckCircle2,
-  XCircle,
   Loader2,
   BookOpen,
   Calendar,
@@ -19,26 +19,33 @@ import {
   CheckCircle,
   XCircleIcon,
   AlertTriangle,
+  DollarSign,
+  AlertCircle,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface ReturnCardProps {
   bookReturn: BookReturn;
+  loan: Loan;
   showActions?: boolean;
   actionLoading: number | null;
   onApprove?: (returnId: number) => void;
-  onReject?: (bookReturn: BookReturn) => void;
+  onFinished?: (returnId: number) => void;
 }
 
 export function ReturnCard({
   bookReturn,
+  loan,
   showActions = true,
   actionLoading,
   onApprove,
-  onReject,
+  onFinished,
 }: ReturnCardProps) {
-  const getApprovalBadge = (status: BookReturn["approval_status"]) => {
+  const router = useRouter();
+
+  const getLoanStatusBadge = (status: Loan["status"]) => {
     const variants: Record<
-      BookReturn["approval_status"],
+      Loan["status"],
       {
         variant: any;
         label: string;
@@ -48,13 +55,31 @@ export function ReturnCard({
     > = {
       pending: {
         variant: "secondary",
-        label: "Pending Approval",
+        label: "Pending",
         icon: <Clock className="h-3 w-3 mr-1" />,
+        className: "bg-blue-100 text-blue-800 hover:bg-blue-100",
+      },
+      waiting: {
+        variant: "secondary",
+        label: "Waiting",
+        icon: <Clock className="h-3 w-3 mr-1" />,
+        className: "bg-purple-100 text-purple-800 hover:bg-purple-100",
+      },
+      borrowed: {
+        variant: "secondary",
+        label: "Borrowed",
+        icon: <BookOpen className="h-3 w-3 mr-1" />,
         className: "bg-orange-100 text-orange-800 hover:bg-orange-100",
       },
-      approved: {
+      checking: {
+        variant: "secondary",
+        label: "Checking",
+        icon: <AlertCircle className="h-3 w-3 mr-1" />,
+        className: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
+      },
+      returned: {
         variant: "default",
-        label: "Approved",
+        label: "Returned",
         icon: <CheckCircle className="h-3 w-3 mr-1" />,
         className: "bg-emerald-100 text-emerald-800 hover:bg-emerald-100",
       },
@@ -62,6 +87,12 @@ export function ReturnCard({
         variant: "destructive",
         label: "Rejected",
         icon: <XCircleIcon className="h-3 w-3 mr-1" />,
+        className: "bg-red-100 text-red-800 hover:bg-red-100",
+      },
+      late: {
+        variant: "destructive",
+        label: "Late",
+        icon: <AlertTriangle className="h-3 w-3 mr-1" />,
         className: "bg-red-100 text-red-800 hover:bg-red-100",
       },
     };
@@ -114,6 +145,18 @@ export function ReturnCard({
     );
   };
 
+  // Check conditions
+  const hasDamagedBooks = bookReturn.details?.some((d) => d.condition === "damaged");
+  const hasLostBooks = bookReturn.details?.some((d) => d.condition === "lost");
+  const allGoodCondition = bookReturn.details?.every((d) => d.condition === "good");
+  
+  // Check if has damaged or lost books
+  const hasDamagedOrLostBooks = hasDamagedBooks || hasLostBooks;
+  
+  // Check fine status - only for loans with fines
+  const unpaidFines = loan.fines?.filter((f) => f.status === "unpaid") || [];
+  const allFinesPaid = loan.fines && loan.fines.length > 0 && unpaidFines.length === 0;
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="bg-muted/30 pb-4">
@@ -121,7 +164,7 @@ export function ReturnCard({
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
               <CardTitle className="text-lg">Return #{bookReturn.id}</CardTitle>
-              {getApprovalBadge(bookReturn.approval_status)}
+              {getLoanStatusBadge(loan.status)}
               <Badge variant="outline">Loan #{bookReturn.loan_id}</Badge>
             </div>
             <CardDescription className="flex items-center gap-4 text-xs">
@@ -136,33 +179,64 @@ export function ReturnCard({
               </span>
             </CardDescription>
           </div>
-          {showActions && (
+          {showActions && loan.status === "checking" && (
             <div className="flex gap-2">
-              {bookReturn.approval_status === "pending" && (
-                <>
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={() => onApprove?.(bookReturn.id)}
-                    disabled={actionLoading === bookReturn.id}
-                  >
-                    {actionLoading === bookReturn.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <CheckCircle2 className="h-4 w-4 mr-1" />
-                    )}
-                    Approve
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => onReject?.(bookReturn)}
-                    disabled={actionLoading === bookReturn.id}
-                  >
-                    <XCircle className="h-4 w-4 mr-1" />
-                    Reject
-                  </Button>
-                </>
+              {allGoodCondition && (
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={() => onApprove?.(bookReturn.id)}
+                  disabled={actionLoading === bookReturn.id}
+                >
+                  {actionLoading === bookReturn.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4 mr-1" />
+                  )}
+                  Approve Return
+                </Button>
+              )}
+              
+              {/* Show Process Fine button when has damaged/lost books AND fines not all paid */}
+              {hasDamagedOrLostBooks && !allFinesPaid && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => router.push(`/admin/fines?loan_id=${loan.id}`)}
+                >
+                  <DollarSign className="h-4 w-4 mr-1" />
+                  Process Fine
+                </Button>
+              )}
+              
+              {/* Show Report Lost Book button when has lost books */}
+              {hasLostBooks && (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => router.push(`/admin/lost-books?loan_id=${loan.id}`)}
+                >
+                  <AlertCircle className="h-4 w-4 mr-1" />
+                  Report Lost Book
+                </Button>
+              )}
+              
+              {/* Show Finished button when has damaged/lost books AND all fines paid */}
+              {hasDamagedOrLostBooks && allFinesPaid && (
+                <Button
+                  size="sm"
+                  variant="submit"
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={() => onFinished?.(bookReturn.id)}
+                  disabled={actionLoading === bookReturn.id}
+                >
+                  {actionLoading === bookReturn.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4 mr-1" />
+                  )}
+                  Finished
+                </Button>
               )}
             </div>
           )}

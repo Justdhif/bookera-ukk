@@ -35,4 +35,14 @@ class Loan extends Model
     {
         return $this->hasMany(BookReturn::class);
     }
+
+    public function fines()
+    {
+        return $this->hasMany(Fine::class);
+    }
+
+    public function lostBook()
+    {
+        return $this->hasOne(LostBook::class);
+    }
 }

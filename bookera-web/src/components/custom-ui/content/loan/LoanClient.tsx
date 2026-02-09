@@ -127,6 +127,7 @@ export default function LoanClient() {
   const pendingLoans = allLoans.filter((loan) => loan.status === "pending");
   const waitingLoans = allLoans.filter((loan) => loan.status === "waiting");
   const borrowedLoans = allLoans.filter((loan) => loan.status === "borrowed");
+  const checkingLoans = allLoans.filter((loan) => loan.status === "checking");
   const returnedLoans = allLoans.filter((loan) => loan.status === "returned");
   const rejectedLoans = allLoans.filter((loan) => loan.status === "rejected");
   const lateLoans = allLoans.filter((loan) => loan.status === "late");
@@ -175,6 +176,9 @@ export default function LoanClient() {
           </TabsTrigger>
           <TabsTrigger value="borrowed">
             Borrowed ({borrowedLoans.length})
+          </TabsTrigger>
+          <TabsTrigger value="checking">
+            Checking ({checkingLoans.length})
           </TabsTrigger>
           <TabsTrigger value="returned">
             Returned ({returnedLoans.length})
@@ -261,6 +265,26 @@ export default function LoanClient() {
               </div>
             ) : (
               renderLoanCards(borrowedLoans, false)
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="checking" className="space-y-4">
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold">Checking</h3>
+              <p className="text-sm text-muted-foreground">
+                Peminjaman yang sedang di-check untuk pengembalian
+              </p>
+            </div>
+            {loading ? (
+              <div className="grid gap-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <LoanSkeletonCard key={i} />
+                ))}
+              </div>
+            ) : (
+              renderLoanCards(checkingLoans, false)
             )}
           </div>
         </TabsContent>

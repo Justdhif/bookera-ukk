@@ -34,6 +34,7 @@ import {
   PackageCheck,
   FileText,
   Shield,
+  DollarSign,
 } from "lucide-react";
 
 // Menu items grouped by categories
@@ -86,6 +87,12 @@ const menuGroups = [
         href: "/admin/returns",
         icon: PackageCheck,
         gradient: "from-cyan-500 to-blue-500",
+      },
+      {
+        title: "Fines",
+        href: "/admin/fines",
+        icon: DollarSign,
+        gradient: "from-rose-500 to-red-500",
       },
       {
         title: "Activity Logs",

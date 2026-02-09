@@ -15,6 +15,9 @@ use App\Http\Controllers\Api\ContentPageController;
 use App\Http\Controllers\Api\TermsOfServiceController;
 use App\Http\Controllers\Api\PrivacyPolicyController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\LostBookController;
+use App\Http\Controllers\Api\FineController;
+use App\Http\Controllers\Api\FineTypeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,11 +87,33 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('loans/{loan}/approve', [ApprovalController::class, 'approveLoan']);
             Route::post('loans/{loan}/reject', [ApprovalController::class, 'rejectLoan']);
             Route::post('loans/{loan}/mark-borrowed', [ApprovalController::class, 'markAsBorrowed']);
+        });
 
-            Route::get('returns', [ApprovalController::class, 'getAllReturns']);
-            Route::get('returns/pending', [ApprovalController::class, 'getPendingReturns']);
-            Route::post('returns/{bookReturn}/approve', [ApprovalController::class, 'approveReturn']);
-            Route::post('returns/{bookReturn}/reject', [ApprovalController::class, 'rejectReturn']);
+        // Book Return routes (admin only)
+        Route::prefix('book-returns')->group(function () {
+            Route::post('/{bookReturn}/approve', [BookReturnController::class, 'approveReturn']);
+        });
+
+        // Fine Type routes (admin only)
+        Route::apiResource('fine-types', FineTypeController::class);
+
+        // Fine routes (admin only)
+        Route::prefix('fines')->group(function () {
+            Route::get('/', [FineController::class, 'index']);
+            Route::post('/loans/{loan}', [FineController::class, 'store']);
+            Route::get('/{fine}', [FineController::class, 'show']);
+            Route::put('/{fine}', [FineController::class, 'update']);
+            Route::post('/{fine}/mark-paid', [FineController::class, 'markAsPaid']);
+            Route::post('/{fine}/waive', [FineController::class, 'waive']);
+            Route::delete('/{fine}', [FineController::class, 'destroy']);
+        });
+
+        // Lost Book routes (admin only)
+        Route::prefix('lost-books')->group(function () {
+            Route::get('/', [LostBookController::class, 'index']);
+            Route::get('/{lostBook}', [LostBookController::class, 'show']);
+            Route::put('/{lostBook}', [LostBookController::class, 'update']);
+            Route::delete('/{lostBook}', [LostBookController::class, 'destroy']);
         });
 
         // Content Pages routes (admin)
@@ -116,9 +141,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('loans/{loan}', [LoanController::class, 'show']);
     Route::get('my-loans', [LoanController::class, 'getLoanByUser']);
 
+    // Book Return routes
     Route::post('loans/{loan}/return', [BookReturnController::class, 'store']);
     Route::get('loans/{loan}/returns', [BookReturnController::class, 'index']);
     Route::get('book-returns/{bookReturn}', [BookReturnController::class, 'show']);
+
+    // Lost Book routes (user can report lost book)
+    Route::post('loans/{loan}/report-lost', [LostBookController::class, 'store']);
+
+    // Fine routes (user can view their fines)
+    Route::get('loans/{loan}/fines', [FineController::class, 'loanFines']);
 
     // Notification routes
     Route::prefix('notifications')->group(function () {

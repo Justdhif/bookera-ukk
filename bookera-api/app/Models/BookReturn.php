@@ -11,7 +11,6 @@ class BookReturn extends Model
     protected $fillable = [
         'loan_id',
         'return_date',
-        'approval_status',
     ];
 
     public function loan()

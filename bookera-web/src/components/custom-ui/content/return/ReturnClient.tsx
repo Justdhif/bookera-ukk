@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { bookReturnService } from "@/services/book-return.service";
-import { BookReturn } from "@/types/book-return";
+import { loanService } from "@/services/loan.service";
+import { Loan } from "@/types/loan";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,20 +11,13 @@ import { PackageCheck, Search } from "lucide-react";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Input } from "@/components/ui/input";
 import { ReturnCard } from "./ReturnCard";
-import { ReturnRejectDialog } from "./ReturnRejectDialog";
 import { ReturnSkeletonCard } from "./ReturnSkeletonCard";
 
 export default function ReturnClient() {
-  const [allReturns, setAllReturns] = useState<BookReturn[]>([]);
+  const [allLoans, setAllLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Dialog states
-  const [rejectDialog, setRejectDialog] = useState<{
-    open: boolean;
-    bookReturn: BookReturn | null;
-  }>({ open: false, bookReturn: null });
 
   useEffect(() => {
     fetchAllData();
@@ -32,8 +26,12 @@ export default function ReturnClient() {
   const fetchAllData = async () => {
     setLoading(true);
     try {
-      const allRes = await bookReturnService.getAllReturns(searchQuery);
-      setAllReturns(allRes.data.data);
+      // Get all loans with status "checking" or "returned"
+      const loansRes = await loanService.getAll();
+      const filteredLoans = loansRes.data.data.filter(
+        (loan) => loan.status === "checking" || loan.status === "returned"
+      );
+      setAllLoans(filteredLoans);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Gagal memuat data");
     } finally {
@@ -62,31 +60,25 @@ export default function ReturnClient() {
     }
   };
 
-  const handleRejectSubmit = async (rejectionReason: string) => {
-    if (!rejectDialog.bookReturn) return;
-
-    setActionLoading(rejectDialog.bookReturn.id);
+  const handleFinished = async (returnId: number) => {
+    setActionLoading(returnId);
     try {
-      const response = await bookReturnService.rejectReturn(
-        rejectDialog.bookReturn.id,
-        {
-          rejection_reason: rejectionReason,
-        },
+      const response = await bookReturnService.approveReturn(returnId);
+      toast.success(
+        response.data.message || "Pengembalian berhasil diselesaikan",
       );
-      toast.success(response.data.message || "Pengembalian berhasil ditolak");
-      setRejectDialog({ open: false, bookReturn: null });
       fetchAllData();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal menolak pengembalian",
+        error.response?.data?.message || "Gagal menyelesaikan pengembalian",
       );
     } finally {
       setActionLoading(null);
     }
   };
 
-  const renderReturnCards = (returns: BookReturn[], showActions = true) => {
-    if (returns.length === 0) {
+  const renderLoanCards = (loans: Loan[], showActions = true) => {
+    if (loans.length === 0) {
       return (
         <EmptyState
           icon={<PackageCheck className="h-16 w-16" />}
@@ -98,32 +90,35 @@ export default function ReturnClient() {
 
     return (
       <div className="grid gap-4">
-        {returns.map((bookReturn) => (
-          <ReturnCard
-            key={bookReturn.id}
-            bookReturn={bookReturn}
-            showActions={showActions}
-            actionLoading={actionLoading}
-            onApprove={handleApprove}
-            onReject={(bookReturn) =>
-              setRejectDialog({ open: true, bookReturn })
-            }
-          />
-        ))}
+        {loans.map((loan) => {
+          // Get the latest return for this loan
+          const latestReturn = loan.book_returns?.[0];
+          
+          // Skip loan if no return record (shouldn't happen for checking/returned status)
+          if (!latestReturn) {
+            console.warn(`Loan #${loan.id} has status ${loan.status} but no book_returns`);
+            return null;
+          }
+
+          return (
+            <ReturnCard
+              key={latestReturn.id}
+              bookReturn={latestReturn}
+              loan={loan}
+              showActions={showActions}
+              actionLoading={actionLoading}
+              onApprove={handleApprove}
+              onFinished={handleFinished}
+            />
+          );
+        })}
       </div>
     );
   };
 
-  // Filter returns by approval_status
-  const pendingReturns = allReturns.filter(
-    (r) => r.approval_status === "pending",
-  );
-  const approvedReturns = allReturns.filter(
-    (r) => r.approval_status === "approved",
-  );
-  const rejectedReturns = allReturns.filter(
-    (r) => r.approval_status === "rejected",
-  );
+  // Filter loans by status
+  const checkingLoans = allLoans.filter((loan) => loan.status === "checking");
+  const returnedLoans = allLoans.filter((loan) => loan.status === "returned");
 
   return (
     <div className="space-y-6">
@@ -156,15 +151,12 @@ export default function ReturnClient() {
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">Semua ({allReturns.length})</TabsTrigger>
-          <TabsTrigger value="pending">
-            Pending ({pendingReturns.length})
+          <TabsTrigger value="all">Semua ({allLoans.length})</TabsTrigger>
+          <TabsTrigger value="checking">
+            Checking ({checkingLoans.length})
           </TabsTrigger>
-          <TabsTrigger value="approved">
-            Approved ({approvedReturns.length})
-          </TabsTrigger>
-          <TabsTrigger value="rejected">
-            Rejected ({rejectedReturns.length})
+          <TabsTrigger value="returned">
+            Returned ({returnedLoans.length})
           </TabsTrigger>
         </TabsList>
 
@@ -183,17 +175,17 @@ export default function ReturnClient() {
                 ))}
               </div>
             ) : (
-              renderReturnCards(allReturns)
+              renderLoanCards(allLoans)
             )}
           </div>
         </TabsContent>
 
-        <TabsContent value="pending" className="space-y-4">
+        <TabsContent value="checking" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">Pending</h2>
+              <h2 className="text-2xl font-bold">Checking</h2>
               <p className="text-muted-foreground">
-                Pengembalian dengan status pending
+                Pengembalian yang sedang di-check
               </p>
             </div>
             {loading ? (
@@ -203,15 +195,15 @@ export default function ReturnClient() {
                 ))}
               </div>
             ) : (
-              renderReturnCards(pendingReturns)
+              renderLoanCards(checkingLoans)
             )}
           </div>
         </TabsContent>
 
-        <TabsContent value="approved" className="space-y-4">
+        <TabsContent value="returned" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">Approved</h2>
+              <h2 className="text-2xl font-bold">Returned</h2>
               <p className="text-muted-foreground">
                 Pengembalian yang sudah di-approve
               </p>
@@ -223,39 +215,11 @@ export default function ReturnClient() {
                 ))}
               </div>
             ) : (
-              renderReturnCards(approvedReturns, false)
-            )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="rejected" className="space-y-4">
-          <div className="space-y-4">
-            <div>
-              <h2 className="text-2xl font-bold">Rejected</h2>
-              <p className="text-muted-foreground">Pengembalian yang ditolak</p>
-            </div>
-            {loading ? (
-              <div className="grid gap-4">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <ReturnSkeletonCard key={i} />
-                ))}
-              </div>
-            ) : (
-              renderReturnCards(rejectedReturns, false)
+              renderLoanCards(returnedLoans, false)
             )}
           </div>
         </TabsContent>
       </Tabs>
-
-      {/* Reject Dialog */}
-      <ReturnRejectDialog
-        open={rejectDialog.open}
-        bookReturn={rejectDialog.bookReturn}
-        onOpenChange={(open) =>
-          !open && setRejectDialog({ open: false, bookReturn: null })
-        }
-        onConfirm={handleRejectSubmit}
-      />
     </div>
   );
 }

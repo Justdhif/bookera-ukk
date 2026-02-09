@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             BookSeeder::class,
             BookCopySeeder::class,
+            FineTypeSeeder::class,
             LoanSeeder::class,
             BookReturnSeeder::class,
             ActivityLogSeeder::class,
