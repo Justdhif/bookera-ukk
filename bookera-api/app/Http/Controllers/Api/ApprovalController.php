@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\LoanApproved;
+use App\Events\ReturnApproved;
+use App\Events\ReturnRejected;
 use App\Http\Controllers\Controller;
 use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
@@ -82,6 +85,8 @@ class ApprovalController extends Controller
 
             return $loan;
         });
+
+        event(new LoanApproved($loan));
 
         return ApiResponse::successResponse(
             'Peminjaman berhasil disetujui',
@@ -221,6 +226,9 @@ class ApprovalController extends Controller
                 'loan.user',
             ]);
 
+            // Dispatch event
+            event(new ReturnApproved($bookReturn));
+
             return $bookReturn;
         });
 
@@ -263,6 +271,9 @@ class ApprovalController extends Controller
             null,
             $bookReturn
         );
+
+        // Dispatch event
+        event(new ReturnRejected($bookReturn, $data['rejection_reason'] ?? null));
 
         $bookReturn->load([
             'details.bookCopy.book',

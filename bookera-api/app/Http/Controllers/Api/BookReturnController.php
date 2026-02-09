@@ -7,6 +7,7 @@ use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
 use App\Models\Loan;
 use App\Models\BookReturn;
+use App\Events\ReturnRequested;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -93,6 +94,9 @@ class BookReturnController extends Controller
                 null,
                 $return
             );
+
+            // Dispatch event
+            event(new ReturnRequested($return));
 
             return $return;
         });

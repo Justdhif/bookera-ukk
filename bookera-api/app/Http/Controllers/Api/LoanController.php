@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\LoanRequested;
 use App\Http\Controllers\Controller;
 use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
 use App\Models\Loan;
 use App\Models\BookCopy;
+use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -80,8 +83,6 @@ class LoanController extends Controller
                     'book_title' => $copy->book->title ?? 'Unknown',
                     'old_status' => $copy->status,
                 ];
-
-                // Status buku tidak diubah dulu, menunggu approval
             }
 
             $loan->load([
@@ -106,6 +107,8 @@ class LoanController extends Controller
 
             return $loan;
         });
+
+        event(new LoanRequested($loan));
 
         return ApiResponse::successResponse(
             'Permintaan peminjaman berhasil dibuat dan menunggu persetujuan admin',

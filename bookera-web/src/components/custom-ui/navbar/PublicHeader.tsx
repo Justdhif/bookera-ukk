@@ -14,16 +14,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import Image from "next/image";
-import { Facebook, Instagram, Twitter, Bell, Moon, Sun, Search } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { Facebook, Instagram, Twitter, Moon, Sun, Search } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
-import { Badge } from "@/components/ui/badge";
 import { useTranslations } from 'next-intl';
 import { useTheme } from "next-themes";
 import LocaleSwitcher from "../LocaleSwitcher";
 import { Locale } from "@/i18n/config";
 import { setUserLocale } from "@/services/locale";
 import { Input } from "@/components/ui/input";
+import NotificationDropdown from "./NotificationDropdown";
+import { TermsOfServiceModal } from "../modal/TermsOfServiceModal";
+import { PrivacyPolicyModal } from "../modal/PrivacyPolicyModal";
 
 export default function PublicHeader() {
   const router = useRouter();
@@ -34,6 +35,8 @@ export default function PublicHeader() {
   const [locale, setLocale] = useState<Locale | undefined>();
   const [isPending, startTransition] = useTransition();
   const [searchQuery, setSearchQuery] = useState("");
+  const [tosModalOpen, setTosModalOpen] = useState(false);
+  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -63,13 +66,19 @@ export default function PublicHeader() {
       <div className="mx-auto max-w-7xl px-6 py-4 space-y-2">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-sm hover:text-brand-primary hover:underline cursor-pointer">
+            <h3 
+              className="font-semibold text-sm hover:text-brand-primary hover:underline cursor-pointer"
+              onClick={() => setTosModalOpen(true)}
+            >
               {t('termsOfService')}
             </h3>
 
             <div className="h-2 w-2 rounded-full bg-brand-primary "></div>
 
-            <h3 className="font-semibold text-sm hover:text-brand-primary hover:underline cursor-pointer">
+            <h3 
+              className="font-semibold text-sm hover:text-brand-primary hover:underline cursor-pointer"
+              onClick={() => setPrivacyModalOpen(true)}
+            >
               {t('privacyPolicy')}
             </h3>
 
@@ -95,20 +104,7 @@ export default function PublicHeader() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              className="relative flex items-center gap-2 h-9 px-3"
-              title={t('notifications')}
-            >
-              <Bell className="h-4 w-4" />
-              <span className="text-sm font-medium">{t('notifications')}</span>
-              <Badge 
-                variant="destructive" 
-                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-              >
-                3
-              </Badge>
-            </Button>
+            <NotificationDropdown isAuthenticated={isAuthenticated} />
 
             <LocaleSwitcher setLocale={setLocale} />
 
@@ -191,6 +187,10 @@ export default function PublicHeader() {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <TermsOfServiceModal open={tosModalOpen} onOpenChange={setTosModalOpen} />
+      <PrivacyPolicyModal open={privacyModalOpen} onOpenChange={setPrivacyModalOpen} />
     </header>
   );
 }

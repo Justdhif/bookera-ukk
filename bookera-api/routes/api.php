@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ContentPageController;
 use App\Http\Controllers\Api\TermsOfServiceController;
 use App\Http\Controllers\Api\PrivacyPolicyController;
+use App\Http\Controllers\Api\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -118,6 +119,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('loans/{loan}/return', [BookReturnController::class, 'store']);
     Route::get('loans/{loan}/returns', [BookReturnController::class, 'index']);
     Route::get('book-returns/{bookReturn}', [BookReturnController::class, 'show']);
+
+    // Notification routes
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+        Route::delete('/delete-all-read', [NotificationController::class, 'deleteAllRead']);
+        Route::get('/{notification}', [NotificationController::class, 'show']);
+        Route::post('/{notification}/mark-read', [NotificationController::class, 'markAsRead']);
+        Route::delete('/{notification}', [NotificationController::class, 'destroy']);
+    });
 
 });
 
