@@ -30,11 +30,13 @@ import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import Image from "next/image";
 import { TermsOfServiceModal } from "@/components/custom-ui/modal/TermsOfServiceModal";
 import { PrivacyPolicyModal } from "@/components/custom-ui/modal/PrivacyPolicyModal";
+import { useTranslations } from "next-intl";
 
 export default function LoginPage() {
   const router = useRouter();
   const login = useAuthStore((s) => s.login);
   const loading = useAuthStore((s) => s.loading);
+  const t = useTranslations('auth.login');
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -48,12 +50,12 @@ export default function LoginPage() {
     try {
       const message = await login(email, password);
 
-      toast.success(message || "Login berhasil");
+      toast.success(message || t("loginSuccess"));
 
       const role = getCookie("role");
       router.push(role === "admin" || role === "officer" ? "/admin" : "/");
     } catch (err: any) {
-      toast.error(err.response?.data?.message ?? "Login gagal");
+      toast.error(err.response?.data?.message ?? t("loginFailed"));
     }
   };
 
@@ -225,10 +227,10 @@ export default function LoginPage() {
                 spinnerClassName="text-white"
               >
                 {loading ? (
-                  "Mengakses..."
+                  t("loggingIn")
                 ) : (
                   <>
-                    Masuk ke Perpustakaan
+                    {t("loginButton")}
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </>
                 )}
@@ -236,7 +238,7 @@ export default function LoginPage() {
 
               {/* Terms of Service & Privacy Policy */}
               <div className="text-center text-xs text-gray-500 dark:text-gray-400 space-y-1 transition-colors">
-                <p>Dengan melanjutkan, Anda menyetujui</p>
+                <p>{t("acceptanceIntro")}</p>
                 <div className="flex items-center justify-center gap-1 flex-wrap">
                   <button
                     type="button"
@@ -244,18 +246,18 @@ export default function LoginPage() {
                     className="text-brand-primary hover:text-brand-primary-dark font-medium hover:underline transition-colors"
                     disabled={loading}
                   >
-                    Terms of Service
+                    {t("termsOfService")}
                   </button>
-                  <span>dan</span>
+                  <span>{t("andLabel")}</span>
                   <button
                     type="button"
                     onClick={() => setPrivacyModalOpen(true)}
                     className="text-brand-primary hover:text-brand-primary-dark font-medium hover:underline transition-colors"
                     disabled={loading}
                   >
-                    Privacy Policy
+                    {t("privacyPolicy")}
                   </button>
-                  <span>kami</span>
+                  <span>{t("ourLabel")}</span>
                 </div>
               </div>
             </form>

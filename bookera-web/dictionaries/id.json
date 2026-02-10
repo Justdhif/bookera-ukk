@@ -222,6 +222,8 @@
       "dueDate": "Jatuh Tempo",
       "books": "buku",
       "noLoansData": "Tidak ada data peminjaman",
+      "statsLabel": "Statistik",
+      "now": "Sekarang",
       "monthNames": {
         "1": "Jan",
         "2": "Feb",
@@ -378,7 +380,11 @@
       "loan": "Peminjaman",
       "user": "User",
       "category": "Kategori",
-      "applyFilter": "Terapkan Filter"
+      "applyFilter": "Terapkan Filter",
+      "moduleComparisonChart": "Perbandingan Aktivitas per Modul",
+      "noData": "Tidak ada data",
+      "statsLabel": "Statistik",
+      "now": "Sekarang"
     },
     "notifications": {
       "title": "Notifikasi",
@@ -516,6 +522,7 @@
     "bookDetail": "Detail Buku",
     "fullInfoAboutBook": "Informasi lengkap tentang buku",
     "borrowBook": "Pinjam Buku",
+    "setReturnDateDescription": "Tentukan tanggal pengembalian untuk buku yang ingin Anda pinjam",
     "copyCode": "Kode Salinan",
     "selectDate": "Pilih tanggal",
     "processing": "Memproses...",
@@ -528,6 +535,10 @@
     "returnDateRequired": "Tanggal pengembalian wajib diisi",
     "borrowSuccess": "Peminjaman berhasil diajukan!",
     "borrowFailed": "Gagal melakukan peminjaman",
+    "returnDateLabel": "Tanggal Pengembalian",
+    "returnDateHint": "Pilih tanggal kapan Anda akan mengembalikan buku ini",
+    "borrowRequestSubmitted": "Permintaan peminjaman berhasil diajukan!",
+    "failedToBorrow": "Gagal melakukan peminjaman",
     "selectUser": "Pilih User",
     "searchUser": "Cari user...",
     "userRequired": "Pilih user yang akan meminjam",
@@ -744,7 +755,16 @@
     "loadingBookData": "Memuat data buku...",
     "editBook": "Edit Buku",
     "viewBookDetail": "Lihat detail buku",
-    "cancel": "Batal"
+    "cancel": "Batal",
+    "processing": "Memproses...",
+    "createLoan": "Buat Peminjaman",
+    "termsOfServiceTitlePlaceholder": "contoh: Ketentuan Layanan - Sistem Perpustakaan Bookera",
+    "termsOfServiceContentPlaceholder": "<h2>1. Penerimaan Ketentuan<\\/h2>\\n<p>Dengan mengakses dan menggunakan Bookera...<\\/p>",
+    "bannerWelcomeTitle": "Selamat Datang di Bookera",
+    "bannerWelcomeSubtitle": "Perpustakaan Digital & Fisik Terintegrasi",
+    "bannerBorrowEasyTitle": "Pinjam Buku Lebih Mudah",
+    "bannerThousandBooksTitle": "Ribuan Koleksi Buku",
+    "bannerThousandBooksSubtitle": "Dari berbagai kategori favoritmu"
   },
   "auth": {
     "login": {
@@ -772,7 +792,10 @@
       "thousandsBooks": "Ribuan Buku Digital",
       "learningMaterials": "Materi Pembelajaran",
       "studentCollaboration": "Kolaborasi Siswa",
-      "access24_7": "Akses 24/7"
+      "access24_7": "Akses 24/7",
+      "acceptanceIntro": "Dengan melanjutkan, Anda menyetujui",
+      "andLabel": "dan",
+      "ourLabel": "kami"
     }
   }
 }

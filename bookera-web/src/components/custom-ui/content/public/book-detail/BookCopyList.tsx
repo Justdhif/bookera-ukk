@@ -12,6 +12,7 @@ import { useTranslations } from "next-intl";
 
 export default function BookCopyList({ copies }: { copies: BookCopy[] }) {
   const t = useTranslations('common');
+  const tBooks = useTranslations('books');
   const router = useRouter();
   const pathname = usePathname();
 
@@ -56,20 +57,28 @@ export default function BookCopyList({ copies }: { copies: BookCopy[] }) {
                     : "bg-gray-100 text-gray-800 hover:bg-gray-100"
                 }
               >
-                {copy.status === "available" 
-                  ? "Tersedia" 
-                  : copy.status === "borrowed" 
-                  ? "Dipinjam" 
+                {copy.status === "available"
+                  ? tBooks('available')
+                  : copy.status === "borrowed"
+                  ? tBooks('borrowed')
                   : copy.status === "lost"
-                  ? "Hilang"
+                  ? t('lost')
                   : copy.status === "damaged"
-                  ? "Rusak"
+                  ? t('damaged')
                   : copy.status}
               </Badge>
             </div>
             {copy.status && (
               <p className="text-sm text-muted-foreground">
-                Kondisi: {copy.status}
+                {t('bookCondition')}: {copy.status === "available"
+                  ? tBooks('available')
+                  : copy.status === "borrowed"
+                  ? tBooks('borrowed')
+                  : copy.status === "lost"
+                  ? t('lost')
+                  : copy.status === "damaged"
+                  ? t('damaged')
+                  : copy.status}
               </p>
             )}
           </div>
@@ -86,7 +95,7 @@ export default function BookCopyList({ copies }: { copies: BookCopy[] }) {
               }}
               className="w-full sm:w-auto"
             >
-              Pinjam Buku
+              {t('borrowBook')}
             </Button>
           )}
         </div>

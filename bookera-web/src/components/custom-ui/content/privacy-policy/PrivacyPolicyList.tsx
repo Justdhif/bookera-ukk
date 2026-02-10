@@ -102,19 +102,18 @@ export default function PrivacyPolicyList({
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Hapus Privacy Policy</AlertDialogTitle>
+                    <AlertDialogTitle>{t('admin.privacyPolicy.deleteTitle')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Apakah Anda yakin ingin menghapus &quot;{item.title}
-                      &quot;? Tindakan ini tidak dapat dibatalkan.
+                      {t('admin.privacyPolicy.deleteConfirm', { title: item.title })}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogCancel>{t('admin.common.cancel')}</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => onDelete(item.id)}
                       className="bg-red-600 hover:bg-red-700"
                     >
-                      Hapus
+                      {t('admin.common.delete')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

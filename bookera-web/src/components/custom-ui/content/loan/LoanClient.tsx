@@ -102,8 +102,8 @@ export default function LoanClient() {
       return (
         <EmptyState
           icon={<Package className="h-16 w-16" />}
-          title="Belum ada peminjaman"
-          description="Belum ada data peminjaman buku yang dapat ditampilkan"
+          title={t('noLoans')}
+          description={t('noLoansDesc')}
         />
       );
     }

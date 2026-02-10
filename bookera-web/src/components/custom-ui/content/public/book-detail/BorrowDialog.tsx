@@ -60,21 +60,21 @@ export default function BorrowDialog({
     <Dialog open={!!copy} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Pinjam Buku</DialogTitle>
+          <DialogTitle>{t('borrowBook')}</DialogTitle>
           <DialogDescription>
-            Tentukan tanggal pengembalian untuk buku yang akan dipinjam
+            {t('setReturnDateDescription')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="rounded-lg border p-3 bg-muted/30">
-            <p className="text-sm text-muted-foreground mb-1">Kode Salinan</p>
+            <p className="text-sm text-muted-foreground mb-1">{t('copyCodeLabel')}</p>
             <p className="font-medium font-mono">{copy.copy_code}</p>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="due_date">
-              Tanggal Pengembalian <span className="text-red-500">*</span>
+              {t('returnDateLabel')} <span className="text-red-500">*</span>
             </Label>
             <DatePicker
               value={dueDate}
@@ -83,7 +83,7 @@ export default function BorrowDialog({
               dateMode="future"
             />
             <p className="text-xs text-muted-foreground">
-              Pilih tanggal kapan Anda akan mengembalikan buku ini
+              {t('returnDateHint')}
             </p>
           </div>
 
@@ -94,7 +94,7 @@ export default function BorrowDialog({
               className="flex-1"
               disabled={loading}
             >
-              Batal
+              {t('cancel')}
             </Button>
             <Button 
               onClick={submit} 
@@ -102,7 +102,7 @@ export default function BorrowDialog({
               disabled={loading || !dueDate}
               loading={loading}
             >
-              {loading ? "Memproses..." : "Konfirmasi Peminjaman"}
+              {loading ? t('processing') : t('confirmBorrow')}
             </Button>
           </div>
         </div>

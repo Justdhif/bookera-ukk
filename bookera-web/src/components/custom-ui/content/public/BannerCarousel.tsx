@@ -15,20 +15,20 @@ export default function BannerCarousel() {
     {
       id: 1,
       image: "/banner/banner-1.jpg",
-      title: "Selamat Datang di Bookera",
-      subtitle: "Perpustakaan Digital & Fisik Terintegrasi",
+      title: t('bannerWelcomeTitle'),
+      subtitle: t('bannerWelcomeSubtitle'),
     },
     {
       id: 2,
       image: "/banner/banner-2.jpg",
-      title: "Pinjam Buku Lebih Mudah",
+      title: t('bannerBorrowEasyTitle'),
       subtitle: t('searchBorrowManage'),
     },
     {
       id: 3,
       image: "/banner/banner-3.jpg",
-      title: "Ribuan Koleksi Buku",
-      subtitle: "Dari berbagai kategori favoritmu",
+      title: t('bannerThousandBooksTitle'),
+      subtitle: t('bannerThousandBooksSubtitle'),
     },
   ];
 

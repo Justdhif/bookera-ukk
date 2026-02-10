@@ -119,7 +119,7 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
                     <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-linear-to-r from-white/50 to-white/30 dark:from-slate-800/50 dark:to-slate-900/50 backdrop-blur-sm border border-slate-200/30 dark:border-slate-700/30">
                       <BarChart3 className="h-3 w-3 text-slate-600 dark:text-slate-400" />
                       <span className="text-[10px] font-bold uppercase tracking-wider bg-linear-to-br from-slate-700 to-slate-900 dark:from-slate-300 dark:to-slate-100 bg-clip-text text-transparent">
-                        Stats
+                          {t('statsLabel')}
                       </span>
                     </div>
                   </div>
@@ -144,7 +144,7 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
                   </div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground/60 font-medium">
                     <Clock className="h-3 w-3" />
-                    <span>Now</span>
+                    <span>{t('now')}</span>
                   </div>
                 </div>
               </div>

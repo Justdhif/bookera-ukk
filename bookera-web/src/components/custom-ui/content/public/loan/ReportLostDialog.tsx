@@ -163,12 +163,10 @@ export function ReportLostDialog({
               <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="text-sm font-medium text-destructive">
-                  Peringatan Penting
+                  {t('importantWarning')}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Dengan melaporkan buku hilang, Anda akan dikenakan denda
-                  sesuai dengan ketentuan perpustakaan. Denda harus dibayarkan
-                  sebelum dapat melakukan peminjaman selanjutnya.
+                  {t('lostBookWarningText')}
                 </p>
               </div>
             </div>
@@ -186,7 +184,7 @@ export function ReportLostDialog({
             }}
             disabled={loading}
           >
-            Batal
+            {t('cancel')}
           </Button>
           <Button
             variant="destructive"
@@ -196,10 +194,10 @@ export function ReportLostDialog({
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Memproses...
+                {t('processing')}
               </>
             ) : (
-              "Laporkan Kehilangan"
+              t('reportLoss')
             )}
           </Button>
         </DialogFooter>

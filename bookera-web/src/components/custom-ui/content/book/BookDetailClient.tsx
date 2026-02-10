@@ -185,7 +185,7 @@ export default function BookDetailClient() {
               className="h-8"
             >
               <X className="h-3.5 w-3.5 mr-1.5" />
-              Batal
+              {t('cancel')}
             </Button>
             <Button
               type="submit"
@@ -235,7 +235,7 @@ export default function BookDetailClient() {
       {!isEditMode && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">Salinan Buku</CardTitle>
+            <CardTitle className="text-xl">{t('bookCopies')}</CardTitle>
           </CardHeader>
           <CardContent>
             <BookCopyList book={book} onChange={fetchBook} />

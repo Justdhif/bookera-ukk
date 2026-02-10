@@ -87,7 +87,7 @@ export default function TermsOfServiceFormDialog({
             </Label>
             <Input
               id="title"
-              placeholder="e.g., Terms of Service - Bookera Library System"
+              placeholder={t('termsOfServiceTitlePlaceholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -99,8 +99,7 @@ export default function TermsOfServiceFormDialog({
             </Label>
             <Textarea
               id="content"
-              placeholder="<h2>1. Acceptance of Terms</h2>
-<p>By accessing and using Bookera...</p>"
+              placeholder={t('termsOfServiceContentPlaceholder')}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={16}

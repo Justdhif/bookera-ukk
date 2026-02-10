@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 export default function LostBooksTable({
@@ -32,12 +33,13 @@ export default function LostBooksTable({
   onFinish: (id: number) => void;
 }) {
   const router = useRouter();
+  const t = useTranslations('admin.lostBooks');
 
   if (data.length === 0) {
     return (
       <EmptyState
-        title="Belum ada buku hilang"
-        description="Data buku yang dilaporkan hilang akan muncul di sini."
+        title={t('noLostBooksYet')}
+        description={t('noLostBooksDesc')}
         icon={<AlertCircle className="h-10 w-10" />}
       />
     );
@@ -49,13 +51,13 @@ export default function LostBooksTable({
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="w-16 text-center">#</TableHead>
-            <TableHead className="font-semibold">Peminjam</TableHead>
-            <TableHead className="font-semibold">Buku</TableHead>
-            <TableHead className="font-semibold">Loan ID</TableHead>
-            <TableHead className="font-semibold">Status Loan</TableHead>
-            <TableHead className="font-semibold">Tanggal Hilang</TableHead>
-            <TableHead className="font-semibold">Catatan</TableHead>
-            <TableHead className="font-semibold text-right">Aksi</TableHead>
+            <TableHead className="font-semibold">{t('borrower')}</TableHead>
+            <TableHead className="font-semibold">{t('book')}</TableHead>
+            <TableHead className="font-semibold">{t('loanId')}</TableHead>
+            <TableHead className="font-semibold">{t('loanStatus')}</TableHead>
+            <TableHead className="font-semibold">{t('lostDate')}</TableHead>
+            <TableHead className="font-semibold">{t('notes')}</TableHead>
+            <TableHead className="font-semibold text-right">{t('actions')}</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -88,7 +90,7 @@ export default function LostBooksTable({
                       {item.book_copy?.book?.title || "-"}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Kode: {item.book_copy?.copy_code || "-"}
+                      {t('copyCodeLabel')}: {item.book_copy?.copy_code || "-"}
                     </div>
                   </div>
                 </div>
@@ -139,11 +141,11 @@ export default function LostBooksTable({
                     </div>
                   ) : (
                     <span className="text-muted-foreground italic">
-                      Tidak diketahui
+                      {t('unknownLostDate')}
                     </span>
                   )}
                   <div className="text-xs text-muted-foreground">
-                    Dilaporkan:{" "}
+                    {t('reportedAt')}{" "}
                     {format(new Date(item.created_at), "dd MMM yyyy", {
                       locale: localeId,
                     })}
@@ -158,7 +160,7 @@ export default function LostBooksTable({
                   </div>
                 ) : (
                   <span className="text-muted-foreground italic text-sm">
-                    Tidak ada catatan
+                    {t('noNotes')}
                   </span>
                 )}
               </TableCell>

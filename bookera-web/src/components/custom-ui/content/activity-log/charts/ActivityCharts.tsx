@@ -21,6 +21,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { MonthlyChartData } from "@/types/activity-log";
+import { useTranslations } from "next-intl";
 
 const COLORS = [
   "#06b6d4",
@@ -69,6 +70,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function ActivityCharts({ charts, onYearChange }: ActivityChartsProps) {
+  const t = useTranslations('admin.activityLogs');
   const hasData = charts.monthly && charts.monthly.length > 0;
   
   const handlePrevYear = () => {
@@ -95,7 +97,7 @@ export default function ActivityCharts({ charts, onYearChange }: ActivityChartsP
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <div className="w-1 h-6 bg-linear-to-b from-cyan-500 to-pink-500 rounded-full" />
-            Perbandingan Aktivitas per Modul
+            {t('moduleComparisonChart')}
           </CardTitle>
           
           <div className="flex items-center gap-2">
@@ -208,7 +210,7 @@ export default function ActivityCharts({ charts, onYearChange }: ActivityChartsP
           </ResponsiveContainer>
         ) : (
           <div className="flex items-center justify-center h-100 text-muted-foreground">
-            Tidak ada data
+            {t('noData')}
           </div>
         )}
       </CardContent>

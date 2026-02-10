@@ -222,7 +222,10 @@
       "dueDate": "Due Date",
       "books": "books",
       "noLoansData": "No loan data available",
-      "monthNames": {
+      "statsLabel": "Stats",
+      "now": "Now",
+      "borrowBook": "Borrow Book",
+      "setReturnDateDescription": "Set the return date for the book you want to borrow",
         "1": "Jan",
         "2": "Feb",
         "3": "Mar",
@@ -379,7 +382,11 @@
       "loan": "Loan",
       "user": "User",
       "category": "Category",
-      "applyFilter": "Apply Filter"
+      "applyFilter": "Apply Filter",
+      "moduleComparisonChart": "Activity by Module",
+      "noData": "No data available",
+      "statsLabel": "Stats",
+      "now": "Now"
     },
     "notifications": {
       "title": "Notifications",
@@ -450,6 +457,10 @@
   },
   "common": {
     "loading": "Loading",
+      "returnDateLabel": "Return Date",
+      "returnDateHint": "Select the date when you will return this book",
+      "borrowRequestSubmitted": "Borrow request submitted successfully!",
+      "failedToBorrow": "Failed to borrow book"
     "errorOccurred": "An error occurred",
     "close": "Close",
     "viewAll": "View All",
@@ -745,7 +756,9 @@
     "loadingBookData": "Loading book data...",
     "editBook": "Edit Book",
     "viewBookDetail": "View book details",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "createLoan": "Create Loan"
   },
   "auth": {
     "login": {
@@ -773,7 +786,10 @@
       "thousandsBooks": "Thousands of Digital Books",
       "learningMaterials": "Learning Materials",
       "studentCollaboration": "Student Collaboration",
-      "access24_7": "24/7 Access"
+      "access24_7": "24/7 Access",
+      "acceptanceIntro": "By continuing, you agree to",
+      "andLabel": "and",
+      "ourLabel": "our"
     }
   }
 }

@@ -15,6 +15,7 @@ import { toast } from "sonner";
 export default function SettingsClient() {
   const t = useTranslations('admin.settings');
   const tCommon = useTranslations('admin.common');
+  const tLocale = useTranslations('LocaleSwitcher');
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const currentLocale = useLocale();
@@ -45,8 +46,8 @@ export default function SettingsClient() {
   ];
 
   const languageOptions = [
-    { value: "en" as Locale, label: "English", flag: "🇺🇸" },
-    { value: "id" as Locale, label: "Indonesia", flag: "🇮🇩" },
+    { value: "en" as Locale, label: tLocale('en'), flag: "🇺🇸" },
+    { value: "id" as Locale, label: tLocale('id'), flag: "🇮🇩" },
   ];
 
   return (

@@ -55,9 +55,9 @@ export default function PrivacyPolicyClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">Privacy Policy</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Kelola Privacy Policy untuk pengguna platform
+            {t('description')}
           </p>
         </div>
         <Button
@@ -69,7 +69,7 @@ export default function PrivacyPolicyClient() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          Tambah Privacy Policy
+          {t('addPrivacyPolicy')}
         </Button>
       </div>
 
@@ -96,8 +96,8 @@ export default function PrivacyPolicyClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Hapus Privacy Policy"
-        description="Apakah kamu yakin ingin menghapus Privacy Policy ini? Data yang dihapus tidak dapat dikembalikan."
+        title={t('deleteTitle')}
+        description={t('deleteConfirm')}
         onConfirm={confirmDelete}
       />
     </div>

@@ -197,9 +197,9 @@ export default function UserAvatarCard({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                Belum ada peminjaman
-              </p>
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  {t('loans.noLoans')}
+                </p>
             )}
           </div>
         </CardContent>

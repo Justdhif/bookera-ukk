@@ -39,6 +39,7 @@ export default function AddBookClient() {
   const t = useTranslations('admin.books');
   const tCategories = useTranslations('admin.categories');
   const tCommon = useTranslations('admin.common');
+  const tCommonRoot = useTranslations('common');
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -140,9 +141,9 @@ export default function AddBookClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Tambah Buku</h1>
+            <h1 className="text-3xl font-bold">{t('addBook')}</h1>
             <p className="text-muted-foreground">
-              Tambahkan buku baru ke perpustakaan
+              {tCommonRoot('addBookToSystem')}
             </p>
           </div>
         </div>
@@ -163,8 +164,8 @@ export default function AddBookClient() {
           {/* Cover Card */}
           <Card className="lg:col-span-1">
             <CardHeader>
-              <CardTitle>Cover Buku</CardTitle>
-              <CardDescription>Upload gambar cover buku</CardDescription>
+              <CardTitle>{tCommonRoot('bookCover')}</CardTitle>
+              <CardDescription>{tCommonRoot('uploadCover')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 flex-1 flex flex-col">
               <div className="flex flex-col gap-4 flex-1">
@@ -192,7 +193,7 @@ export default function AddBookClient() {
                   <div className="w-full flex-1 border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-2 bg-muted/30">
                     <BookOpen className="h-12 w-12 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground">
-                      Belum ada cover
+                      {tCommonRoot('noCover')}
                     </p>
                   </div>
                 )}
@@ -205,7 +206,7 @@ export default function AddBookClient() {
                   className="w-full"
                 >
                   <Upload className="h-4 w-4 mr-2" />
-                  Upload Cover
+                  {tCommonRoot('uploadCover')}
                 </Button>
                 <Input
                   id="cover_image"
@@ -219,9 +220,9 @@ export default function AddBookClient() {
               {/* Status Switch */}
               <div className="flex items-center justify-between rounded-lg border p-4 bg-muted/30">
                 <div className="space-y-0.5">
-                  <Label className="text-sm font-medium">Status</Label>
+                  <Label className="text-sm font-medium">{tCommonRoot('status')}</Label>
                   <p className="text-xs text-muted-foreground">
-                    {formData.is_active ? "Aktif" : "Nonaktif"}
+                    {formData.is_active ? tCommonRoot('active') : tCommonRoot('inactive')}
                   </p>
                 </div>
                 <Switch
@@ -237,18 +238,18 @@ export default function AddBookClient() {
           {/* Form Card */}
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle>Informasi Buku</CardTitle>
+              <CardTitle>{tCommonRoot('bookInfo')}</CardTitle>
               <CardDescription>
-                Lengkapi informasi buku dengan benar
+                {tCommonRoot('fullBookDetails')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Basic Information */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Informasi Dasar</h3>
+                <h3 className="font-semibold text-lg">{tCommonRoot('basicInformation')}</h3>
                 <div className="space-y-2">
                   <Label htmlFor="title">
-                    Judul <span className="text-red-500">*</span>
+                    {tCommonRoot('title')} <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="title"
@@ -257,13 +258,13 @@ export default function AddBookClient() {
                     onChange={(e) =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    placeholder="Masukkan judul buku"
+                    placeholder={tCommonRoot('enterTitle')}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="author">
-                    Penulis <span className="text-red-500">*</span>
+                    {tCommonRoot('author')} <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="author"
@@ -272,25 +273,25 @@ export default function AddBookClient() {
                     onChange={(e) =>
                       setFormData({ ...formData, author: e.target.value })
                     }
-                    placeholder="Masukkan nama penulis"
+                    placeholder={tCommonRoot('enterAuthor')}
                   />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="publisher">Penerbit</Label>
+                    <Label htmlFor="publisher">{tCommonRoot('publisher')}</Label>
                     <Input
                       id="publisher"
                       value={formData.publisher}
                       onChange={(e) =>
                         setFormData({ ...formData, publisher: e.target.value })
                       }
-                      placeholder="Nama penerbit"
+                      placeholder={tCommonRoot('publisherName')}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="publication_year">Tahun Terbit</Label>
+                    <Label htmlFor="publication_year">{tCommonRoot('publicationYear')}</Label>
                     <Input
                       id="publication_year"
                       type="number"
@@ -303,33 +304,33 @@ export default function AddBookClient() {
                           publication_year: e.target.value,
                         })
                       }
-                      placeholder="YYYY"
+                      placeholder={tCommonRoot('yearFormat')}
                     />
                   </div>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="isbn">ISBN</Label>
+                    <Label htmlFor="isbn">{tCommonRoot('isbn')}</Label>
                     <Input
                       id="isbn"
                       value={formData.isbn}
                       onChange={(e) =>
                         setFormData({ ...formData, isbn: e.target.value })
                       }
-                      placeholder="Nomor ISBN"
+                      placeholder={tCommonRoot('isbnNumber')}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="language">Bahasa</Label>
+                    <Label htmlFor="language">{tCommonRoot('language')}</Label>
                     <Input
                       id="language"
                       value={formData.language}
                       onChange={(e) =>
                         setFormData({ ...formData, language: e.target.value })
                       }
-                      placeholder="Contoh: Indonesia, English"
+                      placeholder={tCommonRoot('languageExample')}
                     />
                   </div>
                 </div>
@@ -337,9 +338,9 @@ export default function AddBookClient() {
 
               {/* Categories */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Kategori</h3>
+                <h3 className="font-semibold text-lg">{tCommonRoot('categories')}</h3>
                 <div className="space-y-2">
-                  <Label>Pilih Kategori</Label>
+                  <Label>{tCommonRoot('selectCategory')}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -348,13 +349,13 @@ export default function AddBookClient() {
                         className="w-full justify-start text-left font-normal"
                       >
                         {formData.category_ids.length > 0
-                          ? `${formData.category_ids.length} kategori dipilih`
+                          ? tCommonRoot('categoriesSelected', { count: formData.category_ids.length })
                           : t('selectCategoryPlaceholder')}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0" align="start">
                       <Command>
-                        <CommandEmpty>Kategori tidak ditemukan</CommandEmpty>
+                        <CommandEmpty>{tCommonRoot('categoryNotFound')}</CommandEmpty>
                         <CommandGroup>
                           {categories.map((cat) => (
                             <CommandItem
@@ -413,16 +414,16 @@ export default function AddBookClient() {
 
               {/* Description */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Deskripsi</h3>
+                <h3 className="font-semibold text-lg">{tCommonRoot('bookDescription')}</h3>
                 <div className="space-y-2">
-                  <Label htmlFor="description">Deskripsi Buku</Label>
+                  <Label htmlFor="description">{tCommonRoot('bookDescription')}</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    placeholder="Masukkan deskripsi atau sinopsis buku"
+                    placeholder={tCommonRoot('enterDescription')}
                     rows={4}
                     className="resize-none"
                   />

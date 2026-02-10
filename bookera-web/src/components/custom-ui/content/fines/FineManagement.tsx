@@ -128,7 +128,7 @@ export default function FineManagement() {
             <SelectItem value="all">Semua Status</SelectItem>
             <SelectItem value="unpaid">Belum Dibayar</SelectItem>
             <SelectItem value="paid">Sudah Dibayar</SelectItem>
-            <SelectItem value="waived">Dibatalkan</SelectItem>
+            <SelectItem value="waived">{t('waived')}</SelectItem>
           </SelectContent>
         </Select>
       </div>

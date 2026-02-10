@@ -151,7 +151,7 @@ export function ReturnDialog({
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >
-            Batal
+            {t('cancel')}
           </Button>
           <Button
             variant="submit"
@@ -161,10 +161,10 @@ export function ReturnDialog({
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Memproses...
+                {t('processing')}
               </>
             ) : (
-              "Submit Pengembalian"
+              t('submitReturn')
             )}
           </Button>
         </DialogFooter>

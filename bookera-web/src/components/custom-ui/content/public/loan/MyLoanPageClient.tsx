@@ -32,6 +32,7 @@ export default function MyLoanPageClient() {
     loan: Loan | null;
   }>({ open: false, loan: null });
   const tLoans = useTranslations("loans");
+  const tCommon = useTranslations("common");
   const tStatus = useTranslations("status");
 
   useEffect(() => {
@@ -218,7 +219,7 @@ export default function MyLoanPageClient() {
                       className="flex items-center gap-2"
                     >
                       <AlertCircle className="h-4 w-4" />
-                      Laporkan Kehilangan
+                      {tCommon("reportLoss")}
                     </Button>
                   )}
                 </div>

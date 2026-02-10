@@ -20,6 +20,8 @@ interface Props {
 }
 
 export function BookFilter({ categories, onChange }: Props) {
+  const t = useTranslations('common');
+  
   const [searchValue, setSearchValue] = useState("");
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [statusValue, setStatusValue] = useState<string>();
