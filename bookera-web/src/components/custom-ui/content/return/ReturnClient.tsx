@@ -17,6 +17,8 @@ import { useTranslations } from "next-intl";
 
 export default function ReturnClient() {
   const t = useTranslations('admin.returns');
+  const tCommon = useTranslations('common');
+  const tAdmin = useTranslations('admin.common');
   const [allLoans, setAllLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
@@ -62,7 +64,7 @@ export default function ReturnClient() {
         const lostBookId = loan.lost_books[0].id;
         const response = await lostBookService.finish(lostBookId);
         toast.success(
-          response.data.message || t('lostBookProcessComplete'),
+          response.data.message || tCommon('lostBookProcessComplete'),
         );
       } else {
         // Normal return approval - updates loan status to "returned"
@@ -87,8 +89,8 @@ export default function ReturnClient() {
       return (
         <EmptyState
           icon={<PackageCheck className="h-16 w-16" />}
-          title={t('noReturnsYet')}
-          description={t('noReturnsDesc')}
+          title={tCommon('noReturnsYet')}
+          description={tCommon('noReturnsDesc')}
         />
       );
     }
@@ -128,9 +130,9 @@ export default function ReturnClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">{t('returnManagement')}</h1>
+          <h1 className="text-3xl font-bold">{tCommon('returnManagement')}</h1>
           <p className="text-muted-foreground">
-            {t('manageReturnApproval')}
+            {tCommon('manageReturnApproval')}
           </p>
         </div>
       </div>
@@ -140,7 +142,7 @@ export default function ReturnClient() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={t('searchReturnUserTitle')}
+            placeholder={tCommon('searchReturnUserTitle')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -149,27 +151,27 @@ export default function ReturnClient() {
         </div>
         <Button onClick={handleSearch} variant="secondary">
           <Search className="h-4 w-4 mr-2" />
-          {t('search')}
+          {tAdmin('search')}
         </Button>
       </div>
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">{t('allReturns')} ({allLoans.length})</TabsTrigger>
+          <TabsTrigger value="all">{tCommon('allReturns')} ({allLoans.length})</TabsTrigger>
           <TabsTrigger value="checking">
-            {t('checking')} ({checkingLoans.length})
+            {tCommon('checking')} ({checkingLoans.length})
           </TabsTrigger>
           <TabsTrigger value="returned">
-            {t('returned')} ({returnedLoans.length})
+            {tCommon('returned')} ({returnedLoans.length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">{t('allReturns')}</h2>
+              <h2 className="text-2xl font-bold">{tCommon('allReturns')}</h2>
               <p className="text-muted-foreground">
-                {t('noReturnsDesc')}
+                {tCommon('noReturnsDesc')}
               </p>
             </div>
             {loading ? (
@@ -187,9 +189,9 @@ export default function ReturnClient() {
         <TabsContent value="checking" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">{t('checking')}</h2>
+              <h2 className="text-2xl font-bold">{tCommon('checking')}</h2>
               <p className="text-muted-foreground">
-                {t('checkingReturnsDesc')}
+                {tCommon('checkingReturnsDesc')}
               </p>
             </div>
             {loading ? (
@@ -207,9 +209,9 @@ export default function ReturnClient() {
         <TabsContent value="returned" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">{t('returned')}</h2>
+              <h2 className="text-2xl font-bold">{tCommon('returned')}</h2>
               <p className="text-muted-foreground">
-                {t('returnedDesc')}
+                {tCommon('returnedDesc')}
               </p>
             </div>
             {loading ? (

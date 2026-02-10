@@ -27,7 +27,7 @@ export function LoanRejectDialog({
   onOpenChange,
   onConfirm,
 }: LoanRejectDialogProps) {
-  const t = useTranslations('common');
+  const t = useTranslations('admin.common');
   const [rejectionReason, setRejectionReason] = useState("");
 
   const handleConfirm = () => {

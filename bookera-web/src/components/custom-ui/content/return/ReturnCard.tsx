@@ -42,6 +42,8 @@ export function ReturnCard({
   onFinished,
 }: ReturnCardProps) {
   const router = useRouter();
+  const tLoans = useTranslations('loans');
+  const tStatus = useTranslations('status');
 
   const getLoanStatusBadge = (status: Loan["status"]) => {
     const variants: Record<

@@ -56,6 +56,7 @@ export function AdminBorrowDialog({
   onSuccess,
 }: AdminBorrowDialogProps) {
   const t = useTranslations('common');
+  const tAdmin = useTranslations('admin');
   const [loading, setLoading] = useState(false);
   const [books, setBooks] = useState<Book[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -266,15 +267,15 @@ export function AdminBorrowDialog({
                   className="w-full justify-between"
                 >
                   <span className="truncate">
-                    {selectedBook ? selectedBook.title : t('selectBookPlaceholder')}
+                    {selectedBook ? selectedBook.title : tAdmin('common.selectBookPlaceholder')}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0">
                 <Command>
-                  <CommandInput placeholder={t('searchBookPlaceholder')} />
-                  <CommandEmpty>{t('noBookFound')}</CommandEmpty>
+                  <CommandInput placeholder={tAdmin('common.searchBookPlaceholder')} />
+                  <CommandEmpty>{tAdmin('common.noBookFound')}</CommandEmpty>
                   <CommandList>
                     <CommandGroup>
                       {Array.isArray(books) &&
@@ -393,11 +394,11 @@ export function AdminBorrowDialog({
             <DatePicker
               value={dueDate}
               onChange={setDueDate}
-              placeholder={t('selectDueDatePlaceholder')}
+              placeholder={tAdmin('common.selectDueDatePlaceholder')}
               dateMode="future"
             />
             <p className="text-xs text-muted-foreground">
-              {t('selectDueDateHint')}
+              {tAdmin('common.selectDueDateHint')}
             </p>
           </div>
         </div>

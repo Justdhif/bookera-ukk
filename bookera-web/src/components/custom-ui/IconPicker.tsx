@@ -71,7 +71,7 @@ export default function IconPicker({ value, onChange, onClear }: IconPickerProps
 
       {value && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>{t('selectedIcon')}:</span>
+          <span>{tAdmin('selectedIcon')}:</span>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary/10 border border-primary/20">
             {(() => {
               const selected = AVAILABLE_ICONS.find(i => i.name === value);

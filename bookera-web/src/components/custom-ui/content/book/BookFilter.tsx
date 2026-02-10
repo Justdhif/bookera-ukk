@@ -21,18 +21,16 @@ interface Props {
 
 export function BookFilter({ categories, onChange }: Props) {
   const t = useTranslations('common');
-  
+  const tAdmin = useTranslations('admin.common')
   const [searchValue, setSearchValue] = useState("");
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [statusValue, setStatusValue] = useState<string>();
 
   const handleCategoryToggle = (id: number | null) => {
     if (id === null) {
-      // Klik "Semua" - reset semua kategori
       setCategoryIds([]);
       onChange({ category_ids: undefined });
     } else {
-      // Toggle kategori spesifik
       const newIds = categoryIds.includes(id)
         ? categoryIds.filter((cId) => cId !== id)
         : [...categoryIds, id];
@@ -43,7 +41,6 @@ export function BookFilter({ categories, onChange }: Props) {
 
   const handleCategoryClick = (id: number | null) => {
     handleCategoryToggle(id);
-    // Smooth scroll untuk mobile
     const element = document.getElementById(`book-category-${id}`);
     if (element) {
       element.scrollIntoView({
@@ -54,18 +51,15 @@ export function BookFilter({ categories, onChange }: Props) {
     }
   };
 
-  // "Semua" aktif ketika tidak ada kategori dipilih
   const isAllActive = categoryIds.length === 0;
 
   return (
     <div className="space-y-4">
-      {/* Search Bar dan Status Filter - Sejajar */}
       <div className="flex gap-3">
-        {/* Search Bar - Flex Grow */}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={t('searchBooksPlaceholder')}
+            placeholder={tAdmin('searchBooksPlaceholder')}
             value={searchValue}
             onChange={(e) => {
               setSearchValue(e.target.value);
@@ -85,12 +79,12 @@ export function BookFilter({ categories, onChange }: Props) {
           }}
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="Semua Status" />
+            <SelectValue placeholder={t('allStatus')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
-            <SelectItem value="active">Aktif</SelectItem>
-            <SelectItem value="inactive">Nonaktif</SelectItem>
+            <SelectItem value="all">{t('allStatus')}</SelectItem>
+            <SelectItem value="active">{t('active')}</SelectItem>
+            <SelectItem value="inactive">{t('inactive')}</SelectItem>
           </SelectContent>
         </Select>
       </div>

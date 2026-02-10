@@ -16,6 +16,7 @@ import { useTranslations } from "next-intl";
 export default function UserClient() {
   const router = useRouter();
   const t = useTranslations('admin.users');
+  const tCommon = useTranslations('admin.common');
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -102,7 +103,7 @@ export default function UserClient() {
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
         title={t('deleteUser')}
-        description={t('deleteUserWarning')}
+        description={tCommon('deleteUserWarning')}
         onConfirm={confirmDelete}
       />
     </div>

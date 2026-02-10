@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { getNotificationIcon } from "./notification-utils";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface NotificationListProps {
   notifications: Notification[];

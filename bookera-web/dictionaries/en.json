@@ -12,7 +12,8 @@
     "logout": "Logout",
     "librarySystem": "Library Management System",
     "settings": "Settings",
-    "categories": "Categories"
+    "categories": "Categories",
+    "placeholder": "Search title, author, or ISBN..."
   },
   "search": {
     "placeholder": "Search title, author, or ISBN...",
@@ -90,15 +91,15 @@
       "selectBookPlaceholder": "Select book...",
       "searchBookPlaceholder": "Search book...",
       "noBookFound": "No books found.",
-      "selectBookCopies": "Select Book Copies ({{count}} available)",
-      "selectedCopies": "Selected Copies ({{count}})",
+      "selectBookCopies": "Select Book Copies ({count} available)",
+      "selectedCopies": "Selected Copies ({count})",
       "available": "Available",
       "dueDate": "Due Date",
       "selectDueDatePlaceholder": "Select due date",
       "selectDueDateHint": "Select today or future date for return due date",
       "borrowDialogDescription": "Select the book you want to borrow and set the due date. The request will be processed by the admin.",
       "viewAll": "View All",
-      "booksCount": "{{count}} Books",
+      "booksCount": "{count} Books",
       "editTermsOfService": "Edit Terms of Service",
       "addTermsOfService": "Add Terms of Service",
       "contentHTML": "Content (HTML)",
@@ -132,6 +133,7 @@
       "searchFines": "Search fines...",
       "deleteFine": "Delete Fine",
       "deleteFineWarning": "Deleted fines cannot be recovered.",
+      "addCategory": "Add Category",
       "deleteCategory": "Delete Category",
       "deleteCategoryWarning": "Deleted categories cannot be recovered.",
       "searchBooksPlaceholder": "Search title, author, or ISBN...",
@@ -212,7 +214,7 @@
       "loadError": "Failed to load dashboard",
       "loanStatusChart": "Loan Status",
       "latestLoans": "Latest Loans",
-      "loanMonthlyChart": "Monthly Loans ({{year}})",
+      "loanMonthlyChart": "Monthly Loans ({year})",
       "noData": "No data available",
       "total": "Total",
       "borrower": "Borrower",
@@ -225,19 +227,19 @@
       "statsLabel": "Stats",
       "now": "Now",
       "borrowBook": "Borrow Book",
-      "setReturnDateDescription": "Set the return date for the book you want to borrow",
-        "1": "Jan",
-        "2": "Feb",
-        "3": "Mar",
-        "4": "Apr",
-        "5": "May",
-        "6": "Jun",
-        "7": "Jul",
-        "8": "Aug",
-        "9": "Sep",
-        "10": "Oct",
-        "11": "Nov",
-        "12": "Dec"
+      "monthNames": {
+      "1": "Jan",
+      "2": "Feb",
+      "3": "Mar",
+      "4": "Apr",
+      "5": "May",
+      "6": "Jun",
+      "7": "Jul",
+      "8": "Aug",
+      "9": "Sep",
+      "10": "Oct",
+      "11": "Nov",
+      "12": "Dec"
       }
     },
     "books": {
@@ -319,8 +321,11 @@
       "managementTitle": "Fine Management",
       "managementDescription": "Manage fines and configure fine types",
       "finesTab": "Fines",
+      "finesTabDescription": "Manage fines imposed on borrowers",
       "fineTypesTab": "Fine Types",
+      "fineTypesTabDescription": "Configure different types of fines",
       "markAsComplete": "Complete",
+      "allStatus": "All Status",
       "unpaid": "Unpaid",
       "paid": "Paid",
       "waived": "Waived",
@@ -351,7 +356,11 @@
       "deleteSuccess": "Lost book record deleted successfully",
       "deleteError": "Failed to delete lost book record",
       "completeSuccess": "Lost book process completed successfully",
-      "completeError": "Failed to complete lost book process"
+      "completeError": "Failed to complete lost book process",
+      "notes": "Notes",
+      "noNotes": "No notes",
+      "unknownLostDate": "Unknown lost date",
+      "reportedAt": "Reported at"
     },
     "activityLogs": {
       "title": "Activity Logs",
@@ -431,7 +440,9 @@
       "addError": "Failed to add Privacy Policy",
       "updateError": "Failed to update Privacy Policy",
       "requiredFields": "Please fill in all required fields",
-      "failedToLoad": "Failed to load Privacy Policy"
+      "failedToLoad": "Failed to load Privacy Policy",
+      "lastUpdated": "Last updated",
+      "sections": "sections"
     },
     "termsOfService": {
       "title": "Terms of Service",
@@ -452,15 +463,21 @@
       "addError": "Failed to add Terms of Service",
       "updateError": "Failed to update Terms of Service",
       "requiredFields": "Please fill in all required fields",
-      "failedToLoad": "Failed to load Terms of Service"
+      "failedToLoad": "Failed to load Terms of Service",
+      "lastUpdated": "Last updated",
+      "sections": "sections"
     }
   },
   "common": {
+    "submitReturn": "Submit Return Request",
+    "importantWarning": "Important Warning",
+    "lostBookWarningText": "If the book is reported lost and the loss is confirmed, a fine may be applied according to library policy.",
     "loading": "Loading",
-      "returnDateLabel": "Return Date",
-      "returnDateHint": "Select the date when you will return this book",
-      "borrowRequestSubmitted": "Borrow request submitted successfully!",
-      "failedToBorrow": "Failed to borrow book"
+    "returnDateLabel": "Return Date",
+    "returnDateHint": "Select the date when you will return this book",
+    "borrowRequestSubmitted": "Borrow request submitted successfully!",
+    "failedToBorrow": "Failed to borrow book",
+    "setReturnDateDescription": "Set the return date for the book you want to borrow",
     "errorOccurred": "An error occurred",
     "close": "Close",
     "viewAll": "View All",
@@ -478,6 +495,7 @@
     "all": "All",
     "male": "Male",
     "female": "Female",
+    "active": "Active",
     "inactive": "Inactive",
     "role": "Role",
     "status": "Status",
@@ -757,8 +775,15 @@
     "editBook": "Edit Book",
     "viewBookDetail": "View book details",
     "cancel": "Cancel",
-    "processing": "Processing...",
-    "createLoan": "Create Loan"
+    "createLoan": "Create Loan",
+    "failedToAddBook": "Failed to add book",
+	  "termsOfServiceTitlePlaceholder": "example: Terms of Service - Bookera Library System",
+	  "termsOfServiceContentPlaceholder": "<h2>1. Acceptance of Terms<\/h2>\n<p>By accessing and using Bookera...<\/p>",
+	  "bannerWelcomeTitle": "Welcome to Bookera",
+	  "bannerWelcomeSubtitle": "Integrated Digital & Physical Library",
+	  "bannerBorrowEasyTitle": "Borrow Books More Easily",
+	  "bannerThousandBooksTitle": "Thousands of Book Collections",
+	  "bannerThousandBooksSubtitle": "From various favorite categories"
   },
   "auth": {
     "login": {

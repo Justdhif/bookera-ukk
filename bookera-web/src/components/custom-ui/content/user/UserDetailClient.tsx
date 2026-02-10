@@ -149,7 +149,7 @@ export default function UserDetailClient() {
           <div>
             <h1 className="text-3xl font-bold">{tCommon('userDetail')}</h1>
             <p className="text-muted-foreground">
-              {isEditMode ? t('editUserInfo') : t('viewUserDetail')}
+              {isEditMode ? tCommon('editUserInfo') : tCommon('viewUserDetail')}
             </p>
           </div>
         </div>

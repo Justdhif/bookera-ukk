@@ -41,8 +41,8 @@ export function LoanCard({
   onReject,
   onMarkAsBorrowed,
 }: LoanCardProps) {
-  const t = useTranslations('admin.loans');
-  const tStatus = useTranslations('admin.status');
+  const t = useTranslations('loans');
+  const tStatus = useTranslations('status');
   const getStatusBadge = (status: Loan["status"]) => {
     const variants: Record<
       Loan["status"],

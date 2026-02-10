@@ -48,6 +48,7 @@ export default function UserAvatarCard({
   const router = useRouter();
   const t = useTranslations('common');
   const tAdmin = useTranslations('admin.common');
+  const tLoans = useTranslations('loans');
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
   const handleAvatarSave = (avatar: string | File) => {
@@ -167,7 +168,7 @@ export default function UserAvatarCard({
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium truncate">
-                        {t('booksCount', { count: loan.loan_details.length })}
+                        {tAdmin('booksCount', { count: loan.loan_details.length })}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(loan.loan_date).toLocaleDateString("id-ID")}
@@ -198,7 +199,7 @@ export default function UserAvatarCard({
               </div>
             ) : (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  {t('loans.noLoans')}
+                  {tLoans('noLoans')}
                 </p>
             )}
           </div>

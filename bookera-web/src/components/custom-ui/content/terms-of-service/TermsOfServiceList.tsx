@@ -26,12 +26,13 @@ export default function TermsOfServiceList({
   onEdit: (item: TermsOfService) => void;
   onDelete: (id: number) => void;
 }) {
-  const t = useTranslations('common');
+  const t = useTranslations('admin.termsOfService');
+  const tAdmin = useTranslations('admin.common');
   if (data.length === 0) {
     return (
       <EmptyState
-        title={t('noTermsOfServiceYet')}
-        description={t('noTermsOfServiceDesc')}
+        title={t('noTerms')}
+        description={t('noTermsDesc')}
         icon={<FileText className="h-10 w-10" />}
       />
     );
@@ -103,18 +104,18 @@ export default function TermsOfServiceList({
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>{t('deleteTermsOfService')}</AlertDialogTitle>
+                    <AlertDialogTitle>{t('deleteTitle')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      {t('deleteTermsConfirm', { title: item.title })}
+                      {t('deleteConfirm', { title: item.title })}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                    <AlertDialogCancel>{tAdmin('cancel')}</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => onDelete(item.id)}
                       className="bg-red-600 hover:bg-red-700"
                     >
-                      {t('delete')}
+                      {tAdmin('delete')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

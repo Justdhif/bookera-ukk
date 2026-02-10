@@ -12,7 +12,8 @@
     "logout": "Keluar",
     "librarySystem": "Sistem Manajemen Perpustakaan",
     "settings": "Pengaturan",
-    "categories": "Kategori"
+    "categories": "Kategori",
+    "placeholder": "Cari judul, penulis, atau ISBN..."
   },
   "search": {
     "placeholder": "Cari judul, penulis, atau ISBN...",
@@ -90,15 +91,15 @@
       "selectBookPlaceholder": "Pilih buku...",
       "searchBookPlaceholder": "Cari buku...",
       "noBookFound": "Tidak ada buku ditemukan.",
-      "selectBookCopies": "Pilih Copy Buku ({{count}} tersedia)",
-      "selectedCopies": "Copy yang Dipilih ({{count}})",
+      "selectBookCopies": "Pilih Copy Buku ({count} tersedia)",
+      "selectedCopies": "Copy yang Dipilih ({count})",
       "available": "Tersedia",
       "dueDate": "Tanggal Jatuh Tempo",
       "selectDueDatePlaceholder": "Pilih tanggal jatuh tempo",
       "selectDueDateHint": "Pilih tanggal hari ini atau kedepan untuk jatuh tempo pengembalian",
       "borrowDialogDescription": "Pilih buku yang ingin dipinjam dan tentukan tanggal jatuh tempo. Permintaan akan diproses oleh admin.",
       "viewAll": "Lihat Semua",
-      "booksCount": "{{count}} Buku",
+      "booksCount": "{count} Buku",
       "editTermsOfService": "Edit Terms of Service",
       "addTermsOfService": "Tambah Terms of Service",
       "contentHTML": "Konten (HTML)",
@@ -132,6 +133,7 @@
       "searchFines": "Cari denda...",
       "deleteFine": "Hapus Denda",
       "deleteFineWarning": "Denda yang dihapus tidak dapat dikembalikan.",
+      "addCategory": "Tambah Kategori",
       "deleteCategory": "Hapus Kategori",
       "deleteCategoryWarning": "Kategori yang dihapus tidak dapat dikembalikan.",
       "searchBooksPlaceholder": "Cari judul, penulis, atau ISBN...",
@@ -212,7 +214,7 @@
       "loadError": "Gagal memuat dashboard",
       "loanStatusChart": "Status Peminjaman",
       "latestLoans": "Peminjaman Terbaru",
-      "loanMonthlyChart": "Peminjaman Bulanan ({{year}})",
+      "loanMonthlyChart": "Peminjaman Bulanan ({year})",
       "noData": "Tidak ada data",
       "total": "Total",
       "borrower": "Peminjam",
@@ -317,8 +319,11 @@
       "managementTitle": "Manajemen Denda",
       "managementDescription": "Kelola denda dan konfigurasi tipe denda",
       "finesTab": "Denda",
+      "finesTabDescription": "Kelola denda yang diberikan kepada peminjam",
       "fineTypesTab": "Tipe Denda",
+      "fineTypesTabDescription": "Konfigurasi berbagai tipe denda",
       "markAsComplete": "Selesaikan",
+      "allStatus": "Semua Status",
       "unpaid": "Belum Dibayar",
       "paid": "Sudah Dibayar",
       "waived": "Dibatalkan",
@@ -349,7 +354,11 @@
       "deleteSuccess": "Data buku hilang berhasil dihapus",
       "deleteError": "Gagal menghapus data buku hilang",
       "completeSuccess": "Proses buku hilang berhasil diselesaikan",
-      "completeError": "Gagal menyelesaikan proses buku hilang"
+      "completeError": "Gagal menyelesaikan proses buku hilang",
+      "notes": "Catatan",
+      "noNotes": "Tidak ada catatan",
+      "unknownLostDate": "Tanggal hilang tidak diketahui",
+      "reportedAt": "Dilaporkan pada"
     },
     "activityLogs": {
       "title": "Log Aktivitas",
@@ -429,7 +438,9 @@
       "addError": "Gagal menambahkan Privacy Policy",
       "updateError": "Gagal memperbarui Privacy Policy",
       "requiredFields": "Mohon lengkapi semua field yang wajib diisi",
-      "failedToLoad": "Gagal memuat Privacy Policy"
+      "failedToLoad": "Gagal memuat Privacy Policy",
+      "lastUpdated": "Terakhir diperbarui",
+      "sections": "bagian"
     },
     "termsOfService": {
       "title": "Ketentuan Layanan",
@@ -450,10 +461,15 @@
       "addError": "Gagal menambahkan Terms of Service",
       "updateError": "Gagal memperbarui Terms of Service",
       "requiredFields": "Mohon lengkapi semua field yang wajib diisi",
-      "failedToLoad": "Gagal memuat Terms of Service"
+      "failedToLoad": "Gagal memuat Terms of Service",
+      "lastUpdated": "Terakhir diperbarui",
+      "sections": "bagian"
     }
   },
   "common": {
+    "submitReturn": "Ajukan Permintaan Pengembalian",
+    "importantWarning": "Peringatan Penting",
+    "lostBookWarningText": "Jika buku dilaporkan hilang dan hilangnya dikonfirmasi, denda dapat dikenakan sesuai kebijakan perpustakaan.",
     "loading": "Memuat",
     "errorOccurred": "Terjadi kesalahan",
     "close": "Tutup",
@@ -472,6 +488,7 @@
     "all": "Semua",
     "male": "Laki-laki",
     "female": "Perempuan",
+    "active": "Aktif",
     "inactive": "Nonaktif",
     "role": "Role",
     "status": "Status",
@@ -756,8 +773,8 @@
     "editBook": "Edit Buku",
     "viewBookDetail": "Lihat detail buku",
     "cancel": "Batal",
-    "processing": "Memproses...",
     "createLoan": "Buat Peminjaman",
+    "failedToAddBook": "Gagal menambahkan buku",
     "termsOfServiceTitlePlaceholder": "contoh: Ketentuan Layanan - Sistem Perpustakaan Bookera",
     "termsOfServiceContentPlaceholder": "<h2>1. Penerimaan Ketentuan<\\/h2>\\n<p>Dengan mengakses dan menggunakan Bookera...<\\/p>",
     "bannerWelcomeTitle": "Selamat Datang di Bookera",

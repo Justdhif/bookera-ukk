@@ -13,7 +13,8 @@ import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function CategoryClient() {
-  const t = useTranslations('common');
+  const t = useTranslations('admin.common');
+  const tAdmin = useTranslations('admin.categories');
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -50,9 +51,9 @@ export default function CategoryClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">Kategori</h1>
+          <h1 className="text-3xl font-bold">{tAdmin('title')}</h1>
           <p className="text-muted-foreground">
-            Kelola kategori buku di perpustakaan
+            {tAdmin('description')}
           </p>
         </div>
         <Button
@@ -64,7 +65,7 @@ export default function CategoryClient() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          Tambah Kategori
+          {t('addCategory')}
         </Button>
       </div>
 

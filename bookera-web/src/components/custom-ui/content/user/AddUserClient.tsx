@@ -31,7 +31,7 @@ import { useTranslations } from "next-intl";
 export default function AddUserClient() {
   const router = useRouter();
   const t = useTranslations('admin.users');
-  const tCommon = useTranslations('admin.common');
+  const tCommon = useTranslations('common');
   const [formData, setFormData] = useState<Partial<CreateUserData>>({
     role: "user",
     is_active: true,
@@ -83,7 +83,7 @@ export default function AddUserClient() {
           </Button>
           <div>
             <h1 className="text-3xl font-bold">{t('addUser')}</h1>
-            <p className="text-muted-foreground">{t('addUserToSystem')}</p>
+            <p className="text-muted-foreground">{tCommon('addUserToSystem')}</p>
           </div>
         </div>
         <Button
@@ -94,7 +94,7 @@ export default function AddUserClient() {
           loading={submitting}
           className="h-8"
         >
-          {submitting ? t('saving') : t('addUser')}
+          {submitting ? tCommon('saving') : t('addUser')}
         </Button>
       </div>
 
@@ -104,7 +104,7 @@ export default function AddUserClient() {
           <Card className="lg:col-span-1">
             <CardHeader>
               <CardTitle>Avatar</CardTitle>
-              <CardDescription>{t('uploadUserPhoto')}</CardDescription>
+              <CardDescription>{tCommon('uploadUserPhoto')}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-4">
               <Avatar className="h-32 w-32">
@@ -120,13 +120,13 @@ export default function AddUserClient() {
                 className="w-full"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                {t('uploadAvatar')}
+                {tCommon('uploadAvatar')}
               </Button>
 
               {/* Role & Status Selects */}
               <div className="space-y-2 w-full">
                 <div className="flex items-center gap-2">
-                  <Label className="text-muted-foreground text-xs w-16">{t('role')}:</Label>
+                  <Label className="text-muted-foreground text-xs w-16">{tCommon('role')}:</Label>
                   <Select
                     value={formData.role}
                     onValueChange={(value: any) =>
@@ -136,24 +136,24 @@ export default function AddUserClient() {
                     <SelectTrigger className="h-7 flex-1 text-xs">
                       <SelectValue>
                         {formData.role === "admin"
-                          ? t('admin')
+                          ? tCommon('admin')
                           : formData.role === "officer"
-                            ? t('officer')
+                            ? tCommon('officer')
                             : formData.role === "user"
-                              ? t('userRole')
-                              : t('selectRole')}
+                              ? tCommon('userRole')
+                              : tCommon('selectRole')}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">{t('admin')}</SelectItem>
-                      <SelectItem value="officer">{t('officer')}</SelectItem>
-                      <SelectItem value="user">{t('userRole')}</SelectItem>
+                      <SelectItem value="admin">{tCommon('admin')}</SelectItem>
+                      <SelectItem value="officer">{tCommon('officer')}</SelectItem>
+                      <SelectItem value="user">{tCommon('userRole')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Label className="text-muted-foreground text-xs w-16">{t('status')}:</Label>
+                  <Label className="text-muted-foreground text-xs w-16">{tCommon('status')}:</Label>
                   <Select
                     value={formData.is_active ? "active" : "inactive"}
                     onValueChange={(value) =>
@@ -165,12 +165,12 @@ export default function AddUserClient() {
                   >
                     <SelectTrigger className="h-7 flex-1 text-xs">
                       <SelectValue>
-                        {formData.is_active ? t('active') : t('inactive')}
+                        {formData.is_active ? tCommon('active') : tCommon('inactive')}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="active">{t('active')}</SelectItem>
-                      <SelectItem value="inactive">{t('inactive')}</SelectItem>
+                      <SelectItem value="active">{tCommon('active')}</SelectItem>
+                      <SelectItem value="inactive">{tCommon('inactive')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -181,15 +181,15 @@ export default function AddUserClient() {
           {/* Form Card */}
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle>{t('userInfo')}</CardTitle>
+              <CardTitle>{tCommon('userInfo')}</CardTitle>
               <CardDescription>
-                {t('editUserCorrectly')}
+                {tCommon('editUserCorrectly')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Account Section */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">{t('account')}</h3>
+                <h3 className="font-semibold text-lg">{tCommon('account')}</h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="email">
@@ -203,7 +203,7 @@ export default function AddUserClient() {
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
                       }
-                      placeholder={t('emailPlaceholder')}
+                      placeholder={tCommon('emailPlaceholder')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -218,7 +218,7 @@ export default function AddUserClient() {
                       onChange={(e) =>
                         setFormData({ ...formData, password: e.target.value })
                       }
-                      placeholder={t('minPassword')}
+                      placeholder={tCommon('minPassword')}
                     />
                   </div>
                 </div>
@@ -226,11 +226,11 @@ export default function AddUserClient() {
 
               {/* Profile Section */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">{t('profile')}</h3>
+                <h3 className="font-semibold text-lg">{tCommon('profile')}</h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="full_name">
-                      {t('namePlaceholder')} <span className="text-red-500">*</span>
+                      {tCommon('namePlaceholder')} <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="full_name"
@@ -239,12 +239,12 @@ export default function AddUserClient() {
                       onChange={(e) =>
                         setFormData({ ...formData, full_name: e.target.value })
                       }
-                      placeholder={t('namePlaceholder')}
+                      placeholder={tCommon('namePlaceholder')}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="identification_number">
-                      {t('identificationNumber')}
+                      {tCommon('identificationNumber')}
                     </Label>
                     <Input
                       id="identification_number"
@@ -255,11 +255,11 @@ export default function AddUserClient() {
                           identification_number: e.target.value,
                         })
                       }
-                      placeholder={t('idNumberPlaceholder')}
+                      placeholder={tCommon('idNumberPlaceholder')}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone_number">{t('phoneNumber')}</Label>
+                    <Label htmlFor="phone_number">{tCommon('phoneNumber')}</Label>
                     <Input
                       id="phone_number"
                       value={formData.phone_number || ""}
@@ -269,11 +269,11 @@ export default function AddUserClient() {
                           phone_number: e.target.value,
                         })
                       }
-                      placeholder={t('phonePlaceholder')}
+                      placeholder={tCommon('phonePlaceholder')}
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="gender">{t('gender')}</Label>
+                    <Label htmlFor="gender">{tCommon('gender')}</Label>
                     <Select
                       value={formData.gender || ""}
                       onValueChange={(value: any) =>
@@ -281,19 +281,19 @@ export default function AddUserClient() {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder={t('selectGender')} />
+                        <SelectValue placeholder={tCommon('selectGender')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="male">{t('male')}</SelectItem>
-                        <SelectItem value="female">{t('female')}</SelectItem>
+                        <SelectItem value="male">{tCommon('male')}</SelectItem>
+                        <SelectItem value="female">{tCommon('female')}</SelectItem>
                         <SelectItem value="prefer_not_to_say">
-                          {t('preferNotToSay')}
+                          {tCommon('preferNotToSay')}
                         </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="birth_date">{t('birthDate')}</Label>
+                    <Label htmlFor="birth_date">{tCommon('birthDate')}</Label>
                     <DatePicker
                       value={
                         formData.birth_date ? new Date(formData.birth_date + 'T00:00:00') : undefined
@@ -314,23 +314,23 @@ export default function AddUserClient() {
                           });
                         }
                       }}
-                      placeholder={t('selectBirthDate')}
+                      placeholder={tCommon('selectBirthDate')}
                       dateMode="past"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="occupation">{t('occupation')}</Label>
+                    <Label htmlFor="occupation">{tCommon('occupation')}</Label>
                     <Input
                       id="occupation"
                       value={formData.occupation || ""}
                       onChange={(e) =>
                         setFormData({ ...formData, occupation: e.target.value })
                       }
-                      placeholder={t('occupationPlaceholder')}
+                      placeholder={tCommon('occupationPlaceholder')}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="institution">{t('class')}</Label>
+                    <Label htmlFor="institution">{tCommon('class')}</Label>
                     <Input
                       id="institution"
                       value={formData.institution || ""}
@@ -340,30 +340,30 @@ export default function AddUserClient() {
                           institution: e.target.value,
                         })
                       }
-                      placeholder={t('classPlaceholder')}
+                      placeholder={tCommon('classPlaceholder')}
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="address">{t('address')}</Label>
+                    <Label htmlFor="address">{tCommon('address')}</Label>
                     <Textarea
                       id="address"
                       value={formData.address || ""}
                       onChange={(e) =>
                         setFormData({ ...formData, address: e.target.value })
                       }
-                      placeholder={t('addressPlaceholder')}
+                      placeholder={tCommon('addressPlaceholder')}
                       rows={2}
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="bio">{t('bio')}</Label>
+                    <Label htmlFor="bio">{tCommon('bio')}</Label>
                     <Textarea
                       id="bio"
                       value={formData.bio || ""}
                       onChange={(e) =>
                         setFormData({ ...formData, bio: e.target.value })
                       }
-                      placeholder={t('bioPlaceholder')}
+                      placeholder={tCommon('bioPlaceholder')}
                       rows={3}
                     />
                   </div>

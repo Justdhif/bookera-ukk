@@ -14,6 +14,7 @@ import { Plus } from "lucide-react";
 
 export default function FineTypeManagement() {
   const t = useTranslations('common');
+  const tAdmin = useTranslations('admin');
   const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -53,9 +54,9 @@ export default function FineTypeManagement() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h2 className="text-2xl font-bold">Tipe Denda</h2>
+          <h2 className="text-2xl font-bold">{tAdmin('fines.fineTypesTab')}</h2>
           <p className="text-muted-foreground">
-            Konfigurasi tipe denda dan jumlah denda
+            {tAdmin('fines.fineTypesTabDescription')}
           </p>
         </div>
         <Button
@@ -67,7 +68,7 @@ export default function FineTypeManagement() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          Tambah Tipe Denda
+          {t('addFineType')}
         </Button>
       </div>
 
@@ -88,7 +89,7 @@ export default function FineTypeManagement() {
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
         title={t('deleteFineType')}
-        description={t('deleteFineTypeWarning')}
+        description={tAdmin('common.deleteFineTypeWarning')}
         onConfirm={confirmDelete}
       />
 

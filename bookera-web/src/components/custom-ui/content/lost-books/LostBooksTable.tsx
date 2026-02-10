@@ -34,12 +34,16 @@ export default function LostBooksTable({
 }) {
   const router = useRouter();
   const t = useTranslations('admin.lostBooks');
+  const tAdmin = useTranslations('admin.common');
+  const tCommon = useTranslations('common');
+  const tFines = useTranslations('admin.fines');
+  const tDashboard = useTranslations('admin.dashboard');
 
   if (data.length === 0) {
     return (
       <EmptyState
-        title={t('noLostBooksYet')}
-        description={t('noLostBooksDesc')}
+        title={tAdmin('noLostBooksYet')}
+        description={tAdmin('noLostBooksDesc')}
         icon={<AlertCircle className="h-10 w-10" />}
       />
     );
@@ -51,13 +55,13 @@ export default function LostBooksTable({
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="w-16 text-center">#</TableHead>
-            <TableHead className="font-semibold">{t('borrower')}</TableHead>
-            <TableHead className="font-semibold">{t('book')}</TableHead>
-            <TableHead className="font-semibold">{t('loanId')}</TableHead>
-            <TableHead className="font-semibold">{t('loanStatus')}</TableHead>
-            <TableHead className="font-semibold">{t('lostDate')}</TableHead>
+            <TableHead className="font-semibold">{tFines('borrower')}</TableHead>
+            <TableHead className="font-semibold">{tDashboard('book')}</TableHead>
+            <TableHead className="font-semibold">{tFines('loanId')}</TableHead>
+            <TableHead className="font-semibold">{tCommon('loanStatus')}</TableHead>
+            <TableHead className="font-semibold">{tCommon('dateLost')}</TableHead>
             <TableHead className="font-semibold">{t('notes')}</TableHead>
-            <TableHead className="font-semibold text-right">{t('actions')}</TableHead>
+            <TableHead className="font-semibold text-right">{tAdmin('actions')}</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -90,7 +94,7 @@ export default function LostBooksTable({
                       {item.book_copy?.book?.title || "-"}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {t('copyCodeLabel')}: {item.book_copy?.copy_code || "-"}
+                      {tCommon('copyCodeLabel')}: {item.book_copy?.copy_code || "-"}
                     </div>
                   </div>
                 </div>

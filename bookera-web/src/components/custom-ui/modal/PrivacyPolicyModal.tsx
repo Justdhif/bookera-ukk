@@ -23,7 +23,7 @@ export function PrivacyPolicyModal({
   open,
   onOpenChange,
 }: PrivacyPolicyModalProps) {
-  const t = useTranslations('common');
+  const t = useTranslations('admin.privacyPolicy');
   const [contents, setContents] = useState<PrivacyPolicy[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -54,7 +54,7 @@ export function PrivacyPolicyModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
             <Shield className="w-5 h-5 text-brand-primary" />
-            Privacy Policy
+            {t('title')}
           </DialogTitle>
         </DialogHeader>
 

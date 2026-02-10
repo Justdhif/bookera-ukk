@@ -21,6 +21,7 @@ import { Search } from "lucide-react";
 
 export default function FineManagement() {
   const t = useTranslations('common');
+  const tAdmin = useTranslations('admin');
   const [fines, setFines] = useState<Fine[]>([]);
   const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -103,9 +104,9 @@ export default function FineManagement() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h2 className="text-2xl font-bold">Denda</h2>
+          <h2 className="text-2xl font-bold">{tAdmin('fines.finesTab')}</h2>
           <p className="text-muted-foreground">
-            Kelola denda peminjaman buku. Denda dibuat otomatis saat pengembalian buku rusak/hilang.
+            {tAdmin('fines.finesTabDescription')}
           </p>
         </div>
       </div>
@@ -125,10 +126,10 @@ export default function FineManagement() {
             <SelectValue placeholder="Filter Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
-            <SelectItem value="unpaid">Belum Dibayar</SelectItem>
-            <SelectItem value="paid">Sudah Dibayar</SelectItem>
-            <SelectItem value="waived">{t('waived')}</SelectItem>
+            <SelectItem value="all">{tAdmin('fines.allStatus')}</SelectItem>
+            <SelectItem value="unpaid">{tAdmin('fines.unpaid')}</SelectItem>
+            <SelectItem value="paid">{tAdmin('fines.paid')}</SelectItem>
+            <SelectItem value="waived">{tAdmin('fines.waived')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -147,7 +148,7 @@ export default function FineManagement() {
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
         title={t('deleteFine')}
-        description={t('deleteFineWarning')}
+        description={tAdmin('common.deleteFineWarning')}
         onConfirm={confirmDelete}
       />
     </div>

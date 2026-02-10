@@ -17,6 +17,9 @@ import { useTranslations } from "next-intl";
 
 export default function LoanClient() {
   const t = useTranslations('admin.loans');
+  const tStatus = useTranslations('status');
+  const tCommon = useTranslations('common');
+  const tAdmin = useTranslations('admin.common');
   const [allLoans, setAllLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
@@ -102,8 +105,8 @@ export default function LoanClient() {
       return (
         <EmptyState
           icon={<Package className="h-16 w-16" />}
-          title={t('noLoans')}
-          description={t('noLoansDesc')}
+          title={tCommon('noLoans')}
+          description={tCommon('noLoansDesc')}
         />
       );
     }
@@ -138,14 +141,14 @@ export default function LoanClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">{t('loanManagement')}</h1>
+          <h1 className="text-3xl font-bold">{tCommon('loanManagement')}</h1>
           <p className="text-muted-foreground">
-            {t('manageLoanApproval')}
+            {tCommon('manageLoanApproval')}
           </p>
         </div>
         <Button onClick={() => setBorrowDialog(true)} variant="brand">
           <Plus className="h-4 w-4 mr-2" />
-          {t('requestLoan')}
+          {tCommon('requestLoan')}
         </Button>
       </div>
 
@@ -154,7 +157,7 @@ export default function LoanClient() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={t('searchLoanUserTitle')}
+            placeholder={tCommon('searchLoanUserTitle')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -163,13 +166,13 @@ export default function LoanClient() {
         </div>
         <Button onClick={handleSearch} variant="secondary">
           <Search className="h-4 w-4 mr-2" />
-          {t('search')}
+          {tAdmin('search')}
         </Button>
       </div>
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">{t('allLoans')} ({allLoans.length})</TabsTrigger>
+          <TabsTrigger value="all">{tCommon('allLoans')} ({allLoans.length})</TabsTrigger>
           <TabsTrigger value="pending">
             Pending ({pendingLoans.length})
           </TabsTrigger>
@@ -194,9 +197,9 @@ export default function LoanClient() {
         <TabsContent value="all" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold">{t('allLoans')}</h3>
+              <h3 className="text-lg font-semibold">{tCommon('allLoans')}</h3>
               <p className="text-sm text-muted-foreground">
-                {t('noLoansDesc')}
+                {tCommon('noLoansDesc')}
               </p>
             </div>
             {loading ? (
@@ -314,7 +317,7 @@ export default function LoanClient() {
         <TabsContent value="rejected" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold">{t('rejected')}</h3>
+              <h3 className="text-lg font-semibold">{tStatus('rejected')}</h3>
               <p className="text-sm text-muted-foreground">
                 {t('rejectedLoansDesc')}
               </p>

@@ -13,6 +13,7 @@ import { useTranslations } from "next-intl";
 
 export default function LostBooksClient() {
   const t = useTranslations('admin.lostBooks');
+  const tAdmin = useTranslations('admin.common');
   const [lostBooks, setLostBooks] = useState<LostBook[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -88,7 +89,7 @@ export default function LostBooksClient() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={t('searchLostBooks')}
+            placeholder={tAdmin('searchLostBooks')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -119,8 +120,8 @@ export default function LostBooksClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title={t('deleteLostBookRecord')}
-        description={t('deleteLostBookWarning')}
+        title={tAdmin('deleteLostBookRecord')}
+        description={tAdmin('deleteLostBookWarning')}
         onConfirm={confirmDelete}
       />
     </div>

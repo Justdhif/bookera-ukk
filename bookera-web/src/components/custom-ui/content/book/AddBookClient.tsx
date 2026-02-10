@@ -338,7 +338,7 @@ export default function AddBookClient() {
 
               {/* Categories */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">{tCommonRoot('categories')}</h3>
+                <h3 className="font-semibold text-lg">{tCategories('title')}</h3>
                 <div className="space-y-2">
                   <Label>{tCommonRoot('selectCategory')}</Label>
                   <Popover>
@@ -350,7 +350,7 @@ export default function AddBookClient() {
                       >
                         {formData.category_ids.length > 0
                           ? tCommonRoot('categoriesSelected', { count: formData.category_ids.length })
-                          : t('selectCategoryPlaceholder')}
+                          : tCommon('selectCategoryPlaceholder')}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0" align="start">

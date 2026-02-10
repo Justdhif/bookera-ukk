@@ -39,7 +39,8 @@ export default function AvatarUploadModal({
   userName,
 }: AvatarUploadModalProps) {
   const t = useTranslations('common');
-  const tAdmin = useTranslations('admin.common');
+  const tAdminCommon = useTranslations('admin.common');
+  const tAdminUsers = useTranslations('admin.users');
   const [selectedAvatar, setSelectedAvatar] = useState<string | File>(
     currentAvatar,
   );
@@ -175,10 +176,10 @@ export default function AvatarUploadModal({
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={handleCancel}>
-            {tAdmin('cancel')}
+            {tAdminCommon('cancel')}
           </Button>
           <Button type="button" variant="submit" onClick={handleSave}>
-            {tAdmin('saveAvatar')}
+            {tAdminUsers('saveAvatar')}
           </Button>
         </DialogFooter>
       </DialogContent>

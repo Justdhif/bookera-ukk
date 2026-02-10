@@ -11,6 +11,8 @@ import { termsOfServiceService } from "@/services/terms-of-service.service";
 import { TermsOfService } from "@/types/terms-of-service";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { FileText, Loader2 } from "lucide-react";
 
 interface TermsOfServiceModalProps {
   open: boolean;
@@ -21,7 +23,7 @@ export function TermsOfServiceModal({
   open,
   onOpenChange,
 }: TermsOfServiceModalProps) {
-  const t = useTranslations('common');
+  const t = useTranslations('admin.termsOfService');
   const [contents, setContents] = useState<TermsOfService[]>([]);
   const [loading, setLoading] = useState(false);
 
