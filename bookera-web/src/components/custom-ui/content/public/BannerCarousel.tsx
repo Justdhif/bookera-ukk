@@ -1,34 +1,37 @@
 "use client";
 
 import Autoplay from "embla-carousel-autoplay";
+import { useTranslations } from "next-intl";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
 
-const banners = [
-  {
-    id: 1,
-    image: "/banner/banner-1.jpg",
-    title: "Selamat Datang di Bookera",
-    subtitle: "Perpustakaan Digital & Fisik Terintegrasi",
-  },
-  {
-    id: 2,
-    image: "/banner/banner-2.jpg",
-    title: "Pinjam Buku Lebih Mudah",
-    subtitle: "Cari, Pinjam, & Kelola dalam satu platform",
-  },
-  {
-    id: 3,
-    image: "/banner/banner-3.jpg",
-    title: "Ribuan Koleksi Buku",
-    subtitle: "Dari berbagai kategori favoritmu",
-  },
-];
-
 export default function BannerCarousel() {
+  const t = useTranslations('common');
+  
+  const banners = [
+    {
+      id: 1,
+      image: "/banner/banner-1.jpg",
+      title: "Selamat Datang di Bookera",
+      subtitle: "Perpustakaan Digital & Fisik Terintegrasi",
+    },
+    {
+      id: 2,
+      image: "/banner/banner-2.jpg",
+      title: "Pinjam Buku Lebih Mudah",
+      subtitle: t('searchBorrowManage'),
+    },
+    {
+      id: 3,
+      image: "/banner/banner-3.jpg",
+      title: "Ribuan Koleksi Buku",
+      subtitle: "Dari berbagai kategori favoritmu",
+    },
+  ];
+
   return (
     <Carousel
       plugins={[
@@ -41,7 +44,7 @@ export default function BannerCarousel() {
       <CarouselContent>
         {banners.map((banner) => (
           <CarouselItem key={banner.id}>
-            <div className="relative h-[260px] md:h-[360px] w-full overflow-hidden">
+            <div className="relative h-65 md:h-90 w-full overflow-hidden">
               <img
                 src={banner.image}
                 alt={banner.title}

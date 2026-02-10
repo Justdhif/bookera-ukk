@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useTranslations } from "next-intl";
 
 export default function TermsOfServiceList({
   data,
@@ -25,11 +26,12 @@ export default function TermsOfServiceList({
   onEdit: (item: TermsOfService) => void;
   onDelete: (id: number) => void;
 }) {
+  const t = useTranslations('common');
   if (data.length === 0) {
     return (
       <EmptyState
-        title="Belum ada Terms of Service"
-        description="Terms of Service akan muncul setelah kamu menambahkannya."
+        title={t('noTermsOfServiceYet')}
+        description={t('noTermsOfServiceDesc')}
         icon={<FileText className="h-10 w-10" />}
       />
     );
@@ -40,7 +42,7 @@ export default function TermsOfServiceList({
       {data.map((item, index) => (
         <div
           key={item.id}
-          className="border-l-4 border-brand-primary/30 pl-4 py-4 bg-white dark:bg-gray-800 rounded-lg border border-border hover:shadow-md transition-shadow duration-200"
+          className="border-l-4 border-brand-primary/30 pl-4 py-4 bg-white dark:bg-gray-800 rounded-lg border hover:shadow-md transition-shadow duration-200"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 space-y-3">
@@ -101,19 +103,18 @@ export default function TermsOfServiceList({
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Hapus Terms of Service</AlertDialogTitle>
+                    <AlertDialogTitle>{t('deleteTermsOfService')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Apakah Anda yakin ingin menghapus &quot;{item.title}
-                      &quot;? Tindakan ini tidak dapat dibatalkan.
+                      {t('deleteTermsConfirm', { title: item.title })}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => onDelete(item.id)}
                       className="bg-red-600 hover:bg-red-700"
                     >
-                      Hapus
+                      {t('delete')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

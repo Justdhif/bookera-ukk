@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { PrivacyPolicy } from "@/types/privacy-policy";
 import { privacyPolicyService } from "@/services/privacy-policy.service";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export default function PrivacyPolicyFormDialog({
   open,
@@ -26,6 +27,7 @@ export default function PrivacyPolicyFormDialog({
   item: PrivacyPolicy | null;
   onSuccess: () => void;
 }) {
+  const t = useTranslations('common');
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +41,7 @@ export default function PrivacyPolicyFormDialog({
 
   const handleSubmit = async () => {
     if (!title || !content) {
-      toast.error("Mohon lengkapi semua field yang wajib diisi");
+      toast.error(t('pleaseCompleteRequiredFields'));
       return;
     }
 
@@ -52,10 +54,10 @@ export default function PrivacyPolicyFormDialog({
 
       if (item) {
         await privacyPolicyService.update(item.id, payload);
-        toast.success("Privacy Policy berhasil diperbarui");
+        toast.success(t('privacyPolicyUpdated'));
       } else {
         await privacyPolicyService.create(payload);
-        toast.success("Privacy Policy berhasil ditambahkan");
+        toast.success(t('privacyPolicyAdded'));
       }
 
       setTitle("");
@@ -63,7 +65,7 @@ export default function PrivacyPolicyFormDialog({
       setOpen(false);
       onSuccess();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Terjadi kesalahan");
+      toast.error(err.response?.data?.message || t('errorOccurred'));
     } finally {
       setIsLoading(false);
     }
@@ -74,14 +76,14 @@ export default function PrivacyPolicyFormDialog({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {item ? "Edit Privacy Policy" : "Tambah Privacy Policy"}
+            {item ? t('editPrivacyPolicy') : t('addPrivacyPolicy')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title">
-              Judul <span className="text-red-500">*</span>
+              {t('title')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="title"
@@ -93,7 +95,7 @@ export default function PrivacyPolicyFormDialog({
 
           <div className="space-y-2">
             <Label htmlFor="content">
-              Konten (HTML) <span className="text-red-500">*</span>
+              {t('contentHTML')} <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="content"
@@ -105,8 +107,7 @@ export default function PrivacyPolicyFormDialog({
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              Gunakan HTML tags untuk format. Contoh: &lt;h2&gt;, &lt;p&gt;,
-              &lt;ul&gt;, &lt;li&gt;
+              {t('useHTMLTags')}
             </p>
           </div>
 
@@ -119,11 +120,11 @@ export default function PrivacyPolicyFormDialog({
           >
             {isLoading
               ? item
-                ? "Menyimpan..."
-                : "Menambahkan..."
+                ? t('savingChanges')
+                : t('adding')
               : item
-                ? "Simpan Perubahan"
-                : "Tambah Privacy Policy"}
+                ? t('saveChanges')
+                : t('addPrivacyPolicy')}
           </Button>
         </div>
       </DialogContent>

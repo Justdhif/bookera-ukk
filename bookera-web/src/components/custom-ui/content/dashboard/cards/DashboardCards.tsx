@@ -14,13 +14,14 @@ import {
   BarChart3,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function DashboardCards({ data }: { data: DashboardTotals }) {
+  const t = useTranslations('admin.dashboard');
   const router = useRouter();
-
   const items = [
     {
-      label: "Total Users",
+      label: t('totalUsers'),
       value: data.total_users,
       icon: Users,
       gradient: "from-emerald-500 to-teal-500",
@@ -31,13 +32,13 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
         "group-hover:border-emerald-300 dark:group-hover:border-emerald-700",
       iconBg: "bg-linear-to-br from-emerald-500 to-teal-500",
       statIcon: Sparkles,
-      statText: "Active Users",
-      updatedText: "Recently registered",
+      statText: t('activeUsers'),
+      updatedText: t('recentlyRegistered'),
       detailsHref: "/admin/users",
-      detailsText: "Manage Users",
+      detailsText: t('manageUsers'),
     },
     {
-      label: "Total Books",
+      label: t('totalBooks'),
       value: data.total_books,
       icon: BookOpen,
       gradient: "from-orange-500 to-red-500",
@@ -48,13 +49,13 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
         "group-hover:border-orange-300 dark:group-hover:border-orange-700",
       iconBg: "bg-linear-to-br from-orange-500 to-red-500",
       statIcon: Library,
-      statText: "In Collection",
-      updatedText: "New additions today",
+      statText: t('inCollection'),
+      updatedText: t('newAdditions'),
       detailsHref: "/admin/books",
-      detailsText: "Browse Catalog",
+      detailsText: t('browseCatalog'),
     },
     {
-      label: "Loans Today",
+      label: t('loansToday'),
       value: data.loans_today,
       icon: ArrowUpFromLine,
       gradient: "from-blue-500 to-cyan-500",
@@ -65,13 +66,13 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
         "group-hover:border-blue-300 dark:group-hover:border-blue-700",
       iconBg: "bg-linear-to-br from-blue-500 to-cyan-500",
       statIcon: CalendarClock,
-      statText: "Pending Loans",
-      updatedText: "Checked out today",
+      statText: t('pendingLoans'),
+      updatedText: t('checkedOutToday'),
       detailsHref: "/admin/loans",
-      detailsText: "View All Loans",
+      detailsText: t('viewAllLoans'),
     },
     {
-      label: "Returns Today",
+      label: t('returnsToday'),
       value: data.returns_today,
       icon: ArrowDownToLine,
       gradient: "from-amber-500 to-orange-500",
@@ -82,10 +83,10 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
         "group-hover:border-amber-300 dark:group-hover:border-amber-700",
       iconBg: "bg-linear-to-br from-amber-500 to-orange-500",
       statIcon: Clock,
-      statText: "Completed Returns",
-      updatedText: "Returned today",
+      statText: t('completedReturns'),
+      updatedText: t('returnedToday'),
       detailsHref: "/admin/loans?tab=returns",
-      detailsText: "Check Returns",
+      detailsText: t('checkReturns'),
     },
   ];
 

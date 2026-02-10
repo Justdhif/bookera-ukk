@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
+import { useTranslations } from "next-intl";
 
 export default function BookCopyList({
   book,
@@ -15,12 +16,13 @@ export default function BookCopyList({
   book: Book;
   onChange: () => void;
 }) {
+  const t = useTranslations('common');
   const [copyCode, setCopyCode] = useState("");
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const handleAdd = async (copy_code: string) => {
     await bookCopyService.create(book.id, copy_code);
-    toast.success("Salinan ditambahkan");
+    toast.success(t('copyAdded'));
     setCopyCode(""); // Reset input setelah berhasil
     onChange();
   };
@@ -30,25 +32,25 @@ export default function BookCopyList({
     
     try {
       await bookCopyService.delete(deleteId);
-      toast.success("Salinan dihapus");
+      toast.success(t('copyDeleted'));
       onChange();
       setDeleteId(null);
     } catch (error) {
-      toast.error("Gagal menghapus salinan");
+      toast.error(t('failedToDeleteCopy'));
     }
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="font-semibold">Salinan Buku</h2>
+      <h2 className="font-semibold">{t('bookCopies')}</h2>
 
       <div className="flex gap-2">
         <Input 
-          placeholder="Kode salinan" 
+          placeholder={t('copyCodePlaceholder')} 
           value={copyCode}
           onChange={(e) => setCopyCode(e.target.value)}
         />
-        <Button variant="submit" onClick={() => handleAdd(copyCode)}>Tambah Salinan</Button>
+        <Button variant="submit" onClick={() => handleAdd(copyCode)}>{t('addCopy')}</Button>
       </div>
 
       <ul className="space-y-2">
@@ -62,7 +64,7 @@ export default function BookCopyList({
               variant="destructive"
               onClick={() => setDeleteId(copy.id)}
             >
-              Hapus
+              {t('delete')}
             </Button>
           </li>
         ))}
@@ -71,8 +73,8 @@ export default function BookCopyList({
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Hapus Salinan Buku"
-        description="Apakah kamu yakin ingin menghapus salinan buku ini? Data yang dihapus tidak dapat dikembalikan."
+        title={t('deleteCopyTitle')}
+        description={t('deleteCopyConfirm')}
         onConfirm={confirmDelete}
       />
     </div>

@@ -14,6 +14,7 @@ import { Book } from "@/types/book";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { BookOpen, Eye, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface Props {
   data: Book[];
@@ -22,12 +23,14 @@ interface Props {
 
 export function BookTable({ data, onDelete }: Props) {
   const router = useRouter();
+  const t = useTranslations('admin.books');
+  const tCommon = useTranslations('admin.common');
 
   if (data.length === 0) {
     return (
       <EmptyState
-        title="Belum ada buku"
-        description="Buku akan muncul setelah kamu menambahkannya."
+        title={t('noBooks')}
+        description={t('noBooksDesc')}
         icon={<BookOpen className="h-10 w-10" />}
       />
     );
@@ -39,14 +42,14 @@ export function BookTable({ data, onDelete }: Props) {
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="w-16 text-center font-semibold">#</TableHead>
-            <TableHead className="w-24 font-semibold">Cover</TableHead>
-            <TableHead className="font-semibold">Judul</TableHead>
-            <TableHead className="font-semibold">Penulis</TableHead>
-            <TableHead className="font-semibold">ISBN</TableHead>
-            <TableHead className="font-semibold">Penerbit</TableHead>
-            <TableHead className="font-semibold">Tahun</TableHead>
-            <TableHead className="font-semibold">Status</TableHead>
-            <TableHead className="font-semibold text-right pr-6">Aksi</TableHead>
+            <TableHead className="w-24 font-semibold">{t('cover')}</TableHead>
+            <TableHead className="font-semibold">{t('title_col')}</TableHead>
+            <TableHead className="font-semibold">{t('author')}</TableHead>
+            <TableHead className="font-semibold">{t('isbn')}</TableHead>
+            <TableHead className="font-semibold">{t('publisher')}</TableHead>
+            <TableHead className="font-semibold">{t('year')}</TableHead>
+            <TableHead className="font-semibold">{t('status')}</TableHead>
+            <TableHead className="font-semibold text-right pr-6">{tCommon('actions')}</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -98,7 +101,7 @@ export function BookTable({ data, onDelete }: Props) {
                 variant={book.is_active ? "default" : "secondary"}
                 className={book.is_active ? "bg-green-600 hover:bg-green-700" : "bg-gray-500 hover:bg-gray-600"}
               >
-                {book.is_active ? "Aktif" : "Nonaktif"}
+                {book.is_active ? tCommon('active') : tCommon('inactive')}
               </Badge>
             </TableCell>
             <TableCell className="pr-6">
@@ -110,7 +113,7 @@ export function BookTable({ data, onDelete }: Props) {
                   className="h-8 gap-1"
                 >
                   <Eye className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Detail</span>
+                  <span className="hidden sm:inline">{tCommon('view')}</span>
                 </Button>
                 <Button
                   size="sm"
@@ -119,7 +122,7 @@ export function BookTable({ data, onDelete }: Props) {
                   className="h-8 gap-1"
                 >
                   <Trash className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Hapus</span>
+                  <span className="hidden sm:inline">{tCommon('delete')}</span>
                 </Button>
               </div>
             </TableCell>

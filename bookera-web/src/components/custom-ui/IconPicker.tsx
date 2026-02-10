@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface IconPickerProps {
   value: string;
@@ -13,10 +14,13 @@ interface IconPickerProps {
 }
 
 export default function IconPicker({ value, onChange, onClear }: IconPickerProps) {
+  const t = useTranslations('common');
+  const tAdmin = useTranslations('admin.common');
+  
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <Label>Icon Kategori</Label>
+        <Label>{t('iconCategory')}</Label>
         {value && (
           <Button
             type="button"
@@ -26,7 +30,7 @@ export default function IconPicker({ value, onChange, onClear }: IconPickerProps
             className="h-7 text-xs"
           >
             <X className="h-3 w-3 mr-1" />
-            Hapus
+            {tAdmin('delete')}
           </Button>
         )}
       </div>
@@ -67,7 +71,7 @@ export default function IconPicker({ value, onChange, onClear }: IconPickerProps
 
       {value && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Icon terpilih:</span>
+          <span>{t('selectedIcon')}:</span>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary/10 border border-primary/20">
             {(() => {
               const selected = AVAILABLE_ICONS.find(i => i.name === value);

@@ -32,9 +32,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Upload, X, BookOpen } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export default function AddBookClient() {
   const router = useRouter();
+  const t = useTranslations('admin.books');
+  const tCategories = useTranslations('admin.categories');
+  const tCommon = useTranslations('admin.common');
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -60,7 +64,7 @@ export default function AddBookClient() {
       const res = await categoryService.getAll();
       setCategories(res.data.data);
     } catch (error) {
-      toast.error("Gagal mengambil kategori");
+      toast.error(tCategories('loadError'));
       console.error("Error fetching categories:", error);
     }
   };
@@ -81,7 +85,7 @@ export default function AddBookClient() {
     e.preventDefault();
 
     if (!formData.title.trim() || !formData.author.trim()) {
-      toast.error("Judul dan Penulis wajib diisi");
+      toast.error(tCommon('titleAuthorRequired'));
       return;
     }
 
@@ -113,10 +117,10 @@ export default function AddBookClient() {
       }
 
       await bookService.create(data);
-      toast.success("Buku berhasil ditambahkan");
+      toast.success(tCommon('bookAdded'));
       router.push("/admin/books");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal menambahkan buku");
+      toast.error(error.response?.data?.message || tCommon('failedToAddBook'));
     } finally {
       setSubmitting(false);
     }
@@ -150,7 +154,7 @@ export default function AddBookClient() {
           loading={submitting}
           className="h-8"
         >
-          {submitting ? "Menyimpan..." : "Tambah Buku"}
+          {submitting ? t('saving') : t('addBook')}
         </Button>
       </div>
 
@@ -345,7 +349,7 @@ export default function AddBookClient() {
                       >
                         {formData.category_ids.length > 0
                           ? `${formData.category_ids.length} kategori dipilih`
-                          : "Pilih kategori..."}
+                          : t('selectCategoryPlaceholder')}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0" align="start">

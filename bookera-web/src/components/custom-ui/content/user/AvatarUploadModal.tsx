@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface AvatarUploadModalProps {
   open: boolean;
@@ -37,6 +38,8 @@ export default function AvatarUploadModal({
   onSave,
   userName,
 }: AvatarUploadModalProps) {
+  const t = useTranslations('common');
+  const tAdmin = useTranslations('admin.common');
   const [selectedAvatar, setSelectedAvatar] = useState<string | File>(
     currentAvatar,
   );
@@ -81,16 +84,15 @@ export default function AvatarUploadModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-125">
         <DialogHeader>
-          <DialogTitle>Upload Avatar</DialogTitle>
+          <DialogTitle>{t('uploadAvatar')}</DialogTitle>
           <DialogDescription>
-            Pilih avatar default atau upload gambar sendiri
+            {t('selectDefaultAvatar')} {t('orUploadImage').toLowerCase()}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Preview Avatar */}
           <div className="flex flex-col items-center gap-4">
             <Avatar className="h-32 w-32">
               <AvatarImage src={previewUrl || undefined} />
@@ -98,12 +100,11 @@ export default function AvatarUploadModal({
                 {userName?.[0]?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
-            <p className="text-sm text-muted-foreground">Preview Avatar</p>
+            <p className="text-sm text-muted-foreground">{t('previewAvatar')}</p>
           </div>
 
-          {/* Default Avatars */}
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Pilih Avatar Default</h4>
+            <h4 className="text-sm font-semibold">{t('selectDefaultAvatar')}</h4>
             <div className="grid grid-cols-5 gap-2">
               {DEFAULT_AVATARS.map((avatarUrl, index) => {
                 const isSelected = previewUrl === avatarUrl;
@@ -147,7 +148,7 @@ export default function AvatarUploadModal({
           </div>
 
           <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Atau Upload Gambar</h4>
+            <h4 className="text-sm font-semibold">{t('orUploadImage')}</h4>
             <div className="flex flex-col gap-2">
               <Input
                 ref={fileInputRef}
@@ -174,10 +175,10 @@ export default function AvatarUploadModal({
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={handleCancel}>
-            Batal
+            {tAdmin('cancel')}
           </Button>
           <Button type="button" variant="submit" onClick={handleSave}>
-            Simpan Avatar
+            {tAdmin('saveAvatar')}
           </Button>
         </DialogFooter>
       </DialogContent>

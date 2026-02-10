@@ -11,29 +11,30 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface Props {
   onChange: (params: Record<string, string | undefined>) => void;
 }
 
 export default function UserFilter({ onChange }: Props) {
+  const t = useTranslations('common');
+  const tAdmin = useTranslations('admin.common');
   const [searchValue, setSearchValue] = useState("");
   const [roleValue, setRoleValue] = useState<string>();
   const [statusValue, setStatusValue] = useState<string>();
 
   const roles = [
-    { value: "admin", label: "Admin" },
-    { value: "officer", label: "Petugas" },
-    { value: "user", label: "User" },
+    { value: "admin", label: t('admin') },
+    { value: "officer", label: t('officer') },
+    { value: "user", label: t('userRole') },
   ];
 
   const handleRoleToggle = (value: string | null) => {
     if (value === null) {
-      // Klik "Semua" - reset role
       setRoleValue(undefined);
       onChange({ role: undefined });
     } else {
-      // Toggle role spesifik
       const newValue = roleValue === value ? undefined : value;
       setRoleValue(newValue);
       onChange({ role: newValue });
@@ -42,7 +43,6 @@ export default function UserFilter({ onChange }: Props) {
 
   const handleRoleClick = (value: string | null) => {
     handleRoleToggle(value);
-    // Smooth scroll untuk mobile
     const element = document.getElementById(`user-role-${value}`);
     if (element) {
       element.scrollIntoView({
@@ -53,18 +53,15 @@ export default function UserFilter({ onChange }: Props) {
     }
   };
 
-  // "Semua" aktif ketika tidak ada role dipilih
   const isAllActive = !roleValue;
 
   return (
     <div className="space-y-4">
-      {/* Search Bar dan Status Filter - Sejajar */}
       <div className="flex gap-3">
-        {/* Search Bar - Flex Grow */}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari nama, email, atau nomor identitas..."
+            placeholder={t('searchPlaceholder')}
             value={searchValue}
             onChange={(e) => {
               setSearchValue(e.target.value);
@@ -74,7 +71,6 @@ export default function UserFilter({ onChange }: Props) {
           />
         </div>
 
-        {/* Status Select */}
         <Select
           value={statusValue}
           onValueChange={(v) => {
@@ -84,24 +80,20 @@ export default function UserFilter({ onChange }: Props) {
           }}
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="Semua Status" />
+            <SelectValue placeholder={t('allStatus')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Semua Status</SelectItem>
-            <SelectItem value="active">Aktif</SelectItem>
-            <SelectItem value="inactive">Nonaktif</SelectItem>
+            <SelectItem value="all">{t('allStatus')}</SelectItem>
+            <SelectItem value="active">{tAdmin('active')}</SelectItem>
+            <SelectItem value="inactive">{t('inactive')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {/* Filter Role - Scroll Horizontal */}
       <div className="relative">
-        {/* Fade effect di ujung kanan */}
         <div className="absolute right-0 top-0 bottom-0 w-12 bg-linear-to-l from-white dark:from-gray-950 to-transparent z-10 pointer-events-none rounded-r-md" />
 
-        {/* Scroll container */}
         <div className="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth">
-          {/* Badge "Semua" */}
           <div id="user-role-null" className="shrink-0">
             <Badge
               variant={isAllActive ? "default" : "outline"}
@@ -117,11 +109,10 @@ export default function UserFilter({ onChange }: Props) {
               `}
               onClick={() => handleRoleClick(null)}
             >
-              <span className="flex items-center gap-1.5">Semua</span>
+              <span className="flex items-center gap-1.5">{t('all')}</span>
             </Badge>
           </div>
 
-          {/* Badge role */}
           {roles.map((role) => {
             const isActive = roleValue === role.value;
             return (

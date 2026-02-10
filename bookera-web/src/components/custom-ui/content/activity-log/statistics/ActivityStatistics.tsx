@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Activity, Calendar, CalendarDays, TrendingUp, Sparkles, Clock, BarChart3 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface ActivityStatisticsProps {
   statistics: {
@@ -13,9 +14,10 @@ interface ActivityStatisticsProps {
 }
 
 export default function ActivityStatistics({ statistics }: ActivityStatisticsProps) {
+  const t = useTranslations('admin.activityLogs');
   const stats = [
     {
-      label: "Hari Ini",
+      label: t('today'),
       value: statistics.today,
       icon: Activity,
       gradient: "from-blue-500 to-cyan-500",
@@ -24,11 +26,11 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
       hoverBorderColor: "group-hover:border-blue-300 dark:group-hover:border-blue-700",
       iconBg: "bg-linear-to-br from-blue-500 to-cyan-500",
       statIcon: Sparkles,
-      statText: "Today's Activity",
-      updatedText: "Real-time data",
+      statText: t('todaysActivity'),
+      updatedText: t('realTimeData'),
     },
     {
-      label: "Minggu Ini",
+      label: t('thisWeek'),
       value: statistics.this_week,
       icon: Calendar,
       gradient: "from-emerald-500 to-teal-500",
@@ -37,11 +39,11 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
       hoverBorderColor: "group-hover:border-emerald-300 dark:group-hover:border-emerald-700",
       iconBg: "bg-linear-to-br from-emerald-500 to-teal-500",
       statIcon: Calendar,
-      statText: "This Week",
-      updatedText: "Last 7 days",
+      statText: t('thisWeek'),
+      updatedText: t('lastSevenDays'),
     },
     {
-      label: "Bulan Ini",
+      label: t('thisMonth'),
       value: statistics.this_month,
       icon: CalendarDays,
       gradient: "from-purple-500 to-pink-500",
@@ -50,11 +52,11 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
       hoverBorderColor: "group-hover:border-purple-300 dark:group-hover:border-purple-700",
       iconBg: "bg-linear-to-br from-purple-500 to-pink-500",
       statIcon: CalendarDays,
-      statText: "Monthly Stats",
-      updatedText: "Current month",
+      statText: t('monthlyStats'),
+      updatedText: t('currentMonth'),
     },
     {
-      label: "Total Aktivitas",
+      label: t('totalActivities'),
       value: statistics.total,
       icon: TrendingUp,
       gradient: "from-orange-500 to-amber-500",
@@ -63,8 +65,8 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
       hoverBorderColor: "group-hover:border-orange-300 dark:group-hover:border-orange-700",
       iconBg: "bg-linear-to-br from-orange-500 to-amber-500",
       statIcon: TrendingUp,
-      statText: "All Activities",
-      updatedText: "Total records",
+      statText: t('allActivities'),
+      updatedText: t('totalRecords'),
     },
   ];
 

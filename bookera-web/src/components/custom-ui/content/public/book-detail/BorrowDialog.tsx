@@ -13,6 +13,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { useState } from "react";
 import { loanService } from "@/services/loan.service";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { BookCopy } from "@/types/book-copy";
 import { format } from "date-fns";
 
@@ -23,6 +24,7 @@ export default function BorrowDialog({
   copy: BookCopy | null;
   onClose: () => void;
 }) {
+  const t = useTranslations('common');
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +32,7 @@ export default function BorrowDialog({
 
   const submit = async () => {
     if (!dueDate) {
-      toast.error("Tanggal pengembalian wajib diisi");
+      toast.error(t('returnDateRequired'));
       return;
     }
 
@@ -44,11 +46,11 @@ export default function BorrowDialog({
         due_date: formattedDate,
       });
 
-      toast.success("Peminjaman berhasil diajukan!");
+      toast.success(t('borrowRequestSubmitted'));
       setDueDate(undefined);
       onClose();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal melakukan peminjaman");
+      toast.error(error.response?.data?.message || t('failedToBorrow'));
     } finally {
       setLoading(false);
     }
@@ -77,7 +79,7 @@ export default function BorrowDialog({
             <DatePicker
               value={dueDate}
               onChange={setDueDate}
-              placeholder="Pilih tanggal pengembalian"
+              placeholder={t('selectReturnDate')}
               dateMode="future"
             />
             <p className="text-xs text-muted-foreground">

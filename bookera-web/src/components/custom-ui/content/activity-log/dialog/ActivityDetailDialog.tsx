@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { activityLogService } from "@/services/activity-log.service";
 import { ActivityLog } from "@/types/activity-log";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { Calendar, Globe, Monitor, User } from "lucide-react";
 
 interface ActivityDetailDialogProps {
@@ -25,6 +26,7 @@ export default function ActivityDetailDialog({
   open,
   onClose,
 }: ActivityDetailDialogProps) {
+  const t = useTranslations('common');
   const [detail, setDetail] = useState<ActivityLog | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -42,7 +44,7 @@ export default function ActivityDetailDialog({
       const response = await activityLogService.show(activityId);
       setDetail(response.data.data);
     } catch (error) {
-      toast.error("Gagal memuat detail activity log");
+      toast.error(t('failedToLoadActivityLogDetail'));
     } finally {
       setLoading(false);
     }

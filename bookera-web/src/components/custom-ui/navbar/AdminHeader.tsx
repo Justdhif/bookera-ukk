@@ -21,8 +21,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Bell, Settings, FileText, Shield } from "lucide-react";
 import { notificationService } from "@/services/notification.service";
+import { useTranslations } from "next-intl";
 
 export default function AdminHeader() {
+  const t = useTranslations('header');
   const pathname = usePathname();
   const router = useRouter();
   const segments = pathname.replace("/admin", "").split("/").filter(Boolean);
@@ -57,7 +59,7 @@ export default function AdminHeader() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin">Dashboard</BreadcrumbLink>
+            <BreadcrumbLink href="/admin">{t('dashboard')}</BreadcrumbLink>
           </BreadcrumbItem>
 
           {segments.map((seg, idx) => {
@@ -92,15 +94,15 @@ export default function AdminHeader() {
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => router.push("/admin/settings")}>
               <Settings className="h-4 w-4 mr-2" />
-              Settings
+              {t('settings')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push("/admin/terms-of-service")}>
               <FileText className="h-4 w-4 mr-2" />
-              Terms of Service
+              {t('termsOfService')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push("/admin/privacy-policy")}>
               <Shield className="h-4 w-4 mr-2" />
-              Privacy Policy
+              {t('privacyPolicy')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

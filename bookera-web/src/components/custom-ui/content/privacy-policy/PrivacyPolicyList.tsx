@@ -25,11 +25,12 @@ export default function PrivacyPolicyList({
   onEdit: (item: PrivacyPolicy) => void;
   onDelete: (id: number) => void;
 }) {
+  const t = useTranslations('common');
   if (data.length === 0) {
     return (
       <EmptyState
-        title="Belum ada Privacy Policy"
-        description="Privacy Policy akan muncul setelah kamu menambahkannya."
+        title={t('noPrivacyPolicyYet')}
+        description={t('noPrivacyPolicyDesc')}
         icon={<Shield className="h-10 w-10" />}
       />
     );

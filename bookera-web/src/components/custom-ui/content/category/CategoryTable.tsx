@@ -32,6 +32,7 @@ import {
   Search,
 } from "lucide-react";
 import { getIconByName } from "@/lib/icons";
+import { useTranslations } from "next-intl";
 
 export default function CategoryTable({
   data,
@@ -42,11 +43,13 @@ export default function CategoryTable({
   onEdit: (category: Category) => void;
   onDelete: (id: number) => void;
 }) {
+  const t = useTranslations('common');
+  
   if (data.length === 0) {
     return (
       <EmptyState
-        title="Belum ada kategori"
-        description="Kategori akan muncul setelah kamu menambahkannya."
+        title={t('noCategories')}
+        description={t('noCategoriesDesc')}
         icon={<FolderOpen className="h-10 w-10" />}
       />
     );

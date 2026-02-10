@@ -21,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { FineType } from "@/types/fine";
 import { fineTypeService } from "@/services/fine.service";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export default function FineTypeFormDialog({
   open,
@@ -33,6 +34,8 @@ export default function FineTypeFormDialog({
   fineType: FineType | null;
   onSuccess: () => void;
 }) {
+  const t = useTranslations('common');
+  const tAdmin = useTranslations('admin.common');
   const [name, setName] = useState("");
   const [type, setType] = useState<"lost" | "damaged" | "late">("lost");
   const [amount, setAmount] = useState("");
@@ -55,7 +58,7 @@ export default function FineTypeFormDialog({
 
   const handleSubmit = async () => {
     if (!name || !amount) {
-      toast.error("Nama dan jumlah harus diisi");
+      toast.error(t('nameAmountRequired'));
       return;
     }
 
@@ -70,10 +73,10 @@ export default function FineTypeFormDialog({
 
       if (fineType) {
         await fineTypeService.update(fineType.id, payload);
-        toast.success("Tipe denda berhasil diperbarui");
+        toast.success(t('fineTypeUpdated'));
       } else {
         await fineTypeService.create(payload);
-        toast.success("Tipe denda berhasil ditambahkan");
+        toast.success(t('fineTypeAdded'));
       }
 
       setOpen(false);
@@ -90,18 +93,18 @@ export default function FineTypeFormDialog({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {fineType ? "Edit Tipe Denda" : "Tambah Tipe Denda"}
+            {fineType ? tAdmin('edit') : tAdmin('add')} {t('fineType')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">
-              Nama Tipe Denda <span className="text-red-500">*</span>
+              {t('fineTypeName')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="name"
-              placeholder="Contoh: Denda Buku Hilang"
+              placeholder={t('fineName')}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -109,38 +112,38 @@ export default function FineTypeFormDialog({
 
           <div className="space-y-2">
             <Label htmlFor="type">
-              Tipe <span className="text-red-500">*</span>
+              {t('fineType')} <span className="text-red-500">*</span>
             </Label>
             <Select value={type} onValueChange={(v: any) => setType(v)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="lost">Hilang</SelectItem>
-                <SelectItem value="damaged">Rusak</SelectItem>
-                <SelectItem value="late">Telat</SelectItem>
+                <SelectItem value="lost">{t('lost')}</SelectItem>
+                <SelectItem value="damaged">{t('damaged')}</SelectItem>
+                <SelectItem value="late">{t('late')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="amount">
-              Jumlah (Rp) <span className="text-red-500">*</span>
+              {t('fineAmountLabel')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="amount"
               type="number"
-              placeholder="100000"
+              placeholder={t('fineAmount')}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="description">{t('bookDescription')}</Label>
             <Textarea
               id="description"
-              placeholder="Deskripsi tipe denda (opsional)"
+              placeholder={t('fineDescOptional')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
@@ -156,11 +159,11 @@ export default function FineTypeFormDialog({
           >
             {isLoading
               ? fineType
-                ? "Menyimpan..."
-                : "Menambahkan..."
+                ? tAdmin('saving')
+                : t('addingFineType')
               : fineType
-                ? "Simpan Perubahan"
-                : "Tambah Tipe Denda"}
+                ? tAdmin('save')
+                : t('addFineType')}
           </Button>
         </div>
       </DialogContent>

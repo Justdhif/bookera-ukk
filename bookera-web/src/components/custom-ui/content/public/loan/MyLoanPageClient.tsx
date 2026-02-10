@@ -79,12 +79,12 @@ export default function MyLoanPageClient() {
       late: { variant: "destructive", label: tStatus("late") },
       lost: {
         variant: "destructive",
-        label: "Lost",
+        label: tStatus("lost"),
         className: "bg-red-100 text-white hover:bg-red-100",
       },
       checking: {
         variant: "secondary",
-        label: "Checking",
+        label: tStatus("checking"),
         className: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
       },
     };

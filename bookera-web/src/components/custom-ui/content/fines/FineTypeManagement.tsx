@@ -7,11 +7,13 @@ import FineTypeTable from "./FineTypeTable";
 import FineTypeFormDialog from "./FineTypeFormDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { FineTypeTableSkeleton } from "./FineTypeTableSkeleton";
 import { Plus } from "lucide-react";
 
 export default function FineTypeManagement() {
+  const t = useTranslations('common');
   const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -23,11 +25,11 @@ export default function FineTypeManagement() {
 
     try {
       await fineTypeService.delete(deleteId);
-      toast.success("Tipe denda berhasil dihapus");
+      toast.success(t('fineTypeDeleted'));
       setDeleteId(null);
       fetchFineTypes();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Gagal menghapus tipe denda");
+      toast.error(err.response?.data?.message || t('failedToDeleteFineType'));
     }
   };
 
@@ -37,7 +39,7 @@ export default function FineTypeManagement() {
       const res = await fineTypeService.getAll();
       setFineTypes(res.data.data);
     } catch (err) {
-      toast.error("Gagal memuat data tipe denda");
+      toast.error(t('failedLoadFineTypes'));
     } finally {
       setLoading(false);
     }
@@ -85,8 +87,8 @@ export default function FineTypeManagement() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Hapus Tipe Denda"
-        description="Tipe denda yang dihapus tidak dapat dikembalikan."
+        title={t('deleteFineType')}
+        description={t('deleteFineTypeWarning')}
         onConfirm={confirmDelete}
       />
 

@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useTranslations } from "next-intl";
 
 type DateMode = "all" | "future" | "past";
 
@@ -27,15 +28,18 @@ interface DatePickerProps {
 export function DatePicker({
   value,
   onChange,
-  placeholder = "Pilih tanggal",
+  placeholder,
   disabled = false,
   dateMode = "all",
   minDate,
   maxDate,
 }: DatePickerProps) {
+  const t = useTranslations('common');
   const [open, setOpen] = React.useState(false);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  const effectivePlaceholder = placeholder || t('selectDatePlaceholder');
 
   const effectiveMinDate = React.useMemo(() => {
     if (minDate) return minDate;
@@ -66,7 +70,7 @@ export function DatePicker({
           disabled={disabled}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {value ? format(value, "PPP") : <span>{placeholder}</span>}
+          {value ? format(value, "PPP") : <span>{effectivePlaceholder}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">

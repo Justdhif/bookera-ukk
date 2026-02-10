@@ -4,6 +4,7 @@ import { useState } from "react";
 import { lostBookService } from "@/services/lost-book.service";
 import { Loan } from "@/types/loan";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,7 @@ export function ReportLostDialog({
   loan,
   onSuccess,
 }: ReportLostDialogProps) {
+  const t = useTranslations('common');
   const [loading, setLoading] = useState(false);
   const [bookCopyId, setBookCopyId] = useState<number | null>(null);
   const [estimatedLostDate, setEstimatedLostDate] = useState<Date | undefined>(
@@ -47,7 +49,7 @@ export function ReportLostDialog({
 
   const handleSubmit = async () => {
     if (!loan || !bookCopyId) {
-      toast.error("Pilih buku yang hilang");
+      toast.error(t('selectLostBook'));
       return;
     }
 
@@ -62,8 +64,7 @@ export function ReportLostDialog({
       });
 
       toast.success(
-        response.data.message ||
-          "Laporan kehilangan buku berhasil dibuat. Denda akan diproses oleh admin."
+        response.data.message || t('lostBookReportCreated')
       );
       onOpenChange(false);
       setBookCopyId(null);
@@ -72,7 +73,7 @@ export function ReportLostDialog({
       onSuccess();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal melaporkan kehilangan buku"
+        error.response?.data?.message || t('failedToReportLostBook')
       );
     } finally {
       setLoading(false);
@@ -85,11 +86,10 @@ export function ReportLostDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-destructive" />
-            Laporkan Kehilangan Buku
+            {t('reportLoss')}
           </DialogTitle>
           <DialogDescription>
-            Laporkan buku yang hilang atau tidak dapat dikembalikan. Denda akan
-            otomatis dibuat sesuai dengan ketentuan yang berlaku.
+            {t('reportLostBookDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -97,14 +97,14 @@ export function ReportLostDialog({
           {/* Book Selection */}
           <div className="space-y-2">
             <Label htmlFor="book-copy">
-              Buku yang Hilang <span className="text-destructive">*</span>
+              {t('selectLostBook')} <span className="text-destructive">*</span>
             </Label>
             <Select
               value={bookCopyId?.toString() || ""}
               onValueChange={(value) => setBookCopyId(parseInt(value))}
             >
               <SelectTrigger id="book-copy">
-                <SelectValue placeholder="Pilih buku yang hilang" />
+                <SelectValue placeholder={t('selectLostBook')} />
               </SelectTrigger>
               <SelectContent>
                 {loan?.loan_details.map((detail) => (
@@ -117,7 +117,7 @@ export function ReportLostDialog({
                         {detail.book_copy.book.title}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        Kode: {detail.book_copy.copy_code}
+                        {t('copyCode')}: {detail.book_copy.copy_code}
                       </span>
                     </div>
                   </SelectItem>
@@ -129,32 +129,31 @@ export function ReportLostDialog({
           {/* Estimated Lost Date */}
           <div className="space-y-2">
             <Label htmlFor="lost-date">
-              Perkiraan Tanggal Hilang (Opsional)
+              {t('estimatedLostDateLabel')}
             </Label>
             <DatePicker
               value={estimatedLostDate}
               onChange={setEstimatedLostDate}
-              placeholder="Pilih tanggal perkiraan hilang"
+              placeholder={t('estimateLostDate')}
               dateMode="past"
             />
             <p className="text-xs text-muted-foreground">
-              Tanggal perkiraan kapan buku hilang (jika diketahui)
+              {t('estimatedLostDateHint')}
             </p>
           </div>
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label htmlFor="notes">Catatan (Opsional)</Label>
+            <Label htmlFor="notes">{t('notesOptional')}</Label>
             <Textarea
               id="notes"
-              placeholder="Jelaskan kronologi atau detail kehilangan buku..."
+              placeholder={t('lostBookNotesPlaceholder')}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={4}
             />
             <p className="text-xs text-muted-foreground">
-              Anda dapat menjelaskan kronologi atau detail terkait kehilangan
-              buku
+              {t('lostBookNotesHint')}
             </p>
           </div>
 

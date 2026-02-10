@@ -26,9 +26,12 @@ import { ArrowLeft, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { DatePicker } from "@/components/ui/date-picker";
 import AvatarUploadModal from "./AvatarUploadModal";
+import { useTranslations } from "next-intl";
 
 export default function AddUserClient() {
   const router = useRouter();
+  const t = useTranslations('admin.users');
+  const tCommon = useTranslations('admin.common');
   const [formData, setFormData] = useState<Partial<CreateUserData>>({
     role: "user",
     is_active: true,
@@ -56,10 +59,10 @@ export default function AddUserClient() {
     try {
       setSubmitting(true);
       await userService.create(formData as CreateUserData);
-      toast.success("User berhasil ditambahkan");
+      toast.success(t('addSuccess'));
       router.push("/admin/users");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal menambahkan user");
+      toast.error(error.response?.data?.message || t('addError'));
     } finally {
       setSubmitting(false);
     }
@@ -79,8 +82,8 @@ export default function AddUserClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Tambah User</h1>
-            <p className="text-muted-foreground">Tambahkan user baru ke sistem</p>
+            <h1 className="text-3xl font-bold">{t('addUser')}</h1>
+            <p className="text-muted-foreground">{t('addUserToSystem')}</p>
           </div>
         </div>
         <Button
@@ -91,7 +94,7 @@ export default function AddUserClient() {
           loading={submitting}
           className="h-8"
         >
-          {submitting ? "Menyimpan..." : "Tambah User"}
+          {submitting ? t('saving') : t('addUser')}
         </Button>
       </div>
 
@@ -101,7 +104,7 @@ export default function AddUserClient() {
           <Card className="lg:col-span-1">
             <CardHeader>
               <CardTitle>Avatar</CardTitle>
-              <CardDescription>Upload foto profil user</CardDescription>
+              <CardDescription>{t('uploadUserPhoto')}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-4">
               <Avatar className="h-32 w-32">
@@ -117,13 +120,13 @@ export default function AddUserClient() {
                 className="w-full"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                Upload Avatar
+                {t('uploadAvatar')}
               </Button>
 
               {/* Role & Status Selects */}
               <div className="space-y-2 w-full">
                 <div className="flex items-center gap-2">
-                  <Label className="text-muted-foreground text-xs w-16">Role:</Label>
+                  <Label className="text-muted-foreground text-xs w-16">{t('role')}:</Label>
                   <Select
                     value={formData.role}
                     onValueChange={(value: any) =>
@@ -133,24 +136,24 @@ export default function AddUserClient() {
                     <SelectTrigger className="h-7 flex-1 text-xs">
                       <SelectValue>
                         {formData.role === "admin"
-                          ? "Admin"
+                          ? t('admin')
                           : formData.role === "officer"
-                            ? "Officer"
+                            ? t('officer')
                             : formData.role === "user"
-                              ? "User"
-                              : "Pilih role"}
+                              ? t('userRole')
+                              : t('selectRole')}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="officer">Officer</SelectItem>
-                      <SelectItem value="user">User</SelectItem>
+                      <SelectItem value="admin">{t('admin')}</SelectItem>
+                      <SelectItem value="officer">{t('officer')}</SelectItem>
+                      <SelectItem value="user">{t('userRole')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Label className="text-muted-foreground text-xs w-16">Status:</Label>
+                  <Label className="text-muted-foreground text-xs w-16">{t('status')}:</Label>
                   <Select
                     value={formData.is_active ? "active" : "inactive"}
                     onValueChange={(value) =>
@@ -162,12 +165,12 @@ export default function AddUserClient() {
                   >
                     <SelectTrigger className="h-7 flex-1 text-xs">
                       <SelectValue>
-                        {formData.is_active ? "Active" : "Inactive"}
+                        {formData.is_active ? t('active') : t('inactive')}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="active">{t('active')}</SelectItem>
+                      <SelectItem value="inactive">{t('inactive')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -178,15 +181,15 @@ export default function AddUserClient() {
           {/* Form Card */}
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle>Informasi User</CardTitle>
+              <CardTitle>{t('userInfo')}</CardTitle>
               <CardDescription>
-                Lengkapi informasi user dengan benar
+                {t('editUserCorrectly')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Account Section */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Akun</h3>
+                <h3 className="font-semibold text-lg">{t('account')}</h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="email">
@@ -200,7 +203,7 @@ export default function AddUserClient() {
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
                       }
-                      placeholder="user@example.com"
+                      placeholder={t('emailPlaceholder')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -215,7 +218,7 @@ export default function AddUserClient() {
                       onChange={(e) =>
                         setFormData({ ...formData, password: e.target.value })
                       }
-                      placeholder="Minimal 8 karakter"
+                      placeholder={t('minPassword')}
                     />
                   </div>
                 </div>
@@ -223,11 +226,11 @@ export default function AddUserClient() {
 
               {/* Profile Section */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Profil</h3>
+                <h3 className="font-semibold text-lg">{t('profile')}</h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="full_name">
-                      Nama Lengkap <span className="text-red-500">*</span>
+                      {t('namePlaceholder')} <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="full_name"
@@ -236,12 +239,12 @@ export default function AddUserClient() {
                       onChange={(e) =>
                         setFormData({ ...formData, full_name: e.target.value })
                       }
-                      placeholder="John Doe"
+                      placeholder={t('namePlaceholder')}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="identification_number">
-                      Nomor Identitas
+                      {t('identificationNumber')}
                     </Label>
                     <Input
                       id="identification_number"
@@ -252,11 +255,11 @@ export default function AddUserClient() {
                           identification_number: e.target.value,
                         })
                       }
-                      placeholder="SIS-001"
+                      placeholder={t('idNumberPlaceholder')}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone_number">Nomor Telepon</Label>
+                    <Label htmlFor="phone_number">{t('phoneNumber')}</Label>
                     <Input
                       id="phone_number"
                       value={formData.phone_number || ""}
@@ -266,11 +269,11 @@ export default function AddUserClient() {
                           phone_number: e.target.value,
                         })
                       }
-                      placeholder="08123456789"
+                      placeholder={t('phonePlaceholder')}
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="gender">Jenis Kelamin</Label>
+                    <Label htmlFor="gender">{t('gender')}</Label>
                     <Select
                       value={formData.gender || ""}
                       onValueChange={(value: any) =>
@@ -278,19 +281,19 @@ export default function AddUserClient() {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Pilih jenis kelamin" />
+                        <SelectValue placeholder={t('selectGender')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="male">Laki-laki</SelectItem>
-                        <SelectItem value="female">Perempuan</SelectItem>
+                        <SelectItem value="male">{t('male')}</SelectItem>
+                        <SelectItem value="female">{t('female')}</SelectItem>
                         <SelectItem value="prefer_not_to_say">
-                          Tidak ingin menyebutkan
+                          {t('preferNotToSay')}
                         </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="birth_date">Tanggal Lahir</Label>
+                    <Label htmlFor="birth_date">{t('birthDate')}</Label>
                     <DatePicker
                       value={
                         formData.birth_date ? new Date(formData.birth_date + 'T00:00:00') : undefined
@@ -311,23 +314,23 @@ export default function AddUserClient() {
                           });
                         }
                       }}
-                      placeholder="Pilih tanggal lahir"
+                      placeholder={t('selectBirthDate')}
                       dateMode="past"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="occupation">Pekerjaan</Label>
+                    <Label htmlFor="occupation">{t('occupation')}</Label>
                     <Input
                       id="occupation"
                       value={formData.occupation || ""}
                       onChange={(e) =>
                         setFormData({ ...formData, occupation: e.target.value })
                       }
-                      placeholder="Siswa"
+                      placeholder={t('occupationPlaceholder')}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="institution">Institusi</Label>
+                    <Label htmlFor="institution">{t('class')}</Label>
                     <Input
                       id="institution"
                       value={formData.institution || ""}
@@ -337,30 +340,30 @@ export default function AddUserClient() {
                           institution: e.target.value,
                         })
                       }
-                      placeholder="XII RPL 1"
+                      placeholder={t('classPlaceholder')}
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="address">Alamat</Label>
+                    <Label htmlFor="address">{t('address')}</Label>
                     <Textarea
                       id="address"
                       value={formData.address || ""}
                       onChange={(e) =>
                         setFormData({ ...formData, address: e.target.value })
                       }
-                      placeholder="Alamat lengkap"
+                      placeholder={t('addressPlaceholder')}
                       rows={2}
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="bio">Bio</Label>
+                    <Label htmlFor="bio">{t('bio')}</Label>
                     <Textarea
                       id="bio"
                       value={formData.bio || ""}
                       onChange={(e) =>
                         setFormData({ ...formData, bio: e.target.value })
                       }
-                      placeholder="Bio singkat"
+                      placeholder={t('bioPlaceholder')}
                       rows={3}
                     />
                   </div>

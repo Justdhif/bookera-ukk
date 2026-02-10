@@ -14,6 +14,7 @@ import { Category } from "@/types/category";
 import { categoryService } from "@/services/category.service";
 import { toast } from "sonner";
 import IconPicker from "@/components/custom-ui/IconPicker";
+import { useTranslations } from "next-intl";
 
 export default function CategoryFormDialog({
   open,
@@ -26,6 +27,8 @@ export default function CategoryFormDialog({
   category: Category | null;
   onSuccess: () => void;
 }) {
+  const t = useTranslations('common');
+  const tAdmin = useTranslations('admin.common');
   const [name, setName] = useState("");
   const [icon, setIcon] = useState<string>("");
   const [description, setDescription] = useState("");
@@ -46,14 +49,14 @@ export default function CategoryFormDialog({
           icon: icon || undefined,
           description,
         });
-        toast.success("Kategori berhasil diperbarui");
+        toast.success(t('categoryUpdated'));
       } else {
         await categoryService.create({
           name,
           icon: icon || undefined,
           description,
         });
-        toast.success("Kategori berhasil ditambahkan");
+        toast.success(t('categoryAdded'));
       }
 
       // Reset form inputs setelah berhasil
@@ -64,7 +67,7 @@ export default function CategoryFormDialog({
       onSuccess();
       setIsLoading(false);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Terjadi kesalahan");
+      toast.error(err.response?.data?.message || t('errorOccurred'));
       setIsLoading(false);
     }
   };
@@ -74,27 +77,27 @@ export default function CategoryFormDialog({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {category ? "Edit Kategori" : "Tambah Kategori"}
+            {category ? tAdmin('edit') : tAdmin('add')} Kategori
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nama Kategori <span className="text-red-500">*</span></Label>
+              <Label htmlFor="name">{t('categoryName')} <span className="text-red-500">*</span></Label>
               <Input
                 id="name"
-                placeholder="Nama kategori"
+                placeholder={t('categoryName')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Deskripsi</Label>
+              <Label htmlFor="description">{t('bookDescription')}</Label>
               <Input
                 id="description"
-                placeholder="Deskripsi kategori (opsional)"
+                placeholder={t('categoryDesc')}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -116,11 +119,11 @@ export default function CategoryFormDialog({
           >
             {isLoading
               ? category
-                ? "Menyimpan..."
-                : "Menambahkan..."
+                ? tAdmin('saving')
+                : t('addingCategory')
               : category
-                ? "Simpan Perubahan"
-                : "Tambah Kategori"}
+                ? tAdmin('save')
+                : t('addCategory')}
           </Button>
         </div>
       </DialogContent>

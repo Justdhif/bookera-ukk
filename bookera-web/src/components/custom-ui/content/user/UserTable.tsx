@@ -15,6 +15,7 @@ import { User } from "@/types/user";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Users, Eye, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface Props {
   data: User[];
@@ -23,12 +24,14 @@ interface Props {
 
 export default function UserTable({ data, onDelete }: Props) {
   const router = useRouter();
+  const t = useTranslations('admin.users');
+  const tCommon = useTranslations('admin.common');
 
   if (data.length === 0) {
     return (
       <EmptyState
-        title="Belum ada user"
-        description="User akan muncul setelah kamu menambahkannya."
+        title={t('noUsers')}
+        description={t('noUsersDesc')}
         icon={<Users className="h-10 w-10" />}
       />
     );
@@ -42,7 +45,7 @@ export default function UserTable({ data, onDelete }: Props) {
     };
     return (
       <Badge className={variants[role as keyof typeof variants]}>
-        {role === "officer" ? "PETUGAS" : role.toUpperCase()}
+        {role === "officer" ? t('officer').toUpperCase() : role.toUpperCase()}
       </Badge>
     );
   };
@@ -53,12 +56,12 @@ export default function UserTable({ data, onDelete }: Props) {
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="w-16 text-center font-semibold">#</TableHead>
-            <TableHead className="font-semibold">User</TableHead>
-            <TableHead className="font-semibold">Email</TableHead>
-            <TableHead className="font-semibold">Role</TableHead>
-            <TableHead className="font-semibold">Pekerjaan</TableHead>
-            <TableHead className="font-semibold">Status</TableHead>
-            <TableHead className="font-semibold text-right pr-6">Aksi</TableHead>
+            <TableHead className="font-semibold">{t('user')}</TableHead>
+            <TableHead className="font-semibold">{t('email')}</TableHead>
+            <TableHead className="font-semibold">{t('role')}</TableHead>
+            <TableHead className="font-semibold">{t('occupation')}</TableHead>
+            <TableHead className="font-semibold">{t('status')}</TableHead>
+            <TableHead className="font-semibold text-right pr-6">{tCommon('actions')}</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -115,7 +118,7 @@ export default function UserTable({ data, onDelete }: Props) {
                       : "bg-gray-500 hover:bg-gray-600"
                   }
                 >
-                  {item.is_active ? "Aktif" : "Nonaktif"}
+                  {item.is_active ? tCommon('active') : tCommon('inactive')}
                 </Badge>
               </TableCell>
 
@@ -132,7 +135,7 @@ export default function UserTable({ data, onDelete }: Props) {
                     className="h-8 gap-1"
                   >
                     <Eye className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Detail</span>
+                    <span className="hidden sm:inline">{tCommon('view')}</span>
                   </Button>
 
                   <Button
@@ -142,7 +145,7 @@ export default function UserTable({ data, onDelete }: Props) {
                     className="h-8 gap-1"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Hapus</span>
+                    <span className="hidden sm:inline">{tCommon('delete')}</span>
                   </Button>
                 </div>
               </TableCell>

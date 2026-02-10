@@ -42,6 +42,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DatePicker } from "@/components/ui/date-picker";
+import { useTranslations } from "next-intl";
 
 interface AdminBorrowDialogProps {
   open: boolean;
@@ -54,6 +55,7 @@ export function AdminBorrowDialog({
   onOpenChange,
   onSuccess,
 }: AdminBorrowDialogProps) {
+  const t = useTranslations('common');
   const [loading, setLoading] = useState(false);
   const [books, setBooks] = useState<Book[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -88,7 +90,7 @@ export function AdminBorrowDialog({
       const booksData = response.data.data?.data || response.data.data;
       setBooks(Array.isArray(booksData) ? booksData : []);
     } catch (error: any) {
-      toast.error("Gagal memuat daftar buku");
+      toast.error(t('failedToLoadBookList'));
       setBooks([]);
     }
   };
@@ -99,24 +101,24 @@ export function AdminBorrowDialog({
       const usersData = response.data.data;
       setUsers(Array.isArray(usersData) ? usersData : []);
     } catch (error: any) {
-      toast.error("Gagal memuat daftar user");
+      toast.error(t('failedToLoadUserList'));
       setUsers([]);
     }
   };
 
   const handleSubmit = async () => {
     if (!selectedUser) {
-      toast.error("Pilih user yang akan meminjam");
+      toast.error(t('selectUserToBorrow'));
       return;
     }
 
     if (selectedCopies.length === 0) {
-      toast.error("Pilih minimal 1 copy buku untuk dipinjam");
+      toast.error(t('selectAtLeastOneBookCopy'));
       return;
     }
 
     if (!dueDate) {
-      toast.error("Pilih tanggal jatuh tempo");
+      toast.error(t('selectDueDate'));
       return;
     }
 
@@ -128,8 +130,7 @@ export function AdminBorrowDialog({
         due_date: dueDate.toISOString().split("T")[0],
       });
       toast.success(
-        response.data.message ||
-          "Peminjaman berhasil dibuat dengan status approved & borrowed",
+        response.data.message || t('loanCreatedSuccessfully')
       );
       onOpenChange(false);
       setSelectedUser(null);
@@ -138,7 +139,7 @@ export function AdminBorrowDialog({
       setDueDate(undefined);
       onSuccess();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal membuat peminjaman");
+      toast.error(error.response?.data?.message || t('failedToCreateLoan'));
     } finally {
       setLoading(false);
     }
@@ -180,11 +181,10 @@ export function AdminBorrowDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5" />
-            Request Peminjaman Langsung (Admin)
+            {t('requestLoan')} {t('admin')} (Admin)
           </DialogTitle>
           <DialogDescription>
-            Buat peminjaman untuk user yang datang langsung ke perpustakaan.
-            Status akan otomatis approved & borrowed.
+            {t('createLoanDirectly')}
           </DialogDescription>
         </DialogHeader>
 
@@ -193,7 +193,7 @@ export function AdminBorrowDialog({
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <UserIcon className="h-4 w-4" />
-              Pilih User Peminjam
+              {t('selectUser')}
             </Label>
             <Popover open={userPopoverOpen} onOpenChange={setUserPopoverOpen}>
               <PopoverTrigger asChild>
@@ -204,15 +204,15 @@ export function AdminBorrowDialog({
                   className="w-full justify-between"
                 >
                   <span className="truncate">
-                    {selectedUser ? getSelectedUserName() : "Pilih user..."}
+                    {selectedUser ? getSelectedUserName() : t('searchUser')}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0">
                 <Command>
-                  <CommandInput placeholder="Cari user..." />
-                  <CommandEmpty>Tidak ada user ditemukan.</CommandEmpty>
+                  <CommandInput placeholder={t('searchUser')} />
+                  <CommandEmpty>{t('userNotFound')}</CommandEmpty>
                   <CommandList>
                     <CommandGroup>
                       {Array.isArray(users) &&
@@ -256,7 +256,7 @@ export function AdminBorrowDialog({
 
           {/* Book Selection */}
           <div className="space-y-2">
-            <Label>Pilih Buku</Label>
+            <Label>{t('selectBook')}</Label>
             <Popover open={bookPopoverOpen} onOpenChange={setBookPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -266,15 +266,15 @@ export function AdminBorrowDialog({
                   className="w-full justify-between"
                 >
                   <span className="truncate">
-                    {selectedBook ? selectedBook.title : "Pilih buku..."}
+                    {selectedBook ? selectedBook.title : t('selectBookPlaceholder')}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0">
                 <Command>
-                  <CommandInput placeholder="Cari buku..." />
-                  <CommandEmpty>Tidak ada buku ditemukan.</CommandEmpty>
+                  <CommandInput placeholder={t('searchBookPlaceholder')} />
+                  <CommandEmpty>{t('noBookFound')}</CommandEmpty>
                   <CommandList>
                     <CommandGroup>
                       {Array.isArray(books) &&
@@ -337,7 +337,7 @@ export function AdminBorrowDialog({
           {/* Book Copies Selection (Checkbox) */}
           {selectedBook && availableCopies.length > 0 && (
             <div className="space-y-2">
-              <Label>Pilih Copy Buku ({availableCopies.length} tersedia)</Label>
+              <Label>{t('selectBookCopies', { count: availableCopies.length })}</Label>
               <div className="border rounded-md p-4 space-y-3 max-h-50 overflow-y-auto">
                 {availableCopies.map((copy) => (
                   <div key={copy.id} className="flex items-center space-x-3">
@@ -353,7 +353,7 @@ export function AdminBorrowDialog({
                       <div>
                         <span>{copy.copy_code}</span>
                         <span className="ml-2 text-xs text-green-600 font-medium">
-                          • Tersedia
+                          • {t('available')}
                         </span>
                       </div>
                     </label>
@@ -366,7 +366,7 @@ export function AdminBorrowDialog({
           {/* Selected Copies Display */}
           {selectedCopies.length > 0 && (
             <div className="space-y-2">
-              <Label>Copy yang Dipilih ({selectedCopies.length})</Label>
+              <Label>{t('selectedCopies', { count: selectedCopies.length })}</Label>
               <div className="flex flex-wrap gap-2">
                 {getSelectedCopyNames().map((name, index) => (
                   <Badge
@@ -389,15 +389,15 @@ export function AdminBorrowDialog({
 
           {/* Due Date */}
           <div className="space-y-2">
-            <Label>Tanggal Jatuh Tempo</Label>
+            <Label>{t('dueDate')}</Label>
             <DatePicker
               value={dueDate}
               onChange={setDueDate}
-              placeholder="Pilih tanggal jatuh tempo"
+              placeholder={t('selectDueDatePlaceholder')}
               dateMode="future"
             />
             <p className="text-xs text-muted-foreground">
-              Pilih tanggal hari ini atau kedepan untuk jatuh tempo pengembalian
+              {t('selectDueDateHint')}
             </p>
           </div>
         </div>

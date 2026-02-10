@@ -14,11 +14,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { FineTableSkeleton } from "./FineTableSkeleton";
 import { Search } from "lucide-react";
 
 export default function FineManagement() {
+  const t = useTranslations('common');
   const [fines, setFines] = useState<Fine[]>([]);
   const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -31,11 +33,11 @@ export default function FineManagement() {
 
     try {
       await fineService.delete(deleteId);
-      toast.success("Denda berhasil dihapus");
+      toast.success(t('fineDeleted'));
       setDeleteId(null);
       fetchFines();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Gagal menghapus denda");
+      toast.error(err.response?.data?.message || t('failedLoadFines'));
     }
   };
 
@@ -53,7 +55,7 @@ export default function FineManagement() {
       const res = await fineService.getAll(params);
       setFines(res.data.data);
     } catch (err) {
-      toast.error("Gagal memuat data denda");
+      toast.error(t('failedLoadFines'));
     } finally {
       setLoading(false);
     }
@@ -80,20 +82,20 @@ export default function FineManagement() {
   const handleMarkAsPaid = async (id: number) => {
     try {
       await fineService.markAsPaid(id);
-      toast.success("Denda berhasil ditandai sebagai sudah dibayar");
+      toast.success(t('fineMarkedPaid'));
       fetchFines();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Gagal memproses pembayaran");
+      toast.error(err.response?.data?.message || t('failedToProcessPayment'));
     }
   };
 
   const handleWaive = async (id: number) => {
     try {
       await fineService.waive(id);
-      toast.success("Denda berhasil dibatalkan");
+      toast.success(t('fineCancelled'));
       fetchFines();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Gagal membatalkan denda");
+      toast.error(err.response?.data?.message || t('failedToWaiveFine'));
     }
   };
 
@@ -112,7 +114,7 @@ export default function FineManagement() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari denda..."
+            placeholder={t('searchFines')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -144,8 +146,8 @@ export default function FineManagement() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Hapus Denda"
-        description="Denda yang dihapus tidak dapat dikembalikan."
+        title={t('deleteFine')}
+        description={t('deleteFineWarning')}
         onConfirm={confirmDelete}
       />
     </div>

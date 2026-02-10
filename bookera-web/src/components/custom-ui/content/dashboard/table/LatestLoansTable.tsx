@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { LatestLoan } from "@/types/dashboard";
 import { BookOpen, Calendar, User } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface LatestLoansTableProps {
   data: LatestLoan[];
@@ -36,6 +37,7 @@ const statusColorMap: Record<string, string> = {
 };
 
 export default function LatestLoansTable({ data }: LatestLoansTableProps) {
+  const t = useTranslations('admin.dashboard');
   const hasData = data && data.length > 0;
 
   return (
@@ -43,7 +45,7 @@ export default function LatestLoansTable({ data }: LatestLoansTableProps) {
       <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
         <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <div className="w-1 h-6 bg-linear-to-b from-purple-500 to-pink-500 rounded-full" />
-          Peminjaman Terbaru
+          {t('latestLoans')}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -53,16 +55,16 @@ export default function LatestLoansTable({ data }: LatestLoansTableProps) {
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-gray-100 dark:border-gray-800">
                   <TableHead className="font-semibold text-gray-700 dark:text-gray-300">
-                    Peminjam
+                    {t('borrower')}
                   </TableHead>
                   <TableHead className="font-semibold text-gray-700 dark:text-gray-300">
-                    Buku
+                    {t('book')}
                   </TableHead>
                   <TableHead className="font-semibold text-gray-700 dark:text-gray-300">
-                    Tanggal Pinjam
+                    {t('loanDate')}
                   </TableHead>
                   <TableHead className="font-semibold text-gray-700 dark:text-gray-300">
-                    Status
+                    {t('status')}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -92,7 +94,7 @@ export default function LatestLoansTable({ data }: LatestLoansTableProps) {
                         <BookOpen className="h-4 w-4 text-emerald-500" />
                         <span className="text-sm text-gray-700 dark:text-gray-300">
                           {loan.loan_details?.[0]?.book_copy?.book?.title ||
-                            `${loan.loan_details?.length || 0} buku`}
+                            `${loan.loan_details?.length || 0} ${t('books')}`}
                         </span>
                       </div>
                     </TableCell>
@@ -121,7 +123,7 @@ export default function LatestLoansTable({ data }: LatestLoansTableProps) {
           </div>
         ) : (
           <div className="flex items-center justify-center h-75 text-muted-foreground">
-            Tidak ada data peminjaman
+            {t('noLoansData')}
           </div>
         )}
       </CardContent>

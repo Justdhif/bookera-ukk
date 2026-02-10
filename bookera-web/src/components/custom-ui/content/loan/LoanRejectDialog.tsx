@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { useTranslations } from "next-intl";
 
 interface LoanRejectDialogProps {
   open: boolean;
@@ -26,6 +27,7 @@ export function LoanRejectDialog({
   onOpenChange,
   onConfirm,
 }: LoanRejectDialogProps) {
+  const t = useTranslations('common');
   const [rejectionReason, setRejectionReason] = useState("");
 
   const handleConfirm = () => {
@@ -42,28 +44,28 @@ export function LoanRejectDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Tolak Peminjaman</AlertDialogTitle>
+          <AlertDialogTitle>{t('rejectLoan')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Anda akan menolak peminjaman #{loan?.id} dari {loan?.user?.email}
+            {t('rejectLoanDescription')} #{loan?.id} {t('from')} {loan?.user?.email}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="space-y-2">
-          <Label htmlFor="rejection-reason">Alasan Penolakan (opsional)</Label>
+          <Label htmlFor="rejection-reason">{t('rejectReasonOptional')}</Label>
           <Textarea
             id="rejection-reason"
-            placeholder="Masukkan alasan penolakan..."
+            placeholder={t('rejectReason')}
             value={rejectionReason}
             onChange={(e) => setRejectionReason(e.target.value)}
             rows={4}
           />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancel}>Batal</AlertDialogCancel>
+          <AlertDialogCancel onClick={handleCancel}>{t('cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            Tolak Peminjaman
+            {t('rejectLoan')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

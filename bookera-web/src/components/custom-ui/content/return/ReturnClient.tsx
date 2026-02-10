@@ -13,8 +13,10 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import { Input } from "@/components/ui/input";
 import { ReturnCard } from "./ReturnCard";
 import { ReturnSkeletonCard } from "./ReturnSkeletonCard";
+import { useTranslations } from "next-intl";
 
 export default function ReturnClient() {
+  const t = useTranslations('admin.returns');
   const [allLoans, setAllLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
@@ -34,7 +36,7 @@ export default function ReturnClient() {
       );
       setAllLoans(filteredLoans);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal memuat data");
+      toast.error(error.response?.data?.message || t('loadError'));
     } finally {
       setLoading(false);
     }
@@ -60,20 +62,20 @@ export default function ReturnClient() {
         const lostBookId = loan.lost_books[0].id;
         const response = await lostBookService.finish(lostBookId);
         toast.success(
-          response.data.message || "Proses buku hilang berhasil diselesaikan. Status peminjaman diubah menjadi lost.",
+          response.data.message || t('lostBookProcessComplete'),
         );
       } else {
         // Normal return approval - updates loan status to "returned"
         const response = await bookReturnService.approveReturn(returnId);
         toast.success(
-          response.data.message || "Pengembalian berhasil diselesaikan",
+          response.data.message || t('completeSuccess'),
         );
       }
       
       fetchAllData();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal menyelesaikan pengembalian",
+        error.response?.data?.message || t('completeError'),
       );
     } finally {
       setActionLoading(null);
@@ -85,8 +87,8 @@ export default function ReturnClient() {
       return (
         <EmptyState
           icon={<PackageCheck className="h-16 w-16" />}
-          title="Belum ada pengembalian"
-          description="Belum ada data pengembalian buku yang dapat ditampilkan"
+          title={t('noReturnsYet')}
+          description={t('noReturnsDesc')}
         />
       );
     }
@@ -126,9 +128,9 @@ export default function ReturnClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">Return Management</h1>
+          <h1 className="text-3xl font-bold">{t('returnManagement')}</h1>
           <p className="text-muted-foreground">
-            Kelola pengembalian buku dan approval
+            {t('manageReturnApproval')}
           </p>
         </div>
       </div>
@@ -138,7 +140,7 @@ export default function ReturnClient() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari berdasarkan ID, nama peminjam, atau judul buku..."
+            placeholder={t('searchReturnUserTitle')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -147,27 +149,27 @@ export default function ReturnClient() {
         </div>
         <Button onClick={handleSearch} variant="secondary">
           <Search className="h-4 w-4 mr-2" />
-          Cari
+          {t('search')}
         </Button>
       </div>
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">Semua ({allLoans.length})</TabsTrigger>
+          <TabsTrigger value="all">{t('allReturns')} ({allLoans.length})</TabsTrigger>
           <TabsTrigger value="checking">
-            Checking ({checkingLoans.length})
+            {t('checking')} ({checkingLoans.length})
           </TabsTrigger>
           <TabsTrigger value="returned">
-            Returned ({returnedLoans.length})
+            {t('returned')} ({returnedLoans.length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">Semua Pengembalian</h2>
+              <h2 className="text-2xl font-bold">{t('allReturns')}</h2>
               <p className="text-muted-foreground">
-                Daftar semua pengembalian buku
+                {t('noReturnsDesc')}
               </p>
             </div>
             {loading ? (
@@ -185,9 +187,9 @@ export default function ReturnClient() {
         <TabsContent value="checking" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">Checking</h2>
+              <h2 className="text-2xl font-bold">{t('checking')}</h2>
               <p className="text-muted-foreground">
-                Pengembalian yang sedang di-check
+                {t('checkingReturnsDesc')}
               </p>
             </div>
             {loading ? (
@@ -205,9 +207,9 @@ export default function ReturnClient() {
         <TabsContent value="returned" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">Returned</h2>
+              <h2 className="text-2xl font-bold">{t('returned')}</h2>
               <p className="text-muted-foreground">
-                Pengembalian yang sudah di-approve
+                {t('returnedDesc')}
               </p>
             </div>
             {loading ? (

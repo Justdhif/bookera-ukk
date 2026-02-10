@@ -28,6 +28,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface BookDetailFormProps {
   book: Book;
@@ -44,40 +45,42 @@ export default function BookDetailForm({
   setFormData,
   categories,
 }: BookDetailFormProps) {
+  const t = useTranslations('common');
+
   if (!isEditMode) {
     return (
       <Card className="lg:col-span-2">
         <CardHeader>
-          <CardTitle>Informasi Buku</CardTitle>
-          <CardDescription>Detail lengkap buku</CardDescription>
+          <CardTitle>{t('bookInfo')}</CardTitle>
+          <CardDescription>{t('detailsBookComplete')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Basic Information */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-lg">Informasi Dasar</h3>
+            <h3 className="font-semibold text-lg">{t('basicInfo')}</h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-sm text-muted-foreground">Judul</p>
+                <p className="text-sm text-muted-foreground">{t('title')}</p>
                 <p className="font-medium">{book.title}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Penulis</p>
+                <p className="text-sm text-muted-foreground">{t('author')}</p>
                 <p className="font-medium">{book.author}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Penerbit</p>
+                <p className="text-sm text-muted-foreground">{t('publisher')}</p>
                 <p className="font-medium">{book.publisher || "-"}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Tahun Terbit</p>
+                <p className="text-sm text-muted-foreground">{t('publicationYear')}</p>
                 <p className="font-medium">{book.publication_year || "-"}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">ISBN</p>
+                <p className="text-sm text-muted-foreground">{t('isbn')}</p>
                 <p className="font-medium">{book.isbn || "-"}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Bahasa</p>
+                <p className="text-sm text-muted-foreground">{t('language')}</p>
                 <p className="font-medium">{book.language || "-"}</p>
               </div>
               <div>
@@ -85,7 +88,7 @@ export default function BookDetailForm({
                 <p className="font-medium font-mono text-sm">{book.slug}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total Salinan</p>
+                <p className="text-sm text-muted-foreground">{t('totalCopies')}</p>
                 <p className="font-medium">{book.copies?.length || 0}</p>
               </div>
             </div>
@@ -93,7 +96,7 @@ export default function BookDetailForm({
 
           {/* Categories */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-lg">Kategori</h3>
+            <h3 className="font-semibold text-lg">{t('selectCategory')}</h3>
             {book.categories && book.categories.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {book.categories.map((category) => (
@@ -103,15 +106,15 @@ export default function BookDetailForm({
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground">Tidak ada kategori</p>
+              <p className="text-muted-foreground">{t('noCategory')}</p>
             )}
           </div>
 
           {/* Description */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-lg">Deskripsi</h3>
+            <h3 className="font-semibold text-lg">{t('bookDescription')}</h3>
             <p className="whitespace-pre-line text-muted-foreground leading-relaxed">
-              {book.description || "Tidak ada deskripsi tersedia"}
+              {book.description || t('noDescription')}
             </p>
           </div>
         </CardContent>
@@ -122,18 +125,18 @@ export default function BookDetailForm({
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
-        <CardTitle>Edit Informasi Buku</CardTitle>
+        <CardTitle>{t('editBookInfo')}</CardTitle>
         <CardDescription>
-          Perbarui informasi buku
+          {t('updateBookInfo')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Basic Information */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Informasi Dasar</h3>
+          <h3 className="font-semibold text-lg">{t('basicInfo')}</h3>
           <div className="space-y-2">
             <Label htmlFor="title">
-              Judul <span className="text-red-500">*</span>
+              {t('title')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="title"
@@ -142,13 +145,13 @@ export default function BookDetailForm({
               onChange={(e) =>
                 setFormData({ ...formData, title: e.target.value })
               }
-              placeholder="Masukkan judul buku"
+              placeholder={t('enterTitle')}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="author">
-              Penulis <span className="text-red-500">*</span>
+              {t('author')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="author"
@@ -157,25 +160,25 @@ export default function BookDetailForm({
               onChange={(e) =>
                 setFormData({ ...formData, author: e.target.value })
               }
-              placeholder="Masukkan nama penulis"
+              placeholder={t('enterAuthor')}
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="publisher">Penerbit</Label>
+              <Label htmlFor="publisher">{t('publisher')}</Label>
               <Input
                 id="publisher"
                 value={formData.publisher || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, publisher: e.target.value })
                 }
-                placeholder="Nama penerbit"
+                placeholder={t('publisherName')}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="publication_year">Tahun Terbit</Label>
+              <Label htmlFor="publication_year">{t('publicationYear')}</Label>
               <Input
                 id="publication_year"
                 type="number"
@@ -195,26 +198,26 @@ export default function BookDetailForm({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="isbn">ISBN</Label>
+              <Label htmlFor="isbn">{t('isbn')}</Label>
               <Input
                 id="isbn"
                 value={formData.isbn || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, isbn: e.target.value })
                 }
-                placeholder="Nomor ISBN"
+                placeholder={t('isbnNumber')}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="language">Bahasa</Label>
+              <Label htmlFor="language">{t('language')}</Label>
               <Input
                 id="language"
                 value={formData.language || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, language: e.target.value })
                 }
-                placeholder="Contoh: Indonesia, English"
+                placeholder={t('languageExample')}
               />
             </div>
           </div>
@@ -222,9 +225,9 @@ export default function BookDetailForm({
 
         {/* Categories */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Kategori</h3>
+          <h3 className="font-semibold text-lg">{t('selectCategory')}</h3>
           <div className="space-y-2">
-            <Label>Pilih Kategori</Label>
+            <Label>{t('selectCategory')}</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -233,13 +236,13 @@ export default function BookDetailForm({
                   className="w-full justify-start text-left font-normal"
                 >
                   {formData.category_ids && formData.category_ids.length > 0
-                    ? `${formData.category_ids.length} kategori dipilih`
-                    : "Pilih kategori..."}
+                    ? `${formData.category_ids.length} ${t('categoriesSelected')}`
+                    : t('selectPlaceholder')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0" align="start">
                 <Command>
-                  <CommandEmpty>Kategori tidak ditemukan</CommandEmpty>
+                  <CommandEmpty>{t('categoryNotFound')}</CommandEmpty>
                   <CommandGroup>
                     {categories.map((cat) => (
                       <CommandItem
@@ -294,16 +297,16 @@ export default function BookDetailForm({
 
         {/* Description */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Deskripsi</h3>
+          <h3 className="font-semibold text-lg">{t('bookDescription')}</h3>
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi Buku</Label>
+            <Label htmlFor="description">{t('bookDescription')}</Label>
             <Textarea
               id="description"
               value={formData.description || ""}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              placeholder="Masukkan deskripsi atau sinopsis buku"
+              placeholder={t('enterDescription')}
               rows={4}
               className="resize-none"
             />

@@ -140,7 +140,7 @@ export default function PublicHeader() {
           <form onSubmit={handleSearch} className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Cari buku..."
+              placeholder={t('placeholder')}
               className="pl-10 pr-4 h-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

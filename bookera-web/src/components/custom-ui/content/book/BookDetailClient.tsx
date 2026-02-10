@@ -14,8 +14,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Save, X, Edit2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export default function BookDetailClient() {
+  const t = useTranslations('common');
   const router = useRouter();
   const params = useParams();
   const slug = params.slug as string;
@@ -60,7 +62,7 @@ export default function BookDetailClient() {
       });
       setCoverPreview(res.data.data.cover_image_url || "");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal mengambil data buku");
+      toast.error(error.response?.data?.message || t('failedToLoadBookData'));
       router.push("/admin/books");
     } finally {
       setLoading(false);
@@ -99,11 +101,11 @@ export default function BookDetailClient() {
       }
 
       await bookService.update(book.id, data);
-      toast.success("Buku berhasil diupdate");
+      toast.success(t('bookUpdated'));
       setIsEditMode(false);
       fetchBook();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal mengupdate buku");
+      toast.error(error.response?.data?.message || t('failedToUpdateBook'));
     } finally {
       setSubmitting(false);
     }
@@ -140,8 +142,8 @@ export default function BookDetailClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Detail Buku</h1>
-            <p className="text-muted-foreground">Memuat data buku...</p>
+            <h1 className="text-3xl font-bold">{t('bookDetail')}</h1>
+            <p className="text-muted-foreground">{t('loadingBookData')}</p>
           </div>
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
@@ -167,9 +169,9 @@ export default function BookDetailClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Detail Buku</h1>
+            <h1 className="text-3xl font-bold">{t('bookDetail')}</h1>
             <p className="text-muted-foreground">
-              {isEditMode ? "Edit informasi buku" : "Lihat detail buku"}
+              {isEditMode ? t('editBookInfo') : t('viewBookDetail')}
             </p>
           </div>
         </div>
@@ -193,7 +195,7 @@ export default function BookDetailClient() {
               loading={submitting}
               className="h-8"
             >
-              {submitting ? "Menyimpan..." : "Simpan Perubahan"}
+              {submitting ? t('saving') : t('saveChanges')}
             </Button>
           </div>
         ) : (
@@ -203,7 +205,7 @@ export default function BookDetailClient() {
             className="h-8 gap-1"
           >
             <Edit2 className="h-3.5 w-3.5" />
-            Edit Buku
+            {t('editBook')}
           </Button>
         )}
       </div>

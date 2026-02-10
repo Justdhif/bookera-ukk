@@ -10,8 +10,10 @@ import { toast } from "sonner";
 import { TermsOfServiceListSkeleton } from "./TermsOfServiceListSkeleton";
 import { Plus } from "lucide-react";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
+import { useTranslations } from "next-intl";
 
 export default function TermsOfServiceClient() {
+  const t = useTranslations('admin.termsOfService');
   const [items, setItems] = useState<TermsOfService[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -23,12 +25,12 @@ export default function TermsOfServiceClient() {
     
     try {
       await termsOfServiceService.delete(deleteId);
-      toast.success("Terms of Service berhasil dihapus");
+      toast.success(t('deleteSuccess'));
       fetchData();
       setDeleteId(null);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal menghapus Terms of Service",
+        error.response?.data?.message || t('deleteError'),
       );
     }
   };
@@ -39,7 +41,7 @@ export default function TermsOfServiceClient() {
       const res = await termsOfServiceService.getAll();
       setItems(res.data.data);
     } catch (error) {
-      toast.error("Gagal memuat data");
+      toast.error(t('loadError'));
     } finally {
       setLoading(false);
     }

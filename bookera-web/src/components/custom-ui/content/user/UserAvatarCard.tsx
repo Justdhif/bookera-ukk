@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Upload } from "lucide-react";
 import AvatarUploadModal from "./AvatarUploadModal";
+import { useTranslations } from "next-intl";
 
 interface UserAvatarCardProps {
   user: User;
@@ -45,6 +46,8 @@ export default function UserAvatarCard({
   recentLoans,
 }: UserAvatarCardProps) {
   const router = useRouter();
+  const t = useTranslations('common');
+  const tAdmin = useTranslations('admin.common');
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
   const handleAvatarSave = (avatar: string | File) => {
@@ -67,7 +70,7 @@ export default function UserAvatarCard({
         <CardHeader>
           <CardTitle>Avatar</CardTitle>
           <CardDescription>
-            {isEditMode ? "Upload foto profil user" : "Foto profil user"}
+            {isEditMode ? t('uploadUserProfile') : t('userPhoto')}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
@@ -85,14 +88,13 @@ export default function UserAvatarCard({
               className="w-full"
             >
               <Upload className="h-4 w-4 mr-2" />
-              Upload Avatar
+              {t('uploadAvatar')}
             </Button>
           )}
 
-          {/* Role & Status Selects */}
           <div className="space-y-2 w-full">
             <div className="flex items-center gap-2">
-              <Label className="text-muted-foreground text-xs w-16">Role:</Label>
+              <Label className="text-muted-foreground text-xs w-16">{t('role')}:</Label>
               <Select
                 value={formData.role}
                 onValueChange={(value) =>
@@ -103,24 +105,24 @@ export default function UserAvatarCard({
                 <SelectTrigger className="h-7 flex-1 text-xs">
                   <SelectValue>
                     {formData.role === "admin"
-                      ? "Admin"
+                      ? t('admin')
                       : formData.role === "officer"
-                        ? "Officer"
+                        ? t('officer')
                         : formData.role === "user"
-                          ? "User"
-                          : "Pilih role"}
+                          ? t('userRole')
+                          : t('selectRole')}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="officer">Officer</SelectItem>
-                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="admin">{t('admin')}</SelectItem>
+                  <SelectItem value="officer">{t('officer')}</SelectItem>
+                  <SelectItem value="user">{t('userRole')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="flex items-center gap-2">
-              <Label className="text-muted-foreground text-xs w-16">Status:</Label>
+              <Label className="text-muted-foreground text-xs w-16">{t('status')}:</Label>
               <Select
                 value={formData.is_active ? "active" : "inactive"}
                 onValueChange={(value) =>
@@ -133,27 +135,26 @@ export default function UserAvatarCard({
               >
                 <SelectTrigger className="h-7 flex-1 text-xs">
                   <SelectValue>
-                    {formData.is_active ? "Active" : "Inactive"}
+                    {formData.is_active ? tAdmin('active') : t('inactive')}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="active">{tAdmin('active')}</SelectItem>
+                  <SelectItem value="inactive">{t('inactive')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          {/* Recent Loans Section */}
           <div className="border-t pt-4 mt-4 w-full">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-sm">Peminjaman Terbaru</h4>
+              <h4 className="font-semibold text-sm">{t('recentLoans')}</h4>
               <Button
                 variant="link"
                 className="h-auto p-0 text-xs cursor-pointer"
                 onClick={() => router.push("/admin/loans")}
               >
-                Lihat Semua
+                {t('viewAll')}
               </Button>
             </div>
             {recentLoans.length > 0 ? (
@@ -166,7 +167,7 @@ export default function UserAvatarCard({
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium truncate">
-                        {loan.loan_details.length} Buku
+                        {t('booksCount', { count: loan.loan_details.length })}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(loan.loan_date).toLocaleDateString("id-ID")}

@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BookOpen, Upload, X, CheckCircle, XCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface BookCoverCardProps {
   book: Book;
@@ -32,6 +33,8 @@ export default function BookCoverCard({
   setFormData,
   setCoverPreview,
 }: BookCoverCardProps) {
+  const t = useTranslations('common');
+
   const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -47,9 +50,9 @@ export default function BookCoverCard({
   return (
     <Card className="flex flex-col h-full">
       <CardHeader>
-        <CardTitle>Cover Buku</CardTitle>
+        <CardTitle>{t('bookCover')}</CardTitle>
         <CardDescription>
-          {isEditMode ? "Upload cover buku baru" : "Cover buku saat ini"}
+          {isEditMode ? t('uploadCover') : t('currentCover')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 flex-1 flex flex-col">
@@ -58,7 +61,7 @@ export default function BookCoverCard({
             <div className="relative w-full flex-1">
               <img
                 src={coverPreview}
-                alt="Cover buku"
+                alt={t('bookCover')}
                 className="w-full h-full object-cover rounded-lg border"
               />
               {isEditMode && formData.cover_image && (
@@ -79,7 +82,7 @@ export default function BookCoverCard({
           ) : (
             <div className="w-full flex-1 border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-2 bg-muted/30">
               <BookOpen className="h-12 w-12 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Tidak ada cover</p>
+              <p className="text-sm text-muted-foreground">{t('noCover')}</p>
             </div>
           )}
 
@@ -92,7 +95,7 @@ export default function BookCoverCard({
                 className="w-full"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                Upload Cover Baru
+                {t('uploadNewCover')}
               </Button>
               <Input
                 id="cover_image"

@@ -9,9 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import { termsOfServiceService } from "@/services/terms-of-service.service";
 import { TermsOfService } from "@/types/terms-of-service";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Loader2, FileText } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TermsOfServiceModalProps {
   open: boolean;
@@ -22,6 +21,7 @@ export function TermsOfServiceModal({
   open,
   onOpenChange,
 }: TermsOfServiceModalProps) {
+  const t = useTranslations('common');
   const [contents, setContents] = useState<TermsOfService[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -39,7 +39,7 @@ export function TermsOfServiceModal({
       setContents(items);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal memuat Terms of Service"
+        error.response?.data?.message || t('failedToLoad')
       );
     } finally {
       setLoading(false);
@@ -52,7 +52,7 @@ export function TermsOfServiceModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
             <FileText className="w-5 h-5 text-brand-primary" />
-            Terms of Service
+            {t('title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -65,7 +65,7 @@ export function TermsOfServiceModal({
             <div className="space-y-6 pr-4">
               <div className="p-4 bg-linear-to-r from-brand-primary/5 to-brand-primary/10 dark:from-brand-primary/10 dark:to-brand-primary/20 rounded-lg border border-brand-primary/20 dark:border-brand-primary/30">
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  Terakhir diperbarui:{" "}
+                  {t('lastUpdated')}:{" "}
                   {new Date(
                     contents[contents.length - 1].updated_at
                   ).toLocaleDateString("id-ID", {
@@ -75,7 +75,7 @@ export function TermsOfServiceModal({
                   })}
                 </p>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                  {contents.length} bagian
+                  {contents.length} {t('sections')}
                 </p>
               </div>
 
@@ -102,7 +102,7 @@ export function TermsOfServiceModal({
               <div className="mb-4 flex justify-center opacity-50">
                 <FileText className="w-12 h-12" />
               </div>
-              <p>Konten tidak tersedia</p>
+              <p>{t('contentNotAvailable')}</p>
             </div>
           )}
         </ScrollArea>

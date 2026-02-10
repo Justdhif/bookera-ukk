@@ -1,15 +1,18 @@
 "use client";
 
 import { Volume2, Sparkles } from "lucide-react";
-
-const messages = [
-  { text: "Temukan ribuan koleksi buku terbaik" },
-  { text: "Jangan lupa kembalikan buku tepat waktu" },
-  { text: "Baca buku favoritmu hari ini" },
-  { text: "Ilmu adalah investasi terbaik" },
-];
+import { useTranslations } from "next-intl";
 
 export default function SpeakerMarquee() {
+  const t = useTranslations('common');
+  
+  const messages = [
+    { text: t('discovering') },
+    { text: t('rememberReturn') },
+    { text: t('readFavorite') },
+    { text: t('knowledgeInvestment') },
+  ];
+  
   return (
     <div className="relative w-full overflow-hidden bg-linear-to-r from-emerald-500/10 via-emerald-50 to-emerald-50/50 dark:from-emerald-950/20 dark:via-emerald-950/10 dark:to-emerald-950/5 rounded-lg shadow-sm border border-gray-200/50 dark:border-gray-800/50 py-2">
       {/* Animated Background Pattern */}

@@ -1,6 +1,10 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 export function ContentLoadingScreen() {
+  const t = useTranslations('admin.common');
+  
   return (
     <div className="flex items-center justify-center h-full">
       <div className="relative flex flex-col items-center gap-6">
@@ -50,7 +54,7 @@ export function ContentLoadingScreen() {
 
         {/* Loading text with animated dots */}
         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-          <span>Loading</span>
+          <span>{t('loading')}</span>
           <div className="flex gap-1">
             <span
               className="inline-block h-1 w-1 rounded-full bg-emerald-500 animate-bounce"

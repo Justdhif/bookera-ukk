@@ -11,8 +11,10 @@ import ActivityDetailDialog from "./dialog/ActivityDetailDialog";
 import { ActivityStatisticsSkeleton } from "./statistics/ActivityStatisticsSkeleton";
 import { ActivityChartsSkeleton } from "./charts/ActivityChartsSkeleton";
 import { ActivityTableSkeleton } from "./table/ActivityTableSkeleton";
+import { useTranslations } from "next-intl";
 
 export default function ActivityLogClient() {
+  const t = useTranslations('admin.activityLogs');
   const [data, setData] = useState<ActivityLogIndexResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -33,7 +35,7 @@ export default function ActivityLogClient() {
       const response = await activityLogService.getAll(filters);
       setData(response.data.data);
     } catch (error) {
-      toast.error("Gagal memuat activity logs");
+      toast.error(t('loadError'));
     } finally {
       setLoading(false);
     }
@@ -57,10 +59,10 @@ export default function ActivityLogClient() {
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <h1 className="text-4xl font-black bg-linear-to-r from-gray-900 via-gray-800 to-gray-700 dark:from-white dark:via-gray-100 dark:to-gray-300 bg-clip-text text-transparent">
-            Activity Logs
+            {t('title')}
           </h1>
           <p className="text-base text-gray-600 dark:text-gray-400">
-            Monitor dan lacak semua aktivitas sistem secara real-time
+            {t('description')}
           </p>
         </div>
       </div>

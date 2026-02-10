@@ -3,6 +3,7 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoanStatus } from "@/types/dashboard";
+import { useTranslations } from "next-intl";
 
 const COLORS = [
   "#06b6d4",
@@ -43,6 +44,7 @@ const renderCustomLabel = (entry: any) => {
 };
 
 export default function LoanStatusChart({ data }: { data: LoanStatus[] }) {
+  const t = useTranslations('admin.dashboard');
   const hasData = data && data.length > 0;
 
   return (
@@ -50,7 +52,7 @@ export default function LoanStatusChart({ data }: { data: LoanStatus[] }) {
       <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
         <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <div className="w-1 h-6 bg-linear-to-b from-blue-500 to-cyan-500 rounded-full" />
-          Status Peminjaman
+          {t('loanStatusChart')}
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
@@ -94,7 +96,7 @@ export default function LoanStatusChart({ data }: { data: LoanStatus[] }) {
           </ResponsiveContainer>
         ) : (
           <div className="flex items-center justify-center h-87.5 text-muted-foreground">
-            Tidak ada data
+            {t('noData')}
           </div>
         )}
       </CardContent>

@@ -23,6 +23,8 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { format } from "date-fns";
 
 interface ReturnCardProps {
   bookReturn: BookReturn;
@@ -118,19 +120,19 @@ export function ReturnCard({
     const variants = {
       good: {
         variant: "default" as const,
-        label: "Good",
+        label: tStatus('good'),
         icon: <CheckCircle className="h-3 w-3 mr-1" />,
         className: "bg-green-100 text-green-800 hover:bg-green-100",
       },
       damaged: {
         variant: "secondary" as const,
-        label: "Damaged",
+        label: tStatus('damaged'),
         icon: <AlertTriangle className="h-3 w-3 mr-1" />,
         className: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
       },
       lost: {
         variant: "destructive" as const,
-        label: "Lost",
+        label: tStatus('lost'),
         icon: <XCircleIcon className="h-3 w-3 mr-1" />,
         className: "bg-red-100 text-red-800 hover:bg-red-100",
       },
@@ -169,9 +171,9 @@ export function ReturnCard({
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <CardTitle className="text-lg">Return #{bookReturn.id}</CardTitle>
+              <CardTitle className="text-lg">{tLoans('returnNumber')}{bookReturn.id}</CardTitle>
               {getLoanStatusBadge(loan.status)}
-              <Badge variant="outline">Loan #{bookReturn.loan_id}</Badge>
+              <Badge variant="outline">{tLoans('loanNumber')}{bookReturn.loan_id}</Badge>
             </div>
             <CardDescription className="flex items-center gap-4 text-xs">
               <span className="flex items-center gap-1">
@@ -181,7 +183,7 @@ export function ReturnCard({
               </span>
               <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                {new Date(bookReturn.return_date).toLocaleDateString("id-ID")}
+                {format(new Date(bookReturn.return_date), "dd MMM yyyy")}
               </span>
             </CardDescription>
           </div>
@@ -223,7 +225,7 @@ export function ReturnCard({
       <CardContent>
         <div className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground mb-3">
-            Buku yang Dikembalikan ({bookReturn.details?.length || 0}):
+            {tLoans('returnedBooks')} ({bookReturn.details?.length || 0}):
           </p>
           <div className="grid gap-2">
             {bookReturn.details?.map((detail) => (

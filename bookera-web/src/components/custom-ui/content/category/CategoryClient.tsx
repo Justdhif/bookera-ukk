@@ -10,8 +10,10 @@ import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { CategoryTableSkeleton } from "./CategoryTableSkeleton";
 import { Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function CategoryClient() {
+  const t = useTranslations('common');
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -22,7 +24,7 @@ export default function CategoryClient() {
     if (!deleteId) return;
 
     await categoryService.delete(deleteId);
-    toast.success("Kategori berhasil dihapus");
+    toast.success(t('categoryDeleted'));
     setDeleteId(null);
     fetchCategories();
   };
@@ -82,8 +84,8 @@ export default function CategoryClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Hapus Kategori"
-        description="Kategori yang dihapus tidak dapat dikembalikan."
+        title={t('deleteCategory')}
+        description={t('deleteCategoryWarning')}
         onConfirm={confirmDelete}
       />
 

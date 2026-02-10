@@ -5,6 +5,7 @@ import { loanService } from "@/services/loan.service";
 import { bookService } from "@/services/book.service";
 import { Book } from "@/types/book";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -45,6 +46,7 @@ export function BorrowDialog({
   onOpenChange,
   onSuccess,
 }: BorrowDialogProps) {
+  const t = useTranslations('common');
   const [loading, setLoading] = useState(false);
   const [books, setBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
@@ -74,19 +76,19 @@ export function BorrowDialog({
       const booksData = response.data.data?.data || response.data.data;
       setBooks(Array.isArray(booksData) ? booksData : []);
     } catch (error: any) {
-      toast.error("Gagal memuat daftar buku");
+      toast.error(t('failedLoadBooks'));
       setBooks([]);
     }
   };
 
   const handleSubmit = async () => {
     if (selectedCopies.length === 0) {
-      toast.error("Pilih minimal 1 copy buku untuk dipinjam");
+      toast.error(t('minOneCopy'));
       return;
     }
 
     if (!dueDate) {
-      toast.error("Pilih tanggal jatuh tempo");
+      toast.error(t('selectDueDate'));
       return;
     }
 
@@ -97,8 +99,7 @@ export function BorrowDialog({
         due_date: dueDate.toISOString().split("T")[0],
       });
       toast.success(
-        response.data.message ||
-          "Permintaan peminjaman berhasil dibuat dan menunggu persetujuan admin"
+        response.data.message || t('borrowRequestCreated')
       );
       onOpenChange(false);
       setSelectedBook(null);
@@ -107,7 +108,7 @@ export function BorrowDialog({
       onSuccess();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal membuat permintaan peminjaman"
+        error.response?.data?.message || t('failedCreateBorrow')
       );
     } finally {
       setLoading(false);
@@ -145,18 +146,16 @@ export function BorrowDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5" />
-            Request Peminjaman Buku
+            {t('borrowBook')}
           </DialogTitle>
           <DialogDescription>
-            Pilih buku yang ingin dipinjam dan tentukan tanggal jatuh tempo.
-            Permintaan akan diproses oleh admin.
+            {t('borrowDialogDescription')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          {/* Book Selection */}
           <div className="space-y-2">
-            <Label>Pilih Buku</Label>
+            <Label>{t('selectBook')}</Label>
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -168,15 +167,15 @@ export function BorrowDialog({
                   <span className="truncate">
                     {selectedBook
                       ? selectedBook.title
-                      : "Pilih buku..."}
+                      : t('selectPlaceholder')}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0">
                 <Command>
-                  <CommandInput placeholder="Cari buku..." />
-                  <CommandEmpty>Tidak ada buku ditemukan.</CommandEmpty>
+                  <CommandInput placeholder={t('searchBook')} />
+                  <CommandEmpty>{t('noBookFound')}</CommandEmpty>
                   <CommandList>
                     <CommandGroup>
                       {Array.isArray(books) && books.map((book) => {
@@ -207,7 +206,7 @@ export function BorrowDialog({
                             <div className="flex-1">
                               <p className="font-medium">{book.title}</p>
                               <p className="text-xs text-muted-foreground">
-                                {availableCopies.length} copy tersedia
+                                {availableCopies.length} {t('copiesAvailableCount')}
                               </p>
                             </div>
                           </CommandItem>
@@ -220,10 +219,9 @@ export function BorrowDialog({
             </Popover>
           </div>
 
-          {/* Book Copies Selection (Checkbox) */}
           {selectedBook && availableCopies.length > 0 && (
             <div className="space-y-2">
-              <Label>Pilih Copy Buku ({availableCopies.length} tersedia)</Label>
+              <Label>{t('selectBook')} ({availableCopies.length} {t('copiesAvailableCount')})</Label>
               <div className="border rounded-md p-4 space-y-3 max-h-50 overflow-y-auto">
                 {availableCopies.map((copy) => (
                   <div key={copy.id} className="flex items-center space-x-3">
@@ -249,10 +247,9 @@ export function BorrowDialog({
             </div>
           )}
 
-          {/* Selected Copies Display */}
           {selectedCopies.length > 0 && (
             <div className="space-y-2">
-              <Label>Copy yang Dipilih ({selectedCopies.length})</Label>
+              <Label>{t('selectedCopies')} ({selectedCopies.length})</Label>
               <div className="flex flex-wrap gap-2">
                 {getSelectedCopyNames().map((name, index) => (
                   <Badge
@@ -273,17 +270,16 @@ export function BorrowDialog({
             </div>
           )}
 
-          {/* Due Date */}
           <div className="space-y-2">
-            <Label>Tanggal Jatuh Tempo</Label>
+            <Label>{t('dueDate')}</Label>
             <DatePicker
               value={dueDate}
               onChange={setDueDate}
-              placeholder="Pilih tanggal jatuh tempo"
+              placeholder={t('selectDueDate')}
               dateMode="future"
             />
             <p className="text-xs text-muted-foreground">
-              Pilih tanggal hari ini atau kedepan untuk jatuh tempo pengembalian
+              {t('selectDueDateHint')}
             </p>
           </div>
         </div>
@@ -294,7 +290,7 @@ export function BorrowDialog({
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >
-            Batal
+            {t('cancel')}
           </Button>
           <Button 
             variant="submit" 
@@ -304,10 +300,10 @@ export function BorrowDialog({
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Memproses...
+                {t('processing')}
               </>
             ) : (
-              "Submit Peminjaman"
+              t('submitBorrow')
             )}
           </Button>
         </DialogFooter>

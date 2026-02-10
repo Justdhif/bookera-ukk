@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { TermsOfService } from "@/types/terms-of-service";
 import { termsOfServiceService } from "@/services/terms-of-service.service";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export default function TermsOfServiceFormDialog({
   open,
@@ -26,6 +27,7 @@ export default function TermsOfServiceFormDialog({
   item: TermsOfService | null;
   onSuccess: () => void;
 }) {
+  const t = useTranslations('common');
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +41,7 @@ export default function TermsOfServiceFormDialog({
 
   const handleSubmit = async () => {
     if (!title || !content) {
-      toast.error("Mohon lengkapi semua field yang wajib diisi");
+      toast.error(t('pleaseCompleteRequiredFields'));
       return;
     }
 
@@ -52,10 +54,10 @@ export default function TermsOfServiceFormDialog({
 
       if (item) {
         await termsOfServiceService.update(item.id, payload);
-        toast.success("Terms of Service berhasil diperbarui");
+        toast.success(t('termsOfServiceUpdated'));
       } else {
         await termsOfServiceService.create(payload);
-        toast.success("Terms of Service berhasil ditambahkan");
+        toast.success(t('termsOfServiceAdded'));
       }
 
       setTitle("");
@@ -63,7 +65,7 @@ export default function TermsOfServiceFormDialog({
       setOpen(false);
       onSuccess();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Terjadi kesalahan");
+      toast.error(err.response?.data?.message || t('errorOccurred'));
     } finally {
       setIsLoading(false);
     }
@@ -74,14 +76,14 @@ export default function TermsOfServiceFormDialog({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {item ? "Edit Terms of Service" : "Tambah Terms of Service"}
+            {item ? t('editTermsOfService') : t('addTermsOfService')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title">
-              Judul <span className="text-red-500">*</span>
+              {t('title')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="title"
@@ -93,7 +95,7 @@ export default function TermsOfServiceFormDialog({
 
           <div className="space-y-2">
             <Label htmlFor="content">
-              Konten (HTML) <span className="text-red-500">*</span>
+              {t('contentHTML')} <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="content"
@@ -105,8 +107,7 @@ export default function TermsOfServiceFormDialog({
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              Gunakan HTML tags untuk format. Contoh: &lt;h2&gt;, &lt;p&gt;,
-              &lt;ul&gt;, &lt;li&gt;
+              {t('useHTMLTags')}
             </p>
           </div>
 
@@ -119,11 +120,11 @@ export default function TermsOfServiceFormDialog({
           >
             {isLoading
               ? item
-                ? "Menyimpan..."
-                : "Menambahkan..."
+                ? t('savingChanges')
+                : t('adding')
               : item
-                ? "Simpan Perubahan"
-                : "Tambah Terms of Service"}
+                ? t('saveChanges')
+                : t('addTermsOfService')}
           </Button>
         </div>
       </DialogContent>

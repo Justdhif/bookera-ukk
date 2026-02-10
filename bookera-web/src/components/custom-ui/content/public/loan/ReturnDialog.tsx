@@ -4,6 +4,7 @@ import { useState } from "react";
 import { bookReturnService } from "@/services/book-return.service";
 import { Loan } from "@/types/loan";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +37,7 @@ export function ReturnDialog({
   loan,
   onSuccess,
 }: ReturnDialogProps) {
+  const t = useTranslations('common');
   const [loading, setLoading] = useState(false);
   const [bookConditions, setBookConditions] = useState<
     Record<number, "good" | "damaged">
@@ -50,7 +52,7 @@ export function ReturnDialog({
     );
 
     if (!allBooksHaveCondition) {
-      toast.error("Pilih kondisi untuk semua buku");
+      toast.error(t('selectConditionForAllBooks'));
       return;
     }
 
@@ -63,15 +65,14 @@ export function ReturnDialog({
 
       const response = await bookReturnService.create(loan.id, { copies });
       toast.success(
-        response.data.message ||
-          "Permintaan pengembalian berhasil dibuat dan menunggu persetujuan admin"
+        response.data.message || t('returnRequestCreated')
       );
       onOpenChange(false);
       setBookConditions({});
       onSuccess();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal membuat permintaan pengembalian"
+        error.response?.data?.message || t('failedToCreateReturnRequest')
       );
     } finally {
       setLoading(false);
@@ -91,12 +92,10 @@ export function ReturnDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <PackageX className="h-5 w-5" />
-            Request Pengembalian Buku
+            {t('requestReturn')}
           </DialogTitle>
           <DialogDescription>
-            Pilih kondisi buku yang akan dikembalikan. Pastikan kondisi sesuai
-            dengan keadaan buku saat ini. Jika buku hilang, gunakan tombol
-            "Laporkan Kehilangan" pada daftar peminjaman.
+            {t('selectBookCondition')} {t('reportLostInfo')}
           </DialogDescription>
         </DialogHeader>
 
@@ -109,13 +108,13 @@ export function ReturnDialog({
               <div>
                 <p className="font-medium">{detail.book_copy.book.title}</p>
                 <p className="text-sm text-muted-foreground">
-                  Kode: {detail.book_copy.copy_code}
+                  {t('copyCode')}: {detail.book_copy.copy_code}
                 </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor={`condition-${detail.id}`}>
-                  Kondisi Buku
+                  {t('bookCondition')}
                 </Label>
                 <Select
                   value={bookConditions[detail.book_copy_id] || ""}
@@ -124,19 +123,19 @@ export function ReturnDialog({
                   }
                 >
                   <SelectTrigger id={`condition-${detail.id}`}>
-                    <SelectValue placeholder="Pilih kondisi buku" />
+                    <SelectValue placeholder={t('selectBookConditionPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="good">
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2 rounded-full bg-green-500" />
-                        <span>Baik - Tidak ada kerusakan</span>
+                        <span>{t('bookConditionGood')}</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="damaged">
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                        <span>Rusak - Ada kerusakan ringan</span>
+                        <span>{t('bookConditionDamaged')}</span>
                       </div>
                     </SelectItem>
                   </SelectContent>

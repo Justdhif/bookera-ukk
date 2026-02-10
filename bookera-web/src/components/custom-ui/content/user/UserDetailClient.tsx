@@ -12,10 +12,14 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import UserAvatarCard from "./UserAvatarCard";
 import UserDetailForm from "./UserDetailForm";
+import { useTranslations } from "next-intl";
 
 export default function UserDetailClient() {
   const router = useRouter();
   const params = useParams();
+  const t = useTranslations('admin.users');
+  const tAdmin = useTranslations('admin.common');
+  const tCommon = useTranslations('common');
   const identificationNumber = params.identificationNumber as string;
 
   const [user, setUser] = useState<User | null>(null);
@@ -65,7 +69,7 @@ export default function UserDetailClient() {
       });
       setAvatarPreview(res.data.data.profile.avatar);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal mengambil data user");
+      toast.error(error.response?.data?.message || t('loadError'));
       router.push("/admin/users");
     } finally {
       setLoading(false);
@@ -79,11 +83,11 @@ export default function UserDetailClient() {
     try {
       setSubmitting(true);
       await userService.update(user.id, formData as UpdateUserData);
-      toast.success("User berhasil diupdate");
+      toast.success(t('updateSuccess'));
       setIsEditMode(false);
       fetchUser();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal mengupdate user");
+      toast.error(error.response?.data?.message || t('updateError'));
     } finally {
       setSubmitting(false);
     }
@@ -143,9 +147,9 @@ export default function UserDetailClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Detail User</h1>
+            <h1 className="text-3xl font-bold">{tCommon('userDetail')}</h1>
             <p className="text-muted-foreground">
-              {isEditMode ? "Edit informasi user" : "Lihat detail user"}
+              {isEditMode ? t('editUserInfo') : t('viewUserDetail')}
             </p>
           </div>
         </div>
@@ -159,7 +163,7 @@ export default function UserDetailClient() {
               className="h-8"
             >
               <X className="h-3.5 w-3.5 mr-1.5" />
-              Batal
+              {tAdmin('cancel')}
             </Button>
             <Button
               type="submit"
@@ -169,7 +173,7 @@ export default function UserDetailClient() {
               loading={submitting}
               className="h-8"
             >
-              {submitting ? "Menyimpan..." : "Simpan Perubahan"}
+              {submitting ? tCommon('saving') : tCommon('saveChanges')}
             </Button>
           </div>
         ) : (
@@ -179,7 +183,7 @@ export default function UserDetailClient() {
             className="h-8 gap-1"
           >
             <Edit2 className="h-3.5 w-3.5" />
-            Edit User
+            {t('editUser')}
           </Button>
         )}
       </div>

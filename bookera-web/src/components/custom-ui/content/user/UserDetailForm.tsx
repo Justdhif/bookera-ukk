@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
+import { useTranslations } from "next-intl";
 
 interface UserDetailFormProps {
   user: User;
@@ -33,20 +34,22 @@ export default function UserDetailForm({
   formData,
   setFormData,
 }: UserDetailFormProps) {
+  const t = useTranslations('common');
+  const tAdmin = useTranslations('admin.common');
+  
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
-        <CardTitle>Informasi User</CardTitle>
+        <CardTitle>{t('userInfo')}</CardTitle>
         <CardDescription>
           {isEditMode
-            ? "Edit informasi user dengan benar"
-            : "Detail lengkap user"}
+            ? t('editUserCorrectly')
+            : t('fullUserDetail')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Account Section */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Akun</h3>
+          <h3 className="font-semibold text-lg">{t('account')}</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="email">
@@ -60,7 +63,7 @@ export default function UserDetailForm({
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                placeholder="user@example.com"
+                placeholder={t('emailPlaceholder')}
                 disabled={!isEditMode}
               />
             </div>
@@ -77,16 +80,15 @@ export default function UserDetailForm({
                       password: e.target.value,
                     })
                   }
-                  placeholder="Kosongkan jika tidak diubah"
+                  placeholder={t('passwordPlaceholder')}
                 />
               </div>
             )}
           </div>
         </div>
 
-        {/* Profile Section */}
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Profil</h3>
+          <h3 className="font-semibold text-lg">{t('profile')}</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="full_name">
@@ -103,7 +105,7 @@ export default function UserDetailForm({
                     full_name: e.target.value,
                   })
                 }
-                placeholder="John Doe"
+                placeholder={t('namePlaceholder')}
                 disabled={!isEditMode}
               />
             </div>
@@ -118,7 +120,7 @@ export default function UserDetailForm({
                     identification_number: e.target.value,
                   })
                 }
-                placeholder="SIS-001"
+                placeholder={t('idNumberPlaceholder')}
                 disabled={!isEditMode}
               />
             </div>
@@ -133,7 +135,7 @@ export default function UserDetailForm({
                     phone_number: e.target.value,
                   })
                 }
-                placeholder="08123456789"
+                placeholder={t('phonePlaceholder')}
                 disabled={!isEditMode}
               />
             </div>
@@ -147,13 +149,13 @@ export default function UserDetailForm({
                 disabled={!isEditMode}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih jenis kelamin" />
+                  <SelectValue placeholder={t('selectGender')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="male">Laki-laki</SelectItem>
-                  <SelectItem value="female">Perempuan</SelectItem>
+                  <SelectItem value="male">{t('male')}</SelectItem>
+                  <SelectItem value="female">{t('female')}</SelectItem>
                   <SelectItem value="prefer_not_to_say">
-                    Tidak ingin menyebutkan
+                    {t('preferNotToSay')}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -180,7 +182,7 @@ export default function UserDetailForm({
                     });
                   }
                 }}
-                placeholder="Pilih tanggal lahir"
+                placeholder={t('selectBirthDate')}
                 disabled={!isEditMode}
                 dateMode="past"
               />
@@ -196,7 +198,7 @@ export default function UserDetailForm({
                     occupation: e.target.value,
                   })
                 }
-                placeholder="Siswa"
+                placeholder={t('occupationPlaceholder')}
                 disabled={!isEditMode}
               />
             </div>
@@ -211,12 +213,12 @@ export default function UserDetailForm({
                     institution: e.target.value,
                   })
                 }
-                placeholder="XII RPL 1"
+                placeholder={t('classPlaceholder')}
                 disabled={!isEditMode}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="address">Alamat</Label>
+              <Label htmlFor="address">{t('address')}</Label>
               <Textarea
                 id="address"
                 value={formData.address || ""}
@@ -226,20 +228,20 @@ export default function UserDetailForm({
                     address: e.target.value,
                   })
                 }
-                placeholder="Alamat lengkap"
+                placeholder={t('addressPlaceholder')}
                 rows={2}
                 disabled={!isEditMode}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="bio">Bio</Label>
+              <Label htmlFor="bio">{t('bio')}</Label>
               <Textarea
                 id="bio"
                 value={formData.bio || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, bio: e.target.value })
                 }
-                placeholder="Bio singkat"
+                placeholder={t('bioPlaceholder')}
                 rows={3}
                 disabled={!isEditMode}
               />

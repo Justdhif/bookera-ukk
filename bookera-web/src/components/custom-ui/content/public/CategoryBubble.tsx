@@ -7,6 +7,7 @@ import { Category } from "@/types/category";
 import CategoryBubbleSkeleton from "./CategoryBubbleSkeleton";
 import { ChevronRight, ChevronLeft, Filter, BookOpen } from "lucide-react";
 import { getIconByName } from "@/lib/icons";
+import { useTranslations } from "next-intl";
 
 interface Props {
   active: number | null;
@@ -21,6 +22,7 @@ export default function CategoryBubble({
   onChange,
   showFilterIcon = false,
 }: Props) {
+  const t = useTranslations('common');
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
@@ -39,17 +41,15 @@ export default function CategoryBubble({
 
   if (loading) return <CategoryBubbleSkeleton />;
 
-  // Jika tidak ada kategori
   if (categories.length === 0) {
     return (
       <div className="flex items-center justify-center p-4">
-        <p className="text-gray-500 text-sm">Tidak ada kategori tersedia</p>
+        <p className="text-gray-500 text-sm">{t('noCategoryAvailable')}</p>
       </div>
     );
   }
 
-  // Hitung total pages (termasuk "Semua" sebagai 1 item)
-  const allItems = [{ id: null, name: "Semua" }, ...categories];
+  const allItems = [{ id: null, name: t('all') }, ...categories];
   const totalPages = Math.ceil(allItems.length / ITEMS_PER_PAGE);
   const startIndex = currentPage * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;

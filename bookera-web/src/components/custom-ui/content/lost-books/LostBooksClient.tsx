@@ -9,8 +9,10 @@ import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { Search, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslations } from "next-intl";
 
 export default function LostBooksClient() {
+  const t = useTranslations('admin.lostBooks');
   const [lostBooks, setLostBooks] = useState<LostBook[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -21,12 +23,12 @@ export default function LostBooksClient() {
 
     try {
       await lostBookService.delete(deleteId);
-      toast.success("Data buku hilang berhasil dihapus");
+      toast.success(t('deleteSuccess'));
       setDeleteId(null);
       fetchLostBooks();
     } catch (err: any) {
       toast.error(
-        err.response?.data?.message || "Gagal menghapus data buku hilang"
+        err.response?.data?.message || t('deleteError')
       );
     }
   };
@@ -37,7 +39,7 @@ export default function LostBooksClient() {
       const res = await lostBookService.getAll(searchQuery || undefined);
       setLostBooks(res.data.data);
     } catch (err) {
-      toast.error("Gagal memuat data buku hilang");
+      toast.error(t('loadError'));
     } finally {
       setLoading(false);
     }
@@ -58,12 +60,12 @@ export default function LostBooksClient() {
     try {
       await lostBookService.finish(id);
       toast.success(
-        "Proses buku hilang selesai. Status peminjaman diubah menjadi lost."
+        t('completeSuccess')
       );
       fetchLostBooks();
     } catch (err: any) {
       toast.error(
-        err.response?.data?.message || "Gagal menyelesaikan proses buku hilang"
+        err.response?.data?.message || t('completeError')
       );
     }
   };
@@ -74,11 +76,10 @@ export default function LostBooksClient() {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <AlertCircle className="h-8 w-8 text-destructive" />
-            Buku Hilang
+            {t('title')}
           </h1>
           <p className="text-muted-foreground">
-            Kelola laporan buku yang hilang. Pastikan denda telah dibayarkan
-            sebelum menyelesaikan proses.
+            {t('description')}
           </p>
         </div>
       </div>
@@ -87,7 +88,7 @@ export default function LostBooksClient() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari buku hilang..."
+            placeholder={t('searchLostBooks')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -118,8 +119,8 @@ export default function LostBooksClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Hapus Data Buku Hilang"
-        description="Data buku hilang yang dihapus tidak dapat dikembalikan."
+        title={t('deleteLostBookRecord')}
+        description={t('deleteLostBookWarning')}
         onConfirm={confirmDelete}
       />
     </div>

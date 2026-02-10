@@ -13,9 +13,12 @@ import { Category } from "@/types/category";
 import { categoryService } from "@/services/category.service";
 import { Plus } from "lucide-react";
 import { BookTableSkeleton } from "./BookTableSkeleton";
+import { useTranslations } from "next-intl";
 
 export default function BookClient() {
   const router = useRouter();
+  const t = useTranslations('admin.books');
+  const tCategories = useTranslations('admin.categories');
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -35,7 +38,7 @@ export default function BookClient() {
       const res = await categoryService.getAll();
       setCategories(res.data.data || []);
     } catch (error) {
-      toast.error("Gagal memuat kategori");
+      toast.error(tCategories('loadError'));
       console.error("Error fetching categories:", error);
     } finally {
       setCategoriesLoading(false);
@@ -70,7 +73,7 @@ export default function BookClient() {
       const res = await bookService.getAll(params);
       setBooks(res.data.data.data);
     } catch (error) {
-      toast.error("Gagal memuat data buku");
+      toast.error(t('loadError'));
       console.error("Error fetching books:", error);
     } finally {
       setLoading(false);
@@ -95,9 +98,9 @@ export default function BookClient() {
       {/* HEADER */}
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">Buku</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Kelola buku di perpustakaan
+            {t('description')}
           </p>
         </div>
         <Button
@@ -106,7 +109,7 @@ export default function BookClient() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          Tambah Buku
+          {t('addBook')}
         </Button>
       </div>
 
@@ -135,11 +138,11 @@ export default function BookClient() {
       <DeleteConfirmDialog
         open={!!deleteId}
         onOpenChange={() => setDeleteId(null)}
-        title="Hapus Buku"
+        title={t('deleteBook')}
         description="Apakah kamu yakin ingin menghapus buku ini?"
         onConfirm={async () => {
           await bookService.delete(deleteId!);
-          toast.success("Buku berhasil dihapus");
+          toast.success(t('deleteSuccess'));
           setDeleteId(null);
           fetchBooks();
         }}

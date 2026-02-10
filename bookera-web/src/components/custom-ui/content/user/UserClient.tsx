@@ -11,9 +11,11 @@ import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { UserTableSkeleton } from "./UserTableSkeleton";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function UserClient() {
   const router = useRouter();
+  const t = useTranslations('admin.users');
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -28,7 +30,7 @@ export default function UserClient() {
     if (!deleteId) return;
 
     await userService.delete(deleteId);
-    toast.success("User berhasil dihapus");
+    toast.success(t('deleteSuccess'));
     setDeleteId(null);
     fetchUsers();
   };
@@ -43,7 +45,7 @@ export default function UserClient() {
       );
       setUsers(res.data.data);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal mengambil data user");
+      toast.error(error.response?.data?.message || t('loadError'));
     } finally {
       setLoading(false);
     }
@@ -63,9 +65,9 @@ export default function UserClient() {
       {/* HEADER */}
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">User</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Kelola akun pengguna di perpustakaan
+            {t('description')}
           </p>
         </div>
         <Button
@@ -74,7 +76,7 @@ export default function UserClient() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          Tambah User
+          {t('addUser')}
         </Button>
       </div>
 
@@ -99,8 +101,8 @@ export default function UserClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Hapus User"
-        description="User yang dihapus tidak dapat dikembalikan."
+        title={t('deleteUser')}
+        description={t('deleteUserWarning')}
         onConfirm={confirmDelete}
       />
     </div>

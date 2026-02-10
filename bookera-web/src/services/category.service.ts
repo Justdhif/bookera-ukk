@@ -5,7 +5,7 @@ import { Category } from "@/types/category";
 export const categoryService = {
   getAll: () => api.get<ApiResponse<Category[]>>("/categories"),
 
-  create: (payload: { name: string; description?: string }) =>
+  create: (payload: { name: string; description?: string; icon?: string }) =>
     api.post<ApiResponse<Category>>("/admin/categories", payload),
 
   update: (
@@ -13,6 +13,7 @@ export const categoryService = {
     payload: {
       name: string;
       description?: string;
+      icon?: string;
     },
   ) => api.put<ApiResponse<Category>>(`/admin/categories/${id}`, payload),
 

@@ -13,8 +13,10 @@ import { Input } from "@/components/ui/input";
 import { LoanCard } from "./LoanCard";
 import { LoanRejectDialog } from "./LoanRejectDialog";
 import { LoanSkeletonCard } from "./LoanSkeletonCard";
+import { useTranslations } from "next-intl";
 
 export default function LoanClient() {
+  const t = useTranslations('admin.loans');
   const [allLoans, setAllLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
@@ -37,7 +39,7 @@ export default function LoanClient() {
       const allRes = await loanService.getAll(searchQuery);
       setAllLoans(allRes.data.data);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal memuat data");
+      toast.error(error.response?.data?.message || t('loadError'));
     } finally {
       setLoading(false);
     }
@@ -51,10 +53,10 @@ export default function LoanClient() {
     setActionLoading(loanId);
     try {
       const response = await loanService.approveLoan(loanId);
-      toast.success(response.data.message || "Peminjaman berhasil di-approve");
+      toast.success(response.data.message || t('approveSuccess'));
       fetchAllData();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal approve peminjaman");
+      toast.error(error.response?.data?.message || t('approveError'));
     } finally {
       setActionLoading(null);
     }
@@ -68,11 +70,11 @@ export default function LoanClient() {
       const response = await loanService.rejectLoan(rejectDialog.loan.id, {
         rejection_reason: rejectionReason,
       });
-      toast.success(response.data.message || "Peminjaman berhasil ditolak");
+      toast.success(response.data.message || t('rejectSuccess'));
       setRejectDialog({ open: false, loan: null });
       fetchAllData();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal menolak peminjaman");
+      toast.error(error.response?.data?.message || t('rejectError'));
     } finally {
       setActionLoading(null);
     }
@@ -83,12 +85,12 @@ export default function LoanClient() {
     try {
       const response = await loanService.markAsBorrowed(loanId);
       toast.success(
-        response.data.message || "Status berhasil diubah ke borrowed",
+        response.data.message || t('statusChangedToBorrowed'),
       );
       fetchAllData();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal mengubah status peminjaman",
+        error.response?.data?.message || t('failedChangeStatus'),
       );
     } finally {
       setActionLoading(null);
@@ -136,14 +138,14 @@ export default function LoanClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">Loan Management</h1>
+          <h1 className="text-3xl font-bold">{t('loanManagement')}</h1>
           <p className="text-muted-foreground">
-            Kelola peminjaman buku dan approval
+            {t('manageLoanApproval')}
           </p>
         </div>
         <Button onClick={() => setBorrowDialog(true)} variant="brand">
           <Plus className="h-4 w-4 mr-2" />
-          Request Peminjaman
+          {t('requestLoan')}
         </Button>
       </div>
 
@@ -152,7 +154,7 @@ export default function LoanClient() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari berdasarkan ID, nama peminjam, atau judul buku..."
+            placeholder={t('searchLoanUserTitle')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -161,13 +163,13 @@ export default function LoanClient() {
         </div>
         <Button onClick={handleSearch} variant="secondary">
           <Search className="h-4 w-4 mr-2" />
-          Cari
+          {t('search')}
         </Button>
       </div>
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">Semua ({allLoans.length})</TabsTrigger>
+          <TabsTrigger value="all">{t('allLoans')} ({allLoans.length})</TabsTrigger>
           <TabsTrigger value="pending">
             Pending ({pendingLoans.length})
           </TabsTrigger>
@@ -192,9 +194,9 @@ export default function LoanClient() {
         <TabsContent value="all" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold">Semua Peminjaman</h3>
+              <h3 className="text-lg font-semibold">{t('allLoans')}</h3>
               <p className="text-sm text-muted-foreground">
-                Daftar semua peminjaman buku
+                {t('noLoansDesc')}
               </p>
             </div>
             {loading ? (
@@ -312,9 +314,9 @@ export default function LoanClient() {
         <TabsContent value="rejected" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold">Rejected</h3>
+              <h3 className="text-lg font-semibold">{t('rejected')}</h3>
               <p className="text-sm text-muted-foreground">
-                Peminjaman yang ditolak
+                {t('rejectedLoansDesc')}
               </p>
             </div>
             {loading ? (

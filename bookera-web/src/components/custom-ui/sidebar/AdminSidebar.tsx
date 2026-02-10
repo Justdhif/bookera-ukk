@@ -35,15 +35,17 @@ import {
   Shield,
   DollarSign,
   AlertCircle,
+  Settings,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 // Menu items grouped by categories
-const menuGroups = [
+const getMenuGroups = (t: any) => [
   {
-    title: "Main Menu",
+    title: t('admin.sidebar.mainMenu'),
     items: [
       {
-        title: "Dashboard",
+        title: t('admin.sidebar.dashboard'),
         href: "/admin",
         icon: HomeIcon,
         gradient: "from-blue-500 to-cyan-500",
@@ -51,16 +53,16 @@ const menuGroups = [
     ],
   },
   {
-    title: "Catalog",
+    title: t('admin.sidebar.catalog'),
     items: [
       {
-        title: "Categories",
+        title: t('admin.sidebar.categories'),
         href: "/admin/categories",
         icon: Folder,
         gradient: "from-amber-500 to-orange-500",
       },
       {
-        title: "Books",
+        title: t('admin.sidebar.books'),
         href: "/admin/books",
         icon: BookOpen,
         gradient: "from-orange-500 to-red-500",
@@ -68,43 +70,54 @@ const menuGroups = [
     ],
   },
   {
-    title: "Management",
+    title: t('admin.sidebar.management'),
     items: [
       {
-        title: "Users",
+        title: t('admin.sidebar.users'),
         href: "/admin/users",
         icon: User,
         gradient: "from-emerald-500 to-teal-500",
       },
       {
-        title: "Loans",
+        title: t('admin.sidebar.loans'),
         href: "/admin/loans",
         icon: Package,
         gradient: "from-teal-500 to-cyan-500",
       },
       {
-        title: "Returns",
+        title: t('admin.sidebar.returns'),
         href: "/admin/returns",
         icon: PackageCheck,
         gradient: "from-cyan-500 to-blue-500",
       },
       {
-        title: "Fines",
+        title: t('admin.sidebar.fines'),
         href: "/admin/fines",
         icon: DollarSign,
         gradient: "from-rose-500 to-red-500",
       },
       {
-        title: "Lost Books",
+        title: t('admin.sidebar.lostBooks'),
         href: "/admin/lost-books",
         icon: AlertCircle,
         gradient: "from-red-500 to-rose-600",
       },
       {
-        title: "Activity Logs",
+        title: t('admin.sidebar.activityLogs'),
         href: "/admin/activity-logs",
         icon: Activity,
         gradient: "from-purple-500 to-pink-500",
+      },
+    ],
+  },
+  {
+    title: t('admin.sidebar.system'),
+    items: [
+      {
+        title: t('admin.sidebar.settings'),
+        href: "/admin/settings",
+        icon: Settings,
+        gradient: "from-gray-500 to-slate-500",
       },
     ],
   },
@@ -115,6 +128,9 @@ export function AdminSidebar() {
   const router = useRouter();
   const { user, logout, initialLoading } = useAuthStore();
   const { open } = useSidebar();
+  const t = useTranslations();
+
+  const menuGroups = getMenuGroups(t);
 
   const handleNavigation = (href: string) => {
     router.push(href);
@@ -148,7 +164,7 @@ export function AdminSidebar() {
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-all w-fit bg-linear-to-r from-emerald-100 to-teal-100 dark:from-emerald-950/50 dark:to-teal-950/50 ring-1 ring-emerald-200 dark:ring-emerald-900">
                 <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                  Admin
+                  {t('admin.sidebar.admin')}
                 </span>
               </div>
             </div>
@@ -240,7 +256,7 @@ export function AdminSidebar() {
               onClick={() => handleNavigation("/")}
               isActive={pathname === "/"}
               tooltip={{
-                content: "Public Page",
+                content: t('admin.sidebar.publicPage'),
                 gradient: "from-blue-600 to-indigo-600",
                 className: "font-medium",
               }}
@@ -253,7 +269,7 @@ export function AdminSidebar() {
               >
                 <HomeIcon className="h-3.5 w-3.5" />
               </div>
-              {open && <span className="font-medium">Public Page</span>}
+              {open && <span className="font-medium">{t('admin.sidebar.publicPage')}</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
 
@@ -267,7 +283,7 @@ export function AdminSidebar() {
                 !open && "justify-center px-0 mx-auto"
               }`}
               tooltip={{
-                content: "Logout",
+                content: t('admin.sidebar.logout'),
                 gradient: "from-red-600 to-rose-600",
                 className: "font-medium",
               }}
@@ -281,7 +297,7 @@ export function AdminSidebar() {
               </div>
               {open && (
                 <span className="font-medium text-red-600 dark:text-red-400">
-                  Logout
+                  {t('admin.sidebar.logout')}
                 </span>
               )}
             </SidebarMenuButton>
@@ -368,3 +384,5 @@ export function AdminSidebar() {
     </Sidebar>
   );
 }
+
+

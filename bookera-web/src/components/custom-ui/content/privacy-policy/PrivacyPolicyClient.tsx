@@ -10,8 +10,10 @@ import { toast } from "sonner";
 import { PrivacyPolicyListSkeleton } from "./PrivacyPolicyListSkeleton";
 import { Plus } from "lucide-react";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
+import { useTranslations } from "next-intl";
 
 export default function PrivacyPolicyClient() {
+  const t = useTranslations('admin.privacyPolicy');
   const [items, setItems] = useState<PrivacyPolicy[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -23,12 +25,12 @@ export default function PrivacyPolicyClient() {
     
     try {
       await privacyPolicyService.delete(deleteId);
-      toast.success("Privacy Policy berhasil dihapus");
+      toast.success(t('deleteSuccess'));
       fetchData();
       setDeleteId(null);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal menghapus Privacy Policy",
+        error.response?.data?.message || t('deleteError'),
       );
     }
   };
@@ -39,7 +41,7 @@ export default function PrivacyPolicyClient() {
       const res = await privacyPolicyService.getAll();
       setItems(res.data.data);
     } catch (error) {
-      toast.error("Gagal memuat data");
+      toast.error(t('loadError'));
     } finally {
       setLoading(false);
     }

@@ -21,6 +21,8 @@ import {
   XCircleIcon,
   AlertCircle,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { format } from "date-fns";
 
 interface LoanCardProps {
   loan: Loan;
@@ -39,6 +41,8 @@ export function LoanCard({
   onReject,
   onMarkAsBorrowed,
 }: LoanCardProps) {
+  const t = useTranslations('admin.loans');
+  const tStatus = useTranslations('admin.status');
   const getStatusBadge = (status: Loan["status"]) => {
     const variants: Record<
       Loan["status"],
@@ -158,7 +162,7 @@ export function LoanCard({
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <CardTitle className="text-lg">Loan #{loan.id}</CardTitle>
+              <CardTitle className="text-lg">{t('loanNumber')}{loan.id}</CardTitle>
               {getStatusBadge(loan.status)}
               {getApprovalBadge(loan.approval_status)}
             </div>
@@ -169,11 +173,11 @@ export function LoanCard({
               </span>
               <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                {new Date(loan.loan_date).toLocaleDateString("id-ID")}
+                {format(new Date(loan.loan_date), "dd MMM yyyy")}
               </span>
               <span className="flex items-center gap-1 text-destructive">
                 <Calendar className="h-3 w-3" />
-                Due: {new Date(loan.due_date).toLocaleDateString("id-ID")}
+                {t('due')}: {format(new Date(loan.due_date), "dd MMM yyyy")}
               </span>
             </CardDescription>
           </div>
@@ -217,7 +221,7 @@ export function LoanCard({
                   ) : (
                     <PackageCheck className="h-4 w-4 mr-1" />
                   )}
-                  Mark as Borrowed
+                  {tStatus('markAsBorrowed')}
                 </Button>
               )}
             </div>
@@ -227,7 +231,7 @@ export function LoanCard({
       <CardContent>
         <div className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground mb-3">
-            Buku yang Dipinjam ({loan.loan_details?.length || 0}):
+            {t('borrowedBooks')} ({loan.loan_details?.length || 0}):
           </p>
           <div className="grid gap-2">
             {loan.loan_details?.map((detail) => (
