@@ -30,4 +30,10 @@ class Book extends Model
     {
         return $this->hasMany(BookCopy::class);
     }
+
+    public function saves()
+    {
+        return $this->belongsToMany(Save::class, 'save_items')
+            ->withTimestamps();
+    }
 }

@@ -104,7 +104,7 @@ export default function NotificationDropdown({
           onMouseEnter={() => isAuthenticated && fetchNotifications()}
         >
           <Bell className="h-4 w-4" />
-          <span className="text-sm font-medium">Notifications</span>
+          <span className="hiddentext-sm font-medium lg:block">Notifications</span>
           {unreadCount > 0 && (
             <Badge
               variant="destructive"

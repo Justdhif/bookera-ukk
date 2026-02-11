@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { bookService } from "@/services/book.service";
 import { Book } from "@/types/book";
 import BookCopyList from "./BookCopyList";
+import AddToSaveButton from "./AddToSaveButton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -75,10 +76,11 @@ export default function BookDetailClient() {
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div>
+        <div className="flex-1">
           <h1 className="text-3xl font-bold">{t('bookDetail')}</h1>
           <p className="text-muted-foreground">{t('fullInfoAboutBook')}</p>
         </div>
+        <AddToSaveButton bookId={book.id} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

@@ -5,9 +5,10 @@ import { Locale } from '@/i18n/config';
 
 type LocaleSwitcherProps = {
     setLocale: Dispatch<SetStateAction<Locale | undefined>>;
+    iconOnly?: boolean;
 };
 
-export default function LocaleSwitcher({ setLocale }: LocaleSwitcherProps) {
+export default function LocaleSwitcher({ setLocale, iconOnly = false }: LocaleSwitcherProps) {
     const t = useTranslations('LocaleSwitcher');
     const locale = useLocale();
 
@@ -26,6 +27,7 @@ export default function LocaleSwitcher({ setLocale }: LocaleSwitcherProps) {
             ]}
             label={t('label')}
             setLocale={setLocale}
+            iconOnly={iconOnly}
         />
     );
 }

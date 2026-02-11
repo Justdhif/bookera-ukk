@@ -13,7 +13,9 @@
     "librarySystem": "Library Management System",
     "settings": "Settings",
     "categories": "Categories",
-    "placeholder": "Search title, author, or ISBN..."
+    "placeholder": "Search title, author, or ISBN...",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
   },
   "search": {
     "placeholder": "Search title, author, or ISBN...",
@@ -70,6 +72,28 @@
     "label": "Language",
     "en": "English",
     "id": "Indonesia"
+  },
+  "collections": {
+    "title": "My Collections",
+    "new": "New",
+    "loginRequired": "Login Required",
+    "loginRequiredDesc": "Sign in to create and manage your book collections",
+    "loginToContinue": "Login to Continue",
+    "noCollections": "No collections yet",
+    "createFirst": "Create your first collection",
+    "book": "book",
+    "books": "books",
+    "createNew": "Create New Collection",
+    "name": "Name",
+    "namePlaceholder": "e.g., My Favorites, To Read, etc.",
+    "description": "Description",
+    "descriptionPlaceholder": "Optional description...",
+    "cancel": "Cancel",
+    "create": "Create Collection",
+    "creating": "Creating...",
+    "nameRequired": "Please enter a name for your collection",
+    "createSuccess": "Collection created successfully",
+    "createFailed": "Failed to create collection"
   },
   "admin": {
     "common": {

@@ -5,11 +5,11 @@ import CategoryBubble from "./CategoryBubble";
 import BookList from "./BookList";
 import { bookService } from "@/services/book.service";
 import { Book } from "@/types/book";
-import MyLoanHighlight from "./MyLoanHighlight";
 import { useTranslations } from "next-intl";
+import SavesList from "./SavesList";
 
 export default function PublicPageClient() {
-  const t = useTranslations('header');
+  const t = useTranslations("header");
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,18 +32,11 @@ export default function PublicPageClient() {
   }, [categoryId]);
 
   return (
-    <div className="container space-y-6">
-      <MyLoanHighlight />
-      
-      {/* Category Section with Title */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-            {t('categories').toUpperCase()}
-          </h2>
-        </div>
-        <CategoryBubble active={categoryId} onChange={setCategoryId} />
+    <div className="space-y-6">
+      <div className="lg:hidden mb-6">
+        <SavesList mode="horizontal" />
       </div>
+      <CategoryBubble active={categoryId} onChange={setCategoryId} />
 
       <BookList books={books} loading={loading} />
     </div>

@@ -13,7 +13,9 @@
     "librarySystem": "Sistem Manajemen Perpustakaan",
     "settings": "Pengaturan",
     "categories": "Kategori",
-    "placeholder": "Cari judul, penulis, atau ISBN..."
+    "placeholder": "Cari judul, penulis, atau ISBN...",
+    "darkMode": "Mode Gelap",
+    "lightMode": "Mode Terang"
   },
   "search": {
     "placeholder": "Cari judul, penulis, atau ISBN...",
@@ -70,6 +72,28 @@
     "label": "Bahasa",
     "en": "English",
     "id": "Indonesia"
+  },
+  "collections": {
+    "title": "Koleksi Saya",
+    "new": "Baru",
+    "loginRequired": "Perlu Login",
+    "loginRequiredDesc": "Masuk untuk membuat dan mengelola koleksi buku Anda",
+    "loginToContinue": "Login untuk Melanjutkan",
+    "noCollections": "Belum ada koleksi",
+    "createFirst": "Buat koleksi pertama Anda",
+    "book": "buku",
+    "books": "buku",
+    "createNew": "Buat Koleksi Baru",
+    "name": "Nama",
+    "namePlaceholder": "cth., Favorit Saya, Akan Dibaca, dll.",
+    "description": "Deskripsi",
+    "descriptionPlaceholder": "Deskripsi opsional...",
+    "cancel": "Batal",
+    "create": "Buat Koleksi",
+    "creating": "Membuat...",
+    "nameRequired": "Silakan masukkan nama untuk koleksi Anda",
+    "createSuccess": "Koleksi berhasil dibuat",
+    "createFailed": "Gagal membuat koleksi"
   },
   "admin": {
     "common": {

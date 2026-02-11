@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\LostBookController;
 use App\Http\Controllers\Api\FineController;
 use App\Http\Controllers\Api\FineTypeController;
+use App\Http\Controllers\Api\SaveController;
 
 /*
 |--------------------------------------------------------------------------
@@ -162,6 +163,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{notification}', [NotificationController::class, 'show']);
         Route::post('/{notification}/mark-read', [NotificationController::class, 'markAsRead']);
         Route::delete('/{notification}', [NotificationController::class, 'destroy']);
+    });
+
+    // Save routes (user's saved book collections)
+    Route::prefix('saves')->group(function () {
+        Route::get('/', [SaveController::class, 'index']);
+        Route::post('/', [SaveController::class, 'store']);
+        Route::get('/{save}', [SaveController::class, 'show']);
+        Route::put('/{save}', [SaveController::class, 'update']);
+        Route::delete('/{save}', [SaveController::class, 'destroy']);
+        Route::post('/{save}/books', [SaveController::class, 'addBook']);
+        Route::delete('/{save}/books/{book}', [SaveController::class, 'removeBook']);
     });
 
 });

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/button";
@@ -12,31 +11,25 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
-import Image from "next/image";
-import { Facebook, Instagram, Twitter, Moon, Sun, Search } from "lucide-react";
+import { Moon, Sun, Search, Bell } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
-import { useTranslations } from 'next-intl';
+import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import LocaleSwitcher from "../LocaleSwitcher";
 import { Locale } from "@/i18n/config";
 import { setUserLocale } from "@/services/locale";
 import { Input } from "@/components/ui/input";
 import NotificationDropdown from "./NotificationDropdown";
-import { TermsOfServiceModal } from "../modal/TermsOfServiceModal";
-import { PrivacyPolicyModal } from "../modal/PrivacyPolicyModal";
 
 export default function PublicHeader() {
   const router = useRouter();
   const { user, logout, isAuthenticated, initialLoading } = useAuthStore();
-  const t = useTranslations('header');
+  const t = useTranslations("header");
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [locale, setLocale] = useState<Locale | undefined>();
   const [isPending, startTransition] = useTransition();
   const [searchQuery, setSearchQuery] = useState("");
-  const [tosModalOpen, setTosModalOpen] = useState(false);
-  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -62,135 +55,101 @@ export default function PublicHeader() {
   };
 
   return (
-    <header className="border-b sticky top-0 bg-white dark:bg-gray-900 z-50 shadow-sm transition-colors duration-300">
-      <div className="mx-auto max-w-7xl px-6 py-4 space-y-2">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <h3 
-              className="font-semibold text-sm hover:text-brand-primary hover:underline cursor-pointer"
-              onClick={() => setTosModalOpen(true)}
-            >
-              {t('termsOfService')}
-            </h3>
-
-            <div className="h-2 w-2 rounded-full bg-brand-primary "></div>
-
-            <h3 
-              className="font-semibold text-sm hover:text-brand-primary hover:underline cursor-pointer"
-              onClick={() => setPrivacyModalOpen(true)}
-            >
-              {t('privacyPolicy')}
-            </h3>
-
-            <div className="h-2 w-2 rounded-full bg-brand-primary "></div>
-
-            <h3 className="font-semibold text-sm">{t('followUs')}</h3>
-            <Link
-              href="https://www.facebook.com/bookera.library"
-              target="_blank"
-            >
-              <Facebook className="w-4 h-4 text-brand-primary" />
-            </Link>
-            <Link
-              href="https://www.instagram.com/bookera.library"
-              target="_blank"
-            >
-              <Instagram className="h-4 w-4 text-brand-primary" />
-            </Link>
-
-            <Link href="https://www.twitter.com/@bookera.library" target="_blank">
-              <Twitter className="h-4 w-4 text-brand-primary" />
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <NotificationDropdown isAuthenticated={isAuthenticated} />
-
-            <LocaleSwitcher setLocale={setLocale} />
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleDarkMode}
-              suppressHydrationWarning
-            >
-              {!mounted ? (
-                <Moon className="h-5 w-5 transition-all duration-300" />
-              ) : theme === "dark" ? (
-                <Sun className="h-5 w-5 transition-all duration-300" />
-              ) : (
-                <Moon className="h-5 w-5 transition-all duration-300" />
-              )}
-            </Button>
-          </div>
-        </div>
-        <div className="flex justify-between items-center space-x-7">
-          <Link href="/" className="flex items-center shrink-0">
-            <Image
-              src={BookeraLogo}
-              alt="Bookera Logo"
-              className="h-15 w-15 object-cover"
-            />
-            <div>
-              <span className="font-bold text-3xl">Bookera</span>
-            </div>
-          </Link>
-
-          {/* Search Bar - Centered */}
-          <form onSubmit={handleSearch} className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <header className="sticky top-0 bg-background/95 backdrop-blur-md z-40 border-b border-border shadow-sm">
+      <div className="px-4 md:px-6 lg:px-8 py-3 md:py-4">
+        <div className="flex items-center justify-between gap-2 md:gap-4">
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
             <Input
-              placeholder={t('placeholder')}
-              className="pl-10 pr-4 h-10"
+              placeholder={t("placeholder")}
+              className="pl-9 md:pl-12 pr-3 md:pr-4 h-10 md:h-12 bg-muted/30 border-border focus-visible:ring-1 focus-visible:ring-ring rounded-full text-sm md:text-base"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </form>
 
-          {/* User Section */}
-          <div className="shrink-0">
-            {initialLoading ? (
-              <Skeleton className="h-10 w-10 rounded-full" />
-            ) : !isAuthenticated ? (
-              <Button onClick={() => router.push("/login")}>{t('login')}</Button>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Avatar>
-                    <AvatarImage
-                      src={user?.profile?.avatar}
-                      alt={user?.profile?.full_name || user?.email || "User"}
-                    />
-                    <AvatarFallback>
-                      {user?.profile?.full_name?.[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
+          {/* Right Controls */}
+          <div className="flex items-center gap-1.5 md:gap-3">
+            {/* Notification */}
+            {isAuthenticated && <NotificationDropdown isAuthenticated={isAuthenticated} />}
+            
+            {/* Language Switcher */}
+            <LocaleSwitcher setLocale={setLocale} iconOnly />
+            
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleDarkMode}
+              className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent"
+              suppressHydrationWarning
+            >
+              {!mounted ? (
+                <Moon className="h-4 w-4 md:h-5 md:w-5" />
+              ) : theme === "dark" ? (
+                <Sun className="h-4 w-4 md:h-5 md:w-5" />
+              ) : (
+                <Moon className="h-4 w-4 md:h-5 md:w-5" />
+              )}
+            </Button>
 
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem disabled>
-                    {user?.profile?.full_name}
-                  </DropdownMenuItem>
+            {/* User Section */}
+            <div className="shrink-0">
+              {initialLoading ? (
+                <Skeleton className="h-8 w-8 md:h-10 md:w-10 rounded-full" />
+              ) : !isAuthenticated ? (
+                <Button
+                  onClick={() => router.push("/login")}
+                  size="sm"
+                  className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 md:px-8 h-8 md:h-10 text-sm md:text-base"
+                >
+                  {t("login")}
+                </Button>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="rounded-full ring-2 ring-transparent hover:ring-ring transition-all">
+                    <Avatar className="h-8 w-8 md:h-10 md:w-10">
+                      <AvatarImage
+                        src={user?.profile?.avatar}
+                        alt={user?.profile?.full_name || user?.email || "User"}
+                      />
+                      <AvatarFallback className="bg-linear-to-br from-purple-600 to-blue-600 text-xs md:text-sm">
+                        {user?.profile?.full_name?.[0] || user?.email?.[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
 
-                  {(user?.role === "admin" || user?.role === "officer") && (
-                    <DropdownMenuItem onClick={() => router.push("/admin")}>
-                      {t('dashboard')}
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuItem disabled className="font-semibold">
+                      {user?.profile?.full_name}
                     </DropdownMenuItem>
-                  )}
+                    <DropdownMenuItem
+                      disabled
+                      className="text-xs text-muted-foreground"
+                    >
+                      {user?.email}
+                    </DropdownMenuItem>
 
-                  <DropdownMenuItem className="text-red-600" onClick={logout}>
-                    {t('logout')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+                    {(user?.role === "admin" || user?.role === "officer") && (
+                      <DropdownMenuItem onClick={() => router.push("/admin")}>
+                        {t("dashboard")}
+                      </DropdownMenuItem>
+                    )}
+
+                    <DropdownMenuItem
+                      className="text-red-600 focus:text-red-600"
+                      onClick={logout}
+                    >
+                      {t("logout")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Modals */}
-      <TermsOfServiceModal open={tosModalOpen} onOpenChange={setTosModalOpen} />
-      <PrivacyPolicyModal open={privacyModalOpen} onOpenChange={setPrivacyModalOpen} />
     </header>
   );
 }

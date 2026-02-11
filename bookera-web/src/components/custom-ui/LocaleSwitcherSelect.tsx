@@ -16,13 +16,15 @@ type Props = {
   items: Array<{ value: string; label: string }>;
   label: string;
   setLocale: Dispatch<SetStateAction<Locale | undefined>>;
+  iconOnly?: boolean;
 };
 
 export default function LocaleSwitcherSelect({
   defaultValue,
   items,
   label,
-  setLocale
+  setLocale,
+  iconOnly = false
 }: Props) {
   const [selectedValue, setSelectedValue] = useState(defaultValue);
 
@@ -37,11 +39,18 @@ export default function LocaleSwitcherSelect({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex items-center gap-2 h-9 px-3" title={label}>
+        <Button 
+          variant="ghost" 
+          size={iconOnly ? "icon" : "default"}
+          className={iconOnly ? "h-9 w-9 rounded-full" : "flex items-center gap-2 h-9 px-3"} 
+          title={label}
+        >
           <Globe className="h-4 w-4" />
-          <span className="text-sm font-medium">
-            {selectedItem?.label || label}
-          </span>
+          {!iconOnly && (
+            <span className="text-sm font-medium">
+              {selectedItem?.label || label}
+            </span>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
