@@ -43,9 +43,11 @@ class BookController extends Controller
             ->latest()
             ->paginate($request->per_page ?? 10);
 
-        // append cover_image_url
+        // append cover_image_url and copy counts
         $books->getCollection()->transform(function ($book) {
             $book->cover_image_url = storage_image($book->cover_image);
+            $book->total_copies = $book->copies->count();
+            $book->available_copies = $book->copies->where('status', 'available')->count();
             return $book;
         });
 
@@ -126,6 +128,8 @@ class BookController extends Controller
         ]);
 
         $book->cover_image_url = storage_image($book->cover_image);
+        $book->total_copies = $book->copies->count();
+        $book->available_copies = $book->copies->where('status', 'available')->count();
 
         return ApiResponse::successResponse(
             'Detail buku',
@@ -149,6 +153,8 @@ class BookController extends Controller
         ]);
 
         $book->cover_image_url = storage_image($book->cover_image);
+        $book->total_copies = $book->copies->count();
+        $book->available_copies = $book->copies->where('status', 'available')->count();
 
         return ApiResponse::successResponse(
             'Detail buku',

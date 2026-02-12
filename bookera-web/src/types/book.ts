@@ -20,6 +20,9 @@ export interface Book {
   categories: Category[];
   copies: BookCopy[];
 
+  total_copies?: number;
+  available_copies?: number;
+
   created_at: string;
   updated_at: string;
 }

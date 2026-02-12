@@ -118,6 +118,7 @@
       "selectBookCopies": "Pilih Copy Buku ({count} tersedia)",
       "selectedCopies": "Copy yang Dipilih ({count})",
       "available": "Tersedia",
+      "copies": "Salinan",
       "dueDate": "Tanggal Jatuh Tempo",
       "selectDueDatePlaceholder": "Pilih tanggal jatuh tempo",
       "selectDueDateHint": "Pilih tanggal hari ini atau kedepan untuk jatuh tempo pengembalian",
@@ -562,6 +563,8 @@
     "noCopiesAvailable": "Tidak ada salinan buku yang tersedia",
     "bookDetail": "Detail Buku",
     "fullInfoAboutBook": "Informasi lengkap tentang buku",
+    "noCoverImage": "Tidak ada gambar sampul",
+    "bookDetailsComplete": "Detail lengkap buku",
     "borrowBook": "Pinjam Buku",
     "setReturnDateDescription": "Tentukan tanggal pengembalian untuk buku yang ingin Anda pinjam",
     "copyCode": "Kode Salinan",
@@ -805,7 +808,9 @@
     "bannerWelcomeSubtitle": "Perpustakaan Digital & Fisik Terintegrasi",
     "bannerBorrowEasyTitle": "Pinjam Buku Lebih Mudah",
     "bannerThousandBooksTitle": "Ribuan Koleksi Buku",
-    "bannerThousandBooksSubtitle": "Dari berbagai kategori favoritmu"
+    "bannerThousandBooksSubtitle": "Dari berbagai kategori favoritmu",
+    "openLibrary": "Buka Pustaka Anda",
+    "yourLibrary": "Pustaka Anda"
   },
   "auth": {
     "login": {

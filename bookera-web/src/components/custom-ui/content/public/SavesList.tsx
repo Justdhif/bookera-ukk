@@ -7,7 +7,8 @@ import { SaveListItem } from "@/types/save";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BookMarked, Plus, LogIn, Library } from "lucide-react";
+import { BookMarked, Plus, LogIn, Library, ChevronLeft } from "lucide-react";
+import { useSidebarStore } from "@/store/sidebar.store";
 import SaveCard from "./SaveCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
@@ -24,20 +25,30 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SavesListProps {
   mode?: "sidebar" | "horizontal";
+  isCollapsed?: boolean;
 }
 
-export default function SavesList({ mode = "sidebar" }: SavesListProps) {
+export default function SavesList({ mode = "sidebar", isCollapsed = false }: SavesListProps) {
   const { isAuthenticated } = useAuthStore();
   const [saves, setSaves] = useState<SaveListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [formData, setFormData] = useState({ name: "", description: "" });
   const [isCreating, setIsCreating] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
   const t = useTranslations("collections");
+  const tCommon = useTranslations("common");
+  const { toggleCollapse } = useSidebarStore();
 
   const fetchSaves = async () => {
     if (!isAuthenticated) {
@@ -57,6 +68,15 @@ export default function SavesList({ mode = "sidebar" }: SavesListProps) {
 
   useEffect(() => {
     fetchSaves();
+    const handleRefreshSaves = () => {
+      fetchSaves();
+    };
+
+    window.addEventListener('refreshSavesList', handleRefreshSaves);
+
+    return () => {
+      window.removeEventListener('refreshSavesList', handleRefreshSaves);
+    };
   }, [isAuthenticated]);
 
   const handleCreateSave = async () => {
@@ -84,16 +104,40 @@ export default function SavesList({ mode = "sidebar" }: SavesListProps) {
       return null;
     }
 
+    if (isCollapsed) {
+      return (
+        <TooltipProvider>
+          <div className="flex flex-col items-center py-6 gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => router.push("/login")}
+                  className="h-14 w-14 rounded-lg"
+                >
+                  <LogIn className="h-6 w-6 text-muted-foreground" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <p>{t("loginRequired")}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
+      );
+    }
+
     return (
       <div className="h-full flex flex-col justify-center items-center px-6 py-8 text-center">
-        <BookMarked className="h-16 w-16 mb-4 text-gray-600" />
-        <h4 className="font-semibold text-white mb-2">{t("loginRequired")}</h4>
-        <p className="text-sm text-gray-400 mb-6">
+        <BookMarked className="h-16 w-16 mb-4 text-muted-foreground" />
+        <h4 className="font-semibold text-foreground mb-2">{t("loginRequired")}</h4>
+        <p className="text-sm text-muted-foreground mb-6">
           {t("loginRequiredDesc")}
         </p>
         <Button
           onClick={() => router.push("/login")}
-          className="gap-2 bg-white text-black hover:bg-gray-200 rounded-full px-8"
+          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8"
         >
           <LogIn className="h-4 w-4" />
           {t("loginToContinue")}
@@ -175,23 +219,112 @@ export default function SavesList({ mode = "sidebar" }: SavesListProps) {
   }
 
   // Desktop Sidebar Mode
+  if (isCollapsed) {
+    return (
+      <TooltipProvider>
+        <div className="h-full flex flex-col items-center pt-4 pb-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="default"
+                size="icon-lg"
+                onClick={toggleCollapse}
+                className="h-16 w-16 mb-2 bg-transparent hover:bg-transparent"
+              >
+                <BookMarked className="h-15 w-15 text-muted-foreground" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="font-semibold">
+              <p>{tCommon("openLibrary")}</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <ScrollArea className="flex-1 w-full">
+            <div className="flex flex-col items-center gap-2 py-1">
+            {loading ? (
+              <>
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-12 w-12 rounded-lg" />
+                ))}
+              </>
+            ) : saves.length === 0 ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setShowCreateDialog(true)}
+                    className="h-12 w-12 rounded-lg hover:bg-accent"
+                  >
+                    <Plus className="h-5 w-5 text-muted-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>{t("createNew")}</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              saves.map((save) => (
+                <Tooltip key={save.id}>
+                  <TooltipTrigger asChild>
+                    <div
+                      onClick={() => router.push(`/saves/${save.id}`)}
+                      className="w-12 h-16 rounded-lg bg-gradient-to-br from-brand-primary to-brand-primary-dark flex items-center justify-center shrink-0 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                    >
+                      <BookMarked className="h-5 w-5 text-white" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p className="font-medium">{save.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {save.total_books} {save.total_books === 1 ? t("book") : t("books")}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              ))
+            )}
+            </div>
+          </ScrollArea>
+        </div>
+      </TooltipProvider>
+    );
+  }
+
   return (
     <>
-      <div className="h-full flex flex-col">
+      <div 
+        className="h-full flex flex-col"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
-            <Library className="h-5 w-5 text-gray-300" />
-            <h3 className="font-semibold text-white">{t("title")}</h3>
+            <Library className="h-5 w-5 text-muted-foreground" />
+            <h3 className="font-semibold text-foreground">{tCommon("yourLibrary")}</h3>
           </div>
 
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-8 w-8 p-0 text-gray-300 hover:text-white hover:bg-white/10 rounded-full"
-            onClick={() => setShowCreateDialog(true)}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleCollapse}
+              className={cn(
+                "h-8 w-8 rounded-full transition-opacity duration-200",
+                isHovered ? "opacity-100" : "opacity-0"
+              )}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent rounded-full"
+              onClick={() => setShowCreateDialog(true)}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         <ScrollArea className="flex-1 px-3">
@@ -199,25 +332,25 @@ export default function SavesList({ mode = "sidebar" }: SavesListProps) {
             {loading ? (
               <>
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="p-3 rounded-lg bg-white/5">
+                  <div key={i} className="p-3 rounded-lg bg-muted/50">
                     <div className="flex gap-3">
-                      <Skeleton className="w-12 h-16 rounded bg-white/10" />
+                      <Skeleton className="w-12 h-16 rounded" />
                       <div className="flex-1 space-y-2">
-                        <Skeleton className="h-3 w-3/4 bg-white/10" />
-                        <Skeleton className="h-2 w-1/2 bg-white/10" />
+                        <Skeleton className="h-3 w-3/4" />
+                        <Skeleton className="h-2 w-1/2" />
                       </div>
                     </div>
                   </div>
                 ))}
               </>
             ) : saves.length === 0 ? (
-              <div className="py-8 text-center text-sm text-gray-400">
+              <div className="py-8 text-center text-sm text-muted-foreground">
                 <BookMarked className="h-12 w-12 mx-auto mb-2 opacity-30" />
                 <p>{t("noCollections")}</p>
                 <Button
                   variant="link"
                   size="sm"
-                  className="mt-2 text-gray-300 hover:text-white"
+                  className="mt-2"
                   onClick={() => setShowCreateDialog(true)}
                 >
                   {t("createFirst")}
@@ -228,17 +361,17 @@ export default function SavesList({ mode = "sidebar" }: SavesListProps) {
                 <div
                   key={save.id}
                   onClick={() => router.push(`/saves/${save.id}`)}
-                  className="p-3 rounded-lg bg-white/5 hover:bg-white/10 cursor-pointer transition-colors group"
+                  className="p-3 rounded-lg bg-muted/50 hover:bg-accent cursor-pointer transition-colors group"
                 >
                   <div className="flex gap-3">
-                    <div className="w-12 h-16 bg-linear-to-br from-purple-600 to-blue-600 rounded flex items-center justify-center shrink-0">
+                    <div className="w-12 h-16 bg-gradient-to-br from-brand-primary to-brand-primary-dark rounded flex items-center justify-center shrink-0">
                       <BookMarked className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white text-sm line-clamp-2 group-hover:text-primary transition-colors">
+                      <p className="font-medium text-foreground text-sm line-clamp-2 group-hover:text-primary transition-colors">
                         {save.name}
                       </p>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-muted-foreground mt-1">
                         {save.total_books} {save.total_books === 1 ? t("book") : t("books")}
                       </p>
                     </div>

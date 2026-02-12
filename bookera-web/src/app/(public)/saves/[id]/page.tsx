@@ -76,6 +76,8 @@ export default function SaveDetailPage() {
       toast.success("Collection updated successfully");
       setShowEditDialog(false);
       fetchSave();
+      // Emit event to refresh SavesList
+      window.dispatchEvent(new Event('refreshSavesList'));
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to update collection");
     } finally {
@@ -88,6 +90,8 @@ export default function SaveDetailPage() {
     try {
       await saveService.delete(saveId);
       toast.success("Collection deleted successfully");
+      // Emit event to refresh SavesList
+      window.dispatchEvent(new Event('refreshSavesList'));
       router.push("/");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to delete collection");
@@ -101,6 +105,8 @@ export default function SaveDetailPage() {
       await saveService.removeBook(saveId, bookId);
       toast.success("Book removed from collection");
       fetchSave();
+      // Emit event to refresh SavesList
+      window.dispatchEvent(new Event('refreshSavesList'));
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to remove book");
     }

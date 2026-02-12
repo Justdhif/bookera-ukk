@@ -56,6 +56,8 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
       await saveService.addBook(saveId, bookId);
       toast.success("Book added to collection");
       setShowDialog(false);
+      // Emit event to refresh SavesList
+      window.dispatchEvent(new Event('refreshSavesList'));
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to add book to collection");
     }
@@ -76,6 +78,8 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
       setShowDialog(false);
       setShowCreateNew(false);
       setFormData({ name: "", description: "" });
+      // Emit event to refresh SavesList
+      window.dispatchEvent(new Event('refreshSavesList'));
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to create collection");
     } finally {

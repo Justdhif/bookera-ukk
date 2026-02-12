@@ -58,7 +58,6 @@ export default function PublicHeader() {
     <header className="sticky top-0 bg-background/95 backdrop-blur-md z-40 border-b border-border shadow-sm">
       <div className="px-4 md:px-6 lg:px-8 py-3 md:py-4">
         <div className="flex items-center justify-between gap-2 md:gap-4">
-          {/* Search Bar */}
           <form onSubmit={handleSearch} className="relative flex-1 max-w-md">
             <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
             <Input
@@ -69,15 +68,16 @@ export default function PublicHeader() {
             />
           </form>
 
-          {/* Right Controls */}
           <div className="flex items-center gap-1.5 md:gap-3">
-            {/* Notification */}
-            {isAuthenticated && <NotificationDropdown isAuthenticated={isAuthenticated} />}
+            <NotificationDropdown isAuthenticated={isAuthenticated} />
             
-            {/* Language Switcher */}
-            <LocaleSwitcher setLocale={setLocale} iconOnly />
+            <div className="lg:hidden">
+              <LocaleSwitcher setLocale={setLocale} iconOnly />
+            </div>
+            <div className="hidden md:block">
+              <LocaleSwitcher setLocale={setLocale} iconOnly={false} />
+            </div>
             
-            {/* Theme Toggle */}
             <Button
               variant="ghost"
               size="icon"
@@ -114,7 +114,7 @@ export default function PublicHeader() {
                         src={user?.profile?.avatar}
                         alt={user?.profile?.full_name || user?.email || "User"}
                       />
-                      <AvatarFallback className="bg-linear-to-br from-purple-600 to-blue-600 text-xs md:text-sm">
+                      <AvatarFallback className="bg-linear-to-br from-brand-primary to-brand-primary-dark text-xs md:text-sm text-white">
                         {user?.profile?.full_name?.[0] || user?.email?.[0]}
                       </AvatarFallback>
                     </Avatar>

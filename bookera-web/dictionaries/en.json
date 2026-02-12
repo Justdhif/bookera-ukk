@@ -118,6 +118,7 @@
       "selectBookCopies": "Select Book Copies ({count} available)",
       "selectedCopies": "Selected Copies ({count})",
       "available": "Available",
+      "copies": "Copies",
       "dueDate": "Due Date",
       "selectDueDatePlaceholder": "Select due date",
       "selectDueDateHint": "Select today or future date for return due date",
@@ -569,6 +570,8 @@
     "noCopiesAvailable": "No book copies available",
     "bookDetail": "Book Detail",
     "fullInfoAboutBook": "Complete information about the book",
+    "noCoverImage": "No cover image",
+    "bookDetailsComplete": "Complete book details",
     "borrowBook": "Borrow Book",
     "copyCode": "Copy Code",
     "selectDate": "Select date",
@@ -807,7 +810,9 @@
 	  "bannerWelcomeSubtitle": "Integrated Digital & Physical Library",
 	  "bannerBorrowEasyTitle": "Borrow Books More Easily",
 	  "bannerThousandBooksTitle": "Thousands of Book Collections",
-	  "bannerThousandBooksSubtitle": "From various favorite categories"
+	  "bannerThousandBooksSubtitle": "From various favorite categories",
+	  "openLibrary": "Open Your Library",
+	  "yourLibrary": "Your Library"
   },
   "auth": {
     "login": {

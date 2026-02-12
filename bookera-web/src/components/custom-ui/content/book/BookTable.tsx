@@ -48,6 +48,7 @@ export function BookTable({ data, onDelete }: Props) {
             <TableHead className="font-semibold">{t('isbn')}</TableHead>
             <TableHead className="font-semibold">{t('publisher')}</TableHead>
             <TableHead className="font-semibold">{t('year')}</TableHead>
+            <TableHead className="font-semibold text-center">{tCommon('copies')}</TableHead>
             <TableHead className="font-semibold">{t('status')}</TableHead>
             <TableHead className="font-semibold text-right pr-6">{tCommon('actions')}</TableHead>
           </TableRow>
@@ -95,6 +96,19 @@ export function BookTable({ data, onDelete }: Props) {
               <span className="text-muted-foreground">
                 {book.publication_year || "-"}
               </span>
+            </TableCell>
+            <TableCell className="text-center">
+              <div className="flex flex-col gap-1 items-center">
+                <Badge 
+                  variant={book.available_copies && book.available_copies > 0 ? "default" : "secondary"}
+                  className={book.available_copies && book.available_copies > 0 ? "bg-brand-primary hover:bg-brand-primary-dark text-white text-xs" : "text-xs"}
+                >
+                  {book.available_copies || 0}/{book.total_copies || 0}
+                </Badge>
+                <span className="text-[10px] text-muted-foreground">
+                  {tCommon('available')}
+                </span>
+              </div>
             </TableCell>
             <TableCell>
               <Badge 
