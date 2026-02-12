@@ -12,7 +12,7 @@ export function LoanMonthlyChartSkeleton() {
       </CardHeader>
 
       <CardContent className="pt-6">
-        <div className="flex items-end justify-between gap-2 h-[350px]">
+        <div className="flex items-end justify-between gap-2 h-87.5">
           {Array.from({ length: 12 }).map((_, i) => (
             <div key={i} className="flex flex-col items-center gap-2 flex-1">
               <Skeleton 
@@ -39,7 +39,7 @@ export function LoanStatusChartSkeleton() {
       </CardHeader>
 
       <CardContent className="pt-6">
-        <div className="flex flex-col items-center justify-center h-[350px] gap-8">
+        <div className="flex flex-col items-center justify-center h-87.5 gap-8">
           <Skeleton className="h-64 w-64 rounded-full" />
           <div className="space-x-2 flex">
             {Array.from({ length: 3 }).map((_, i) => (

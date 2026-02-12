@@ -11,7 +11,7 @@ export default function CategoryBubbleSkeleton() {
         <div className="flex-1">
           <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="flex flex-col items-center justify-center gap-2.5 p-4 rounded-2xl border-2 border-border aspect-[4/5]">
+              <div key={i} className="flex flex-col items-center justify-center gap-2.5 p-4 rounded-2xl border-2 border-border aspect-4/5">
                 <Skeleton className="h-14 w-14 md:h-16 md:w-16 rounded-full" />
                 <Skeleton className="h-4 w-16 rounded" />
               </div>

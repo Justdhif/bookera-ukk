@@ -20,7 +20,7 @@ export default function SaveCard({ save, onClick }: SaveCardProps) {
     if (onClick) {
       onClick();
     } else {
-      router.push(`/saves/${save.id}`);
+      router.push(`/saves/${save.slug}`);
     }
   };
 
@@ -31,34 +31,19 @@ export default function SaveCard({ save, onClick }: SaveCardProps) {
     >
       <CardContent className="p-4">
         <div className="flex gap-3">
-          {/* Cover Images Grid */}
+          {/* Cover Image - Using collage from backend */}
           <div className="shrink-0">
-            {save.covers.length > 0 ? (
-              <div className={cn(
-                "grid gap-1",
-                save.covers.length === 1 && "grid-cols-1",
-                save.covers.length === 2 && "grid-cols-2",
-                save.covers.length >= 3 && "grid-cols-2"
-              )}>
-                {save.covers.slice(0, 4).map((cover, index) => (
-                  <div 
-                    key={index}
-                    className={cn(
-                      "rounded overflow-hidden bg-gray-100 dark:bg-gray-800",
-                      save.covers.length === 1 ? "w-16 h-20" : "w-8 h-10"
-                    )}
-                  >
-                    <img
-                      src={cover || '/placeholder-book.png'}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
+            {save.cover ? (
+              <div className="w-16 h-20 rounded overflow-hidden bg-gray-100 dark:bg-gray-800">
+                <img
+                  src={save.cover}
+                  alt={save.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
             ) : (
-              <div className="w-16 h-20 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                <BookMarked className="h-6 w-6 text-gray-400" />
+              <div className="w-16 h-20 rounded bg-gradient-to-br from-brand-primary to-brand-primary-dark flex items-center justify-center">
+                <BookMarked className="h-6 w-6 text-white" />
               </div>
             )}
           </div>

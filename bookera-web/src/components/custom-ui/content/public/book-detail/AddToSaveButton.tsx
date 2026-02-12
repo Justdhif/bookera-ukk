@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BookMarked, Plus, Check } from "lucide-react";
+import { BookMarked, Plus, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -199,7 +199,12 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
                 >
                   Back
                 </Button>
-                <Button onClick={handleCreateAndAdd} disabled={isCreating}>
+                <Button
+                  variant="submit"
+                  onClick={handleCreateAndAdd}
+                  disabled={isCreating}
+                >
+                  {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {isCreating ? "Creating..." : "Create & Add Book"}
                 </Button>
               </DialogFooter>

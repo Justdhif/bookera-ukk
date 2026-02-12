@@ -7,7 +7,7 @@ import { SaveListItem } from "@/types/save";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BookMarked, Plus, LogIn, Library, ChevronLeft } from "lucide-react";
+import { BookMarked, Plus, LogIn, Library, ChevronLeft, Loader2 } from "lucide-react";
 import { useSidebarStore } from "@/store/sidebar.store";
 import SaveCard from "./SaveCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -196,7 +196,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
               {saves.map((save) => (
                 <div
                   key={save.id}
-                  onClick={() => router.push(`/saves/${save.id}`)}
+                  onClick={() => router.push(`/saves/${save.slug}`)}
                   className="shrink-0 w-40 md:w-48 cursor-pointer"
                 >
                   <Card className="p-2.5 md:p-3 hover:border-primary transition-colors">
@@ -267,12 +267,25 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
               saves.map((save) => (
                 <Tooltip key={save.id}>
                   <TooltipTrigger asChild>
-                    <div
-                      onClick={() => router.push(`/saves/${save.id}`)}
-                      className="w-12 h-16 rounded-lg bg-gradient-to-br from-brand-primary to-brand-primary-dark flex items-center justify-center shrink-0 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
-                    >
-                      <BookMarked className="h-5 w-5 text-white" />
-                    </div>
+                    {save.cover ? (
+                      <div
+                        onClick={() => router.push(`/saves/${save.slug}`)}
+                        className="w-12 h-16 rounded-lg overflow-hidden shrink-0 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                      >
+                        <img
+                          src={save.cover}
+                          alt={save.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => router.push(`/saves/${save.slug}`)}
+                        className="w-12 h-16 rounded-lg bg-linear-to-br from-brand-primary to-brand-primary-dark flex items-center justify-center shrink-0 cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                      >
+                        <BookMarked className="h-5 w-5 text-white" />
+                      </div>
+                    )}
                   </TooltipTrigger>
                   <TooltipContent side="right">
                     <p className="font-medium">{save.name}</p>
@@ -360,13 +373,23 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
               saves.map((save) => (
                 <div
                   key={save.id}
-                  onClick={() => router.push(`/saves/${save.id}`)}
+                  onClick={() => router.push(`/saves/${save.slug}`)}
                   className="p-3 rounded-lg bg-muted/50 hover:bg-accent cursor-pointer transition-colors group"
                 >
                   <div className="flex gap-3">
-                    <div className="w-12 h-16 bg-gradient-to-br from-brand-primary to-brand-primary-dark rounded flex items-center justify-center shrink-0">
-                      <BookMarked className="h-6 w-6 text-white" />
-                    </div>
+                    {save.cover ? (
+                      <div className="w-12 h-16 rounded overflow-hidden shrink-0">
+                        <img
+                          src={save.cover}
+                          alt={save.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-16 bg-linear-to-br from-brand-primary to-brand-primary-dark rounded flex items-center justify-center shrink-0">
+                        <BookMarked className="h-6 w-6 text-white" />
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-foreground text-sm line-clamp-2 group-hover:text-primary transition-colors">
                         {save.name}
@@ -424,7 +447,12 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
             >
               {t("cancel")}
             </Button>
-            <Button onClick={handleCreateSave} disabled={isCreating}>
+            <Button
+              variant="submit"
+              onClick={handleCreateSave}
+              disabled={isCreating}
+            >
+              {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isCreating ? t("creating") : t("create")}
             </Button>
           </DialogFooter>

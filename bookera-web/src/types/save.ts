@@ -3,7 +3,9 @@ import { Book } from "./book";
 export interface Save {
   id: number;
   name: string;
+  slug: string;
   description: string | null;
+  cover: string | null;
   covers: string[];
   total_books: number;
   created_at: string;
@@ -14,7 +16,9 @@ export interface Save {
 export interface SaveListItem {
   id: number;
   name: string;
+  slug: string;
   description: string | null;
+  cover: string | null;
   covers: string[];
   total_books: number;
   created_at: string;

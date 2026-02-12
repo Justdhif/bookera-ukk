@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
+use App\Helpers\SlugGenerator;
+use App\Helpers\SaveCoverHelper;
 use App\Models\Save;
+use App\Models\Book;
 use Illuminate\Http\Request;
 
 class SaveController extends Controller
@@ -33,7 +36,9 @@ class SaveController extends Controller
             return [
                 'id' => $save->id,
                 'name' => $save->name,
+                'slug' => $save->slug,
                 'description' => $save->description,
+                'cover' => storage_image($save->cover),
                 'covers' => $covers,
                 'total_books' => $save->books->count(),
                 'created_at' => $save->created_at,
@@ -47,18 +52,29 @@ class SaveController extends Controller
         );
     }
 
-    public function show($id)
+    public function show($identifier)
     {
-        $save = Save::with(['books' => function ($query) {
-            $query->with('categories')
+        // Try to find by slug first, then by ID
+        $query = Save::with(['books' => function ($query) {
+            $query->with(['categories', 'copies'])
                 ->select('books.*');
         }])
-            ->where('user_id', auth()->id())
-            ->findOrFail($id);
+            ->where('user_id', auth()->id());
 
-        // Transform books to include cover URL
+        // Check if identifier is numeric (ID) or string (slug)
+        if (is_numeric($identifier)) {
+            $save = $query->findOrFail($identifier);
+        } else {
+            $save = $query->where('slug', $identifier)->firstOrFail();
+        }
+
+        // Transform books to include cover URL and copy counts
         $save->books->transform(function ($book) {
             $book->cover_image_url = storage_image($book->cover_image);
+            $book->total_copies = $book->copies->count();
+            $book->available_copies = $book->copies->where('status', 'available')->count();
+            // Remove copies collection to keep response clean
+            unset($book->copies);
             return $book;
         });
 
@@ -70,7 +86,9 @@ class SaveController extends Controller
         $data = [
             'id' => $save->id,
             'name' => $save->name,
+            'slug' => $save->slug,
             'description' => $save->description,
+            'cover' => storage_image($save->cover),
             'covers' => $covers,
             'total_books' => $save->books->count(),
             'books' => $save->books,
@@ -92,6 +110,7 @@ class SaveController extends Controller
         ]);
 
         $data['user_id'] = auth()->id();
+        $data['slug'] = SlugGenerator::generate('saves', 'slug', $data['name']);
 
         $save = Save::create($data);
 
@@ -120,6 +139,11 @@ class SaveController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
+
+        // Update slug if name changed
+        if (isset($data['name']) && $data['name'] !== $save->name) {
+            $data['slug'] = SlugGenerator::generate('saves', 'slug', $data['name'], $save->id);
+        }
 
         $oldData = $save->toArray();
 
@@ -183,6 +207,9 @@ class SaveController extends Controller
 
         $save->books()->attach($data['book_id']);
 
+        // Regenerate cover collage with new book
+        $this->updateSaveCover($save);
+
         ActivityLogger::log(
             'update',
             'save',
@@ -213,6 +240,9 @@ class SaveController extends Controller
 
         $save->books()->detach($bookId);
 
+        // Regenerate cover collage after removing book
+        $this->updateSaveCover($save);
+
         ActivityLogger::log(
             'update',
             'save',
@@ -226,5 +256,28 @@ class SaveController extends Controller
             'Buku berhasil dihapus dari simpanan',
             null
         );
+    }
+
+    /**
+     * Update save cover collage
+     */
+    protected function updateSaveCover(Save $save): void
+    {
+        // Get up to 4 book covers
+        $bookCovers = $save->books()
+            ->take(4)
+            ->pluck('cover_image')
+            ->toArray();
+
+        // Delete old cover if exists
+        if ($save->cover) {
+            SaveCoverHelper::deleteOldCover($save->cover);
+        }
+
+        // Generate new collage
+        $newCover = SaveCoverHelper::generateCollage($bookCovers, $save->id);
+
+        // Update save with new cover
+        $save->update(['cover' => $newCover]);
     }
 }

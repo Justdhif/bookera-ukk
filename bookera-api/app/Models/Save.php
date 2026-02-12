@@ -11,7 +11,9 @@ class Save extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'slug',
         'description',
+        'cover',
     ];
 
     protected $casts = [
