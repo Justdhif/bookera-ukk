@@ -2,114 +2,53 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\PrivacyPolicy\StorePrivacyPolicyRequest;
+use App\Http\Requests\PrivacyPolicy\UpdatePrivacyPolicyRequest;
 use App\Models\PrivacyPolicy;
-use Illuminate\Http\Request;
+use App\Services\PrivacyPolicy\PrivacyPolicyService;
+use Illuminate\Http\JsonResponse;
 
 class PrivacyPolicyController extends Controller
 {
-    /**
-     * Get all privacy policies
-     */
-    public function index()
-    {
-        $privacyPolicies = PrivacyPolicy::orderBy('created_at', 'desc')->get();
+    private PrivacyPolicyService $privacyPolicyService;
 
-        return ApiResponse::successResponse(
-            'Data Privacy Policy berhasil diambil',
-            $privacyPolicies
-        );
+    public function __construct(PrivacyPolicyService $privacyPolicyService)
+    {
+        $this->privacyPolicyService = $privacyPolicyService;
     }
 
-    /**
-     * Get specific privacy policy by ID
-     */
-    public function show(PrivacyPolicy $privacyPolicy)
+    public function index(): JsonResponse
     {
-        return ApiResponse::successResponse(
-            'Detail Privacy Policy berhasil diambil',
-            $privacyPolicy
-        );
+        $privacyPolicies = $this->privacyPolicyService->getAllPrivacyPolicies();
+
+        return ApiResponse::successResponse('Data Privacy Policy berhasil diambil', $privacyPolicies);
     }
 
-    /**
-     * Create new privacy policy (admin)
-     */
-    public function store(Request $request)
+    public function show(PrivacyPolicy $privacyPolicy): JsonResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-        ]);
-
-        $privacyPolicy = PrivacyPolicy::create($data);
-
-        ActivityLogger::log(
-            'create',
-            'privacy_policy',
-            "Created Privacy Policy: {$privacyPolicy->title}",
-            $privacyPolicy->toArray(),
-            null,
-            $privacyPolicy
-        );
-
-        return ApiResponse::successResponse(
-            'Privacy Policy berhasil ditambahkan',
-            $privacyPolicy,
-            201
-        );
+        return ApiResponse::successResponse('Detail Privacy Policy berhasil diambil', $privacyPolicy);
     }
 
-    /**
-     * Update privacy policy (admin)
-     */
-    public function update(Request $request, PrivacyPolicy $privacyPolicy)
+    public function store(StorePrivacyPolicyRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-        ]);
+        $privacyPolicy = $this->privacyPolicyService->createPrivacyPolicy($request->validated());
 
-        $oldData = $privacyPolicy->toArray();
-
-        $privacyPolicy->update($data);
-
-        ActivityLogger::log(
-            'update',
-            'privacy_policy',
-            "Updated Privacy Policy: {$privacyPolicy->title}",
-            $privacyPolicy->toArray(),
-            $oldData,
-            $privacyPolicy
-        );
-
-        return ApiResponse::successResponse(
-            'Privacy Policy berhasil diperbarui',
-            $privacyPolicy
-        );
+        return ApiResponse::successResponse('Privacy Policy berhasil ditambahkan', $privacyPolicy, 201);
     }
 
-    /**
-     * Delete privacy policy (admin)
-     */
-    public function destroy(PrivacyPolicy $privacyPolicy)
+    public function update(UpdatePrivacyPolicyRequest $request, PrivacyPolicy $privacyPolicy): JsonResponse
     {
-        $oldData = $privacyPolicy->toArray();
+        $privacyPolicy = $this->privacyPolicyService->updatePrivacyPolicy($privacyPolicy, $request->validated());
 
-        $privacyPolicy->delete();
+        return ApiResponse::successResponse('Privacy Policy berhasil diperbarui', $privacyPolicy);
+    }
 
-        ActivityLogger::log(
-            'delete',
-            'privacy_policy',
-            "Deleted Privacy Policy: {$oldData['title']}",
-            null,
-            $oldData
-        );
+    public function destroy(PrivacyPolicy $privacyPolicy): JsonResponse
+    {
+        $this->privacyPolicyService->deletePrivacyPolicy($privacyPolicy);
 
-        return ApiResponse::successResponse(
-            'Privacy Policy berhasil dihapus'
-        );
+        return ApiResponse::successResponse('Privacy Policy berhasil dihapus');
     }
 }

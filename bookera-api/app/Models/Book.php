@@ -4,6 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property string $slug
+ * @property string $title
+ * @property string|null $isbn
+ * @property string|null $description
+ * @property string $author
+ * @property string|null $publisher
+ * @property int|null $publication_year
+ * @property string|null $language
+ * @property string|null $cover_image
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Category> $categories
+ * @property-read int|null $categories_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BookCopy> $copies
+ * @property-read int|null $copies_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Save> $saves
+ * @property-read int|null $saves_count
+ */
 class Book extends Model
 {
     protected $table = 'books';

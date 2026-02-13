@@ -2,114 +2,53 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\TermsOfService\StoreTermsOfServiceRequest;
+use App\Http\Requests\TermsOfService\UpdateTermsOfServiceRequest;
 use App\Models\TermsOfService;
-use Illuminate\Http\Request;
+use App\Services\TermsOfService\TermsOfServiceService;
+use Illuminate\Http\JsonResponse;
 
 class TermsOfServiceController extends Controller
 {
-    /**
-     * Get all terms of service
-     */
-    public function index()
-    {
-        $termsOfServices = TermsOfService::orderBy('created_at', 'desc')->get();
+    private TermsOfServiceService $termsOfServiceService;
 
-        return ApiResponse::successResponse(
-            'Data Terms of Service berhasil diambil',
-            $termsOfServices
-        );
+    public function __construct(TermsOfServiceService $termsOfServiceService)
+    {
+        $this->termsOfServiceService = $termsOfServiceService;
     }
 
-    /**
-     * Get specific terms of service by ID
-     */
-    public function show(TermsOfService $termsOfService)
+    public function index(): JsonResponse
     {
-        return ApiResponse::successResponse(
-            'Detail Terms of Service berhasil diambil',
-            $termsOfService
-        );
+        $termsOfServices = $this->termsOfServiceService->getAllTermsOfServices();
+
+        return ApiResponse::successResponse('Data Terms of Service berhasil diambil', $termsOfServices);
     }
 
-    /**
-     * Create new terms of service (admin)
-     */
-    public function store(Request $request)
+    public function show(TermsOfService $termsOfService): JsonResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-        ]);
-
-        $termsOfService = TermsOfService::create($data);
-
-        ActivityLogger::log(
-            'create',
-            'terms_of_service',
-            "Created Terms of Service: {$termsOfService->title}",
-            $termsOfService->toArray(),
-            null,
-            $termsOfService
-        );
-
-        return ApiResponse::successResponse(
-            'Terms of Service berhasil ditambahkan',
-            $termsOfService,
-            201
-        );
+        return ApiResponse::successResponse('Detail Terms of Service berhasil diambil', $termsOfService);
     }
 
-    /**
-     * Update terms of service (admin)
-     */
-    public function update(Request $request, TermsOfService $termsOfService)
+    public function store(StoreTermsOfServiceRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-        ]);
+        $termsOfService = $this->termsOfServiceService->createTermsOfService($request->validated());
 
-        $oldData = $termsOfService->toArray();
-
-        $termsOfService->update($data);
-
-        ActivityLogger::log(
-            'update',
-            'terms_of_service',
-            "Updated Terms of Service: {$termsOfService->title}",
-            $termsOfService->toArray(),
-            $oldData,
-            $termsOfService
-        );
-
-        return ApiResponse::successResponse(
-            'Terms of Service berhasil diperbarui',
-            $termsOfService
-        );
+        return ApiResponse::successResponse('Terms of Service berhasil ditambahkan', $termsOfService, 201);
     }
 
-    /**
-     * Delete terms of service (admin)
-     */
-    public function destroy(TermsOfService $termsOfService)
+    public function update(UpdateTermsOfServiceRequest $request, TermsOfService $termsOfService): JsonResponse
     {
-        $oldData = $termsOfService->toArray();
+        $termsOfService = $this->termsOfServiceService->updateTermsOfService($termsOfService, $request->validated());
 
-        $termsOfService->delete();
+        return ApiResponse::successResponse('Terms of Service berhasil diperbarui', $termsOfService);
+    }
 
-        ActivityLogger::log(
-            'delete',
-            'terms_of_service',
-            "Deleted Terms of Service: {$oldData['title']}",
-            null,
-            $oldData
-        );
+    public function destroy(TermsOfService $termsOfService): JsonResponse
+    {
+        $this->termsOfServiceService->deleteTermsOfService($termsOfService);
 
-        return ApiResponse::successResponse(
-            'Terms of Service berhasil dihapus'
-        );
+        return ApiResponse::successResponse('Terms of Service berhasil dihapus');
     }
 }

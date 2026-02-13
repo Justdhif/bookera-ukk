@@ -4,6 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $book_return_id
+ * @property int $book_copy_id
+ * @property string $condition
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\BookReturn $bookReturn
+ * @property-read \App\Models\BookCopy $bookCopy
+ */
 class BookReturnDetail extends Model
 {
     protected $table = 'book_return_details';

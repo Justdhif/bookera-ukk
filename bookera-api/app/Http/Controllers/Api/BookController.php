@@ -2,258 +2,91 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
-use App\Helpers\SlugGenerator;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Book\StoreBookRequest;
+use App\Http\Requests\Book\UpdateBookRequest;
 use App\Models\Book;
+use App\Services\Book\BookService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
-    public function index(Request $request)
+    private BookService $bookService;
+
+    public function __construct(BookService $bookService)
     {
-        $books = Book::query()
-            ->with(['categories', 'copies'])
-            ->when($request->search, function ($q) use ($request) {
-                $q->where(function ($sub) use ($request) {
-                    $sub->where('title', 'like', "%{$request->search}%")
-                        ->orWhere('author', 'like', "%{$request->search}%")
-                        ->orWhere('isbn', 'like', "%{$request->search}%");
-                });
-            })
-            ->when($request->category_ids, function ($q) use ($request) {
-                $categoryIds = is_array($request->category_ids)
-                    ? $request->category_ids
-                    : explode(',', $request->category_ids);
-
-                $q->whereHas('categories', function ($cat) use ($categoryIds) {
-                    $cat->whereIn('categories.id', $categoryIds);
-                });
-            })
-            ->when($request->status, function ($q) use ($request) {
-                $q->where('is_active', $request->status === 'active');
-            })
-            ->when($request->has_stock, function ($q) {
-                $q->whereHas('copies', function ($copy) {
-                    $copy->where('status', 'available');
-                });
-            })
-            ->latest()
-            ->paginate($request->per_page ?? 10);
-
-        // append cover_image_url and copy counts
-        $books->getCollection()->transform(function ($book) {
-            $book->cover_image_url = storage_image($book->cover_image);
-            $book->total_copies = $book->copies->count();
-            $book->available_copies = $book->copies->where('status', 'available')->count();
-            return $book;
-        });
-
-        return ApiResponse::successResponse(
-            'Data buku berhasil diambil',
-            $books
-        );
+        $this->bookService = $bookService;
     }
 
-    public function store(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string',
-            'author' => 'required|string',
-            'publisher' => 'nullable|string',
-            'publication_year' => 'nullable|integer',
-            'isbn' => 'nullable|string|unique:books,isbn',
-            'description' => 'nullable|string',
-            'language' => 'nullable|string|max:50',
-            'is_active' => 'nullable|boolean',
+        $filters = [
+            'search' => $request->search,
+            'category_ids' => $request->category_ids,
+            'status' => $request->status,
+            'has_stock' => $request->has_stock,
+            'per_page' => $request->per_page
+        ];
 
-            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        $books = $this->bookService->getBooks($filters);
 
-            'category_ids' => 'nullable|array',
-            'category_ids.*' => 'integer|exists:categories,id',
-        ]);
+        return ApiResponse::successResponse('Data buku berhasil diambil', $books);
+    }
 
-        $data['slug'] = SlugGenerator::generate(
-            'books',
-            'slug',
-            $data['title']
+    public function store(StoreBookRequest $request): JsonResponse
+    {
+        $book = $this->bookService->createBook(
+            $request->validated(),
+            $request->file('cover_image')
         );
 
-        if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = $request
-                ->file('cover_image')
-                ->store('books/covers', 'public');
+        return ApiResponse::successResponse('Buku berhasil ditambahkan', $book, 201);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        $book = $this->bookService->getBookById($id);
+
+        if (!$book) {
+            return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
         }
 
-        $book = Book::create($data);
+        return ApiResponse::successResponse('Detail buku', $book);
+    }
 
-        if (!empty($data['category_ids'])) {
-            $book->categories()->sync($data['category_ids']);
+    public function showBySlug(string $slug): JsonResponse
+    {
+        $book = $this->bookService->getBookBySlug($slug);
+
+        if (!$book) {
+            return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
         }
 
-        $book->load(['categories', 'copies']);
-        $book->cover_image_url = storage_image($book->cover_image);
+        return ApiResponse::successResponse('Detail buku', $book);
+    }
 
-        ActivityLogger::log(
-            'create',
-            'book',
-            "Created book: {$book->title}",
-            $book->toArray(),
-            null,
-            $book
-        );
-
-        return ApiResponse::successResponse(
-            'Buku berhasil ditambahkan',
+    public function update(UpdateBookRequest $request, Book $book): JsonResponse
+    {
+        $book = $this->bookService->updateBook(
             $book,
-            201
+            $request->validated(),
+            $request->file('cover_image')
         );
+
+        return ApiResponse::successResponse('Buku berhasil diperbarui', $book);
     }
 
-    public function show($id)
+    public function destroy(int $id): JsonResponse
     {
-        $book = Book::find($id);
-        if (!$book) {
+        $deleted = $this->bookService->deleteBook($id);
+
+        if (!$deleted) {
             return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
         }
 
-        $book->load([
-            'categories',
-            'copies' => function ($q) {
-                $q->orderBy('status')
-                    ->orderBy('created_at');
-            }
-        ]);
-
-        $book->cover_image_url = storage_image($book->cover_image);
-        $book->total_copies = $book->copies->count();
-        $book->available_copies = $book->copies->where('status', 'available')->count();
-
-        return ApiResponse::successResponse(
-            'Detail buku',
-            $book
-        );
-    }
-
-    public function showBySlug($slug)
-    {
-        $book = Book::where('slug', $slug)->first();
-        if (!$book) {
-            return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
-        }
-
-        $book->load([
-            'categories',
-            'copies' => function ($q) {
-                $q->orderBy('status')
-                    ->orderBy('created_at');
-            }
-        ]);
-
-        $book->cover_image_url = storage_image($book->cover_image);
-        $book->total_copies = $book->copies->count();
-        $book->available_copies = $book->copies->where('status', 'available')->count();
-
-        return ApiResponse::successResponse(
-            'Detail buku',
-            $book
-        );
-    }
-
-    public function update(Request $request, Book $book)
-    {
-        if (!$book) {
-            return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
-        }
-
-        $data = $request->validate([
-            'title' => 'required|string',
-            'author' => 'required|string',
-            'publisher' => 'nullable|string',
-            'publication_year' => 'nullable|integer',
-            'isbn' => 'nullable|string|unique:books,isbn,' . $book->id,
-            'description' => 'nullable|string',
-            'language' => 'nullable|string|max:50',
-            'is_active' => 'nullable|boolean',
-
-            'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-
-            'category_ids' => 'nullable|array',
-            'category_ids.*' => 'integer|exists:categories,id',
-        ]);
-
-        if ($data['title'] !== $book->title) {
-            $data['slug'] = SlugGenerator::generate(
-                'books',
-                'slug',
-                $data['title'],
-                $book->id
-            );
-        }
-
-        if ($request->hasFile('cover_image')) {
-            if ($book->cover_image) {
-                Storage::disk('public')->delete($book->cover_image);
-            }
-
-            $data['cover_image'] = $request
-                ->file('cover_image')
-                ->store('books/covers', 'public');
-        }
-
-        $oldData = $book->toArray();
-
-        $book->update($data);
-
-        if (array_key_exists('category_ids', $data)) {
-            $book->categories()->sync($data['category_ids']);
-        }
-
-        $book->load(['categories', 'copies']);
-        $book->cover_image_url = storage_image($book->cover_image);
-
-        ActivityLogger::log(
-            'update',
-            'book',
-            "Updated book: {$book->title}",
-            $book->toArray(),
-            $oldData,
-            $book
-        );
-
-        return ApiResponse::successResponse(
-            'Buku berhasil diperbarui',
-            $book
-        );
-    }
-
-    public function destroy($id)
-    {
-        $book = Book::find($id);
-
-        if (!$book) {
-            return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
-        }
-
-        $bookData = $book->toArray();
-        $bookTitle = $book->title;
-
-        $book->delete();
-
-        ActivityLogger::log(
-            'delete',
-            'book',
-            "Deleted book: {$bookTitle}",
-            null,
-            $bookData,
-            null
-        );
-
-        return ApiResponse::successResponse(
-            'Buku berhasil dihapus',
-            null
-        );
+        return ApiResponse::successResponse('Buku berhasil dihapus', null);
     }
 }
+

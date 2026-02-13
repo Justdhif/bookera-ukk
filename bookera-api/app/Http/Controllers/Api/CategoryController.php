@@ -2,104 +2,49 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Helpers\ActivityLogger;
 use App\Helpers\ApiResponse;
-use App\Helpers\SlugGenerator;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use App\Services\Category\CategoryService;
+use Illuminate\Http\JsonResponse;
 
 class CategoryController extends Controller
 {
-    public function index()
-    {
-        $categories = Category::latest()->get();
+    private CategoryService $categoryService;
 
-        return ApiResponse::successResponse(
-            'Data kategori berhasil diambil',
-            $categories
-        );
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
     }
 
-    public function store(Request $request)
+    public function index(): JsonResponse
     {
-        $data = $request->validate([
-            'name' => 'required|string|unique:categories,name',
-            'icon' => 'nullable|string',
-            'description' => 'nullable|string',
-        ]);
+        $categories = $this->categoryService->getAllCategories();
 
-        $data['slug'] = SlugGenerator::generate('categories', 'name', $data['name']);
-
-        $category = Category::create($data);
-
-        ActivityLogger::log(
-            'create',
-            'category',
-            "Created category: {$category->name}",
-            $category->toArray(),
-            null,
-            $category
-        );
-
-        return ApiResponse::successResponse(
-            'Kategori berhasil ditambahkan',
-            $category,
-            201
-        );
+        return ApiResponse::successResponse('Data kategori berhasil diambil', $categories);
     }
 
-    public function update(Request $request, Category $category)
+    public function store(StoreCategoryRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'name' => 'required|string|unique:categories,name,' . $category->id,
-            'icon' => 'nullable|string',
-            'description' => 'nullable|string',
-        ]);
+        $category = $this->categoryService->createCategory($request->validated());
 
-        $data['slug'] = SlugGenerator::generate('categories', 'name', $data['name']);
-
-        $oldData = $category->toArray();
-
-        $category->update($data);
-
-        ActivityLogger::log(
-            'update',
-            'category',
-            "Updated category: {$category->name}",
-            $category->toArray(),
-            $oldData,
-            $category
-        );
-
-        return ApiResponse::successResponse(
-            'Kategori berhasil diperbarui',
-            $category
-        );
+        return ApiResponse::successResponse('Kategori berhasil ditambahkan', $category, 201);
     }
 
-    public function destroy(Category $category)
+    public function update(UpdateCategoryRequest $request, Category $category): JsonResponse
     {
-        $deletedCategoryId = $category->id;
-        $categoryData = $category->toArray();
-        $categoryName = $category->name;
+        $category = $this->categoryService->updateCategory($category, $request->validated());
 
-        $category->delete();
+        return ApiResponse::successResponse('Kategori berhasil diperbarui', $category);
+    }
 
-        ActivityLogger::log(
-            'delete',
-            'category',
-            "Deleted category: {$categoryName}",
-            null,
-            $categoryData,
-            null
-        );
+    public function destroy(Category $category): JsonResponse
+    {
+        $data = $this->categoryService->deleteCategory($category);
 
-        return ApiResponse::successResponse(
-            'Kategori berhasil dihapus',
-            [
-                'deleted_category_id' => $deletedCategoryId,
-            ]
-        );
+        return ApiResponse::successResponse('Kategori berhasil dihapus', $data);
     }
 }
+

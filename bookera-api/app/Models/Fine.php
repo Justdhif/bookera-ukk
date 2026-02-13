@@ -5,6 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $loan_id
+ * @property int $fine_type_id
+ * @property float $amount
+ * @property \Illuminate\Support\Carbon|null $paid_at
+ * @property string $status
+ * @property string|null $notes
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Loan $loan
+ * @property-read \App\Models\FineType $fineType
+ */
 class Fine extends Model
 {
     protected $fillable = [

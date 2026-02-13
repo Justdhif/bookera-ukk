@@ -2,163 +2,85 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Helpers\ApiResponse;
+use App\Http\Controllers\Controller;
 use App\Models\Notification;
+use App\Services\Notification\NotificationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    /**
-     * Display a listing of notifications for authenticated user
-     */
-    public function index(Request $request)
+    private NotificationService $notificationService;
+
+    public function __construct(NotificationService $notificationService)
     {
-        $user = $request->user();
+        $this->notificationService = $notificationService;
+    }
 
-        $perPage = $request->get('per_page', 15);
-        $filter = $request->get('filter'); // 'read' or 'unread'
+    public function index(Request $request): JsonResponse
+    {
+        $notifications = $this->notificationService->getUserNotifications(
+            $request->user(),
+            $request->get('filter'),
+            $request->get('per_page', 15)
+        );
 
-        $query = Notification::where('user_id', $user->id)
-            ->latest();
+        return ApiResponse::successResponse('Notifications retrieved successfully', $notifications);
+    }
 
-        // Filter by read/unread
-        if ($filter === 'unread') {
-            $query->whereNull('read_at');
-        } elseif ($filter === 'read') {
-            $query->whereNotNull('read_at');
+    public function show(Request $request, Notification $notification): JsonResponse
+    {
+        try {
+            $notification = $this->notificationService->getNotificationById($request->user(), $notification);
+
+            return ApiResponse::successResponse('Notification retrieved successfully', $notification);
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse($e->getMessage(), null, 403);
         }
-
-        $notifications = $query->paginate($perPage);
-
-        return ApiResponse::successResponse(
-            'Notifications retrieved successfully',
-            $notifications
-        );
     }
 
-    /**
-     * Display the specified notification
-     */
-    public function show(Request $request, Notification $notification)
+    public function markAsRead(Request $request, Notification $notification): JsonResponse
     {
-        $user = $request->user();
+        try {
+            $notification = $this->notificationService->markAsRead($request->user(), $notification);
 
-        // Make sure the notification belongs to the authenticated user
-        if ($notification->user_id !== $user->id) {
-            return ApiResponse::errorResponse(
-                'Unauthorized access to notification',
-                null,
-                403
-            );
+            return ApiResponse::successResponse('Notification marked as read', $notification);
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse($e->getMessage(), null, 403);
         }
-
-        return ApiResponse::successResponse(
-            'Notification retrieved successfully',
-            $notification
-        );
     }
 
-    /**
-     * Mark notification as read
-     */
-    public function markAsRead(Request $request, Notification $notification)
+    public function markAllAsRead(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $updated = $this->notificationService->markAllAsRead($request->user());
 
-        // Make sure the notification belongs to the authenticated user
-        if ($notification->user_id !== $user->id) {
-            return ApiResponse::errorResponse(
-                'Unauthorized access to notification',
-                null,
-                403
-            );
+        return ApiResponse::successResponse('All notifications marked as read', ['updated_count' => $updated]);
+    }
+
+    public function unreadCount(Request $request): JsonResponse
+    {
+        $count = $this->notificationService->getUnreadCount($request->user());
+
+        return ApiResponse::successResponse('Unread count retrieved successfully', ['unread_count' => $count]);
+    }
+
+    public function destroy(Request $request, Notification $notification): JsonResponse
+    {
+        try {
+            $this->notificationService->deleteNotification($request->user(), $notification);
+
+            return ApiResponse::successResponse('Notification deleted successfully', null);
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse($e->getMessage(), null, 403);
         }
-
-        if ($notification->read_at === null) {
-            $notification->update([
-                'read_at' => now()
-            ]);
-        }
-
-        return ApiResponse::successResponse(
-            'Notification marked as read',
-            $notification
-        );
     }
 
-    /**
-     * Mark all notifications as read
-     */
-    public function markAllAsRead(Request $request)
+    public function deleteAllRead(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $deleted = $this->notificationService->deleteAllRead($request->user());
 
-        $updated = Notification::where('user_id', $user->id)
-            ->whereNull('read_at')
-            ->update(['read_at' => now()]);
-
-        return ApiResponse::successResponse(
-            'All notifications marked as read',
-            ['updated_count' => $updated]
-        );
-    }
-
-    /**
-     * Get unread notifications count
-     */
-    public function unreadCount(Request $request)
-    {
-        $user = $request->user();
-
-        $count = Notification::where('user_id', $user->id)
-            ->whereNull('read_at')
-            ->count();
-
-        return ApiResponse::successResponse(
-            'Unread count retrieved successfully',
-            ['unread_count' => $count]
-        );
-    }
-
-    /**
-     * Delete notification
-     */
-    public function destroy(Request $request, Notification $notification)
-    {
-        $user = $request->user();
-
-        // Make sure the notification belongs to the authenticated user
-        if ($notification->user_id !== $user->id) {
-            return ApiResponse::errorResponse(
-                'Unauthorized access to notification',
-                null,
-                403
-            );
-        }
-
-        $notification->delete();
-
-        return ApiResponse::successResponse(
-            'Notification deleted successfully',
-            null
-        );
-    }
-
-    /**
-     * Delete all read notifications
-     */
-    public function deleteAllRead(Request $request)
-    {
-        $user = $request->user();
-
-        $deleted = Notification::where('user_id', $user->id)
-            ->whereNotNull('read_at')
-            ->delete();
-
-        return ApiResponse::successResponse(
-            'All read notifications deleted',
-            ['deleted_count' => $deleted]
-        );
+        return ApiResponse::successResponse('All read notifications deleted', ['deleted_count' => $deleted]);
     }
 }
+

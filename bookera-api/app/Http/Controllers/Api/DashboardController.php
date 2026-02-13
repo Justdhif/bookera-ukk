@@ -2,98 +2,46 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Helpers\ApiResponse;
-use App\Models\{
-    User,
-    Book,
-    Loan,
-    BookReturn
-};
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Services\Dashboard\DashboardService;
+use Illuminate\Http\JsonResponse;
 
 class DashboardController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | TOTAL CARD
-    |--------------------------------------------------------------------------
-    */
-    public function totals()
-    {
-        $data = [
-            'total_users' => User::count(),
-            'total_books' => Book::count(),
-            'loans_today' => Loan::whereDate('loan_date', today())->count(),
-            'returns_today' => BookReturn::whereDate('return_date', today())->count(),
-        ];
+    private DashboardService $dashboardService;
 
-        return ApiResponse::successResponse(
-            'Data total dashboard berhasil diambil',
-            $data
-        );
+    public function __construct(DashboardService $dashboardService)
+    {
+        $this->dashboardService = $dashboardService;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | LOANS - LINE & BAR CHART (PER MONTH)
-    |--------------------------------------------------------------------------
-    */
-    public function loanMonthlyChart()
+    public function totals(): JsonResponse
     {
-        $data = Loan::select(
-            DB::raw('MONTH(loan_date) as month'),
-            DB::raw('COUNT(*) as total')
-        )
-            ->whereYear('loan_date', now()->year)
-            ->groupBy('month')
-            ->orderBy('month')
-            ->get();
+        $data = $this->dashboardService->getTotals();
 
-        return ApiResponse::successResponse(
-            'Data grafik peminjaman bulanan',
-            $data
-        );
+        return ApiResponse::successResponse('Data total dashboard berhasil diambil', $data);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | LOANS - PIE CHART (STATUS)
-    |--------------------------------------------------------------------------
-    */
-    public function loanStatusChart()
+    public function loanMonthlyChart(): JsonResponse
     {
-        $data = Loan::select(
-            'status',
-            DB::raw('COUNT(*) as total')
-        )
-            ->groupBy('status')
-            ->get();
+        $data = $this->dashboardService->getLoanMonthlyChart();
 
-        return ApiResponse::successResponse(
-            'Data grafik status peminjaman',
-            $data
-        );
+        return ApiResponse::successResponse('Data grafik peminjaman bulanan', $data);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | LATEST DATA (HIGHLIGHT)
-    |--------------------------------------------------------------------------
-    */
-    public function latest()
+    public function loanStatusChart(): JsonResponse
     {
-        $data = Loan::with([
-            'user.profile',
-            'loanDetails.bookCopy.book'
-        ])
-            ->latest()
-            ->limit(5)
-            ->get();
+        $data = $this->dashboardService->getLoanStatusChart();
 
-        return ApiResponse::successResponse(
-            'Data peminjaman terbaru',
-            $data
-        );
+        return ApiResponse::successResponse('Data grafik status peminjaman', $data);
+    }
+
+    public function latest(): JsonResponse
+    {
+        $data = $this->dashboardService->getLatestLoans();
+
+        return ApiResponse::successResponse('Data peminjaman terbaru', $data);
     }
 }
+

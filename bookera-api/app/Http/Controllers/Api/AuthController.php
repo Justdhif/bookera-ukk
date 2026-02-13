@@ -2,83 +2,54 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Helpers\ApiResponse;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Services\Auth\AuthService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    private AuthService $authService;
+
+    public function __construct(AuthService $authService)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return ApiResponse::unauthorizedResponse(
-                'Email atau password salah',
-                null,
-                401
-            );
-        }
-
-        if (!$user->is_active) {
-            return ApiResponse::forbiddenResponse(
-                'Akun tidak aktif',
-                null,
-                403
-            );
-        }
-
-        Auth::login($user);
-
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        $user->update([
-            'last_login_at' => now()
-        ]);
-
-        $user->load('profile');
-
-        return ApiResponse::successResponse(
-            'Login berhasil',
-            [
-                'token' => $token,
-                'user' => $user
-            ]
-        );
+        $this->authService = $authService;
     }
 
-    public function logout(Request $request)
+    public function login(LoginRequest $request): JsonResponse
     {
-        $user = $request->user();
+        try {
+            $data = $this->authService->login(
+                $request->email,
+                $request->password
+            );
 
-        if ($user && $user->currentAccessToken()) {
-            $user->currentAccessToken()->delete();
+            return ApiResponse::successResponse('Login berhasil', $data);
+        } catch (\Exception $e) {
+            $statusCode = $e->getCode() === 403 ? 403 : 401;
+
+            if ($statusCode === 403) {
+                return ApiResponse::forbiddenResponse($e->getMessage(), null, 403);
+            }
+
+            return ApiResponse::unauthorizedResponse($e->getMessage(), null, 401);
         }
-
-
-        return ApiResponse::successResponse(
-            'Logout berhasil',
-            null
-        );
     }
 
-    public function me(Request $request)
+    public function logout(Request $request): JsonResponse
     {
-        $user = $request->user()->load('profile');
+        $this->authService->logout($request->user());
 
-        return ApiResponse::successResponse(
-            'Data user',
-            [
-                'user' => $user
-            ]
-        );
+        return ApiResponse::successResponse('Logout berhasil', null);
+    }
+
+    public function me(Request $request): JsonResponse
+    {
+        $user = $this->authService->getCurrentUser($request->user());
+
+        return ApiResponse::successResponse('Data user', ['user' => $user]);
     }
 }
+
