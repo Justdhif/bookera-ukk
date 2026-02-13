@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
+import { getNotificationIcon } from "@/components/custom-ui/content/notification/notification-utils";
 
 interface NotificationDropdownProps {
   isAuthenticated: boolean;
@@ -28,6 +29,19 @@ export default function NotificationDropdown({
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Listen for notification received event
+  useEffect(() => {
+    const handleNotificationReceived = () => {
+      fetchNotifications();
+      fetchUnreadCount();
+    };
+
+    window.addEventListener("notification-received", handleNotificationReceived);
+    return () => {
+      window.removeEventListener("notification-received", handleNotificationReceived);
+    };
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -78,20 +92,6 @@ export default function NotificationDropdown({
       router.push(`/loans/${notif.data.loan_id}`);
     } else {
       router.push("/notifications");
-    }
-  };
-
-  const getNotificationIcon = (type: string | null) => {
-    switch (type) {
-      case "approved":
-        return "✅";
-      case "rejected":
-        return "❌";
-      case "borrow_request":
-      case "return_request":
-        return "📝";
-      default:
-        return "🔔";
     }
   };
 
@@ -160,7 +160,7 @@ export default function NotificationDropdown({
                   )}
                 >
                   <div className="flex gap-3">
-                    <div className="text-2xl shrink-0">
+                    <div className="shrink-0 mt-1">
                       {getNotificationIcon(notif.type)}
                     </div>
                     <div className="flex-1 min-w-0">

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\ApprovalController;
 use App\Http\Controllers\Api\AuthController;
@@ -25,6 +26,12 @@ use App\Http\Controllers\Api\UserController;
 | API Routes
 |--------------------------------------------------------------------------
 */
+
+// ============================================================================
+// BROADCASTING AUTHENTICATION
+// ============================================================================
+
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 // ============================================================================
 // PUBLIC ROUTES (No Authentication Required)

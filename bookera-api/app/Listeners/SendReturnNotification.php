@@ -4,8 +4,6 @@ namespace App\Listeners;
 
 use App\Models\User;
 use App\Services\NotificationService;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
 class SendReturnNotification
 {
@@ -23,55 +21,54 @@ class SendReturnNotification
     public function handle($event)
     {
         $bookReturn = $event->bookReturn;
+        $loan = $bookReturn->loan;
 
+        // Notifikasi saat user request return (loan status: borrowed -> checking)
         if ($event instanceof \App\Events\ReturnRequested) {
 
             $admins = User::where('role', 'admin')->pluck('id');
+
+            $bookTitles = $bookReturn->details->map(function($detail) {
+                return $detail->bookCopy->book->title ?? 'Unknown';
+            })->take(2)->implode(', ');
+
+            $totalBooks = $bookReturn->details->count();
+            $moreText = $totalBooks > 2 ? " and " . ($totalBooks - 2) . " more" : "";
 
             foreach ($admins as $adminId) {
                 NotificationService::send(
                     $adminId,
                     'New Return Request',
-                    "Return #{$bookReturn->id} requested",
+                    "User {$loan->user->profile->full_name} wants to return {$bookTitles}{$moreText} (Loan #{$loan->id})",
                     'return_request',
                     'return',
-                    ['return_id' => $bookReturn->id, 'loan_id' => $bookReturn->loan_id]
+                    ['return_id' => $bookReturn->id, 'loan_id' => $loan->id]
                 );
             }
 
         }
 
+        // Notifikasi saat admin approve return (loan status: checking -> returned/finished)
         if ($event instanceof \App\Events\ReturnApproved) {
 
-            $userId = $bookReturn->loan->user_id;
+            $userId = $loan->user_id;
+
+            $bookTitles = $bookReturn->details->map(function($detail) {
+                return $detail->bookCopy->book->title ?? 'Unknown';
+            })->take(2)->implode(', ');
+
+            $totalBooks = $bookReturn->details->count();
+            $moreText = $totalBooks > 2 ? " and " . ($totalBooks - 2) . " more" : "";
 
             NotificationService::send(
                 $userId,
-                'Return Approved',
-                "Return #{$bookReturn->id} approved",
+                'Return Completed',
+                "Your return for {$bookTitles}{$moreText} has been processed successfully. Thank you!",
                 'approved',
                 'return',
-                ['return_id' => $bookReturn->id, 'loan_id' => $bookReturn->loan_id]
+                ['return_id' => $bookReturn->id, 'loan_id' => $loan->id]
             );
 
-        }
-
-        if ($event instanceof \App\Events\ReturnRejected) {
-
-            $userId = $bookReturn->loan->user_id;
-
-            NotificationService::send(
-                $userId,
-                'Return Rejected',
-                "Return #{$bookReturn->id} rejected" . ($event->reason ? ": {$event->reason}" : ''),
-                'rejected',
-                'return',
-                [
-                    'return_id' => $bookReturn->id,
-                    'loan_id' => $bookReturn->loan_id,
-                    'reason' => $event->reason ?? null
-                ]
-            );
         }
     }
 }

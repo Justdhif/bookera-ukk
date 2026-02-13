@@ -3,6 +3,7 @@
 namespace App\Services\Approval;
 
 use App\Events\LoanApproved;
+use App\Events\LoanRejected;
 use App\Helpers\ActivityLogger;
 use App\Models\BookReturn;
 use App\Models\Loan;
@@ -82,6 +83,8 @@ class ApprovalService
             'loanDetails.bookCopy.book',
             'user',
         ]);
+
+        event(new LoanRejected($loan, $rejectionReason));
 
         return $loan;
     }

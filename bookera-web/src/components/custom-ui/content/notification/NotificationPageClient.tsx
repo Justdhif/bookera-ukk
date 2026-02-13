@@ -26,6 +26,19 @@ export default function NotificationPageClient() {
   
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
+  // Listen for notification received event
+  useEffect(() => {
+    const handleNotificationReceived = () => {
+      fetchNotifications();
+      fetchUnreadCount();
+    };
+
+    window.addEventListener("notification-received", handleNotificationReceived);
+    return () => {
+      window.removeEventListener("notification-received", handleNotificationReceived);
+    };
+  }, []);
+
   useEffect(() => {
     fetchNotifications();
     fetchUnreadCount();

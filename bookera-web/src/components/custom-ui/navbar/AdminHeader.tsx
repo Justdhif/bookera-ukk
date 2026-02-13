@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,39 +12,21 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell, Settings, FileText, Shield } from "lucide-react";
-import { notificationService } from "@/services/notification.service";
+import { Settings, FileText, Shield } from "lucide-react";
 import { useTranslations } from "next-intl";
+import NotificationDropdown from "./NotificationDropdown";
 
 export default function AdminHeader() {
   const t = useTranslations('header');
   const pathname = usePathname();
   const router = useRouter();
   const segments = pathname.replace("/admin", "").split("/").filter(Boolean);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    fetchUnreadCount();
-    // Refresh count every 30 seconds
-    const interval = setInterval(fetchUnreadCount, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchUnreadCount = async () => {
-    try {
-      const response = await notificationService.getUnreadCount();
-      setUnreadCount(response.data.data.unread_count);
-    } catch (error) {
-      console.error("Failed to fetch unread count:", error);
-    }
-  };
 
   // Format segment untuk breadcrumb
   const formatSegment = (seg: string) => {
@@ -108,22 +90,7 @@ export default function AdminHeader() {
         </DropdownMenu>
 
         {/* Notifications */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative"
-          onClick={() => router.push("/admin/notifications")}
-        >
-          <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
-            <Badge
-              variant="destructive"
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-            >
-              {unreadCount > 99 ? "99+" : unreadCount}
-            </Badge>
-          )}
-        </Button>
+        <NotificationDropdown isAuthenticated={true} />
       </div>
     </header>
   );

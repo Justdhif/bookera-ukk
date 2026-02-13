@@ -10,7 +10,10 @@ use App\Listeners\LogLogoutActivity;
 use App\Events\LoanRequested;
 use App\Events\LoanApproved;
 use App\Events\LoanRejected;
+use App\Events\ReturnRequested;
+use App\Events\ReturnApproved;
 use App\Listeners\SendLoanNotification;
+use App\Listeners\SendReturnNotification;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -31,6 +34,13 @@ class EventServiceProvider extends ServiceProvider
         ],
         LoanRejected::class => [
             SendLoanNotification::class,
+        ],
+
+        ReturnRequested::class => [
+            SendReturnNotification::class,
+        ],
+        ReturnApproved::class => [
+            SendReturnNotification::class,
         ],
     ];
 

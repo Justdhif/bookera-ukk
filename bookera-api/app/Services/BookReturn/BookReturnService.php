@@ -7,6 +7,8 @@ use App\Models\BookReturn;
 use App\Models\Fine;
 use App\Models\FineType;
 use App\Models\Loan;
+use App\Events\ReturnRequested;
+use App\Events\ReturnApproved;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -113,6 +115,8 @@ class BookReturnService
                 $return
             );
 
+            event(new ReturnRequested($return));
+
             return $return;
         });
     }
@@ -156,6 +160,8 @@ class BookReturnService
                 ['loan_id' => $loan->id, 'old_status' => $oldLoanStatus],
                 $loan
             );
+
+            event(new ReturnApproved($bookReturn));
         });
 
         return $bookReturn->load('details.bookCopy.book', 'loan');
