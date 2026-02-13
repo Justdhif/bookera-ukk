@@ -33,6 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Upload, X, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import YearPicker from "@/components/custom-ui/YearPicker";
 
 export default function AddBookClient() {
   const router = useRouter();
@@ -151,7 +152,7 @@ export default function AddBookClient() {
           type="submit"
           form="book-form"
           variant="submit"
-          disabled={submitting || !formData.title || !formData.author}
+          disabled={submitting || !formData.title.trim() || !formData.author.trim()}
           loading={submitting}
           className="h-8"
         >
@@ -248,8 +249,8 @@ export default function AddBookClient() {
               <div className="space-y-4">
                 <h3 className="font-semibold text-lg">{tCommonRoot('basicInformation')}</h3>
                 <div className="space-y-2">
-                  <Label htmlFor="title">
-                    {tCommonRoot('title')} <span className="text-red-500">*</span>
+                  <Label htmlFor="title" variant="required">
+                    {tCommonRoot('title')}
                   </Label>
                   <Input
                     id="title"
@@ -263,8 +264,8 @@ export default function AddBookClient() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="author">
-                    {tCommonRoot('author')} <span className="text-red-500">*</span>
+                  <Label htmlFor="author" variant="required">
+                    {tCommonRoot('author')}
                   </Label>
                   <Input
                     id="author"
@@ -292,19 +293,17 @@ export default function AddBookClient() {
 
                   <div className="space-y-2">
                     <Label htmlFor="publication_year">{tCommonRoot('publicationYear')}</Label>
-                    <Input
-                      id="publication_year"
-                      type="number"
-                      min="1000"
-                      max={new Date().getFullYear()}
+                    <YearPicker
                       value={formData.publication_year}
-                      onChange={(e) =>
+                      onChange={(year) =>
                         setFormData({
                           ...formData,
-                          publication_year: e.target.value,
+                          publication_year: year,
                         })
                       }
-                      placeholder={tCommonRoot('yearFormat')}
+                      placeholder={tCommonRoot('selectYear')}
+                      searchPlaceholder={tCommonRoot('searchYear')}
+                      emptyText={tCommonRoot('yearNotFound')}
                     />
                   </div>
                 </div>

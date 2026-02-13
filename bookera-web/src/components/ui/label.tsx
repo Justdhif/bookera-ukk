@@ -5,10 +5,17 @@ import * as LabelPrimitive from "@radix-ui/react-label"
 
 import { cn } from "@/lib/utils"
 
+export interface LabelProps
+  extends React.ComponentProps<typeof LabelPrimitive.Root> {
+  variant?: "default" | "required"
+}
+
 function Label({
   className,
+  variant = "default",
+  children,
   ...props
-}: React.ComponentProps<typeof LabelPrimitive.Root>) {
+}: LabelProps) {
   return (
     <LabelPrimitive.Root
       data-slot="label"
@@ -17,7 +24,14 @@ function Label({
         className
       )}
       {...props}
-    />
+    >
+      {children}
+      {variant === "required" && (
+        <span className="text-red-500" aria-label="required">
+          *
+        </span>
+      )}
+    </LabelPrimitive.Root>
   )
 }
 

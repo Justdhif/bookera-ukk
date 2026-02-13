@@ -56,7 +56,7 @@ export default function NotificationList({
   ];
 
   return (
-    <Card className="h-full">
+    <Card className="h-[calc(100vh-7rem)]">
       <CardHeader className="border-b pb-3">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-lg">{t('allNotifications')}</h3>

@@ -73,6 +73,11 @@ export default function BookDetailClient() {
     e.preventDefault();
     if (!book) return;
 
+    if (!formData.title?.trim() || !formData.author?.trim()) {
+      toast.error(t('titleAuthorRequired'));
+      return;
+    }
+
     try {
       setSubmitting(true);
       const data = new FormData();
@@ -191,7 +196,7 @@ export default function BookDetailClient() {
               type="submit"
               form="book-form"
               variant="submit"
-              disabled={submitting || !formData.title || !formData.author}
+              disabled={submitting || !formData.title?.trim() || !formData.author?.trim()}
               loading={submitting}
               className="h-8"
             >

@@ -40,7 +40,7 @@ export default function TermsOfServiceFormDialog({
   }, [item, open]);
 
   const handleSubmit = async () => {
-    if (!title || !content) {
+    if (!title.trim() || !content.trim()) {
       toast.error(t('pleaseCompleteRequiredFields'));
       return;
     }
@@ -48,8 +48,8 @@ export default function TermsOfServiceFormDialog({
     setIsLoading(true);
     try {
       const payload = {
-        title,
-        content,
+        title: title.trim(),
+        content: content.trim(),
       };
 
       if (item) {
@@ -82,8 +82,8 @@ export default function TermsOfServiceFormDialog({
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">
-              {t('title')} <span className="text-red-500">*</span>
+            <Label htmlFor="title" variant="required">
+              {t('title')}
             </Label>
             <Input
               id="title"
@@ -94,8 +94,8 @@ export default function TermsOfServiceFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="content">
-              {t('contentHTML')} <span className="text-red-500">*</span>
+            <Label htmlFor="content" variant="required">
+              {t('contentHTML')}
             </Label>
             <Textarea
               id="content"
@@ -113,7 +113,7 @@ export default function TermsOfServiceFormDialog({
           <Button
             onClick={handleSubmit}
             variant="submit"
-            disabled={isLoading || !title || !content}
+            disabled={isLoading || !title.trim() || !content.trim()}
             loading={isLoading}
             className="w-full"
           >

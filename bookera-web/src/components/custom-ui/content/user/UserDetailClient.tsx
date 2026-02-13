@@ -80,6 +80,11 @@ export default function UserDetailClient() {
     e.preventDefault();
     if (!user) return;
 
+    if (!formData.email?.trim() || !formData.full_name?.trim() || !formData.role) {
+      toast.error(tCommon('pleaseCompleteRequiredFields'));
+      return;
+    }
+
     try {
       setSubmitting(true);
       await userService.update(user.id, formData as UpdateUserData);
@@ -169,7 +174,7 @@ export default function UserDetailClient() {
               type="submit"
               form="user-form"
               variant="submit"
-              disabled={submitting || !formData.email || !formData.full_name || !formData.role}
+              disabled={submitting || !formData.email?.trim() || !formData.full_name?.trim() || !formData.role}
               loading={submitting}
               className="h-8"
             >

@@ -56,6 +56,12 @@ export default function AddUserClient() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.email?.trim() || !formData.full_name?.trim() || !formData.password?.trim()) {
+      toast.error(tCommon('pleaseCompleteRequiredFields'));
+      return;
+    }
+
     try {
       setSubmitting(true);
       await userService.create(formData as CreateUserData);
@@ -90,7 +96,7 @@ export default function AddUserClient() {
           type="submit"
           form="user-form"
           variant="submit"
-          disabled={submitting || !formData.email || !formData.full_name || !formData.password}
+          disabled={submitting || !formData.email?.trim() || !formData.full_name?.trim() || !formData.password?.trim()}
           loading={submitting}
           className="h-8"
         >
@@ -192,8 +198,8 @@ export default function AddUserClient() {
                 <h3 className="font-semibold text-lg">{tCommon('account')}</h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="email">
-                      Email <span className="text-red-500">*</span>
+                    <Label htmlFor="email" variant="required">
+                      Email
                     </Label>
                     <Input
                       id="email"
@@ -207,8 +213,8 @@ export default function AddUserClient() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">
-                      Password <span className="text-red-500">*</span>
+                    <Label htmlFor="password" variant="required">
+                      Password
                     </Label>
                     <Input
                       id="password"
@@ -229,8 +235,8 @@ export default function AddUserClient() {
                 <h3 className="font-semibold text-lg">{tCommon('profile')}</h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="full_name">
-                      {tCommon('namePlaceholder')} <span className="text-red-500">*</span>
+                    <Label htmlFor="full_name" variant="required">
+                      {tCommon('namePlaceholder')}
                     </Label>
                     <Input
                       id="full_name"

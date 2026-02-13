@@ -29,6 +29,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import YearPicker from "@/components/custom-ui/YearPicker";
 
 interface BookDetailFormProps {
   book: Book;
@@ -135,8 +136,8 @@ export default function BookDetailForm({
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">{t('basicInfo')}</h3>
           <div className="space-y-2">
-            <Label htmlFor="title">
-              {t('title')} <span className="text-red-500">*</span>
+            <Label htmlFor="title" variant="required">
+              {t('title')}
             </Label>
             <Input
               id="title"
@@ -150,8 +151,8 @@ export default function BookDetailForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="author">
-              {t('author')} <span className="text-red-500">*</span>
+            <Label htmlFor="author" variant="required">
+              {t('author')}
             </Label>
             <Input
               id="author"
@@ -179,19 +180,17 @@ export default function BookDetailForm({
 
             <div className="space-y-2">
               <Label htmlFor="publication_year">{t('publicationYear')}</Label>
-              <Input
-                id="publication_year"
-                type="number"
-                min="1000"
-                max={new Date().getFullYear()}
+              <YearPicker
                 value={formData.publication_year || ""}
-                onChange={(e) =>
+                onChange={(year) =>
                   setFormData({
                     ...formData,
-                    publication_year: e.target.value,
+                    publication_year: year,
                   })
                 }
-                placeholder="YYYY"
+                placeholder={t('selectYear')}
+                searchPlaceholder={t('searchYear')}
+                emptyText={t('yearNotFound')}
               />
             </div>
           </div>

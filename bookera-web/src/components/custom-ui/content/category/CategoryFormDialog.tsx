@@ -41,6 +41,11 @@ export default function CategoryFormDialog({
   }, [category, open]);
 
   const handleSubmit = async () => {
+    if (!name.trim()) {
+      toast.error(tAdmin('fieldRequired'));
+      return;
+    }
+
     setIsLoading(true);
     try {
       if (category) {
@@ -84,7 +89,9 @@ export default function CategoryFormDialog({
         <div className="space-y-6">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">{t('categoryName')} <span className="text-red-500">*</span></Label>
+              <Label htmlFor="name" variant="required">
+                {t('categoryName')}
+              </Label>
               <Input
                 id="name"
                 placeholder={t('categoryName')}
@@ -113,7 +120,7 @@ export default function CategoryFormDialog({
           <Button
             onClick={handleSubmit}
             variant="submit"
-            disabled={isLoading || !name}
+            disabled={isLoading || !name.trim()}
             loading={isLoading}
             className="w-full"
           >

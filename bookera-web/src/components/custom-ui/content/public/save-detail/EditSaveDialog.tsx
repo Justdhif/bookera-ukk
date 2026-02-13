@@ -46,7 +46,10 @@ export default function EditSaveDialog({
 
     setIsUpdating(true);
     try {
-      await saveService.update(save.id, formData);
+      await saveService.update(save.id, {
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+      });
       toast.success(t('updateSuccess'));
       onOpenChange(false);
       onSuccess();
@@ -66,7 +69,7 @@ export default function EditSaveDialog({
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="edit-name">{t('name')} *</Label>
+            <Label htmlFor="edit-name" variant="required">{t('name')}</Label>
             <Input
               id="edit-name"
               value={formData.name}
@@ -101,7 +104,7 @@ export default function EditSaveDialog({
           <Button
             variant="submit"
             onClick={handleUpdate}
-            disabled={isUpdating}
+            disabled={isUpdating || !formData.name.trim()}
           >
             {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isUpdating ? t('updating') : t('update')}

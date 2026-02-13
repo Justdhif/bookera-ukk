@@ -257,7 +257,7 @@ export function BorrowFromCollectionDialog({
         )}
 
         <div className="space-y-2 border-t pt-4">
-          <Label className="text-sm font-semibold">{t("dueDate")}</Label>
+          <Label className="text-sm font-semibold" variant="required">{t("dueDate")}</Label>
           <DatePicker
             value={dueDate}
             onChange={setDueDate}

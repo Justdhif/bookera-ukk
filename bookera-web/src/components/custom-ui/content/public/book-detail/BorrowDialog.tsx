@@ -73,8 +73,8 @@ export default function BorrowDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="due_date">
-              {t('returnDateLabel')} <span className="text-red-500">*</span>
+            <Label htmlFor="due_date" variant="required">
+              {t('returnDateLabel')}
             </Label>
             <DatePicker
               value={dueDate}

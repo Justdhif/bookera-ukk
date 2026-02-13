@@ -415,7 +415,9 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">{t("name")} *</Label>
+              <Label htmlFor="name" variant="required">
+                {t("name")}
+              </Label>
               <Input
                 id="name"
                 placeholder={t("namePlaceholder")}
@@ -450,7 +452,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
             <Button
               variant="submit"
               onClick={handleCreateSave}
-              disabled={isCreating}
+              disabled={isCreating || !formData.name.trim()}
             >
               {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isCreating ? t("creating") : t("create")}

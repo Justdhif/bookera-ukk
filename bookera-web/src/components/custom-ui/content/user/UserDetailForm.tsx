@@ -52,8 +52,8 @@ export default function UserDetailForm({
           <h3 className="font-semibold text-lg">{t('account')}</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="email">
-                Email {isEditMode && <span className="text-red-500">*</span>}
+              <Label htmlFor="email" variant={isEditMode ? "required" : "default"}>
+                Email
               </Label>
               <Input
                 id="email"
@@ -91,9 +91,8 @@ export default function UserDetailForm({
           <h3 className="font-semibold text-lg">{t('profile')}</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="full_name">
-                Nama Lengkap{" "}
-                {isEditMode && <span className="text-red-500">*</span>}
+              <Label htmlFor="full_name" variant={isEditMode ? "required" : "default"}>
+                Nama Lengkap
               </Label>
               <Input
                 id="full_name"
