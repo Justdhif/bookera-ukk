@@ -77,4 +77,3 @@ class LoanController extends Controller
         return ApiResponse::successResponse('Data peminjaman user', $loans);
     }
 }
-

@@ -13,9 +13,6 @@ class LoanRejected implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
     public $loan;
     public $reason;
 
@@ -25,11 +22,6 @@ class LoanRejected implements ShouldBroadcastNow
         $this->reason = $reason;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): array
     {
         return [
@@ -37,24 +29,28 @@ class LoanRejected implements ShouldBroadcastNow
         ];
     }
 
-    /**
-     * The event's broadcast name.
-     */
     public function broadcastAs(): string
     {
         return 'loan.rejected';
     }
 
-    /**
-     * Get the data to broadcast.
-     */
     public function broadcastWith(): array
     {
+        $approvalStatus = $this->loan->approval_status;
+        
+        $message = match($approvalStatus) {
+            'rejected' => 'All your loan requests have been rejected',
+            'partial' => 'Some of your loan requests have been rejected',
+            'processing' => 'Your loan request is being processed',
+            default => 'Your loan request has been updated',
+        };
+
         return [
             'loan_id' => $this->loan->id,
-            'message' => 'Your loan request has been rejected',
+            'message' => $message,
             'type' => 'rejected',
             'reason' => $this->reason,
+            'approval_status' => $approvalStatus,
         ];
     }
 }

@@ -147,6 +147,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('approvals')->group(function () {
             Route::get('loans/pending', [ApprovalController::class, 'getPendingLoans']);
             Route::get('loans/approved', [ApprovalController::class, 'getApprovedLoans']);
+            Route::post('loan-details/{loanDetail}/approve', [ApprovalController::class, 'approveLoanDetail']);
+            Route::post('loan-details/{loanDetail}/reject', [ApprovalController::class, 'rejectLoanDetail']);
             Route::post('loans/{loan}/approve', [ApprovalController::class, 'approveLoan']);
             Route::post('loans/{loan}/reject', [ApprovalController::class, 'rejectLoan']);
             Route::post('loans/{loan}/mark-borrowed', [ApprovalController::class, 'markAsBorrowed']);

@@ -4,28 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @property int $id
- * @property int $user_id
- * @property \Illuminate\Support\Carbon $loan_date
- * @property \Illuminate\Support\Carbon $due_date
- * @property string $status
- * @property string $approval_status
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $user
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LoanDetail> $loanDetails
- * @property-read int|null $loan_details_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LoanDetail> $details
- * @property-read int|null $details_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BookReturn> $bookReturns
- * @property-read int|null $book_returns_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Fine> $fines
- * @property-read int|null $fines_count
- * @property-read \App\Models\LostBook|null $lostBook
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LostBook> $lostBooks
- * @property-read int|null $lost_books_count
- */
 class Loan extends Model
 {
     protected $table = 'loans';
@@ -35,8 +13,9 @@ class Loan extends Model
         'loan_date',
         'due_date',
         'status',
-        'approval_status',
     ];
+
+    protected $appends = ['approval_status'];
 
     public function user()
     {
@@ -71,5 +50,52 @@ class Loan extends Model
     public function lostBooks()
     {
         return $this->hasMany(LostBook::class);
+    }
+
+    public function getApprovalStatusAttribute(): string
+    {
+        $details = $this->loanDetails;
+        
+        if ($details->isEmpty()) {
+            return 'pending';
+        }
+
+        $totalDetails = $details->count();
+        $approvedCount = $details->where('approval_status', 'approved')->count();
+        $rejectedCount = $details->where('approval_status', 'rejected')->count();
+        $pendingCount = $details->where('approval_status', 'pending')->count();
+
+        if ($pendingCount === $totalDetails) {
+            return 'pending';
+        }
+
+        if ($approvedCount === $totalDetails) {
+            return 'approved';
+        }
+
+        if ($rejectedCount === $totalDetails) {
+            return 'rejected';
+        }
+
+        if ($pendingCount > 0) {
+            return 'processing';
+        }
+
+        return 'partial';
+    }
+
+    public function scopeWithApprovalStatus($query, $status)
+    {
+        return $query->whereHas('loanDetails', function ($q) use ($status) {
+            if ($status === 'pending') {
+                $q->where('approval_status', 'pending');
+            } elseif ($status === 'approved') {
+                $q->where('approval_status', 'approved')
+                  ->havingRaw('COUNT(*) = (SELECT COUNT(*) FROM loan_details WHERE loan_id = loans.id)');
+            } elseif ($status === 'rejected') {
+                $q->where('approval_status', 'rejected')
+                  ->havingRaw('COUNT(*) = (SELECT COUNT(*) FROM loan_details WHERE loan_id = loans.id)');
+            }
+        });
     }
 }

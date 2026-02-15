@@ -11,12 +11,8 @@ use Carbon\Carbon;
 
 class LoanSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Get users with 'user' role
         $users = User::where('role', 'user')->get();
         
         if ($users->isEmpty()) {
@@ -24,7 +20,6 @@ class LoanSeeder extends Seeder
             return;
         }
 
-        // Get book copies
         $bookCopies = BookCopy::whereIn('status', ['borrowed', 'available'])->get();
         
         if ($bookCopies->isEmpty()) {
@@ -121,16 +116,14 @@ class LoanSeeder extends Seeder
                 'loan_date' => $loanData['loan_date'],
                 'due_date' => $loanData['due_date'],
                 'status' => $loanData['status'],
-                'approval_status' => $loanData['approval_status'],
             ]);
 
-            // Create loan detail
             LoanDetail::create([
                 'loan_id' => $loan->id,
                 'book_copy_id' => $bookCopy->id,
+                'approval_status' => $loanData['approval_status'],
             ]);
 
-            // Update book copy status
             if ($loanData['status'] === 'borrowed' || $loanData['status'] === 'late') {
                 $bookCopy->update(['status' => 'borrowed']);
             }

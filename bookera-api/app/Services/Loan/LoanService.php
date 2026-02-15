@@ -48,7 +48,6 @@ class LoanService
                 'loan_date' => now(),
                 'due_date' => $data['due_date'],
                 'status' => 'pending',
-                'approval_status' => 'pending',
             ]);
 
             $borrowedCopies = [];
@@ -61,6 +60,7 @@ class LoanService
 
                 $loan->loanDetails()->create([
                     'book_copy_id' => $copy->id,
+                    'approval_status' => 'pending',
                 ]);
 
                 $borrowedCopies[] = [
@@ -83,7 +83,6 @@ class LoanService
                     'loan_id' => $loan->id,
                     'user' => $loan->user->email,
                     'due_date' => $loan->due_date,
-                    'approval_status' => 'pending',
                     'borrowed_copies' => $borrowedCopies,
                 ],
                 null,
@@ -104,9 +103,6 @@ class LoanService
                 'loan_date' => now(),
                 'due_date' => $data['due_date'],
                 'status' => 'borrowed',
-                'approval_status' => 'approved',
-                'approved_by' => $admin->id,
-                'approved_at' => now(),
             ]);
 
             $borrowedCopies = [];
@@ -119,6 +115,7 @@ class LoanService
 
                 $loan->loanDetails()->create([
                     'book_copy_id' => $copy->id,
+                    'approval_status' => 'approved',
                 ]);
 
                 $borrowedCopies[] = [
@@ -152,7 +149,6 @@ class LoanService
                     'loan_id' => $loan->id,
                     'user' => $loan->user->email,
                     'due_date' => $loan->due_date,
-                    'approval_status' => 'approved',
                     'status' => 'borrowed',
                     'borrowed_copies' => $borrowedCopies,
                     'admin' => $admin->email,

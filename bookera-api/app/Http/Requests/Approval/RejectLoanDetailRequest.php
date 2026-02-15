@@ -4,7 +4,7 @@ namespace App\Http\Requests\Approval;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RejectLoanRequest extends FormRequest
+class RejectLoanDetailRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,7 +14,7 @@ class RejectLoanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rejection_reason' => 'nullable|string',
+            'note' => 'nullable|string',
         ];
     }
 }

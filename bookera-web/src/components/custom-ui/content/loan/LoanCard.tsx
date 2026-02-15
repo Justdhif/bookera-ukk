@@ -1,4 +1,4 @@
-import { Loan } from "@/types/loan";
+import { Loan, LoanDetail } from "@/types/loan";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,14 +23,27 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface LoanCardProps {
   loan: Loan;
   showActions?: boolean;
-  actionLoading: number | null;
+  actionLoading: number | null | string;
   onApprove?: (loanId: number) => void;
   onReject?: (loan: Loan) => void;
   onMarkAsBorrowed?: (loanId: number) => void;
+  onApproveDetail?: (detailId: number) => void;
+  onRejectDetail?: (detailId: number, note: string) => void;
 }
 
 export function LoanCard({
@@ -40,7 +53,14 @@ export function LoanCard({
   onApprove,
   onReject,
   onMarkAsBorrowed,
+  onApproveDetail,
+  onRejectDetail,
 }: LoanCardProps) {
+  const [rejectDetailDialog, setRejectDetailDialog] = useState<{
+    open: boolean;
+    detail: LoanDetail | null;
+  }>({ open: false, detail: null });
+  const [rejectNote, setRejectNote] = useState("");
   const t = useTranslations('loans');
   const tStatus = useTranslations('status');
   const getStatusBadge = (status: Loan["status"]) => {
@@ -130,6 +150,12 @@ export function LoanCard({
         icon: <Clock className="h-3 w-3 mr-1" />,
         className: "bg-orange-100 text-orange-800 hover:bg-orange-100",
       },
+      processing: {
+        variant: "secondary",
+        label: "Processing",
+        icon: <Clock className="h-3 w-3 mr-1" />,
+        className: "bg-blue-100 text-blue-800 hover:bg-blue-100",
+      },
       approved: {
         variant: "default",
         label: "Approved",
@@ -140,6 +166,12 @@ export function LoanCard({
         variant: "destructive", 
         label: "Rejected",
         icon: <XCircleIcon className="h-3 w-3 mr-1" />,
+      },
+      partial: {
+        variant: "secondary",
+        label: "Partially Approved",
+        icon: <AlertCircle className="h-3 w-3 mr-1" />,
+        className: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
       },
     };
 
@@ -183,7 +215,7 @@ export function LoanCard({
           </div>
           {showActions && (
             <div className="flex gap-2">
-              {loan.approval_status === "pending" && (
+              {(loan.approval_status === "pending" || loan.approval_status === "processing") && (
                 <>
                   <Button
                     size="sm"
@@ -196,7 +228,7 @@ export function LoanCard({
                     ) : (
                       <CheckCircle2 className="h-4 w-4 mr-1" />
                     )}
-                    Approve
+                    Approve All
                   </Button>
                   <Button
                     size="sm"
@@ -205,7 +237,7 @@ export function LoanCard({
                     disabled={actionLoading === loan.id}
                   >
                     <XCircle className="h-4 w-4 mr-1" />
-                    Reject
+                    Reject All
                   </Button>
                 </>
               )}
@@ -233,29 +265,157 @@ export function LoanCard({
           <p className="text-sm font-medium text-muted-foreground mb-3">
             {t('borrowedBooks')} ({loan.loan_details?.length || 0}):
           </p>
-          <div className="grid gap-2">
-            {loan.loan_details?.map((detail) => (
-              <div
-                key={detail.id}
-                className="flex items-start gap-3 rounded-lg border bg-muted/20 p-3"
-              >
-                <BookOpen className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">
-                    {detail.book_copy?.book?.title || "Unknown"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Copy Code: {detail.book_copy?.copy_code}
-                  </p>
+          <div className="grid gap-3">
+            {loan.loan_details?.map((detail) => {
+              const getDetailApprovalBadge = (status: LoanDetail["approval_status"]) => {
+                const variants: Record<
+                  LoanDetail["approval_status"],
+                  { variant: any; label: string; icon: React.ReactNode; className?: string }
+                > = {
+                  pending: {
+                    variant: "secondary",
+                    label: "Pending",
+                    icon: <Clock className="h-3 w-3 mr-1" />,
+                    className: "bg-orange-100 text-orange-800",
+                  },
+                  approved: {
+                    variant: "default",
+                    label: "Approved",
+                    icon: <CheckCircle className="h-3 w-3 mr-1" />,
+                    className: "bg-emerald-100 text-emerald-800",
+                  },
+                  rejected: {
+                    variant: "destructive",
+                    label: "Rejected",
+                    icon: <XCircleIcon className="h-3 w-3 mr-1" />,
+                  },
+                };
+
+                return (
+                  <Badge variant={variants[status]?.variant || "secondary"} className={variants[status]?.className}>
+                    <span className="flex items-center">
+                      {variants[status]?.icon}
+                      {variants[status]?.label || status}
+                    </span>
+                  </Badge>
+                );
+              };
+
+              return (
+                <div
+                  key={detail.id}
+                  className="flex items-start gap-3 rounded-lg border bg-card p-4 hover:shadow-md transition-shadow"
+                >
+                  <BookOpen className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">
+                          {detail.book_copy?.book?.title || "Unknown"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Copy Code: {detail.book_copy?.copy_code}
+                        </p>
+                      </div>
+                      {getDetailApprovalBadge(detail.approval_status)}
+                    </div>
+                    
+                    {detail.note && (
+                      <div className="text-xs text-destructive bg-destructive/10 p-2 rounded">
+                        <span className="font-medium">Note: </span>
+                        {detail.note}
+                      </div>
+                    )}
+
+                    {showActions && detail.approval_status === "pending" && (
+                      <div className="flex gap-2 pt-1">
+                        <Button
+                          size="sm"
+                          variant="default"
+                          className="h-7 text-xs"
+                          onClick={() => onApproveDetail?.(detail.id)}
+                          disabled={actionLoading === `detail-${detail.id}`}
+                        >
+                          {actionLoading === `detail-${detail.id}` ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <>
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Approve
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="h-7 text-xs"
+                          onClick={() => setRejectDetailDialog({ open: true, detail })}
+                          disabled={actionLoading === `detail-${detail.id}`}
+                        >
+                          <XCircle className="h-3 w-3 mr-1" />
+                          Reject
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <Badge variant="outline" className="shrink-0">
-                  {detail.book_copy?.status}
-                </Badge>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </CardContent>
+
+      <Dialog 
+        open={rejectDetailDialog.open} 
+        onOpenChange={(open) => {
+          setRejectDetailDialog({ open, detail: rejectDetailDialog.detail });
+          if (!open) setRejectNote("");
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Book Copy</DialogTitle>
+            <DialogDescription>
+              Provide a reason for rejecting this book copy from the loan request.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="note">Rejection Note</Label>
+              <Textarea
+                id="note"
+                placeholder="Enter rejection reason..."
+                value={rejectNote}
+                onChange={(e) => setRejectNote(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRejectDetailDialog({ open: false, detail: null });
+                setRejectNote("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (rejectDetailDialog.detail) {
+                  onRejectDetail?.(rejectDetailDialog.detail.id, rejectNote);
+                  setRejectDetailDialog({ open: false, detail: null });
+                  setRejectNote("");
+                }
+              }}
+            >
+              Reject
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { loanService } from "@/services/loan.service";
 import { Loan } from "@/types/loan";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Package, Search } from "lucide-react";
-import { AdminBorrowDialog } from "./AdminBorrowDialog";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Input } from "@/components/ui/input";
 import { LoanCard } from "./LoanCard";
@@ -16,17 +16,17 @@ import { LoanSkeletonCard } from "./LoanSkeletonCard";
 import { useTranslations } from "next-intl";
 
 export default function LoanClient() {
+  const router = useRouter();
   const t = useTranslations('admin.loans');
   const tStatus = useTranslations('status');
   const tCommon = useTranslations('common');
   const tAdmin = useTranslations('admin.common');
   const [allLoans, setAllLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(false);
-  const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [actionLoading, setActionLoading] = useState<number | null | string>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   // Dialog states
-  const [borrowDialog, setBorrowDialog] = useState(false);
   const [rejectDialog, setRejectDialog] = useState<{
     open: boolean;
     loan: Loan | null;
@@ -83,6 +83,32 @@ export default function LoanClient() {
     }
   };
 
+  const handleApproveDetail = async (detailId: number) => {
+    setActionLoading(`detail-${detailId}`);
+    try {
+      const response = await loanService.approveLoanDetail(detailId);
+      toast.success(response.data.message || "Book copy approved successfully");
+      fetchAllData();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to approve book copy");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRejectDetail = async (detailId: number, note: string) => {
+    setActionLoading(`detail-${detailId}`);
+    try {
+      const response = await loanService.rejectLoanDetail(detailId, { note });
+      toast.success(response.data.message || "Book copy rejected successfully");
+      fetchAllData();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to reject book copy");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleMarkAsBorrowed = async (loanId: number) => {
     setActionLoading(loanId);
     try {
@@ -122,6 +148,8 @@ export default function LoanClient() {
             onApprove={handleApprove}
             onReject={(loan) => setRejectDialog({ open: true, loan })}
             onMarkAsBorrowed={handleMarkAsBorrowed}
+            onApproveDetail={handleApproveDetail}
+            onRejectDetail={handleRejectDetail}
           />
         ))}
       </div>
@@ -146,8 +174,8 @@ export default function LoanClient() {
             {tCommon('manageLoanApproval')}
           </p>
         </div>
-        <Button onClick={() => setBorrowDialog(true)} variant="brand">
-          <Plus className="h-4 w-4 mr-2" />
+        <Button onClick={() => router.push('/admin/loans/create')} variant="brand">
+          <Plus className="h-4 w-4" />
           {tCommon('requestLoan')}
         </Button>
       </div>
@@ -354,13 +382,6 @@ export default function LoanClient() {
           </div>
         </TabsContent>
       </Tabs>
-
-      {/* Borrow Dialog */}
-      <AdminBorrowDialog
-        open={borrowDialog}
-        onOpenChange={setBorrowDialog}
-        onSuccess={fetchAllData}
-      />
 
       {/* Reject Dialog */}
       <LoanRejectDialog

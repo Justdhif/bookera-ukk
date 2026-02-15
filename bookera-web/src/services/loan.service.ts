@@ -49,4 +49,10 @@ export const loanService = {
 
   markAsBorrowed: (id: number) => 
     api.post<ApiResponse<Loan>>(`/admin/approvals/loans/${id}/mark-borrowed`),
+
+  approveLoanDetail: (detailId: number) => 
+    api.post<ApiResponse<any>>(`/admin/approvals/loan-details/${detailId}/approve`),
+
+  rejectLoanDetail: (detailId: number, data?: { note?: string }) => 
+    api.post<ApiResponse<any>>(`/admin/approvals/loan-details/${detailId}/reject`, data),
 };
