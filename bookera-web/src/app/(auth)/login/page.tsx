@@ -75,7 +75,7 @@ export default function LoginPage() {
               <Image
                 src={BookeraLogo}
                 alt="Bookera Logo"
-                className="w-48 lg:w-56 brightness-0 invert-[0.1]"
+                className="w-48 lg:w-56 brightness-0 dark:invert"
                 priority
               />
             </div>
