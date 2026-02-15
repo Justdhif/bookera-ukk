@@ -12,8 +12,12 @@ use App\Events\LoanApproved;
 use App\Events\LoanRejected;
 use App\Events\ReturnRequested;
 use App\Events\ReturnApproved;
+use App\Events\FineCreated;
+use App\Events\LostBookReported;
 use App\Listeners\SendLoanNotification;
 use App\Listeners\SendReturnNotification;
+use App\Listeners\SendFineNotification;
+use App\Listeners\SendLostBookNotification;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -41,6 +45,14 @@ class EventServiceProvider extends ServiceProvider
         ],
         ReturnApproved::class => [
             SendReturnNotification::class,
+        ],
+
+        FineCreated::class => [
+            SendFineNotification::class,
+        ],
+
+        LostBookReported::class => [
+            SendLostBookNotification::class,
         ],
     ];
 

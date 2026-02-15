@@ -6,7 +6,7 @@ import { useAuthStore } from "@/store/auth.store";
 import SavesList from "@/components/custom-ui/content/public/SavesList";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import Image from "next/image";
-import { Home, BookOpen } from "lucide-react";
+import { Home, BookOpen, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import {
@@ -16,6 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useSidebarStore } from "@/store/sidebar.store";
+import { title } from "process";
 
 export default function PublicSidebar() {
   const pathname = usePathname();
@@ -39,10 +40,15 @@ export default function PublicSidebar() {
       href: "/my-loans",
       icon: BookOpen,
     },
+    {
+      title: "My Fines",
+      href: "/my-fines",
+      icon: DollarSign,
+    }
   ];
 
   const handleNavClick = (e: React.MouseEvent, href: string) => {
-    if (href === "/my-loans" && !isAuthenticated) {
+    if (href === "/my-loans" && !isAuthenticated|| href === "/my-fines" && !isAuthenticated) {
       e.preventDefault();
       router.push("/login");
       return;

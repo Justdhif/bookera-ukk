@@ -46,6 +46,16 @@ class FineService
             ->get();
     }
 
+    public function getMyFines(int $userId): Collection
+    {
+        return Fine::with(['fineType', 'loan.details.bookCopy.book'])
+            ->whereHas('loan', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->latest()
+            ->get();
+    }
+
     public function createFine(Loan $loan, array $data): Fine
     {
         $fineType = FineType::findOrFail($data['fine_type_id']);

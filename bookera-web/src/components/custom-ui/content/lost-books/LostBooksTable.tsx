@@ -17,6 +17,8 @@ import {
   Trash2,
   CheckCircle,
   BookOpen,
+  Loader2,
+  DollarSign,
 } from "lucide-react";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
@@ -27,10 +29,14 @@ export default function LostBooksTable({
   data,
   onDelete,
   onFinish,
+  onProcessFine,
+  actionLoading,
 }: {
   data: LostBook[];
   onDelete: (id: number) => void;
   onFinish: (id: number) => void;
+  onProcessFine: (id: number) => void;
+  actionLoading: number | null;
 }) {
   const router = useRouter();
   const t = useTranslations('admin.lostBooks');
@@ -172,30 +178,45 @@ export default function LostBooksTable({
               <TableCell>
                 <div className="flex justify-end items-center gap-2">
                   {item.loan?.status === "checking" && (() => {
-                    // Check if all fines are paid
+                    // Check fines status
                     const unpaidFines = item.loan?.fines?.filter((f: any) => f.status === "unpaid") || [];
-                    const allFinesPaid = item.loan?.fines && item.loan.fines.length > 0 && unpaidFines.length === 0;
+                    const hasFines = item.loan?.fines && item.loan.fines.length > 0;
+                    const hasUnpaidFines = unpaidFines.length > 0;
+                    
+                    const shouldShowProcessFine = !hasFines;
+                    const shouldShowFinished = hasFines && !hasUnpaidFines;
                     
                     return (
                       <>
-                        {!allFinesPaid && (
+                        {shouldShowProcessFine && (
                           <Button
                             size="sm"
-                            variant="outline"
-                            onClick={() => router.push(`/admin/fines?loan_id=${item.loan_id}`)}
-                            className="h-8 gap-1 text-orange-600 border-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+                            variant="secondary"
+                            onClick={() => onProcessFine(item.id)}
+                            disabled={actionLoading === item.id}
+                            className="h-8 gap-1"
                           >
+                            {actionLoading === item.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <DollarSign className="h-3.5 w-3.5" />
+                            )}
                             Process Fine
                           </Button>
                         )}
-                        {allFinesPaid && (
+                        {shouldShowFinished && (
                           <Button
                             size="sm"
                             variant="default"
                             onClick={() => onFinish(item.id)}
+                            disabled={actionLoading === item.id}
                             className="h-8 gap-1 bg-green-600 hover:bg-green-700"
                           >
-                            <CheckCircle className="h-3.5 w-3.5" />
+                            {actionLoading === item.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <CheckCircle className="h-3.5 w-3.5" />
+                            )}
                             Finish
                           </Button>
                         )}

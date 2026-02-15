@@ -648,6 +648,10 @@
     "borrowRequestCreated": "Borrow request created successfully",
     "failedCreateBorrow": "Failed to create borrow request",
     "selectDueDate": "Please select a due date",
+    "myFines": "My Fines",
+    "viewAllYourFines": "View all your fines and payment status",
+    "noFinesYet": "No Fines Yet",
+    "noFinesDesc": "You don't have any fines. Keep your books in good condition!",
     "createLoan": "Create Loan",
     "addCopy": "Add Copy",
 

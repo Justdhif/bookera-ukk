@@ -51,23 +51,19 @@ export default function ReturnClient() {
   const handleFinished = async (returnId: number) => {
     setActionLoading(returnId);
     try {
-      // Find the loan for this return
       const loan = allLoans.find((l) => 
         l.book_returns?.some((r) => r.id === returnId)
       );
       
-      // Check if this loan has any lost books
       const hasLostBooks = loan?.lost_books && loan.lost_books.length > 0;
       
       if (hasLostBooks && loan?.lost_books) {
-        // Use lost book finish endpoint to update loan status to "lost"
         const lostBookId = loan.lost_books[0].id;
         const response = await lostBookService.finish(lostBookId);
         toast.success(
           response.data.message || tCommon('lostBookProcessComplete'),
         );
       } else {
-        // Normal return approval - updates loan status to "returned"
         const response = await bookReturnService.approveReturn(returnId);
         toast.success(
           response.data.message || t('completeSuccess'),
@@ -78,6 +74,23 @@ export default function ReturnClient() {
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || t('completeError'),
+      );
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleProcessFine = async (returnId: number) => {
+    setActionLoading(returnId);
+    try {
+      const response = await bookReturnService.processFine(returnId);
+      toast.success(
+        response.data.message || 'Denda berhasil diproses',
+      );
+      fetchAllData();
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || 'Gagal memproses denda',
       );
     } finally {
       setActionLoading(null);
@@ -115,6 +128,7 @@ export default function ReturnClient() {
               showActions={showActions}
               actionLoading={actionLoading}
               onFinished={handleFinished}
+              onProcessFine={handleProcessFine}
             />
           );
         })}

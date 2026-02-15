@@ -16,6 +16,7 @@ export interface Fine {
   paid_at?: string;
   status: "unpaid" | "paid" | "waived";
   notes?: string;
+  waive_reason?: string;
   created_at: string;
   updated_at: string;
   fine_type?: FineType;
@@ -28,6 +29,17 @@ export interface Fine {
         full_name: string;
       };
     };
+    details?: Array<{
+      id: number;
+      book_copy?: {
+        id: number;
+        copy_code: string;
+        book?: {
+          id: number;
+          title: string;
+        };
+      };
+    }>;
   };
 }
 

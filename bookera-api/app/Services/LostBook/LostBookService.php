@@ -55,31 +55,6 @@ class LostBookService
 
             $bookCopy->update(['status' => 'lost']);
 
-            $lostFineType = FineType::where('type', 'lost')->first();
-            if ($lostFineType) {
-                $fine = Fine::create([
-                    'loan_id' => $loan->id,
-                    'fine_type_id' => $lostFineType->id,
-                    'amount' => $lostFineType->amount,
-                    'status' => 'unpaid',
-                    'notes' => 'Denda buku hilang: ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')',
-                ]);
-
-                ActivityLogger::log(
-                    'create',
-                    'fine',
-                    "Fine created for lost book in loan #{$loan->id}",
-                    [
-                        'fine_id' => $fine->id,
-                        'loan_id' => $loan->id,
-                        'amount' => $fine->amount,
-                        'fine_type' => 'lost',
-                    ],
-                    null,
-                    $fine
-                );
-            }
-
             ActivityLogger::log(
                 'update',
                 'book_copy',
@@ -123,6 +98,8 @@ class LostBookService
             );
 
             $lostBook->load(['loan.user.profile', 'bookCopy.book']);
+
+            event(new \App\Events\LostBookReported($lostBook));
 
             return $lostBook;
         });
@@ -234,5 +211,50 @@ class LostBookService
         }
 
         return [true, ''];
+    }
+
+    public function processFine(LostBook $lostBook): Fine
+    {
+        return DB::transaction(function () use ($lostBook) {
+            $loan = $lostBook->loan;
+            $bookCopy = $lostBook->bookCopy;
+
+            $existingFine = $loan->fines()
+                ->where('status', 'unpaid')
+                ->first();
+
+            if ($existingFine) {
+                throw new \Exception('Sudah ada denda yang belum dibayar untuk peminjaman ini');
+            }
+
+            $lostFineType = FineType::where('type', 'lost')->first();
+
+            if (!$lostFineType) {
+                throw new \Exception('Tipe denda untuk buku hilang tidak ditemukan');
+            }
+
+            $fine = Fine::create([
+                'loan_id' => $loan->id,
+                'fine_type_id' => $lostFineType->id,
+                'amount' => $lostFineType->amount,
+                'status' => 'unpaid',
+                'notes' => 'Denda buku hilang: ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')',
+            ]);
+
+            ActivityLogger::log(
+                'create',
+                'fine',
+                "Fine created for lost book in loan #{$loan->id}",
+                ['fine_id' => $fine->id, 'amount' => $fine->amount],
+                null,
+                $fine
+            );
+
+            $fine->load('fineType', 'loan.user', 'loan.details.bookCopy.book');
+
+            event(new \App\Events\FineCreated($fine));
+
+            return $fine;
+        });
     }
 }

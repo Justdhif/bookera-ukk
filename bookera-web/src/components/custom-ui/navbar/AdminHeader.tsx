@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Settings, FileText, Shield } from "lucide-react";
 import { useTranslations } from "next-intl";
-import NotificationDropdown from "./NotificationDropdown";
+import NotificationButton from "./NotificationButton";
 
 export default function AdminHeader() {
   const t = useTranslations('header');
@@ -28,9 +28,7 @@ export default function AdminHeader() {
   const router = useRouter();
   const segments = pathname.replace("/admin", "").split("/").filter(Boolean);
 
-  // Format segment untuk breadcrumb
   const formatSegment = (seg: string) => {
-    // Capitalize first letter
     const formatted = seg.charAt(0).toUpperCase() + seg.slice(1);
     return formatted;
   };
@@ -66,7 +64,6 @@ export default function AdminHeader() {
       </Breadcrumb>
 
       <div className="ml-auto flex items-center gap-2">
-        {/* Settings Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
@@ -89,8 +86,7 @@ export default function AdminHeader() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Notifications */}
-        <NotificationDropdown isAuthenticated={true} />
+        <NotificationButton />
       </div>
     </header>
   );

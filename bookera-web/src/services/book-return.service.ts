@@ -35,4 +35,12 @@ export const bookReturnService = {
     api.post<ApiResponse<BookReturn>>(
       `/admin/book-returns/${id}/approve`
     ),
+
+  /**
+   * ADMIN - PROCESS FINE FOR DAMAGED BOOKS
+   */
+  processFine: (id: number) =>
+    api.post<ApiResponse<any>>(
+      `/admin/book-returns/${id}/process-fine`
+    ),
 };

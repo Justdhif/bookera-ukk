@@ -6,13 +6,14 @@ import { useAuthStore } from "@/store/auth.store";
 import { getCookie } from "cookies-next";
 import { toast } from "sonner";
 
-// Global variable to track subscription status (singleton pattern)
 let isSubscribed = false;
 let echoInstance: any = null;
 
 interface NotificationEvent {
   loan_id?: number;
   return_id?: number;
+  fine_id?: number;
+  lost_book_id?: number;
   user_name?: string;
   message: string;
   type: string;
@@ -27,35 +28,50 @@ export const useRealTimeNotifications = (
 
   const handleNotification = useCallback(
     (event: NotificationEvent) => {
-      // Show toast notification
-      const notificationTypes: Record<string, string> = {
-        borrow_request: "⚠️",
-        return_request: "📦",
-        approved: "✅",
-        rejected: "❌",
+      const notificationConfig: Record<string, { 
+        variant: 'success' | 'warning' | 'info' | 'error'
+      }> = {
+        borrow_request: { variant: 'info' },
+        return_request: { variant: 'info' },
+        approved: { variant: 'success' },
+        rejected: { variant: 'error' },
+        fine_created: { variant: 'warning' },
+        lost_book_report: { variant: 'warning' },
       };
 
-      const icon = notificationTypes[event.type] || "🔔";
-      toast.info(`${icon} ${event.message}`, {
+      const config = notificationConfig[event.type] || { variant: 'info' };
+      
+      const toastMethod = config.variant === 'success' ? toast.success :
+                          config.variant === 'warning' ? toast.warning :
+                          config.variant === 'error' ? toast.error :
+                          toast.info;
+
+      toastMethod(event.message, {
         duration: 5000,
-        action: event.loan_id
+        action: event.loan_id || event.fine_id || event.lost_book_id
           ? {
               label: "View",
               onClick: () => {
-                window.location.href = user?.role === "admin" 
-                  ? `/admin/loans`
-                  : `/loans/${event.loan_id}`;
+                if (event.fine_id) {
+                  window.location.href = user?.role === "admin" 
+                    ? `/admin/fines/${event.fine_id}`
+                    : `/my-fines`;
+                } else if (event.lost_book_id) {
+                  window.location.href = `/admin/lost-books`;
+                } else if (event.loan_id) {
+                  window.location.href = user?.role === "admin" 
+                    ? `/admin/loans`
+                    : `/loans/${event.loan_id}`;
+                }
               },
             }
           : undefined,
       });
 
-      // Trigger custom event to refresh notification list
       if (typeof window !== "undefined") {
         window.dispatchEvent(new CustomEvent("notification-received"));
       }
 
-      // Callback to refresh notification list
       if (onNotificationReceived) {
         onNotificationReceived();
       }
@@ -64,22 +80,34 @@ export const useRealTimeNotifications = (
   );
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleNotificationRead = () => {
+      if (onNotificationReceived) {
+        onNotificationReceived();
+      }
+    };
+
+    window.addEventListener("notification-read", handleNotificationRead);
+    
+    return () => {
+      window.removeEventListener("notification-read", handleNotificationRead);
+    };
+  }, [onNotificationReceived]);
+
+  useEffect(() => {
     if (!token || !user) {
       return;
     }
 
-    // Prevent multiple subscriptions using global variable
     if (isSubscribed) {
       return;
     }
 
-    // Initialize Echo (only once)
     const echo = initializeEcho(token);
     echoInstance = echo;
 
-    // Subscribe to appropriate channels based on user role
     if (user.role === "admin") {
-      // Admin listens to admin channel for loan/return requests
       echo
         .private("admin")
         .listen(".loan.requested", (event: NotificationEvent) => {
@@ -87,9 +115,11 @@ export const useRealTimeNotifications = (
         })
         .listen(".return.requested", (event: NotificationEvent) => {
           handleNotification(event);
+        })
+        .listen(".lost-book.reported", (event: NotificationEvent) => {
+          handleNotification(event);
         });
     } else {
-      // Regular users listen to their personal channel
       echo
         .private(`user.${user.id}`)
         .listen(".loan.approved", (event: NotificationEvent) => {
@@ -100,13 +130,14 @@ export const useRealTimeNotifications = (
         })
         .listen(".return.approved", (event: NotificationEvent) => {
           handleNotification(event);
+        })
+        .listen(".fine.created", (event: NotificationEvent) => {
+          handleNotification(event);
         });
     }
 
-    // Mark as subscribed globally
     isSubscribed = true;
 
-    // Cleanup on unmount
     return () => {
       isSubscribed = false;
       

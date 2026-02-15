@@ -18,6 +18,7 @@ export default function LostBooksClient() {
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
 
   const confirmDelete = async () => {
     if (!deleteId) return;
@@ -58,6 +59,7 @@ export default function LostBooksClient() {
   }, [searchQuery]);
 
   const handleFinish = async (id: number) => {
+    setActionLoading(id);
     try {
       await lostBookService.finish(id);
       toast.success(
@@ -68,6 +70,25 @@ export default function LostBooksClient() {
       toast.error(
         err.response?.data?.message || t('completeError')
       );
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleProcessFine = async (id: number) => {
+    setActionLoading(id);
+    try {
+      const response = await lostBookService.processFine(id);
+      toast.success(
+        response.data.message || 'Denda berhasil diproses'
+      );
+      fetchLostBooks();
+    } catch (err: any) {
+      toast.error(
+        err.response?.data?.message || 'Gagal memproses denda'
+      );
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -114,6 +135,8 @@ export default function LostBooksClient() {
           data={lostBooks}
           onDelete={(id) => setDeleteId(id)}
           onFinish={handleFinish}
+          onProcessFine={handleProcessFine}
+          actionLoading={actionLoading}
         />
       )}
 

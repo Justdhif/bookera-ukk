@@ -9,6 +9,7 @@ use App\Models\FineType;
 use App\Models\Loan;
 use App\Events\ReturnRequested;
 use App\Events\ReturnApproved;
+use App\Events\FineCreated;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -76,28 +77,6 @@ class BookReturnService
                 ['loan_id' => $loan->id, 'old_status' => $oldLoanStatus],
                 $loan
             );
-
-            if ($hasDamagedBooks) {
-                $damagedFineType = FineType::where('type', 'damaged')->first();
-
-                if ($damagedFineType) {
-                    $fine = Fine::create([
-                        'loan_id' => $loan->id,
-                        'fine_type_id' => $damagedFineType->id,
-                        'amount' => $damagedFineType->amount,
-                        'status' => 'unpaid',
-                    ]);
-
-                    ActivityLogger::log(
-                        'create',
-                        'fine',
-                        "Auto-created damaged book fine for loan #{$loan->id}",
-                        ['fine_id' => $fine->id, 'amount' => $fine->amount],
-                        null,
-                        $fine
-                    );
-                }
-            }
 
             $return->load(['details.bookCopy.book']);
 
@@ -180,18 +159,57 @@ class BookReturnService
             return false;
         }
 
-        $hasDamagedOrLostBooks = $bookReturn->details()
-            ->whereIn('condition', ['damaged', 'lost'])
-            ->exists();
-
-        if ($hasDamagedOrLostBooks) {
-            $unpaidFines = $loan->fines()->where('status', 'unpaid')->exists();
-
-            if ($unpaidFines) {
-                return false;
-            }
-        }
-
         return true;
+    }
+
+    public function processFine(BookReturn $bookReturn): Fine
+    {
+        return DB::transaction(function () use ($bookReturn) {
+            $loan = $bookReturn->loan;
+
+            $hasDamagedBooks = $bookReturn->details()
+                ->where('condition', 'damaged')
+                ->exists();
+
+            if (!$hasDamagedBooks) {
+                throw new \Exception('Tidak ada buku yang rusak pada peminjaman ini');
+            }
+
+            $existingFine = $loan->fines()
+                ->where('status', 'unpaid')
+                ->first();
+
+            if ($existingFine) {
+                throw new \Exception('Sudah ada denda yang belum dibayar untuk peminjaman ini');
+            }
+
+            $damagedFineType = FineType::where('type', 'damaged')->first();
+
+            if (!$damagedFineType) {
+                throw new \Exception('Tipe denda untuk buku rusak tidak ditemukan');
+            }
+
+            $fine = Fine::create([
+                'loan_id' => $loan->id,
+                'fine_type_id' => $damagedFineType->id,
+                'amount' => $damagedFineType->amount,
+                'status' => 'unpaid',
+            ]);
+
+            ActivityLogger::log(
+                'create',
+                'fine',
+                "Fine created for damaged book(s) in loan #{$loan->id}",
+                ['fine_id' => $fine->id, 'amount' => $fine->amount],
+                null,
+                $fine
+            );
+
+            $fine->load('fineType', 'loan.user', 'loan.details.bookCopy.book');
+
+            event(new FineCreated($fine));
+
+            return $fine;
+        });
     }
 }

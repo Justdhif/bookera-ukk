@@ -36,6 +36,13 @@ class FineController extends Controller
         return ApiResponse::successResponse('Data denda untuk peminjaman ini', $fines);
     }
 
+    public function myFines(Request $request): JsonResponse
+    {
+        $fines = $this->fineService->getMyFines($request->user()->id);
+
+        return ApiResponse::successResponse('Data denda saya', $fines);
+    }
+
     public function store(StoreFineRequest $request, Loan $loan): JsonResponse
     {
         $fine = $this->fineService->createFine($loan, $request->validated());
@@ -74,7 +81,8 @@ class FineController extends Controller
             return ApiResponse::errorResponse('Denda ini sudah dibatalkan', null, 400);
         }
 
-        $fine = $this->fineService->waiveFine($fine, $request->notes);
+        $validated = $request->validated();
+        $fine = $this->fineService->waiveFine($fine, $validated['notes'] ?? null);
 
         return ApiResponse::successResponse('Denda berhasil dibatalkan', $fine);
     }

@@ -29,8 +29,8 @@ export default function NotificationDropdown({
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Listen for notification received event
   useEffect(() => {
     const handleNotificationReceived = () => {
       fetchNotifications();
@@ -42,6 +42,27 @@ export default function NotificationDropdown({
       window.removeEventListener("notification-received", handleNotificationReceived);
     };
   }, []);
+
+  useEffect(() => {
+    const handleNotificationRead = (event: any) => {
+      const notificationId = event.detail?.notificationId;
+      
+      if (notificationId) {
+        setNotifications(
+          notifications.map((n) =>
+            n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
+          )
+        );
+      }
+      
+      fetchUnreadCount();
+    };
+
+    window.addEventListener("notification-read", handleNotificationRead);
+    return () => {
+      window.removeEventListener("notification-read", handleNotificationRead);
+    };
+  }, [notifications]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -75,17 +96,28 @@ export default function NotificationDropdown({
   };
 
   const handleNotificationClick = async (notif: Notification) => {
-    // Mark as read if not read yet
     if (!notif.read_at) {
       try {
         await notificationService.markAsRead(notif.id);
+        
+        setNotifications(
+          notifications.map((n) =>
+            n.id === notif.id ? { ...n, read_at: new Date().toISOString() } : n
+          )
+        );
+        
         fetchUnreadCount();
+        
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("notification-read", { 
+            detail: { notificationId: notif.id } 
+          }));
+        }
       } catch (error) {
         console.error("Failed to mark as read:", error);
       }
     }
 
-    // Navigate based on notification type
     if (notif.module === "loan" && notif.data?.loan_id) {
       router.push(`/loans/${notif.data.loan_id}`);
     } else if (notif.module === "return" && notif.data?.return_id) {
@@ -95,13 +127,23 @@ export default function NotificationDropdown({
     }
   };
 
+  const handleViewAllNotifications = () => {
+    router.push("/notifications");
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (open && isAuthenticated) {
+      fetchNotifications();
+    }
+  };
+
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
           className="relative flex items-center gap-2 h-9 px-3"
-          onMouseEnter={() => isAuthenticated && fetchNotifications()}
         >
           <Bell className="h-4 w-4" />
           <span className="hidden text-sm font-medium lg:block">Notifications</span>
@@ -193,7 +235,7 @@ export default function NotificationDropdown({
             <Button
               variant="ghost"
               className="w-full justify-between"
-              onClick={() => router.push("/notifications")}
+              onClick={handleViewAllNotifications}
             >
               <span>{t('viewAllNotifications')}</span>
               <ChevronRight className="h-4 w-4" />

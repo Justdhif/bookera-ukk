@@ -26,7 +26,6 @@ export default function NotificationPageClient() {
   
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  // Listen for notification received event
   useEffect(() => {
     const handleNotificationReceived = () => {
       fetchNotifications();
@@ -36,6 +35,33 @@ export default function NotificationPageClient() {
     window.addEventListener("notification-received", handleNotificationReceived);
     return () => {
       window.removeEventListener("notification-received", handleNotificationReceived);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleNotificationRead = (event: any) => {
+      const notificationId = event.detail?.notificationId;
+      
+      if (notificationId) {
+        setNotifications((prevNotifications) =>
+          prevNotifications.map((n) =>
+            n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
+          )
+        );
+        
+        setSelectedNotif((prevSelected) =>
+          prevSelected && prevSelected.id === notificationId
+            ? { ...prevSelected, read_at: new Date().toISOString() }
+            : prevSelected
+        );
+        
+        fetchUnreadCount();
+      }
+    };
+
+    window.addEventListener("notification-read", handleNotificationRead);
+    return () => {
+      window.removeEventListener("notification-read", handleNotificationRead);
     };
   }, []);
 
@@ -80,20 +106,33 @@ export default function NotificationPageClient() {
   };
 
   const handleNotificationClick = async (notif: Notification) => {
-    setSelectedNotif(notif);
-
     if (!notif.read_at) {
       try {
         await notificationService.markAsRead(notif.id);
+        
+        const updatedNotif = { ...notif, read_at: new Date().toISOString() };
+        
         setNotifications(
           notifications.map((n) =>
-            n.id === notif.id ? { ...n, read_at: new Date().toISOString() } : n
+            n.id === notif.id ? updatedNotif : n
           )
         );
+        
+        setSelectedNotif(updatedNotif);
+        
         fetchUnreadCount();
+        
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("notification-read", { 
+            detail: { notificationId: notif.id } 
+          }));
+        }
       } catch (error) {
         console.error("Failed to mark as read:", error);
+        setSelectedNotif(notif);
       }
+    } else {
+      setSelectedNotif(notif);
     }
   };
 

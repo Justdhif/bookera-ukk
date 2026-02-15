@@ -32,6 +32,7 @@ interface ReturnCardProps {
   showActions?: boolean;
   actionLoading: number | null;
   onFinished?: (returnId: number) => void;
+  onProcessFine?: (returnId: number) => void;
 }
 
 export function ReturnCard({
@@ -40,6 +41,7 @@ export function ReturnCard({
   showActions = true,
   actionLoading,
   onFinished,
+  onProcessFine,
 }: ReturnCardProps) {
   const router = useRouter();
   const tLoans = useTranslations('loans');
@@ -153,19 +155,19 @@ export function ReturnCard({
     );
   };
 
-  // Check conditions
   const hasDamagedBooks = bookReturn.details?.some((d) => d.condition === "damaged");
   const hasLostBooks = bookReturn.details?.some((d) => d.condition === "lost");
   const allGoodCondition = bookReturn.details?.every((d) => d.condition === "good");
   
-  // Check if has damaged or lost books
   const hasDamagedOrLostBooks = hasDamagedBooks || hasLostBooks;
   
-  // Check fine status - only for loans with fines
   const unpaidFines = loan.fines?.filter((f) => f.status === "unpaid") || [];
   const hasFines = loan.fines && loan.fines.length > 0;
   const hasUnpaidFines = unpaidFines.length > 0;
   const allFinesPaid = hasFines && unpaidFines.length === 0;
+
+  const shouldShowProcessFine = hasDamagedBooks && !hasFines;
+  const shouldShowFinished = !hasDamagedBooks || (hasFines && !hasUnpaidFines);
 
   return (
     <Card className="overflow-hidden">
@@ -191,20 +193,23 @@ export function ReturnCard({
           </div>
           {showActions && loan.status === "checking" && (
             <div className="flex gap-2">
-              {/* Show Process Fine button when there are unpaid fines */}
-              {hasUnpaidFines && (
+              {shouldShowProcessFine && (
                 <Button
                   size="sm"
                   variant="secondary"
-                  onClick={() => router.push(`/admin/fines?loan_id=${loan.id}`)}
+                  onClick={() => onProcessFine?.(bookReturn.id)}
+                  disabled={actionLoading === bookReturn.id}
                 >
-                  <DollarSign className="h-4 w-4 mr-1" />
+                  {actionLoading === bookReturn.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <DollarSign className="h-4 w-4 mr-1" />
+                  )}
                   Process Fine
                 </Button>
               )}
               
-              {/* Show Finished button when no unpaid fines (either no fines or all paid) */}
-              {!hasUnpaidFines && (
+              {shouldShowFinished && (
                 <Button
                   size="sm"
                   variant="submit"

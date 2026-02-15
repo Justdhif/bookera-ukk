@@ -155,6 +155,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Book Return Management (Admin)
         Route::prefix('book-returns')->group(function () {
             Route::post('/{bookReturn}/approve', [BookReturnController::class, 'approveReturn']);
+            Route::post('/{bookReturn}/process-fine', [BookReturnController::class, 'processFine']);
         });
 
         // Fine Type Management
@@ -177,6 +178,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{lostBook}', [LostBookController::class, 'show']);
             Route::put('/{lostBook}', [LostBookController::class, 'update']);
             Route::post('/{lostBook}/finish', [LostBookController::class, 'finish']);
+            Route::post('/{lostBook}/process-fine', [LostBookController::class, 'processFine']);
             Route::delete('/{lostBook}', [LostBookController::class, 'destroy']);
         });
 
@@ -218,6 +220,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('my-loans', [LoanController::class, 'getLoanByUser']);
+
+    Route::get('my-fines', [FineController::class, 'myFines']);
 
     // Book Return (User)
     Route::get('book-returns/{bookReturn}', [BookReturnController::class, 'show']);

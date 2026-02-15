@@ -43,6 +43,12 @@ export const lostBookService = {
     api.post<ApiResponse<LostBook>>(`/admin/lost-books/${id}/finish`),
 
   /**
+   * ADMIN - Process fine for lost book
+   */
+  processFine: (id: number) =>
+    api.post<ApiResponse<any>>(`/admin/lost-books/${id}/process-fine`),
+
+  /**
    * ADMIN - Delete lost book record
    */
   delete: (id: number) =>

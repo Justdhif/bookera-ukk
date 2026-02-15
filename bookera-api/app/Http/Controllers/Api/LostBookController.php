@@ -30,13 +30,14 @@ class LostBookController extends Controller
 
     public function store(StoreLostBookRequest $request, Loan $loan): JsonResponse
     {
-        [$canReport, $errorMessage] = $this->lostBookService->canReportLost($loan, $request->book_copy_id);
+        $validated = $request->validated();
+        [$canReport, $errorMessage] = $this->lostBookService->canReportLost($loan, $validated['book_copy_id']);
 
         if (!$canReport) {
             return ApiResponse::errorResponse($errorMessage, null, 400);
         }
 
-        $lostBook = $this->lostBookService->reportLostBook($loan, $request->validated());
+        $lostBook = $this->lostBookService->reportLostBook($loan, $validated);
 
         return ApiResponse::successResponse('Buku hilang berhasil dilaporkan', $lostBook, 201);
     }
@@ -73,5 +74,15 @@ class LostBookController extends Controller
         $lostBook = $this->lostBookService->finishLostBookProcess($lostBook);
 
         return ApiResponse::successResponse('Proses buku hilang telah selesai. Status peminjaman diubah menjadi lost.', $lostBook);
+    }
+
+    public function processFine(LostBook $lostBook): JsonResponse
+    {
+        try {
+            $fine = $this->lostBookService->processFine($lostBook);
+            return ApiResponse::successResponse('Denda berhasil diproses', $fine, 201);
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse($e->getMessage(), null, 400);
+        }
     }
 }
