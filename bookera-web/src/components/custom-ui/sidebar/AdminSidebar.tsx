@@ -26,7 +26,6 @@ import {
   BookOpen,
   HomeIcon,
   Folder,
-  Crown,
   ChevronRight,
   Activity,
   Package,
@@ -173,21 +172,21 @@ export function AdminSidebar() {
         <div
           className={`flex items-center gap-3 py-4 ${open ? "px-4" : "justify-center"}`}
         >
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-emerald-600 via-emerald-500 to-teal-500 text-white shrink-0 shadow-lg shadow-emerald-500/30 ring-2 ring-emerald-100 dark:ring-emerald-900/50">
-            <Crown className="h-5 w-5" />
+          <div className="relative flex h-10 w-10 items-center justify-center shrink-0">
+            <Image
+              src={BookeraLogo}
+              alt="Bookera"
+              className="h-10 w-10 object-contain brightness-0 dark:invert"
+            />
           </div>
           {open && (
-            <div className="flex flex-col flex-1 gap-1.5">
+            <div className="flex flex-col flex-1 gap-0.5">
               <span className="text-lg font-bold bg-linear-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
                 Bookera
               </span>
-              {/* Admin Status Badge */}
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-all w-fit bg-linear-to-r from-emerald-100 to-teal-100 dark:from-emerald-950/50 dark:to-teal-950/50 ring-1 ring-emerald-200 dark:ring-emerald-900">
-                <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                  {t('admin.sidebar.admin')}
-                </span>
-              </div>
+              <span className="text-xs text-muted-foreground">
+                {roleDisplay}
+              </span>
             </div>
           )}
         </div>
@@ -387,10 +386,6 @@ export function AdminSidebar() {
                         </span>
                         <span className="text-xs text-muted-foreground truncate w-full">
                           {user?.email}
-                        </span>
-                        <span className="text-[10px] font-medium text-emerald-600/80 dark:text-emerald-400/80 truncate w-full mt-0.5 flex items-center gap-1">
-                          <span className="inline-flex h-1 w-1 rounded-full bg-emerald-500" />
-                          {roleDisplay}
                         </span>
                       </div>
                       <ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover/profile:text-emerald-600 dark:group-hover/profile:text-emerald-400 group-hover/profile:translate-x-1 transition-all shrink-0" />

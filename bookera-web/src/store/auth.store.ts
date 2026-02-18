@@ -4,7 +4,6 @@ import { create } from "zustand";
 import { setCookie, deleteCookie } from "cookies-next";
 import { authService } from "@/services/auth.service";
 import { User } from "@/types/user";
-import { useSidebarStore } from "./sidebar.store";
 
 interface AuthState {
   user: User | null;
@@ -74,9 +73,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     } finally {
       deleteCookie("token");
       deleteCookie("role");
-
-      // Reset sidebar to expanded state
-      useSidebarStore.getState().setCollapsed(false);
 
       set({
         user: null,

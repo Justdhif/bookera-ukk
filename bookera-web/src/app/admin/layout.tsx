@@ -18,10 +18,10 @@ export default function AdminLayout({
     <SidebarProvider>
       <AdminSidebar />
 
-      <SidebarInset>
+      <SidebarInset className="h-screen flex flex-col overflow-hidden">
         <AdminHeader />
         <main
-          className="p-6 relative min-h-[90vh]"
+          className="p-6 flex-1 overflow-y-auto"
         >
           {initialLoading ? <ContentLoadingScreen /> : children}
         </main>

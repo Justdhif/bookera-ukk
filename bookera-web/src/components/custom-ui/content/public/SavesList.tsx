@@ -7,8 +7,7 @@ import { SaveListItem } from "@/types/save";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BookMarked, Plus, LogIn, Library, ChevronLeft, Loader2 } from "lucide-react";
-import { useSidebarStore } from "@/store/sidebar.store";
+import { BookMarked, Plus, LogIn, Library, Loader2 } from "lucide-react";
 import SaveCard from "./SaveCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
@@ -44,11 +43,9 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [formData, setFormData] = useState({ name: "", description: "" });
   const [isCreating, setIsCreating] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
   const t = useTranslations("collections");
   const tCommon = useTranslations("common");
-  const { toggleCollapse } = useSidebarStore();
 
   const fetchSaves = async () => {
     if (!isAuthenticated) {
@@ -156,7 +153,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
           </div>
           <Button
             size="sm"
-            variant="outline"
+            variant="ghost"
             onClick={() => setShowCreateDialog(true)}
             className="gap-1.5 h-8 text-xs md:text-sm"
           >
@@ -223,22 +220,6 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
     return (
       <TooltipProvider>
         <div className="h-full flex flex-col items-center pt-4 pb-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="default"
-                size="icon-lg"
-                onClick={toggleCollapse}
-                className="h-16 w-16 mb-2 bg-transparent hover:bg-transparent"
-              >
-                <BookMarked className="h-15 w-15 text-muted-foreground" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="font-semibold">
-              <p>{tCommon("openLibrary")}</p>
-            </TooltipContent>
-          </Tooltip>
-
           <ScrollArea className="flex-1 w-full">
             <div className="flex flex-col items-center gap-2 py-1">
             {loading ? (
@@ -252,11 +233,11 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
                 <TooltipTrigger asChild>
                   <Button
                     size="icon"
-                    variant="ghost"
+                    variant="brand"
                     onClick={() => setShowCreateDialog(true)}
-                    className="h-12 w-12 rounded-lg hover:bg-accent"
+                    className="h-8 w-8 rounded-lg"
                   >
-                    <Plus className="h-5 w-5 text-muted-foreground" />
+                    <Plus className="h-5 w-5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">
@@ -305,30 +286,14 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
 
   return (
     <>
-      <div 
-        className="h-full flex flex-col"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div className="flex items-center justify-between px-6 py-4">
+      <div className="h-full flex flex-col">
+        <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-2">
             <Library className="h-5 w-5 text-muted-foreground" />
             <h3 className="font-semibold text-foreground">{tCommon("yourLibrary")}</h3>
           </div>
 
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleCollapse}
-              className={cn(
-                "h-8 w-8 rounded-full transition-opacity duration-200",
-                isHovered ? "opacity-100" : "opacity-0"
-              )}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-
             <Button
               size="sm"
               variant="ghost"

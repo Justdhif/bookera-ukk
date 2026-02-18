@@ -43,7 +43,7 @@ export function middleware(req: NextRequest) {
       );
       
       if (!hasAccess) {
-        return NextResponse.redirect(new URL("/admin/forbidden", req.url));
+        return NextResponse.redirect(new URL("/forbidden", req.url));
       }
     }
 
@@ -53,9 +53,13 @@ export function middleware(req: NextRequest) {
       );
       
       if (!hasAccess) {
-        return NextResponse.redirect(new URL("/admin/forbidden", req.url));
+        return NextResponse.redirect(new URL("/forbidden", req.url));
       }
     }
+  }
+
+  if (role === "user" && pathname.startsWith("/admin")) {
+    return NextResponse.redirect(new URL("/forbidden", req.url));
   }
 
   return NextResponse.next();
