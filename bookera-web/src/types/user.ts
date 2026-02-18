@@ -18,7 +18,7 @@ export interface UserProfile {
 export interface User {
   id: number;
   email: string;
-  role: "admin" | "officer" | "user";
+  role: "admin" | "officer:catalog" | "officer:management" | "user";
   is_active: boolean;
   last_login_at: string | null;
   email_verified_at: string | null;

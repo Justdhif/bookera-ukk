@@ -21,7 +21,7 @@ class BookCopySeeder extends Seeder
         }
 
         $statuses = ['available', 'available', 'available', 'available', 'borrowed', 'available'];
-        
+
         // Create 3 copies for each book
         foreach ($books as $index => $book) {
             for ($i = 1; $i <= 3; $i++) {
@@ -32,7 +32,5 @@ class BookCopySeeder extends Seeder
                 ]);
             }
         }
-
-        $this->command->info('Created ' . ($books->count() * 3) . ' book copies.');
     }
 }

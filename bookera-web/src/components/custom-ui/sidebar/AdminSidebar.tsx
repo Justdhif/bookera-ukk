@@ -39,10 +39,10 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-// Menu items grouped by categories
 const getMenuGroups = (t: any) => [
   {
     title: t('admin.sidebar.mainMenu'),
+    roles: ['admin', 'officer:catalog', 'officer:management'],
     items: [
       {
         title: t('admin.sidebar.dashboard'),
@@ -54,6 +54,7 @@ const getMenuGroups = (t: any) => [
   },
   {
     title: t('admin.sidebar.catalog'),
+    roles: ['admin', 'officer:catalog'],
     items: [
       {
         title: t('admin.sidebar.categories'),
@@ -71,6 +72,7 @@ const getMenuGroups = (t: any) => [
   },
   {
     title: t('admin.sidebar.management'),
+    roles: ['admin', 'officer:management'],
     items: [
       {
         title: t('admin.sidebar.users'),
@@ -112,6 +114,7 @@ const getMenuGroups = (t: any) => [
   },
   {
     title: t('admin.sidebar.system'),
+    roles: ['admin'],
     items: [
       {
         title: t('admin.sidebar.settings'),
@@ -130,7 +133,25 @@ export function AdminSidebar() {
   const { open } = useSidebar();
   const t = useTranslations();
 
-  const menuGroups = getMenuGroups(t);
+  const allMenuGroups = getMenuGroups(t);
+  
+  const menuGroups = React.useMemo(() => {
+    if (!user?.role) return [];
+    return allMenuGroups.filter(group => 
+      group.roles.includes(user.role)
+    );
+  }, [user?.role, allMenuGroups]);
+
+  const roleDisplay = React.useMemo(() => {
+    if (!user?.role) return '';
+    
+    if (user.role.startsWith('officer:')) {
+      const [role, type] = user.role.split(':');
+      return `${role.toUpperCase()} • ${type.toUpperCase()}`;
+    }
+    
+    return user.role.toUpperCase();
+  }, [user?.role]);
 
   const handleNavigation = (href: string) => {
     router.push(href);
@@ -369,7 +390,7 @@ export function AdminSidebar() {
                         </span>
                         <span className="text-[10px] font-medium text-emerald-600/80 dark:text-emerald-400/80 truncate w-full mt-0.5 flex items-center gap-1">
                           <span className="inline-flex h-1 w-1 rounded-full bg-emerald-500" />
-                          {user?.role?.toUpperCase()}
+                          {roleDisplay}
                         </span>
                       </div>
                       <ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover/profile:text-emerald-600 dark:group-hover/profile:text-emerald-400 group-hover/profile:translate-x-1 transition-all shrink-0" />

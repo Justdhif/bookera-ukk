@@ -36,7 +36,7 @@ class UserSeeder extends Seeder
             $officer = User::create([
                 'email' => 'officer@school.test',
                 'password' => Hash::make('password'),
-                'role' => 'officer',
+                'role' => 'officer:catalog',
                 'is_active' => true,
             ]);
 
@@ -230,7 +230,7 @@ class UserSeeder extends Seeder
             $officer2 = User::create([
                 'email' => 'officer2@school.test',
                 'password' => Hash::make('password'),
-                'role' => 'officer',
+                'role' => 'officer:management',
                 'is_active' => true,
             ]);
 

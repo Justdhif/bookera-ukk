@@ -131,7 +131,7 @@ export default function PublicHeader() {
                       {user?.email}
                     </DropdownMenuItem>
 
-                    {(user?.role === "admin" || user?.role === "officer") && (
+                    {(user?.role === "admin" || user?.role?.startsWith("officer:")) && (
                       <DropdownMenuItem onClick={() => router.push("/admin")}>
                         {t("dashboard")}
                       </DropdownMenuItem>

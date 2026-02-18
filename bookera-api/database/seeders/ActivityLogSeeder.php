@@ -107,7 +107,7 @@ class ActivityLogSeeder extends Seeder
 
                 // Loan approval activity
                 if ($loan->approval_status === 'approved') {
-                    $officer = $users->where('role', 'officer')->first() ?? $users->first();
+                    $officer = $users->where('role', 'officer:management')->first() ?? $users->first();
                     $activities[] = [
                         'user_id' => $officer->id,
                         'action' => 'update',
@@ -129,7 +129,7 @@ class ActivityLogSeeder extends Seeder
         // Book copy status update activities
         if ($bookCopies->isNotEmpty()) {
             foreach ($bookCopies->where('status', 'borrowed')->take(5) as $bookCopy) {
-                $officer = $users->where('role', 'officer')->first() ?? $users->first();
+                $officer = $users->where('role', 'officer:management')->first() ?? $users->first();
                 $activities[] = [
                     'user_id' => $officer->id,
                     'action' => 'update',
@@ -235,7 +235,7 @@ class ActivityLogSeeder extends Seeder
 
                 // Approval activities
                 if ($bookReturn->approval_status === 'approved') {
-                    $officer = $users->where('role', 'officer')->first() ?? $users->first();
+                    $officer = $users->where('role', 'officer:management')->first() ?? $users->first();
                     $activities[] = [
                         'user_id' => $officer->id,
                         'action' => 'update',
@@ -276,8 +276,6 @@ class ActivityLogSeeder extends Seeder
         foreach ($activities as $activity) {
             ActivityLog::create($activity);
         }
-
-        $this->command->info('Created ' . count($activities) . ' activity logs for current period.');
 
         $this->seed2025Activities($users, $books, $loans, $bookCopies, $categories, $bookReturns, $ipAddresses, $userAgents);
     }
@@ -420,7 +418,5 @@ class ActivityLogSeeder extends Seeder
         foreach ($activities2025 as $activity) {
             ActivityLog::create($activity);
         }
-
-        $this->command->info('Created ' . count($activities2025) . ' activity logs for year 2025.');
     }
 }

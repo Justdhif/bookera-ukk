@@ -26,7 +26,8 @@ export default function UserFilter({ onChange }: Props) {
 
   const roles = [
     { value: "admin", label: t('admin') },
-    { value: "officer", label: t('officer') },
+    { value: "officer:catalog", label: t('officerCatalog') },
+    { value: "officer:management", label: t('officerManagement') },
     { value: "user", label: t('userRole') },
   ];
 

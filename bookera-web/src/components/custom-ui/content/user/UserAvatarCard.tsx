@@ -107,16 +107,19 @@ export default function UserAvatarCard({
                   <SelectValue>
                     {formData.role === "admin"
                       ? t('admin')
-                      : formData.role === "officer"
-                        ? t('officer')
-                        : formData.role === "user"
-                          ? t('userRole')
-                          : t('selectRole')}
+                      : formData.role === "officer:catalog"
+                        ? t('officerCatalog')
+                        : formData.role === "officer:management"
+                          ? t('officerManagement')
+                          : formData.role === "user"
+                            ? t('userRole')
+                            : t('selectRole')}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">{t('admin')}</SelectItem>
-                  <SelectItem value="officer">{t('officer')}</SelectItem>
+                  <SelectItem value="officer:catalog">{t('officerCatalog')}</SelectItem>
+                  <SelectItem value="officer:management">{t('officerManagement')}</SelectItem>
                   <SelectItem value="user">{t('userRole')}</SelectItem>
                 </SelectContent>
               </Select>

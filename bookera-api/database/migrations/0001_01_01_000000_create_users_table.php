@@ -17,7 +17,8 @@ return new class extends Migration {
             $table->string('password');
             $table->enum('role', [
                 'admin',
-                'officer',
+                'officer:catalog',
+                'officer:management',
                 'user',
             ])->default('user');
             $table->boolean('is_active')->default(true);

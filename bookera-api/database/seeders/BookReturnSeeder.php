@@ -6,7 +6,6 @@ use Illuminate\Database\Seeder;
 use App\Models\BookReturn;
 use App\Models\BookReturnDetail;
 use App\Models\Loan;
-use App\Models\LoanDetail;
 use Carbon\Carbon;
 
 class BookReturnSeeder extends Seeder
@@ -58,7 +57,5 @@ class BookReturnSeeder extends Seeder
                 ]);
             }
         }
-
-        $this->command->info('Created ' . $returnedLoans->count() . ' book returns.');
     }
 }

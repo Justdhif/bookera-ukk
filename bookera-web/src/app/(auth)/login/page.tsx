@@ -53,7 +53,8 @@ export default function LoginPage() {
       toast.success(message || t("loginSuccess"));
 
       const role = getCookie("role");
-      router.push(role === "admin" || role === "officer" ? "/admin" : "/");
+      const isAdmin = role === "admin" || role?.startsWith("officer:");
+      router.push(isAdmin ? "/admin" : "/");
     } catch (err: any) {
       toast.error(err.response?.data?.message ?? t("loginFailed"));
     }

@@ -40,12 +40,23 @@ export default function UserTable({ data, onDelete }: Props) {
   const getRoleBadge = (role: string) => {
     const variants = {
       admin: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+      "officer:catalog": "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
+      "officer:management": "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
       officer: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
       user: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
     };
+    
+    const roleLabels = {
+      admin: "ADMIN",
+      "officer:catalog": t('officerCatalog').toUpperCase(),
+      "officer:management": t('officerManagement').toUpperCase(),
+      officer: t('officer').toUpperCase(),
+      user: "USER",
+    };
+    
     return (
-      <Badge className={variants[role as keyof typeof variants]}>
-        {role === "officer" ? t('officer').toUpperCase() : role.toUpperCase()}
+      <Badge className={variants[role as keyof typeof variants] || variants.user}>
+        {roleLabels[role as keyof typeof roleLabels] || role.toUpperCase()}
       </Badge>
     );
   };

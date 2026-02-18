@@ -143,16 +143,19 @@ export default function AddUserClient() {
                       <SelectValue>
                         {formData.role === "admin"
                           ? tCommon('admin')
-                          : formData.role === "officer"
-                            ? tCommon('officer')
-                            : formData.role === "user"
-                              ? tCommon('userRole')
-                              : tCommon('selectRole')}
+                          : formData.role === "officer:catalog"
+                            ? tCommon('officerCatalog')
+                            : formData.role === "officer:management"
+                              ? tCommon('officerManagement')
+                              : formData.role === "user"
+                                ? tCommon('userRole')
+                                : tCommon('selectRole')}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="admin">{tCommon('admin')}</SelectItem>
-                      <SelectItem value="officer">{tCommon('officer')}</SelectItem>
+                      <SelectItem value="officer:catalog">{tCommon('officerCatalog')}</SelectItem>
+                      <SelectItem value="officer:management">{tCommon('officerManagement')}</SelectItem>
                       <SelectItem value="user">{tCommon('userRole')}</SelectItem>
                     </SelectContent>
                   </Select>

@@ -21,23 +21,8 @@ use App\Http\Controllers\Api\SaveController;
 use App\Http\Controllers\Api\TermsOfServiceController;
 use App\Http\Controllers\Api\UserController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-*/
-
-// ============================================================================
-// BROADCASTING AUTHENTICATION
-// ============================================================================
-
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
-// ============================================================================
-// PUBLIC ROUTES (No Authentication Required)
-// ============================================================================
-
-// API Info
 Route::get('/', function () {
     return response()->json([
         'message' => 'Welcome to the Bookera API'
@@ -50,31 +35,22 @@ Route::get('/test', function () {
     ]);
 });
 
-// Books (Public)
 Route::get('books', [BookController::class, 'index']);
 Route::get('books/slug/{slug}', [BookController::class, 'showBySlug']);
 Route::get('books/{id}', [BookController::class, 'show']);
 
-// Categories (Public)
 Route::get('categories', [CategoryController::class, 'index']);
 
-// Content Pages (Public)
 Route::get('content-pages', [ContentPageController::class, 'index']);
 Route::get('content-pages/{slug}', [ContentPageController::class, 'show']);
 
-// Terms of Service (Public)
 Route::get('terms-of-services/active', [TermsOfServiceController::class, 'getActive']);
 Route::get('terms-of-services', [TermsOfServiceController::class, 'index']);
 Route::get('terms-of-services/{termsOfService}', [TermsOfServiceController::class, 'show']);
 
-// Privacy Policy (Public)
 Route::get('privacy-policies/active', [PrivacyPolicyController::class, 'getActive']);
 Route::get('privacy-policies', [PrivacyPolicyController::class, 'index']);
 Route::get('privacy-policies/{privacyPolicy}', [PrivacyPolicyController::class, 'show']);
-
-// ============================================================================
-// AUTHENTICATION ROUTES
-// ============================================================================
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -85,33 +61,34 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-// ============================================================================
-// AUTHENTICATED ROUTES (Requires auth:sanctum)
-// ============================================================================
-
 Route::middleware('auth:sanctum')->group(function () {
 
-    // ========================================================================
-    // ADMIN ROUTES (Requires role:admin)
-    // ========================================================================
+    Route::middleware('role:admin,officer:*')->prefix('admin')->group(function () {
 
-    Route::middleware('role:admin')->prefix('admin')->group(function () {
-
-        // Dashboard
         Route::prefix('dashboard')->group(function () {
             Route::get('/totals', [DashboardController::class, 'totals']);
             Route::get('/loan-monthly-chart', [DashboardController::class, 'loanMonthlyChart']);
             Route::get('/loan-status-chart', [DashboardController::class, 'loanStatusChart']);
             Route::get('/latest', [DashboardController::class, 'latest']);
         });
+    });
 
-        // Activity Logs (Admin Only)
-        Route::prefix('activity-logs')->group(function () {
-            Route::get('/', [ActivityController::class, 'index']);
-            Route::get('/{id}', [ActivityController::class, 'show']);
+    Route::middleware('role:admin,officer:catalog')->prefix('admin')->group(function () {
+
+        Route::prefix('books')->group(function () {
+            Route::post('/', [BookController::class, 'store']);
+            Route::put('/{book}', [BookController::class, 'update']);
+            Route::delete('/{book}', [BookController::class, 'destroy']);
+            Route::post('/{book}/copies', [BookCopyController::class, 'store']);
         });
 
-        // User Management
+        Route::delete('book-copies/{bookCopy}', [BookCopyController::class, 'destroy']);
+
+        Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
+    });
+
+    Route::middleware('role:admin,officer:management')->prefix('admin')->group(function () {
+
         Route::prefix('users')->group(function () {
             Route::get('/', [UserController::class, 'index']);
             Route::post('/', [UserController::class, 'store']);
@@ -122,28 +99,11 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{user}', [UserController::class, 'destroy']);
         });
 
-        // Book Management
-        Route::prefix('books')->group(function () {
-            Route::post('/', [BookController::class, 'store']);
-            Route::put('/{book}', [BookController::class, 'update']);
-            Route::delete('/{book}', [BookController::class, 'destroy']);
-
-            // Book Copies
-            Route::post('/{book}/copies', [BookCopyController::class, 'store']);
-        });
-
-        Route::delete('book-copies/{bookCopy}', [BookCopyController::class, 'destroy']);
-
-        // Category Management
-        Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
-
-        // Loan Management (Admin)
         Route::prefix('loans')->group(function () {
             Route::get('/', [LoanController::class, 'index']);
-            Route::post('/', [LoanController::class, 'storeAdminLoan']); // Admin creates direct loan
+            Route::post('/', [LoanController::class, 'storeAdminLoan']);
         });
 
-        // Approval Management
         Route::prefix('approvals')->group(function () {
             Route::get('loans/pending', [ApprovalController::class, 'getPendingLoans']);
             Route::get('loans/approved', [ApprovalController::class, 'getApprovedLoans']);
@@ -154,16 +114,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('loans/{loan}/mark-borrowed', [ApprovalController::class, 'markAsBorrowed']);
         });
 
-        // Book Return Management (Admin)
         Route::prefix('book-returns')->group(function () {
             Route::post('/{bookReturn}/approve', [BookReturnController::class, 'approveReturn']);
             Route::post('/{bookReturn}/process-fine', [BookReturnController::class, 'processFine']);
         });
 
-        // Fine Type Management
         Route::apiResource('fine-types', FineTypeController::class);
 
-        // Fine Management (Admin)
         Route::prefix('fines')->group(function () {
             Route::get('/', [FineController::class, 'index']);
             Route::post('/loans/{loan}', [FineController::class, 'store']);
@@ -174,7 +131,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{fine}', [FineController::class, 'destroy']);
         });
 
-        // Lost Book Management (Admin)
         Route::prefix('lost-books')->group(function () {
             Route::get('/', [LostBookController::class, 'index']);
             Route::get('/{lostBook}', [LostBookController::class, 'show']);
@@ -184,13 +140,19 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{lostBook}', [LostBookController::class, 'destroy']);
         });
 
-        // Content Page Management (Admin)
+        Route::prefix('activity-logs')->group(function () {
+            Route::get('/', [ActivityController::class, 'index']);
+            Route::get('/{id}', [ActivityController::class, 'show']);
+        });
+    });
+
+    Route::middleware('role:admin')->prefix('admin')->group(function () {
+
         Route::prefix('content-pages')->group(function () {
             Route::get('/', [ContentPageController::class, 'adminIndex']);
             Route::put('/{slug}', [ContentPageController::class, 'update']);
         });
 
-        // Terms of Service Management (Admin)
         Route::prefix('terms-of-services')->group(function () {
             Route::post('/', [TermsOfServiceController::class, 'store']);
             Route::put('/{termsOfService}', [TermsOfServiceController::class, 'update']);
@@ -198,7 +160,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{termsOfService}/activate', [TermsOfServiceController::class, 'activate']);
         });
 
-        // Privacy Policy Management (Admin)
         Route::prefix('privacy-policies')->group(function () {
             Route::post('/', [PrivacyPolicyController::class, 'store']);
             Route::put('/{privacyPolicy}', [PrivacyPolicyController::class, 'update']);
@@ -207,11 +168,6 @@ Route::middleware('auth:sanctum')->group(function () {
         });
     });
 
-    // ========================================================================
-    // USER ROUTES (Authenticated Users)
-    // ========================================================================
-
-    // Loan Management (User)
     Route::prefix('loans')->group(function () {
         Route::post('/', [LoanController::class, 'store']);
         Route::get('/{loan}', [LoanController::class, 'show']);
@@ -225,10 +181,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('my-fines', [FineController::class, 'myFines']);
 
-    // Book Return (User)
     Route::get('book-returns/{bookReturn}', [BookReturnController::class, 'show']);
 
-    // Notification Management (User)
     Route::prefix('notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
         Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
@@ -239,7 +193,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{notification}', [NotificationController::class, 'destroy']);
     });
 
-    // Save Collection Management (User)
     Route::prefix('saves')->group(function () {
         Route::get('/', [SaveController::class, 'index']);
         Route::post('/', [SaveController::class, 'store']);

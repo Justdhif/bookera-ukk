@@ -14,14 +14,14 @@ class LoanSeeder extends Seeder
     public function run(): void
     {
         $users = User::where('role', 'user')->get();
-        
+
         if ($users->isEmpty()) {
             $this->command->warn('No users found. Please run UserSeeder first.');
             return;
         }
 
         $bookCopies = BookCopy::whereIn('status', ['borrowed', 'available'])->get();
-        
+
         if ($bookCopies->isEmpty()) {
             $this->command->warn('No book copies found. Please run BookCopySeeder first.');
             return;
@@ -130,7 +130,5 @@ class LoanSeeder extends Seeder
 
             $copyIndex++;
         }
-
-        $this->command->info('Created ' . count($loans) . ' loans.');
     }
 }
