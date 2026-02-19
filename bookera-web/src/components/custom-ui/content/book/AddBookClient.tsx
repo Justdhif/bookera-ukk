@@ -37,10 +37,10 @@ import YearPicker from "@/components/custom-ui/YearPicker";
 
 export default function AddBookClient() {
   const router = useRouter();
-  const t = useTranslations('admin.books');
-  const tCategories = useTranslations('admin.categories');
-  const tCommon = useTranslations('admin.common');
-  const tCommonRoot = useTranslations('common');
+  const t = useTranslations("admin.books");
+  const tCategories = useTranslations("admin.categories");
+  const tCommon = useTranslations("admin.common");
+  const tCommonRoot = useTranslations("common");
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -56,6 +56,8 @@ export default function AddBookClient() {
   const [coverPreview, setCoverPreview] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isTitleValid, setIsTitleValid] = useState(true);
+  const [isAuthorValid, setIsAuthorValid] = useState(true);
 
   useEffect(() => {
     fetchCategories();
@@ -66,7 +68,7 @@ export default function AddBookClient() {
       const res = await categoryService.getAll();
       setCategories(res.data.data);
     } catch (error) {
-      toast.error(tCategories('loadError'));
+      toast.error(tCategories("loadError"));
       console.error("Error fetching categories:", error);
     }
   };
@@ -87,7 +89,7 @@ export default function AddBookClient() {
     e.preventDefault();
 
     if (!formData.title.trim() || !formData.author.trim()) {
-      toast.error(tCommon('titleAuthorRequired'));
+      toast.error(tCommon("titleAuthorRequired"));
       return;
     }
 
@@ -119,10 +121,10 @@ export default function AddBookClient() {
       }
 
       await bookService.create(data);
-      toast.success(tCommon('bookAdded'));
+      toast.success(tCommon("bookAdded"));
       router.push("/admin/books");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || tCommon('failedToAddBook'));
+      toast.error(error.response?.data?.message || tCommon("failedToAddBook"));
     } finally {
       setSubmitting(false);
     }
@@ -142,9 +144,9 @@ export default function AddBookClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{t('addBook')}</h1>
+            <h1 className="text-3xl font-bold">{t("addBook")}</h1>
             <p className="text-muted-foreground">
-              {tCommonRoot('addBookToSystem')}
+              {tCommonRoot("addBookToSystem")}
             </p>
           </div>
         </div>
@@ -152,11 +154,17 @@ export default function AddBookClient() {
           type="submit"
           form="book-form"
           variant="submit"
-          disabled={submitting || !formData.title.trim() || !formData.author.trim()}
+          disabled={
+            submitting ||
+            !formData.title.trim() ||
+            !formData.author.trim() ||
+            !isTitleValid ||
+            !isAuthorValid
+          }
           loading={submitting}
           className="h-8"
         >
-          {submitting ? t('saving') : t('addBook')}
+          {submitting ? t("saving") : t("addBook")}
         </Button>
       </div>
 
@@ -165,8 +173,8 @@ export default function AddBookClient() {
           {/* Cover Card */}
           <Card className="lg:col-span-1">
             <CardHeader>
-              <CardTitle>{tCommonRoot('bookCover')}</CardTitle>
-              <CardDescription>{tCommonRoot('uploadCover')}</CardDescription>
+              <CardTitle>{tCommonRoot("bookCover")}</CardTitle>
+              <CardDescription>{tCommonRoot("uploadCover")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 flex-1 flex flex-col">
               <div className="flex flex-col gap-4 flex-1">
@@ -194,7 +202,7 @@ export default function AddBookClient() {
                   <div className="w-full flex-1 border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-2 bg-muted/30">
                     <BookOpen className="h-12 w-12 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground">
-                      {tCommonRoot('noCover')}
+                      {tCommonRoot("noCover")}
                     </p>
                   </div>
                 )}
@@ -207,7 +215,7 @@ export default function AddBookClient() {
                   className="w-full"
                 >
                   <Upload className="h-4 w-4 mr-2" />
-                  {tCommonRoot('uploadCover')}
+                  {tCommonRoot("uploadCover")}
                 </Button>
                 <Input
                   id="cover_image"
@@ -221,9 +229,13 @@ export default function AddBookClient() {
               {/* Status Switch */}
               <div className="flex items-center justify-between rounded-lg border p-4 bg-muted/30">
                 <div className="space-y-0.5">
-                  <Label className="text-sm font-medium">{tCommonRoot('status')}</Label>
+                  <Label className="text-sm font-medium">
+                    {tCommonRoot("status")}
+                  </Label>
                   <p className="text-xs text-muted-foreground">
-                    {formData.is_active ? tCommonRoot('active') : tCommonRoot('inactive')}
+                    {formData.is_active
+                      ? tCommonRoot("active")
+                      : tCommonRoot("inactive")}
                   </p>
                 </div>
                 <Switch
@@ -239,18 +251,20 @@ export default function AddBookClient() {
           {/* Form Card */}
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle>{tCommonRoot('bookInfo')}</CardTitle>
+              <CardTitle>{tCommonRoot("bookInfo")}</CardTitle>
               <CardDescription>
-                {tCommonRoot('fullBookDetails')}
+                {tCommonRoot("fullBookDetails")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Basic Information */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">{tCommonRoot('basicInformation')}</h3>
+                <h3 className="font-semibold text-lg">
+                  {tCommonRoot("basicInformation")}
+                </h3>
                 <div className="space-y-2">
                   <Label htmlFor="title" variant="required">
-                    {tCommonRoot('title')}
+                    {tCommonRoot("title")}
                   </Label>
                   <Input
                     id="title"
@@ -259,13 +273,15 @@ export default function AddBookClient() {
                     onChange={(e) =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    placeholder={tCommonRoot('enterTitle')}
+                    validationType="alphanumeric"
+                    onValidationChange={setIsTitleValid}
+                    placeholder={tCommonRoot("enterTitle")}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="author" variant="required">
-                    {tCommonRoot('author')}
+                    {tCommonRoot("author")}
                   </Label>
                   <Input
                     id="author"
@@ -274,25 +290,34 @@ export default function AddBookClient() {
                     onChange={(e) =>
                       setFormData({ ...formData, author: e.target.value })
                     }
-                    placeholder={tCommonRoot('enterAuthor')}
+                    validationType="letters-only"
+                    onValidationChange={setIsAuthorValid}
+                    errorMessage={{
+                      "letters-only": "Nama penulis hanya boleh berisi huruf",
+                    }}
+                    placeholder={tCommonRoot("enterAuthor")}
                   />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="publisher">{tCommonRoot('publisher')}</Label>
+                    <Label htmlFor="publisher">
+                      {tCommonRoot("publisher")}
+                    </Label>
                     <Input
                       id="publisher"
                       value={formData.publisher}
                       onChange={(e) =>
                         setFormData({ ...formData, publisher: e.target.value })
                       }
-                      placeholder={tCommonRoot('publisherName')}
+                      placeholder={tCommonRoot("publisherName")}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="publication_year">{tCommonRoot('publicationYear')}</Label>
+                    <Label htmlFor="publication_year">
+                      {tCommonRoot("publicationYear")}
+                    </Label>
                     <YearPicker
                       value={formData.publication_year}
                       onChange={(year) =>
@@ -301,35 +326,35 @@ export default function AddBookClient() {
                           publication_year: year,
                         })
                       }
-                      placeholder={tCommonRoot('selectYear')}
-                      searchPlaceholder={tCommonRoot('searchYear')}
-                      emptyText={tCommonRoot('yearNotFound')}
+                      placeholder={tCommonRoot("selectYear")}
+                      searchPlaceholder={tCommonRoot("searchYear")}
+                      emptyText={tCommonRoot("yearNotFound")}
                     />
                   </div>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="isbn">{tCommonRoot('isbn')}</Label>
+                    <Label htmlFor="isbn">{tCommonRoot("isbn")}</Label>
                     <Input
                       id="isbn"
                       value={formData.isbn}
                       onChange={(e) =>
                         setFormData({ ...formData, isbn: e.target.value })
                       }
-                      placeholder={tCommonRoot('isbnNumber')}
+                      placeholder={tCommonRoot("isbnNumber")}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="language">{tCommonRoot('language')}</Label>
+                    <Label htmlFor="language">{tCommonRoot("language")}</Label>
                     <Input
                       id="language"
                       value={formData.language}
                       onChange={(e) =>
                         setFormData({ ...formData, language: e.target.value })
                       }
-                      placeholder={tCommonRoot('languageExample')}
+                      placeholder={tCommonRoot("languageExample")}
                     />
                   </div>
                 </div>
@@ -337,9 +362,11 @@ export default function AddBookClient() {
 
               {/* Categories */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">{tCategories('title')}</h3>
+                <h3 className="font-semibold text-lg">
+                  {tCategories("title")}
+                </h3>
                 <div className="space-y-2">
-                  <Label>{tCommonRoot('selectCategory')}</Label>
+                  <Label>{tCommonRoot("selectCategory")}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -348,13 +375,17 @@ export default function AddBookClient() {
                         className="w-full justify-start text-left font-normal"
                       >
                         {formData.category_ids.length > 0
-                          ? tCommonRoot('categoriesSelected', { count: formData.category_ids.length })
-                          : tCommon('selectCategoryPlaceholder')}
+                          ? tCommonRoot("categoriesSelected", {
+                              count: formData.category_ids.length,
+                            })
+                          : tCommon("selectCategoryPlaceholder")}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0" align="start">
                       <Command>
-                        <CommandEmpty>{tCommonRoot('categoryNotFound')}</CommandEmpty>
+                        <CommandEmpty>
+                          {tCommonRoot("categoryNotFound")}
+                        </CommandEmpty>
                         <CommandGroup>
                           {categories.map((cat) => (
                             <CommandItem
@@ -413,16 +444,20 @@ export default function AddBookClient() {
 
               {/* Description */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">{tCommonRoot('bookDescription')}</h3>
+                <h3 className="font-semibold text-lg">
+                  {tCommonRoot("bookDescription")}
+                </h3>
                 <div className="space-y-2">
-                  <Label htmlFor="description">{tCommonRoot('bookDescription')}</Label>
+                  <Label htmlFor="description">
+                    {tCommonRoot("bookDescription")}
+                  </Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    placeholder={tCommonRoot('enterDescription')}
+                    placeholder={tCommonRoot("enterDescription")}
                     rows={4}
                     className="resize-none"
                   />

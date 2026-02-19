@@ -33,6 +33,7 @@ export default function CategoryFormDialog({
   const [icon, setIcon] = useState<string>("");
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isNameValid, setIsNameValid] = useState(true);
 
   useEffect(() => {
     setName(category?.name ?? "");
@@ -64,7 +65,6 @@ export default function CategoryFormDialog({
         toast.success(t('categoryAdded'));
       }
 
-      // Reset form inputs setelah berhasil
       setName("");
       setIcon("");
       setDescription("");
@@ -97,6 +97,11 @@ export default function CategoryFormDialog({
                 placeholder={t('categoryName')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                validationType="letters-only"
+                onValidationChange={setIsNameValid}
+                errorMessage={{
+                  'letters-only': 'Nama kategori hanya boleh berisi huruf'
+                }}
               />
             </div>
 
@@ -120,7 +125,7 @@ export default function CategoryFormDialog({
           <Button
             onClick={handleSubmit}
             variant="submit"
-            disabled={isLoading || !name.trim()}
+            disabled={isLoading || !name.trim() || !isNameValid}
             loading={isLoading}
             className="w-full"
           >

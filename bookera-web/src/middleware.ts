@@ -1,22 +1,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const CATALOG_ROUTES = [
-  "/admin",
-  "/admin/categories",
-  "/admin/books",
-  "/admin/profile",
-];
+const CATALOG_ROUTES = ["/admin/categories", "/admin/books"];
 
 const MANAGEMENT_ROUTES = [
-  "/admin",
   "/admin/users",
   "/admin/loans",
   "/admin/returns",
   "/admin/fines",
   "/admin/lost-books",
   "/admin/activity-logs",
-  "/admin/profile",
 ];
 
 export function middleware(req: NextRequest) {
@@ -24,12 +17,25 @@ export function middleware(req: NextRequest) {
   const role = req.cookies.get("role")?.value;
   const pathname = req.nextUrl.pathname;
 
-  if (pathname.startsWith("/admin")) {
+  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isAdminRoute = pathname.startsWith("/admin");
+
+  if (isAuthPage && token) {
+    if (role === "admin" || role === "officer:*") {
+      return NextResponse.redirect(new URL("/admin", req.url));
+    }
+
+    if (role === "user") {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
+
+  if (isAdminRoute) {
     if (!token) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    if (!role || (role !== "admin" && !role.startsWith("officer:"))) {
+    if (!role || role === "user") {
       return NextResponse.redirect(new URL("/login", req.url));
     }
 
@@ -37,34 +43,34 @@ export function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
+    if (pathname === "/admin") {
+      return NextResponse.next();
+    }
+
     if (role === "officer:catalog") {
-      const hasAccess = CATALOG_ROUTES.some(route => 
-        pathname === route || pathname.startsWith(route + "/")
+      const blocked = MANAGEMENT_ROUTES.some(
+        (route) => pathname === route || pathname.startsWith(route + "/"),
       );
-      
-      if (!hasAccess) {
+
+      if (blocked) {
         return NextResponse.redirect(new URL("/forbidden", req.url));
       }
     }
 
     if (role === "officer:management") {
-      const hasAccess = MANAGEMENT_ROUTES.some(route => 
-        pathname === route || pathname.startsWith(route + "/")
+      const blocked = CATALOG_ROUTES.some(
+        (route) => pathname === route || pathname.startsWith(route + "/"),
       );
-      
-      if (!hasAccess) {
+
+      if (blocked) {
         return NextResponse.redirect(new URL("/forbidden", req.url));
       }
     }
-  }
-
-  if (role === "user" && pathname.startsWith("/admin")) {
-    return NextResponse.redirect(new URL("/forbidden", req.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/login", "/register"],
 };
