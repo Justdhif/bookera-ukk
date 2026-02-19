@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,41 +12,23 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Moon, Sun, Search, Bell } from "lucide-react";
+import { Search, Bell, Home, Settings } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { useTheme } from "next-themes";
-import LocaleSwitcher from "../LocaleSwitcher";
-import { Locale } from "@/i18n/config";
-import { setUserLocale } from "@/services/locale";
 import { Input } from "@/components/ui/input";
 import NotificationDropdown from "./NotificationDropdown";
 
 export default function PublicHeader() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, logout, isAuthenticated, initialLoading } = useAuthStore();
   const t = useTranslations("header");
-  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [locale, setLocale] = useState<Locale | undefined>();
-  const [isPending, startTransition] = useTransition();
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (locale) {
-      startTransition(() => {
-        setUserLocale(locale);
-      });
-    }
-  }, [locale]);
-
-  const toggleDarkMode = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,11 +37,30 @@ export default function PublicHeader() {
     }
   };
 
+  const isHomePage = pathname === "/";
+
   return (
     <header className="sticky top-0 bg-background/95 backdrop-blur-md z-40 border-b border-border shadow-sm">
       <div className="px-4 md:px-6 lg:px-8 py-3 md:py-4">
         <div className="flex items-center justify-between gap-2 md:gap-4">
           <div className="flex items-center gap-2 md:gap-4 flex-1 max-w-md">
+            {/* Home button - only visible on mobile */}
+            <div className="lg:hidden">
+              <Button
+                variant={isHomePage ? "secondary" : "ghost"}
+                size="icon"
+                onClick={() => router.push("/")}
+                className={`h-9 w-9 rounded-full ${
+                  isHomePage
+                    ? "bg-primary/10 text-primary hover:bg-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                }`}
+                aria-label="Go to home"
+              >
+                <Home className="h-4 w-4 md:h-5 md:w-5" />
+              </Button>
+            </div>
+
             <div className="hidden lg:block">
               <SidebarTrigger />
             </div>
@@ -76,28 +77,16 @@ export default function PublicHeader() {
 
           <div className="flex items-center gap-1.5 md:gap-3">
             <NotificationDropdown isAuthenticated={isAuthenticated} />
-            
-            <div className="lg:hidden">
-              <LocaleSwitcher setLocale={setLocale} iconOnly />
-            </div>
-            <div className="hidden md:block">
-              <LocaleSwitcher setLocale={setLocale} iconOnly={false} />
-            </div>
-            
+
+            {/* Settings button - replaces dark mode and locale switcher */}
             <Button
               variant="ghost"
               size="icon"
-              onClick={toggleDarkMode}
+              onClick={() => router.push("/settings")}
               className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent"
-              suppressHydrationWarning
+              aria-label="Go to settings"
             >
-              {!mounted ? (
-                <Moon className="h-4 w-4 md:h-5 md:w-5" />
-              ) : theme === "dark" ? (
-                <Sun className="h-4 w-4 md:h-5 md:w-5" />
-              ) : (
-                <Moon className="h-4 w-4 md:h-5 md:w-5" />
-              )}
+              <Settings className="h-4 w-4 md:h-5 md:w-5" />
             </Button>
 
             {/* User Section */}
@@ -137,7 +126,8 @@ export default function PublicHeader() {
                       {user?.email}
                     </DropdownMenuItem>
 
-                    {(user?.role === "admin" || user?.role?.startsWith("officer:")) && (
+                    {(user?.role === "admin" ||
+                      user?.role?.startsWith("officer:")) && (
                       <DropdownMenuItem onClick={() => router.push("/admin")}>
                         {t("dashboard")}
                       </DropdownMenuItem>

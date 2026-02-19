@@ -7,29 +7,18 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import banner1 from "@/assets/banner/banner-1.png";
+import banner2 from "@/assets/banner/banner-2.png";
+import banner3 from "@/assets/banner/banner-3.png";
+import Image from "next/image";
 
 export default function BannerCarousel() {
-  const t = useTranslations('common');
-  
+  const t = useTranslations("common");
+
   const banners = [
-    {
-      id: 1,
-      image: "/banner/banner-1.jpg",
-      title: t('bannerWelcomeTitle'),
-      subtitle: t('bannerWelcomeSubtitle'),
-    },
-    {
-      id: 2,
-      image: "/banner/banner-2.jpg",
-      title: t('bannerBorrowEasyTitle'),
-      subtitle: t('searchBorrowManage'),
-    },
-    {
-      id: 3,
-      image: "/banner/banner-3.jpg",
-      title: t('bannerThousandBooksTitle'),
-      subtitle: t('bannerThousandBooksSubtitle'),
-    },
+    { id: 1, image: banner1 },
+    { id: 2, image: banner2 },
+    { id: 3, image: banner3 },
   ];
 
   return (
@@ -44,24 +33,12 @@ export default function BannerCarousel() {
       <CarouselContent>
         {banners.map((banner) => (
           <CarouselItem key={banner.id}>
-            <div className="relative h-65 md:h-90 w-full overflow-hidden">
-              <img
+            <div className="relative aspect-3/1 w-full overflow-hidden">
+              <Image
                 src={banner.image}
-                alt={banner.title}
+                alt={banner.id.toString()}
                 className="h-full w-full object-cover"
               />
-
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-black/40 flex items-center">
-                <div className="container mx-auto px-6 text-white space-y-2 animate-fade-in">
-                  <h1 className="text-2xl md:text-4xl font-bold">
-                    {banner.title}
-                  </h1>
-                  <p className="text-sm md:text-lg opacity-90">
-                    {banner.subtitle}
-                  </p>
-                </div>
-              </div>
             </div>
           </CarouselItem>
         ))}
