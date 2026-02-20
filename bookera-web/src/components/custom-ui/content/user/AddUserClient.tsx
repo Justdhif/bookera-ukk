@@ -39,6 +39,7 @@ export default function AddUserClient() {
   const [avatarPreview, setAvatarPreview] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const [isFullNameValid, setIsFullNameValid] = useState(true);
 
   const handleAvatarSave = (avatar: string | File) => {
     if (typeof avatar === "string") {
@@ -96,7 +97,7 @@ export default function AddUserClient() {
           type="submit"
           form="user-form"
           variant="submit"
-          disabled={submitting || !formData.email?.trim() || !formData.full_name?.trim() || !formData.password?.trim()}
+          disabled={submitting || !formData.email?.trim() || !formData.full_name?.trim() || !formData.password?.trim() || !isFullNameValid}
           loading={submitting}
           className="h-8"
         >
@@ -249,6 +250,13 @@ export default function AddUserClient() {
                         setFormData({ ...formData, full_name: e.target.value })
                       }
                       placeholder={tCommon('namePlaceholder')}
+                      validationType="letters-only"
+                      onValidationChange={setIsFullNameValid}
+                      errorMessage={{
+                        'letters-only': tCommon('validationLettersOnly'),
+                        'numbers-only': tCommon('validationNumbersOnly'),
+                        'alphanumeric': tCommon('validationAlphanumeric'),
+                      }}
                     />
                   </div>
                   <div className="space-y-2">
@@ -265,6 +273,12 @@ export default function AddUserClient() {
                         })
                       }
                       placeholder={tCommon('idNumberPlaceholder')}
+                      validationType="numbers-only"
+                      errorMessage={{
+                        'letters-only': tCommon('validationLettersOnly'),
+                        'numbers-only': tCommon('validationNumbersOnly'),
+                        'alphanumeric': tCommon('validationAlphanumeric'),
+                      }}
                     />
                   </div>
                   <div className="space-y-2">
@@ -279,6 +293,12 @@ export default function AddUserClient() {
                         })
                       }
                       placeholder={tCommon('phonePlaceholder')}
+                      validationType="numbers-only"
+                      errorMessage={{
+                        'letters-only': tCommon('validationLettersOnly'),
+                        'numbers-only': tCommon('validationNumbersOnly'),
+                        'alphanumeric': tCommon('validationAlphanumeric'),
+                      }}
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
@@ -336,6 +356,12 @@ export default function AddUserClient() {
                         setFormData({ ...formData, occupation: e.target.value })
                       }
                       placeholder={tCommon('occupationPlaceholder')}
+                      validationType="letters-only"
+                      errorMessage={{
+                        'letters-only': tCommon('validationLettersOnly'),
+                        'numbers-only': tCommon('validationNumbersOnly'),
+                        'alphanumeric': tCommon('validationAlphanumeric'),
+                      }}
                     />
                   </div>
                   <div className="space-y-2">
@@ -350,6 +376,12 @@ export default function AddUserClient() {
                         })
                       }
                       placeholder={tCommon('classPlaceholder')}
+                      validationType="alphanumeric"
+                      errorMessage={{
+                        'letters-only': tCommon('validationLettersOnly'),
+                        'numbers-only': tCommon('validationNumbersOnly'),
+                        'alphanumeric': tCommon('validationAlphanumeric'),
+                      }}
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">

@@ -12,7 +12,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Search, Bell, Home, Settings } from "lucide-react";
+import { Search, Bell, Home, Settings, User } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
@@ -124,6 +124,14 @@ export default function PublicHeader() {
                       className="text-xs text-muted-foreground"
                     >
                       {user?.email}
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      onClick={() => router.push("/profile")}
+                      className="gap-2"
+                    >
+                      <User className="h-4 w-4" />
+                      {t("profile")}
                     </DropdownMenuItem>
 
                     {(user?.role === "admin" ||

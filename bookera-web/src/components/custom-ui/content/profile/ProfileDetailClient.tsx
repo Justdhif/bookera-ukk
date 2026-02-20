@@ -1,29 +1,31 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { authService } from "@/services/auth.service";
 import { userService, UpdateUserData } from "@/services/user.service";
-import { loanService } from "@/services/loan.service";
 import { User } from "@/types/user";
-import { Loan } from "@/types/loan";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save, X, Edit2 } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import UserAvatarCard from "./UserAvatarCard";
-import UserDetailForm from "./UserDetailForm";
+import ProfileAvatarCard from "./ProfileAvatarCard";
+import UserDetailForm from "@/components/custom-ui/content/admin/user/UserDetailForm";
 import { useTranslations } from "next-intl";
 
-export default function UserDetailClient() {
+type ProfileVariant = "public" | "admin";
+
+interface ProfileDetailClientProps {
+  variant: ProfileVariant;
+}
+
+export default function ProfileDetailClient({ variant }: ProfileDetailClientProps) {
   const router = useRouter();
-  const params = useParams();
-  const t = useTranslations('admin.users');
-  const tAdmin = useTranslations('admin.common');
-  const tCommon = useTranslations('common');
-  const identificationNumber = params.identificationNumber as string;
+  const t = useTranslations("admin.users");
+  const tAdmin = useTranslations("admin.common");
+  const tCommon = useTranslations("common");
 
   const [user, setUser] = useState<User | null>(null);
-  const [recentLoans, setRecentLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState<Partial<UpdateUserData>>({});
@@ -31,69 +33,66 @@ export default function UserDetailClient() {
   const [submitting, setSubmitting] = useState(false);
   const [isFullNameValid, setIsFullNameValid] = useState(true);
 
-  useEffect(() => {
-    fetchUser();
-    fetchRecentLoans();
-  }, [identificationNumber]);
-
-  const fetchRecentLoans = async () => {
-    try {
-      const res = await loanService.getAll();
-      const userLoans = res.data.data
-        .filter((loan) => loan.user?.profile?.identification_number === identificationNumber)
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-        .slice(0, 3);
-      setRecentLoans(userLoans);
-    } catch (error) {
-      console.error("Failed to fetch loans", error);
-    }
-  };
+  const backHref = variant === "admin" ? "/admin/users" : "/";
 
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const res = await userService.showByIdentification(identificationNumber);
-      setUser(res.data.data);
+      const res = await authService.me();
+      const userData = res.data.data.user;
+      setUser(userData);
       setFormData({
-        email: res.data.data.email,
-        role: res.data.data.role,
-        is_active: res.data.data.is_active,
-        full_name: res.data.data.profile.full_name,
-        gender: res.data.data.profile.gender || undefined,
-        birth_date: res.data.data.profile.birth_date || undefined,
-        phone_number: res.data.data.profile.phone_number || undefined,
-        address: res.data.data.profile.address || undefined,
-        bio: res.data.data.profile.bio || undefined,
-        identification_number: res.data.data.profile.identification_number || undefined,
-        occupation: res.data.data.profile.occupation || undefined,
-        institution: res.data.data.profile.institution || undefined,
+        email: userData.email,
+        role: userData.role,
+        is_active: userData.is_active,
+        full_name: userData.profile.full_name,
+        gender: userData.profile.gender || undefined,
+        birth_date: userData.profile.birth_date || undefined,
+        phone_number: userData.profile.phone_number || undefined,
+        address: userData.profile.address || undefined,
+        bio: userData.profile.bio || undefined,
+        identification_number: userData.profile.identification_number || undefined,
+        occupation: userData.profile.occupation || undefined,
+        institution: userData.profile.institution || undefined,
       });
-      setAvatarPreview(res.data.data.profile.avatar);
+      setAvatarPreview(userData.profile.avatar);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('loadError'));
-      router.push("/admin/users");
+      toast.error(error.response?.data?.message || t("loadError"));
+      if (error.response?.status === 401 && variant === "public") {
+        router.push("/login");
+      } else {
+        router.push(variant === "admin" ? "/admin" : "/");
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    if (!formData.email?.trim() || !formData.full_name?.trim() || !formData.role) {
-      toast.error(tCommon('pleaseCompleteRequiredFields'));
+    if (
+      !formData.email?.trim() ||
+      !formData.full_name?.trim() ||
+      !formData.role
+    ) {
+      toast.error(tCommon("pleaseCompleteRequiredFields"));
       return;
     }
 
     try {
       setSubmitting(true);
       await userService.update(user.id, formData as UpdateUserData);
-      toast.success(t('updateSuccess'));
+      toast.success(t("updateSuccess"));
       setIsEditMode(false);
       fetchUser();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('updateError'));
+      toast.error(error.response?.data?.message || t("updateError"));
     } finally {
       setSubmitting(false);
     }
@@ -147,15 +146,17 @@ export default function UserDetailClient() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push("/admin/users")}
+            onClick={() => router.push(backHref)}
             className="h-8 w-8"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{tCommon('userDetail')}</h1>
+            <h1 className="text-3xl font-bold">{tCommon("userDetail")}</h1>
             <p className="text-muted-foreground">
-              {isEditMode ? tCommon('editUserInfo') : tCommon('viewUserDetail')}
+              {isEditMode
+                ? tCommon("editUserInfo")
+                : tCommon("viewUserDetail")}
             </p>
           </div>
         </div>
@@ -169,17 +170,23 @@ export default function UserDetailClient() {
               className="h-8"
             >
               <X className="h-3.5 w-3.5 mr-1.5" />
-              {tAdmin('cancel')}
+              {tAdmin("cancel")}
             </Button>
             <Button
               type="submit"
-              form="user-form"
+              form="profile-form"
               variant="submit"
-              disabled={submitting || !formData.email?.trim() || !formData.full_name?.trim() || !formData.role || !isFullNameValid}
+              disabled={
+                submitting ||
+                !formData.email?.trim() ||
+                !formData.full_name?.trim() ||
+                !formData.role ||
+                !isFullNameValid
+              }
               loading={submitting}
               className="h-8"
             >
-              {submitting ? tCommon('saving') : tCommon('saveChanges')}
+              {submitting ? tCommon("saving") : tCommon("saveChanges")}
             </Button>
           </div>
         ) : (
@@ -189,23 +196,22 @@ export default function UserDetailClient() {
             className="h-8 gap-1"
           >
             <Edit2 className="h-3.5 w-3.5" />
-            {t('editUser')}
+            {t("editUser")}
           </Button>
         )}
       </div>
 
-      <form id="user-form" onSubmit={handleSubmit}>
+      <form id="profile-form" onSubmit={handleSubmit}>
         <div className="grid gap-6 lg:grid-cols-3">
-          <UserAvatarCard
+          <ProfileAvatarCard
             user={user}
             avatarPreview={avatarPreview}
             isEditMode={isEditMode}
             formData={formData}
             setFormData={setFormData}
             setAvatarPreview={setAvatarPreview}
-            recentLoans={recentLoans}
           />
-          
+
           <UserDetailForm
             user={user}
             isEditMode={isEditMode}

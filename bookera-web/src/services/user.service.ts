@@ -2,10 +2,12 @@ import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
 import { User } from "@/types/user";
 
+export type UserRole = User["role"];
+
 export interface CreateUserData {
   email: string;
   password: string;
-  role: "admin" | "officer" | "user";
+  role: UserRole;
   is_active?: boolean;
   full_name: string;
   gender?: "male" | "female" | "prefer_not_to_say";
@@ -21,7 +23,7 @@ export interface CreateUserData {
 
 export interface UpdateUserData extends Partial<CreateUserData> {
   email: string;
-  role: "admin" | "officer" | "user";
+  role: UserRole;
   full_name: string;
 }
 

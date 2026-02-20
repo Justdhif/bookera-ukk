@@ -8,6 +8,7 @@
     "indonesian": "Indonesia",
     "english": "English",
     "login": "Masuk",
+    "profile": "Profil",
     "dashboard": "Dasbor",
     "logout": "Keluar",
     "librarySystem": "Sistem Manajemen Perpustakaan",
@@ -359,7 +360,8 @@
       "updateSuccess": "Pengguna berhasil diperbarui",
       "updateError": "Gagal mengupdate pengguna",
       "addSuccess": "Pengguna berhasil ditambahkan",
-      "addError": "Gagal menambahkan pengguna"
+      "addError": "Gagal menambahkan pengguna",
+      "saveAvatar": "Simpan Avatar"
     },
     "categories": {
       "title": "Kategori",
@@ -578,6 +580,9 @@
     "passwordPlaceholder": "Kosongkan jika tidak diubah",
     "namePlaceholder": "John Doe",
     "idNumberPlaceholder": "SIS-001",
+    "validationLettersOnly": "Hanya boleh berisi huruf",
+    "validationNumbersOnly": "Hanya boleh berisi angka",
+    "validationAlphanumeric": "Hanya boleh berisi huruf dan angka",
     "phonePlaceholder": "08123456789",
     "occupationPlaceholder": "Siswa",
     "classPlaceholder": "XII RPL 1",

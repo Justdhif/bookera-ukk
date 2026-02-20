@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { User } from "@/types/user";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +27,7 @@ interface UserDetailFormProps {
   isEditMode: boolean;
   formData: any;
   setFormData: (data: any) => void;
+  onFullNameValidChange?: (valid: boolean) => void;
 }
 
 export default function UserDetailForm({
@@ -33,10 +35,25 @@ export default function UserDetailForm({
   isEditMode,
   formData,
   setFormData,
+  onFullNameValidChange,
 }: UserDetailFormProps) {
   const t = useTranslations('common');
   const tAdmin = useTranslations('admin.common');
-  
+
+  const errorMessages = {
+    'letters-only': t('validationLettersOnly'),
+    'numbers-only': t('validationNumbersOnly'),
+    'alphanumeric': t('validationAlphanumeric'),
+  };
+
+  useEffect(() => {
+    if (isEditMode && onFullNameValidChange) {
+      const val = formData.full_name || "";
+      const valid = val === "" || /^[a-zA-Z\s]*$/.test(val);
+      onFullNameValidChange(valid);
+    }
+  }, [isEditMode, formData.full_name, onFullNameValidChange]);
+
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
@@ -106,6 +123,9 @@ export default function UserDetailForm({
                 }
                 placeholder={t('namePlaceholder')}
                 disabled={!isEditMode}
+                validationType={isEditMode ? "letters-only" : undefined}
+                onValidationChange={isEditMode ? onFullNameValidChange : undefined}
+                errorMessage={isEditMode ? errorMessages : undefined}
               />
             </div>
             <div className="space-y-2">
@@ -121,6 +141,8 @@ export default function UserDetailForm({
                 }
                 placeholder={t('idNumberPlaceholder')}
                 disabled={!isEditMode}
+                validationType={!isEditMode ? undefined : "numbers-only"}
+                errorMessage={!isEditMode ? undefined : errorMessages}
               />
             </div>
             <div className="space-y-2">
@@ -136,6 +158,8 @@ export default function UserDetailForm({
                 }
                 placeholder={t('phonePlaceholder')}
                 disabled={!isEditMode}
+                validationType={!isEditMode ? undefined : "numbers-only"}
+                errorMessage={!isEditMode ? undefined : errorMessages}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
@@ -199,6 +223,8 @@ export default function UserDetailForm({
                 }
                 placeholder={t('occupationPlaceholder')}
                 disabled={!isEditMode}
+                validationType={!isEditMode ? undefined : "letters-only"}
+                errorMessage={!isEditMode ? undefined : errorMessages}
               />
             </div>
             <div className="space-y-2">
@@ -214,6 +240,8 @@ export default function UserDetailForm({
                 }
                 placeholder={t('classPlaceholder')}
                 disabled={!isEditMode}
+                validationType={!isEditMode ? undefined : "alphanumeric"}
+                errorMessage={!isEditMode ? undefined : errorMessages}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
