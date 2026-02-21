@@ -1,7 +1,6 @@
 "use client";
 
 import Autoplay from "embla-carousel-autoplay";
-import { useTranslations } from "next-intl";
 import {
   Carousel,
   CarouselContent,
@@ -13,12 +12,19 @@ import banner3 from "@/assets/banner/banner-3.png";
 import Image from "next/image";
 
 export default function BannerCarousel() {
-  const t = useTranslations("common");
-
   const banners = [
-    { id: 1, image: banner1 },
-    { id: 2, image: banner2 },
-    { id: 3, image: banner3 },
+    {
+      id: 1,
+      image: banner1,
+    },
+    {
+      id: 2,
+      image: banner2,
+    },
+    {
+      id: 3,
+      image: banner3,
+    },
   ];
 
   return (
@@ -33,11 +39,16 @@ export default function BannerCarousel() {
       <CarouselContent>
         {banners.map((banner) => (
           <CarouselItem key={banner.id}>
-            <div className="relative aspect-3/1 w-full overflow-hidden">
+            <div
+              className="relative w-full"
+              style={{ aspectRatio: "160/60" }}
+            >
               <Image
                 src={banner.image}
-                alt={banner.id.toString()}
-                className="h-full w-full object-cover"
+                alt={`Banner ${banner.id}`}
+                fill
+                className="object-cover"
+                priority={banner.id === 1}
               />
             </div>
           </CarouselItem>
