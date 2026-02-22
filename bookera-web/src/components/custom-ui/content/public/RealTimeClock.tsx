@@ -86,7 +86,7 @@ export default function RealTimeClock() {
 
   return (
     <div
-      className={`h-full rounded-2xl bg-gradient-to-br ${theme.bg} p-4 shadow-xl backdrop-blur-sm transition-all duration-1000`}
+      className={`h-full rounded-2xl bg-linear-to-br ${theme.bg} p-4 shadow-xl backdrop-blur-sm transition-all duration-1000`}
     >
       <div className="flex h-full flex-col justify-between">
         <div className="flex items-center justify-between">

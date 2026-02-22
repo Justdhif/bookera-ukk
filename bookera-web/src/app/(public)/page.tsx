@@ -15,10 +15,10 @@ export default function PublicPage() {
 
           <div className="lg:col-span-1">
             <div className="flex h-full flex-col gap-1">
-              <div className="flex-[3]">
+              <div className="flex-3">
                 <RealTimeClock />
               </div>
-              <div className="flex-[2]">
+              <div className="flex-2">
                 <LiveSectionContent />
               </div>
             </div>

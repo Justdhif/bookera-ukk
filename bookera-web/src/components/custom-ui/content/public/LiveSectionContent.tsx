@@ -49,7 +49,7 @@ export default function LiveSectionContent() {
   }, [contents.length]);
 
   return (
-    <div className="h-full rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 p-4 shadow-xl">
+    <div className="h-full rounded-2xl bg-linear-to-br from-gray-800 to-gray-900 p-4 shadow-xl">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-white">Update Terkini</h3>
         <span className="text-xs text-gray-400">Live</span>
