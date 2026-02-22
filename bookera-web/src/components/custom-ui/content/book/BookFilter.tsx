@@ -69,7 +69,6 @@ export function BookFilter({ categories, onChange }: Props) {
           />
         </div>
 
-        {/* Status Select */}
         <Select 
           value={statusValue}
           onValueChange={(v) => {
@@ -79,24 +78,20 @@ export function BookFilter({ categories, onChange }: Props) {
           }}
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder={t('allStatus')} />
+            <SelectValue placeholder="All" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{t('allStatus')}</SelectItem>
-            <SelectItem value="active">{t('active')}</SelectItem>
-            <SelectItem value="inactive">{t('inactive')}</SelectItem>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {/* Filter Kategori - Scroll Horizontal */}
       <div className="relative">
-        {/* Fade effect di ujung kanan */}
         <div className="absolute right-0 top-0 bottom-0 w-12 bg-linear-to-l from-white dark:from-gray-950 to-transparent z-10 pointer-events-none rounded-r-md" />
 
-        {/* Scroll container */}
         <div className="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth">
-          {/* Badge "Semua" */}
           <div id="book-category-null" className="shrink-0">
             <Badge
               variant={isAllActive ? "default" : "outline"}
@@ -113,12 +108,11 @@ export function BookFilter({ categories, onChange }: Props) {
               onClick={() => handleCategoryClick(null)}
             >
               <span className="flex items-center gap-1.5">
-                Semua
+                All
               </span>
             </Badge>
           </div>
 
-          {/* Badge kategori */}
           {categories.map((cat) => {
             const isActive = categoryIds.includes(cat.id);
             return (

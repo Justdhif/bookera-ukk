@@ -261,3 +261,11 @@
   border-radius: 9999px;
   width: 8px;
 }
+
+@keyframes ping {
+  75%,
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}

@@ -17,8 +17,8 @@ import { useTranslations } from "next-intl";
 
 export default function BookClient() {
   const router = useRouter();
-  const t = useTranslations('admin.books');
-  const tCategories = useTranslations('admin.categories');
+  const t = useTranslations("admin.books");
+  const tCategories = useTranslations("admin.categories");
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -38,7 +38,7 @@ export default function BookClient() {
       const res = await categoryService.getAll();
       setCategories(res.data.data || []);
     } catch (error) {
-      toast.error(tCategories('loadError'));
+      toast.error(tCategories("loadError"));
       console.error("Error fetching categories:", error);
     } finally {
       setCategoriesLoading(false);
@@ -48,7 +48,6 @@ export default function BookClient() {
   const fetchBooks = useCallback(async () => {
     setLoading(true);
     try {
-      // Prepare params with proper serialization for array
       const params: any = {
         per_page: 10,
       };
@@ -58,8 +57,7 @@ export default function BookClient() {
       }
 
       if (filters.category_ids && filters.category_ids.length > 0) {
-        // Send as comma-separated string for Laravel
-        params.category_ids = filters.category_ids.join(',');
+        params.category_ids = filters.category_ids.join(",");
       }
 
       if (filters.status) {
@@ -73,7 +71,7 @@ export default function BookClient() {
       const res = await bookService.getAll(params);
       setBooks(res.data.data.data);
     } catch (error) {
-      toast.error(t('loadError'));
+      toast.error(t("loadError"));
       console.error("Error fetching books:", error);
     } finally {
       setLoading(false);
@@ -84,24 +82,32 @@ export default function BookClient() {
     fetchCategories();
   }, []);
 
-  // Debounce effect for filters
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchBooks();
-    }, 300); // 300ms debounce
+    }, 300);
 
     return () => clearTimeout(timeoutId);
   }, [fetchBooks]);
 
+  const confirmDelete = async () => {
+    if (!deleteId) {
+      toast.error(t("errorOccured"));
+      return;
+    }
+
+    await bookService.delete(deleteId);
+    toast.success(t("bookDeleted"));
+    setDeleteId(null);
+    fetchBooks();
+  };
+
   return (
     <div className="space-y-6">
-      {/* HEADER */}
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">{t('title')}</h1>
-          <p className="text-muted-foreground">
-            {t('description')}
-          </p>
+          <h1 className="text-3xl font-bold">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("description")}</p>
         </div>
         <Button
           onClick={() => router.push("/admin/books/add")}
@@ -109,11 +115,10 @@ export default function BookClient() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          {t('addBook')}
+          {t("addBook")}
         </Button>
       </div>
 
-      {/* FILTER */}
       <BookFilter
         categories={categories}
         onChange={(value) =>
@@ -124,28 +129,18 @@ export default function BookClient() {
         }
       />
 
-      {/* TABLE */}
       {loading ? (
         <BookTableSkeleton />
       ) : (
-        <BookTable
-          data={books}
-          onDelete={(id) => setDeleteId(id)}
-        />
+        <BookTable data={books} onDelete={(id) => setDeleteId(id)} />
       )}
 
-      {/* DELETE CONFIRM */}
       <DeleteConfirmDialog
-        open={!!deleteId}
+        open={deleteId !== null}
         onOpenChange={() => setDeleteId(null)}
-        title={t('deleteBook')}
+        title={t("deleteBook")}
         description="Apakah kamu yakin ingin menghapus buku ini?"
-        onConfirm={async () => {
-          await bookService.delete(deleteId!);
-          toast.success(t('deleteSuccess'));
-          setDeleteId(null);
-          fetchBooks();
-        }}
+        onConfirm={confirmDelete}
       />
     </div>
   );

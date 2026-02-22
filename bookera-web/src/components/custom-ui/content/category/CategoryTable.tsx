@@ -24,12 +24,7 @@ import {
   FolderOpen,
   Edit,
   Trash2,
-  MoreVertical,
   Tag,
-  ChevronRight,
-  CheckCircle2,
-  XCircle,
-  Search,
 } from "lucide-react";
 import { getIconByName } from "@/lib/icons";
 import { useTranslations } from "next-intl";

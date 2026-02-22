@@ -42,11 +42,6 @@ export default function CategoryFormDialog({
   }, [category, open]);
 
   const handleSubmit = async () => {
-    if (!name.trim()) {
-      toast.error(tAdmin('fieldRequired'));
-      return;
-    }
-
     setIsLoading(true);
     try {
       if (category) {

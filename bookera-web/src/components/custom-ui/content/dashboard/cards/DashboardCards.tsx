@@ -102,15 +102,12 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
           className={`group relative overflow-hidden border ${item.borderColor} ${item.hoverBorderColor} transition-all duration-300 hover:shadow-lg dark:hover:shadow-slate-900/30 bg-linear-to-br ${item.bgGradient} backdrop-blur-sm cursor-pointer`}
           onClick={() => handleDetailsClick(item.detailsHref)}
         >
-          {/* Animated gradient border effect */}
           <div className="absolute inset-0 bg-linear-to-br from-transparent via-transparent to-transparent group-hover:via-white/10 dark:group-hover:via-white/5 transition-all duration-500 pointer-events-none" />
 
-          {/* Corner accent matching sidebar design */}
           <div
             className={`absolute top-0 right-0 w-16 h-16 bg-linear-to-br ${item.gradient} opacity-5 dark:opacity-10 rounded-bl-full transition-opacity group-hover:opacity-10 dark:group-hover:opacity-15`}
           />
 
-          {/* Pulsing dot indicator */}
           <div
             className={`absolute top-3 right-3 h-2 w-2 rounded-full bg-linear-to-br ${item.gradient} animate-pulse ring-2 ring-background`}
           />
@@ -153,7 +150,6 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
                   </div>
                 </div>
 
-                {/* Interactive button with navigation */}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -168,7 +164,6 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
                 </button>
               </div>
 
-              {/* Decorative line with gradient */}
               <div className="mt-4 relative">
                 <div className="absolute left-0 right-0 h-px bg-linear-to-r from-transparent via-slate-300/30 dark:via-slate-600/30 to-transparent" />
                 <div
@@ -177,7 +172,6 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
                 />
               </div>
 
-              {/* Stats indicator dengan teks yang lebih informatif */}
               <div className="mt-3 flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <div
@@ -195,14 +189,12 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
             </div>
           </CardContent>
 
-          {/* Hover overlay effect */}
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
             <div
               className={`absolute inset-0 bg-linear-to-br ${item.gradient} opacity-[0.03] dark:opacity-[0.05]`}
             />
           </div>
 
-          {/* Clickable overlay untuk seluruh card */}
           <div className="absolute inset-0 cursor-pointer" aria-hidden="true" />
         </Card>
       ))}

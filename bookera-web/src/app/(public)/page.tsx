@@ -9,12 +9,13 @@ export default function PublicPage() {
     <div className="space-y-8 pb-10">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 flex flex-col gap-4">
             <BannerCarousel />
+            <SpeakerMarquee />
           </div>
 
           <div className="lg:col-span-1">
-            <div className="flex h-full flex-col gap-1">
+            <div className="flex h-full flex-col gap-2">
               <div className="flex-3">
                 <RealTimeClock />
               </div>
@@ -26,7 +27,6 @@ export default function PublicPage() {
         </div>
       </div>
 
-      <SpeakerMarquee />
       <PublicPageClient />
     </div>
   );

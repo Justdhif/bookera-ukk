@@ -22,7 +22,10 @@ export default function CategoryClient() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const confirmDelete = async () => {
-    if (!deleteId) return;
+    if (!deleteId) {
+      toast.error(t('errorOccured'));
+      return;
+    };
 
     await categoryService.delete(deleteId);
     toast.success(t('categoryDeleted'));
@@ -40,12 +43,6 @@ export default function CategoryClient() {
   useEffect(() => {
     fetchCategories();
   }, []);
-
-  const handleDelete = async (id: number) => {
-    await categoryService.delete(id);
-    toast.success("Kategori berhasil dihapus");
-    fetchCategories();
-  };
 
   return (
     <div className="space-y-6">
@@ -84,7 +81,7 @@ export default function CategoryClient() {
 
       <DeleteConfirmDialog
         open={deleteId !== null}
-        onOpenChange={(open) => !open && setDeleteId(null)}
+        onOpenChange={() => setDeleteId(null)}
         title={t('deleteCategory')}
         description={t('deleteCategoryWarning')}
         onConfirm={confirmDelete}

@@ -88,11 +88,6 @@ export default function AddBookClient() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title.trim() || !formData.author.trim()) {
-      toast.error(tCommon("titleAuthorRequired"));
-      return;
-    }
-
     try {
       setSubmitting(true);
       const data = new FormData();
@@ -132,7 +127,6 @@ export default function AddBookClient() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
@@ -170,7 +164,6 @@ export default function AddBookClient() {
 
       <form id="book-form" onSubmit={handleSubmit}>
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Cover Card */}
           <Card className="lg:col-span-1">
             <CardHeader>
               <CardTitle>{tCommonRoot("bookCover")}</CardTitle>
@@ -226,16 +219,15 @@ export default function AddBookClient() {
                 />
               </div>
 
-              {/* Status Switch */}
               <div className="flex items-center justify-between rounded-lg border p-4 bg-muted/30">
                 <div className="space-y-0.5">
                   <Label className="text-sm font-medium">
-                    {tCommonRoot("status")}
+                    Status
                   </Label>
                   <p className="text-xs text-muted-foreground">
                     {formData.is_active
-                      ? tCommonRoot("active")
-                      : tCommonRoot("inactive")}
+                      ? "Active"
+                      : "Inactive"}
                   </p>
                 </div>
                 <Switch
@@ -247,8 +239,7 @@ export default function AddBookClient() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Form Card */}
+\
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>{tCommonRoot("bookInfo")}</CardTitle>

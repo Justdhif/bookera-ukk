@@ -108,7 +108,6 @@ export default function BookCoverCard({
           )}
         </div>
 
-        {/* Info Cards */}
         <div className="rounded-lg border p-3 bg-muted/30">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
@@ -116,11 +115,11 @@ export default function BookCoverCard({
               <p className="text-xs text-muted-foreground">
                 {isEditMode
                   ? formData.is_active
-                    ? "Aktif"
-                    : "Nonaktif"
+                    ? "Active"
+                    : "Inactive"
                   : book.is_active
-                    ? "Aktif"
-                    : "Nonaktif"}
+                    ? "Active"
+                    : "Inactive"}
               </p>
             </div>
             {isEditMode ? (
@@ -135,12 +134,12 @@ export default function BookCoverCard({
                 {book.is_active ? (
                   <>
                     <CheckCircle className="h-3 w-3 mr-1" />
-                    Aktif
+                    Active
                   </>
                 ) : (
                   <>
                     <XCircle className="h-3 w-3 mr-1" />
-                    Tidak Aktif
+                    Inactive
                   </>
                 )}
               </Badge>
