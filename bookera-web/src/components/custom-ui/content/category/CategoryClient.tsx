@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { CategoryTableSkeleton } from "./CategoryTableSkeleton";
-import { Plus } from "lucide-react";
+import { Plus, Tag } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function CategoryClient() {
@@ -47,12 +47,15 @@ export default function CategoryClient() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
-        <div>
-          <h1 className="text-3xl font-bold">{tAdmin('title')}</h1>
-          <p className="text-muted-foreground">
-            {tAdmin('description')}
-          </p>
+        <div className="flex items-center gap-4">
+        <div className="p-2 bg-brand-primary rounded-lg">
+          <Tag className="h-8 w-8 text-white" />
         </div>
+        <div>
+          <h1 className="text-3xl font-bold">{tAdmin("title")}</h1>
+          <p className="text-muted-foreground">{tAdmin("description")}</p>
+        </div>
+      </div>
         <Button
           onClick={() => {
             setEditing(null);

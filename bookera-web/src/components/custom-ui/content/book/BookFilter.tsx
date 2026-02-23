@@ -107,7 +107,7 @@ export function BookFilter({ categories, onChange }: Props) {
               `}
               onClick={() => handleCategoryClick(null)}
             >
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5 text-white">
                 All
               </span>
             </Badge>
@@ -126,11 +126,11 @@ export function BookFilter({ categories, onChange }: Props) {
                   className={`
                     cursor-pointer whitespace-nowrap transition-all duration-200
                     px-3 py-2 text-sm font-medium
-                    rounded-md border
+                    rounded-md border text-white
                     ${
                       isActive
-                        ? "bg-brand-primary text-primary-foreground border-brand-primary shadow-sm"
-                        : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
+                        ? "bg-brand-primary border-brand-primary shadow-sm"
+                        : "bg-background border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
                     }
                   `}
                   onClick={() => handleCategoryClick(cat.id)}

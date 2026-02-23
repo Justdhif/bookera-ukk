@@ -239,7 +239,7 @@ export default function AddBookClient() {
               </div>
             </CardContent>
           </Card>
-\
+
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>{tCommonRoot("bookInfo")}</CardTitle>

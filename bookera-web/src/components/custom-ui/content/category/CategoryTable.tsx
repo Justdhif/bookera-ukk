@@ -23,7 +23,7 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import {
   FolderOpen,
   Edit,
-  Trash2,
+  Trash,
   Tag,
 } from "lucide-react";
 import { getIconByName } from "@/lib/icons";
@@ -122,7 +122,7 @@ export default function CategoryTable({
                   onClick={() => onDelete(item.id)}
                   className="h-8 gap-1"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">Hapus</span>
                 </Button>
               </div>

@@ -12,7 +12,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Search, Bell, Home, Settings, User } from "lucide-react";
+import { Search, Bell, Home, Settings, User, LayoutDashboard, LogOut } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
@@ -78,7 +78,6 @@ export default function PublicHeader() {
           <div className="flex items-center gap-1.5 md:gap-3">
             <NotificationDropdown isAuthenticated={isAuthenticated} />
 
-            {/* Settings button - replaces dark mode and locale switcher */}
             <Button
               variant="ghost"
               size="icon"
@@ -89,7 +88,6 @@ export default function PublicHeader() {
               <Settings className="h-4 w-4 md:h-5 md:w-5" />
             </Button>
 
-            {/* User Section */}
             <div className="shrink-0">
               {initialLoading ? (
                 <Skeleton className="h-8 w-8 md:h-10 md:w-10 rounded-full" />
@@ -116,15 +114,21 @@ export default function PublicHeader() {
                   </DropdownMenuTrigger>
 
                   <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuItem disabled className="font-semibold">
-                      {user?.profile?.full_name}
+                    <DropdownMenuItem disabled className="flex-col items-start font-semibold">
+                      <div className="relative">
+                        <span>{user?.profile?.full_name}</span>
+                        <div className="absolute -bottom-1 left-0 h-1 w-8 rounded-full bg-brand-primary"></div>
+                      </div>
+                      <span className="text-muted-foreground text-xs">Role : {user?.role}</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      disabled
-                      className="text-xs text-muted-foreground"
-                    >
-                      {user?.email}
-                    </DropdownMenuItem>
+
+                    {(user?.role === "admin" ||
+                      user?.role?.startsWith("officer:")) && (
+                      <DropdownMenuItem onClick={() => router.push("/admin")} className="gap-2">
+                        <LayoutDashboard className="h-4 w-4" />
+                        {t("dashboard")}
+                      </DropdownMenuItem>
+                    )}
 
                     <DropdownMenuItem
                       onClick={() => router.push("/profile")}
@@ -134,17 +138,11 @@ export default function PublicHeader() {
                       {t("profile")}
                     </DropdownMenuItem>
 
-                    {(user?.role === "admin" ||
-                      user?.role?.startsWith("officer:")) && (
-                      <DropdownMenuItem onClick={() => router.push("/admin")}>
-                        {t("dashboard")}
-                      </DropdownMenuItem>
-                    )}
-
                     <DropdownMenuItem
-                      className="text-red-600 focus:text-red-600"
+                      className="text-red-600 dark:text-red-400 focus:text-red-600 gap-2"
                       onClick={logout}
                     >
+                      <LogOut className="h-4 w-4 text-red-600 dark:text-red-400" />
                       {t("logout")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>

@@ -11,7 +11,7 @@ import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { toast } from "sonner";
 import { Category } from "@/types/category";
 import { categoryService } from "@/services/category.service";
-import { Plus } from "lucide-react";
+import { BookOpen, Plus } from "lucide-react";
 import { BookTableSkeleton } from "./BookTableSkeleton";
 import { useTranslations } from "next-intl";
 
@@ -105,9 +105,14 @@ export default function BookClient() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
-        <div>
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
-          <p className="text-muted-foreground">{t("description")}</p>
+        <div className="flex items-center gap-4">
+          <div className="p-2 bg-brand-primary rounded-lg">
+            <BookOpen className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">{t("title")}</h1>
+            <p className="text-muted-foreground">{t("description")}</p>
+          </div>
         </div>
         <Button
           onClick={() => router.push("/admin/books/add")}

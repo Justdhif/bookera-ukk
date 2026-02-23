@@ -25,16 +25,14 @@ import {
   User,
   BookOpen,
   HomeIcon,
-  Folder,
   ChevronRight,
   Activity,
   Package,
   PackageCheck,
-  FileText,
-  Shield,
   DollarSign,
   AlertCircle,
-  Settings,
+  Tag,
+  LayoutDashboard,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -46,7 +44,7 @@ const getMenuGroups = (t: any) => [
       {
         title: t('admin.sidebar.dashboard'),
         href: "/admin",
-        icon: HomeIcon,
+        icon: LayoutDashboard,
         gradient: "from-blue-500 to-cyan-500",
       },
     ],
@@ -58,7 +56,7 @@ const getMenuGroups = (t: any) => [
       {
         title: t('admin.sidebar.categories'),
         href: "/admin/categories",
-        icon: Folder,
+        icon: Tag,
         gradient: "from-amber-500 to-orange-500",
       },
       {
@@ -111,18 +109,6 @@ const getMenuGroups = (t: any) => [
       },
     ],
   },
-  {
-    title: t('admin.sidebar.system'),
-    roles: ['admin'],
-    items: [
-      {
-        title: t('admin.sidebar.settings'),
-        href: "/admin/settings",
-        icon: Settings,
-        gradient: "from-gray-500 to-slate-500",
-      },
-    ],
-  },
 ];
 
 export function AdminSidebar() {
@@ -146,10 +132,10 @@ export function AdminSidebar() {
     
     if (user.role.startsWith('officer:')) {
       const [role, type] = user.role.split(':');
-      return `${role.toUpperCase()} • ${type.toUpperCase()}`;
+      return `${role} • ${type}`;
     }
     
-    return user.role.toUpperCase();
+    return user.role;
   }, [user?.role]);
 
   const handleNavigation = (href: string) => {
@@ -172,11 +158,11 @@ export function AdminSidebar() {
         <div
           className={`flex items-center gap-3 py-4 ${open ? "px-4" : "justify-center"}`}
         >
-          <div className="relative flex h-10 w-10 items-center justify-center shrink-0">
+          <div className="relative flex h-12 w-12 items-center justify-center bg-brand-primary rounded-lg shrink-0">
             <Image
               src={BookeraLogo}
               alt="Bookera"
-              className="h-10 w-10 object-contain brightness-0 dark:invert"
+              className="w-full h-full object-contain brightness-0 invert"
             />
           </div>
           {open && (
@@ -265,10 +251,8 @@ export function AdminSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* FOOTER */}
       <SidebarFooter className="border-t bg-linear-to-br from-slate-50/50 to-gray-50/50 dark:from-slate-950/20 dark:to-gray-950/20">
         <SidebarMenu className={!open ? "flex flex-col items-center" : ""}>
-          {/* Home/Public Button */}
           <SidebarMenuItem
             className={!open ? "w-full flex justify-center" : ""}
           >

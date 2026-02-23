@@ -22,6 +22,7 @@ import {
   Play,
   Pause,
   Music,
+  Settings,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Locale } from "@/i18n/config";
@@ -46,7 +47,7 @@ const musicTrack = {
   id: "chill-music",
   name: "Chill Vibes - Lofi Girl",
   file: "/audios/chill-music.mp3",
-  duration: "1:10:39",
+  duration: "1:01:39",
 };
 
 export default function SettingsClient() {
@@ -60,7 +61,6 @@ export default function SettingsClient() {
   );
   const [isPending, startTransition] = useTransition();
 
-  // Gunakan audio context
   const {
     isMusicEnabled,
     isPlaying,
@@ -144,22 +144,22 @@ export default function SettingsClient() {
   }
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
-      <div className="space-y-2">
-        <h1 className="text-4xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          {t("title")}
-        </h1>
-        <p className="text-muted-foreground text-lg">{t("description")}</p>
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="p-2 bg-brand-primary rounded-lg">
+          <Settings className="h-8 w-8 text-white" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("description")}</p>
+        </div>
       </div>
 
-      {/* Theme Settings */}
       <Card className="overflow-hidden border-none shadow-lg">
-        <CardHeader className="bg-linear-to-r from-primary/10 via-primary/5 to-transparent">
-          <CardTitle className="flex items-center gap-3 text-2xl">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Sun className="h-6 w-6 text-primary" />
-            </div>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3 text-2xl relative">
             {t("themeTitle")}
+            <div className="absolute -bottom-1 left-0 h-1 w-6 rounded-full bg-muted-foreground"></div>
           </CardTitle>
           <CardDescription className="text-base">
             {t("themeDescription")}
@@ -174,14 +174,14 @@ export default function SettingsClient() {
               return (
                 <button
                   key={option.value}
-                  className={`group relative rounded-xl overflow-hidden transition-all duration-300 ${
+                  className={`group relative rounded-xl overflow-hidden transition-all duration-300 cursor-pointer ${
                     isActive
                       ? "ring-4 ring-brand-primary shadow-xl"
                       : "hover:shadow-lg"
                   }`}
                   onClick={() => handleThemeChange(option.value)}
                 >
-                  <div className="relative h-48">
+                  <div className="relative h-56">
                     <Image
                       src={option.image}
                       alt={option.label}
@@ -190,7 +190,7 @@ export default function SettingsClient() {
                     />
                     <div
                       className={`absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent ${
-                        isActive ? "from-primary/80" : ""
+                        isActive ? "from-brand-primary/80" : ""
                       }`}
                     />
 
@@ -212,14 +212,11 @@ export default function SettingsClient() {
         </CardContent>
       </Card>
 
-      {/* Language Settings */}
       <Card className="overflow-hidden border-none shadow-lg">
-        <CardHeader className="bg-linear-to-r from-primary/10 via-primary/5 to-transparent">
-          <CardTitle className="flex items-center gap-3 text-2xl">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Languages className="h-6 w-6 text-primary" />
-            </div>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3 text-2xl relative">
             {t("languageTitle")}
+            <div className="absolute -bottom-1 left-0 h-1 w-6 rounded-full bg-muted-foreground"></div>
           </CardTitle>
           <CardDescription className="text-base">
             {t("languageDescription")}
@@ -288,14 +285,11 @@ export default function SettingsClient() {
         </CardContent>
       </Card>
 
-      {/* Background Music Settings */}
       <Card className="overflow-hidden border-none shadow-lg">
-        <CardHeader className="bg-linear-to-r from-primary/10 via-primary/5 to-transparent">
-          <CardTitle className="flex items-center gap-3 text-2xl">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Music className="h-6 w-6 text-primary" />
-            </div>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3 text-2xl relative">
             Background Music
+            <div className="absolute -bottom-1 left-0 h-1 w-6 rounded-full bg-muted-foreground"></div>
           </CardTitle>
           <CardDescription className="text-base">
             Relax with ambient background music while using the application
