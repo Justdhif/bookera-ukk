@@ -117,7 +117,7 @@ export default function CategoryBubble({
                     "flex flex-col items-center justify-center gap-2.5 p-4 rounded-2xl transition-all duration-300 relative overflow-hidden",
                     "aspect-4/5",
                     isActive
-                      ? "bg-linear-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white shadow-2xl shadow-emerald-500/50 ring-2 ring-emerald-400 ring-offset-2 ring-offset-background"
+                      ? "bg-linear-to-br from-emerald-500 via-emerald-600 to-emerald-700 text-white ring-2 ring-emerald-400 ring-offset-2 ring-offset-background"
                       : "bg-card hover:bg-accent border-2 border-border hover:border-emerald-400/60 dark:hover:border-emerald-500/60 hover:shadow-lg"
                   )}
                 >

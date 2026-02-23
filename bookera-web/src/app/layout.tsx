@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
-import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
 import Providers from "./providers";
+import { AudioProvider } from "@/context/AudioContext";
+import "./globals.css";
+import TopLoader from "@/components/custom-ui/TopLoader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,16 +36,17 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider 
-          attribute="class" 
-          defaultTheme="system" 
+        <TopLoader />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages}>
-            <Providers>
-              {children}
-            </Providers>
+            <AudioProvider>
+              <Providers>{children}</Providers>
+            </AudioProvider>
           </NextIntlClientProvider>
         </ThemeProvider>
         <Toaster richColors position="bottom-right" />
