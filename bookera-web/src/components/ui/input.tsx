@@ -1,5 +1,4 @@
 import * as React from "react"
-
 import { cn } from "@/lib/utils"
 
 export type InputValidationType = 'letters-only' | 'numbers-only' | 'alphanumeric';
@@ -8,11 +7,6 @@ interface InputProps extends Omit<React.ComponentProps<"input">, 'onChange'> {
   validationType?: InputValidationType;
   onValidationChange?: (isValid: boolean) => void;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  errorMessage?: {
-    'letters-only'?: string;
-    'numbers-only'?: string;
-    'alphanumeric'?: string;
-  };
 }
 
 function Input({ 
@@ -21,7 +15,6 @@ function Input({
   validationType,
   onValidationChange,
   onChange,
-  errorMessage,
   ...props 
 }: InputProps) {
   const [isValid, setIsValid] = React.useState(true);
@@ -31,32 +24,28 @@ function Input({
   const validateInput = (value: string): boolean => {
     if (!validationType || value === '') return true;
 
+    const hasSpecialChars = /[^a-zA-Z0-9\s]/.test(value);
+
     switch (validationType) {
       case 'letters-only':
-        return /^[a-zA-Z\s]*$/.test(value);
+        return /^[a-zA-Z\s]*$/.test(value) && !hasSpecialChars;
       case 'numbers-only':
-        return /^[0-9]*$/.test(value);
+        return /^[0-9]*$/.test(value) && !hasSpecialChars;
       case 'alphanumeric':
-        return /^[a-zA-Z0-9\s]*$/.test(value);
+        return /^[a-zA-Z0-9\s]*$/.test(value) && !hasSpecialChars;
       default:
         return true;
     }
   };
 
   const getErrorMessage = (): string => {
-    if (!validationType) return '';
-    
-    if (errorMessage && errorMessage[validationType]) {
-      return errorMessage[validationType];
-    }
-
     switch (validationType) {
       case 'letters-only':
-        return 'Input hanya boleh berisi huruf';
+        return 'Input can only contain letters';
       case 'numbers-only':
-        return 'Input hanya boleh berisi angka';
+        return 'Input can only contain numbers';
       case 'alphanumeric':
-        return 'Input hanya boleh berisi huruf dan angka';
+        return 'Input can only contain letters and numbers';
       default:
         return '';
     }

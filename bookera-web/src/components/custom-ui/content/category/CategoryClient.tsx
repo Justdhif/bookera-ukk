@@ -10,11 +10,8 @@ import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { CategoryTableSkeleton } from "./CategoryTableSkeleton";
 import { Plus, Tag } from "lucide-react";
-import { useTranslations } from "next-intl";
 
 export default function CategoryClient() {
-  const t = useTranslations('admin.common');
-  const tAdmin = useTranslations('admin.categories');
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -23,12 +20,12 @@ export default function CategoryClient() {
 
   const confirmDelete = async () => {
     if (!deleteId) {
-      toast.error(t('errorOccured'));
+      toast.error("An error occurred");
       return;
-    };
+    }
 
     await categoryService.delete(deleteId);
-    toast.success(t('categoryDeleted'));
+    toast.success("Category deleted successfully");
     setDeleteId(null);
     fetchCategories();
   };
@@ -48,14 +45,16 @@ export default function CategoryClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div className="flex items-center gap-4">
-        <div className="p-2 bg-brand-primary rounded-lg">
-          <Tag className="h-8 w-8 text-white" />
+          <div className="p-2 bg-brand-primary rounded-lg">
+            <Tag className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">Categories</h1>
+            <p className="text-muted-foreground">
+              Manage your product categories
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-3xl font-bold">{tAdmin("title")}</h1>
-          <p className="text-muted-foreground">{tAdmin("description")}</p>
-        </div>
-      </div>
         <Button
           onClick={() => {
             setEditing(null);
@@ -65,7 +64,7 @@ export default function CategoryClient() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          {t('addCategory')}
+          Add Category
         </Button>
       </div>
 
@@ -85,8 +84,8 @@ export default function CategoryClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={() => setDeleteId(null)}
-        title={t('deleteCategory')}
-        description={t('deleteCategoryWarning')}
+        title="Delete Category"
+        description="Are you sure you want to delete this category? This action cannot be undone."
         onConfirm={confirmDelete}
       />
 

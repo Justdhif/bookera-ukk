@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Category } from "@/types/category";
-import { useTranslations } from "next-intl";
 import {
   Select,
   SelectItem,
@@ -20,8 +19,6 @@ interface Props {
 }
 
 export function BookFilter({ categories, onChange }: Props) {
-  const t = useTranslations('common');
-  const tAdmin = useTranslations('admin.common')
   const [searchValue, setSearchValue] = useState("");
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [statusValue, setStatusValue] = useState<string>();
@@ -59,7 +56,7 @@ export function BookFilter({ categories, onChange }: Props) {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={tAdmin('searchBooksPlaceholder')}
+            placeholder="Search books..."
             value={searchValue}
             onChange={(e) => {
               setSearchValue(e.target.value);
@@ -69,7 +66,7 @@ export function BookFilter({ categories, onChange }: Props) {
           />
         </div>
 
-        <Select 
+        <Select
           value={statusValue}
           onValueChange={(v) => {
             const newValue = v === "all" ? undefined : v;
@@ -107,9 +104,7 @@ export function BookFilter({ categories, onChange }: Props) {
               `}
               onClick={() => handleCategoryClick(null)}
             >
-              <span className="flex items-center gap-1.5 text-white">
-                All
-              </span>
+              <span className="flex items-center gap-1.5 text-white">All</span>
             </Badge>
           </div>
 
@@ -135,9 +130,7 @@ export function BookFilter({ categories, onChange }: Props) {
                   `}
                   onClick={() => handleCategoryClick(cat.id)}
                 >
-                  <span className="flex items-center gap-1.5">
-                    {cat.name}
-                  </span>
+                  <span className="flex items-center gap-1.5">{cat.name}</span>
                 </Badge>
               </div>
             );

@@ -13,12 +13,9 @@ import { Category } from "@/types/category";
 import { categoryService } from "@/services/category.service";
 import { BookOpen, Plus } from "lucide-react";
 import { BookTableSkeleton } from "./BookTableSkeleton";
-import { useTranslations } from "next-intl";
 
 export default function BookClient() {
   const router = useRouter();
-  const t = useTranslations("admin.books");
-  const tCategories = useTranslations("admin.categories");
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -38,7 +35,7 @@ export default function BookClient() {
       const res = await categoryService.getAll();
       setCategories(res.data.data || []);
     } catch (error) {
-      toast.error(tCategories("loadError"));
+      toast.error("Failed to load categories");
       console.error("Error fetching categories:", error);
     } finally {
       setCategoriesLoading(false);
@@ -71,7 +68,7 @@ export default function BookClient() {
       const res = await bookService.getAll(params);
       setBooks(res.data.data.data);
     } catch (error) {
-      toast.error(t("loadError"));
+      toast.error("Failed to load books");
       console.error("Error fetching books:", error);
     } finally {
       setLoading(false);
@@ -92,12 +89,12 @@ export default function BookClient() {
 
   const confirmDelete = async () => {
     if (!deleteId) {
-      toast.error(t("errorOccured"));
+      toast.error("An error occurred");
       return;
     }
 
     await bookService.delete(deleteId);
-    toast.success(t("bookDeleted"));
+    toast.success("Book deleted successfully");
     setDeleteId(null);
     fetchBooks();
   };
@@ -110,8 +107,8 @@ export default function BookClient() {
             <BookOpen className="h-8 w-8 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">{t("title")}</h1>
-            <p className="text-muted-foreground">{t("description")}</p>
+            <h1 className="text-3xl font-bold">Books</h1>
+            <p className="text-muted-foreground">Manage your book collection</p>
           </div>
         </div>
         <Button
@@ -120,7 +117,7 @@ export default function BookClient() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          {t("addBook")}
+          Add Book
         </Button>
       </div>
 
@@ -143,8 +140,8 @@ export default function BookClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={() => setDeleteId(null)}
-        title={t("deleteBook")}
-        description="Apakah kamu yakin ingin menghapus buku ini?"
+        title="Delete Book"
+        description="Are you sure you want to delete this book?"
         onConfirm={confirmDelete}
       />
     </div>

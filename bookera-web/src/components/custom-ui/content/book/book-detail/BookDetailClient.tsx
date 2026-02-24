@@ -7,17 +7,28 @@ import { categoryService } from "@/services/category.service";
 import { Book } from "@/types/book";
 import { Category } from "@/types/category";
 import BookCopyList from "./BookCopyList";
-import BookCoverCard from "./BookCoverCard";
+import BookCoverCard from "../BookCoverCard";
 import BookDetailForm from "./BookDetailForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Save, X, Edit2 } from "lucide-react";
+import { ArrowLeft, X, Edit } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
+
+interface FormData {
+  title: string;
+  author: string;
+  publisher: string;
+  publication_year: string;
+  isbn: string;
+  language: string;
+  description: string;
+  is_active: boolean;
+  category_ids: number[];
+  cover_image?: File | null;
+}
 
 export default function BookDetailClient() {
-  const t = useTranslations('common');
   const router = useRouter();
   const params = useParams();
   const slug = params.slug as string;
@@ -26,9 +37,21 @@ export default function BookDetailClient() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState<FormData>({
+    title: "",
+    author: "",
+    publisher: "",
+    publication_year: "",
+    isbn: "",
+    language: "",
+    description: "",
+    is_active: true,
+    category_ids: [],
+    cover_image: null,
+  });
   const [coverPreview, setCoverPreview] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
+  const [coverError, setCoverError] = useState(false);
 
   useEffect(() => {
     fetchBook();
@@ -48,25 +71,71 @@ export default function BookDetailClient() {
     try {
       setLoading(true);
       const res = await bookService.showBySlug(slug);
-      setBook(res.data.data);
+      const bookData = res.data.data;
+      setBook(bookData);
       setFormData({
-        title: res.data.data.title,
-        author: res.data.data.author,
-        publisher: res.data.data.publisher || "",
-        publication_year: res.data.data.publication_year?.toString() || "",
-        isbn: res.data.data.isbn || "",
-        language: res.data.data.language || "",
-        description: res.data.data.description || "",
-        is_active: res.data.data.is_active,
-        category_ids: res.data.data.categories?.map((c) => c.id) || [],
+        title: bookData.title,
+        author: bookData.author,
+        publisher: bookData.publisher || "",
+        publication_year: bookData.publication_year?.toString() || "",
+        isbn: bookData.isbn || "",
+        language: bookData.language || "",
+        description: bookData.description || "",
+        is_active: bookData.is_active,
+        category_ids: bookData.categories?.map((c) => c.id) || [],
+        cover_image: null,
       });
-      setCoverPreview(res.data.data.cover_image_url || "");
+      setCoverPreview(bookData.cover_image_url || "");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('failedToLoadBookData'));
+      toast.error(error.response?.data?.message || "Failed to load book data");
       router.push("/admin/books");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSwitchChange = (checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      is_active: checked,
+    }));
+  };
+
+  const handleYearChange = (year: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      publication_year: year,
+    }));
+  };
+
+  const handleCategoryChange = (categoryIds: number[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      category_ids: categoryIds,
+    }));
+  };
+
+  const handleCoverImageChange = (file: File | null, preview: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      cover_image: file,
+    }));
+    setCoverPreview(preview);
+    setCoverError(false);
+  };
+
+  const handleCoverValidationChange = (isValid: boolean) => {
+    setCoverError(!isValid);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,7 +143,7 @@ export default function BookDetailClient() {
     if (!book) return;
 
     if (!formData.title?.trim() || !formData.author?.trim()) {
-      toast.error(t('titleAuthorRequired'));
+      toast.error("Title and author are required");
       return;
     }
 
@@ -98,7 +167,7 @@ export default function BookDetailClient() {
       }
 
       formData.category_ids.forEach((id: number) =>
-        data.append("category_ids[]", String(id))
+        data.append("category_ids[]", String(id)),
       );
 
       if (formData.cover_image) {
@@ -106,11 +175,11 @@ export default function BookDetailClient() {
       }
 
       await bookService.update(book.id, data);
-      toast.success(t('bookUpdated'));
+      toast.success("Book updated successfully");
       setIsEditMode(false);
       fetchBook();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('failedToUpdateBook'));
+      toast.error(error.response?.data?.message || "Failed to update book");
     } finally {
       setSubmitting(false);
     }
@@ -128,8 +197,10 @@ export default function BookDetailClient() {
         description: book.description || "",
         is_active: book.is_active,
         category_ids: book.categories?.map((c) => c.id) || [],
+        cover_image: null,
       });
       setCoverPreview(book.cover_image_url || "");
+      setCoverError(false);
     }
     setIsEditMode(false);
   };
@@ -147,8 +218,8 @@ export default function BookDetailClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{t('bookDetail')}</h1>
-            <p className="text-muted-foreground">{t('loadingBookData')}</p>
+            <h1 className="text-3xl font-bold">Book Detail</h1>
+            <p className="text-muted-foreground">Loading book data...</p>
           </div>
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
@@ -174,9 +245,9 @@ export default function BookDetailClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{t('bookDetail')}</h1>
+            <h1 className="text-3xl font-bold">Book Detail</h1>
             <p className="text-muted-foreground">
-              {isEditMode ? t('editBookInfo') : t('viewBookDetail')}
+              {isEditMode ? "Edit book information" : "View book details"}
             </p>
           </div>
         </div>
@@ -190,17 +261,22 @@ export default function BookDetailClient() {
               className="h-8"
             >
               <X className="h-3.5 w-3.5 mr-1.5" />
-              {t('cancel')}
+              Cancel
             </Button>
             <Button
               type="submit"
               form="book-form"
               variant="submit"
-              disabled={submitting || !formData.title?.trim() || !formData.author?.trim()}
+              disabled={
+                submitting ||
+                !formData.title?.trim() ||
+                !formData.author?.trim() ||
+                coverError
+              }
               loading={submitting}
               className="h-8"
             >
-              {submitting ? t('saving') : t('saveChanges')}
+              {submitting ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         ) : (
@@ -209,8 +285,8 @@ export default function BookDetailClient() {
             variant="brand"
             className="h-8 gap-1"
           >
-            <Edit2 className="h-3.5 w-3.5" />
-            {t('editBook')}
+            <Edit className="h-3.5 w-3.5" />
+            Edit Book
           </Button>
         )}
       </div>
@@ -218,29 +294,32 @@ export default function BookDetailClient() {
       <form id="book-form" onSubmit={handleSubmit}>
         <div className="grid gap-6 lg:grid-cols-3">
           <BookCoverCard
-            book={book}
             coverPreview={coverPreview}
             isEditMode={isEditMode}
-            formData={formData}
-            setFormData={setFormData}
-            setCoverPreview={setCoverPreview}
+            formData={{ is_active: formData.is_active }}
+            onCoverImageChange={handleCoverImageChange}
+            onSwitchChange={handleSwitchChange}
+            isCoverRequired={false}
+            coverError={coverError}
+            onCoverValidationChange={handleCoverValidationChange}
           />
 
           <BookDetailForm
             book={book}
             isEditMode={isEditMode}
             formData={formData}
-            setFormData={setFormData}
+            onInputChange={handleInputChange}
+            onYearChange={handleYearChange}
+            onCategoryChange={handleCategoryChange}
             categories={categories}
           />
         </div>
       </form>
 
-      {/* Book Copies Section */}
       {!isEditMode && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">{t('bookCopies')}</CardTitle>
+            <CardTitle className="text-xl">Book Copies</CardTitle>
           </CardHeader>
           <CardContent>
             <BookCopyList book={book} onChange={fetchBook} />

@@ -14,7 +14,6 @@ import { Book } from "@/types/book";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { BookOpen, Eye, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 
 interface Props {
   data: Book[];
@@ -23,14 +22,12 @@ interface Props {
 
 export function BookTable({ data, onDelete }: Props) {
   const router = useRouter();
-  const t = useTranslations("admin.books");
-  const tCommon = useTranslations("admin.common");
 
   if (data.length === 0) {
     return (
       <EmptyState
-        title={t("noBooks")}
-        description={t("noBooksDesc")}
+        title="No books found"
+        description="Get started by adding your first book"
         icon={<BookOpen className="h-10 w-10" />}
       />
     );
@@ -42,15 +39,15 @@ export function BookTable({ data, onDelete }: Props) {
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="w-16 text-center font-semibold">#</TableHead>
-            <TableHead className="w-24 font-semibold">{t("cover")}</TableHead>
-            <TableHead className="font-semibold">{t("title_col")}</TableHead>
-            <TableHead className="font-semibold">{t("author")}</TableHead>
-            <TableHead className="font-semibold">{t("isbn")}</TableHead>
-            <TableHead className="font-semibold">{t("publisher")}</TableHead>
-            <TableHead className="font-semibold">{t("year")}</TableHead>
-            <TableHead className="font-semibold">{t("status")}</TableHead>
+            <TableHead className="w-24 font-semibold">Cover</TableHead>
+            <TableHead className="font-semibold">Title</TableHead>
+            <TableHead className="font-semibold">Author</TableHead>
+            <TableHead className="font-semibold">ISBN</TableHead>
+            <TableHead className="font-semibold">Publisher</TableHead>
+            <TableHead className="font-semibold">Year</TableHead>
+            <TableHead className="font-semibold">Status</TableHead>
             <TableHead className="font-semibold text-right pr-6">
-              {tCommon("actions")}
+              Actions
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -80,22 +77,23 @@ export function BookTable({ data, onDelete }: Props) {
               <TableCell>
                 <div className="flex flex-col gap-2">
                   <span className="font-medium text-foreground">
-                  {book.title}
-                </span>
-                <Badge
-                  variant={
-                    book.available_copies && book.available_copies > 0
-                      ? "default"
-                      : "secondary"
-                  }
-                  className={
-                    book.available_copies && book.available_copies > 0
-                      ? "bg-brand-primary hover:bg-brand-primary-dark text-white text-xs"
-                      : "text-xs"
-                  }
-                >
-                  {book.available_copies || 0}/{book.total_copies || 0} {tCommon("available")}
-                </Badge>
+                    {book.title}
+                  </span>
+                  <Badge
+                    variant={
+                      book.available_copies && book.available_copies > 0
+                        ? "default"
+                        : "secondary"
+                    }
+                    className={
+                      book.available_copies && book.available_copies > 0
+                        ? "bg-brand-primary hover:bg-brand-primary-dark text-white text-xs"
+                        : "text-xs"
+                    }
+                  >
+                    {book.available_copies || 0}/{book.total_copies || 0}{" "}
+                    available
+                  </Badge>
                 </div>
               </TableCell>
               <TableCell>
@@ -137,7 +135,7 @@ export function BookTable({ data, onDelete }: Props) {
                     className="h-8 gap-1"
                   >
                     <Eye className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{tCommon("view")}</span>
+                    <span className="hidden sm:inline">View</span>
                   </Button>
                   <Button
                     size="sm"
@@ -146,9 +144,7 @@ export function BookTable({ data, onDelete }: Props) {
                     className="h-8 gap-1"
                   >
                     <Trash className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">
-                      {tCommon("delete")}
-                    </span>
+                    <span className="hidden sm:inline">Delete</span>
                   </Button>
                 </div>
               </TableCell>

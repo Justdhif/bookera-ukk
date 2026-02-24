@@ -14,7 +14,12 @@ import { Category } from "@/types/category";
 import { categoryService } from "@/services/category.service";
 import { toast } from "sonner";
 import IconPicker from "@/components/custom-ui/IconPicker";
-import { useTranslations } from "next-intl";
+
+interface FormData {
+  name: string;
+  icon: string;
+  description: string;
+}
 
 export default function CategoryFormDialog({
   open,
@@ -27,47 +32,75 @@ export default function CategoryFormDialog({
   category: Category | null;
   onSuccess: () => void;
 }) {
-  const t = useTranslations('common');
-  const tAdmin = useTranslations('admin.common');
-  const [name, setName] = useState("");
-  const [icon, setIcon] = useState<string>("");
-  const [description, setDescription] = useState("");
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    icon: "",
+    description: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
-  const [isNameValid, setIsNameValid] = useState(true);
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    setName(category?.name ?? "");
-    setIcon(category?.icon ?? "");
-    setDescription(category?.description ?? "");
+    setFormData({
+      name: category?.name ?? "",
+      icon: category?.icon ?? "",
+      description: category?.description ?? "",
+    });
   }, [category, open]);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleIconChange = (iconValue: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      icon: iconValue,
+    }));
+  };
+
+  const handleClearIcon = () => {
+    setFormData((prev) => ({
+      ...prev,
+      icon: "",
+    }));
+  };
 
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
       if (category) {
         await categoryService.update(category.id, {
-          name,
-          icon: icon || undefined,
-          description,
+          name: formData.name,
+          icon: formData.icon || undefined,
+          description: formData.description,
         });
-        toast.success(t('categoryUpdated'));
+        toast.success("Category updated successfully");
       } else {
         await categoryService.create({
-          name,
-          icon: icon || undefined,
-          description,
+          name: formData.name,
+          icon: formData.icon || undefined,
+          description: formData.description,
         });
-        toast.success(t('categoryAdded'));
+        toast.success("Category added successfully");
       }
 
-      setName("");
-      setIcon("");
-      setDescription("");
+      setFormData({
+        name: "",
+        icon: "",
+        description: "",
+      });
       setOpen(false);
       onSuccess();
-      setIsLoading(false);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || t('errorOccurred'));
+      toast.error(err.response?.data?.message || "An error occurred");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -76,61 +109,60 @@ export default function CategoryFormDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {category ? tAdmin('edit') : tAdmin('add')} Kategori
-          </DialogTitle>
+          <DialogTitle>{category ? "Edit" : "Add"} Category</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name" variant="required">
-                {t('categoryName')}
+                Category Name
               </Label>
               <Input
                 id="name"
-                placeholder={t('categoryName')}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                name="name"
+                placeholder="Enter category name"
+                value={formData.name}
+                onChange={handleInputChange}
                 validationType="letters-only"
-                onValidationChange={setIsNameValid}
-                errorMessage={{
-                  'letters-only': 'Nama kategori hanya boleh berisi huruf'
-                }}
+                onValidationChange={(isValid: boolean) =>
+                  setErrors((prev) => ({ ...prev, name: !isValid }))
+                }
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">{t('bookDescription')}</Label>
+              <Label htmlFor="description">Description</Label>
               <Input
                 id="description"
-                placeholder={t('categoryDesc')}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                name="description"
+                placeholder="Enter category description"
+                value={formData.description}
+                onChange={handleInputChange}
               />
             </div>
           </div>
 
-          <IconPicker 
-            value={icon} 
-            onChange={setIcon}
-            onClear={() => setIcon("")}
+          <IconPicker
+            value={formData.icon}
+            onChange={handleIconChange}
+            onClear={handleClearIcon}
           />
 
           <Button
             onClick={handleSubmit}
             variant="submit"
-            disabled={isLoading || !name.trim() || !isNameValid}
+            disabled={isLoading || !formData.name.trim() || errors.name}
             loading={isLoading}
             className="w-full"
           >
             {isLoading
               ? category
-                ? tAdmin('saving')
-                : t('addingCategory')
+                ? "Saving..."
+                : "Adding..."
               : category
-                ? tAdmin('save')
-                : t('addCategory')}
+                ? "Save Changes"
+                : "Add Category"}
           </Button>
         </div>
       </DialogContent>
