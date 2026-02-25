@@ -72,6 +72,22 @@ export default function CategoryFormDialog({
     }));
   };
 
+  const isFormValid = (): boolean => {
+    const requiredFieldsFilled = formData.name.trim() !== "";
+    if (!requiredFieldsFilled) return false;
+
+    const hasValidationErrors = Object.values(errors).some(
+      (error) => error === true,
+    );
+    if (hasValidationErrors) return false;
+
+    return true;
+  };
+
+  const isSubmitDisabled = (): boolean => {
+    return isLoading || !isFormValid();
+  };
+
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
@@ -152,7 +168,7 @@ export default function CategoryFormDialog({
           <Button
             onClick={handleSubmit}
             variant="submit"
-            disabled={isLoading || !formData.name.trim() || errors.name}
+            disabled={isSubmitDisabled()}
             loading={isLoading}
             className="w-full"
           >

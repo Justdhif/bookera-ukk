@@ -9,14 +9,11 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { UserTableSkeleton } from "./UserTableSkeleton";
-import { Plus } from "lucide-react";
+import { Plus, User as UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 
 export default function UserClient() {
   const router = useRouter();
-  const t = useTranslations('admin.users');
-  const tCommon = useTranslations('admin.common');
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -31,7 +28,7 @@ export default function UserClient() {
     if (!deleteId) return;
 
     await userService.delete(deleteId);
-    toast.success(t('deleteSuccess'));
+    toast.success("User deleted successfully");
     setDeleteId(null);
     fetchUsers();
   };
@@ -42,34 +39,37 @@ export default function UserClient() {
       const res = await userService.getAll(
         filters.search,
         filters.role,
-        filters.status
+        filters.status,
       );
       setUsers(res.data.data);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('loadError'));
+      toast.error(error.response?.data?.message || "Failed to load users");
     } finally {
       setLoading(false);
     }
   }, [filters]);
 
-  // Debounce effect for filters
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchUsers();
-    }, 300); // 300ms debounce
+    }, 300);
 
     return () => clearTimeout(timeoutId);
   }, [fetchUsers]);
 
   return (
     <div className="space-y-6">
-      {/* HEADER */}
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
-        <div>
-          <h1 className="text-3xl font-bold">{t('title')}</h1>
-          <p className="text-muted-foreground">
-            {t('description')}
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="p-2 bg-brand-primary rounded-lg">
+            <UserIcon className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">Users</h1>
+            <p className="text-muted-foreground">
+              Manage your library users and their roles
+            </p>
+          </div>
         </div>
         <Button
           onClick={() => router.push("/admin/users/add")}
@@ -77,11 +77,10 @@ export default function UserClient() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          {t('addUser')}
+          Add User
         </Button>
       </div>
 
-      {/* FILTER */}
       <UserFilter
         onChange={(value) =>
           setFilters((prev) => ({
@@ -91,19 +90,17 @@ export default function UserClient() {
         }
       />
 
-      {/* TABLE */}
       {loading ? (
         <UserTableSkeleton />
       ) : (
         <UserTable data={users} onDelete={(id) => setDeleteId(id)} />
       )}
 
-      {/* DELETE CONFIRM */}
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title={t('deleteUser')}
-        description={tCommon('deleteUserWarning')}
+        title="Delete User"
+        description="Are you sure you want to delete this user? This action cannot be undone."
         onConfirm={confirmDelete}
       />
     </div>

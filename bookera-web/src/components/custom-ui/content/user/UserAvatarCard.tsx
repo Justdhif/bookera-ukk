@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Upload } from "lucide-react";
 import AvatarUploadModal from "./AvatarUploadModal";
-import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 interface UserAvatarCardProps {
   user: User;
@@ -46,9 +46,6 @@ export default function UserAvatarCard({
   recentLoans,
 }: UserAvatarCardProps) {
   const router = useRouter();
-  const t = useTranslations('common');
-  const tAdmin = useTranslations('admin.common');
-  const tLoans = useTranslations('loans');
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
   const handleAvatarSave = (avatar: string | File) => {
@@ -65,22 +62,64 @@ export default function UserAvatarCard({
     }
   };
 
+  const getRoleDisplay = (role: string) => {
+    switch (role) {
+      case "admin":
+        return "Admin";
+      case "officer:catalog":
+        return "Catalog Officer";
+      case "officer:management":
+        return "Management Officer";
+      case "user":
+        return "User";
+      default:
+        return "Select Role";
+    }
+  };
+
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case "borrowed":
+        return "Borrowed";
+      case "returned":
+        return "Returned";
+      case "overdue":
+        return "Overdue";
+      default:
+        return status;
+    }
+  };
+
   return (
     <>
       <Card className="lg:col-span-1">
         <CardHeader>
           <CardTitle>Avatar</CardTitle>
           <CardDescription>
-            {isEditMode ? t('uploadUserProfile') : t('userPhoto')}
+            {isEditMode ? "Upload user profile picture" : "User photo"}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
-          <Avatar className="h-32 w-32">
-            <AvatarImage src={avatarPreview} />
-            <AvatarFallback className="text-2xl">
-              {user.profile.full_name[0]?.toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative h-32 w-32">
+            <div className="relative h-full w-full rounded-full overflow-hidden ring-4 ring-gray-100 dark:ring-gray-800">
+              {avatarPreview ? (
+                <Image
+                  src={avatarPreview}
+                  alt={user.profile.full_name}
+                  fill
+                  sizes="128px"
+                  className="object-cover"
+                  unoptimized={true}
+                />
+              ) : (
+                <div className="h-full w-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+                  <span className="text-4xl font-medium text-gray-600 dark:text-gray-400">
+                    {user.profile.full_name[0]?.toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
           {isEditMode && (
             <Button
               type="button"
@@ -89,13 +128,15 @@ export default function UserAvatarCard({
               className="w-full"
             >
               <Upload className="h-4 w-4 mr-2" />
-              {t('uploadAvatar')}
+              Upload Avatar
             </Button>
           )}
 
           <div className="space-y-2 w-full">
             <div className="flex items-center gap-2">
-              <Label className="text-muted-foreground text-xs w-16">{t('role')}:</Label>
+              <Label className="text-muted-foreground text-xs w-16">
+                Role:
+              </Label>
               <Select
                 value={formData.role}
                 onValueChange={(value) =>
@@ -104,29 +145,25 @@ export default function UserAvatarCard({
                 disabled={!isEditMode}
               >
                 <SelectTrigger className="h-7 flex-1 text-xs">
-                  <SelectValue>
-                    {formData.role === "admin"
-                      ? t('admin')
-                      : formData.role === "officer:catalog"
-                        ? t('officerCatalog')
-                        : formData.role === "officer:management"
-                          ? t('officerManagement')
-                          : formData.role === "user"
-                            ? t('userRole')
-                            : t('selectRole')}
-                  </SelectValue>
+                  <SelectValue>{getRoleDisplay(formData.role)}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">{t('admin')}</SelectItem>
-                  <SelectItem value="officer:catalog">{t('officerCatalog')}</SelectItem>
-                  <SelectItem value="officer:management">{t('officerManagement')}</SelectItem>
-                  <SelectItem value="user">{t('userRole')}</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="officer:catalog">
+                    Catalog Officer
+                  </SelectItem>
+                  <SelectItem value="officer:management">
+                    Management Officer
+                  </SelectItem>
+                  <SelectItem value="user">User</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="flex items-center gap-2">
-              <Label className="text-muted-foreground text-xs w-16">{t('status')}:</Label>
+              <Label className="text-muted-foreground text-xs w-16">
+                Status:
+              </Label>
               <Select
                 value={formData.is_active ? "active" : "inactive"}
                 onValueChange={(value) =>
@@ -139,12 +176,12 @@ export default function UserAvatarCard({
               >
                 <SelectTrigger className="h-7 flex-1 text-xs">
                   <SelectValue>
-                    {formData.is_active ? tAdmin('active') : t('inactive')}
+                    {formData.is_active ? "Active" : "Inactive"}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">{tAdmin('active')}</SelectItem>
-                  <SelectItem value="inactive">{t('inactive')}</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -152,13 +189,13 @@ export default function UserAvatarCard({
 
           <div className="border-t pt-4 mt-4 w-full">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-sm">{t('recentLoans')}</h4>
+              <h4 className="font-semibold text-sm">Recent Loans</h4>
               <Button
                 variant="link"
                 className="h-auto p-0 text-xs cursor-pointer"
                 onClick={() => router.push("/admin/loans")}
               >
-                {t('viewAll')}
+                View All
               </Button>
             </div>
             {recentLoans.length > 0 ? (
@@ -171,7 +208,8 @@ export default function UserAvatarCard({
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium truncate">
-                        {tAdmin('booksCount', { count: loan.loan_details.length })}
+                        {loan.loan_details.length} book
+                        {loan.loan_details.length !== 1 ? "s" : ""}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(loan.loan_date).toLocaleDateString("id-ID")}
@@ -191,19 +229,15 @@ export default function UserAvatarCard({
                           : ""
                       }`}
                     >
-                      {loan.status === "borrowed"
-                        ? "Dipinjam"
-                        : loan.status === "returned"
-                          ? "Dikembalikan"
-                          : "Terlambat"}
+                      {getStatusDisplay(loan.status)}
                     </Badge>
                   </div>
                 ))}
               </div>
             ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  {tLoans('noLoans')}
-                </p>
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No recent loans
+              </p>
             )}
           </div>
         </CardContent>

@@ -11,24 +11,21 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
-import { useTranslations } from "next-intl";
 
 interface Props {
   onChange: (params: Record<string, string | undefined>) => void;
 }
 
 export default function UserFilter({ onChange }: Props) {
-  const t = useTranslations('common');
-  const tAdmin = useTranslations('admin.common');
   const [searchValue, setSearchValue] = useState("");
   const [roleValue, setRoleValue] = useState<string>();
   const [statusValue, setStatusValue] = useState<string>();
 
   const roles = [
-    { value: "admin", label: t('admin') },
-    { value: "officer:catalog", label: t('officerCatalog') },
-    { value: "officer:management", label: t('officerManagement') },
-    { value: "user", label: t('userRole') },
+    { value: "admin", label: "Admin" },
+    { value: "officer:catalog", label: "Catalog Officer" },
+    { value: "officer:management", label: "Management Officer" },
+    { value: "user", label: "User" },
   ];
 
   const handleRoleToggle = (value: string | null) => {
@@ -62,7 +59,7 @@ export default function UserFilter({ onChange }: Props) {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={t('searchPlaceholder')}
+            placeholder="Search users..."
             value={searchValue}
             onChange={(e) => {
               setSearchValue(e.target.value);
@@ -81,12 +78,12 @@ export default function UserFilter({ onChange }: Props) {
           }}
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder={t('allStatus')} />
+            <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{t('allStatus')}</SelectItem>
-            <SelectItem value="active">{tAdmin('active')}</SelectItem>
-            <SelectItem value="inactive">{t('inactive')}</SelectItem>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -104,13 +101,17 @@ export default function UserFilter({ onChange }: Props) {
                 rounded-md border
                 ${
                   isAllActive
-                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                    ? "bg-brand-primary text-primary-foreground border-brand-primary shadow-sm"
                     : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
                 }
               `}
               onClick={() => handleRoleClick(null)}
             >
-              <span className="flex items-center gap-1.5">{t('all')}</span>
+              <span
+                className={`flex items-center gap-1.5 ${isAllActive ? "text-white" : ""}`}
+              >
+                All Roles
+              </span>
             </Badge>
           </div>
 
@@ -130,13 +131,15 @@ export default function UserFilter({ onChange }: Props) {
                     rounded-md border
                     ${
                       isActive
-                        ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                        ? "bg-brand-primary text-primary-foreground border-brand-primary shadow-sm"
                         : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
                     }
                   `}
                   onClick={() => handleRoleClick(role.value)}
                 >
-                  <span className="flex items-center gap-1.5">
+                  <span
+                    className={`flex items-center gap-1.5 ${isActive ? "text-white" : ""}`}
+                  >
                     {role.label}
                   </span>
                 </Badge>

@@ -31,8 +31,9 @@ interface BookCoverCardProps {
   formData: {
     is_active: boolean;
   };
+  setFormData: (data: any) => void;
   onCoverImageChange: (file: File | null, preview: string) => void;
-  onSwitchChange: (checked: boolean) => void;
+  onSwitchChange?: (checked: boolean) => void;
   isCoverRequired?: boolean;
   coverError?: boolean;
   onCoverValidationChange?: (isValid: boolean) => void;
@@ -46,6 +47,7 @@ export default function BookCoverCard({
   coverPreview,
   isEditMode = true,
   formData,
+  setFormData,
   onCoverImageChange,
   onSwitchChange,
   isCoverRequired = false,
@@ -54,6 +56,14 @@ export default function BookCoverCard({
 }: BookCoverCardProps) {
   const [localError, setLocalError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  const handleSwitchChange = (checked: boolean) => {
+    if (onSwitchChange) {
+      onSwitchChange(checked);
+    } else if (setFormData) {
+      setFormData({ ...formData, is_active: checked });
+    }
+  };
 
   const validateFile = (file: File): boolean => {
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
@@ -102,7 +112,9 @@ export default function BookCoverCard({
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(true);
+    if (isEditMode) {
+      setIsDragging(true);
+    }
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
@@ -113,6 +125,8 @@ export default function BookCoverCard({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+
+    if (!isEditMode) return;
 
     const file = e.dataTransfer.files?.[0];
     if (file) {
@@ -163,9 +177,9 @@ export default function BookCoverCard({
               isDragging &&
                 "ring-2 ring-primary ring-offset-2 dark:ring-offset-gray-900",
             )}
-            onDragOver={isEditMode ? handleDragOver : undefined}
-            onDragLeave={isEditMode ? handleDragLeave : undefined}
-            onDrop={isEditMode ? handleDrop : undefined}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
             onClick={() => {
               if (isEditMode && !coverPreview) {
                 document.getElementById("cover_image")?.click();
@@ -209,7 +223,8 @@ export default function BookCoverCard({
                     ? "border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/30"
                     : isDragging
                       ? "border-primary bg-primary/5 dark:bg-primary/10 border-dashed"
-                      : "border-dashed border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 hover:bg-gray-100/50 dark:hover:bg-gray-800/50",
+                      : "border-dashed border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30",
+                  !isEditMode && "cursor-default",
                 )}
               >
                 {hasError ? (
@@ -308,7 +323,7 @@ export default function BookCoverCard({
             {isEditMode ? (
               <Switch
                 checked={formData.is_active}
-                onCheckedChange={onSwitchChange}
+                onCheckedChange={handleSwitchChange}
                 className="data-[state=checked]:bg-green-600 dark:data-[state=checked]:bg-green-500"
               />
             ) : (

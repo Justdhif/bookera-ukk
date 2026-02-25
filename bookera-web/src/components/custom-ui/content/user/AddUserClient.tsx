@@ -26,50 +26,116 @@ import { ArrowLeft, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { DatePicker } from "@/components/ui/date-picker";
 import AvatarUploadModal from "./AvatarUploadModal";
-import { useTranslations } from "next-intl";
+
+interface FormData {
+  email: string;
+  password: string;
+  full_name: string;
+  identification_number: string;
+  phone_number: string;
+  gender: string;
+  birth_date: string;
+  occupation: string;
+  institution: string;
+  address: string;
+  bio: string;
+  role: string;
+  is_active: boolean;
+  avatar?: string | File;
+}
+
+interface FormErrors {
+  full_name: boolean;
+  identification_number: boolean;
+  phone_number: boolean;
+  occupation: boolean;
+  institution: boolean;
+}
 
 export default function AddUserClient() {
   const router = useRouter();
-  const t = useTranslations('admin.users');
-  const tCommon = useTranslations('common');
-  const [formData, setFormData] = useState<Partial<CreateUserData>>({
+
+  const [formData, setFormData] = useState<FormData>({
+    email: "",
+    password: "",
+    full_name: "",
+    identification_number: "",
+    phone_number: "",
+    gender: "",
+    birth_date: "",
+    occupation: "",
+    institution: "",
+    address: "",
+    bio: "",
     role: "user",
     is_active: true,
   });
+
+  const [errors, setErrors] = useState<FormErrors>({
+    full_name: false,
+    identification_number: false,
+    phone_number: false,
+    occupation: false,
+    institution: false,
+  });
+
   const [avatarPreview, setAvatarPreview] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
-  const [isFullNameValid, setIsFullNameValid] = useState(true);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleAvatarSave = (avatar: string | File) => {
     if (typeof avatar === "string") {
       setAvatarPreview(avatar);
-      setFormData({ ...formData, avatar: avatar });
+      setFormData((prev) => ({ ...prev, avatar }));
     } else {
-      setFormData({ ...formData, avatar: avatar });
+      setFormData((prev) => ({ ...prev, avatar }));
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result as string);
-      };
+      reader.onloadend = () => setAvatarPreview(reader.result as string);
       reader.readAsDataURL(avatar);
     }
   };
 
+  const isFormValid = (): boolean => {
+    if (
+      !formData.email.trim() ||
+      !formData.password.trim() ||
+      !formData.full_name.trim()
+    )
+      return false;
+
+    const hasValidationErrors = Object.values(errors).some(
+      (error) => error === true,
+    );
+    if (hasValidationErrors) return false;
+
+    return true;
+  };
+
+  const isSubmitDisabled = (): boolean => submitting || !isFormValid();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.email?.trim() || !formData.full_name?.trim() || !formData.password?.trim()) {
-      toast.error(tCommon('pleaseCompleteRequiredFields'));
+    const hasErrors = Object.values(errors).some((error) => error === true);
+    if (hasErrors) {
+      toast.error("Please complete all required fields correctly");
       return;
     }
 
     try {
       setSubmitting(true);
       await userService.create(formData as CreateUserData);
-      toast.success(t('addSuccess'));
+      toast.success("User added successfully");
       router.push("/admin/users");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('addError'));
+      toast.error(error.response?.data?.message || "Failed to add user");
     } finally {
       setSubmitting(false);
     }
@@ -77,7 +143,6 @@ export default function AddUserClient() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
@@ -89,19 +154,21 @@ export default function AddUserClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{t('addUser')}</h1>
-            <p className="text-muted-foreground">{tCommon('addUserToSystem')}</p>
+            <h1 className="text-3xl font-bold">Add User</h1>
+            <p className="text-muted-foreground">
+              Add a new user to the system
+            </p>
           </div>
         </div>
         <Button
           type="submit"
           form="user-form"
           variant="submit"
-          disabled={submitting || !formData.email?.trim() || !formData.full_name?.trim() || !formData.password?.trim() || !isFullNameValid}
+          disabled={isSubmitDisabled()}
           loading={submitting}
           className="h-8"
         >
-          {submitting ? tCommon('saving') : t('addUser')}
+          {submitting ? "Saving..." : "Add User"}
         </Button>
       </div>
 
@@ -111,7 +178,9 @@ export default function AddUserClient() {
           <Card className="lg:col-span-1">
             <CardHeader>
               <CardTitle>Avatar</CardTitle>
-              <CardDescription>{tCommon('uploadUserPhoto')}</CardDescription>
+              <CardDescription>
+                Upload a profile photo for the user
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-4">
               <Avatar className="h-32 w-32">
@@ -127,60 +196,65 @@ export default function AddUserClient() {
                 className="w-full"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                {tCommon('uploadAvatar')}
+                Upload Avatar
               </Button>
 
-              {/* Role & Status Selects */}
               <div className="space-y-2 w-full">
                 <div className="flex items-center gap-2">
-                  <Label className="text-muted-foreground text-xs w-16">{tCommon('role')}:</Label>
+                  <Label className="text-muted-foreground text-xs w-16">
+                    Role:
+                  </Label>
                   <Select
                     value={formData.role}
-                    onValueChange={(value: any) =>
-                      setFormData({ ...formData, role: value })
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, role: value }))
                     }
                   >
                     <SelectTrigger className="h-7 flex-1 text-xs">
                       <SelectValue>
                         {formData.role === "admin"
-                          ? tCommon('admin')
+                          ? "Admin"
                           : formData.role === "officer:catalog"
-                            ? tCommon('officerCatalog')
+                            ? "Catalog Officer"
                             : formData.role === "officer:management"
-                              ? tCommon('officerManagement')
-                              : formData.role === "user"
-                                ? tCommon('userRole')
-                                : tCommon('selectRole')}
+                              ? "Management Officer"
+                              : "User"}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">{tCommon('admin')}</SelectItem>
-                      <SelectItem value="officer:catalog">{tCommon('officerCatalog')}</SelectItem>
-                      <SelectItem value="officer:management">{tCommon('officerManagement')}</SelectItem>
-                      <SelectItem value="user">{tCommon('userRole')}</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="officer:catalog">
+                        Catalog Officer
+                      </SelectItem>
+                      <SelectItem value="officer:management">
+                        Management Officer
+                      </SelectItem>
+                      <SelectItem value="user">User</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Label className="text-muted-foreground text-xs w-16">{tCommon('status')}:</Label>
+                  <Label className="text-muted-foreground text-xs w-16">
+                    Status:
+                  </Label>
                   <Select
                     value={formData.is_active ? "active" : "inactive"}
                     onValueChange={(value) =>
-                      setFormData({
-                        ...formData,
+                      setFormData((prev) => ({
+                        ...prev,
                         is_active: value === "active",
-                      })
+                      }))
                     }
                   >
                     <SelectTrigger className="h-7 flex-1 text-xs">
                       <SelectValue>
-                        {formData.is_active ? tCommon('active') : tCommon('inactive')}
+                        {formData.is_active ? "Active" : "Inactive"}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="active">{tCommon('active')}</SelectItem>
-                      <SelectItem value="inactive">{tCommon('inactive')}</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -191,15 +265,15 @@ export default function AddUserClient() {
           {/* Form Card */}
           <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle>{tCommon('userInfo')}</CardTitle>
+              <CardTitle>User Information</CardTitle>
               <CardDescription>
-                {tCommon('editUserCorrectly')}
+                Enter the user's details correctly
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Account Section */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">{tCommon('account')}</h3>
+                <h3 className="font-semibold text-lg">Account</h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="email" variant="required">
@@ -207,13 +281,12 @@ export default function AddUserClient() {
                     </Label>
                     <Input
                       id="email"
+                      name="email"
                       type="email"
                       required
-                      value={formData.email || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      placeholder={tCommon('emailPlaceholder')}
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="Enter email address"
                     />
                   </div>
                   <div className="space-y-2">
@@ -222,13 +295,12 @@ export default function AddUserClient() {
                     </Label>
                     <Input
                       id="password"
+                      name="password"
                       type="password"
                       required
-                      value={formData.password || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, password: e.target.value })
-                      }
-                      placeholder={tCommon('minPassword')}
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      placeholder="Minimum 6 characters"
                     />
                   </div>
                 </div>
@@ -236,175 +308,167 @@ export default function AddUserClient() {
 
               {/* Profile Section */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-lg">{tCommon('profile')}</h3>
+                <h3 className="font-semibold text-lg">Profile</h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="full_name" variant="required">
-                      {tCommon('namePlaceholder')}
+                      Full Name
                     </Label>
                     <Input
                       id="full_name"
+                      name="full_name"
                       required
-                      value={formData.full_name || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, full_name: e.target.value })
-                      }
-                      placeholder={tCommon('namePlaceholder')}
+                      value={formData.full_name}
+                      onChange={handleInputChange}
+                      placeholder="Enter full name"
                       validationType="letters-only"
-                      onValidationChange={setIsFullNameValid}
-                      errorMessage={{
-                        'letters-only': tCommon('validationLettersOnly'),
-                        'numbers-only': tCommon('validationNumbersOnly'),
-                        'alphanumeric': tCommon('validationAlphanumeric'),
-                      }}
+                      onValidationChange={(isValid: boolean) =>
+                        setErrors((prev) => ({ ...prev, full_name: !isValid }))
+                      }
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="identification_number">
-                      {tCommon('identificationNumber')}
+                      Identification Number
                     </Label>
                     <Input
                       id="identification_number"
-                      value={formData.identification_number || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          identification_number: e.target.value,
-                        })
-                      }
-                      placeholder={tCommon('idNumberPlaceholder')}
+                      name="identification_number"
+                      value={formData.identification_number}
+                      onChange={handleInputChange}
+                      placeholder="Enter ID number"
                       validationType="numbers-only"
-                      errorMessage={{
-                        'letters-only': tCommon('validationLettersOnly'),
-                        'numbers-only': tCommon('validationNumbersOnly'),
-                        'alphanumeric': tCommon('validationAlphanumeric'),
-                      }}
+                      onValidationChange={(isValid: boolean) =>
+                        setErrors((prev) => ({
+                          ...prev,
+                          identification_number: !isValid,
+                        }))
+                      }
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="phone_number">{tCommon('phoneNumber')}</Label>
+                    <Label htmlFor="phone_number">Phone Number</Label>
                     <Input
                       id="phone_number"
-                      value={formData.phone_number || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          phone_number: e.target.value,
-                        })
-                      }
-                      placeholder={tCommon('phonePlaceholder')}
+                      name="phone_number"
+                      value={formData.phone_number}
+                      onChange={handleInputChange}
+                      placeholder="Enter phone number"
                       validationType="numbers-only"
-                      errorMessage={{
-                        'letters-only': tCommon('validationLettersOnly'),
-                        'numbers-only': tCommon('validationNumbersOnly'),
-                        'alphanumeric': tCommon('validationAlphanumeric'),
-                      }}
+                      onValidationChange={(isValid: boolean) =>
+                        setErrors((prev) => ({
+                          ...prev,
+                          phone_number: !isValid,
+                        }))
+                      }
                     />
                   </div>
+
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="gender">{tCommon('gender')}</Label>
+                    <Label htmlFor="gender">Gender</Label>
                     <Select
-                      value={formData.gender || ""}
-                      onValueChange={(value: any) =>
-                        setFormData({ ...formData, gender: value })
+                      value={formData.gender}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, gender: value }))
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder={tCommon('selectGender')} />
+                        <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="male">{tCommon('male')}</SelectItem>
-                        <SelectItem value="female">{tCommon('female')}</SelectItem>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
                         <SelectItem value="prefer_not_to_say">
-                          {tCommon('preferNotToSay')}
+                          Prefer not to say
                         </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="birth_date">{tCommon('birthDate')}</Label>
+                    <Label htmlFor="birth_date">Birth Date</Label>
                     <DatePicker
                       value={
-                        formData.birth_date ? new Date(formData.birth_date + 'T00:00:00') : undefined
+                        formData.birth_date
+                          ? new Date(formData.birth_date + "T00:00:00")
+                          : undefined
                       }
                       onChange={(date) => {
                         if (date) {
                           const year = date.getFullYear();
-                          const month = String(date.getMonth() + 1).padStart(2, '0');
-                          const day = String(date.getDate()).padStart(2, '0');
-                          setFormData({
-                            ...formData,
+                          const month = String(date.getMonth() + 1).padStart(
+                            2,
+                            "0",
+                          );
+                          const day = String(date.getDate()).padStart(2, "0");
+                          setFormData((prev) => ({
+                            ...prev,
                             birth_date: `${year}-${month}-${day}`,
-                          });
+                          }));
                         } else {
-                          setFormData({
-                            ...formData,
-                            birth_date: undefined,
-                          });
+                          setFormData((prev) => ({ ...prev, birth_date: "" }));
                         }
                       }}
-                      placeholder={tCommon('selectBirthDate')}
+                      placeholder="Select birth date"
                       dateMode="past"
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="occupation">{tCommon('occupation')}</Label>
+                    <Label htmlFor="occupation">Occupation</Label>
                     <Input
                       id="occupation"
-                      value={formData.occupation || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, occupation: e.target.value })
-                      }
-                      placeholder={tCommon('occupationPlaceholder')}
+                      name="occupation"
+                      value={formData.occupation}
+                      onChange={handleInputChange}
+                      placeholder="Enter occupation"
                       validationType="letters-only"
-                      errorMessage={{
-                        'letters-only': tCommon('validationLettersOnly'),
-                        'numbers-only': tCommon('validationNumbersOnly'),
-                        'alphanumeric': tCommon('validationAlphanumeric'),
-                      }}
+                      onValidationChange={(isValid: boolean) =>
+                        setErrors((prev) => ({ ...prev, occupation: !isValid }))
+                      }
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="institution">{tCommon('class')}</Label>
+                    <Label htmlFor="institution">Class</Label>
                     <Input
                       id="institution"
-                      value={formData.institution || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          institution: e.target.value,
-                        })
-                      }
-                      placeholder={tCommon('classPlaceholder')}
+                      name="institution"
+                      value={formData.institution}
+                      onChange={handleInputChange}
+                      placeholder="Enter class"
                       validationType="alphanumeric"
-                      errorMessage={{
-                        'letters-only': tCommon('validationLettersOnly'),
-                        'numbers-only': tCommon('validationNumbersOnly'),
-                        'alphanumeric': tCommon('validationAlphanumeric'),
-                      }}
+                      onValidationChange={(isValid: boolean) =>
+                        setErrors((prev) => ({
+                          ...prev,
+                          institution: !isValid,
+                        }))
+                      }
                     />
                   </div>
+
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="address">{tCommon('address')}</Label>
+                    <Label htmlFor="address">Address</Label>
                     <Textarea
                       id="address"
-                      value={formData.address || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, address: e.target.value })
-                      }
-                      placeholder={tCommon('addressPlaceholder')}
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      placeholder="Enter address"
                       rows={2}
                     />
                   </div>
+
                   <div className="space-y-2 sm:col-span-2">
-                    <Label htmlFor="bio">{tCommon('bio')}</Label>
+                    <Label htmlFor="bio">Bio</Label>
                     <Textarea
                       id="bio"
-                      value={formData.bio || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, bio: e.target.value })
-                      }
-                      placeholder={tCommon('bioPlaceholder')}
+                      name="bio"
+                      value={formData.bio}
+                      onChange={handleInputChange}
+                      placeholder="Enter bio"
                       rows={3}
                     />
                   </div>

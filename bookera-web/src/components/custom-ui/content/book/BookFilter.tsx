@@ -12,13 +12,15 @@ import {
   SelectContent,
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Props {
   categories: Category[];
   onChange: (params: Record<string, string | number[] | undefined>) => void;
+  isLoading?: boolean;
 }
 
-export function BookFilter({ categories, onChange }: Props) {
+export function BookFilter({ categories, onChange, isLoading = false }: Props) {
   const [searchValue, setSearchValue] = useState("");
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [statusValue, setStatusValue] = useState<string>();
@@ -50,6 +52,34 @@ export function BookFilter({ categories, onChange }: Props) {
 
   const isAllActive = categoryIds.length === 0;
 
+  const CategorySkeleton = () => (
+    <div className="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth">
+      <div id="book-category-null" className="shrink-0">
+        <Badge
+          variant={isAllActive ? "default" : "outline"}
+          className={`
+            cursor-pointer whitespace-nowrap transition-all duration-200
+            px-3 py-2 text-sm font-medium
+            rounded-md border
+            ${
+              isAllActive
+                ? "bg-brand-primary text-primary-foreground border-brand-primary shadow-sm"
+                : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
+            }
+          `}
+          onClick={() => handleCategoryClick(null)}
+        >
+          <span className="flex items-center gap-1.5 text-white">All Categories</span>
+        </Badge>
+      </div>
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="shrink-0">
+          <Skeleton className="h-9 w-24 rounded-md" />
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="space-y-4">
       <div className="flex gap-3">
@@ -63,6 +93,7 @@ export function BookFilter({ categories, onChange }: Props) {
               onChange({ search: e.target.value });
             }}
             className="pl-9"
+            disabled={isLoading}
           />
         </div>
 
@@ -73,6 +104,7 @@ export function BookFilter({ categories, onChange }: Props) {
             setStatusValue(newValue);
             onChange({ status: newValue });
           }}
+          disabled={isLoading}
         >
           <SelectTrigger className="w-40">
             <SelectValue placeholder="All" />
@@ -88,54 +120,62 @@ export function BookFilter({ categories, onChange }: Props) {
       <div className="relative">
         <div className="absolute right-0 top-0 bottom-0 w-12 bg-linear-to-l from-white dark:from-gray-950 to-transparent z-10 pointer-events-none rounded-r-md" />
 
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth">
-          <div id="book-category-null" className="shrink-0">
-            <Badge
-              variant={isAllActive ? "default" : "outline"}
-              className={`
-                cursor-pointer whitespace-nowrap transition-all duration-200
-                px-3 py-2 text-sm font-medium
-                rounded-md border
-                ${
-                  isAllActive
-                    ? "bg-brand-primary text-primary-foreground border-brand-primary shadow-sm"
-                    : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
-                }
-              `}
-              onClick={() => handleCategoryClick(null)}
-            >
-              <span className="flex items-center gap-1.5 text-white">All</span>
-            </Badge>
-          </div>
-
-          {categories.map((cat) => {
-            const isActive = categoryIds.includes(cat.id);
-            return (
-              <div
-                key={cat.id}
-                id={`book-category-${cat.id}`}
-                className="shrink-0"
+        {isLoading ? (
+          <CategorySkeleton />
+        ) : (
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth">
+            <div id="book-category-null" className="shrink-0">
+              <Badge
+                variant={isAllActive ? "default" : "outline"}
+                className={`
+                  cursor-pointer whitespace-nowrap transition-all duration-200
+                  px-3 py-2 text-sm font-medium
+                  rounded-md border
+                  ${
+                    isAllActive
+                      ? "bg-brand-primary text-primary-foreground border-brand-primary shadow-sm"
+                      : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
+                  }
+                `}
+                onClick={() => handleCategoryClick(null)}
               >
-                <Badge
-                  variant={isActive ? "default" : "outline"}
-                  className={`
-                    cursor-pointer whitespace-nowrap transition-all duration-200
-                    px-3 py-2 text-sm font-medium
-                    rounded-md border text-white
-                    ${
-                      isActive
-                        ? "bg-brand-primary border-brand-primary shadow-sm"
-                        : "bg-background border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
-                    }
-                  `}
-                  onClick={() => handleCategoryClick(cat.id)}
+                <span className="flex items-center gap-1.5 text-white">
+                  All
+                </span>
+              </Badge>
+            </div>
+
+            {categories.map((cat) => {
+              const isActive = categoryIds.includes(cat.id);
+              return (
+                <div
+                  key={cat.id}
+                  id={`book-category-${cat.id}`}
+                  className="shrink-0"
                 >
-                  <span className="flex items-center gap-1.5">{cat.name}</span>
-                </Badge>
-              </div>
-            );
-          })}
-        </div>
+                  <Badge
+                    variant={isActive ? "default" : "outline"}
+                    className={`
+                      cursor-pointer whitespace-nowrap transition-all duration-200
+                      px-3 py-2 text-sm font-medium
+                      rounded-md border text-white
+                      ${
+                        isActive
+                          ? "bg-brand-primary border-brand-primary shadow-sm"
+                          : "bg-background border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
+                      }
+                    `}
+                    onClick={() => handleCategoryClick(cat.id)}
+                  >
+                    <span className="flex items-center gap-1.5">
+                      {cat.name}
+                    </span>
+                  </Badge>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

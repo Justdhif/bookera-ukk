@@ -54,11 +54,12 @@ interface BookDetailFormProps {
   book: Book;
   isEditMode: boolean;
   formData: FormData;
-  onInputChange: (
+  setFormData: (data: FormData) => void;
+  onInputChange?: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
-  onYearChange: (year: string) => void;
-  onCategoryChange: (categoryIds: number[]) => void;
+  onYearChange?: (year: string) => void;
+  onCategoryChange?: (categoryIds: number[]) => void;
   categories: Category[];
   onValidationChange?: (hasErrors: boolean) => void;
 }
@@ -67,6 +68,7 @@ export default function BookDetailForm({
   book,
   isEditMode,
   formData,
+  setFormData,
   onInputChange,
   onYearChange,
   onCategoryChange,
@@ -81,8 +83,64 @@ export default function BookDetailForm({
     language: false,
   });
 
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    if (onInputChange) {
+      onInputChange(e);
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value,
+      });
+    }
+  };
+
+  const handleYearChange = (year: string) => {
+    if (onYearChange) {
+      onYearChange(year);
+    } else {
+      setFormData({
+        ...formData,
+        publication_year: year,
+      });
+    }
+  };
+
+  const handleCategorySelect = (categoryId: number) => {
+    const newCategoryIds = formData.category_ids.includes(categoryId)
+      ? formData.category_ids.filter((id) => id !== categoryId)
+      : [...formData.category_ids, categoryId];
+
+    if (onCategoryChange) {
+      onCategoryChange(newCategoryIds);
+    } else {
+      setFormData({
+        ...formData,
+        category_ids: newCategoryIds,
+      });
+    }
+  };
+
+  const handleRemoveCategory = (categoryId: number) => {
+    const newCategoryIds = formData.category_ids.filter(
+      (id) => id !== categoryId,
+    );
+
+    if (onCategoryChange) {
+      onCategoryChange(newCategoryIds);
+    } else {
+      setFormData({
+        ...formData,
+        category_ids: newCategoryIds,
+      });
+    }
+  };
+
   const handleValidationChange =
     (field: keyof FormErrors) => (isValid: boolean) => {
+      if (!isEditMode) return;
+
       const newErrors = { ...errors, [field]: !isValid };
       setErrors(newErrors);
 
@@ -92,129 +150,60 @@ export default function BookDetailForm({
       onValidationChange?.(hasErrors);
     };
 
-  const handleCategorySelect = (categoryId: number) => {
-    const newCategoryIds = formData.category_ids.includes(categoryId)
-      ? formData.category_ids.filter((id) => id !== categoryId)
-      : [...formData.category_ids, categoryId];
-    onCategoryChange(newCategoryIds);
-  };
-
-  const handleRemoveCategory = (categoryId: number) => {
-    onCategoryChange(formData.category_ids.filter((id) => id !== categoryId));
-  };
-
-  if (!isEditMode) {
-    return (
-      <Card className="lg:col-span-2">
-        <CardHeader>
-          <CardTitle>Book Information</CardTitle>
-          <CardDescription>Complete book details</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg">Basic Information</h3>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <p className="text-sm text-muted-foreground">Title</p>
-                <p className="font-medium">{book.title}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Author</p>
-                <p className="font-medium">{book.author}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Publisher</p>
-                <p className="font-medium">{book.publisher || "-"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Publication Year
-                </p>
-                <p className="font-medium">{book.publication_year || "-"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">ISBN</p>
-                <p className="font-medium">{book.isbn || "-"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Language</p>
-                <p className="font-medium">{book.language || "-"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Slug</p>
-                <p className="font-medium font-mono text-sm">{book.slug}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Copies</p>
-                <p className="font-medium">{book.copies?.length || 0}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg">Categories</h3>
-            {book.categories && book.categories.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {book.categories.map((category) => (
-                  <Badge key={category.id} variant="secondary">
-                    {category.name}
-                  </Badge>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground">No categories</p>
-            )}
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg">Description</h3>
-            <p className="whitespace-pre-line text-muted-foreground leading-relaxed">
-              {book.description || "No description available"}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
-        <CardTitle>Edit Book Information</CardTitle>
-        <CardDescription>Update book details</CardDescription>
+        <CardTitle>Book Information</CardTitle>
+        <CardDescription>
+          {isEditMode
+            ? "Edit book information correctly"
+            : "Complete book details"}
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">Basic Information</h3>
           <div className="space-y-2">
-            <Label htmlFor="title" variant="required">
+            <Label
+              htmlFor="title"
+              variant={isEditMode ? "required" : "default"}
+            >
               Title
             </Label>
             <Input
               id="title"
               name="title"
-              required
+              required={isEditMode}
               value={formData.title || ""}
-              onChange={onInputChange}
+              onChange={handleInputChange}
               placeholder="Enter book title"
-              validationType="alphanumeric"
-              onValidationChange={handleValidationChange("title")}
+              disabled={!isEditMode}
+              validationType={isEditMode ? "alphanumeric" : undefined}
+              onValidationChange={
+                isEditMode ? handleValidationChange("title") : undefined
+              }
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="author" variant="required">
+            <Label
+              htmlFor="author"
+              variant={isEditMode ? "required" : "default"}
+            >
               Author
             </Label>
             <Input
               id="author"
               name="author"
-              required
+              required={isEditMode}
               value={formData.author || ""}
-              onChange={onInputChange}
+              onChange={handleInputChange}
               placeholder="Enter author name"
-              validationType="letters-only"
-              onValidationChange={handleValidationChange("author")}
+              disabled={!isEditMode}
+              validationType={isEditMode ? "letters-only" : undefined}
+              onValidationChange={
+                isEditMode ? handleValidationChange("author") : undefined
+              }
             />
           </div>
 
@@ -225,10 +214,13 @@ export default function BookDetailForm({
                 id="publisher"
                 name="publisher"
                 value={formData.publisher || ""}
-                onChange={onInputChange}
+                onChange={handleInputChange}
                 placeholder="Enter publisher name"
-                validationType="alphanumeric"
-                onValidationChange={handleValidationChange("publisher")}
+                disabled={!isEditMode}
+                validationType={isEditMode ? "alphanumeric" : undefined}
+                onValidationChange={
+                  isEditMode ? handleValidationChange("publisher") : undefined
+                }
               />
             </div>
 
@@ -236,10 +228,11 @@ export default function BookDetailForm({
               <Label htmlFor="publication_year">Publication Year</Label>
               <YearPicker
                 value={formData.publication_year || ""}
-                onChange={onYearChange}
+                onChange={handleYearChange}
                 placeholder="Select year"
                 searchPlaceholder="Search year..."
                 emptyText="Year not found"
+                disabled={!isEditMode}
               />
             </div>
           </div>
@@ -251,10 +244,13 @@ export default function BookDetailForm({
                 id="isbn"
                 name="isbn"
                 value={formData.isbn || ""}
-                onChange={onInputChange}
+                onChange={handleInputChange}
                 placeholder="Enter ISBN number"
-                validationType="alphanumeric"
-                onValidationChange={handleValidationChange("isbn")}
+                disabled={!isEditMode}
+                validationType={isEditMode ? "alphanumeric" : undefined}
+                onValidationChange={
+                  isEditMode ? handleValidationChange("isbn") : undefined
+                }
               />
             </div>
 
@@ -264,10 +260,13 @@ export default function BookDetailForm({
                 id="language"
                 name="language"
                 value={formData.language || ""}
-                onChange={onInputChange}
+                onChange={handleInputChange}
                 placeholder="e.g., English, Indonesian"
-                validationType="letters-only"
-                onValidationChange={handleValidationChange("language")}
+                disabled={!isEditMode}
+                validationType={isEditMode ? "letters-only" : undefined}
+                onValidationChange={
+                  isEditMode ? handleValidationChange("language") : undefined
+                }
               />
             </div>
           </div>
@@ -283,6 +282,7 @@ export default function BookDetailForm({
                   type="button"
                   variant="outline"
                   className="w-full justify-start text-left font-normal"
+                  disabled={!isEditMode}
                 >
                   {formData.category_ids && formData.category_ids.length > 0
                     ? `${formData.category_ids.length} categories selected`
@@ -296,12 +296,15 @@ export default function BookDetailForm({
                     {categories.map((cat) => (
                       <CommandItem
                         key={cat.id}
-                        onSelect={() => handleCategorySelect(cat.id)}
+                        onSelect={() =>
+                          isEditMode && handleCategorySelect(cat.id)
+                        }
                         className="cursor-pointer"
                       >
                         <Checkbox
                           checked={formData.category_ids.includes(cat.id)}
                           className="mr-2"
+                          disabled={!isEditMode}
                         />
                         {cat.name}
                       </CommandItem>
@@ -318,20 +321,24 @@ export default function BookDetailForm({
                   return category ? (
                     <Badge key={id} variant="secondary" className="gap-1">
                       {category.name}
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleRemoveCategory(id);
-                        }}
-                        className="h-4 w-4 p-0 ml-1 hover:bg-muted rounded-full"
-                      >
-                        <X className="h-3 w-3" />
-                        <span className="sr-only">Remove {category.name}</span>
-                      </Button>
+                      {isEditMode && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleRemoveCategory(id);
+                          }}
+                          className="h-4 w-4 p-0 ml-1 hover:bg-muted rounded-full"
+                        >
+                          <X className="h-3 w-3" />
+                          <span className="sr-only">
+                            Remove {category.name}
+                          </span>
+                        </Button>
+                      )}
                     </Badge>
                   ) : null;
                 })}
@@ -348,10 +355,11 @@ export default function BookDetailForm({
               id="description"
               name="description"
               value={formData.description || ""}
-              onChange={onInputChange}
+              onChange={handleInputChange}
               placeholder="Enter book description"
               rows={10}
               className="resize-y"
+              disabled={!isEditMode}
             />
           </div>
         </div>

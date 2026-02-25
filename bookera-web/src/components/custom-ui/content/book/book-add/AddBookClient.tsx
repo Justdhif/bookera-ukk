@@ -147,6 +147,26 @@ export default function AddBookClient() {
     }));
   };
 
+  const isFormValid = (): boolean => {
+    const requiredFieldsFilled =
+      formData.title.trim() !== "" && formData.author.trim() !== "";
+
+    if (!requiredFieldsFilled) return false;
+
+    if (!coverImage && !coverPreview) return false;
+
+    const hasValidationErrors = Object.values(errors).some(
+      (error) => error === true,
+    );
+    if (hasValidationErrors) return false;
+
+    return true;
+  };
+
+  const isSubmitDisabled = (): boolean => {
+    return submitting || !isFormValid();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -222,12 +242,7 @@ export default function AddBookClient() {
           type="submit"
           form="book-form"
           variant="submit"
-          disabled={
-            submitting ||
-            !formData.title.trim() ||
-            !formData.author.trim() ||
-            Object.values(errors).some((error) => error === true)
-          }
+          disabled={isSubmitDisabled()}
           loading={submitting}
           className="h-8"
         >

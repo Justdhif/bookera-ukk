@@ -12,14 +12,10 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import UserAvatarCard from "./UserAvatarCard";
 import UserDetailForm from "./UserDetailForm";
-import { useTranslations } from "next-intl";
 
 export default function UserDetailClient() {
   const router = useRouter();
   const params = useParams();
-  const t = useTranslations('admin.users');
-  const tAdmin = useTranslations('admin.common');
-  const tCommon = useTranslations('common');
   const identificationNumber = params.identificationNumber as string;
 
   const [user, setUser] = useState<User | null>(null);
@@ -40,8 +36,14 @@ export default function UserDetailClient() {
     try {
       const res = await loanService.getAll();
       const userLoans = res.data.data
-        .filter((loan) => loan.user?.profile?.identification_number === identificationNumber)
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .filter(
+          (loan) =>
+            loan.user?.profile?.identification_number === identificationNumber,
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        )
         .slice(0, 3);
       setRecentLoans(userLoans);
     } catch (error) {
@@ -64,13 +66,14 @@ export default function UserDetailClient() {
         phone_number: res.data.data.profile.phone_number || undefined,
         address: res.data.data.profile.address || undefined,
         bio: res.data.data.profile.bio || undefined,
-        identification_number: res.data.data.profile.identification_number || undefined,
+        identification_number:
+          res.data.data.profile.identification_number || undefined,
         occupation: res.data.data.profile.occupation || undefined,
         institution: res.data.data.profile.institution || undefined,
       });
       setAvatarPreview(res.data.data.profile.avatar);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('loadError'));
+      toast.error(error.response?.data?.message || "Failed to load user data");
       router.push("/admin/users");
     } finally {
       setLoading(false);
@@ -81,19 +84,23 @@ export default function UserDetailClient() {
     e.preventDefault();
     if (!user) return;
 
-    if (!formData.email?.trim() || !formData.full_name?.trim() || !formData.role) {
-      toast.error(tCommon('pleaseCompleteRequiredFields'));
+    if (
+      !formData.email?.trim() ||
+      !formData.full_name?.trim() ||
+      !formData.role
+    ) {
+      toast.error("Please complete all required fields");
       return;
     }
 
     try {
       setSubmitting(true);
       await userService.update(user.id, formData as UpdateUserData);
-      toast.success(t('updateSuccess'));
+      toast.success("User updated successfully");
       setIsEditMode(false);
       fetchUser();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('updateError'));
+      toast.error(error.response?.data?.message || "Failed to update user");
     } finally {
       setSubmitting(false);
     }
@@ -153,9 +160,9 @@ export default function UserDetailClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{tCommon('userDetail')}</h1>
+            <h1 className="text-3xl font-bold">User Details</h1>
             <p className="text-muted-foreground">
-              {isEditMode ? tCommon('editUserInfo') : tCommon('viewUserDetail')}
+              {isEditMode ? "Edit user information" : "View user details"}
             </p>
           </div>
         </div>
@@ -169,17 +176,23 @@ export default function UserDetailClient() {
               className="h-8"
             >
               <X className="h-3.5 w-3.5 mr-1.5" />
-              {tAdmin('cancel')}
+              Cancel
             </Button>
             <Button
               type="submit"
               form="user-form"
               variant="submit"
-              disabled={submitting || !formData.email?.trim() || !formData.full_name?.trim() || !formData.role || !isFullNameValid}
+              disabled={
+                submitting ||
+                !formData.email?.trim() ||
+                !formData.full_name?.trim() ||
+                !formData.role ||
+                !isFullNameValid
+              }
               loading={submitting}
               className="h-8"
             >
-              {submitting ? tCommon('saving') : tCommon('saveChanges')}
+              {submitting ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         ) : (
@@ -189,7 +202,7 @@ export default function UserDetailClient() {
             className="h-8 gap-1"
           >
             <Edit2 className="h-3.5 w-3.5" />
-            {t('editUser')}
+            Edit User
           </Button>
         )}
       </div>
@@ -205,7 +218,7 @@ export default function UserDetailClient() {
             setAvatarPreview={setAvatarPreview}
             recentLoans={recentLoans}
           />
-          
+
           <UserDetailForm
             user={user}
             isEditMode={isEditMode}

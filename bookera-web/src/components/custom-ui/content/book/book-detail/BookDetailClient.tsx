@@ -52,6 +52,7 @@ export default function BookDetailClient() {
   const [coverPreview, setCoverPreview] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [coverError, setCoverError] = useState(false);
+  const [formHasErrors, setFormHasErrors] = useState(false);
 
   useEffect(() => {
     fetchBook();
@@ -92,6 +93,23 @@ export default function BookDetailClient() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const isFormValid = (): boolean => {
+    const requiredFieldsFilled =
+      formData.title?.trim() !== "" && formData.author?.trim() !== "";
+
+    if (!requiredFieldsFilled) return false;
+
+    if (coverError) return false;
+
+    if (formHasErrors) return false;
+
+    return true;
+  };
+
+  const isSubmitDisabled = (): boolean => {
+    return submitting || !isFormValid();
   };
 
   const handleInputChange = (
@@ -136,6 +154,10 @@ export default function BookDetailClient() {
 
   const handleCoverValidationChange = (isValid: boolean) => {
     setCoverError(!isValid);
+  };
+
+  const handleFormValidationChange = (hasErrors: boolean) => {
+    setFormHasErrors(hasErrors);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -201,6 +223,7 @@ export default function BookDetailClient() {
       });
       setCoverPreview(book.cover_image_url || "");
       setCoverError(false);
+      setFormHasErrors(false);
     }
     setIsEditMode(false);
   };
@@ -267,12 +290,7 @@ export default function BookDetailClient() {
               type="submit"
               form="book-form"
               variant="submit"
-              disabled={
-                submitting ||
-                !formData.title?.trim() ||
-                !formData.author?.trim() ||
-                coverError
-              }
+              disabled={isSubmitDisabled()}
               loading={submitting}
               className="h-8"
             >
@@ -297,6 +315,7 @@ export default function BookDetailClient() {
             coverPreview={coverPreview}
             isEditMode={isEditMode}
             formData={{ is_active: formData.is_active }}
+            setFormData={setFormData}
             onCoverImageChange={handleCoverImageChange}
             onSwitchChange={handleSwitchChange}
             isCoverRequired={false}
@@ -308,10 +327,12 @@ export default function BookDetailClient() {
             book={book}
             isEditMode={isEditMode}
             formData={formData}
+            setFormData={setFormData}
             onInputChange={handleInputChange}
             onYearChange={handleYearChange}
             onCategoryChange={handleCategoryChange}
             categories={categories}
+            onValidationChange={handleFormValidationChange}
           />
         </div>
       </form>

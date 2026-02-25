@@ -13,9 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "@/types/user";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { Users, Eye, Trash2 } from "lucide-react";
+import { Users, Eye, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 
 interface Props {
   data: User[];
@@ -24,14 +23,12 @@ interface Props {
 
 export default function UserTable({ data, onDelete }: Props) {
   const router = useRouter();
-  const t = useTranslations('admin.users');
-  const tCommon = useTranslations('admin.common');
 
   if (data.length === 0) {
     return (
       <EmptyState
-        title={t('noUsers')}
-        description={t('noUsersDesc')}
+        title="No users found"
+        description="Get started by adding your first user"
         icon={<Users className="h-10 w-10" />}
       />
     );
@@ -40,22 +37,26 @@ export default function UserTable({ data, onDelete }: Props) {
   const getRoleBadge = (role: string) => {
     const variants = {
       admin: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
-      "officer:catalog": "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
-      "officer:management": "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+      "officer:catalog":
+        "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
+      "officer:management":
+        "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
       officer: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
       user: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
     };
-    
+
     const roleLabels = {
       admin: "ADMIN",
-      "officer:catalog": t('officerCatalog').toUpperCase(),
-      "officer:management": t('officerManagement').toUpperCase(),
-      officer: t('officer').toUpperCase(),
+      "officer:catalog": "CATALOG OFFICER",
+      "officer:management": "MANAGEMENT OFFICER",
+      officer: "OFFICER",
       user: "USER",
     };
-    
+
     return (
-      <Badge className={variants[role as keyof typeof variants] || variants.user}>
+      <Badge
+        className={variants[role as keyof typeof variants] || variants.user}
+      >
         {roleLabels[role as keyof typeof roleLabels] || role.toUpperCase()}
       </Badge>
     );
@@ -67,12 +68,14 @@ export default function UserTable({ data, onDelete }: Props) {
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="w-16 text-center font-semibold">#</TableHead>
-            <TableHead className="font-semibold">{t('user')}</TableHead>
-            <TableHead className="font-semibold">{t('email')}</TableHead>
-            <TableHead className="font-semibold">{t('role')}</TableHead>
-            <TableHead className="font-semibold">{t('occupation')}</TableHead>
-            <TableHead className="font-semibold">{t('status')}</TableHead>
-            <TableHead className="font-semibold text-right pr-6">{tCommon('actions')}</TableHead>
+            <TableHead className="font-semibold">User</TableHead>
+            <TableHead className="font-semibold">Email</TableHead>
+            <TableHead className="font-semibold">Role</TableHead>
+            <TableHead className="font-semibold">Occupation</TableHead>
+            <TableHead className="font-semibold">Status</TableHead>
+            <TableHead className="font-semibold text-right pr-6">
+              Actions
+            </TableHead>
           </TableRow>
         </TableHeader>
 
@@ -92,10 +95,9 @@ export default function UserTable({ data, onDelete }: Props) {
                     <AvatarImage
                       src={item.profile.avatar}
                       alt={item.profile.full_name}
+                      className="object-cover"
                     />
-                    <AvatarFallback>
-                      {item.profile.full_name[0]}
-                    </AvatarFallback>
+                    <AvatarFallback>{item.profile.full_name[0]}</AvatarFallback>
                   </Avatar>
                   <div>
                     <div className="font-medium text-foreground">
@@ -109,7 +111,9 @@ export default function UserTable({ data, onDelete }: Props) {
               </TableCell>
 
               <TableCell>
-                <span className="font-medium text-foreground">{item.email}</span>
+                <span className="font-medium text-foreground">
+                  {item.email}
+                </span>
               </TableCell>
 
               <TableCell>{getRoleBadge(item.role)}</TableCell>
@@ -123,13 +127,13 @@ export default function UserTable({ data, onDelete }: Props) {
               <TableCell>
                 <Badge
                   variant={item.is_active ? "default" : "secondary"}
-                  className={
+                  className={`text-white ${
                     item.is_active
                       ? "bg-green-600 hover:bg-green-700"
                       : "bg-gray-500 hover:bg-gray-600"
-                  }
+                  }`}
                 >
-                  {item.is_active ? tCommon('active') : tCommon('inactive')}
+                  {item.is_active ? "Active" : "Inactive"}
                 </Badge>
               </TableCell>
 
@@ -140,13 +144,13 @@ export default function UserTable({ data, onDelete }: Props) {
                     variant="outline"
                     onClick={() =>
                       router.push(
-                        `/admin/users/${item.profile.identification_number}`
+                        `/admin/users/${item.profile.identification_number}`,
                       )
                     }
                     className="h-8 gap-1"
                   >
                     <Eye className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{tCommon('view')}</span>
+                    <span className="hidden sm:inline">View</span>
                   </Button>
 
                   <Button
@@ -155,8 +159,8 @@ export default function UserTable({ data, onDelete }: Props) {
                     onClick={() => onDelete(item.id)}
                     className="h-8 gap-1"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{tCommon('delete')}</span>
+                    <Trash className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Delete</span>
                   </Button>
                 </div>
               </TableCell>

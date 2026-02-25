@@ -99,6 +99,15 @@ export default function BookClient() {
     fetchBooks();
   };
 
+  const handleFilterChange = (
+    value: Record<string, string | number[] | undefined>,
+  ) => {
+    setFilters((prev) => ({
+      ...prev,
+      ...value,
+    }));
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
@@ -123,12 +132,8 @@ export default function BookClient() {
 
       <BookFilter
         categories={categories}
-        onChange={(value) =>
-          setFilters((prev) => ({
-            ...prev,
-            ...value,
-          }))
-        }
+        onChange={handleFilterChange}
+        isLoading={loading}
       />
 
       {loading ? (

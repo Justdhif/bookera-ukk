@@ -20,7 +20,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
-import { useTranslations } from "next-intl";
 
 interface UserDetailFormProps {
   user: User;
@@ -37,15 +36,6 @@ export default function UserDetailForm({
   setFormData,
   onFullNameValidChange,
 }: UserDetailFormProps) {
-  const t = useTranslations('common');
-  const tAdmin = useTranslations('admin.common');
-
-  const errorMessages = {
-    'letters-only': t('validationLettersOnly'),
-    'numbers-only': t('validationNumbersOnly'),
-    'alphanumeric': t('validationAlphanumeric'),
-  };
-
   useEffect(() => {
     if (isEditMode && onFullNameValidChange) {
       const val = formData.full_name || "";
@@ -57,19 +47,20 @@ export default function UserDetailForm({
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
-        <CardTitle>{t('userInfo')}</CardTitle>
+        <CardTitle>User Information</CardTitle>
         <CardDescription>
-          {isEditMode
-            ? t('editUserCorrectly')
-            : t('fullUserDetail')}
+          {isEditMode ? "Edit user information correctly" : "Full user details"}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">{t('account')}</h3>
+          <h3 className="font-semibold text-lg">Account</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="email" variant={isEditMode ? "required" : "default"}>
+              <Label
+                htmlFor="email"
+                variant={isEditMode ? "required" : "default"}
+              >
                 Email
               </Label>
               <Input
@@ -80,7 +71,7 @@ export default function UserDetailForm({
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                placeholder={t('emailPlaceholder')}
+                placeholder="Enter email"
                 disabled={!isEditMode}
               />
             </div>
@@ -97,7 +88,7 @@ export default function UserDetailForm({
                       password: e.target.value,
                     })
                   }
-                  placeholder={t('passwordPlaceholder')}
+                  placeholder="Enter password (leave empty to keep current)"
                 />
               </div>
             )}
@@ -105,11 +96,14 @@ export default function UserDetailForm({
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">{t('profile')}</h3>
+          <h3 className="font-semibold text-lg">Profile</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="full_name" variant={isEditMode ? "required" : "default"}>
-                Nama Lengkap
+              <Label
+                htmlFor="full_name"
+                variant={isEditMode ? "required" : "default"}
+              >
+                Full Name
               </Label>
               <Input
                 id="full_name"
@@ -121,15 +115,18 @@ export default function UserDetailForm({
                     full_name: e.target.value,
                   })
                 }
-                placeholder={t('namePlaceholder')}
+                placeholder="Enter full name"
                 disabled={!isEditMode}
                 validationType={isEditMode ? "letters-only" : undefined}
-                onValidationChange={isEditMode ? onFullNameValidChange : undefined}
-                errorMessage={isEditMode ? errorMessages : undefined}
+                onValidationChange={
+                  isEditMode ? onFullNameValidChange : undefined
+                }
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="identification_number">Nomor Identitas</Label>
+              <Label htmlFor="identification_number">
+                Identification Number
+              </Label>
               <Input
                 id="identification_number"
                 value={formData.identification_number || ""}
@@ -139,14 +136,13 @@ export default function UserDetailForm({
                     identification_number: e.target.value,
                   })
                 }
-                placeholder={t('idNumberPlaceholder')}
+                placeholder="Enter identification number"
                 disabled={!isEditMode}
                 validationType={!isEditMode ? undefined : "numbers-only"}
-                errorMessage={!isEditMode ? undefined : errorMessages}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone_number">Nomor Telepon</Label>
+              <Label htmlFor="phone_number">Phone Number</Label>
               <Input
                 id="phone_number"
                 value={formData.phone_number || ""}
@@ -156,14 +152,13 @@ export default function UserDetailForm({
                     phone_number: e.target.value,
                   })
                 }
-                placeholder={t('phonePlaceholder')}
+                placeholder="Enter phone number"
                 disabled={!isEditMode}
                 validationType={!isEditMode ? undefined : "numbers-only"}
-                errorMessage={!isEditMode ? undefined : errorMessages}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="gender">Jenis Kelamin</Label>
+              <Label htmlFor="gender">Gender</Label>
               <Select
                 value={formData.gender || ""}
                 onValueChange={(value: any) =>
@@ -172,28 +167,30 @@ export default function UserDetailForm({
                 disabled={!isEditMode}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={t('selectGender')} />
+                  <SelectValue placeholder="Select gender" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="male">{t('male')}</SelectItem>
-                  <SelectItem value="female">{t('female')}</SelectItem>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
                   <SelectItem value="prefer_not_to_say">
-                    {t('preferNotToSay')}
+                    Prefer not to say
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="birth_date">Tanggal Lahir</Label>
+              <Label htmlFor="birth_date">Birth Date</Label>
               <DatePicker
                 value={
-                  formData.birth_date ? new Date(formData.birth_date + 'T00:00:00') : undefined
+                  formData.birth_date
+                    ? new Date(formData.birth_date + "T00:00:00")
+                    : undefined
                 }
                 onChange={(date) => {
                   if (date) {
                     const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, "0");
+                    const day = String(date.getDate()).padStart(2, "0");
                     setFormData({
                       ...formData,
                       birth_date: `${year}-${month}-${day}`,
@@ -205,13 +202,13 @@ export default function UserDetailForm({
                     });
                   }
                 }}
-                placeholder={t('selectBirthDate')}
+                placeholder="Select birth date"
                 disabled={!isEditMode}
                 dateMode="past"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="occupation">Pekerjaan</Label>
+              <Label htmlFor="occupation">Occupation</Label>
               <Input
                 id="occupation"
                 value={formData.occupation || ""}
@@ -221,14 +218,13 @@ export default function UserDetailForm({
                     occupation: e.target.value,
                   })
                 }
-                placeholder={t('occupationPlaceholder')}
+                placeholder="Enter occupation"
                 disabled={!isEditMode}
                 validationType={!isEditMode ? undefined : "letters-only"}
-                errorMessage={!isEditMode ? undefined : errorMessages}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="institution">Institusi</Label>
+              <Label htmlFor="institution">Institution</Label>
               <Input
                 id="institution"
                 value={formData.institution || ""}
@@ -238,14 +234,13 @@ export default function UserDetailForm({
                     institution: e.target.value,
                   })
                 }
-                placeholder={t('classPlaceholder')}
+                placeholder="Enter institution"
                 disabled={!isEditMode}
                 validationType={!isEditMode ? undefined : "alphanumeric"}
-                errorMessage={!isEditMode ? undefined : errorMessages}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="address">{t('address')}</Label>
+              <Label htmlFor="address">Address</Label>
               <Textarea
                 id="address"
                 value={formData.address || ""}
@@ -255,20 +250,20 @@ export default function UserDetailForm({
                     address: e.target.value,
                   })
                 }
-                placeholder={t('addressPlaceholder')}
+                placeholder="Enter address"
                 rows={2}
                 disabled={!isEditMode}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="bio">{t('bio')}</Label>
+              <Label htmlFor="bio">Bio</Label>
               <Textarea
                 id="bio"
                 value={formData.bio || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, bio: e.target.value })
                 }
-                placeholder={t('bioPlaceholder')}
+                placeholder="Enter bio"
                 rows={3}
                 disabled={!isEditMode}
               />
