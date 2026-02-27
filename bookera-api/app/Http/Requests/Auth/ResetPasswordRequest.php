@@ -5,7 +5,7 @@ namespace App\Http\Requests\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
-class RegisterRequest extends FormRequest
+class ResetPasswordRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,7 +15,8 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email|exists:users,email',
+            'token' => 'required|string',
             'password' => [
                 'required',
                 'confirmed',
@@ -32,8 +33,9 @@ class RegisterRequest extends FormRequest
         return [
             'email.required' => 'Email harus diisi',
             'email.email' => 'Format email tidak valid',
-            'email.unique' => 'Email sudah terdaftar',
-            'password.required' => 'Password harus diisi',
+            'email.exists' => 'Email tidak terdaftar',
+            'token.required' => 'Token reset password harus diisi',
+            'password.required' => 'Password baru harus diisi',
             'password.confirmed' => 'Konfirmasi password tidak sesuai',
             'password.min' => 'Password minimal 8 karakter',
             'password.mixed_case' => 'Password harus mengandung huruf besar dan kecil',

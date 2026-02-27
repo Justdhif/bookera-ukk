@@ -35,6 +35,15 @@ Route::get('/test', function () {
     ]);
 });
 
+Route::get('/test-smtp', function () {
+    Mail::raw('SMTP berhasil terkoneksi', function ($message) {
+        $message->to('noob1234five@gmail.com')
+                ->subject('Test SMTP Laravel');
+    });
+
+    return 'Email berhasil dikirim';
+});
+
 Route::get('books', [BookController::class, 'index']);
 Route::get('books/slug/{slug}', [BookController::class, 'showBySlug']);
 Route::get('books/{id}', [BookController::class, 'show']);
@@ -55,11 +64,13 @@ Route::get('privacy-policies/{privacyPolicy}', [PrivacyPolicyController::class, 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/setup-profile', [AuthController::class, 'setupProfile']);
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('/setup-profile', [AuthController::class, 'setupProfile']);
     });
 });
 

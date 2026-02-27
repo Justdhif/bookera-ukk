@@ -13,17 +13,14 @@ import { Input } from "@/components/ui/input";
 import { LoanCard } from "./LoanCard";
 import { LoanRejectDialog } from "./LoanRejectDialog";
 import { LoanSkeletonCard } from "./LoanSkeletonCard";
-import { useTranslations } from "next-intl";
 
 export default function LoanClient() {
   const router = useRouter();
-  const t = useTranslations('admin.loans');
-  const tStatus = useTranslations('status');
-  const tCommon = useTranslations('common');
-  const tAdmin = useTranslations('admin.common');
   const [allLoans, setAllLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(false);
-  const [actionLoading, setActionLoading] = useState<number | null | string>(null);
+  const [actionLoading, setActionLoading] = useState<number | null | string>(
+    null,
+  );
   const [searchQuery, setSearchQuery] = useState("");
 
   // Dialog states
@@ -42,7 +39,7 @@ export default function LoanClient() {
       const allRes = await loanService.getAll(searchQuery);
       setAllLoans(allRes.data.data);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('loadError'));
+      toast.error(error.response?.data?.message || "Failed to load loans");
     } finally {
       setLoading(false);
     }
@@ -56,10 +53,10 @@ export default function LoanClient() {
     setActionLoading(loanId);
     try {
       const response = await loanService.approveLoan(loanId);
-      toast.success(response.data.message || t('approveSuccess'));
+      toast.success(response.data.message || "Loan approved successfully");
       fetchAllData();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('approveError'));
+      toast.error(error.response?.data?.message || "Failed to approve loan");
     } finally {
       setActionLoading(null);
     }
@@ -73,11 +70,11 @@ export default function LoanClient() {
       const response = await loanService.rejectLoan(rejectDialog.loan.id, {
         rejection_reason: rejectionReason,
       });
-      toast.success(response.data.message || t('rejectSuccess'));
+      toast.success(response.data.message || "Loan rejected successfully");
       setRejectDialog({ open: false, loan: null });
       fetchAllData();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('rejectError'));
+      toast.error(error.response?.data?.message || "Failed to reject loan");
     } finally {
       setActionLoading(null);
     }
@@ -90,7 +87,9 @@ export default function LoanClient() {
       toast.success(response.data.message || "Book copy approved successfully");
       fetchAllData();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to approve book copy");
+      toast.error(
+        error.response?.data?.message || "Failed to approve book copy",
+      );
     } finally {
       setActionLoading(null);
     }
@@ -103,7 +102,9 @@ export default function LoanClient() {
       toast.success(response.data.message || "Book copy rejected successfully");
       fetchAllData();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to reject book copy");
+      toast.error(
+        error.response?.data?.message || "Failed to reject book copy",
+      );
     } finally {
       setActionLoading(null);
     }
@@ -113,14 +114,10 @@ export default function LoanClient() {
     setActionLoading(loanId);
     try {
       const response = await loanService.markAsBorrowed(loanId);
-      toast.success(
-        response.data.message || t('statusChangedToBorrowed'),
-      );
+      toast.success(response.data.message || "Status changed to borrowed");
       fetchAllData();
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || t('failedChangeStatus'),
-      );
+      toast.error(error.response?.data?.message || "Failed to change status");
     } finally {
       setActionLoading(null);
     }
@@ -131,8 +128,8 @@ export default function LoanClient() {
       return (
         <EmptyState
           icon={<Package className="h-16 w-16" />}
-          title={tCommon('noLoans')}
-          description={tCommon('noLoansDesc')}
+          title="No Loans Found"
+          description="There are no loans to display at the moment."
         />
       );
     }
@@ -169,23 +166,25 @@ export default function LoanClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">{tCommon('loanManagement')}</h1>
+          <h1 className="text-3xl font-bold">Loan Management</h1>
           <p className="text-muted-foreground">
-            {tCommon('manageLoanApproval')}
+            Manage loan approvals and track borrowing activities
           </p>
         </div>
-        <Button onClick={() => router.push('/admin/loans/create')} variant="brand">
+        <Button
+          onClick={() => router.push("/admin/loans/create")}
+          variant="brand"
+        >
           <Plus className="h-4 w-4" />
-          {tCommon('requestLoan')}
+          Request Loan
         </Button>
       </div>
 
-      {/* Search Bar */}
       <div className="flex gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={tCommon('searchLoanUserTitle')}
+            placeholder="Search by user or title..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -194,13 +193,13 @@ export default function LoanClient() {
         </div>
         <Button onClick={handleSearch} variant="secondary">
           <Search className="h-4 w-4 mr-2" />
-          {tAdmin('search')}
+          Search
         </Button>
       </div>
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">{tCommon('allLoans')} ({allLoans.length})</TabsTrigger>
+          <TabsTrigger value="all">All Loans ({allLoans.length})</TabsTrigger>
           <TabsTrigger value="pending">
             Pending ({pendingLoans.length})
           </TabsTrigger>
@@ -225,9 +224,9 @@ export default function LoanClient() {
         <TabsContent value="all" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold">{tCommon('allLoans')}</h3>
+              <h3 className="text-lg font-semibold">All Loans</h3>
               <p className="text-sm text-muted-foreground">
-                {tCommon('noLoansDesc')}
+                View and manage all loan transactions
               </p>
             </div>
             {loading ? (
@@ -247,7 +246,7 @@ export default function LoanClient() {
             <div>
               <h3 className="text-lg font-semibold">Pending</h3>
               <p className="text-sm text-muted-foreground">
-                Peminjaman dengan status pending
+                Loans waiting for approval
               </p>
             </div>
             {loading ? (
@@ -267,7 +266,7 @@ export default function LoanClient() {
             <div>
               <h3 className="text-lg font-semibold">Waiting</h3>
               <p className="text-sm text-muted-foreground">
-                Peminjaman dengan status waiting
+                Approved loans waiting for pickup
               </p>
             </div>
             {loading ? (
@@ -287,7 +286,7 @@ export default function LoanClient() {
             <div>
               <h3 className="text-lg font-semibold">Borrowed</h3>
               <p className="text-sm text-muted-foreground">
-                Peminjaman dengan status borrowed (sedang dipinjam)
+                Currently borrowed books
               </p>
             </div>
             {loading ? (
@@ -307,7 +306,7 @@ export default function LoanClient() {
             <div>
               <h3 className="text-lg font-semibold">Checking</h3>
               <p className="text-sm text-muted-foreground">
-                Peminjaman yang sedang di-check untuk pengembalian
+                Loans being checked for return
               </p>
             </div>
             {loading ? (
@@ -327,7 +326,7 @@ export default function LoanClient() {
             <div>
               <h3 className="text-lg font-semibold">Returned</h3>
               <p className="text-sm text-muted-foreground">
-                Peminjaman yang sudah dikembalikan
+                Completed loans that have been returned
               </p>
             </div>
             {loading ? (
@@ -345,9 +344,9 @@ export default function LoanClient() {
         <TabsContent value="rejected" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold">{tStatus('rejected')}</h3>
+              <h3 className="text-lg font-semibold">Rejected</h3>
               <p className="text-sm text-muted-foreground">
-                {t('rejectedLoansDesc')}
+                Loans that have been rejected
               </p>
             </div>
             {loading ? (
@@ -367,7 +366,7 @@ export default function LoanClient() {
             <div>
               <h3 className="text-lg font-semibold">Late</h3>
               <p className="text-sm text-muted-foreground">
-                Peminjaman yang terlambat dikembalikan
+                Overdue loans that need attention
               </p>
             </div>
             {loading ? (
@@ -383,7 +382,6 @@ export default function LoanClient() {
         </TabsContent>
       </Tabs>
 
-      {/* Reject Dialog */}
       <LoanRejectDialog
         open={rejectDialog.open}
         loan={rejectDialog.loan}

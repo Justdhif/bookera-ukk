@@ -11,7 +11,6 @@ import { User } from "@/types/user";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useTranslations } from "next-intl";
 import BookSelectorCard from "./BookSelectorCard";
 import BookCopySelectorCard from "./BookCopySelectorCard";
 import DueDateCard from "./DueDateCard";
@@ -19,15 +18,14 @@ import UserSelectorCard from "./UserSelectorCard";
 
 export default function CreateLoanClient() {
   const router = useRouter();
-  const t = useTranslations("common");
 
   const [loading, setLoading] = useState(false);
   const [books, setBooks] = useState<Book[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [selectedUser, setSelectedUser] = useState<number | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const [selectedBooks, setSelectedBooks] = useState<Book[]>([]);
-  const [selectedCopies, setSelectedCopies] = useState<number[]>([]);
+  const [selectedCopyIds, setSelectedCopyIds] = useState<number[]>([]);
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [userPopoverOpen, setUserPopoverOpen] = useState(false);
 
@@ -45,7 +43,7 @@ export default function CreateLoanClient() {
       const booksData = response.data.data?.data || response.data.data;
       setBooks(Array.isArray(booksData) ? booksData : []);
     } catch {
-      toast.error(t("failedToLoadBookList"));
+      toast.error("Failed to load book list");
       setBooks([]);
     }
   };
@@ -56,7 +54,7 @@ export default function CreateLoanClient() {
       const usersData = response.data.data;
       setUsers(Array.isArray(usersData) ? usersData : []);
     } catch {
-      toast.error(t("failedToLoadUserList"));
+      toast.error("Failed to load user list");
       setUsers([]);
     }
   };
@@ -69,51 +67,60 @@ export default function CreateLoanClient() {
   }, []);
 
   useEffect(() => {
-    setSelectedCopies((prevCopies) => {
+    setSelectedCopyIds((prev) => {
       const allowedCopyIds = new Set(
         selectedBooks.flatMap((b) => b.copies?.map((c) => c.id) ?? []),
       );
-      return prevCopies.filter((id) => allowedCopyIds.has(id));
+      return prev.filter((id) => allowedCopyIds.has(id));
     });
   }, [selectedBooks]);
 
   const handleCopyToggle = useCallback((copyId: number) => {
-    setSelectedCopies((prev) =>
+    setSelectedCopyIds((prev) =>
       prev.includes(copyId)
         ? prev.filter((id) => id !== copyId)
         : [...prev, copyId],
     );
   }, []);
 
+  const handleDueDateChange = useCallback((date: Date | undefined) => {
+    setDueDate(date);
+  }, []);
+
+  const handleUserSelect = useCallback((userId: number) => {
+    setSelectedUserId(userId);
+    setUserPopoverOpen(false);
+  }, []);
+
   const handleSubmit = async () => {
-    if (!selectedUser) {
-      toast.error(t("selectUserToBorrow"));
+    if (!selectedUserId) {
+      toast.error("Please select a user to borrow books");
       return;
     }
 
-    if (selectedCopies.length === 0) {
-      toast.error(t("selectAtLeastOneBookCopy"));
+    if (selectedCopyIds.length === 0) {
+      toast.error("Please select at least one book copy");
       return;
     }
 
     if (!dueDate) {
-      toast.error(t("selectDueDate"));
+      toast.error("Please select a due date");
       return;
     }
 
     try {
       setLoading(true);
       const response = await loanService.createAdminLoan({
-        user_id: selectedUser,
-        book_copy_ids: selectedCopies,
+        user_id: selectedUserId,
+        book_copy_ids: selectedCopyIds,
         due_date: dueDate.toISOString().split("T")[0],
       });
 
-      toast.success(response.data.message || t("loanCreatedSuccessfully"));
+      toast.success(response.data.message || "Loan created successfully");
       router.push("/admin/loans");
     } catch (error: any) {
       const errorMessage =
-        error.response?.data?.message || t("failedToCreateLoan");
+        error.response?.data?.message || "Failed to create loan";
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -143,9 +150,9 @@ export default function CreateLoanClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{t("createNewLoan")}</h1>
+            <h1 className="text-3xl font-bold">Create New Loan</h1>
             <p className="text-muted-foreground">
-              {t("selectUserAndBooksDesc")}
+              Select a user and books to create a new loan
             </p>
           </div>
         </div>
@@ -154,21 +161,24 @@ export default function CreateLoanClient() {
           onClick={handleSubmit}
           variant="submit"
           disabled={
-            loading || !selectedUser || selectedCopies.length === 0 || !dueDate
+            loading ||
+            !selectedUserId ||
+            selectedCopyIds.length === 0 ||
+            !dueDate
           }
           loading={loading}
           className="h-8"
         >
-          {t("createLoan")}
+          Create Loan
         </Button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3 flex-1 overflow-hidden min-h-0">
-        <div className="lg:col-span-1 space-y-6 overflow-y-auto">
+        <div className="lg:col-span-1 space-y-6 overflow-y-auto scrollbar-hide">
           <UserSelectorCard
             users={users}
-            selectedUser={selectedUser}
-            onSelectUser={setSelectedUser}
+            selectedUserId={selectedUserId}
+            onSelectUser={handleUserSelect}
             popoverOpen={userPopoverOpen}
             onPopoverOpenChange={setUserPopoverOpen}
           />
@@ -179,13 +189,13 @@ export default function CreateLoanClient() {
             onBookToggle={handleBookToggle}
           />
 
-          <DueDateCard value={dueDate} onChange={setDueDate} />
+          <DueDateCard value={dueDate} onChange={handleDueDateChange} />
         </div>
 
         <div className="lg:col-span-2 min-h-0">
           <BookCopySelectorCard
             selectedBooks={selectedBooks}
-            selectedCopies={selectedCopies}
+            selectedCopyIds={selectedCopyIds}
             onCopyToggle={handleCopyToggle}
           />
         </div>

@@ -1,18 +1,34 @@
 "use client";
 
 import { User } from "@/types/user";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { User as UserIcon, ChevronsUpDown, Check } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 interface UserSelectorCardProps {
   users: User[];
-  selectedUser: number | null;
+  selectedUserId: number | null;
   onSelectUser: (userId: number) => void;
   popoverOpen: boolean;
   onPopoverOpenChange: (open: boolean) => void;
@@ -20,13 +36,12 @@ interface UserSelectorCardProps {
 
 export default function UserSelectorCard({
   users,
-  selectedUser,
+  selectedUserId,
   onSelectUser,
   popoverOpen,
   onPopoverOpenChange,
 }: UserSelectorCardProps) {
-  const t = useTranslations("common");
-  const selectedUserData = users.find((u) => u.id === selectedUser);
+  const selectedUser = users.find((u) => u.id === selectedUserId);
 
   return (
     <Card>
@@ -34,10 +49,10 @@ export default function UserSelectorCard({
         <Label variant="required">
           <CardTitle className="flex items-center gap-2">
             <UserIcon className="h-5 w-5" />
-            {t("selectUser")}
+            Select User
           </CardTitle>
         </Label>
-        <CardDescription>{t("userRequired")}</CardDescription>
+        <CardDescription>User is required to create a loan</CardDescription>
       </CardHeader>
       <CardContent>
         <Popover open={popoverOpen} onOpenChange={onPopoverOpenChange}>
@@ -54,24 +69,24 @@ export default function UserSelectorCard({
                   </div>
                   <div className="text-left">
                     <div className="font-medium">
-                      {selectedUserData?.profile?.full_name}
+                      {selectedUser.profile?.full_name}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {selectedUserData?.email}
+                      {selectedUser.email}
                     </div>
                   </div>
                 </div>
               ) : (
-                t("selectUser")
+                "Select User"
               )}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-125 p-0">
             <Command>
-              <CommandInput placeholder={t("searchUser")} />
+              <CommandInput placeholder="Search user..." />
               <CommandList>
-                <CommandEmpty>{t("noUserFound")}</CommandEmpty>
+                <CommandEmpty>No user found</CommandEmpty>
                 <CommandGroup>
                   {users
                     .filter((user) => user.is_active && user.role !== "admin")
@@ -79,17 +94,14 @@ export default function UserSelectorCard({
                       <CommandItem
                         key={user.id}
                         value={`${user.profile?.full_name} ${user.email}`}
-                        onSelect={() => {
-                          onSelectUser(user.id);
-                          onPopoverOpenChange(false);
-                        }}
+                        onSelect={() => onSelectUser(user.id)}
                       >
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            selectedUser === user.id
+                            selectedUserId === user.id
                               ? "opacity-100"
-                              : "opacity-0"
+                              : "opacity-0",
                           )}
                         />
                         <div className="flex items-center gap-3">

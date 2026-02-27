@@ -1,9 +1,14 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
-import { useTranslations } from "next-intl";
 
 interface DueDateCardProps {
   value: Date | undefined;
@@ -11,21 +16,21 @@ interface DueDateCardProps {
 }
 
 export default function DueDateCard({ value, onChange }: DueDateCardProps) {
-  const t = useTranslations("common");
-
   return (
     <Card>
       <CardHeader>
         <Label variant="required">
-          <CardTitle>{t("dueDate")}</CardTitle>
+          <CardTitle>Due Date</CardTitle>
         </Label>
-        <CardDescription>{t("selectReturnDate")}</CardDescription>
+        <CardDescription>
+          Select the return due date for the loan
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <DatePicker
           value={value}
           onChange={onChange}
-          placeholder={t("selectReturnDate")}
+          placeholder="Select return date"
           dateMode="future"
         />
       </CardContent>

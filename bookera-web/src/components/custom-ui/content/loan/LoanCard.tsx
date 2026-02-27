@@ -21,7 +21,6 @@ import {
   XCircleIcon,
   AlertCircle,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 import { useState } from "react";
 import {
@@ -61,16 +60,15 @@ export function LoanCard({
     detail: LoanDetail | null;
   }>({ open: false, detail: null });
   const [rejectNote, setRejectNote] = useState("");
-  const t = useTranslations('loans');
-  const tStatus = useTranslations('status');
+
   const getStatusBadge = (status: Loan["status"]) => {
     const variants: Record<
       Loan["status"],
-      { 
-        variant: any; 
-        label: string; 
+      {
+        variant: any;
+        label: string;
         icon: React.ReactNode;
-        className?: string 
+        className?: string;
       }
     > = {
       pending: {
@@ -103,13 +101,13 @@ export function LoanCard({
         icon: <CheckCircle className="h-3 w-3 mr-1" />,
         className: "bg-gray-100 text-gray-800 hover:bg-gray-100",
       },
-      rejected: { 
-        variant: "destructive", 
+      rejected: {
+        variant: "destructive",
         label: "Rejected",
         icon: <XCircleIcon className="h-3 w-3 mr-1" />,
       },
-      late: { 
-        variant: "destructive", 
+      late: {
+        variant: "destructive",
         label: "Late",
         icon: <AlertCircle className="h-3 w-3 mr-1" />,
       },
@@ -137,11 +135,11 @@ export function LoanCard({
   const getApprovalBadge = (status: Loan["approval_status"]) => {
     const variants: Record<
       Loan["approval_status"],
-      { 
-        variant: any; 
-        label: string; 
+      {
+        variant: any;
+        label: string;
         icon: React.ReactNode;
-        className?: string 
+        className?: string;
       }
     > = {
       pending: {
@@ -162,8 +160,8 @@ export function LoanCard({
         icon: <CheckCircle className="h-3 w-3 mr-1" />,
         className: "bg-emerald-100 text-emerald-800 hover:bg-emerald-100",
       },
-      rejected: { 
-        variant: "destructive", 
+      rejected: {
+        variant: "destructive",
         label: "Rejected",
         icon: <XCircleIcon className="h-3 w-3 mr-1" />,
       },
@@ -194,7 +192,7 @@ export function LoanCard({
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <CardTitle className="text-lg">{t('loanNumber')}{loan.id}</CardTitle>
+              <CardTitle className="text-lg">Loan #{loan.id}</CardTitle>
               {getStatusBadge(loan.status)}
               {getApprovalBadge(loan.approval_status)}
             </div>
@@ -209,13 +207,14 @@ export function LoanCard({
               </span>
               <span className="flex items-center gap-1 text-destructive">
                 <Calendar className="h-3 w-3" />
-                {t('due')}: {format(new Date(loan.due_date), "dd MMM yyyy")}
+                Due: {format(new Date(loan.due_date), "dd MMM yyyy")}
               </span>
             </CardDescription>
           </div>
           {showActions && (
             <div className="flex gap-2">
-              {(loan.approval_status === "pending" || loan.approval_status === "processing") && (
+              {(loan.approval_status === "pending" ||
+                loan.approval_status === "processing") && (
                 <>
                   <Button
                     size="sm"
@@ -241,21 +240,22 @@ export function LoanCard({
                   </Button>
                 </>
               )}
-              {loan.approval_status === "approved" && loan.status === "waiting" && (
-                <Button
-                  size="sm"
-                  variant="submit"
-                  onClick={() => onMarkAsBorrowed?.(loan.id)}
-                  disabled={actionLoading === loan.id}
-                >
-                  {actionLoading === loan.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <PackageCheck className="h-4 w-4 mr-1" />
-                  )}
-                  {tStatus('markAsBorrowed')}
-                </Button>
-              )}
+              {loan.approval_status === "approved" &&
+                loan.status === "waiting" && (
+                  <Button
+                    size="sm"
+                    variant="submit"
+                    onClick={() => onMarkAsBorrowed?.(loan.id)}
+                    disabled={actionLoading === loan.id}
+                  >
+                    {actionLoading === loan.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <PackageCheck className="h-4 w-4 mr-1" />
+                    )}
+                    Mark as Borrowed
+                  </Button>
+                )}
             </div>
           )}
         </div>
@@ -263,14 +263,21 @@ export function LoanCard({
       <CardContent>
         <div className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground mb-3">
-            {t('borrowedBooks')} ({loan.loan_details?.length || 0}):
+            Borrowed Books ({loan.loan_details?.length || 0}):
           </p>
           <div className="grid gap-3">
             {loan.loan_details?.map((detail) => {
-              const getDetailApprovalBadge = (status: LoanDetail["approval_status"]) => {
+              const getDetailApprovalBadge = (
+                status: LoanDetail["approval_status"],
+              ) => {
                 const variants: Record<
                   LoanDetail["approval_status"],
-                  { variant: any; label: string; icon: React.ReactNode; className?: string }
+                  {
+                    variant: any;
+                    label: string;
+                    icon: React.ReactNode;
+                    className?: string;
+                  }
                 > = {
                   pending: {
                     variant: "secondary",
@@ -292,7 +299,10 @@ export function LoanCard({
                 };
 
                 return (
-                  <Badge variant={variants[status]?.variant || "secondary"} className={variants[status]?.className}>
+                  <Badge
+                    variant={variants[status]?.variant || "secondary"}
+                    className={variants[status]?.className}
+                  >
                     <span className="flex items-center">
                       {variants[status]?.icon}
                       {variants[status]?.label || status}
@@ -319,7 +329,7 @@ export function LoanCard({
                       </div>
                       {getDetailApprovalBadge(detail.approval_status)}
                     </div>
-                    
+
                     {detail.note && (
                       <div className="text-xs text-destructive bg-destructive/10 p-2 rounded">
                         <span className="font-medium">Note: </span>
@@ -349,7 +359,9 @@ export function LoanCard({
                           size="sm"
                           variant="destructive"
                           className="h-7 text-xs"
-                          onClick={() => setRejectDetailDialog({ open: true, detail })}
+                          onClick={() =>
+                            setRejectDetailDialog({ open: true, detail })
+                          }
                           disabled={actionLoading === `detail-${detail.id}`}
                         >
                           <XCircle className="h-3 w-3 mr-1" />
@@ -365,8 +377,8 @@ export function LoanCard({
         </div>
       </CardContent>
 
-      <Dialog 
-        open={rejectDetailDialog.open} 
+      <Dialog
+        open={rejectDetailDialog.open}
         onOpenChange={(open) => {
           setRejectDetailDialog({ open, detail: rejectDetailDialog.detail });
           if (!open) setRejectNote("");
@@ -376,7 +388,8 @@ export function LoanCard({
           <DialogHeader>
             <DialogTitle>Reject Book Copy</DialogTitle>
             <DialogDescription>
-              Provide a reason for rejecting this book copy from the loan request.
+              Provide a reason for rejecting this book copy from the loan
+              request.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">

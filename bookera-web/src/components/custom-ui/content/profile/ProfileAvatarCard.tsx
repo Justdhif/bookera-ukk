@@ -13,8 +13,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
-import AvatarUploadModal from "@/components/custom-ui/content/admin/user/AvatarUploadModal";
 import { useTranslations } from "next-intl";
+import AvatarUploadModal from "../user/AvatarUploadModal";
 
 interface ProfileAvatarCardProps {
   user: User;

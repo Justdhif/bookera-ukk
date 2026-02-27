@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\SetupProfile;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,6 +22,9 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
+    /**
+     * Login user
+     */
     public function login(LoginRequest $request): JsonResponse
     {
         try {
@@ -40,28 +45,18 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Register new user (email + password only)
+     */
     public function register(RegisterRequest $request): JsonResponse
     {
         try {
             $userData = [
                 'email' => $request->email,
                 'password' => $request->password,
-                'role' => $request->role ?? 'user',
             ];
 
-            $profileData = [
-                'full_name' => $request->full_name,
-                'gender' => $request->gender,
-                'birth_date' => $request->birth_date,
-                'phone_number' => $request->phone_number,
-                'address' => $request->address,
-                'bio' => $request->bio,
-                'identification_number' => $request->identification_number,
-                'occupation' => $request->occupation,
-                'institution' => $request->institution,
-            ];
-
-            $data = $this->authService->register($userData, $profileData);
+            $data = $this->authService->register($userData);
 
             return ApiResponse::successResponse('Registrasi berhasil', $data, 201);
         } catch (\Exception $e) {
@@ -69,6 +64,9 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Setup or update user profile (requires authentication)
+     */
     public function setupProfile(SetupProfile $request): JsonResponse
     {
         try {
@@ -86,6 +84,52 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Send password reset token to email
+     */
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    {
+        try {
+            $this->authService->forgotPassword($request->email);
+
+            return ApiResponse::successResponse(
+                'Kode verifikasi telah dikirim ke email Anda',
+                ['email' => $request->email]
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Reset password using token
+     */
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
+        try {
+            $this->authService->resetPassword(
+                $request->email,
+                $request->token,
+                $request->password
+            );
+
+            return ApiResponse::successResponse('Password berhasil direset. Silakan login dengan password baru.');
+        } catch (\Exception $e) {
+            $statusCode = 400;
+
+            if (str_contains($e->getMessage(), 'kadaluarsa')) {
+                $statusCode = 410; // Gone
+            } elseif (str_contains($e->getMessage(), 'tidak valid') || str_contains($e->getMessage(), 'tidak ditemukan')) {
+                $statusCode = 422; // Unprocessable Entity
+            }
+
+            return ApiResponse::errorResponse($e->getMessage(), $statusCode);
+        }
+    }
+
+    /**
+     * Logout user
+     */
     public function logout(Request $request): JsonResponse
     {
         $this->authService->logout($request->user());
@@ -93,6 +137,9 @@ class AuthController extends Controller
         return ApiResponse::successResponse('Logout berhasil', null);
     }
 
+    /**
+     * Get current authenticated user data
+     */
     public function me(Request $request): JsonResponse
     {
         $user = $this->authService->getCurrentUser($request->user());
@@ -100,4 +147,3 @@ class AuthController extends Controller
         return ApiResponse::successResponse('Data user', ['user' => $user]);
     }
 }
-

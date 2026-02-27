@@ -17,8 +17,18 @@ export function middleware(req: NextRequest) {
   const role = req.cookies.get("role")?.value;
   const pathname = req.nextUrl.pathname;
 
-  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password";
+  const isSetupProfile = pathname === "/setup-profile";
   const isAdminRoute = pathname.startsWith("/admin");
+
+  // Allow setup-profile for authenticated users
+  if (isSetupProfile && !token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  if (isSetupProfile && token) {
+    return NextResponse.next();
+  }
 
   if (isAuthPage && token) {
     if (role === "admin" || role === "officer:*") {
@@ -72,5 +82,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/login", "/register"],
+  matcher: ["/admin/:path*", "/login", "/register", "/setup-profile", "/forgot-password"],
 };

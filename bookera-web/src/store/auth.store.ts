@@ -12,8 +12,14 @@ interface AuthState {
   initialLoading: boolean;
 
   login: (email: string, password: string) => Promise<string>;
+  register: (
+    email: string,
+    password: string,
+    password_confirmation: string
+  ) => Promise<string>;
   fetchUser: () => Promise<void>;
   logout: () => Promise<void>;
+  setUser: (user: User) => void;
   setInitialLoadingComplete: () => void;
 }
 
@@ -28,6 +34,34 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ loading: true });
 
       const res = await authService.login(email, password);
+
+      const { token, user } = res.data.data;
+
+      setCookie("token", token, { maxAge: 60 * 60 * 24 });
+      setCookie("role", user.role, { maxAge: 60 * 60 * 24 });
+
+      set({
+        user,
+        isAuthenticated: true,
+        loading: false,
+      });
+
+      return res.data.message;
+    } catch (err) {
+      set({ loading: false });
+      throw err;
+    }
+  },
+
+  register: async (email, password, password_confirmation) => {
+    try {
+      set({ loading: true });
+
+      const res = await authService.register(
+        email,
+        password,
+        password_confirmation
+      );
 
       const { token, user } = res.data.data;
 
@@ -79,6 +113,10 @@ export const useAuthStore = create<AuthState>((set) => ({
         isAuthenticated: false,
       });
     }
+  },
+
+  setUser: (user: User) => {
+    set({ user });
   },
 
   setInitialLoadingComplete: () => {

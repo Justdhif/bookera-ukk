@@ -13,12 +13,8 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import { Input } from "@/components/ui/input";
 import { ReturnCard } from "./ReturnCard";
 import { ReturnSkeletonCard } from "./ReturnSkeletonCard";
-import { useTranslations } from "next-intl";
 
 export default function ReturnClient() {
-  const t = useTranslations('admin.returns');
-  const tCommon = useTranslations('common');
-  const tAdmin = useTranslations('admin.common');
   const [allLoans, setAllLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
@@ -31,14 +27,13 @@ export default function ReturnClient() {
   const fetchAllData = async () => {
     setLoading(true);
     try {
-      // Get all loans with status "checking" or "returned"
       const loansRes = await loanService.getAll(searchQuery);
       const filteredLoans = loansRes.data.data.filter(
-        (loan) => loan.status === "checking" || loan.status === "returned"
+        (loan) => loan.status === "checking" || loan.status === "returned",
       );
       setAllLoans(filteredLoans);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('loadError'));
+      toast.error(error.response?.data?.message || "Failed to load returns");
     } finally {
       setLoading(false);
     }
@@ -51,30 +46,24 @@ export default function ReturnClient() {
   const handleFinished = async (returnId: number) => {
     setActionLoading(returnId);
     try {
-      const loan = allLoans.find((l) => 
-        l.book_returns?.some((r) => r.id === returnId)
+      const loan = allLoans.find((l) =>
+        l.book_returns?.some((r) => r.id === returnId),
       );
-      
+
       const hasLostBooks = loan?.lost_books && loan.lost_books.length > 0;
-      
+
       if (hasLostBooks && loan?.lost_books) {
         const lostBookId = loan.lost_books[0].id;
         const response = await lostBookService.finish(lostBookId);
-        toast.success(
-          response.data.message || tCommon('lostBookProcessComplete'),
-        );
+        toast.success(response.data.message || "Lost book process completed");
       } else {
         const response = await bookReturnService.approveReturn(returnId);
-        toast.success(
-          response.data.message || t('completeSuccess'),
-        );
+        toast.success(response.data.message || "Return completed successfully");
       }
-      
+
       fetchAllData();
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || t('completeError'),
-      );
+      toast.error(error.response?.data?.message || "Failed to complete return");
     } finally {
       setActionLoading(null);
     }
@@ -84,14 +73,10 @@ export default function ReturnClient() {
     setActionLoading(returnId);
     try {
       const response = await bookReturnService.processFine(returnId);
-      toast.success(
-        response.data.message || 'Denda berhasil diproses',
-      );
+      toast.success(response.data.message || "Fine processed successfully");
       fetchAllData();
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || 'Gagal memproses denda',
-      );
+      toast.error(error.response?.data?.message || "Failed to process fine");
     } finally {
       setActionLoading(null);
     }
@@ -102,8 +87,8 @@ export default function ReturnClient() {
       return (
         <EmptyState
           icon={<PackageCheck className="h-16 w-16" />}
-          title={tCommon('noReturnsYet')}
-          description={tCommon('noReturnsDesc')}
+          title="No Returns Yet"
+          description="There are no returns to display at the moment."
         />
       );
     }
@@ -111,12 +96,12 @@ export default function ReturnClient() {
     return (
       <div className="grid gap-4">
         {loans.map((loan) => {
-          // Get the latest return for this loan
           const latestReturn = loan.book_returns?.[0];
-          
-          // Skip loan if no return record (shouldn't happen for checking/returned status)
+
           if (!latestReturn) {
-            console.warn(`Loan #${loan.id} has status ${loan.status} but no book_returns`);
+            console.warn(
+              `Loan #${loan.id} has status ${loan.status} but no book_returns`,
+            );
             return null;
           }
 
@@ -136,7 +121,6 @@ export default function ReturnClient() {
     );
   };
 
-  // Filter loans by status
   const checkingLoans = allLoans.filter((loan) => loan.status === "checking");
   const returnedLoans = allLoans.filter((loan) => loan.status === "returned");
 
@@ -144,19 +128,18 @@ export default function ReturnClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">{tCommon('returnManagement')}</h1>
+          <h1 className="text-3xl font-bold">Return Management</h1>
           <p className="text-muted-foreground">
-            {tCommon('manageReturnApproval')}
+            Manage return approvals and track returned books
           </p>
         </div>
       </div>
 
-      {/* Search Bar */}
       <div className="flex gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={tCommon('searchReturnUserTitle')}
+            placeholder="Search by user or title..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -165,27 +148,27 @@ export default function ReturnClient() {
         </div>
         <Button onClick={handleSearch} variant="secondary">
           <Search className="h-4 w-4 mr-2" />
-          {tAdmin('search')}
+          Search
         </Button>
       </div>
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">{tCommon('allReturns')} ({allLoans.length})</TabsTrigger>
+          <TabsTrigger value="all">All Returns ({allLoans.length})</TabsTrigger>
           <TabsTrigger value="checking">
-            {tCommon('checking')} ({checkingLoans.length})
+            Checking ({checkingLoans.length})
           </TabsTrigger>
           <TabsTrigger value="returned">
-            {tCommon('returned')} ({returnedLoans.length})
+            Returned ({returnedLoans.length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">{tCommon('allReturns')}</h2>
+              <h2 className="text-2xl font-bold">All Returns</h2>
               <p className="text-muted-foreground">
-                {tCommon('noReturnsDesc')}
+                View all return transactions
               </p>
             </div>
             {loading ? (
@@ -203,9 +186,9 @@ export default function ReturnClient() {
         <TabsContent value="checking" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">{tCommon('checking')}</h2>
+              <h2 className="text-2xl font-bold">Checking</h2>
               <p className="text-muted-foreground">
-                {tCommon('checkingReturnsDesc')}
+                Returns that are being checked for condition
               </p>
             </div>
             {loading ? (
@@ -223,9 +206,9 @@ export default function ReturnClient() {
         <TabsContent value="returned" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">{tCommon('returned')}</h2>
+              <h2 className="text-2xl font-bold">Returned</h2>
               <p className="text-muted-foreground">
-                {tCommon('returnedDesc')}
+                Completed returns that have been finalized
               </p>
             </div>
             {loading ? (

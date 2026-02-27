@@ -10,8 +10,8 @@ import { ArrowLeft, Save, X, Edit2 } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProfileAvatarCard from "./ProfileAvatarCard";
-import UserDetailForm from "@/components/custom-ui/content/admin/user/UserDetailForm";
 import { useTranslations } from "next-intl";
+import UserDetailForm from "../user/UserDetailForm";
 
 type ProfileVariant = "public" | "admin";
 

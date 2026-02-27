@@ -106,6 +106,7 @@ export default function PublicHeader() {
                       <AvatarImage
                         src={user?.profile?.avatar}
                         alt={user?.profile?.full_name || user?.email || "User"}
+                        className="object-cover"
                       />
                       <AvatarFallback className="bg-linear-to-br from-brand-primary to-brand-primary-dark text-xs md:text-sm text-white">
                         {user?.profile?.full_name?.[0] || user?.email?.[0]}

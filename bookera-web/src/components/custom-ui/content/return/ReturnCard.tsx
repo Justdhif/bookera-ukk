@@ -23,7 +23,6 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 
 interface ReturnCardProps {
@@ -44,8 +43,6 @@ export function ReturnCard({
   onProcessFine,
 }: ReturnCardProps) {
   const router = useRouter();
-  const tLoans = useTranslations('loans');
-  const tStatus = useTranslations('status');
 
   const getLoanStatusBadge = (status: Loan["status"]) => {
     const variants: Record<
@@ -124,19 +121,19 @@ export function ReturnCard({
     const variants = {
       good: {
         variant: "default" as const,
-        label: tStatus('good'),
+        label: "Good",
         icon: <CheckCircle className="h-3 w-3 mr-1" />,
         className: "bg-green-100 text-green-800 hover:bg-green-100",
       },
       damaged: {
         variant: "secondary" as const,
-        label: tStatus('damaged'),
+        label: "Damaged",
         icon: <AlertTriangle className="h-3 w-3 mr-1" />,
         className: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
       },
       lost: {
         variant: "destructive" as const,
-        label: tStatus('lost'),
+        label: "Lost",
         icon: <XCircleIcon className="h-3 w-3 mr-1" />,
         className: "bg-red-100 text-red-800 hover:bg-red-100",
       },
@@ -155,12 +152,16 @@ export function ReturnCard({
     );
   };
 
-  const hasDamagedBooks = bookReturn.details?.some((d) => d.condition === "damaged");
+  const hasDamagedBooks = bookReturn.details?.some(
+    (d) => d.condition === "damaged",
+  );
   const hasLostBooks = bookReturn.details?.some((d) => d.condition === "lost");
-  const allGoodCondition = bookReturn.details?.every((d) => d.condition === "good");
-  
+  const allGoodCondition = bookReturn.details?.every(
+    (d) => d.condition === "good",
+  );
+
   const hasDamagedOrLostBooks = hasDamagedBooks || hasLostBooks;
-  
+
   const unpaidFines = loan.fines?.filter((f) => f.status === "unpaid") || [];
   const hasFines = loan.fines && loan.fines.length > 0;
   const hasUnpaidFines = unpaidFines.length > 0;
@@ -175,9 +176,9 @@ export function ReturnCard({
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <CardTitle className="text-lg">{tLoans('returnNumber')}{bookReturn.id}</CardTitle>
+              <CardTitle className="text-lg">Return #{bookReturn.id}</CardTitle>
               {getLoanStatusBadge(loan.status)}
-              <Badge variant="outline">{tLoans('loanNumber')}{bookReturn.loan_id}</Badge>
+              <Badge variant="outline">Loan #{bookReturn.loan_id}</Badge>
             </div>
             <CardDescription className="flex items-center gap-4 text-xs">
               <span className="flex items-center gap-1">
@@ -208,7 +209,7 @@ export function ReturnCard({
                   Process Fine
                 </Button>
               )}
-              
+
               {shouldShowFinished && (
                 <Button
                   size="sm"
@@ -232,7 +233,7 @@ export function ReturnCard({
       <CardContent>
         <div className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground mb-3">
-            {tLoans('returnedBooks')} ({bookReturn.details?.length || 0}):
+            Returned Books ({bookReturn.details?.length || 0}):
           </p>
           <div className="grid gap-2">
             {bookReturn.details?.map((detail) => (

@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useTranslations } from "next-intl";
 
 interface LoanRejectDialogProps {
   open: boolean;
@@ -27,7 +26,6 @@ export function LoanRejectDialog({
   onOpenChange,
   onConfirm,
 }: LoanRejectDialogProps) {
-  const t = useTranslations('admin.common');
   const [rejectionReason, setRejectionReason] = useState("");
 
   const handleConfirm = () => {
@@ -40,32 +38,37 @@ export function LoanRejectDialog({
     setRejectionReason("");
   };
 
+  const handleReasonChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setRejectionReason(e.target.value);
+  };
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t('rejectLoan')}</AlertDialogTitle>
+          <AlertDialogTitle>Reject Loan</AlertDialogTitle>
           <AlertDialogDescription>
-            {t('rejectLoanDescription')} #{loan?.id} {t('from')} {loan?.user?.email}
+            Are you sure you want to reject loan #{loan?.id} from{" "}
+            {loan?.user?.email}?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="space-y-2">
-          <Label htmlFor="rejection-reason">{t('rejectReasonOptional')}</Label>
+          <Label htmlFor="rejection-reason">Rejection Reason (Optional)</Label>
           <Textarea
             id="rejection-reason"
-            placeholder={t('rejectReason')}
+            placeholder="Enter rejection reason..."
             value={rejectionReason}
-            onChange={(e) => setRejectionReason(e.target.value)}
+            onChange={handleReasonChange}
             rows={4}
           />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancel}>{t('cancel')}</AlertDialogCancel>
+          <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {t('rejectLoan')}
+            Reject Loan
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
