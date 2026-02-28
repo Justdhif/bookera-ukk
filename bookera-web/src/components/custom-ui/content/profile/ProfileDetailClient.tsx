@@ -1,7 +1,7 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { authService } from "@/services/auth.service";
 import { userService, UpdateUserData } from "@/services/user.service";
 import { User } from "@/types/user";
@@ -10,7 +10,6 @@ import { ArrowLeft, Save, X, Edit2 } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProfileAvatarCard from "./ProfileAvatarCard";
-import { useTranslations } from "next-intl";
 import UserDetailForm from "../user/UserDetailForm";
 
 type ProfileVariant = "public" | "admin";
@@ -21,10 +20,6 @@ interface ProfileDetailClientProps {
 
 export default function ProfileDetailClient({ variant }: ProfileDetailClientProps) {
   const router = useRouter();
-  const t = useTranslations("admin.users");
-  const tAdmin = useTranslations("admin.common");
-  const tCommon = useTranslations("common");
-
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -57,7 +52,7 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
       });
       setAvatarPreview(userData.profile.avatar);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t("loadError"));
+      toast.error(error.response?.data?.message || "Failed to load users");
       if (error.response?.status === 401 && variant === "public") {
         router.push("/login");
       } else {
@@ -81,18 +76,18 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
       !formData.full_name?.trim() ||
       !formData.role
     ) {
-      toast.error(tCommon("pleaseCompleteRequiredFields"));
+      toast.error("pleaseCompleteRequiredFields");
       return;
     }
 
     try {
       setSubmitting(true);
       await userService.update(user.id, formData as UpdateUserData);
-      toast.success(t("updateSuccess"));
+      toast.success("User updated successfully");
       setIsEditMode(false);
       fetchUser();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t("updateError"));
+      toast.error(error.response?.data?.message || "Failed to update user");
     } finally {
       setSubmitting(false);
     }
@@ -143,20 +138,12 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.push(backHref)}
-            className="h-8 w-8"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
           <div>
-            <h1 className="text-3xl font-bold">{tCommon("userDetail")}</h1>
+            <h1 className="text-3xl font-bold">My Profile</h1>
             <p className="text-muted-foreground">
               {isEditMode
-                ? tCommon("editUserInfo")
-                : tCommon("viewUserDetail")}
+                ? `Edit ${user.profile.full_name}'s profile`
+                : `View ${user.profile.full_name}'s profile`}
             </p>
           </div>
         </div>
@@ -170,7 +157,7 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
               className="h-8"
             >
               <X className="h-3.5 w-3.5 mr-1.5" />
-              {tAdmin("cancel")}
+              {"Cancel"}
             </Button>
             <Button
               type="submit"
@@ -186,7 +173,7 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
               loading={submitting}
               className="h-8"
             >
-              {submitting ? tCommon("saving") : tCommon("saveChanges")}
+              {submitting ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         ) : (
@@ -196,7 +183,7 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
             className="h-8 gap-1"
           >
             <Edit2 className="h-3.5 w-3.5" />
-            {t("editUser")}
+            {"Edit User"}
           </Button>
         )}
       </div>
@@ -218,6 +205,7 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
             formData={formData}
             setFormData={setFormData}
             onFullNameValidChange={setIsFullNameValid}
+            isProfileView={true}
           />
         </div>
       </form>

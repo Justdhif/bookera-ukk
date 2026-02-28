@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 import { Bell, ChevronRight } from "lucide-react";
@@ -11,10 +12,8 @@ import {
 } from "@/components/ui/popover";
 import { notificationService } from "@/services/notification.service";
 import { Notification } from "@/types/notification";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { useTranslations } from "next-intl";
 import { getNotificationIcon } from "@/components/custom-ui/content/notification/notification-utils";
 
 interface NotificationDropdownProps {
@@ -24,7 +23,6 @@ interface NotificationDropdownProps {
 export default function NotificationDropdown({
   isAuthenticated,
 }: NotificationDropdownProps) {
-  const t = useTranslations('common');
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -237,7 +235,7 @@ export default function NotificationDropdown({
               className="w-full justify-between"
               onClick={handleViewAllNotifications}
             >
-              <span>{t('viewAllNotifications')}</span>
+              <span>{"View all notifications"}</span>
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

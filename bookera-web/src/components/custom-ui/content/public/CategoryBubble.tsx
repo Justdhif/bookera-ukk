@@ -6,7 +6,6 @@ import { Category } from "@/types/category";
 import CategoryBubbleSkeleton from "./CategoryBubbleSkeleton";
 import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { getIconByName } from "@/lib/icons";
-import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -24,7 +23,6 @@ export default function CategoryBubble({
   onChange,
   showFilterIcon = false,
 }: Props) {
-  const t = useTranslations('common');
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
@@ -56,12 +54,12 @@ export default function CategoryBubble({
   if (categories.length === 0) {
     return (
       <div className="flex items-center justify-center p-4">
-        <p className="text-muted-foreground text-sm">{t('noCategoryAvailable')}</p>
+        <p className="text-muted-foreground text-sm">{"No categories available"}</p>
       </div>
     );
   }
 
-  const allItems = [{ id: null, name: t('all'), icon: null }, ...categories];
+  const allItems = [{ id: null, name: "All", icon: null }, ...categories];
   const itemsPerPage = isDesktop ? ITEMS_PER_PAGE_DESKTOP : ITEMS_PER_PAGE_MOBILE;
   const totalPages = Math.ceil(allItems.length / itemsPerPage);
 
@@ -128,7 +126,7 @@ export default function CategoryBubble({
                     </div>
                   )}
 
-                  {/* Icon Container */}
+                  
                   <div
                     className={cn(
                       "w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center transition-all duration-300 relative z-10",
@@ -154,7 +152,7 @@ export default function CategoryBubble({
                     )}
                   </div>
 
-                  {/* Category Name */}
+                  
                   <span
                     className={cn(
                       "text-sm md:text-base font-bold text-center line-clamp-2 px-2 relative z-10",
@@ -166,7 +164,7 @@ export default function CategoryBubble({
                     {item.name}
                   </span>
 
-                  {/* Active Bottom Border Indicator */}
+                  
                   {isActive && (
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-1 bg-white rounded-full shadow-lg" />
                   )}
@@ -176,7 +174,7 @@ export default function CategoryBubble({
           </div>
         </div>
 
-        {/* Next Button */}
+        
         <Button
           variant="outline"
           size="icon"
@@ -193,7 +191,7 @@ export default function CategoryBubble({
         </Button>
       </div>
 
-      {/* Page Indicator */}
+      
       {totalPages > 1 && (
         <div className="flex justify-center gap-2">
           {Array.from({ length: totalPages }).map((_, index) => (

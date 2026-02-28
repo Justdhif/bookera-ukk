@@ -14,17 +14,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Search, Bell, Home, Settings, User, LayoutDashboard, LogOut } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
-import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import NotificationDropdown from "./NotificationDropdown";
+import LogoutConfirmDialog from "@/components/custom-ui/LogoutConfirmDialog";
 
 export default function PublicHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const { user, logout, isAuthenticated, initialLoading } = useAuthStore();
-  const t = useTranslations("header");
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+
+  const handleLogoutConfirm = async () => {
+    logout();
+    router.push("/");
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -44,7 +49,7 @@ export default function PublicHeader() {
       <div className="px-4 md:px-6 lg:px-8 py-3 md:py-4">
         <div className="flex items-center justify-between gap-2 md:gap-4">
           <div className="flex items-center gap-2 md:gap-4 flex-1 max-w-md">
-            {/* Home button - only visible on mobile */}
+            
             <div className="lg:hidden">
               <Button
                 variant={isHomePage ? "secondary" : "ghost"}
@@ -67,7 +72,7 @@ export default function PublicHeader() {
             <form onSubmit={handleSearch} className="relative flex-1">
               <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
               <Input
-                placeholder={t("placeholder")}
+                placeholder={"Search title, author, or ISBN..."}
                 className="pl-9 md:pl-12 pr-3 md:pr-4 h-10 md:h-12 bg-muted/30 border-border focus-visible:ring-1 focus-visible:ring-ring rounded-full text-sm md:text-base"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -97,7 +102,7 @@ export default function PublicHeader() {
                   size="sm"
                   className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 md:px-8 h-8 md:h-10 text-sm md:text-base"
                 >
-                  {t("login")}
+                  {"Login"}
                 </Button>
               ) : (
                 <DropdownMenu>
@@ -127,7 +132,7 @@ export default function PublicHeader() {
                       user?.role?.startsWith("officer:")) && (
                       <DropdownMenuItem onClick={() => router.push("/admin")} className="gap-2">
                         <LayoutDashboard className="h-4 w-4" />
-                        {t("dashboard")}
+                        {"Dashboard"}
                       </DropdownMenuItem>
                     )}
 
@@ -136,15 +141,15 @@ export default function PublicHeader() {
                       className="gap-2"
                     >
                       <User className="h-4 w-4" />
-                      {t("profile")}
+                      {"Profile"}
                     </DropdownMenuItem>
 
                     <DropdownMenuItem
                       className="text-red-600 dark:text-red-400 focus:text-red-600 gap-2"
-                      onClick={logout}
+                      onClick={() => setIsLogoutDialogOpen(true)}
                     >
                       <LogOut className="h-4 w-4 text-red-600 dark:text-red-400" />
-                      {t("logout")}
+                      {"Logout"}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -153,6 +158,11 @@ export default function PublicHeader() {
           </div>
         </div>
       </div>
+      <LogoutConfirmDialog
+        open={isLogoutDialogOpen}
+        onOpenChange={setIsLogoutDialogOpen}
+        onConfirm={handleLogoutConfirm}
+      />
     </header>
   );
 }

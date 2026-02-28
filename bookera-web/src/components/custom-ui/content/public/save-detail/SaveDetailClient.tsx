@@ -1,7 +1,7 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { saveService } from "@/services/save.service";
 import { bookService } from "@/services/book.service";
 import { Save } from "@/types/save";
@@ -15,7 +15,6 @@ import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { BorrowFromCollectionDialog } from "./BorrowFromCollectionDialog";
 import { Loader2, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
 import SaveDetailSkeleton from "./SaveDetailSkeleton";
 
 interface SaveDetailClientProps {
@@ -25,8 +24,6 @@ interface SaveDetailClientProps {
 export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
-  const t = useTranslations('collections.detail');
-
   const [save, setSave] = useState<Save | null>(null);
   const [loading, setLoading] = useState(true);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -41,7 +38,7 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
       const res = await saveService.getOne(saveIdentifier);
       setSave(res.data.data);
     } catch (error) {
-      toast.error(t('failedToLoad'));
+      toast.error("Failed to load collection");
       router.push("/");
     } finally {
       setLoading(false);
@@ -57,11 +54,11 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
 
     try {
       await saveService.removeBook(save.id, bookId);
-      toast.success(t('bookRemoved'));
+      toast.success("Book removed from collection");
       fetchSave();
       window.dispatchEvent(new Event('refreshSavesList'));
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('failedToRemove'));
+      toast.error(error.response?.data?.message || "Failed to remove book");
     }
   };
 
@@ -75,13 +72,13 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
 
   const handleBorrowClick = async () => {
     if (!isAuthenticated) {
-      toast.error(t('pleaseLogin'));
+      toast.error("Please login to borrow books");
       router.push("/login");
       return;
     }
 
     if (selectedBooks.length === 0) {
-      toast.error(t('selectOne'));
+      toast.error("Please select at least one book");
       return;
     }
 
@@ -93,7 +90,7 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
       setBooksWithCopies(booksData.map((res) => res.data.data));
       setShowBorrowDialog(true);
     } catch (error) {
-      toast.error(t('failedToLoadBooks'));
+      toast.error("Failed to load book details");
     } finally {
       setLoadingCopies(false);
     }
@@ -104,11 +101,11 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
 
     try {
       await saveService.delete(save.id);
-      toast.success(t('deleted'));
+      toast.success("Collection deleted successfully");
       window.dispatchEvent(new Event('refreshSavesList'));
       router.push("/");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('failedToDelete'));
+      toast.error(error.response?.data?.message || "Failed to delete collection");
       throw error;
     }
   };
@@ -145,12 +142,12 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
               {loadingCopies ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {t('loading')}
+                  {"Loading..."}
                 </>
               ) : (
                 <>
                   <ShoppingCart className="h-4 w-4 mr-2" />
-                  {t('borrowSelected')} ({selectedBooks.length})
+                  {"Borrow Selected"} ({selectedBooks.length})
                 </>
               )}
             </Button>
@@ -171,8 +168,8 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
       <DeleteConfirmDialog
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
-        title={t('deleteTitle')}
-        description={`${t('deleteConfirm')} "${save.name}". ${t('failedToDelete').includes('cannot') ? 'This action cannot be undone.' : ''}`}
+        title={"Delete Collection"}
+        description={`${"This will permanently delete the collection"} "${save.name}". ${"Failed to delete collection".includes('cannot') ? 'This action cannot be undone.' : ''}`}
         onConfirm={handleDeleteConfirm}
       />
 

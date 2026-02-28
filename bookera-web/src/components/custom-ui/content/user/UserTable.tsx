@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import {
   Table,
@@ -14,8 +15,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "@/types/user";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Users, Eye, Trash } from "lucide-react";
-import { useRouter } from "next/navigation";
-
 interface Props {
   data: User[];
   onDelete: (id: number) => void;

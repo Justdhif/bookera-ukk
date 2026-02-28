@@ -1,11 +1,11 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 import { SaveListItem } from "@/types/save";
 import { Card, CardContent } from "@/components/ui/card";
 import { format } from "date-fns";
 import { BookMarked } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface SaveCardProps {
@@ -31,7 +31,7 @@ export default function SaveCard({ save, onClick }: SaveCardProps) {
     >
       <CardContent className="p-4">
         <div className="flex gap-3">
-          {/* Cover Image - Using collage from backend */}
+          
           <div className="shrink-0">
             {save.cover ? (
               <div className="w-16 h-20 rounded overflow-hidden bg-gray-100 dark:bg-gray-800">
@@ -48,7 +48,7 @@ export default function SaveCard({ save, onClick }: SaveCardProps) {
             )}
           </div>
 
-          {/* Save Info */}
+          
           <div className="flex-1 min-w-0">
             <h4 className="font-semibold text-sm truncate text-gray-900 dark:text-gray-100">
               {save.name}

@@ -12,8 +12,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useTranslations } from "next-intl";
-
 interface ReturnRejectDialogProps {
   open: boolean;
   bookReturn: BookReturn | null;
@@ -27,7 +25,6 @@ export function ReturnRejectDialog({
   onOpenChange,
   onConfirm,
 }: ReturnRejectDialogProps) {
-  const t = useTranslations('common');
   const [rejectionReason, setRejectionReason] = useState("");
 
   const handleConfirm = () => {
@@ -44,29 +41,29 @@ export function ReturnRejectDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t('rejectReturn')}</AlertDialogTitle>
+          <AlertDialogTitle>{"Reject Return"}</AlertDialogTitle>
           <AlertDialogDescription>
-            {t('rejectReturnDescription')} #{bookReturn?.id} {t('from')}{" "}
+            {"rejectReturnDescription"} #{bookReturn?.id} {"from"}{" "}
             {bookReturn?.loan?.user?.email}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="space-y-2">
-          <Label htmlFor="rejection-reason">{t('rejectReasonOptional')}</Label>
+          <Label htmlFor="rejection-reason">{"rejectReasonOptional"}</Label>
           <Textarea
             id="rejection-reason"
-            placeholder={t('rejectReturnReason')}
+            placeholder={"Please enter rejection reason..."}
             value={rejectionReason}
             onChange={(e) => setRejectionReason(e.target.value)}
             rows={4}
           />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancel}>{t('cancel')}</AlertDialogCancel>
+          <AlertDialogCancel onClick={handleCancel}>{"Cancel"}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {t('rejectReturn')}
+            {"Reject Return"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

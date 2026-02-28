@@ -15,8 +15,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useTranslations } from "next-intl";
-
 export default function PrivacyPolicyList({
   data,
   onEdit,
@@ -26,13 +24,11 @@ export default function PrivacyPolicyList({
   onEdit: (item: PrivacyPolicy) => void;
   onDelete: (id: number) => void;
 }) {
-  const t = useTranslations('admin.privacyPolicy');
-  const tAdmin = useTranslations('admin.common');
   if (data.length === 0) {
     return (
       <EmptyState
-        title={t('noPrivacyPolicy')}
-        description={t('noPrivacyPolicyDesc')}
+        title={"No Privacy Policy yet"}
+        description={"Privacy Policy will appear after you add it."}
         icon={<Shield className="h-10 w-10" />}
       />
     );
@@ -104,18 +100,18 @@ export default function PrivacyPolicyList({
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>{t('deleteTitle')}</AlertDialogTitle>
+                    <AlertDialogTitle>{"Delete Privacy Policy"}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      {t('deleteConfirm', { title: item.title })}
+                      {"Are you sure you want to delete this Privacy Policy? Deleted data cannot be recovered."}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>{tAdmin('cancel')}</AlertDialogCancel>
+                    <AlertDialogCancel>{"Cancel"}</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => onDelete(item.id)}
                       className="bg-red-600 hover:bg-red-700"
                     >
-                      {tAdmin('delete')}
+                      {"Delete"}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

@@ -1,19 +1,16 @@
 "use client";
 
 import { Sparkles } from "lucide-react";
-import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Marquee from "react-fast-marquee";
 import Botera from "@/assets/logo/botera.png";
 
 export default function SpeakerMarquee() {
-  const t = useTranslations("common");
-
   const messages = [
-    { text: t("discovering"), accent: "#34d399" },
-    { text: t("rememberReturn"), accent: "#10b981" },
-    { text: t("readFavorite"), accent: "#059669" },
-    { text: t("knowledgeInvestment"), accent: "#047857" },
+    { text: "Discovering thousands of best book collections", accent: "#34d399" },
+    { text: "Don't forget to return books on time", accent: "#10b981" },
+    { text: "Read your favorite book today", accent: "#059669" },
+    { text: "Knowledge is the best investment", accent: "#047857" },
   ];
 
   return (

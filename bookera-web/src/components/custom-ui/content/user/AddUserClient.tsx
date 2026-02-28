@@ -1,7 +1,7 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { userService, CreateUserData } from "@/services/user.service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -174,7 +174,7 @@ export default function AddUserClient() {
 
       <form id="user-form" onSubmit={handleSubmit}>
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Avatar Card */}
+          
           <Card className="lg:col-span-1">
             <CardHeader>
               <CardTitle>Avatar</CardTitle>
@@ -262,7 +262,7 @@ export default function AddUserClient() {
             </CardContent>
           </Card>
 
-          {/* Form Card */}
+          
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>User Information</CardTitle>
@@ -271,7 +271,7 @@ export default function AddUserClient() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Account Section */}
+              
               <div className="space-y-4">
                 <h3 className="font-semibold text-lg">Account</h3>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -306,7 +306,7 @@ export default function AddUserClient() {
                 </div>
               </div>
 
-              {/* Profile Section */}
+              
               <div className="space-y-4">
                 <h3 className="font-semibold text-lg">Profile</h3>
                 <div className="grid gap-4 sm:grid-cols-2">

@@ -1,12 +1,11 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { notificationService } from "@/services/notification.service";
-import { useRouter } from "next/navigation";
-
 export default function NotificationButton() {
   const router = useRouter();
   const [unreadCount, setUnreadCount] = useState(0);

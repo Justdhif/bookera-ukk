@@ -8,15 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { DollarSign, BookOpen, Calendar, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 
 export default function MyFinesPageClient() {
   const [fines, setFines] = useState<Fine[]>([]);
   const [loading, setLoading] = useState(true);
-  const tCommon = useTranslations("common");
-  const tStatus = useTranslations("status");
-
   useEffect(() => {
     fetchFines();
   }, []);
@@ -101,15 +97,15 @@ export default function MyFinesPageClient() {
     return (
       <div className="container mx-auto p-6">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">{tCommon("myFines")}</h1>
+          <h1 className="text-3xl font-bold">{"My Fines"}</h1>
           <p className="text-muted-foreground">
-            {tCommon("viewAllYourFines")}
+            {"View all your fines and payment status"}
           </p>
         </div>
         <EmptyState
           icon={<DollarSign className="h-16 w-16" />}
-          title={tCommon("noFinesYet")}
-          description={tCommon("noFinesDesc")}
+          title={"No Fines Yet"}
+          description={"Fines will appear after added to loans."}
         />
       </div>
     );
@@ -118,9 +114,9 @@ export default function MyFinesPageClient() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">{tCommon("myFines")}</h1>
+        <h1 className="text-3xl font-bold">{"My Fines"}</h1>
         <p className="text-muted-foreground">
-          {tCommon("viewAllYourFines")}
+          {"View all your fines and payment status"}
         </p>
       </div>
 

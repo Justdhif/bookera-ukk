@@ -4,8 +4,6 @@ import { Save } from "@/types/save";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Edit2, Trash, BookMarked } from "lucide-react";
 import { format } from "date-fns";
-import { useTranslations } from "next-intl";
-
 interface SaveHeaderProps {
   save: Save;
   onEdit: () => void;
@@ -19,14 +17,12 @@ export default function SaveHeader({
   onDelete,
   onBack,
 }: SaveHeaderProps) {
-  const t = useTranslations('collections.detail');
-  
   return (
     <div className="space-y-4 mb-6">
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {t('back')}
+          {"Back"}
         </Button>
       </div>
 
@@ -77,7 +73,7 @@ export default function SaveHeader({
         )}
 
         <div className="flex flex-col justify-end flex-1">
-          <p className="text-muted-foreground text-sm">{t('collection')}</p>
+          <p className="text-muted-foreground text-sm">{"Collection"}</p>
           <h1 className="lg:text-6xl sm:text-4xl font-bold wrap-break-word">
             {save.name}
           </h1>
@@ -90,7 +86,7 @@ export default function SaveHeader({
             <span className="font-medium">{save.total_books} books</span>
             <span>•</span>
             <span>
-              {t('created')} {format(new Date(save.created_at), "MMM d, yyyy")}
+              {"Created"} {format(new Date(save.created_at), "MMM d, yyyy")}
             </span>
           </div>
           <div className="mt-2 flex gap-2 shrink-0">
@@ -101,7 +97,7 @@ export default function SaveHeader({
               className="h-8 gap-1.5"
             >
               <Edit2 className="h-3.5 w-3.5" />
-              {t('edit')}
+              {"Edit"}
             </Button>
             <Button
               variant="destructive"
@@ -110,7 +106,7 @@ export default function SaveHeader({
               className="h-8 gap-1.5"
             >
               <Trash className="h-3.5 w-3.5" />
-              {t('delete')}
+              {"Delete"}
             </Button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { bookService } from "@/services/book.service";
 import { Book } from "@/types/book";
 import BookCopyList from "./BookCopyList";
@@ -11,10 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BookOpen, CheckCircle, XCircle, ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTranslations } from "next-intl";
-
 export default function BookDetailClient() {
-  const t = useTranslations('common');
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
@@ -51,8 +48,8 @@ export default function BookDetailClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{t('bookDetail')}</h1>
-            <p className="text-muted-foreground">{t('loadingBookData')}</p>
+            <h1 className="text-3xl font-bold">{"Book Detail"}</h1>
+            <p className="text-muted-foreground">{"Loading book data..."}</p>
           </div>
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
@@ -77,18 +74,18 @@ export default function BookDetailClient() {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold">{t('bookDetail')}</h1>
-          <p className="text-muted-foreground">{t('fullInfoAboutBook')}</p>
+          <h1 className="text-3xl font-bold">{"Book Detail"}</h1>
+          <p className="text-muted-foreground">{"Complete information about the book"}</p>
         </div>
         <AddToSaveButton bookId={book.id} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Cover Card */}
+        
         <Card className="flex flex-col h-full">
           <CardHeader>
-            <CardTitle>{t('bookCover')}</CardTitle>
-            <CardDescription>{t('currentCover')}</CardDescription>
+            <CardTitle>{"Book Cover"}</CardTitle>
+            <CardDescription>{"Current book cover"}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 flex-1 flex flex-col">
             <div className="flex flex-col gap-4 flex-1">
@@ -103,12 +100,12 @@ export default function BookDetailClient() {
               ) : (
                 <div className="w-full flex-1 border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-2 bg-muted/30">
                   <BookOpen className="h-12 w-12 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">{t('noCoverImage')}</p>
+                  <p className="text-sm text-muted-foreground">{"No cover image"}</p>
                 </div>
               )}
             </div>
 
-            {/* Status Card */}
+            
             <div className="rounded-lg border p-3 bg-muted/30">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -135,14 +132,14 @@ export default function BookDetailClient() {
           </CardContent>
         </Card>
 
-        {/* Book Information */}
+        
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Informasi Buku</CardTitle>
-            <CardDescription>{t('bookDetailsComplete')}</CardDescription>
+            <CardDescription>{"Complete book details"}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Basic Information */}
+            
             <div className="space-y-4">
               <h3 className="font-semibold text-lg">Informasi Dasar</h3>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -177,7 +174,7 @@ export default function BookDetailClient() {
               </div>
             </div>
 
-            {/* Categories */}
+            
             <div className="space-y-4">
               <h3 className="font-semibold text-lg">Kategori</h3>
               {book.categories && book.categories.length > 0 ? (
@@ -189,26 +186,26 @@ export default function BookDetailClient() {
                   ))}
                 </div>
               ) : (
-                <p className="text-muted-foreground">{t('noCategory')}</p>
+                <p className="text-muted-foreground">{"No category"}</p>
               )}
             </div>
 
-            {/* Description */}
+            
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg">{t('bookDescription')}</h3>
+              <h3 className="font-semibold text-lg">{"Book Description"}</h3>
               <p className="whitespace-pre-line text-muted-foreground leading-relaxed">
-                {book.description || t('noDescription')}
+                {book.description || "No description available"}
               </p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Book Copies Section */}
+      
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl">{t('availableBookCopies')}</CardTitle>
-          <CardDescription>{t('copyListDesc')}</CardDescription>
+          <CardTitle className="text-xl">{"Available Book Copies"}</CardTitle>
+          <CardDescription>{"List of books that can be borrowed"}</CardDescription>
         </CardHeader>
         <CardContent>
           <BookCopyList copies={book.copies || []} />

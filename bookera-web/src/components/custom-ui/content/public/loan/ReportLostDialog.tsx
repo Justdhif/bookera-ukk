@@ -4,7 +4,6 @@ import { useState } from "react";
 import { lostBookService } from "@/services/lost-book.service";
 import { Loan } from "@/types/loan";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -39,7 +38,6 @@ export function ReportLostDialog({
   loan,
   onSuccess,
 }: ReportLostDialogProps) {
-  const t = useTranslations('common');
   const [loading, setLoading] = useState(false);
   const [bookCopyId, setBookCopyId] = useState<number | null>(null);
   const [estimatedLostDate, setEstimatedLostDate] = useState<Date | undefined>(
@@ -49,7 +47,7 @@ export function ReportLostDialog({
 
   const handleSubmit = async () => {
     if (!loan || !bookCopyId) {
-      toast.error(t('selectLostBook'));
+      toast.error("Select lost book");
       return;
     }
 
@@ -64,7 +62,7 @@ export function ReportLostDialog({
       });
 
       toast.success(
-        response.data.message || t('lostBookReportCreated')
+        response.data.message || "lostBookReportCreated"
       );
       onOpenChange(false);
       setBookCopyId(null);
@@ -73,7 +71,7 @@ export function ReportLostDialog({
       onSuccess();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || t('failedToReportLostBook')
+        error.response?.data?.message || "failedToReportLostBook"
       );
     } finally {
       setLoading(false);
@@ -86,25 +84,25 @@ export function ReportLostDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-destructive" />
-            {t('reportLoss')}
+            {"Report Loss"}
           </DialogTitle>
           <DialogDescription>
-            {t('reportLostBookDescription')}
+            {"Report lost or unrecoverable books. Fines will be automatically created according to applicable regulations."}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {/* Book Selection */}
+          
           <div className="space-y-2">
             <Label htmlFor="book-copy">
-              {t('selectLostBook')} <span className="text-destructive">*</span>
+              {"Select lost book"} <span className="text-destructive">*</span>
             </Label>
             <Select
               value={bookCopyId?.toString() || ""}
               onValueChange={(value) => setBookCopyId(parseInt(value))}
             >
               <SelectTrigger id="book-copy">
-                <SelectValue placeholder={t('selectLostBook')} />
+                <SelectValue placeholder={"Select lost book"} />
               </SelectTrigger>
               <SelectContent>
                 {loan?.loan_details.map((detail) => (
@@ -117,7 +115,7 @@ export function ReportLostDialog({
                         {detail.book_copy.book.title}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        {t('copyCode')}: {detail.book_copy.copy_code}
+                        {"Copy Code"}: {detail.book_copy.copy_code}
                       </span>
                     </div>
                   </SelectItem>
@@ -126,47 +124,47 @@ export function ReportLostDialog({
             </Select>
           </div>
 
-          {/* Estimated Lost Date */}
+          
           <div className="space-y-2">
             <Label htmlFor="lost-date">
-              {t('estimatedLostDateLabel')}
+              {"Estimated Lost Date (Optional)"}
             </Label>
             <DatePicker
               value={estimatedLostDate}
               onChange={setEstimatedLostDate}
-              placeholder={t('estimateLostDate')}
+              placeholder={"Select estimated date lost"}
               dateMode="past"
             />
             <p className="text-xs text-muted-foreground">
-              {t('estimatedLostDateHint')}
+              {"Estimated date when the book was lost (if known)"}
             </p>
           </div>
 
-          {/* Notes */}
+          
           <div className="space-y-2">
-            <Label htmlFor="notes">{t('notesOptional')}</Label>
+            <Label htmlFor="notes">{"Notes (Optional)"}</Label>
             <Textarea
               id="notes"
-              placeholder={t('lostBookNotesPlaceholder')}
+              placeholder={"Explain the chronology or details of the book loss..."}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={4}
             />
             <p className="text-xs text-muted-foreground">
-              {t('lostBookNotesHint')}
+              {"You can explain the chronology or details related to the book loss"}
             </p>
           </div>
 
-          {/* Warning */}
+          
           <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
             <div className="flex gap-3">
               <AlertCircle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="text-sm font-medium text-destructive">
-                  {t('importantWarning')}
+                  {"Important Warning"}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {t('lostBookWarningText')}
+                  {"If the book is reported lost and the loss is confirmed, a fine may be applied according to library policy."}
                 </p>
               </div>
             </div>
@@ -184,7 +182,7 @@ export function ReportLostDialog({
             }}
             disabled={loading}
           >
-            {t('cancel')}
+            {"Cancel"}
           </Button>
           <Button
             variant="destructive"
@@ -194,10 +192,10 @@ export function ReportLostDialog({
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {t('processing')}
+                {"Processing..."}
               </>
             ) : (
-              t('reportLoss')
+              "Report Loss"
             )}
           </Button>
         </DialogFooter>

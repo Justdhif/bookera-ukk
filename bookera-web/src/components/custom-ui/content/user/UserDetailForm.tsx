@@ -27,6 +27,7 @@ interface UserDetailFormProps {
   formData: any;
   setFormData: (data: any) => void;
   onFullNameValidChange?: (valid: boolean) => void;
+  isProfileView?: boolean;
 }
 
 export default function UserDetailForm({
@@ -35,6 +36,7 @@ export default function UserDetailForm({
   formData,
   setFormData,
   onFullNameValidChange,
+  isProfileView,
 }: UserDetailFormProps) {
   useEffect(() => {
     if (isEditMode && onFullNameValidChange) {
@@ -72,10 +74,10 @@ export default function UserDetailForm({
                   setFormData({ ...formData, email: e.target.value })
                 }
                 placeholder="Enter email"
-                disabled={!isEditMode}
+                disabled={!isEditMode || isProfileView}
               />
             </div>
-            {isEditMode && (
+            {isEditMode && !isProfileView && (
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <Input

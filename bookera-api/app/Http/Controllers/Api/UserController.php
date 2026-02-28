@@ -100,5 +100,6 @@ class UserController extends Controller
             return ApiResponse::errorResponse('Gagal menghapus user: ' . $e->getMessage(), null, 500);
         }
     }
+
 }
 

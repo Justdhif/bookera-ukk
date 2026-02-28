@@ -10,8 +10,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
-
 interface DeleteConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -33,8 +31,6 @@ export default function DeleteConfirmDialog({
   onConfirm,
   loading = false,
 }: DeleteConfirmDialogProps) {
-  const t = useTranslations('common');
-  const tAdmin = useTranslations('admin.common');
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleConfirm = async () => {
@@ -60,7 +56,7 @@ export default function DeleteConfirmDialog({
           </div>
           <div className="text-center space-y-2">
             <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-              {title || t('deleteData')}
+              {title || "Delete Data"}
             </DialogTitle>
             <DialogDescription className="text-base text-gray-600 dark:text-gray-400 leading-relaxed">
               {description}
@@ -76,7 +72,7 @@ export default function DeleteConfirmDialog({
             disabled={isDeleting}
             className="w-full sm:w-auto sm:flex-1 h-11 font-medium border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 transition-all duration-200"
           >
-            {cancelText || tAdmin('cancel')}
+            {cancelText || "Cancel"}
           </Button>
           <Button
             type="button"
@@ -88,10 +84,10 @@ export default function DeleteConfirmDialog({
             {isDeleting ? (
               <span className="flex items-center justify-center">
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {tAdmin('loading')}...
+                {"Loading..."}...
               </span>
             ) : (
-              confirmText || tAdmin('delete')
+              confirmText || "Delete"
             )}
           </Button>
         </DialogFooter>

@@ -7,8 +7,6 @@ export const termsOfServiceService = {
 
   getById: (id: number) =>
     api.get<ApiResponse<TermsOfService>>(`/terms-of-services/${id}`),
-
-  // Admin endpoints
   create: (payload: TermsOfServiceFormData) =>
     api.post<ApiResponse<TermsOfService>>(
       "/admin/terms-of-services",

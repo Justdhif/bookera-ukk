@@ -1,10 +1,9 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Newspaper, Megaphone, CalendarDays, Lightbulb, ArrowRight, ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation";
-
 const contents = [
   {
     id: 1,

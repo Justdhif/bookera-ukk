@@ -16,10 +16,7 @@ import { DashboardCardsSkeleton } from "./cards/DashboardCardsSkeleton";
 import { LoanMonthlyChartSkeleton, LoanStatusChartSkeleton } from "./charts/ChartsSkeleton";
 import { LatestLoansTableSkeleton } from "./table/LatestLoansTableSkeleton";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
-
 export default function DashboardClient() {
-  const t = useTranslations('admin.dashboard');
   const [totals, setTotals] = useState<DashboardTotals>();
   const [monthly, setMonthly] = useState<LoanMonthly[]>([]);
   const [status, setStatus] = useState<LoanStatus[]>([]);
@@ -41,7 +38,7 @@ export default function DashboardClient() {
         setLatestLoans(latestRes.data.data);
       })
       .catch(() => {
-        toast.error(t('loadError'));
+        toast.error("Failed to load dashboard");
       })
       .finally(() => {
         setLoading(false);

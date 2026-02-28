@@ -4,7 +4,6 @@ import { useState } from "react";
 import { bookReturnService } from "@/services/book-return.service";
 import { Loan } from "@/types/loan";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -37,7 +36,6 @@ export function ReturnDialog({
   loan,
   onSuccess,
 }: ReturnDialogProps) {
-  const t = useTranslations('common');
   const [loading, setLoading] = useState(false);
   const [bookConditions, setBookConditions] = useState<
     Record<number, "good" | "damaged">
@@ -45,14 +43,12 @@ export function ReturnDialog({
 
   const handleSubmit = async () => {
     if (!loan) return;
-
-    // Validate all books have conditions selected
     const allBooksHaveCondition = loan.loan_details.every(
       (detail) => bookConditions[detail.book_copy_id]
     );
 
     if (!allBooksHaveCondition) {
-      toast.error(t('selectConditionForAllBooks'));
+      toast.error("selectConditionForAllBooks");
       return;
     }
 
@@ -65,14 +61,14 @@ export function ReturnDialog({
 
       const response = await bookReturnService.create(loan.id, { copies });
       toast.success(
-        response.data.message || t('returnRequestCreated')
+        response.data.message || "returnRequestCreated"
       );
       onOpenChange(false);
       setBookConditions({});
       onSuccess();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || t('failedToCreateReturnRequest')
+        error.response?.data?.message || "failedToCreateReturnRequest"
       );
     } finally {
       setLoading(false);
@@ -92,10 +88,10 @@ export function ReturnDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <PackageX className="h-5 w-5" />
-            {t('requestReturn')}
+            {"Request Return"}
           </DialogTitle>
           <DialogDescription>
-            {t('selectBookCondition')} {t('reportLostInfo')}
+            {"Please select condition for all books"} {"If the book is lost, use the 'Report Loss' button on the loan list."}
           </DialogDescription>
         </DialogHeader>
 
@@ -108,13 +104,13 @@ export function ReturnDialog({
               <div>
                 <p className="font-medium">{detail.book_copy.book.title}</p>
                 <p className="text-sm text-muted-foreground">
-                  {t('copyCode')}: {detail.book_copy.copy_code}
+                  {"Copy Code"}: {detail.book_copy.copy_code}
                 </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor={`condition-${detail.id}`}>
-                  {t('bookCondition')}
+                  {"Book Condition"}
                 </Label>
                 <Select
                   value={bookConditions[detail.book_copy_id] || ""}
@@ -123,19 +119,19 @@ export function ReturnDialog({
                   }
                 >
                   <SelectTrigger id={`condition-${detail.id}`}>
-                    <SelectValue placeholder={t('selectBookConditionPlaceholder')} />
+                    <SelectValue placeholder={"Select book condition"} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="good">
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2 rounded-full bg-green-500" />
-                        <span>{t('bookConditionGood')}</span>
+                        <span>{"Good - No damage"}</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="damaged">
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                        <span>{t('bookConditionDamaged')}</span>
+                        <span>{"Damaged - Minor damage"}</span>
                       </div>
                     </SelectItem>
                   </SelectContent>
@@ -151,7 +147,7 @@ export function ReturnDialog({
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >
-            {t('cancel')}
+            {"Cancel"}
           </Button>
           <Button
             variant="submit"
@@ -161,10 +157,10 @@ export function ReturnDialog({
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {t('processing')}
+                {"Processing..."}
               </>
             ) : (
-              t('submitReturn')
+              "Submit Return Request"
             )}
           </Button>
         </DialogFooter>

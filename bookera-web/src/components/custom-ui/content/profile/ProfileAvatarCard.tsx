@@ -13,7 +13,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
-import { useTranslations } from "next-intl";
 import AvatarUploadModal from "../user/AvatarUploadModal";
 
 interface ProfileAvatarCardProps {
@@ -33,8 +32,6 @@ export default function ProfileAvatarCard({
   setFormData,
   setAvatarPreview,
 }: ProfileAvatarCardProps) {
-  const t = useTranslations("common");
-  const tAdmin = useTranslations("admin.common");
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
   const handleAvatarSave = (avatar: string | File) => {
@@ -53,15 +50,15 @@ export default function ProfileAvatarCard({
 
   const roleLabel =
     formData.role === "admin"
-      ? t("admin")
+      ? "Admin"
       : formData.role === "officer:catalog"
-        ? t("officerCatalog")
+        ? "Catalog Officer"
         : formData.role === "officer:management"
-          ? t("officerManagement")
+          ? "Management Officer"
           : formData.role === "user"
-            ? t("userRole")
+            ? "User"
             : formData.role ?? "—";
-  const statusLabel = formData.is_active ? tAdmin("active") : t("inactive");
+  const statusLabel = formData.is_active ? "Active" : "Inactive";
 
   return (
     <>
@@ -69,7 +66,7 @@ export default function ProfileAvatarCard({
         <CardHeader>
           <CardTitle>Avatar</CardTitle>
           <CardDescription>
-            {isEditMode ? t("uploadUserProfile") : t("userPhoto")}
+            {isEditMode ? "Upload user profile photo" : "User profile photo"}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
@@ -87,20 +84,20 @@ export default function ProfileAvatarCard({
               className="w-full"
             >
               <Upload className="h-4 w-4 mr-2" />
-              {t("uploadAvatar")}
+              {"Upload Avatar"}
             </Button>
           )}
 
           <div className="space-y-2 w-full">
             <div className="flex items-center gap-2">
               <Label className="text-muted-foreground text-xs w-16">
-                {t("role")}:
+                {"Role"}:
               </Label>
               <span className="flex-1 text-xs font-medium">{roleLabel}</span>
             </div>
             <div className="flex items-center gap-2">
               <Label className="text-muted-foreground text-xs w-16">
-                {t("status")}:
+                {"Status"}:
               </Label>
               <span className="flex-1 text-xs font-medium">{statusLabel}</span>
             </div>

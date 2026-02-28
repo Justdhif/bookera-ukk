@@ -1,7 +1,7 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { bookService } from "@/services/book.service";
 import { categoryService } from "@/services/category.service";
 import { Category } from "@/types/category";
@@ -256,6 +256,7 @@ export default function AddBookClient() {
             coverPreview={coverPreview}
             formData={{ is_active: formData.is_active }}
             onCoverImageChange={handleCoverImageChange}
+            setFormData={setFormData}
             onSwitchChange={handleSwitchChange}
             isCoverRequired={true}
             coverError={errors.cover}

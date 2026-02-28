@@ -14,14 +14,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { FineTableSkeleton } from "./FineTableSkeleton";
 import { Search } from "lucide-react";
 
 export default function FineManagement() {
-  const t = useTranslations('common');
-  const tAdmin = useTranslations('admin');
   const [fines, setFines] = useState<Fine[]>([]);
   const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -34,11 +31,11 @@ export default function FineManagement() {
 
     try {
       await fineService.delete(deleteId);
-      toast.success(t('fineDeleted'));
+      toast.success("Fine deleted successfully");
       setDeleteId(null);
       fetchFines();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || t('failedLoadFines'));
+      toast.error(err.response?.data?.message || "Failed to load fines");
     }
   };
 
@@ -56,7 +53,7 @@ export default function FineManagement() {
       const res = await fineService.getAll(params);
       setFines(res.data.data);
     } catch (err) {
-      toast.error(t('failedLoadFines'));
+      toast.error("Failed to load fines");
     } finally {
       setLoading(false);
     }
@@ -83,20 +80,20 @@ export default function FineManagement() {
   const handleMarkAsPaid = async (id: number) => {
     try {
       await fineService.markAsPaid(id);
-      toast.success(t('fineMarkedPaid'));
+      toast.success("Fine marked as paid successfully");
       fetchFines();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || t('failedToProcessPayment'));
+      toast.error(err.response?.data?.message || "Failed to process payment");
     }
   };
 
   const handleWaive = async (id: number) => {
     try {
       await fineService.waive(id);
-      toast.success(t('fineCancelled'));
+      toast.success("Fine cancelled successfully");
       fetchFines();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || t('failedToWaiveFine'));
+      toast.error(err.response?.data?.message || "Failed to waive fine");
     }
   };
 
@@ -104,9 +101,9 @@ export default function FineManagement() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h2 className="text-2xl font-bold">{tAdmin('fines.finesTab')}</h2>
+          <h2 className="text-2xl font-bold">{"Fines"}</h2>
           <p className="text-muted-foreground">
-            {tAdmin('fines.finesTabDescription')}
+            {"Manage fines imposed on borrowers"}
           </p>
         </div>
       </div>
@@ -115,7 +112,7 @@ export default function FineManagement() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={t('searchFines')}
+            placeholder={"Search fines..."}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -126,10 +123,10 @@ export default function FineManagement() {
             <SelectValue placeholder="Filter Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{tAdmin('fines.allStatus')}</SelectItem>
-            <SelectItem value="unpaid">{tAdmin('fines.unpaid')}</SelectItem>
-            <SelectItem value="paid">{tAdmin('fines.paid')}</SelectItem>
-            <SelectItem value="waived">{tAdmin('fines.waived')}</SelectItem>
+            <SelectItem value="all">{"All Status"}</SelectItem>
+            <SelectItem value="unpaid">{"Unpaid"}</SelectItem>
+            <SelectItem value="paid">{"Paid"}</SelectItem>
+            <SelectItem value="waived">{"Waived"}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -147,8 +144,8 @@ export default function FineManagement() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title={t('deleteFine')}
-        description={tAdmin('common.deleteFineWarning')}
+        title={"Delete Fine"}
+        description={"Deleted fines cannot be recovered."}
         onConfirm={confirmDelete}
       />
     </div>

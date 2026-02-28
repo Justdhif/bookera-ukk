@@ -18,7 +18,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { DatePicker } from "@/components/ui/date-picker";
 import { BookOpen, Loader2, X } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface BorrowFromCollectionDialogProps {
@@ -34,19 +33,16 @@ export function BorrowFromCollectionDialog({
   selectedBooks,
   onSuccess,
 }: BorrowFromCollectionDialogProps) {
-  const t = useTranslations("common");
   const [loading, setLoading] = useState(false);
   const [selectedCopies, setSelectedCopies] = useState<number[]>([]);
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
 
   useEffect(() => {
     if (open) {
-      // Set default due date to 7 days from now
       const defaultDate = new Date();
       defaultDate.setDate(defaultDate.getDate() + 7);
       setDueDate(defaultDate);
     } else {
-      // Reset form
       setSelectedCopies([]);
       setDueDate(undefined);
     }
@@ -54,12 +50,12 @@ export function BorrowFromCollectionDialog({
 
   const handleSubmit = async () => {
     if (selectedCopies.length === 0) {
-      toast.error(t("minOneCopy"));
+      toast.error("Select at least 1 book copy to borrow");
       return;
     }
 
     if (!dueDate) {
-      toast.error(t("selectDueDate"));
+      toast.error("Select due date");
       return;
     }
 
@@ -69,13 +65,13 @@ export function BorrowFromCollectionDialog({
         book_copy_ids: selectedCopies,
         due_date: dueDate.toISOString().split("T")[0],
       });
-      toast.success(response.data.message || t("borrowRequestCreated"));
+      toast.success(response.data.message || "Borrow request created successfully and awaiting admin approval");
       onOpenChange(false);
       setSelectedCopies([]);
       setDueDate(undefined);
       onSuccess();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t("failedCreateBorrow"));
+      toast.error(error.response?.data?.message || "Failed to create borrow request");
     } finally {
       setLoading(false);
     }
@@ -113,10 +109,10 @@ export function BorrowFromCollectionDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5" />
-            {t("borrowBooks")} - {selectedBooks.length} {t("booksSelected")}
+            {"Borrow Books"} - {selectedBooks.length} {"books selected"}
           </DialogTitle>
           <DialogDescription>
-            {t("selectCopiesFromCollectionDesc")}
+            {"Select book copies from each book you want to borrow"}
           </DialogDescription>
         </DialogHeader>
 
@@ -153,7 +149,7 @@ export function BorrowFromCollectionDialog({
                             {totalCopies} Total
                           </Badge>
                           <Badge variant="destructive" className="text-xs">
-                            {t("noCopiesAvailable")}
+                            {"No book copies available"}
                           </Badge>
                         </div>
                       </div>
@@ -184,7 +180,7 @@ export function BorrowFromCollectionDialog({
                           {totalCopies} Total
                         </Badge>
                         <Badge variant="secondary" className="text-xs">
-                          {availableCopies.length} {t("available")}
+                          {availableCopies.length} {"Available"}
                         </Badge>
                       </div>
                     </div>
@@ -192,7 +188,7 @@ export function BorrowFromCollectionDialog({
 
                   <div className="p-3 space-y-1 bg-background">
                     <Label className="text-xs font-medium text-muted-foreground mb-2 block">
-                      {t("selectCopies")}:
+                      {"Select copies"}:
                     </Label>
                     <div className="space-y-1">
                       {availableCopies.map((copy) => (
@@ -214,7 +210,7 @@ export function BorrowFromCollectionDialog({
                             {copy.copy_code}
                           </label>
                           <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0">
-                            {t("available")}
+                            {"Available"}
                           </Badge>
                         </div>
                       ))}
@@ -230,7 +226,7 @@ export function BorrowFromCollectionDialog({
           <div className="space-y-3 border-t pt-4">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-semibold">
-                {t("selectedCopies", { count: selectedCopies.length })}
+                {"Selected Copies"}
               </Label>
               <Badge variant="secondary" className="text-xs">
                 {selectedCopies.length} Selected
@@ -257,11 +253,11 @@ export function BorrowFromCollectionDialog({
         )}
 
         <div className="space-y-2 border-t pt-4">
-          <Label className="text-sm font-semibold" variant="required">{t("dueDate")}</Label>
+          <Label className="text-sm font-semibold" variant="required">{"Due Date"}</Label>
           <DatePicker
             value={dueDate}
             onChange={setDueDate}
-            placeholder={t("selectReturnDate")}
+            placeholder={"Select return date"}
             minDate={new Date()}
           />
         </div>
@@ -272,7 +268,7 @@ export function BorrowFromCollectionDialog({
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >
-            {t("cancel")}
+            {"Cancel"}
           </Button>
           <Button
             variant="submit"
@@ -280,7 +276,7 @@ export function BorrowFromCollectionDialog({
             disabled={loading || selectedCopies.length === 0}
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {t("createLoan")}
+            {"Create Loan"}
           </Button>
         </DialogFooter>
       </DialogContent>

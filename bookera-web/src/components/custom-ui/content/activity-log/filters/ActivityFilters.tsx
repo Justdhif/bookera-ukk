@@ -13,8 +13,6 @@ import {
 } from "@/components/ui/select";
 import { ActivityLogFilters as Filters } from "@/types/activity-log";
 import { Search, X } from "lucide-react";
-import { useTranslations } from "next-intl";
-
 interface ActivityFiltersProps {
   filters: Filters;
   onFilterChange: (filters: Filters) => void;
@@ -24,7 +22,6 @@ export default function ActivityFilters({
   filters,
   onFilterChange,
 }: ActivityFiltersProps) {
-  const t = useTranslations('admin.activityLogs');
   const [localFilters, setLocalFilters] = useState(filters);
 
   const handleApplyFilters = () => {
@@ -50,7 +47,7 @@ export default function ActivityFilters({
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder={t('searchDescription')}
+              placeholder={"Search description..."}
               value={localFilters.search || ""}
               onChange={(e) =>
                 setLocalFilters({ ...localFilters, search: e.target.value })
@@ -67,15 +64,15 @@ export default function ActivityFilters({
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder={t('filterByAction')} />
+              <SelectValue placeholder={"Filter by action"} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('allActions')}</SelectItem>
-              <SelectItem value="login">{t('login')}</SelectItem>
-              <SelectItem value="logout">{t('logout')}</SelectItem>
-              <SelectItem value="create">{t('create')}</SelectItem>
-              <SelectItem value="update">{t('update')}</SelectItem>
-              <SelectItem value="delete">{t('delete')}</SelectItem>
+              <SelectItem value="all">{"All Actions"}</SelectItem>
+              <SelectItem value="login">{"Login"}</SelectItem>
+              <SelectItem value="logout">{"Logout"}</SelectItem>
+              <SelectItem value="create">{"Create"}</SelectItem>
+              <SelectItem value="update">{"Update"}</SelectItem>
+              <SelectItem value="delete">{"Delete"}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -86,22 +83,22 @@ export default function ActivityFilters({
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder={t('filterByModule')} />
+              <SelectValue placeholder={"Filter by module"} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('allModules')}</SelectItem>
-              <SelectItem value="auth">{t('auth')}</SelectItem>
-              <SelectItem value="book">{t('book')}</SelectItem>
-              <SelectItem value="loan">{t('loan')}</SelectItem>
-              <SelectItem value="user">{t('user')}</SelectItem>
-              <SelectItem value="category">{t('category')}</SelectItem>
+              <SelectItem value="all">{"All Modules"}</SelectItem>
+              <SelectItem value="auth">{"Auth"}</SelectItem>
+              <SelectItem value="book">{"Book"}</SelectItem>
+              <SelectItem value="loan">{"Loan"}</SelectItem>
+              <SelectItem value="user">{"User"}</SelectItem>
+              <SelectItem value="category">{"Category"}</SelectItem>
             </SelectContent>
           </Select>
 
           <div className="flex gap-2">
             <Button onClick={handleApplyFilters} variant="brand" className="flex-1 shadow-sm hover:shadow-md transition-shadow">
               <Search className="h-4 w-4 mr-2" />
-              {t('applyFilter')}
+              {"Apply Filter"}
             </Button>
             <Button onClick={handleReset} variant="outline" size="icon" className="hover:bg-destructive hover:text-white hover:border-destructive transition-colors">
               <X className="h-4 w-4" />

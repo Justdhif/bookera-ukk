@@ -10,8 +10,6 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { getNotificationIcon } from "./notification-utils";
 import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
-
 interface NotificationListProps {
   notifications: Notification[];
   loading: boolean;
@@ -35,7 +33,6 @@ export default function NotificationList({
   onMarkAllAsRead,
   isMarkingAll = false,
 }: NotificationListProps) {
-  const t = useTranslations('admin.notifications');
   const [searchValue, setSearchValue] = useState("");
   const [statusValue, setStatusValue] = useState("all");
 
@@ -50,16 +47,16 @@ export default function NotificationList({
   };
 
   const statusOptions = [
-    { value: "all", label: t('allStatus') },
-    { value: "unread", label: t('unread') },
-    { value: "read", label: t('read') },
+    { value: "all", label: "All Status" },
+    { value: "unread", label: "Unread" },
+    { value: "read", label: "Read" },
   ];
 
   return (
     <Card className="h-[calc(100vh-7rem)]">
       <CardHeader className="border-b pb-3">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-lg">{t('allNotifications')}</h3>
+          <h3 className="font-semibold text-lg">{"All Notifications"}</h3>
           {notifications.length > 0 && (
             <Badge variant="secondary">{notifications.length}</Badge>
           )}
@@ -79,7 +76,7 @@ export default function NotificationList({
               ) : (
                 <CheckCheck className="h-4 w-4 mr-2" />
               )}
-              {t('markAllAsRead')}
+              {"Mark all as read"}
             </Button>
           </div>
         )}
@@ -88,7 +85,7 @@ export default function NotificationList({
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder={t('searchNotifications')}
+              placeholder={"Search notifications..."}
               value={searchValue}
               onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-10"
@@ -96,7 +93,7 @@ export default function NotificationList({
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground">{t('statusFilter')}</p>
+            <p className="text-xs font-medium text-muted-foreground">{"Status"}</p>
             <div className="flex flex-wrap gap-2">
               {statusOptions.map((option) => {
                 const isActive = statusValue === option.value;
@@ -121,8 +118,8 @@ export default function NotificationList({
           </div>
 
           <div className="text-xs text-muted-foreground pt-1">
-            {notifications.length} {t('notificationsCount')}
-            {unreadCount > 0 && ` • ${unreadCount} ${t('unreadCount')}`}
+            {notifications.length} {"notifications"}
+            {unreadCount > 0 && ` • ${unreadCount} ${"unread"}`}
           </div>
         </div>
       </CardHeader>
@@ -135,9 +132,9 @@ export default function NotificationList({
         ) : notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
             <Bell className="h-12 w-12 text-muted-foreground mb-3" />
-            <p className="text-lg font-medium mb-1">{t('noNotifications')}</p>
+            <p className="text-lg font-medium mb-1">{"No notifications"}</p>
             <p className="text-sm text-muted-foreground">
-              {t('noNotificationsMatch')}
+              {"No notifications match your filters"}
             </p>
           </div>
         ) : (

@@ -3,8 +3,6 @@
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useTranslations } from "next-intl";
-
 export default function EmptyState({
   title,
   description,
@@ -20,7 +18,6 @@ export default function EmptyState({
   onAction?: () => void;
   className?: string;
 }) {
-  const t = useTranslations('common');
   return (
     <div
       className={cn(

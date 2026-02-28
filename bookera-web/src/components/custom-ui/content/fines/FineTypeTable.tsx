@@ -13,8 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import { FineType } from "@/types/fine";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { DollarSign, Edit, Trash2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-
 const typeColors = {
   lost: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
   damaged: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
@@ -30,19 +28,17 @@ export default function FineTypeTable({
   onEdit: (fineType: FineType) => void;
   onDelete: (id: number) => void;
 }) {
-  const t = useTranslations("admin.fines");
-
   const typeLabels = {
-    lost: t("lost"),
-    damaged: t("damaged"),
-    late: t("late"),
+    lost: "Lost",
+    damaged: "Damaged",
+    late: "Late",
   };
 
   if (data.length === 0) {
     return (
       <EmptyState
-        title={t("noFineTypes")}
-        description={t("noFineTypesDesc")}
+        title={"No fine types yet"}
+        description={"Fine types will appear after you add them."}
         icon={<DollarSign className="h-10 w-10" />}
       />
     );
@@ -53,11 +49,11 @@ export default function FineTypeTable({
       <TableHeader>
         <TableRow className="bg-muted/50 hover:bg-muted/50">
           <TableHead className="w-16 text-center">#</TableHead>
-          <TableHead className="font-semibold">{t("name")}</TableHead>
-          <TableHead className="font-semibold">{t("type")}</TableHead>
-          <TableHead className="font-semibold">{t("amount")}</TableHead>
-          <TableHead className="font-semibold">{t("description")}</TableHead>
-          <TableHead className="font-semibold text-right">{t("actions")}</TableHead>
+          <TableHead className="font-semibold">{"Name"}</TableHead>
+          <TableHead className="font-semibold">{"Type"}</TableHead>
+          <TableHead className="font-semibold">{"Amount"}</TableHead>
+          <TableHead className="font-semibold">{"Manage library fines"}</TableHead>
+          <TableHead className="font-semibold text-right">{"Actions"}</TableHead>
         </TableRow>
       </TableHeader>
 
@@ -102,7 +98,7 @@ export default function FineTypeTable({
                   className="h-8 gap-1"
                 >
                   <Edit className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t("edit")}</span>
+                  <span className="hidden sm:inline">{"Edit"}</span>
                 </Button>
 
                 <Button
@@ -112,7 +108,7 @@ export default function FineTypeTable({
                   className="h-8 gap-1"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t("delete")}</span>
+                  <span className="hidden sm:inline">{"Delete"}</span>
                 </Button>
               </div>
             </TableCell>

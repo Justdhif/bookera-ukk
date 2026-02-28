@@ -133,14 +133,14 @@ export function BookFilter({ categories, onChange, isLoading = false }: Props) {
                   rounded-md border
                   ${
                     isAllActive
-                      ? "bg-brand-primary text-primary-foreground border-brand-primary shadow-sm"
+                      ? "bg-brand-primary text-primary-foreground border-brand-primary shadow-sm text-white"
                       : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
                   }
                 `}
                 onClick={() => handleCategoryClick(null)}
               >
-                <span className="flex items-center gap-1.5 text-white">
-                  All
+                <span className="flex items-center gap-1.5">
+                  All Categories
                 </span>
               </Badge>
             </div>
@@ -158,10 +158,10 @@ export function BookFilter({ categories, onChange, isLoading = false }: Props) {
                     className={`
                       cursor-pointer whitespace-nowrap transition-all duration-200
                       px-3 py-2 text-sm font-medium
-                      rounded-md border text-white
+                      rounded-md border
                       ${
                         isActive
-                          ? "bg-brand-primary border-brand-primary shadow-sm"
+                          ? "bg-brand-primary border-brand-primary shadow-sm text-white"
                           : "bg-background border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
                       }
                     `}

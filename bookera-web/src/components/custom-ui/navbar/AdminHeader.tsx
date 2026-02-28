@@ -10,7 +10,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,11 +19,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings, FileText, Shield } from "lucide-react";
-import { useTranslations } from "next-intl";
 import NotificationButton from "./NotificationButton";
 
 export default function AdminHeader() {
-  const t = useTranslations('header');
   const pathname = usePathname();
   const router = useRouter();
   const segments = pathname.replace("/admin", "").split("/").filter(Boolean);
@@ -39,7 +37,7 @@ export default function AdminHeader() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin">{t('dashboard')}</BreadcrumbLink>
+            <BreadcrumbLink href="/admin">{"Dashboard"}</BreadcrumbLink>
           </BreadcrumbItem>
 
           {segments.map((seg, idx) => {
@@ -73,15 +71,15 @@ export default function AdminHeader() {
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => router.push("/admin/settings")}>
               <Settings className="h-4 w-4 mr-2" />
-              {t('settings')}
+              {"Settings"}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push("/admin/terms-of-service")}>
               <FileText className="h-4 w-4 mr-2" />
-              {t('termsOfService')}
+              {"Terms of Service"}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push("/admin/privacy-policy")}>
               <Shield className="h-4 w-4 mr-2" />
-              {t('privacyPolicy')}
+              {"Privacy Policy"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

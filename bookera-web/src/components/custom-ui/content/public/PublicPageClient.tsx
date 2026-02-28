@@ -5,11 +5,9 @@ import CategoryBubble from "./CategoryBubble";
 import BookList from "./BookList";
 import { bookService } from "@/services/book.service";
 import { Book } from "@/types/book";
-import { useTranslations } from "next-intl";
 import SavesList from "./SavesList";
 
 export default function PublicPageClient() {
-  const t = useTranslations("header");
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
 

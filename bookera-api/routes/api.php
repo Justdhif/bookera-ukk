@@ -71,10 +71,14 @@ Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::post('/setup-profile', [AuthController::class, 'setupProfile']);
+        
     });
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::put('users/{user}', [UserController::class, 'update']);
+    Route::patch('users/{user}', [UserController::class, 'update']);
 
     Route::middleware('role:admin,officer:*')->prefix('admin')->group(function () {
 
@@ -107,8 +111,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/', [UserController::class, 'store']);
             Route::get('/identification/{identificationNumber}', [UserController::class, 'showByIdentification']);
             Route::get('/{user}', [UserController::class, 'show']);
-            Route::put('/{user}', [UserController::class, 'update']);
-            Route::patch('/{user}', [UserController::class, 'update']);
             Route::delete('/{user}', [UserController::class, 'destroy']);
         });
 
@@ -193,6 +195,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('my-loans', [LoanController::class, 'getLoanByUser']);
 
     Route::get('my-fines', [FineController::class, 'myFines']);
+
+
 
     Route::get('book-returns/{bookReturn}', [BookReturnController::class, 'show']);
 

@@ -1,7 +1,7 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { loanService } from "@/services/loan.service";
 import { Loan } from "@/types/loan";
 import { toast } from "sonner";
@@ -22,8 +22,6 @@ export default function LoanClient() {
     null,
   );
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Dialog states
   const [rejectDialog, setRejectDialog] = useState<{
     open: boolean;
     loan: Loan | null;
@@ -152,8 +150,6 @@ export default function LoanClient() {
       </div>
     );
   };
-
-  // Filter loans by status
   const pendingLoans = allLoans.filter((loan) => loan.status === "pending");
   const waitingLoans = allLoans.filter((loan) => loan.status === "waiting");
   const borrowedLoans = allLoans.filter((loan) => loan.status === "borrowed");

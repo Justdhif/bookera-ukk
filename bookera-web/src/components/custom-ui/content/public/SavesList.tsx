@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/auth.store";
@@ -10,7 +11,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookMarked, Plus, LogIn, Library, Loader2 } from "lucide-react";
 import SaveCard from "./SaveCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useTranslations } from "next-intl";
 import {
   Tooltip,
   TooltipContent,
@@ -44,9 +43,6 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
   const [formData, setFormData] = useState({ name: "", description: "" });
   const [isCreating, setIsCreating] = useState(false);
   const router = useRouter();
-  const t = useTranslations("collections");
-  const tCommon = useTranslations("common");
-
   const fetchSaves = async () => {
     if (!isAuthenticated) {
       return;
@@ -78,19 +74,19 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
 
   const handleCreateSave = async () => {
     if (!formData.name.trim()) {
-      toast.error(t("nameRequired"));
+      toast.error("Please enter a name for your collection");
       return;
     }
 
     setIsCreating(true);
     try {
       await saveService.create(formData);
-      toast.success(t("createSuccess"));
+      toast.success("Collection created successfully");
       setShowCreateDialog(false);
       setFormData({ name: "", description: "" });
       fetchSaves();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t("createFailed"));
+      toast.error(error.response?.data?.message || "Failed to create collection");
     } finally {
       setIsCreating(false);
     }
@@ -117,7 +113,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="right">
-                <p>{t("loginRequired")}</p>
+                <p>{"Login Required"}</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -128,16 +124,16 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
     return (
       <div className="h-full flex flex-col justify-center items-center px-6 py-8 text-center">
         <BookMarked className="h-16 w-16 mb-4 text-muted-foreground" />
-        <h4 className="font-semibold text-foreground mb-2">{t("loginRequired")}</h4>
+        <h4 className="font-semibold text-foreground mb-2">{"Login Required"}</h4>
         <p className="text-sm text-muted-foreground mb-6">
-          {t("loginRequiredDesc")}
+          {"Sign in to create and manage your book collections"}
         </p>
         <Button
           onClick={() => router.push("/login")}
           className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8"
         >
           <LogIn className="h-4 w-4" />
-          {t("loginToContinue")}
+          {"Login to Continue"}
         </Button>
       </div>
     );
@@ -149,7 +145,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BookMarked className="h-4 w-4 md:h-5 md:w-5 text-primary" />
-            <h3 className="font-semibold text-sm md:text-base">{t("title")}</h3>
+            <h3 className="font-semibold text-sm md:text-base">{"My Collections"}</h3>
           </div>
           <Button
             size="sm"
@@ -158,7 +154,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
             className="gap-1.5 h-8 text-xs md:text-sm"
           >
             <Plus className="h-3 w-3 md:h-4 md:w-4" />
-            <span className="hidden xs:inline">{t("new")}</span>
+            <span className="hidden xs:inline">{"New"}</span>
           </Button>
         </div>
 
@@ -176,14 +172,14 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
         ) : saves.length === 0 ? (
           <Card className="p-3 md:p-4">
             <div className="text-center text-xs md:text-sm text-muted-foreground">
-              <p>{t("noCollections")}</p>
+              <p>{"No collections yet"}</p>
               <Button
                 variant="link"
                 size="sm"
                 className="mt-1 h-auto p-0 text-xs md:text-sm"
                 onClick={() => setShowCreateDialog(true)}
               >
-                {t("createFirst")}
+                {"Create your first collection"}
               </Button>
             </div>
           </Card>
@@ -202,7 +198,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
                         {save.name}
                       </p>
                       <p className="text-[10px] md:text-xs text-muted-foreground">
-                        {save.total_books} {save.total_books === 1 ? t("book") : t("books")}
+                        {save.total_books} {save.total_books === 1 ? "book" : "books"}
                       </p>
                     </div>
                   </Card>
@@ -214,8 +210,6 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
       </div>
     );
   }
-
-  // Desktop Sidebar Mode
   if (isCollapsed) {
     return (
       <TooltipProvider>
@@ -241,7 +235,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                  <p>{t("createNew")}</p>
+                  <p>{"Create New Collection"}</p>
                 </TooltipContent>
               </Tooltip>
             ) : (
@@ -271,7 +265,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
                   <TooltipContent side="right">
                     <p className="font-medium">{save.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {save.total_books} {save.total_books === 1 ? t("book") : t("books")}
+                      {save.total_books} {save.total_books === 1 ? "book" : "books"}
                     </p>
                   </TooltipContent>
                 </Tooltip>
@@ -290,7 +284,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-2">
             <Library className="h-5 w-5 text-muted-foreground" />
-            <h3 className="font-semibold text-foreground">{tCommon("yourLibrary")}</h3>
+            <h3 className="font-semibold text-foreground">{"Your Library"}</h3>
           </div>
 
           <div className="flex items-center gap-1">
@@ -324,14 +318,14 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
             ) : saves.length === 0 ? (
               <div className="py-8 text-center text-sm text-muted-foreground">
                 <BookMarked className="h-12 w-12 mx-auto mb-2 opacity-30" />
-                <p>{t("noCollections")}</p>
+                <p>{"No collections yet"}</p>
                 <Button
                   variant="link"
                   size="sm"
                   className="mt-2"
                   onClick={() => setShowCreateDialog(true)}
                 >
-                  {t("createFirst")}
+                  {"Create your first collection"}
                 </Button>
               </div>
             ) : (
@@ -360,7 +354,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
                         {save.name}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {save.total_books} {save.total_books === 1 ? t("book") : t("books")}
+                        {save.total_books} {save.total_books === 1 ? "book" : "books"}
                       </p>
                     </div>
                   </div>
@@ -371,21 +365,21 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
         </ScrollArea>
       </div>
 
-      {/* Create Save Dialog */}
+      
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("createNew")}</DialogTitle>
+            <DialogTitle>{"Create New Collection"}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="name" variant="required">
-                {t("name")}
+                {"Name"}
               </Label>
               <Input
                 id="name"
-                placeholder={t("namePlaceholder")}
+                placeholder={"e.g., My Favorites, To Read, etc."}
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
@@ -394,10 +388,10 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">{t("description")}</Label>
+              <Label htmlFor="description">{"Description"}</Label>
               <Textarea
                 id="description"
-                placeholder={t("descriptionPlaceholder")}
+                placeholder={"Optional description..."}
                 value={formData.description}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
@@ -412,7 +406,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
               onClick={() => setShowCreateDialog(false)}
               disabled={isCreating}
             >
-              {t("cancel")}
+              {"Cancel"}
             </Button>
             <Button
               variant="submit"
@@ -420,7 +414,7 @@ export default function SavesList({ mode = "sidebar", isCollapsed = false }: Sav
               disabled={isCreating || !formData.name.trim()}
             >
               {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isCreating ? t("creating") : t("create")}
+              {isCreating ? "Creating..." : "Create Collection"}
             </Button>
           </DialogFooter>
         </DialogContent>

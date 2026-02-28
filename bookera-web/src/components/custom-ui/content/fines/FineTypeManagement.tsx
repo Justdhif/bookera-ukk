@@ -7,14 +7,11 @@ import FineTypeTable from "./FineTypeTable";
 import FineTypeFormDialog from "./FineTypeFormDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { FineTypeTableSkeleton } from "./FineTypeTableSkeleton";
 import { Plus } from "lucide-react";
 
 export default function FineTypeManagement() {
-  const t = useTranslations('common');
-  const tAdmin = useTranslations('admin');
   const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -26,11 +23,11 @@ export default function FineTypeManagement() {
 
     try {
       await fineTypeService.delete(deleteId);
-      toast.success(t('fineTypeDeleted'));
+      toast.success("Fine type deleted successfully");
       setDeleteId(null);
       fetchFineTypes();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || t('failedToDeleteFineType'));
+      toast.error(err.response?.data?.message || "Failed to delete fine type");
     }
   };
 
@@ -40,7 +37,7 @@ export default function FineTypeManagement() {
       const res = await fineTypeService.getAll();
       setFineTypes(res.data.data);
     } catch (err) {
-      toast.error(t('failedLoadFineTypes'));
+      toast.error("Failed to load fine types");
     } finally {
       setLoading(false);
     }
@@ -54,9 +51,9 @@ export default function FineTypeManagement() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h2 className="text-2xl font-bold">{tAdmin('fines.fineTypesTab')}</h2>
+          <h2 className="text-2xl font-bold">{"Fine Types"}</h2>
           <p className="text-muted-foreground">
-            {tAdmin('fines.fineTypesTabDescription')}
+            {"Configure different types of fines"}
           </p>
         </div>
         <Button
@@ -68,7 +65,7 @@ export default function FineTypeManagement() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          {t('addFineType')}
+          {"Add Fine Type"}
         </Button>
       </div>
 
@@ -88,8 +85,8 @@ export default function FineTypeManagement() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title={t('deleteFineType')}
-        description={tAdmin('common.deleteFineTypeWarning')}
+        title={"Delete Fine Type"}
+        description={"Deleted fine types cannot be recovered."}
         onConfirm={confirmDelete}
       />
 

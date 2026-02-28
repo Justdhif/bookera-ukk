@@ -1,17 +1,13 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { Book } from "@/types/book";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { BookOpen } from "lucide-react";
-import { useTranslations } from 'next-intl';
-
 export default function BookCard({ book }: { book: Book }) {
   const router = useRouter();
-  const t = useTranslations('books');
-
   return (
     <div className="border rounded-lg p-3 space-y-3">
       <div className="relative">
@@ -25,7 +21,7 @@ export default function BookCard({ book }: { book: Book }) {
               variant={book.available_copies && book.available_copies > 0 ? "default" : "secondary"}
               className={book.available_copies && book.available_copies > 0 ? "bg-brand-primary hover:bg-brand-primary-dark text-white text-xs" : "text-xs"}
             >
-              {book.available_copies || 0}/{book.total_copies} {t('available')}
+              {book.available_copies || 0}/{book.total_copies} {"Available"}
             </Badge>
           </div>
         )}
@@ -42,7 +38,7 @@ export default function BookCard({ book }: { book: Book }) {
         onClick={() => router.push(`/books/${book.slug}`)}
         className="w-full"
       >
-        {t('detail')}
+        {"Detail"}
       </Button>
     </div>
   );

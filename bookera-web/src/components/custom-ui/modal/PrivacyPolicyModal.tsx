@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import { privacyPolicyService } from "@/services/privacy-policy.service";
 import { PrivacyPolicy } from "@/types/privacy-policy";
-import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Loader2, Shield } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -23,7 +22,6 @@ export function PrivacyPolicyModal({
   open,
   onOpenChange,
 }: PrivacyPolicyModalProps) {
-  const t = useTranslations('admin.privacyPolicy');
   const [contents, setContents] = useState<PrivacyPolicy[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -41,7 +39,7 @@ export function PrivacyPolicyModal({
       setContents(items);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || t('failedToLoad')
+        error.response?.data?.message || "Failed to load Privacy Policy"
       );
     } finally {
       setLoading(false);
@@ -54,7 +52,7 @@ export function PrivacyPolicyModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
             <Shield className="w-5 h-5 text-brand-primary" />
-            {t('title')}
+            {"Privacy Policy"}
           </DialogTitle>
         </DialogHeader>
 
@@ -67,7 +65,7 @@ export function PrivacyPolicyModal({
             <div className="space-y-6 pr-4">
               <div className="p-4 bg-linear-to-r from-brand-primary/5 to-brand-primary/10 dark:from-brand-primary/10 dark:to-brand-primary/20 rounded-lg border border-brand-primary/20 dark:border-brand-primary/30">
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  {t('lastUpdated')}:{" "}
+                  {"Last updated"}:{" "}
                   {new Date(
                     contents[contents.length - 1].updated_at
                   ).toLocaleDateString("id-ID", {
@@ -77,11 +75,11 @@ export function PrivacyPolicyModal({
                   })}
                 </p>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                  {contents.length} {t('sections')}
+                  {contents.length} {"sections"}
                 </p>
               </div>
 
-              {/* Display all sections */}
+              
               <div className="prose prose-sm dark:prose-invert max-w-none space-y-6">
                 {contents.map((item) => (
                   <div
@@ -104,7 +102,7 @@ export function PrivacyPolicyModal({
               <div className="mb-4 flex justify-center opacity-50">
                 <Shield className="w-12 h-12" />
               </div>
-              <p>{t('contentNotAvailable')}</p>
+              <p>{"Content not available"}</p>
             </div>
           )}
         </ScrollArea>

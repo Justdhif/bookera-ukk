@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import {
   Table,
@@ -22,9 +23,6 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-
 export default function LostBooksTable({
   data,
   onDelete,
@@ -39,17 +37,11 @@ export default function LostBooksTable({
   actionLoading: number | null;
 }) {
   const router = useRouter();
-  const t = useTranslations('admin.lostBooks');
-  const tAdmin = useTranslations('admin.common');
-  const tCommon = useTranslations('common');
-  const tFines = useTranslations('admin.fines');
-  const tDashboard = useTranslations('admin.dashboard');
-
   if (data.length === 0) {
     return (
       <EmptyState
-        title={tAdmin('noLostBooksYet')}
-        description={tAdmin('noLostBooksDesc')}
+        title={"No lost books yet"}
+        description={"Lost book reports will appear here."}
         icon={<AlertCircle className="h-10 w-10" />}
       />
     );
@@ -61,13 +53,13 @@ export default function LostBooksTable({
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="w-16 text-center">#</TableHead>
-            <TableHead className="font-semibold">{tFines('borrower')}</TableHead>
-            <TableHead className="font-semibold">{tDashboard('book')}</TableHead>
-            <TableHead className="font-semibold">{tFines('loanId')}</TableHead>
-            <TableHead className="font-semibold">{tCommon('loanStatus')}</TableHead>
-            <TableHead className="font-semibold">{tCommon('dateLost')}</TableHead>
-            <TableHead className="font-semibold">{t('notes')}</TableHead>
-            <TableHead className="font-semibold text-right">{tAdmin('actions')}</TableHead>
+            <TableHead className="font-semibold">{"Borrower"}</TableHead>
+            <TableHead className="font-semibold">{"Book"}</TableHead>
+            <TableHead className="font-semibold">{"Loan ID"}</TableHead>
+            <TableHead className="font-semibold">{"Loan Status"}</TableHead>
+            <TableHead className="font-semibold">{"Date Lost"}</TableHead>
+            <TableHead className="font-semibold">{"Notes"}</TableHead>
+            <TableHead className="font-semibold text-right">{"Actions"}</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -100,7 +92,7 @@ export default function LostBooksTable({
                       {item.book_copy?.book?.title || "-"}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {tCommon('copyCodeLabel')}: {item.book_copy?.copy_code || "-"}
+                      {"Copy Code"}: {item.book_copy?.copy_code || "-"}
                     </div>
                   </div>
                 </div>
@@ -151,11 +143,11 @@ export default function LostBooksTable({
                     </div>
                   ) : (
                     <span className="text-muted-foreground italic">
-                      {t('unknownLostDate')}
+                      {"Unknown lost date"}
                     </span>
                   )}
                   <div className="text-xs text-muted-foreground">
-                    {t('reportedAt')}{" "}
+                    {"Reported at"}{" "}
                     {format(new Date(item.created_at), "dd MMM yyyy", {
                       locale: localeId,
                     })}
@@ -170,7 +162,7 @@ export default function LostBooksTable({
                   </div>
                 ) : (
                   <span className="text-muted-foreground italic text-sm">
-                    {t('noNotes')}
+                    {"No notes"}
                   </span>
                 )}
               </TableCell>
@@ -178,7 +170,6 @@ export default function LostBooksTable({
               <TableCell>
                 <div className="flex justify-end items-center gap-2">
                   {item.loan?.status === "checking" && (() => {
-                    // Check fines status
                     const unpaidFines = item.loan?.fines?.filter((f: any) => f.status === "unpaid") || [];
                     const hasFines = item.loan?.fines && item.loan.fines.length > 0;
                     const hasUnpaidFines = unpaidFines.length > 0;

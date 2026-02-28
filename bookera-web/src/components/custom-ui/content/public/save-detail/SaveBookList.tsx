@@ -1,7 +1,7 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Book } from "@/types/book";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,8 +9,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { BookMarked, LayoutGrid, List, Eye, Trash } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { useTranslations } from "next-intl";
-
 interface SaveBookListProps {
   books: Book[];
   selectedBooks: number[];
@@ -30,14 +28,12 @@ export default function SaveBookList({
 }: SaveBookListProps) {
   const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const t = useTranslations("collections.detail");
-
   if (!books || books.length === 0) {
     return (
       <Card className="p-8 sm:p-12">
         <div className="text-center text-muted-foreground">
           <BookMarked className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 opacity-30" />
-          <p className="text-sm sm:text-base">{t("noBooksYet")}</p>
+          <p className="text-sm sm:text-base">{"No books in this collection yet"}</p>
         </div>
       </Card>
     );
@@ -101,7 +97,7 @@ export default function SaveBookList({
                     }
                   >
                     {book.available_copies || 0}/{book.total_copies || 0}{" "}
-                    {t("available")}
+                    {"Available"}
                   </Badge>
                 </div>
               </div>
@@ -122,7 +118,7 @@ export default function SaveBookList({
                   }}
                 >
                   <Eye className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t("detail")}</span>
+                  <span className="hidden sm:inline">{"Detail"}</span>
                 </Button>
                 <Button
                   variant="outline"
@@ -133,7 +129,7 @@ export default function SaveBookList({
                     onRemoveBook(book.id);
                   }}
                 >
-                  {t("remove")}
+                  {"Remove"}
                 </Button>
               </div>
             </div>
@@ -141,7 +137,7 @@ export default function SaveBookList({
         </div>
       )}
 
-      {/* List View */}
+      
       {viewMode === "list" && (
         <div className="rounded-md border">
           <div className="divide-y">
@@ -152,7 +148,7 @@ export default function SaveBookList({
                 onClick={() => onToggleBookSelection(book.id)}
               >
                 <div className="p-4 flex items-center gap-4">
-                  {/* Checkbox */}
+                  
                   <div
                     className="shrink-0"
                     onClick={(e) => e.stopPropagation()}
@@ -178,7 +174,7 @@ export default function SaveBookList({
                     )}
                   </div>
 
-                  {/* Book Info */}
+                  
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-foreground line-clamp-1">
                       {book.title}
@@ -208,7 +204,7 @@ export default function SaveBookList({
                         }
                       >
                         {book.available_copies || 0}/{book.total_copies || 0}{" "}
-                        {t("available")}
+                        {"Available"}
                       </Badge>
                     </div>
 
@@ -226,7 +222,7 @@ export default function SaveBookList({
                         className="h-8 gap-1"
                       >
                         <Eye className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">{t("detail")}</span>
+                        <span className="hidden sm:inline">{"Detail"}</span>
                       </Button>
                       <Button
                         variant="destructive"
@@ -238,7 +234,7 @@ export default function SaveBookList({
                         className="h-8"
                       >
                         <Trash className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">{t("remove")}</span>
+                        <span className="hidden sm:inline">{"Remove"}</span>
                       </Button>
                     </div>
                   </div>

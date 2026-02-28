@@ -14,8 +14,6 @@ import { Label } from "@/components/ui/label";
 import { PrivacyPolicy } from "@/types/privacy-policy";
 import { privacyPolicyService } from "@/services/privacy-policy.service";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
-
 export default function PrivacyPolicyFormDialog({
   open,
   setOpen,
@@ -27,7 +25,6 @@ export default function PrivacyPolicyFormDialog({
   item: PrivacyPolicy | null;
   onSuccess: () => void;
 }) {
-  const t = useTranslations('common');
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +38,7 @@ export default function PrivacyPolicyFormDialog({
 
   const handleSubmit = async () => {
     if (!title.trim() || !content.trim()) {
-      toast.error(t('pleaseCompleteRequiredFields'));
+      toast.error("pleaseCompleteRequiredFields");
       return;
     }
 
@@ -54,10 +51,10 @@ export default function PrivacyPolicyFormDialog({
 
       if (item) {
         await privacyPolicyService.update(item.id, payload);
-        toast.success(t('privacyPolicyUpdated'));
+        toast.success("privacyPolicyUpdated");
       } else {
         await privacyPolicyService.create(payload);
-        toast.success(t('privacyPolicyAdded'));
+        toast.success("privacyPolicyAdded");
       }
 
       setTitle("");
@@ -65,7 +62,7 @@ export default function PrivacyPolicyFormDialog({
       setOpen(false);
       onSuccess();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || t('errorOccurred'));
+      toast.error(err.response?.data?.message || "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -76,14 +73,14 @@ export default function PrivacyPolicyFormDialog({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {item ? t('editPrivacyPolicy') : t('addPrivacyPolicy')}
+            {item ? "editPrivacyPolicy" : "addPrivacyPolicy"}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title" variant="required">
-              {t('title')}
+              {"Title"}
             </Label>
             <Input
               id="title"
@@ -95,19 +92,18 @@ export default function PrivacyPolicyFormDialog({
 
           <div className="space-y-2">
             <Label htmlFor="content" variant="required">
-              {t('contentHTML')}
+              {"contentHTML"}
             </Label>
             <Textarea
               id="content"
-              placeholder="<h2>1. Information We Collect</h2>
-<p>We collect information that you provide...</p>"
+              placeholder={`<h2>1. Information We Collect</h2>\n<p>We collect information that you provide...</p>`}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={16}
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              {t('useHTMLTags')}
+              {"useHTMLTags"}
             </p>
           </div>
 
@@ -120,11 +116,11 @@ export default function PrivacyPolicyFormDialog({
           >
             {isLoading
               ? item
-                ? t('savingChanges')
-                : t('adding')
+                ? "Saving..."
+                : "Adding..."
               : item
-                ? t('saveChanges')
-                : t('addPrivacyPolicy')}
+                ? "Save Changes"
+                : "Add"}
           </Button>
         </div>
       </DialogContent>

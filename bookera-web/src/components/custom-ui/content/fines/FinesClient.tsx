@@ -5,18 +5,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DollarSign, Settings } from "lucide-react";
 import FineTypeManagement from "./FineTypeManagement";
 import FineManagement from "./FineManagement";
-import { useTranslations } from "next-intl";
-
 export default function FinesClient() {
-  const t = useTranslations('admin.fines');
   const [activeTab, setActiveTab] = useState("fines");
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">{t('managementTitle')}</h1>
+        <h1 className="text-3xl font-bold">{"Fine Management"}</h1>
         <p className="text-muted-foreground">
-          {t('managementDescription')}
+          {"Manage fines and configure fine types"}
         </p>
       </div>
 
@@ -24,11 +21,11 @@ export default function FinesClient() {
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="fines" className="gap-2">
             <DollarSign className="h-4 w-4" />
-            {t('finesTab')}
+            {"Fines"}
           </TabsTrigger>
           <TabsTrigger value="fine-types" className="gap-2">
             <Settings className="h-4 w-4" />
-            {t('fineTypesTab')}
+            {"Fine Types"}
           </TabsTrigger>
         </TabsList>
 

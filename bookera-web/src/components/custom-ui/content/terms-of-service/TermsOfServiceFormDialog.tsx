@@ -14,8 +14,6 @@ import { Label } from "@/components/ui/label";
 import { TermsOfService } from "@/types/terms-of-service";
 import { termsOfServiceService } from "@/services/terms-of-service.service";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
-
 export default function TermsOfServiceFormDialog({
   open,
   setOpen,
@@ -27,7 +25,6 @@ export default function TermsOfServiceFormDialog({
   item: TermsOfService | null;
   onSuccess: () => void;
 }) {
-  const t = useTranslations('common');
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +38,7 @@ export default function TermsOfServiceFormDialog({
 
   const handleSubmit = async () => {
     if (!title.trim() || !content.trim()) {
-      toast.error(t('pleaseCompleteRequiredFields'));
+      toast.error("pleaseCompleteRequiredFields");
       return;
     }
 
@@ -54,10 +51,10 @@ export default function TermsOfServiceFormDialog({
 
       if (item) {
         await termsOfServiceService.update(item.id, payload);
-        toast.success(t('termsOfServiceUpdated'));
+        toast.success("termsOfServiceUpdated");
       } else {
         await termsOfServiceService.create(payload);
-        toast.success(t('termsOfServiceAdded'));
+        toast.success("termsOfServiceAdded");
       }
 
       setTitle("");
@@ -65,7 +62,7 @@ export default function TermsOfServiceFormDialog({
       setOpen(false);
       onSuccess();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || t('errorOccurred'));
+      toast.error(err.response?.data?.message || "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -76,18 +73,18 @@ export default function TermsOfServiceFormDialog({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {item ? t('editTermsOfService') : t('addTermsOfService')}
+            {item ? "editTermsOfService" : "addTermsOfService"}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title" variant="required">
-              {t('title')}
+              {"Title"}
             </Label>
             <Input
               id="title"
-              placeholder={t('termsOfServiceTitlePlaceholder')}
+              placeholder={"example: Terms of Service - Bookera Library System"}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -95,18 +92,18 @@ export default function TermsOfServiceFormDialog({
 
           <div className="space-y-2">
             <Label htmlFor="content" variant="required">
-              {t('contentHTML')}
+              {"contentHTML"}
             </Label>
             <Textarea
               id="content"
-              placeholder={t('termsOfServiceContentPlaceholder')}
+              placeholder={`<h2>1. Acceptance of Terms</h2>\n<p>By accessing and using Bookera...</p>`}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={16}
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              {t('useHTMLTags')}
+              {"useHTMLTags"}
             </p>
           </div>
 
@@ -119,11 +116,11 @@ export default function TermsOfServiceFormDialog({
           >
             {isLoading
               ? item
-                ? t('savingChanges')
-                : t('adding')
+                ? "Saving..."
+                : "Adding..."
               : item
-                ? t('saveChanges')
-                : t('addTermsOfService')}
+                ? "Save Changes"
+                : "Add"}
           </Button>
         </div>
       </DialogContent>

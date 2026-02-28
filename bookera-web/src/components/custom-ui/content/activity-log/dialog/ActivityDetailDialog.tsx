@@ -12,7 +12,6 @@ import { Separator } from "@/components/ui/separator";
 import { activityLogService } from "@/services/activity-log.service";
 import { ActivityLog } from "@/types/activity-log";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
 import { Calendar, Globe, Monitor, User } from "lucide-react";
 
 interface ActivityDetailDialogProps {
@@ -26,7 +25,6 @@ export default function ActivityDetailDialog({
   open,
   onClose,
 }: ActivityDetailDialogProps) {
-  const t = useTranslations('common');
   const [detail, setDetail] = useState<ActivityLog | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +42,7 @@ export default function ActivityDetailDialog({
       const response = await activityLogService.show(activityId);
       setDetail(response.data.data);
     } catch (error) {
-      toast.error(t('failedToLoadActivityLogDetail'));
+      toast.error("failedToLoadActivityLogDetail");
     } finally {
       setLoading(false);
     }
@@ -77,7 +75,7 @@ export default function ActivityDetailDialog({
           </div>
         ) : detail ? (
           <div className="space-y-6">
-            {/* User Info */}
+            
             <div className="bg-linear-to-br from-brand-primary/5 to-brand-primary-dark/5 dark:from-brand-primary/10 dark:to-brand-primary-dark/10 p-5 rounded-xl border border-brand-primary/20">
               <div className="flex items-center gap-2 mb-4">
                 <div className="p-2 bg-brand-primary/10 rounded-lg">
@@ -105,7 +103,7 @@ export default function ActivityDetailDialog({
 
             <Separator />
 
-            {/* Activity Info */}
+            
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="p-2 bg-blue-500/10 rounded-lg">
@@ -144,7 +142,7 @@ export default function ActivityDetailDialog({
 
             <Separator />
 
-            {/* Network Info */}
+            
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="p-2 bg-purple-500/10 rounded-lg">
@@ -160,7 +158,7 @@ export default function ActivityDetailDialog({
               </div>
             </div>
 
-            {/* User Agent */}
+            
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="p-2 bg-orange-500/10 rounded-lg">
@@ -173,7 +171,7 @@ export default function ActivityDetailDialog({
               </p>
             </div>
 
-            {/* Old Data */}
+            
             {detail.old_data && (
               <>
                 <Separator />
@@ -189,7 +187,7 @@ export default function ActivityDetailDialog({
               </>
             )}
 
-            {/* New Data */}
+            
             {detail.new_data && (
               <>
                 <Separator />
@@ -205,7 +203,7 @@ export default function ActivityDetailDialog({
               </>
             )}
 
-            {/* Subject */}
+            
             {detail.subject && (
               <>
                 <Separator />

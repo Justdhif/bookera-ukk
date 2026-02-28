@@ -5,7 +5,6 @@ import { loanService } from "@/services/loan.service";
 import { bookService } from "@/services/book.service";
 import { Book } from "@/types/book";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -46,7 +45,6 @@ export function BorrowDialog({
   onOpenChange,
   onSuccess,
 }: BorrowDialogProps) {
-  const t = useTranslations('common');
   const [loading, setLoading] = useState(false);
   const [books, setBooks] = useState<Book[]>([]);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
@@ -57,12 +55,10 @@ export function BorrowDialog({
   useEffect(() => {
     if (open) {
       fetchBooks();
-      // Set default due date to 7 days from now
       const defaultDate = new Date();
       defaultDate.setDate(defaultDate.getDate() + 7);
       setDueDate(defaultDate);
     } else {
-      // Reset form
       setSelectedBook(null);
       setSelectedCopies([]);
       setDueDate(undefined);
@@ -72,23 +68,22 @@ export function BorrowDialog({
   const fetchBooks = async () => {
     try {
       const response = await bookService.getAll();
-      // Handle paginated response: response.data.data.data
       const booksData = response.data.data?.data || response.data.data;
       setBooks(Array.isArray(booksData) ? booksData : []);
     } catch (error: any) {
-      toast.error(t('failedLoadBooks'));
+      toast.error("Failed to load book list");
       setBooks([]);
     }
   };
 
   const handleSubmit = async () => {
     if (selectedCopies.length === 0) {
-      toast.error(t('minOneCopy'));
+      toast.error("Select at least 1 book copy to borrow");
       return;
     }
 
     if (!dueDate) {
-      toast.error(t('selectDueDate'));
+      toast.error("Select due date");
       return;
     }
 
@@ -99,7 +94,7 @@ export function BorrowDialog({
         due_date: dueDate.toISOString().split("T")[0],
       });
       toast.success(
-        response.data.message || t('borrowRequestCreated')
+        response.data.message || "Borrow request created successfully and awaiting admin approval"
       );
       onOpenChange(false);
       setSelectedBook(null);
@@ -108,7 +103,7 @@ export function BorrowDialog({
       onSuccess();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || t('failedCreateBorrow')
+        error.response?.data?.message || "Failed to create borrow request"
       );
     } finally {
       setLoading(false);
@@ -146,16 +141,16 @@ export function BorrowDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5" />
-            {t('borrowBook')}
+            {"Borrow Book"}
           </DialogTitle>
           <DialogDescription>
-            {t('borrowDialogDescription')}
+            {"borrowDialogDescription"}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           <div className="space-y-2">
-            <Label>{t('selectBook')}</Label>
+            <Label>{"Select Book"}</Label>
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -167,15 +162,15 @@ export function BorrowDialog({
                   <span className="truncate">
                     {selectedBook
                       ? selectedBook.title
-                      : t('selectPlaceholder')}
+                      : "Select..."}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-full p-0">
                 <Command>
-                  <CommandInput placeholder={t('searchBook')} />
-                  <CommandEmpty>{t('noBookFound')}</CommandEmpty>
+                  <CommandInput placeholder={"Search book..."} />
+                  <CommandEmpty>{"noBookFound"}</CommandEmpty>
                   <CommandList>
                     <CommandGroup>
                       {Array.isArray(books) && books.map((book) => {
@@ -206,7 +201,7 @@ export function BorrowDialog({
                             <div className="flex-1">
                               <p className="font-medium">{book.title}</p>
                               <p className="text-xs text-muted-foreground">
-                                {availableCopies.length} {t('copiesAvailableCount')}
+                                {availableCopies.length} {"copies available"}
                               </p>
                             </div>
                           </CommandItem>
@@ -221,7 +216,7 @@ export function BorrowDialog({
 
           {selectedBook && availableCopies.length > 0 && (
             <div className="space-y-2">
-              <Label>{t('selectBook')} ({availableCopies.length} {t('copiesAvailableCount')})</Label>
+              <Label>{"Select Book"} ({availableCopies.length} {"copies available"})</Label>
               <div className="border rounded-md p-4 space-y-3 max-h-50 overflow-y-auto">
                 {availableCopies.map((copy) => (
                   <div key={copy.id} className="flex items-center space-x-3">
@@ -249,7 +244,7 @@ export function BorrowDialog({
 
           {selectedCopies.length > 0 && (
             <div className="space-y-2">
-              <Label>{t('selectedCopies')} ({selectedCopies.length})</Label>
+              <Label>{"Selected Copies"} ({selectedCopies.length})</Label>
               <div className="flex flex-wrap gap-2">
                 {getSelectedCopyNames().map((name, index) => (
                   <Badge
@@ -271,15 +266,15 @@ export function BorrowDialog({
           )}
 
           <div className="space-y-2">
-            <Label>{t('dueDate')}</Label>
+            <Label>{"Due Date"}</Label>
             <DatePicker
               value={dueDate}
               onChange={setDueDate}
-              placeholder={t('selectDueDate')}
+              placeholder={"Select due date"}
               dateMode="future"
             />
             <p className="text-xs text-muted-foreground">
-              {t('selectDueDateHint')}
+              {"selectDueDateHint"}
             </p>
           </div>
         </div>
@@ -290,7 +285,7 @@ export function BorrowDialog({
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >
-            {t('cancel')}
+            {"Cancel"}
           </Button>
           <Button 
             variant="submit" 
@@ -300,10 +295,10 @@ export function BorrowDialog({
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {t('processing')}
+                {"Processing..."}
               </>
             ) : (
-              t('submitBorrow')
+              "Submit Borrow"
             )}
           </Button>
         </DialogFooter>

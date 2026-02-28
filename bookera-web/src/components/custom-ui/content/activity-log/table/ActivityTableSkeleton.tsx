@@ -13,7 +13,7 @@ export function ActivityTableSkeleton() {
           </CardTitle>
         </div>
 
-        {/* Filter Section Skeleton */}
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
           <div className="space-y-2">
             <Skeleton className="h-4 w-20" />
@@ -65,7 +65,7 @@ export function ActivityTableSkeleton() {
           </Table>
         </div>
 
-        {/* Pagination Skeleton */}
+        
         <div className="flex items-center justify-between pt-6">
           <Skeleton className="h-4 w-48" />
           <div className="flex gap-2">

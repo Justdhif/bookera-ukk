@@ -2,8 +2,6 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Activity, Calendar, CalendarDays, TrendingUp, Sparkles, Clock, BarChart3 } from "lucide-react";
-import { useTranslations } from "next-intl";
-
 interface ActivityStatisticsProps {
   statistics: {
     today: number;
@@ -14,10 +12,9 @@ interface ActivityStatisticsProps {
 }
 
 export default function ActivityStatistics({ statistics }: ActivityStatisticsProps) {
-  const t = useTranslations('admin.activityLogs');
   const stats = [
     {
-      label: t('today'),
+      label: "Today",
       value: statistics.today,
       icon: Activity,
       gradient: "from-blue-500 to-cyan-500",
@@ -26,11 +23,11 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
       hoverBorderColor: "group-hover:border-blue-300 dark:group-hover:border-blue-700",
       iconBg: "bg-linear-to-br from-blue-500 to-cyan-500",
       statIcon: Sparkles,
-      statText: t('todaysActivity'),
-      updatedText: t('realTimeData'),
+      statText: "Today's Activity",
+      updatedText: "Real-time data",
     },
     {
-      label: t('thisWeek'),
+      label: "This Week",
       value: statistics.this_week,
       icon: Calendar,
       gradient: "from-emerald-500 to-teal-500",
@@ -39,11 +36,11 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
       hoverBorderColor: "group-hover:border-emerald-300 dark:group-hover:border-emerald-700",
       iconBg: "bg-linear-to-br from-emerald-500 to-teal-500",
       statIcon: Calendar,
-      statText: t('thisWeek'),
-      updatedText: t('lastSevenDays'),
+      statText: "This Week",
+      updatedText: "Last 7 days",
     },
     {
-      label: t('thisMonth'),
+      label: "This Month",
       value: statistics.this_month,
       icon: CalendarDays,
       gradient: "from-purple-500 to-pink-500",
@@ -52,11 +49,11 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
       hoverBorderColor: "group-hover:border-purple-300 dark:group-hover:border-purple-700",
       iconBg: "bg-linear-to-br from-purple-500 to-pink-500",
       statIcon: CalendarDays,
-      statText: t('monthlyStats'),
-      updatedText: t('currentMonth'),
+      statText: "Monthly Stats",
+      updatedText: "Current month",
     },
     {
-      label: t('totalActivities'),
+      label: "Total Activities",
       value: statistics.total,
       icon: TrendingUp,
       gradient: "from-orange-500 to-amber-500",
@@ -65,8 +62,8 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
       hoverBorderColor: "group-hover:border-orange-300 dark:group-hover:border-orange-700",
       iconBg: "bg-linear-to-br from-orange-500 to-amber-500",
       statIcon: TrendingUp,
-      statText: t('allActivities'),
-      updatedText: t('totalRecords'),
+      statText: "All Activities",
+      updatedText: "Total records",
     },
   ];
 
@@ -79,13 +76,13 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
             key={index}
             className={`group relative overflow-hidden border ${item.borderColor} ${item.hoverBorderColor} transition-all duration-300 hover:shadow-lg dark:hover:shadow-slate-900/30 bg-linear-to-br ${item.bgGradient} backdrop-blur-sm`}
           >
-            {/* Animated gradient border effect */}
+            
             <div className="absolute inset-0 bg-linear-to-br from-transparent via-transparent to-transparent group-hover:via-white/10 dark:group-hover:via-white/5 transition-all duration-500 pointer-events-none" />
 
-            {/* Corner accent */}
+            
             <div className={`absolute top-0 right-0 w-16 h-16 bg-linear-to-br ${item.gradient} opacity-5 dark:opacity-10 rounded-bl-full transition-opacity group-hover:opacity-10 dark:group-hover:opacity-15`} />
 
-            {/* Pulsing dot indicator */}
+            
             <div className={`absolute top-3 right-3 h-2 w-2 rounded-full bg-linear-to-br ${item.gradient} animate-pulse ring-2 ring-background`} />
 
             <CardHeader className="pb-3">
@@ -119,13 +116,13 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
                     <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-linear-to-r from-white/50 to-white/30 dark:from-slate-800/50 dark:to-slate-900/50 backdrop-blur-sm border border-slate-200/30 dark:border-slate-700/30">
                       <BarChart3 className="h-3 w-3 text-slate-600 dark:text-slate-400" />
                       <span className="text-[10px] font-bold uppercase tracking-wider bg-linear-to-br from-slate-700 to-slate-900 dark:from-slate-300 dark:to-slate-100 bg-clip-text text-transparent">
-                          {t('statsLabel')}
+                          {"Stats"}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Decorative line with gradient */}
+                
                 <div className="mt-4 relative">
                   <div className="absolute left-0 right-0 h-px bg-linear-to-r from-transparent via-slate-300/30 dark:via-slate-600/30 to-transparent" />
                   <div
@@ -134,7 +131,7 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
                   />
                 </div>
 
-                {/* Stats indicator */}
+                
                 <div className="mt-3 flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <div className={`h-2 w-2 rounded-full bg-linear-to-br ${item.gradient} animate-pulse`} />
@@ -144,13 +141,13 @@ export default function ActivityStatistics({ statistics }: ActivityStatisticsPro
                   </div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground/60 font-medium">
                     <Clock className="h-3 w-3" />
-                    <span>{t('now')}</span>
+                    <span>{"Now"}</span>
                   </div>
                 </div>
               </div>
             </CardContent>
 
-            {/* Hover overlay effect */}
+            
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
               <div className={`absolute inset-0 bg-linear-to-br ${item.gradient} opacity-[0.03] dark:opacity-[0.05]`} />
             </div>

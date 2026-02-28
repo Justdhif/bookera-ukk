@@ -7,8 +7,6 @@ export const privacyPolicyService = {
 
   getById: (id: number) =>
     api.get<ApiResponse<PrivacyPolicy>>(`/privacy-policies/${id}`),
-
-  // Admin endpoints
   create: (payload: PrivacyPolicyFormData) =>
     api.post<ApiResponse<PrivacyPolicy>>("/admin/privacy-policies", payload),
 

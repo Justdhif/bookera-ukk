@@ -1,7 +1,7 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { User } from "@/types/user";
 import { Loan } from "@/types/loan";
 import { Button } from "@/components/ui/button";

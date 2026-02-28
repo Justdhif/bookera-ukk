@@ -1,19 +1,17 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
 import { notificationService } from "@/services/notification.service";
 import { Notification } from "@/types/notification";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { CheckCheck, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import NotificationList from "./NotificationList";
 import NotificationDetail from "./NotificationDetail";
 
 export default function NotificationPageClient() {
-  const t = useTranslations('common');
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [selectedNotif, setSelectedNotif] = useState<Notification | null>(null);
@@ -89,7 +87,7 @@ export default function NotificationPageClient() {
       });
       setNotifications(response.data.data.data);
     } catch (error) {
-      toast.error(t('failedToLoadNotifications'));
+      toast.error("failedToLoadNotifications");
       console.error("Failed to fetch notifications:", error);
     } finally {
       setLoading(false);
@@ -150,9 +148,9 @@ export default function NotificationPageClient() {
       await notificationService.markAllAsRead();
       fetchNotifications();
       fetchUnreadCount();
-      toast.success(t('allNotificationsMarkedAsRead'));
+      toast.success("All notifications marked as read");
     } catch (error) {
-      toast.error(t('failedToMarkAllAsRead'));
+      toast.error("Failed to mark all notifications as read");
       console.error("Failed to mark all as read:", error);
     } finally {
       setIsMarkingAll(false);
@@ -165,14 +163,14 @@ export default function NotificationPageClient() {
     try {
       await notificationService.deleteNotification(deleteId);
       setNotifications(notifications.filter((n) => n.id !== deleteId));
-      toast.success(t('notificationDeleted'));
+      toast.success("Notification deleted");
       fetchUnreadCount();
       setDeleteId(null);
       if (selectedNotif?.id === deleteId) {
         setSelectedNotif(null);
       }
     } catch (error) {
-      toast.error(t('failedToDeleteNotification'));
+      toast.error("failedToDeleteNotification");
       console.error("Failed to delete notification:", error);
     }
   };

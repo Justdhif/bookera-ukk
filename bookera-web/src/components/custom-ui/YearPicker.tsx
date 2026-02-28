@@ -42,8 +42,6 @@ export default function YearPicker({
   emptyText = "Tahun tidak ditemukan",
 }: YearPickerProps) {
   const [open, setOpen] = useState(false);
-
-  // Generate years array in descending order (newest first)
   const years = Array.from(
     { length: endYear - startYear + 1 },
     (_, i) => endYear - i

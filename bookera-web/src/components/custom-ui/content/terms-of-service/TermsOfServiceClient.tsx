@@ -10,10 +10,7 @@ import { toast } from "sonner";
 import { TermsOfServiceListSkeleton } from "./TermsOfServiceListSkeleton";
 import { Plus } from "lucide-react";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
-import { useTranslations } from "next-intl";
-
 export default function TermsOfServiceClient() {
-  const t = useTranslations('admin.termsOfService');
   const [items, setItems] = useState<TermsOfService[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -25,12 +22,12 @@ export default function TermsOfServiceClient() {
     
     try {
       await termsOfServiceService.delete(deleteId);
-      toast.success(t('deleteSuccess'));
+      toast.success("Terms of Service deleted successfully");
       fetchData();
       setDeleteId(null);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || t('deleteError'),
+        error.response?.data?.message || "Failed to delete Terms of Service",
       );
     }
   };
@@ -41,7 +38,7 @@ export default function TermsOfServiceClient() {
       const res = await termsOfServiceService.getAll();
       setItems(res.data.data);
     } catch (error) {
-      toast.error(t('loadError'));
+      toast.error("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -55,9 +52,9 @@ export default function TermsOfServiceClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <h1 className="text-3xl font-bold">{"Terms of Service"}</h1>
           <p className="text-muted-foreground">
-            {t('description')}
+            {"Manage terms of service"}
           </p>
         </div>
         <Button
@@ -69,7 +66,7 @@ export default function TermsOfServiceClient() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          {t('addTerms')}
+          {"Add Terms of Service"}
         </Button>
       </div>
 
@@ -96,8 +93,8 @@ export default function TermsOfServiceClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title={t('deleteTitle')}
-        description={t('deleteConfirm')}
+        title={"Delete Terms of Service"}
+        description={"Are you sure you want to delete this Terms of Service? Deleted data cannot be recovered."}
         onConfirm={confirmDelete}
       />
     </div>

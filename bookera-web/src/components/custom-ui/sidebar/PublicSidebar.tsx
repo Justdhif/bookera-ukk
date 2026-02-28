@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -85,7 +85,7 @@ export default function PublicSidebar() {
         </div>
       </SidebarHeader>
 
-      {/* MENU */}
+      
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -126,7 +126,7 @@ export default function PublicSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* SavesList Section */}
+        
         <SidebarGroup className="flex-1 mt-4">
           <div className="h-full">
             <SavesList mode="sidebar" isCollapsed={!open} />

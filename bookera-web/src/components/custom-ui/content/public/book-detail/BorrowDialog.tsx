@@ -13,7 +13,6 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { useState } from "react";
 import { loanService } from "@/services/loan.service";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
 import { BookCopy } from "@/types/book-copy";
 import { format } from "date-fns";
 
@@ -24,7 +23,6 @@ export default function BorrowDialog({
   copy: BookCopy | null;
   onClose: () => void;
 }) {
-  const t = useTranslations('common');
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +30,7 @@ export default function BorrowDialog({
 
   const submit = async () => {
     if (!dueDate) {
-      toast.error(t('returnDateRequired'));
+      toast.error("Return date is required");
       return;
     }
 
@@ -46,11 +44,11 @@ export default function BorrowDialog({
         due_date: formattedDate,
       });
 
-      toast.success(t('borrowRequestSubmitted'));
+      toast.success("Borrow request submitted successfully!");
       setDueDate(undefined);
       onClose();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t('failedToBorrow'));
+      toast.error(error.response?.data?.message || "Failed to borrow book");
     } finally {
       setLoading(false);
     }
@@ -60,30 +58,30 @@ export default function BorrowDialog({
     <Dialog open={!!copy} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('borrowBook')}</DialogTitle>
+          <DialogTitle>{"Borrow Book"}</DialogTitle>
           <DialogDescription>
-            {t('setReturnDateDescription')}
+            {"Set the return date for the book you want to borrow"}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="rounded-lg border p-3 bg-muted/30">
-            <p className="text-sm text-muted-foreground mb-1">{t('copyCodeLabel')}</p>
+            <p className="text-sm text-muted-foreground mb-1">{"Copy Code"}</p>
             <p className="font-medium font-mono">{copy.copy_code}</p>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="due_date" variant="required">
-              {t('returnDateLabel')}
+              {"Return Date"}
             </Label>
             <DatePicker
               value={dueDate}
               onChange={setDueDate}
-              placeholder={t('selectReturnDate')}
+              placeholder={"Select return date"}
               dateMode="future"
             />
             <p className="text-xs text-muted-foreground">
-              {t('returnDateHint')}
+              {"Select the date when you will return this book"}
             </p>
           </div>
 
@@ -94,7 +92,7 @@ export default function BorrowDialog({
               className="flex-1"
               disabled={loading}
             >
-              {t('cancel')}
+              {"Cancel"}
             </Button>
             <Button 
               onClick={submit} 
@@ -102,7 +100,7 @@ export default function BorrowDialog({
               disabled={loading || !dueDate}
               loading={loading}
             >
-              {loading ? t('processing') : t('confirmBorrow')}
+              {loading ? "Processing..." : "Confirm Borrow"}
             </Button>
           </div>
         </div>

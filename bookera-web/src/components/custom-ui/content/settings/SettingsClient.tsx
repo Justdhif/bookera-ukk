@@ -24,7 +24,6 @@ import {
   Music,
   Settings,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { Locale } from "@/i18n/config";
 import { setUserLocale } from "@/services/locale";
 import { useLocale } from "next-intl";
@@ -51,8 +50,6 @@ const musicTrack = {
 };
 
 export default function SettingsClient() {
-  const t = useTranslations("admin.settings");
-  const tLocale = useTranslations("LocaleSwitcher");
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const currentLocale = useLocale();
@@ -79,14 +76,14 @@ export default function SettingsClient() {
 
   const handleThemeChange = (newTheme: string) => {
     setTheme(newTheme);
-    toast.success(t("themeUpdated"));
+    toast.success("Theme updated successfully");
   };
 
   const handleLanguageChange = (locale: Locale) => {
     setSelectedLocale(locale);
     startTransition(() => {
       setUserLocale(locale);
-      toast.success(t("languageUpdated"));
+      toast.success("Language updated successfully");
     });
   };
 
@@ -106,19 +103,19 @@ export default function SettingsClient() {
   const themeOptions = [
     {
       value: "light",
-      label: t("light"),
+      label: "Light",
       icon: Sun,
       image: ThemeLight,
     },
     {
       value: "dark",
-      label: t("dark"),
+      label: "Dark",
       icon: Moon,
       image: ThemeDark,
     },
     {
       value: "system",
-      label: t("system"),
+      label: "System",
       icon: Monitor,
       image: ThemeSystem,
     },
@@ -127,13 +124,13 @@ export default function SettingsClient() {
   const languageOptions = [
     {
       value: "en" as Locale,
-      label: tLocale("en"),
+      label: "English",
       flag: "🇺🇸",
       nativeName: "English",
     },
     {
       value: "id" as Locale,
-      label: tLocale("id"),
+      label: "Indonesia",
       flag: "🇮🇩",
       nativeName: "Bahasa Indonesia",
     },
@@ -150,19 +147,19 @@ export default function SettingsClient() {
           <Settings className="h-8 w-8 text-white" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
-          <p className="text-muted-foreground">{t("description")}</p>
+          <h1 className="text-3xl font-bold">{"Settings"}</h1>
+          <p className="text-muted-foreground">{"Manage your application settings"}</p>
         </div>
       </div>
 
       <Card className="overflow-hidden border-none shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-2xl relative">
-            {t("themeTitle")}
+            {"Theme"}
             <div className="absolute -bottom-1 left-0 h-1 w-6 rounded-full bg-muted-foreground"></div>
           </CardTitle>
           <CardDescription className="text-base">
-            {t("themeDescription")}
+            {"Choose your preferred theme"}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
@@ -215,11 +212,11 @@ export default function SettingsClient() {
       <Card className="overflow-hidden border-none shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-2xl relative">
-            {t("languageTitle")}
+            {"Language"}
             <div className="absolute -bottom-1 left-0 h-1 w-6 rounded-full bg-muted-foreground"></div>
           </CardTitle>
           <CardDescription className="text-base">
-            {t("languageDescription")}
+            {"Choose your preferred language"}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">

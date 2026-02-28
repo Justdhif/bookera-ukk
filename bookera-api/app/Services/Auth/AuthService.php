@@ -84,20 +84,27 @@ class AuthService
         try {
             DB::beginTransaction();
 
-            // Handle avatar upload if provided
+            // Handle avatar: file upload takes priority, then avatar_url (default avatar)
+            $avatarUrl = $profileData['avatar_url'] ?? null;
+            unset($profileData['avatar_url']);
+
             if ($avatarFile) {
                 $avatarPath = $avatarFile->store('avatars', 'public');
 
-                // Delete old avatar if exists
+                // Delete old avatar file if it was a local upload
                 if ($user->profile && $user->profile->getRawOriginal('avatar')) {
                     $oldAvatar = $user->profile->getRawOriginal('avatar');
-                    $storagePath = storage_path('app/public/' . $oldAvatar);
-                    if (file_exists($storagePath)) {
-                        unlink($storagePath);
+                    if (!str_starts_with($oldAvatar, 'http')) {
+                        $storagePath = storage_path('app/public/' . $oldAvatar);
+                        if (file_exists($storagePath)) {
+                            unlink($storagePath);
+                        }
                     }
                 }
 
                 $profileData['avatar'] = $avatarPath;
+            } elseif ($avatarUrl) {
+                $profileData['avatar'] = $avatarUrl;
             }
 
             if ($user->profile) {
@@ -116,6 +123,7 @@ class AuthService
             throw new \Exception('Gagal mengupdate profile: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Send password reset token to user's email via SMTP

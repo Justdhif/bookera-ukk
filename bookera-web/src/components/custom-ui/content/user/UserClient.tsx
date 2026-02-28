@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useEffect, useState, useCallback } from "react";
 import { User } from "@/types/user";
@@ -10,8 +11,6 @@ import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { UserTableSkeleton } from "./UserTableSkeleton";
 import { Plus, User as UserIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-
 export default function UserClient() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);

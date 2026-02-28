@@ -112,9 +112,9 @@ export default function ActivityTable({
           </span>
         </CardTitle>
 
-        {/* Filters */}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3">
-          {/* Search Input - spans full width on mobile, 2 columns on md, 3 on lg */}
+          
           <div className="relative md:col-span-2 lg:col-span-3">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -128,7 +128,7 @@ export default function ActivityTable({
             />
           </div>
 
-          {/* Action and Module filters side by side on mobile */}
+          
           <div className="grid grid-cols-2 gap-3 md:col-span-1 lg:col-span-2">
             <Select
               value={localFilters.action || "all"}
@@ -175,7 +175,7 @@ export default function ActivityTable({
             </Select>
           </div>
 
-          {/* Apply and Reset buttons */}
+          
           <div className="flex gap-2 md:col-span-1 lg:col-span-2">
             <Button
               onClick={handleApplyFilters}
@@ -286,7 +286,7 @@ export default function ActivityTable({
           </Table>
         </div>
 
-        {/* Pagination */}
+        
         {logs.length > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
             <p className="text-sm text-muted-foreground">
@@ -308,12 +308,11 @@ export default function ActivityTable({
                   />
                 </PaginationItem>
 
-                {/* Page numbers */}
+                
                 {Array.from({ length: pagination.last_page }, (_, i) => i + 1)
                   .filter((page) => {
                     const current = pagination.current_page;
                     const last = pagination.last_page;
-                    // Show first page, last page, current page, and pages around current
                     return (
                       page === 1 ||
                       page === last ||

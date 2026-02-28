@@ -21,8 +21,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { FineType } from "@/types/fine";
 import { fineTypeService } from "@/services/fine.service";
 import { toast } from "sonner";
-import { useTranslations } from "next-intl";
-
 export default function FineTypeFormDialog({
   open,
   setOpen,
@@ -34,8 +32,6 @@ export default function FineTypeFormDialog({
   fineType: FineType | null;
   onSuccess: () => void;
 }) {
-  const t = useTranslations('common');
-  const tAdmin = useTranslations('admin.common');
   const [name, setName] = useState("");
   const [type, setType] = useState<"lost" | "damaged" | "late">("lost");
   const [amount, setAmount] = useState("");
@@ -58,7 +54,7 @@ export default function FineTypeFormDialog({
 
   const handleSubmit = async () => {
     if (!name || !amount) {
-      toast.error(t('nameAmountRequired'));
+      toast.error("Name and amount are required");
       return;
     }
 
@@ -73,10 +69,10 @@ export default function FineTypeFormDialog({
 
       if (fineType) {
         await fineTypeService.update(fineType.id, payload);
-        toast.success(t('fineTypeUpdated'));
+        toast.success("Fine type updated successfully");
       } else {
         await fineTypeService.create(payload);
-        toast.success(t('fineTypeAdded'));
+        toast.success("Fine type added successfully");
       }
 
       setOpen(false);
@@ -93,18 +89,18 @@ export default function FineTypeFormDialog({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {fineType ? tAdmin('edit') : tAdmin('add')} {t('fineType')}
+            {fineType ? "Edit" : "Add"} {"Fine Type"}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">
-              {t('fineTypeName')} <span className="text-red-500">*</span>
+              {"Fine Type Name"} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="name"
-              placeholder={t('fineName')}
+              placeholder={"Fine name"}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -112,38 +108,38 @@ export default function FineTypeFormDialog({
 
           <div className="space-y-2">
             <Label htmlFor="type">
-              {t('fineType')} <span className="text-red-500">*</span>
+              {"Fine Type"} <span className="text-red-500">*</span>
             </Label>
             <Select value={type} onValueChange={(v: any) => setType(v)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="lost">{t('lost')}</SelectItem>
-                <SelectItem value="damaged">{t('damaged')}</SelectItem>
-                <SelectItem value="late">{t('late')}</SelectItem>
+                <SelectItem value="lost">{"Lost"}</SelectItem>
+                <SelectItem value="damaged">{"Damaged"}</SelectItem>
+                <SelectItem value="late">{"Late"}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="amount">
-              {t('fineAmountLabel')} <span className="text-red-500">*</span>
+              {"Amount (Rp)"} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="amount"
               type="number"
-              placeholder={t('fineAmount')}
+              placeholder={"100000"}
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">{t('bookDescription')}</Label>
+            <Label htmlFor="description">{"Book Description"}</Label>
             <Textarea
               id="description"
-              placeholder={t('fineDescOptional')}
+              placeholder={"Fine description (optional)"}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
@@ -159,11 +155,11 @@ export default function FineTypeFormDialog({
           >
             {isLoading
               ? fineType
-                ? tAdmin('saving')
-                : t('addingFineType')
+                ? "Saving..."
+                : "Adding..."
               : fineType
-                ? tAdmin('save')
-                : t('addFineType')}
+                ? "Save"
+                : "Add Fine Type"}
           </Button>
         </div>
       </DialogContent>

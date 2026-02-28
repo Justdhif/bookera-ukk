@@ -26,7 +26,7 @@ interface AvatarUploadModalProps {
   isRequired?: boolean;
 }
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_FILE_SIZE = 2 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 const ALLOWED_FILE_EXTENSIONS = [".jpg", ".jpeg", ".png"];
 
