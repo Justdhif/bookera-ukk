@@ -208,7 +208,7 @@ export default function AvatarUploadModal({
                       fill
                       sizes="128px"
                       className="object-cover"
-                      unoptimized={true}
+                      
                     />
                   </div>
                   <Button
@@ -309,7 +309,7 @@ export default function AvatarUploadModal({
                           fill
                           sizes="56px"
                           className="object-cover"
-                          unoptimized={true}
+                          
                         />
                       </div>
 

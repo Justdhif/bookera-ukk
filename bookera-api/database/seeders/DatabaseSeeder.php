@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -23,9 +22,8 @@ class DatabaseSeeder extends Seeder
             BookSeeder::class,
             BookCopySeeder::class,
             FineTypeSeeder::class,
-            LoanSeeder::class,
+            BorrowSeeder::class,
             BookReturnSeeder::class,
-            ActivityLogSeeder::class,
             TermsOfServiceSeeder::class,
             PrivacyPolicySeeder::class,
         ]);

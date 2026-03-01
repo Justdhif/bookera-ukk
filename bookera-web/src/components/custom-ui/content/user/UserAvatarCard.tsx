@@ -109,7 +109,7 @@ export default function UserAvatarCard({
                   fill
                   sizes="128px"
                   className="object-cover"
-                  unoptimized={true}
+                  
                 />
               ) : (
                 <div className="h-full w-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">

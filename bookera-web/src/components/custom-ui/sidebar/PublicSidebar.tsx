@@ -30,8 +30,8 @@ const mainNavItems = [
     gradient: "from-blue-500 to-cyan-500",
   },
   {
-    title: "My Loans",
-    href: "/my-loans",
+    title: "My Borrows",
+    href: "/my-borrows",
     icon: BookOpen,
     gradient: "from-orange-500 to-red-500",
   },
@@ -50,7 +50,10 @@ export default function PublicSidebar() {
   const { open } = useSidebar();
 
   const handleNavClick = (href: string) => {
-    if ((href === "/my-loans" || href === "/my-fines") && !isAuthenticated) {
+    if (
+      (href === "/my-borrows" || href === "/my-fines") &&
+      !isAuthenticated
+    ) {
       router.push("/login");
       return;
     }

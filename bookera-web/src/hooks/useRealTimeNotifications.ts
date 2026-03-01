@@ -33,8 +33,6 @@ export const useRealTimeNotifications = (
       }> = {
         borrow_request: { variant: 'info' },
         return_request: { variant: 'info' },
-        approved: { variant: 'success' },
-        rejected: { variant: 'error' },
         fine_created: { variant: 'warning' },
         lost_book_report: { variant: 'warning' },
       };
@@ -122,12 +120,6 @@ export const useRealTimeNotifications = (
     } else {
       echo
         .private(`user.${user.id}`)
-        .listen(".loan.approved", (event: NotificationEvent) => {
-          handleNotification(event);
-        })
-        .listen(".loan.rejected", (event: NotificationEvent) => {
-          handleNotification(event);
-        })
         .listen(".return.approved", (event: NotificationEvent) => {
           handleNotification(event);
         })

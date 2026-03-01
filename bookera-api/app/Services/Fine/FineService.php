@@ -3,9 +3,9 @@
 namespace App\Services\Fine;
 
 use App\Helpers\ActivityLogger;
+use App\Models\Borrow;
 use App\Models\Fine;
 use App\Models\FineType;
-use App\Models\Loan;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -13,7 +13,7 @@ class FineService
 {
     public function getAllFines(?string $status = null, ?string $search = null): Collection
     {
-        $query = Fine::with(['loan.user.profile', 'fineType']);
+        $query = Fine::with(['borrow.user.profile', 'fineType']);
 
         if ($status) {
             $query->where('status', $status);
@@ -22,8 +22,8 @@ class FineService
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
-                    ->orWhere('loan_id', 'like', "%{$search}%")
-                    ->orWhereHas('loan.user', function ($userQuery) use ($search) {
+                    ->orWhere('borrow_id', 'like', "%{$search}%")
+                    ->orWhereHas('borrow.user', function ($userQuery) use ($search) {
                         $userQuery->where('email', 'like', "%{$search}%")
                             ->orWhereHas('profile', function ($profileQuery) use ($search) {
                                 $profileQuery->where('full_name', 'like', "%{$search}%");
@@ -38,55 +38,55 @@ class FineService
         return $query->latest()->get();
     }
 
-    public function getLoanFines(Loan $loan): Collection
+    public function getBorrowFines(Borrow $borrow): Collection
     {
         return Fine::with(['fineType'])
-            ->where('loan_id', $loan->id)
+            ->where('borrow_id', $borrow->id)
             ->latest()
             ->get();
     }
 
     public function getMyFines(int $userId): Collection
     {
-        return Fine::with(['fineType', 'loan.details.bookCopy.book'])
-            ->whereHas('loan', function ($query) use ($userId) {
+        return Fine::with(['fineType', 'borrow.borrowDetails.bookCopy.book'])
+            ->whereHas('borrow', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
             ->latest()
             ->get();
     }
 
-    public function createFine(Loan $loan, array $data): Fine
+    public function createFine(Borrow $borrow, array $data): Fine
     {
         $fineType = FineType::findOrFail($data['fine_type_id']);
 
-        return DB::transaction(function () use ($loan, $fineType, $data) {
+        return DB::transaction(function () use ($borrow, $fineType, $data) {
             $amount = $data['amount'] ?? $fineType->amount;
 
             $fine = Fine::create([
-                'loan_id' => $loan->id,
+                'borrow_id'    => $borrow->id,
                 'fine_type_id' => $fineType->id,
-                'amount' => $amount,
-                'status' => 'unpaid',
-                'notes' => $data['notes'] ?? null,
+                'amount'       => $amount,
+                'status'       => 'unpaid',
+                'notes'        => $data['notes'] ?? null,
             ]);
 
             ActivityLogger::log(
                 'create',
                 'fine',
-                "Fine created for loan #{$loan->id} - {$fineType->name}",
+                "Fine created for borrow #{$borrow->id} - {$fineType->name}",
                 [
-                    'fine_id' => $fine->id,
-                    'loan_id' => $loan->id,
+                    'fine_id'   => $fine->id,
+                    'borrow_id' => $borrow->id,
                     'fine_type' => $fineType->name,
-                    'amount' => $amount,
-                    'status' => 'unpaid',
+                    'amount'    => $amount,
+                    'status'    => 'unpaid',
                 ],
                 null,
                 $fine
             );
 
-            return $fine->load(['loan.user.profile', 'fineType']);
+            return $fine->load(['borrow.user.profile', 'fineType']);
         });
     }
 
@@ -108,7 +108,7 @@ class FineService
             $fine
         );
 
-        return $fine->load(['loan.user.profile', 'fineType']);
+        return $fine->load(['borrow.user.profile', 'fineType']);
     }
 
     public function markAsPaid(Fine $fine): Fine
@@ -131,7 +131,7 @@ class FineService
             $fine
         );
 
-        return $fine->load(['loan.user.profile', 'fineType']);
+        return $fine->load(['borrow.user.profile', 'fineType']);
     }
 
     public function waiveFine(Fine $fine, ?string $notes = null): Fine
@@ -156,7 +156,7 @@ class FineService
             $fine
         );
 
-        return $fine->load(['loan.user.profile', 'fineType']);
+        return $fine->load(['borrow.user.profile', 'fineType']);
     }
 
     public function deleteFine(Fine $fine): void
@@ -166,8 +166,8 @@ class FineService
             'fine',
             "Fine #{$fine->id} deleted",
             [
-                'fine_id' => $fine->id,
-                'loan_id' => $fine->loan_id,
+                    'fine_id'   => $fine->id,
+                'borrow_id' => $fine->borrow_id,
                 'fine_type' => $fine->fineType->name ?? 'Unknown',
                 'amount' => $fine->amount,
             ],

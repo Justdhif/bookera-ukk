@@ -2,20 +2,20 @@ import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
 import {
   DashboardTotals,
-  LoanMonthly,
-  LoanStatus,
-  LatestLoan,
+  BorrowMonthly,
+  BorrowStatus,
+  LatestBorrow,
 } from "@/types/dashboard";
 
 export const dashboardService = {
   totals: () => api.get<ApiResponse<DashboardTotals>>("/admin/dashboard/totals"),
 
   loanMonthlyChart: () =>
-    api.get<ApiResponse<LoanMonthly[]>>("/admin/dashboard/loan-monthly-chart"),
+    api.get<ApiResponse<BorrowMonthly[]>>("/admin/dashboard/loan-monthly-chart"),
 
   loanStatusChart: () =>
-    api.get<ApiResponse<LoanStatus[]>>("/admin/dashboard/loan-status-chart"),
+    api.get<ApiResponse<BorrowStatus[]>>("/admin/dashboard/loan-status-chart"),
 
-  latestLoans: () =>
-    api.get<ApiResponse<LatestLoan[]>>("/admin/dashboard/latest"),
+  latestBorrows: () =>
+    api.get<ApiResponse<LatestBorrow[]>>("/admin/dashboard/latest"),
 };

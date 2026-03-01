@@ -8,7 +8,7 @@ use App\Http\Requests\Fine\StoreFineRequest;
 use App\Http\Requests\Fine\UpdateFineRequest;
 use App\Http\Requests\Fine\WaiveFineRequest;
 use App\Models\Fine;
-use App\Models\Loan;
+use App\Models\Borrow;
 use App\Services\Fine\FineService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -29,9 +29,9 @@ class FineController extends Controller
         return ApiResponse::successResponse('Data denda', $fines);
     }
 
-    public function loanFines(Loan $loan): JsonResponse
+    public function borrowFines(Borrow $borrow): JsonResponse
     {
-        $fines = $this->fineService->getLoanFines($loan);
+        $fines = $this->fineService->getBorrowFines($borrow);
 
         return ApiResponse::successResponse('Data denda untuk peminjaman ini', $fines);
     }
@@ -43,16 +43,16 @@ class FineController extends Controller
         return ApiResponse::successResponse('Data denda saya', $fines);
     }
 
-    public function store(StoreFineRequest $request, Loan $loan): JsonResponse
+    public function store(StoreFineRequest $request, Borrow $borrow): JsonResponse
     {
-        $fine = $this->fineService->createFine($loan, $request->validated());
+        $fine = $this->fineService->createFine($borrow, $request->validated());
 
         return ApiResponse::successResponse('Denda berhasil dibuat', $fine, 201);
     }
 
     public function show(Fine $fine): JsonResponse
     {
-        $fine->load(['loan.user.profile', 'fineType']);
+        $fine->load(['borrow.user.profile', 'fineType']);
 
         return ApiResponse::successResponse('Detail denda', $fine);
     }

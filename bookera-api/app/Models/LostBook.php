@@ -7,19 +7,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
- * @property int $loan_id
+ * @property int $borrow_id
  * @property int $book_copy_id
  * @property \Illuminate\Support\Carbon $estimated_lost_date
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Loan $loan
+ * @property-read \App\Models\Borrow $borrow
  * @property-read \App\Models\BookCopy $bookCopy
  */
 class LostBook extends Model
 {
     protected $fillable = [
-        'loan_id',
+        'borrow_id',
         'book_copy_id',
         'estimated_lost_date',
         'notes',
@@ -30,11 +30,11 @@ class LostBook extends Model
     ];
 
     /**
-     * Get the loan associated with this lost book
+     * Get the borrow associated with this lost book
      */
-    public function loan(): BelongsTo
+    public function borrow(): BelongsTo
     {
-        return $this->belongsTo(Loan::class);
+        return $this->belongsTo(Borrow::class);
     }
 
     /**

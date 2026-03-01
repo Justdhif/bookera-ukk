@@ -5,21 +5,22 @@ export interface DashboardTotals {
   returns_today: number;
 }
 
-export interface LoanMonthly {
+export interface BorrowMonthly {
   month: number;
   total: number;
 }
 
-export interface LoanStatus {
+export interface BorrowStatus {
   status: string;
   total: number;
 }
 
-export interface LatestLoan {
+export interface LatestBorrow {
   id: number;
   user_id: number;
-  loan_date: string;
-  due_date: string;
+  borrow_code: string;
+  borrow_date: string;
+  return_date: string;
   status: string;
   user?: {
     id: number;
@@ -28,7 +29,7 @@ export interface LatestLoan {
       full_name: string;
     };
   };
-  loan_details?: {
+  borrow_details?: {
     book_copy?: {
       book?: {
         title: string;

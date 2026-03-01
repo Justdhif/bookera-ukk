@@ -6,7 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LostBook\StoreLostBookRequest;
 use App\Http\Requests\LostBook\UpdateLostBookRequest;
-use App\Models\Loan;
+use App\Models\Borrow;
 use App\Models\LostBook;
 use App\Services\LostBook\LostBookService;
 use Illuminate\Http\JsonResponse;
@@ -28,23 +28,23 @@ class LostBookController extends Controller
         return ApiResponse::successResponse('Data buku hilang', $lostBooks);
     }
 
-    public function store(StoreLostBookRequest $request, Loan $loan): JsonResponse
+    public function store(StoreLostBookRequest $request, Borrow $borrow): JsonResponse
     {
         $validated = $request->validated();
-        [$canReport, $errorMessage] = $this->lostBookService->canReportLost($loan, $validated['book_copy_id']);
+        [$canReport, $errorMessage] = $this->lostBookService->canReportLost($borrow, $validated['book_copy_id']);
 
         if (!$canReport) {
             return ApiResponse::errorResponse($errorMessage, null, 400);
         }
 
-        $lostBook = $this->lostBookService->reportLostBook($loan, $validated);
+        $lostBook = $this->lostBookService->reportLostBook($borrow, $validated);
 
         return ApiResponse::successResponse('Buku hilang berhasil dilaporkan', $lostBook, 201);
     }
 
     public function show(LostBook $lostBook): JsonResponse
     {
-        $lostBook->load(['loan.user.profile', 'bookCopy.book']);
+        $lostBook->load(['borrow.user.profile', 'bookCopy.book']);
 
         return ApiResponse::successResponse('Detail buku hilang', $lostBook);
     }

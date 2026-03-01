@@ -6,7 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BookReturn\StoreBookReturnRequest;
 use App\Models\BookReturn;
-use App\Models\Loan;
+use App\Models\Borrow;
 use App\Services\BookReturn\BookReturnService;
 use Illuminate\Http\JsonResponse;
 
@@ -19,20 +19,20 @@ class BookReturnController extends Controller
         $this->bookReturnService = $bookReturnService;
     }
 
-    public function index(Loan $loan): JsonResponse
+    public function index(Borrow $borrow): JsonResponse
     {
-        $returns = $this->bookReturnService->getReturnsByLoan($loan);
+        $returns = $this->bookReturnService->getReturnsByBorrow($borrow);
 
         return ApiResponse::successResponse('Data pengembalian buku berhasil diambil', $returns);
     }
 
-    public function store(StoreBookReturnRequest $request, Loan $loan): JsonResponse
+    public function store(StoreBookReturnRequest $request, Borrow $borrow): JsonResponse
     {
-        if (!$this->bookReturnService->canCreateReturn($loan)) {
-            return ApiResponse::errorResponse('Peminjaman ini tidak dalam status dipinjam', null, 400);
+        if (!$this->bookReturnService->canCreateReturn($borrow)) {
+            return ApiResponse::errorResponse('Peminjaman ini tidak dalam status open', null, 400);
         }
 
-        $bookReturn = $this->bookReturnService->createReturn($loan, $request->validated());
+        $bookReturn = $this->bookReturnService->createReturn($borrow, $request->validated());
 
         return ApiResponse::successResponse('Request pengembalian berhasil dibuat. Menunggu persetujuan admin.', $bookReturn, 201);
     }
@@ -40,11 +40,12 @@ class BookReturnController extends Controller
     public function approveReturn(BookReturn $bookReturn): JsonResponse
     {
         if (!$this->bookReturnService->canApproveReturn($bookReturn)) {
-            $loan = $bookReturn->loan;
+            $borrow = $bookReturn->borrow;
 
-            if ($loan->status !== 'checking') {
-                return ApiResponse::errorResponse('Peminjaman ini tidak dalam status checking', null, 400);
+            if ($borrow->status !== 'open') {
+                return ApiResponse::errorResponse('Peminjaman ini tidak dalam status open', null, 400);
             }
+
 
             return ApiResponse::errorResponse('Tidak dapat menyelesaikan return', null, 400);
         }

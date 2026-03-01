@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\BookReturn;
 use App\Models\BookReturnDetail;
-use App\Models\Loan;
+use App\Models\Borrow;
 use Carbon\Carbon;
 
 class BookReturnSeeder extends Seeder
@@ -15,45 +15,39 @@ class BookReturnSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get returned loans
-        $returnedLoans = Loan::whereIn('status', ['returned'])->with('loanDetails.bookCopy')->get();
+        // Get closed borrows (returned)
+        $closedBorrows = Borrow::where('status', 'close')->with('borrowDetails.bookCopy')->get();
 
-        if ($returnedLoans->isEmpty()) {
-            $this->command->warn('No returned loans found. Please run LoanSeeder first.');
+        if ($closedBorrows->isEmpty()) {
+            $this->command->warn('No closed borrows found. Please run BorrowSeeder first.');
             return;
         }
 
-        foreach ($returnedLoans as $loan) {
-            $daysLate = 0;
-
-            // Calculate if return was late
-            $loanDate = Carbon::parse($loan->loan_date);
-            $dueDate = Carbon::parse($loan->due_date);
-            $returnDate = $loanDate->copy()->addDays(rand(7, 14));
-
-            if ($returnDate->greaterThan($dueDate)) {
-                $daysLate = $returnDate->diffInDays($dueDate);
-            }
+        foreach ($closedBorrows as $borrow) {
+            // Calculate return date
+            $borrowDate = Carbon::parse($borrow->borrow_date);
+            $returnDate = Carbon::parse($borrow->return_date);
+            $actualReturnDate = $borrowDate->copy()->addDays(rand(7, 14));
 
             $bookReturn = BookReturn::create([
-                'loan_id' => $loan->id,
-                'return_date' => $returnDate,
+                'borrow_id'   => $borrow->id,
+                'return_date' => $actualReturnDate,
             ]);
 
-            // Create return details for each loaned book copy
-            foreach ($loan->loanDetails as $loanDetail) {
-                $bookCopy = $loanDetail->bookCopy;
+            // Create return details for each borrowed book copy
+            foreach ($borrow->borrowDetails as $borrowDetail) {
+                $bookCopy  = $borrowDetail->bookCopy;
                 $condition = rand(0, 10) > 8 ? 'damaged' : 'good';
 
                 BookReturnDetail::create([
                     'book_return_id' => $bookReturn->id,
-                    'book_copy_id' => $bookCopy->id,
-                    'condition' => $condition,
+                    'book_copy_id'   => $bookCopy->id,
+                    'condition'      => $condition,
                 ]);
 
                 // Update book copy status
                 $bookCopy->update([
-                    'status' => $condition === 'damaged' ? 'damaged' : 'available'
+                    'status' => $condition === 'damaged' ? 'damaged' : 'available',
                 ]);
             }
         }

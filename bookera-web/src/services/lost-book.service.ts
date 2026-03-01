@@ -14,12 +14,11 @@ export const lostBookService = {
     api.get<ApiResponse<LostBook>>(`/admin/lost-books/${id}`),
 
   
-  report: (loanId: number, data: {
+  report: (borrowId: number, data: {
     book_copy_id: number;
-    estimated_lost_date?: string;
     notes?: string;
   }) =>
-    api.post<ApiResponse<LostBook>>(`/loans/${loanId}/report-lost`, data),
+    api.post<ApiResponse<LostBook>>(`/borrows/${borrowId}/report-lost`, data),
 
   
   update: (id: number, data: {

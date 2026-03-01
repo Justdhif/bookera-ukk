@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function LoanMonthlyChartSkeleton() {
+export function BorrowMonthlyChartSkeleton() {
   return (
     <Card className="border-0 shadow-lg bg-white dark:bg-gray-900">
       <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
@@ -28,7 +28,7 @@ export function LoanMonthlyChartSkeleton() {
   );
 }
 
-export function LoanStatusChartSkeleton() {
+export function BorrowStatusChartSkeleton() {
   return (
     <Card className="border-0 shadow-lg bg-white dark:bg-gray-900">
       <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">

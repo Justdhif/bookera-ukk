@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Approval\RejectLoanDetailRequest;
-use App\Http\Requests\Approval\RejectLoanRequest;
-use App\Models\Loan;
-use App\Models\LoanDetail;
+use App\Http\Requests\Approval\RejectBorrowRequest;
+use App\Models\Borrow;
 use App\Services\Approval\ApprovalService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,79 +19,54 @@ class ApprovalController extends Controller
         $this->approvalService = $approvalService;
     }
 
-    public function approveLoanDetail(Request $request, LoanDetail $loanDetail): JsonResponse
+    public function approveBorrow(Request $request, Borrow $borrow): JsonResponse
     {
         try {
-            $loanDetail = $this->approvalService->approveLoanDetail($loanDetail);
+            $borrow = $this->approvalService->approveBorrow($borrow);
 
-            return ApiResponse::successResponse('Salinan buku berhasil disetujui', $loanDetail->load(['loan.loanDetails.bookCopy.book', 'bookCopy.book']));
+            return ApiResponse::successResponse('Semua salinan buku berhasil disetujui', $borrow);
         } catch (\Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }
     }
 
-    public function rejectLoanDetail(RejectLoanDetailRequest $request, LoanDetail $loanDetail): JsonResponse
+    public function rejectBorrow(RejectBorrowRequest $request, Borrow $borrow): JsonResponse
     {
         try {
-            $loanDetail = $this->approvalService->rejectLoanDetail(
-                $loanDetail,
-                $request->note
+            $borrow = $this->approvalService->rejectBorrow(
+                $borrow,
+                $request->input('rejection_reason')
             );
 
-            return ApiResponse::successResponse('Salinan buku ditolak', $loanDetail->load(['loan.loanDetails.bookCopy.book', 'bookCopy.book']));
+            return ApiResponse::successResponse('Semua salinan buku ditolak', $borrow);
         } catch (\Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }
     }
 
-    public function approveLoan(Request $request, Loan $loan): JsonResponse
+    public function markAsOpen(Request $request, Borrow $borrow): JsonResponse
     {
         try {
-            $loan = $this->approvalService->approveLoan($loan);
+            $borrow = $this->approvalService->markBorrowAsOpen($borrow);
 
-            return ApiResponse::successResponse('Semua salinan buku berhasil disetujui', $loan);
+            return ApiResponse::successResponse('Status peminjaman berhasil diubah menjadi open', $borrow);
         } catch (\Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }
     }
 
-    public function rejectLoan(RejectLoanRequest $request, Loan $loan): JsonResponse
+    public function getPendingBorrows(Request $request): JsonResponse
     {
-        try {
-            $loan = $this->approvalService->rejectLoan(
-                $loan,
-                $request->rejection_reason
-            );
+        $borrows = $this->approvalService->getPendingBorrows($request->search);
 
-            return ApiResponse::successResponse('Semua salinan buku ditolak', $loan);
-        } catch (\Exception $e) {
-            return ApiResponse::errorResponse($e->getMessage(), null, 400);
-        }
+        return ApiResponse::successResponse('Data peminjaman yang perlu diproses', $borrows);
     }
 
-    public function markAsBorrowed(Request $request, Loan $loan): JsonResponse
+    public function getApprovedBorrows(Request $request): JsonResponse
     {
-        try {
-            $loan = $this->approvalService->markLoanAsBorrowed($loan);
+        $borrows = $this->approvalService->getApprovedBorrows($request->search);
 
-            return ApiResponse::successResponse('Status peminjaman berhasil diubah menjadi borrowed', $loan);
-        } catch (\Exception $e) {
-            return ApiResponse::errorResponse($e->getMessage(), null, 400);
-        }
-    }
-
-    public function getPendingLoans(Request $request): JsonResponse
-    {
-        $loans = $this->approvalService->getPendingLoans($request->search);
-
-        return ApiResponse::successResponse('Data peminjaman yang perlu diproses', $loans);
-    }
-
-    public function getApprovedLoans(Request $request): JsonResponse
-    {
-        $loans = $this->approvalService->getApprovedLoans($request->search);
-
-        return ApiResponse::successResponse('Data peminjaman yang sudah di-approve dan menunggu penyerahan buku', $loans);
+        return ApiResponse::successResponse('Data peminjaman yang sudah di-approve dan menunggu penyerahan buku', $borrows);
     }
 
     public function getAllReturns(Request $request): JsonResponse

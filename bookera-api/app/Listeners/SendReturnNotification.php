@@ -21,9 +21,9 @@ class SendReturnNotification
     public function handle($event)
     {
         $bookReturn = $event->bookReturn;
-        $loan = $bookReturn->loan;
+        $borrow = $bookReturn->borrow;
 
-        // Notifikasi saat user request return (loan status: borrowed -> checking)
+        // Notifikasi saat user request return
         if ($event instanceof \App\Events\ReturnRequested) {
 
             $admins = User::where('role', 'admin')->pluck('id');
@@ -39,19 +39,19 @@ class SendReturnNotification
                 NotificationService::send(
                     $adminId,
                     'New Return Request',
-                    "User {$loan->user->profile->full_name} wants to return {$bookTitles}{$moreText} (Loan #{$loan->id})",
+                    "User {$borrow->user->profile->full_name} wants to return {$bookTitles}{$moreText} (Borrow #{$borrow->id})",
                     'return_request',
                     'return',
-                    ['return_id' => $bookReturn->id, 'loan_id' => $loan->id]
+                    ['return_id' => $bookReturn->id, 'borrow_id' => $borrow->id]
                 );
             }
 
         }
 
-        // Notifikasi saat admin approve return (loan status: checking -> returned/finished)
+        // Notifikasi saat admin approve return
         if ($event instanceof \App\Events\ReturnApproved) {
 
-            $userId = $loan->user_id;
+            $userId = $borrow->user_id;
 
             $bookTitles = $bookReturn->details->map(function($detail) {
                 return $detail->bookCopy->book->title ?? 'Unknown';
@@ -66,7 +66,7 @@ class SendReturnNotification
                 "Your return for {$bookTitles}{$moreText} has been processed successfully. Thank you!",
                 'approved',
                 'return',
-                ['return_id' => $bookReturn->id, 'loan_id' => $loan->id]
+                ['return_id' => $bookReturn->id, 'borrow_id' => $borrow->id]
             );
 
         }

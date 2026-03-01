@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
- * @property int $loan_id
+ * @property int $borrow_id
  * @property \Illuminate\Support\Carbon $return_date
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Loan $loan
+ * @property-read \App\Models\Borrow $borrow
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BookReturnDetail> $bookReturnDetails
  * @property-read int|null $book_return_details_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BookReturnDetail> $details
@@ -21,13 +21,13 @@ class BookReturn extends Model
     protected $table = 'book_returns';
 
     protected $fillable = [
-        'loan_id',
+        'borrow_id',
         'return_date',
     ];
 
-    public function loan()
+    public function borrow()
     {
-        return $this->belongsTo(Loan::class);
+        return $this->belongsTo(Borrow::class);
     }
 
     public function bookReturnDetails()

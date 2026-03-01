@@ -116,10 +116,10 @@ export default function NotificationDropdown({
       }
     }
 
-    if (notif.module === "loan" && notif.data?.loan_id) {
-      router.push(`/loans/${notif.data.loan_id}`);
+    if (notif.module === "borrow" && notif.data?.borrow_id) {
+      router.push(`/my-borrows/${notif.data.borrow_id}`);
     } else if (notif.module === "return" && notif.data?.return_id) {
-      router.push(`/loans/${notif.data.loan_id}`);
+      router.push(`/my-borrows/${notif.data.borrow_id}`);
     } else {
       router.push("/notifications");
     }

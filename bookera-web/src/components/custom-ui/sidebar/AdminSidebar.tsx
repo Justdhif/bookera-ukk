@@ -77,8 +77,8 @@ const getMenuGroups = () => [
         gradient: "from-emerald-500 to-teal-500",
       },
       {
-        title: "Loans",
-        href: "/admin/loans",
+        title: "Borrows",
+        href: "/admin/borrows",
         icon: Package,
         gradient: "from-teal-500 to-cyan-500",
       },

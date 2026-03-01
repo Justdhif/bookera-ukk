@@ -1,9 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\Api\ActivityController;
-use App\Http\Controllers\Api\ApprovalController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookController;
 use App\Http\Controllers\Api\BookCopyController;
@@ -13,7 +13,8 @@ use App\Http\Controllers\Api\ContentPageController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\FineController;
 use App\Http\Controllers\Api\FineTypeController;
-use App\Http\Controllers\Api\LoanController;
+use App\Http\Controllers\Api\BorrowController;
+use App\Http\Controllers\Api\BorrowRequestController;
 use App\Http\Controllers\Api\LostBookController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PrivacyPolicyController;
@@ -71,7 +72,7 @@ Route::prefix('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::post('/setup-profile', [AuthController::class, 'setupProfile']);
-        
+
     });
 });
 
@@ -114,19 +115,18 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{user}', [UserController::class, 'destroy']);
         });
 
-        Route::prefix('loans')->group(function () {
-            Route::get('/', [LoanController::class, 'index']);
-            Route::post('/', [LoanController::class, 'storeAdminLoan']);
+        Route::prefix('borrows')->group(function () {
+            Route::get('/', [BorrowController::class, 'index']);
+            Route::post('/', [BorrowController::class, 'storeAdminBorrow']);
+            Route::get('/code/{code}', [BorrowController::class, 'showByCode']);
         });
 
-        Route::prefix('approvals')->group(function () {
-            Route::get('loans/pending', [ApprovalController::class, 'getPendingLoans']);
-            Route::get('loans/approved', [ApprovalController::class, 'getApprovedLoans']);
-            Route::post('loan-details/{loanDetail}/approve', [ApprovalController::class, 'approveLoanDetail']);
-            Route::post('loan-details/{loanDetail}/reject', [ApprovalController::class, 'rejectLoanDetail']);
-            Route::post('loans/{loan}/approve', [ApprovalController::class, 'approveLoan']);
-            Route::post('loans/{loan}/reject', [ApprovalController::class, 'rejectLoan']);
-            Route::post('loans/{loan}/mark-borrowed', [ApprovalController::class, 'markAsBorrowed']);
+        Route::prefix('borrow-requests')->group(function () {
+            Route::get('/', [BorrowRequestController::class, 'index']);
+            Route::get('/code/{code}', [BorrowRequestController::class, 'showByCode']);
+            Route::get('/{borrowRequest}', [BorrowRequestController::class, 'show']);
+            Route::post('/{borrowRequest}/assign', [BorrowRequestController::class, 'assignBorrow']);
+            Route::delete('/{borrowRequest}', [BorrowRequestController::class, 'destroy']);
         });
 
         Route::prefix('book-returns')->group(function () {
@@ -138,7 +138,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('fines')->group(function () {
             Route::get('/', [FineController::class, 'index']);
-            Route::post('/loans/{loan}', [FineController::class, 'store']);
+            Route::post('/borrows/{borrow}', [FineController::class, 'store']);
             Route::get('/{fine}', [FineController::class, 'show']);
             Route::put('/{fine}', [FineController::class, 'update']);
             Route::post('/{fine}/mark-paid', [FineController::class, 'markAsPaid']);
@@ -183,16 +183,25 @@ Route::middleware('auth:sanctum')->group(function () {
         });
     });
 
-    Route::prefix('loans')->group(function () {
-        Route::post('/', [LoanController::class, 'store']);
-        Route::get('/{loan}', [LoanController::class, 'show']);
-        Route::post('/{loan}/return', [BookReturnController::class, 'store']);
-        Route::get('/{loan}/returns', [BookReturnController::class, 'index']);
-        Route::post('/{loan}/report-lost', [LostBookController::class, 'store']);
-        Route::get('/{loan}/fines', [FineController::class, 'loanFines']);
+    Route::prefix('borrows')->group(function () {
+        Route::post('/', [BorrowController::class, 'store']);
+        Route::get('/code/{code}', [BorrowController::class, 'showByCode']);
+        Route::get('/{borrow}', [BorrowController::class, 'show']);
+        Route::post('/{borrow}/return', [BookReturnController::class, 'store']);
+        Route::get('/{borrow}/returns', [BookReturnController::class, 'index']);
+        Route::post('/{borrow}/report-lost', [LostBookController::class, 'store']);
+        Route::get('/{borrow}/fines', [FineController::class, 'borrowFines']);
     });
 
-    Route::get('my-loans', [LoanController::class, 'getLoanByUser']);
+    Route::get('my-borrows', [BorrowController::class, 'getBorrowByUser']);
+
+    Route::prefix('borrow-requests')->group(function () {
+        Route::post('/', [BorrowRequestController::class, 'store']);
+        Route::get('/{borrowRequest}', [BorrowRequestController::class, 'show']);
+        Route::delete('/{borrowRequest}', [BorrowRequestController::class, 'destroy']);
+    });
+
+    Route::get('my-borrow-requests', [BorrowRequestController::class, 'getMyRequests']);
 
     Route::get('my-fines', [FineController::class, 'myFines']);
 

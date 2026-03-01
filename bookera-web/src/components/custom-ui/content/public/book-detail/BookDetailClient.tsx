@@ -6,6 +6,7 @@ import { bookService } from "@/services/book.service";
 import { Book } from "@/types/book";
 import BookCopyList from "./BookCopyList";
 import AddToSaveButton from "./AddToSaveButton";
+import AddToRequestButton from "./AddToRequestButton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -78,6 +79,7 @@ export default function BookDetailClient() {
           <p className="text-muted-foreground">{"Complete information about the book"}</p>
         </div>
         <AddToSaveButton bookId={book.id} />
+        <AddToRequestButton bookId={book.id} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

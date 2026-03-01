@@ -5,18 +5,15 @@ import { BookReturn } from "@/types/book-return";
 export const bookReturnService = {
   
   create: (
-    loanId: number,
+    borrowId: number,
     data: {
-      copies: Array<{
-        book_copy_id: number;
-        condition?: "good" | "damaged" | "lost";
-      }>;
+      borrow_detail_ids: number[];
     }
-  ) => api.post<ApiResponse<BookReturn>>(`/loans/${loanId}/return`, data),
+  ) => api.post<ApiResponse<BookReturn>>(`/borrows/${borrowId}/return`, data),
 
   
-  getByLoan: (loanId: number) =>
-    api.get<ApiResponse<BookReturn[]>>(`/loans/${loanId}/returns`),
+  getByBorrow: (borrowId: number) =>
+    api.get<ApiResponse<BookReturn[]>>(`/borrows/${borrowId}/returns`),
 
   
   show: (id: number) =>

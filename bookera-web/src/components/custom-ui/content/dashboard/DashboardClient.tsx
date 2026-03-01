@@ -4,23 +4,23 @@ import { useEffect, useState } from "react";
 import { dashboardService } from "@/services/dashboard.service";
 import {
   DashboardTotals,
-  LoanMonthly,
-  LoanStatus,
-  LatestLoan,
+  BorrowMonthly,
+  BorrowStatus,
+  LatestBorrow,
 } from "@/types/dashboard";
 import DashboardCards from "./cards/DashboardCards";
-import LoanMonthlyChart from "./charts/LoanMonthlyChart";
-import LoanStatusChart from "./charts/LoanStatusChart";
-import LatestLoansTable from "./table/LatestLoansTable";
+import BorrowMonthlyChart from "./charts/BorrowMonthlyChart";
+import BorrowStatusChart from "./charts/BorrowStatusChart";
+import LatestBorrowsTable from "./table/LatestBorrowsTable";
 import { DashboardCardsSkeleton } from "./cards/DashboardCardsSkeleton";
-import { LoanMonthlyChartSkeleton, LoanStatusChartSkeleton } from "./charts/ChartsSkeleton";
-import { LatestLoansTableSkeleton } from "./table/LatestLoansTableSkeleton";
+import { BorrowMonthlyChartSkeleton, BorrowStatusChartSkeleton } from "./charts/ChartsSkeleton";
+import { LatestBorrowsTableSkeleton } from "./table/LatestBorrowsTableSkeleton";
 import { toast } from "sonner";
 export default function DashboardClient() {
   const [totals, setTotals] = useState<DashboardTotals>();
-  const [monthly, setMonthly] = useState<LoanMonthly[]>([]);
-  const [status, setStatus] = useState<LoanStatus[]>([]);
-  const [latestLoans, setLatestLoans] = useState<LatestLoan[]>([]);
+  const [monthly, setMonthly] = useState<BorrowMonthly[]>([]);
+  const [status, setStatus] = useState<BorrowStatus[]>([]);
+  const [latestBorrows, setLatestBorrows] = useState<LatestBorrow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,13 +29,13 @@ export default function DashboardClient() {
       dashboardService.totals(),
       dashboardService.loanMonthlyChart(),
       dashboardService.loanStatusChart(),
-      dashboardService.latestLoans(),
+      dashboardService.latestBorrows(),
     ])
       .then(([totalsRes, monthlyRes, statusRes, latestRes]) => {
         setTotals(totalsRes.data.data);
         setMonthly(monthlyRes.data.data);
         setStatus(statusRes.data.data);
-        setLatestLoans(latestRes.data.data);
+        setLatestBorrows(latestRes.data.data);
       })
       .catch(() => {
         toast.error("Failed to load dashboard");
@@ -50,11 +50,11 @@ export default function DashboardClient() {
       {loading ? <DashboardCardsSkeleton /> : <DashboardCards data={totals!} />}
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {loading ? <LoanStatusChartSkeleton /> : <LoanStatusChart data={status} />}
-        {loading ? <LatestLoansTableSkeleton /> : <LatestLoansTable data={latestLoans} />}
+        {loading ? <BorrowStatusChartSkeleton /> : <BorrowStatusChart data={status} />}
+        {loading ? <LatestBorrowsTableSkeleton /> : <LatestBorrowsTable data={latestBorrows} />}
       </div>
 
-      {loading ? <LoanMonthlyChartSkeleton /> : <LoanMonthlyChart data={monthly} />}
+      {loading ? <BorrowMonthlyChartSkeleton /> : <BorrowMonthlyChart data={monthly} />}
     </div>
   );
 }

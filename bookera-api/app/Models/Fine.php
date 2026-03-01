@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
- * @property int $loan_id
+ * @property int $borrow_id
  * @property int $fine_type_id
  * @property float $amount
  * @property \Illuminate\Support\Carbon|null $paid_at
@@ -15,13 +15,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Loan $loan
+ * @property-read \App\Models\Borrow $borrow
  * @property-read \App\Models\FineType $fineType
  */
 class Fine extends Model
 {
     protected $fillable = [
-        'loan_id',
+        'borrow_id',
         'fine_type_id',
         'amount',
         'paid_at',
@@ -35,11 +35,11 @@ class Fine extends Model
     ];
 
     /**
-     * Get the loan that has this fine
+     * Get the borrow that has this fine
      */
-    public function loan(): BelongsTo
+    public function borrow(): BelongsTo
     {
-        return $this->belongsTo(Loan::class);
+        return $this->belongsTo(Borrow::class);
     }
 
     /**

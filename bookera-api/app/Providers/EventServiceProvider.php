@@ -7,14 +7,12 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use App\Listeners\LogLoginActivity;
 use App\Listeners\LogLogoutActivity;
-use App\Events\LoanRequested;
-use App\Events\LoanApproved;
-use App\Events\LoanRejected;
+use App\Events\BorrowRequested;
 use App\Events\ReturnRequested;
 use App\Events\ReturnApproved;
 use App\Events\FineCreated;
 use App\Events\LostBookReported;
-use App\Listeners\SendLoanNotification;
+use App\Listeners\SendBorrowNotification;
 use App\Listeners\SendReturnNotification;
 use App\Listeners\SendFineNotification;
 use App\Listeners\SendLostBookNotification;
@@ -30,14 +28,8 @@ class EventServiceProvider extends ServiceProvider
             LogLogoutActivity::class,
         ],
 
-        LoanRequested::class => [
-            SendLoanNotification::class,
-        ],
-        LoanApproved::class => [
-            SendLoanNotification::class,
-        ],
-        LoanRejected::class => [
-            SendLoanNotification::class,
+        BorrowRequested::class => [
+            SendBorrowNotification::class,
         ],
 
         ReturnRequested::class => [

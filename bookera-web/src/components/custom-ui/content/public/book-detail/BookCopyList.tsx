@@ -1,21 +1,10 @@
 "use client";
 
 import { BookCopy } from "@/types/book-copy";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import BorrowDialog from "./BorrowDialog";
-import { useState } from "react";
-import { useAuthStore } from "@/store/auth.store";
-import { useRouter, usePathname } from "next/navigation";
 import { BookOpen } from "lucide-react";
+
 export default function BookCopyList({ copies }: { copies: BookCopy[] }) {
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const { isAuthenticated } = useAuthStore();
-
-  const [selectedCopy, setSelectedCopy] = useState<BookCopy | null>(null);
-
   if (!copies || copies.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -35,12 +24,12 @@ export default function BookCopyList({ copies }: { copies: BookCopy[] }) {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <p className="font-medium">{"Copy Code"}: {copy.copy_code}</p>
-              <Badge 
+              <Badge
                 variant={
-                  copy.status === "available" 
-                    ? "default" 
-                    : copy.status === "borrowed" 
-                    ? "destructive" 
+                  copy.status === "available"
+                    ? "default"
+                    : copy.status === "borrowed"
+                    ? "destructive"
                     : "secondary"
                 }
                 className={
@@ -66,7 +55,8 @@ export default function BookCopyList({ copies }: { copies: BookCopy[] }) {
             </div>
             {copy.status && (
               <p className="text-sm text-muted-foreground">
-                {"Book Condition"}: {copy.status === "available"
+                {"Book Condition"}:{" "}
+                {copy.status === "available"
                   ? "Available"
                   : copy.status === "borrowed"
                   ? "Borrowed"
@@ -78,26 +68,8 @@ export default function BookCopyList({ copies }: { copies: BookCopy[] }) {
               </p>
             )}
           </div>
-
-          {copy.status === "available" && (
-            <Button
-              onClick={() => {
-                if (!isAuthenticated) {
-                  router.push(`/login?redirect=${pathname}`);
-                  return;
-                }
-
-                setSelectedCopy(copy);
-              }}
-              className="w-full sm:w-auto"
-            >
-              {"Borrow Book"}
-            </Button>
-          )}
         </div>
       ))}
-
-      <BorrowDialog copy={selectedCopy} onClose={() => setSelectedCopy(null)} />
     </div>
   );
 }
