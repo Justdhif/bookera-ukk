@@ -45,19 +45,19 @@ export function BorrowFromCollectionDialog({
 
   const handleSubmit = async () => {
     if (selectedBooks.length === 0) {
-      toast.error("Tidak ada buku yang dipilih");
+      toast.error("No books selected");
       return;
     }
     if (!borrowDate) {
-      toast.error("Tanggal pinjam wajib diisi");
+      toast.error("Borrow date is required");
       return;
     }
     if (!returnDate) {
-      toast.error("Tanggal kembali wajib diisi");
+      toast.error("Return date is required");
       return;
     }
     if (returnDate <= borrowDate) {
-      toast.error("Tanggal kembali harus setelah tanggal pinjam");
+      toast.error("Return date must be after borrow date");
       return;
     }
 
@@ -68,12 +68,12 @@ export function BorrowFromCollectionDialog({
         borrow_date: format(borrowDate, "yyyy-MM-dd"),
         return_date: format(returnDate, "yyyy-MM-dd"),
       });
-      toast.success("Permintaan peminjaman berhasil dibuat!");
+      toast.success("Borrow request created successfully!");
       onOpenChange(false);
       onSuccess();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal membuat permintaan peminjaman"
+        error.response?.data?.message || "Failed to create borrow request",
       );
     } finally {
       setLoading(false);
@@ -86,7 +86,7 @@ export function BorrowFromCollectionDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BookPlus className="h-5 w-5" />
-            {"Borrow Request"} - {selectedBooks.length} {"buku dipilih"}
+            {"Borrow Request"} - {selectedBooks.length} {"books selected"}
           </DialogTitle>
           <DialogDescription>
             {"Set the borrow date and return date for your borrow request"}
@@ -105,10 +105,10 @@ export function BorrowFromCollectionDialog({
                   />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold line-clamp-1 text-sm">{book.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {book.author}
+                  <p className="font-semibold line-clamp-1 text-sm">
+                    {book.title}
                   </p>
+                  <p className="text-xs text-muted-foreground">{book.author}</p>
                 </div>
               </div>
             ))}
@@ -117,25 +117,25 @@ export function BorrowFromCollectionDialog({
 
         <div className="space-y-4 mt-2">
           <div className="space-y-2">
-            <Label variant="required">{"Tanggal Pinjam"}</Label>
+            <Label variant="required">{"Borrow Date"}</Label>
             <DatePicker
               value={borrowDate}
               onChange={setBorrowDate}
-              placeholder={"Pilih tanggal pinjam"}
+              placeholder={"Select borrow date"}
               dateMode="future"
             />
           </div>
 
           <div className="space-y-2">
-            <Label variant="required">{"Tanggal Kembali"}</Label>
+            <Label variant="required">{"Return Date"}</Label>
             <DatePicker
               value={returnDate}
               onChange={setReturnDate}
-              placeholder={"Pilih tanggal kembali"}
+              placeholder={"Select return date"}
               dateMode="future"
             />
             <p className="text-xs text-muted-foreground">
-              {"Tanggal kembali harus setelah tanggal pinjam"}
+              {"Return date must be after borrow date"}
             </p>
           </div>
         </div>
@@ -146,14 +146,14 @@ export function BorrowFromCollectionDialog({
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >
-            {"Batal"}
+            {"Cancel"}
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={loading || selectedBooks.length === 0}
           >
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            {loading ? "Memproses..." : "Kirim Permintaan"}
+            {loading ? "Processing..." : "Submit Request"}
           </Button>
         </DialogFooter>
       </DialogContent>

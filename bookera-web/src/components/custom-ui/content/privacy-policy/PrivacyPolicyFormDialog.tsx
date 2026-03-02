@@ -61,8 +61,8 @@ export default function PrivacyPolicyFormDialog({
       setContent("");
       setOpen(false);
       onSuccess();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "An error occurred");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -102,9 +102,7 @@ export default function PrivacyPolicyFormDialog({
               rows={16}
               className="font-mono text-sm"
             />
-            <p className="text-xs text-muted-foreground">
-              {"useHTMLTags"}
-            </p>
+            <p className="text-xs text-muted-foreground">{"useHTMLTags"}</p>
           </div>
 
           <Button

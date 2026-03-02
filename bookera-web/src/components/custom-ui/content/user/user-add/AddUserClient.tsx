@@ -25,7 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowLeft, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { DatePicker } from "@/components/ui/date-picker";
-import AvatarUploadModal from "./AvatarUploadModal";
+import AvatarUploadModal from "../AvatarUploadModal";
 
 interface FormData {
   email: string;

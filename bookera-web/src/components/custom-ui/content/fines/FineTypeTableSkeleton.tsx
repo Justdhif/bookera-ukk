@@ -16,15 +16,15 @@ export function FineTypeTableSkeleton() {
       <TableHeader>
         <TableRow className="bg-muted/50 hover:bg-muted/50">
           <TableHead className="w-16 text-center">#</TableHead>
-          <TableHead className="font-semibold">Nama</TableHead>
-          <TableHead className="font-semibold">Tipe</TableHead>
-          <TableHead className="font-semibold">Jumlah</TableHead>
-          <TableHead className="font-semibold">Deskripsi</TableHead>
-          <TableHead className="font-semibold text-right">Aksi</TableHead>
+          <TableHead className="font-semibold">Name</TableHead>
+          <TableHead className="font-semibold">Type</TableHead>
+          <TableHead className="font-semibold">Amount</TableHead>
+          <TableHead className="font-semibold">Description</TableHead>
+          <TableHead className="font-semibold text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {[...Array(5)].map((_, i) => (
+        {Array.from({ length: 5 }).map((_, i) => (
           <TableRow key={i}>
             <TableCell className="text-center">
               <Skeleton className="h-4 w-8 mx-auto" />

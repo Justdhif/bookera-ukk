@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 import { User } from "@/types/user";
-import { Loan } from "@/types/loan";
+import { Borrow } from "@/types/borrow";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Upload } from "lucide-react";
-import AvatarUploadModal from "./AvatarUploadModal";
+import AvatarUploadModal from "../AvatarUploadModal";
 import Image from "next/image";
 
 interface UserAvatarCardProps {
@@ -33,7 +33,7 @@ interface UserAvatarCardProps {
   formData: any;
   setFormData: (data: any) => void;
   setAvatarPreview: (preview: string) => void;
-  recentLoans: Loan[];
+  recentBorrows: Borrow[];
 }
 
 export default function UserAvatarCard({
@@ -43,7 +43,7 @@ export default function UserAvatarCard({
   formData,
   setFormData,
   setAvatarPreview,
-  recentLoans,
+  recentBorrows,
 }: UserAvatarCardProps) {
   const router = useRouter();
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
@@ -79,12 +79,10 @@ export default function UserAvatarCard({
 
   const getStatusDisplay = (status: string) => {
     switch (status) {
-      case "borrowed":
-        return "Borrowed";
-      case "returned":
-        return "Returned";
-      case "overdue":
-        return "Overdue";
+      case "open":
+        return "Open";
+      case "close":
+        return "Closed";
       default:
         return status;
     }
@@ -112,7 +110,7 @@ export default function UserAvatarCard({
                   
                 />
               ) : (
-                <div className="h-full w-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+                <div className="h-full w-full bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
                   <span className="text-4xl font-medium text-gray-600 dark:text-gray-400">
                     {user.profile.full_name[0]?.toUpperCase()}
                   </span>
@@ -189,54 +187,54 @@ export default function UserAvatarCard({
 
           <div className="border-t pt-4 mt-4 w-full">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-sm">Recent Loans</h4>
+              <h4 className="font-semibold text-sm">Recent Borrows</h4>
               <Button
                 variant="link"
                 className="h-auto p-0 text-xs cursor-pointer"
-                onClick={() => router.push("/admin/loans")}
+                onClick={() => router.push("/admin/borrows")}
               >
                 View All
               </Button>
             </div>
-            {recentLoans.length > 0 ? (
+            {recentBorrows.length > 0 ? (
               <div className="space-y-2">
-                {recentLoans.map((loan) => (
+                {recentBorrows.map((borrow) => (
                   <div
-                    key={loan.id}
+                    key={borrow.id}
                     className="flex items-center justify-between p-2 rounded-md bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
-                    onClick={() => router.push(`/admin/loans/${loan.id}`)}
+                    onClick={() => router.push(`/admin/borrows/${borrow.borrow_code}`)}
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium truncate">
-                        {loan.loan_details.length} book
-                        {loan.loan_details.length !== 1 ? "s" : ""}
+                        {borrow.borrow_details.length} book
+                        {borrow.borrow_details.length !== 1 ? "s" : ""}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(loan.loan_date).toLocaleDateString("id-ID")}
+                        {new Date(borrow.borrow_date).toLocaleDateString("id-ID")}
                       </p>
                     </div>
                     <Badge
                       variant={
-                        loan.status === "borrowed"
+                        borrow.status === "open"
                           ? "secondary"
-                          : loan.status === "returned"
+                          : borrow.status === "close"
                             ? "default"
                             : "destructive"
                       }
                       className={`text-xs ${
-                        loan.status === "returned"
+                        borrow.status === "close"
                           ? "bg-green-600 hover:bg-green-700 text-white"
                           : ""
                       }`}
                     >
-                      {getStatusDisplay(loan.status)}
+                      {getStatusDisplay(borrow.status)}
                     </Badge>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground text-center py-4">
-                No recent loans
+                No recent borrows
               </p>
             )}
           </div>

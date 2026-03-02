@@ -17,17 +17,17 @@ export function FineTableSkeleton() {
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="w-16 text-center">#</TableHead>
-            <TableHead className="font-semibold">Peminjam</TableHead>
+            <TableHead className="font-semibold">Borrower</TableHead>
             <TableHead className="font-semibold">Loan ID</TableHead>
-            <TableHead className="font-semibold">Tipe Denda</TableHead>
-            <TableHead className="font-semibold">Jumlah</TableHead>
+            <TableHead className="font-semibold">Fine Type</TableHead>
+            <TableHead className="font-semibold">Amount</TableHead>
             <TableHead className="font-semibold">Status</TableHead>
-            <TableHead className="font-semibold">Tanggal</TableHead>
-            <TableHead className="font-semibold text-right">Aksi</TableHead>
+            <TableHead className="font-semibold">Date</TableHead>
+            <TableHead className="font-semibold text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {[...Array(5)].map((_, i) => (
+          {Array.from({ length: 5 }).map((_, i) => (
             <TableRow key={i}>
               <TableCell className="text-center">
                 <Skeleton className="h-4 w-8 mx-auto" />

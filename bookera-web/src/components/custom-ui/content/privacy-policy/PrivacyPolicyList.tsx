@@ -3,18 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { PrivacyPolicy } from "@/types/privacy-policy";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { Shield, Edit, Trash2, Calendar, Clock } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Shield, Edit2, Trash, Calendar, Clock } from "lucide-react";
 export default function PrivacyPolicyList({
   data,
   onEdit,
@@ -80,42 +69,24 @@ export default function PrivacyPolicyList({
 
             <div className="flex items-start gap-2 pr-2">
               <Button
-                variant="outline"
-                size="icon"
+                variant="brand"
+                size="sm"
                 onClick={() => onEdit(item)}
-                className="h-9 w-9"
+                className="h-8 gap-1"
               >
-                <Edit className="h-4 w-4" />
+                <Edit2 className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Edit</span>
               </Button>
 
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-9 w-9 text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>{"Delete Privacy Policy"}</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {"Are you sure you want to delete this Privacy Policy? Deleted data cannot be recovered."}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{"Cancel"}</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => onDelete(item.id)}
-                      className="bg-red-600 hover:bg-red-700"
-                    >
-                      {"Delete"}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => onDelete(item.id)}
+                className="h-8 gap-1"
+              >
+                <Trash className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Delete</span>
+              </Button>
             </div>
           </div>
         </div>

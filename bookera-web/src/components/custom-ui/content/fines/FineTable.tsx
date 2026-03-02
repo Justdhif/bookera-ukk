@@ -14,7 +14,7 @@ import { Fine } from "@/types/fine";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import {
   DollarSign,
-  Trash2,
+  Trash,
   CheckCircle,
   XCircle,
   MoreVertical,
@@ -167,7 +167,7 @@ export default function FineTable({
                         onClick={() => onDelete(item.id)}
                         className="text-red-600"
                       >
-                        <Trash2 className="h-4 w-4 mr-2" />
+                        <Trash className="h-4 w-4 mr-2" />
                         {"Delete"}
                       </DropdownMenuItem>
                     </DropdownMenuContent>

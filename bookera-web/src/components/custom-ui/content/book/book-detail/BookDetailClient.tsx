@@ -11,7 +11,7 @@ import BookCoverCard from "../BookCoverCard";
 import BookDetailForm from "./BookDetailForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, X, Edit } from "lucide-react";
+import { ArrowLeft, X, Edit2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
@@ -303,7 +303,7 @@ export default function BookDetailClient() {
             variant="brand"
             className="h-8 gap-1"
           >
-            <Edit className="h-3.5 w-3.5" />
+            <Edit2 className="h-3.5 w-3.5" />
             Edit Book
           </Button>
         )}

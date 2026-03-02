@@ -4,7 +4,7 @@ import { Notification } from "@/types/notification";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, CheckCheck, X, ExternalLink, Trash2 } from "lucide-react";
+import { Bell, CheckCheck, X, ExternalLink, Trash } from "lucide-react";
 import { format } from "date-fns";
 import { getNotificationIcon } from "./notification-utils";
 interface NotificationDetailProps {
@@ -148,7 +148,7 @@ export default function NotificationDetail({
               onClick={() => onDelete(notification.id)}
               className="gap-2"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash className="h-4 w-4" />
               {"Delete Notification"}
             </Button>
           </div>

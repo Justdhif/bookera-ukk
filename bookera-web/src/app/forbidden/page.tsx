@@ -12,12 +12,12 @@ export default function ForbiddenPage() {
 
   const getRoleMessage = () => {
     if (user?.role === "officer:catalog") {
-      return "Sebagai Officer Catalog, Anda hanya memiliki akses ke Dashboard, Categories, dan Books.";
+      return "As an Officer Catalog, you only have access to Dashboard, Categories, and Books.";
     }
     if (user?.role === "officer:management") {
-      return "Sebagai Officer Management, Anda hanya memiliki akses ke Dashboard, Users, Loans, Returns, Fines, Lost Books, dan Activity Logs.";
+      return "As an Officer Management, you only have access to Dashboard, Users, Loans, Returns, Fines, Lost Books, and Activity Logs.";
     }
-    return "Anda tidak memiliki izin untuk mengakses halaman ini.";
+    return "You do not have permission to access this page.";
   };
 
   return (
@@ -27,7 +27,7 @@ export default function ForbiddenPage() {
         <div className="relative overflow-hidden rounded-3xl border bg-card shadow-2xl">
           {/* Background Gradient */}
           <div className="absolute inset-0 bg-linear-to-br from-red-50/50 via-rose-50/30 to-orange-50/50 dark:from-red-950/20 dark:via-rose-950/10 dark:to-orange-950/20" />
-          
+
           {/* Decorative Elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-red-500/10 to-rose-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-linear-to-br from-orange-500/10 to-amber-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
@@ -39,7 +39,7 @@ export default function ForbiddenPage() {
               <div className="relative">
                 {/* Animated Ring */}
                 <div className="absolute inset-0 rounded-full bg-linear-to-br from-red-500 to-rose-500 opacity-20 animate-ping" />
-                
+
                 {/* Icon Container */}
                 <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-linear-to-br from-red-500 to-rose-500 shadow-lg shadow-red-500/30">
                   <ShieldX className="w-12 h-12 text-white" />
@@ -56,7 +56,7 @@ export default function ForbiddenPage() {
 
             {/* Title */}
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 bg-linear-to-r from-red-700 to-rose-700 dark:from-red-300 dark:to-rose-300 bg-clip-text text-transparent">
-              Akses Ditolak
+              Access Denied
             </h2>
 
             {/* Description */}
@@ -65,7 +65,8 @@ export default function ForbiddenPage() {
                 {getRoleMessage()}
               </p>
               <p className="text-center text-sm text-muted-foreground/80">
-                Jika Anda merasa ini adalah kesalahan, silakan hubungi administrator untuk mendapatkan izin akses yang sesuai.
+                If you believe this is a mistake, please contact an
+                administrator to get appropriate access permissions.
               </p>
             </div>
 
@@ -79,7 +80,7 @@ export default function ForbiddenPage() {
               >
                 <div className="absolute inset-0 bg-linear-to-r from-red-500/10 to-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                Kembali
+                Go Back
               </Button>
 
               <Link href="/admin" className="w-full sm:w-auto">
@@ -88,7 +89,7 @@ export default function ForbiddenPage() {
                   className="w-full bg-linear-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-lg shadow-red-500/30 hover:shadow-red-500/50 transition-all"
                 >
                   <Home className="mr-2 h-4 w-4" />
-                  Ke Dashboard
+                  Go to Dashboard
                 </Button>
               </Link>
             </div>
@@ -97,7 +98,9 @@ export default function ForbiddenPage() {
             <div className="mt-12 pt-8 border-t border-red-200/50 dark:border-red-800/50">
               <div className="flex items-center justify-center gap-2 text-muted-foreground/60">
                 <BookOpen className="h-4 w-4" />
-                <span className="text-sm font-medium">Bookera Library System</span>
+                <span className="text-sm font-medium">
+                  Bookera Library System
+                </span>
               </div>
             </div>
           </div>
@@ -106,12 +109,12 @@ export default function ForbiddenPage() {
         {/* Help Text */}
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Butuh bantuan?{" "}
+            Need help?{" "}
             <Link
               href="/admin"
               className="font-medium text-red-600 dark:text-red-400 hover:underline"
             >
-              Hubungi Administrator
+              Contact Administrator
             </Link>
           </p>
         </div>

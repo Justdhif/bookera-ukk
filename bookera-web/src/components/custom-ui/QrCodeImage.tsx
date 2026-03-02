@@ -47,7 +47,7 @@ export function QrCodeImage({
         >
           <QrCode className={cn(sz.icon, "text-muted-foreground opacity-50")} />
           <p className="text-xs text-muted-foreground text-center px-2">
-            QR code tidak tersedia
+            QR code not available
           </p>
         </div>
       )}

@@ -28,7 +28,7 @@ const themes: Record<string, Theme> = {
     textPrimary: "#fef0e0",
     textDim: "rgba(254,230,200,0.65)",
     textMuted: "rgba(220,170,120,0.4)",
-    greeting: "Selamat Pagi",
+    greeting: "Good Morning",
     surface: "rgba(255,170,60,0.08)",
     surfaceBorder: "rgba(255,170,60,0.16)",
     divider: "rgba(255,160,60,0.12)",
@@ -44,7 +44,7 @@ const themes: Record<string, Theme> = {
     textPrimary: "#ffffff",
     textDim: "rgba(255,255,255,0.7)",
     textMuted: "rgba(255,255,255,0.38)",
-    greeting: "Selamat Pagi",
+    greeting: "Good Morning",
     surface: "rgba(255,255,255,0.1)",
     surfaceBorder: "rgba(255,255,255,0.2)",
     divider: "rgba(255,255,255,0.14)",
@@ -60,7 +60,7 @@ const themes: Record<string, Theme> = {
     textPrimary: "#ffffff",
     textDim: "rgba(255,255,255,0.7)",
     textMuted: "rgba(200,235,255,0.38)",
-    greeting: "Selamat Siang",
+    greeting: "Good Noon",
     surface: "rgba(255,255,255,0.1)",
     surfaceBorder: "rgba(255,255,255,0.2)",
     divider: "rgba(255,255,255,0.13)",
@@ -76,7 +76,7 @@ const themes: Record<string, Theme> = {
     textPrimary: "#ffffff",
     textDim: "rgba(255,255,255,0.7)",
     textMuted: "rgba(255,220,180,0.38)",
-    greeting: "Selamat Sore",
+    greeting: "Good Afternoon",
     surface: "rgba(255,255,255,0.09)",
     surfaceBorder: "rgba(255,255,255,0.18)",
     divider: "rgba(255,255,255,0.12)",
@@ -92,7 +92,7 @@ const themes: Record<string, Theme> = {
     textPrimary: "#fff7ed",
     textDim: "rgba(255,230,190,0.65)",
     textMuted: "rgba(220,170,100,0.38)",
-    greeting: "Selamat Sore",
+    greeting: "Good Evening",
     surface: "rgba(255,160,50,0.08)",
     surfaceBorder: "rgba(255,160,50,0.16)",
     divider: "rgba(255,150,40,0.12)",
@@ -108,7 +108,7 @@ const themes: Record<string, Theme> = {
     textPrimary: "#e0e7ff",
     textDim: "rgba(180,195,255,0.62)",
     textMuted: "rgba(140,160,230,0.36)",
-    greeting: "Selamat Malam",
+    greeting: "Good Night",
     surface: "rgba(100,130,255,0.07)",
     surfaceBorder: "rgba(100,130,255,0.15)",
     divider: "rgba(100,130,255,0.1)",
@@ -124,7 +124,7 @@ const themes: Record<string, Theme> = {
     textPrimary: "rgba(210,215,255,0.9)",
     textDim: "rgba(170,178,240,0.55)",
     textMuted: "rgba(120,130,210,0.35)",
-    greeting: "Selamat Malam",
+    greeting: "Good Night",
     surface: "rgba(80,90,220,0.06)",
     surfaceBorder: "rgba(80,90,220,0.12)",
     divider: "rgba(80,90,220,0.08)",
@@ -242,8 +242,8 @@ export default function RealTimeClock() {
   const hour = time.getHours();
   const theme = getTheme(hour);
 
-  const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-  const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
   const dayName = days[time.getDay()];
   const dateNum = time.getDate();
@@ -300,7 +300,7 @@ export default function RealTimeClock() {
             fontSize: "9px", fontWeight: 700, letterSpacing: "0.18em",
             textTransform: "uppercase", color: theme.textMuted,
           }}>
-            Perpustakaan Umum
+            Bookera Library
           </span>
           <span style={{ fontSize: "9px", color: theme.textMuted, opacity: 0.5, margin: "0 2px" }}>·</span>
           <MapPin size={9} color={theme.textMuted} strokeWidth={2} />
@@ -360,7 +360,7 @@ export default function RealTimeClock() {
               {ss}
             </span>
             <span style={{ fontSize: "8px", color: theme.textMuted, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-              detik
+              sec
             </span>
           </div>
         </div>
@@ -373,9 +373,9 @@ export default function RealTimeClock() {
 
       <div style={{ position: "relative", zIndex: 1, display: "flex", gap: "8px" }}>
         {[
-          { label: "Suhu", value: tempVal, Icon: Thermometer, sub: "Jakarta" },
-          { label: "Kelembapan", value: humVal, Icon: Droplets, sub: "Relatif" },
-          { label: "Zona Waktu", value: "WIB", Icon: MapPin, sub: "UTC+7" },
+          { label: "Temp.", value: tempVal, Icon: Thermometer, sub: "Jakarta" },
+          { label: "Humidity", value: humVal, Icon: Droplets, sub: "Relative" },
+          { label: "Time Zone", value: "WIB", Icon: MapPin, sub: "UTC+7" },
         ].map(({ label, value, Icon, sub }) => (
           <div key={label} style={{
             flex: 1,

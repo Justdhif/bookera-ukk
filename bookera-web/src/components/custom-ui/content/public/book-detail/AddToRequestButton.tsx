@@ -22,7 +22,9 @@ interface AddToRequestButtonProps {
   bookId: number;
 }
 
-export default function AddToRequestButton({ bookId }: AddToRequestButtonProps) {
+export default function AddToRequestButton({
+  bookId,
+}: AddToRequestButtonProps) {
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -48,15 +50,15 @@ export default function AddToRequestButton({ bookId }: AddToRequestButtonProps) 
 
   const handleSubmit = async () => {
     if (!borrowDate) {
-      toast.error("Tanggal pinjam wajib diisi");
+      toast.error("Borrow date is required");
       return;
     }
     if (!returnDate) {
-      toast.error("Tanggal kembali wajib diisi");
+      toast.error("Return date is required");
       return;
     }
     if (returnDate <= borrowDate) {
-      toast.error("Tanggal kembali harus setelah tanggal pinjam");
+      toast.error("Return date must be after borrow date");
       return;
     }
 
@@ -67,11 +69,11 @@ export default function AddToRequestButton({ bookId }: AddToRequestButtonProps) 
         borrow_date: format(borrowDate, "yyyy-MM-dd"),
         return_date: format(returnDate, "yyyy-MM-dd"),
       });
-      toast.success("Permintaan peminjaman berhasil dibuat!");
+      toast.success("Borrow request created successfully!");
       handleClose();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal membuat permintaan peminjaman"
+        error.response?.data?.message || "Failed to create borrow request",
       );
     } finally {
       setLoading(false);
@@ -80,7 +82,12 @@ export default function AddToRequestButton({ bookId }: AddToRequestButtonProps) 
 
   return (
     <>
-      <Button variant="outline" size="sm" onClick={handleOpen} className="gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleOpen}
+        className="gap-2"
+      >
         <BookPlus className="h-4 w-4" />
         {"Add to Request"}
       </Button>
@@ -96,25 +103,25 @@ export default function AddToRequestButton({ bookId }: AddToRequestButtonProps) 
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label variant="required">{"Tanggal Pinjam"}</Label>
+              <Label variant="required">{"Borrow Date"}</Label>
               <DatePicker
                 value={borrowDate}
                 onChange={setBorrowDate}
-                placeholder={"Pilih tanggal pinjam"}
+                placeholder={"Select borrow date"}
                 dateMode="future"
               />
             </div>
 
             <div className="space-y-2">
-              <Label variant="required">{"Tanggal Kembali"}</Label>
+              <Label variant="required">{"Return Date"}</Label>
               <DatePicker
                 value={returnDate}
                 onChange={setReturnDate}
-                placeholder={"Pilih tanggal kembali"}
+                placeholder={"Select return date"}
                 dateMode="future"
               />
               <p className="text-xs text-muted-foreground">
-                {"Tanggal kembali harus setelah tanggal pinjam"}
+                {"Return date must be after borrow date"}
               </p>
             </div>
 
@@ -125,10 +132,14 @@ export default function AddToRequestButton({ bookId }: AddToRequestButtonProps) 
                 className="flex-1"
                 disabled={loading}
               >
-                {"Batal"}
+                {"Cancel"}
               </Button>
-              <Button onClick={handleSubmit} className="flex-1" disabled={loading}>
-                {loading ? "Memproses..." : "Kirim Permintaan"}
+              <Button
+                onClick={handleSubmit}
+                className="flex-1"
+                disabled={loading}
+              >
+                {loading ? "Processing..." : "Submit Request"}
               </Button>
             </div>
           </div>

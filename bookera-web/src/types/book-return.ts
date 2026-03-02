@@ -1,4 +1,4 @@
-import { Loan } from "./loan";
+import { Borrow } from "./borrow";
 import { BookCopy } from "./book-copy";
 import { Book } from "./book";
 
@@ -16,10 +16,10 @@ export interface BookReturnDetail {
 
 export interface BookReturn {
   id: number;
-  loan_id: number;
+  borrow_id: number;
   return_date: string;
   
-  loan: Loan;
+  borrow: Borrow;
   details: BookReturnDetail[];
   
   created_at: string;

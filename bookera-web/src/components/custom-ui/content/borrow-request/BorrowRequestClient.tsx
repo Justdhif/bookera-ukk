@@ -17,18 +17,18 @@ import {
   Calendar,
   BookOpen,
   ArrowRight,
-  Trash2,
-  Loader2,
+  Trash,
 } from "lucide-react";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { format } from "date-fns";
+import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 
 export default function BorrowRequestClient() {
   const router = useRouter();
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchRequests();
@@ -40,7 +40,9 @@ export default function BorrowRequestClient() {
       const res = await borrowRequestService.getAll(searchQuery);
       setRequests(res.data.data);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal memuat permintaan peminjaman");
+      toast.error(
+        error.response?.data?.message || "Failed to load borrow requests",
+      );
     } finally {
       setLoading(false);
     }
@@ -50,16 +52,19 @@ export default function BorrowRequestClient() {
     fetchRequests();
   };
 
-  const handleDelete = async (id: number) => {
-    setDeletingId(id);
+  const handleDelete = (id: number) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await borrowRequestService.destroy(id);
-      toast.success("Permintaan berhasil dihapus");
+      await borrowRequestService.destroy(deleteId);
+      toast.success("Request deleted successfully");
+      setDeleteId(null);
       fetchRequests();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal menghapus permintaan");
-    } finally {
-      setDeletingId(null);
+      toast.error(error.response?.data?.message || "Failed to delete request");
     }
   };
 
@@ -69,7 +74,7 @@ export default function BorrowRequestClient() {
         <div>
           <h1 className="text-3xl font-bold">Borrow Requests</h1>
           <p className="text-muted-foreground">
-            Daftar permintaan peminjaman dari member
+            List of borrow requests from members
           </p>
         </div>
       </div>
@@ -78,7 +83,7 @@ export default function BorrowRequestClient() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari berdasarkan kode, nama, atau judul buku..."
+            placeholder="Search by code, name, or book title..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -92,15 +97,15 @@ export default function BorrowRequestClient() {
 
       {loading ? (
         <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
+          {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-32 w-full" />
           ))}
         </div>
       ) : requests.length === 0 ? (
         <EmptyState
           icon={<ClipboardList className="h-16 w-16" />}
-          title="Tidak Ada Permintaan"
-          description="Belum ada permintaan peminjaman dari member"
+          title="No Requests"
+          description="No borrow requests from members yet"
         />
       ) : (
         <div className="space-y-4">
@@ -125,14 +130,14 @@ export default function BorrowRequestClient() {
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5" />
                         <span>
-                          Pinjam:{" "}
+                          Borrow:{" "}
                           {format(new Date(req.borrow_date), "dd MMM yyyy")}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5" />
                         <span>
-                          Kembali:{" "}
+                          Return:{" "}
                           {format(new Date(req.return_date), "dd MMM yyyy")}
                         </span>
                       </div>
@@ -151,22 +156,17 @@ export default function BorrowRequestClient() {
                   <div className="flex gap-2 shrink-0">
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="text-destructive hover:text-destructive"
+                      variant="destructive"
                       onClick={() => handleDelete(req.id)}
-                      disabled={deletingId === req.id}
                     >
-                      {deletingId === req.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
+                      <Trash className="h-4 w-4" />
                     </Button>
                     <Button
                       size="sm"
+                      variant="brand"
                       onClick={() =>
                         router.push(
-                          `/admin/borrow-requests/${req.request_code}`
+                          `/admin/borrow-requests/${req.request_code}`,
                         )
                       }
                     >
@@ -180,6 +180,14 @@ export default function BorrowRequestClient() {
           ))}
         </div>
       )}
+
+      <DeleteConfirmDialog
+        open={deleteId !== null}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        title="Delete Borrow Request"
+        description="Are you sure you want to delete this borrow request? This action cannot be undone."
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

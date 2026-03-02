@@ -33,13 +33,13 @@ interface YearPickerProps {
 export default function YearPicker({
   value = "",
   onChange,
-  placeholder = "Pilih tahun",
+  placeholder = "Select year",
   startYear = 1900,
   endYear = new Date().getFullYear(),
   className,
   disabled = false,
-  searchPlaceholder = "Cari tahun...",
-  emptyText = "Tahun tidak ditemukan",
+  searchPlaceholder = "Search year...",
+  emptyText = "Year not found",
 }: YearPickerProps) {
   const [open, setOpen] = useState(false);
   const years = Array.from(

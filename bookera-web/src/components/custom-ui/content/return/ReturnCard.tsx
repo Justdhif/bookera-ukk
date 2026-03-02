@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import { BookReturn } from "@/types/book-return";
-import { Loan } from "@/types/loan";
+import { Borrow } from "@/types/borrow";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,18 +16,16 @@ import {
   BookOpen,
   Calendar,
   User,
-  Clock,
   CheckCircle,
   XCircleIcon,
   AlertTriangle,
   DollarSign,
-  AlertCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 
 interface ReturnCardProps {
   bookReturn: BookReturn;
-  loan: Loan;
+  borrow: Borrow;
   showActions?: boolean;
   actionLoading: number | null;
   onFinished?: (returnId: number) => void;
@@ -36,7 +34,7 @@ interface ReturnCardProps {
 
 export function ReturnCard({
   bookReturn,
-  loan,
+  borrow,
   showActions = true,
   actionLoading,
   onFinished,
@@ -44,9 +42,9 @@ export function ReturnCard({
 }: ReturnCardProps) {
   const router = useRouter();
 
-  const getLoanStatusBadge = (status: Loan["status"]) => {
+  const getBorrowStatusBadge = (status: Borrow["status"]) => {
     const variants: Record<
-      Loan["status"],
+      Borrow["status"],
       {
         variant: any;
         label: string;
@@ -54,53 +52,17 @@ export function ReturnCard({
         className?: string;
       }
     > = {
-      pending: {
+      open: {
         variant: "secondary",
-        label: "Pending",
-        icon: <Clock className="h-3 w-3 mr-1" />,
-        className: "bg-blue-100 text-blue-800 hover:bg-blue-100",
-      },
-      waiting: {
-        variant: "secondary",
-        label: "Waiting",
-        icon: <Clock className="h-3 w-3 mr-1" />,
-        className: "bg-purple-100 text-purple-800 hover:bg-purple-100",
-      },
-      borrowed: {
-        variant: "secondary",
-        label: "Borrowed",
+        label: "Open",
         icon: <BookOpen className="h-3 w-3 mr-1" />,
         className: "bg-orange-100 text-orange-800 hover:bg-orange-100",
       },
-      checking: {
-        variant: "secondary",
-        label: "Checking",
-        icon: <AlertCircle className="h-3 w-3 mr-1" />,
-        className: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
-      },
-      returned: {
+      close: {
         variant: "default",
-        label: "Returned",
+        label: "Closed",
         icon: <CheckCircle className="h-3 w-3 mr-1" />,
         className: "bg-emerald-100 text-emerald-800 hover:bg-emerald-100",
-      },
-      rejected: {
-        variant: "destructive",
-        label: "Rejected",
-        icon: <XCircleIcon className="h-3 w-3 mr-1" />,
-        className: "bg-red-100 text-red-800 hover:bg-red-100",
-      },
-      late: {
-        variant: "destructive",
-        label: "Late",
-        icon: <AlertTriangle className="h-3 w-3 mr-1" />,
-        className: "bg-red-100 text-red-800 hover:bg-red-100",
-      },
-      lost: {
-        variant: "destructive",
-        label: "Lost",
-        icon: <XCircleIcon className="h-3 w-3 mr-1" />,
-        className: "bg-red-100 text-red-800 hover:bg-red-100",
       },
     };
 
@@ -162,8 +124,8 @@ export function ReturnCard({
 
   const hasDamagedOrLostBooks = hasDamagedBooks || hasLostBooks;
 
-  const unpaidFines = loan.fines?.filter((f) => f.status === "unpaid") || [];
-  const hasFines = loan.fines && loan.fines.length > 0;
+  const unpaidFines = borrow.fines?.filter((f) => f.status === "unpaid") || [];
+  const hasFines = borrow.fines && borrow.fines.length > 0;
   const hasUnpaidFines = unpaidFines.length > 0;
   const allFinesPaid = hasFines && unpaidFines.length === 0;
 
@@ -177,14 +139,14 @@ export function ReturnCard({
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
               <CardTitle className="text-lg">Return #{bookReturn.id}</CardTitle>
-              {getLoanStatusBadge(loan.status)}
-              <Badge variant="outline">Loan #{bookReturn.loan_id}</Badge>
+              {getBorrowStatusBadge(borrow.status)}
+              <Badge variant="outline">Borrow #{bookReturn.borrow_id}</Badge>
             </div>
             <CardDescription className="flex items-center gap-4 text-xs">
               <span className="flex items-center gap-1">
                 <User className="h-3 w-3" />
-                {bookReturn.loan?.user?.profile?.full_name ||
-                  bookReturn.loan?.user?.email}
+                {bookReturn.borrow?.user?.profile?.full_name ||
+                  bookReturn.borrow?.user?.email}
               </span>
               <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
@@ -192,7 +154,7 @@ export function ReturnCard({
               </span>
             </CardDescription>
           </div>
-          {showActions && loan.status === "checking" && (
+          {showActions && borrow.status === "open" && (
             <div className="flex gap-2">
               {shouldShowProcessFine && (
                 <Button

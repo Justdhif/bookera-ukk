@@ -15,7 +15,7 @@ import { LostBook } from "@/types/lost-book";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import {
   AlertCircle,
-  Trash2,
+  Trash,
   CheckCircle,
   BookOpen,
   Loader2,
@@ -124,7 +124,7 @@ export default function LostBooksTable({
                   }
                 >
                   {item.loan?.status === "borrowed"
-                    ? "Dipinjam"
+                    ? "Borrowed"
                     : item.loan?.status === "checking"
                     ? "Checking"
                     : item.loan?.status === "lost"
@@ -198,7 +198,7 @@ export default function LostBooksTable({
                         {shouldShowFinished && (
                           <Button
                             size="sm"
-                            variant="default"
+                            variant="brand"
                             onClick={() => onFinish(item.id)}
                             disabled={actionLoading === item.id}
                             className="h-8 gap-1 bg-green-600 hover:bg-green-700"
@@ -216,11 +216,12 @@ export default function LostBooksTable({
                   })()}
                   <Button
                     size="sm"
-                    variant="ghost"
+                    variant="destructive"
                     onClick={() => onDelete(item.id)}
-                    className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    className="h-8 gap-1"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash className="h-4 w-4" />
+                    <span className="hidden sm:inline">Delete</span>
                   </Button>
                 </div>
               </TableCell>

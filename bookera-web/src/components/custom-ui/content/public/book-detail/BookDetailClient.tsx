@@ -113,19 +113,19 @@ export default function BookDetailClient() {
                 <div className="space-y-0.5">
                   <p className="text-sm font-medium">Status</p>
                   <p className="text-xs text-muted-foreground">
-                    {book.is_active ? "Aktif" : "Nonaktif"}
+                    {book.is_active ? "Active" : "Inactive"}
                   </p>
                 </div>
                 <Badge variant={book.is_active ? "default" : "secondary"}>
                   {book.is_active ? (
                     <>
                       <CheckCircle className="h-3 w-3 mr-1" />
-                      Aktif
+                      Active
                     </>
                   ) : (
                     <>
                       <XCircle className="h-3 w-3 mr-1" />
-                      Tidak Aktif
+                      Inactive
                     </>
                   )}
                 </Badge>
@@ -137,28 +137,28 @@ export default function BookDetailClient() {
         
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Informasi Buku</CardTitle>
+            <CardTitle>Book Information</CardTitle>
             <CardDescription>{"Complete book details"}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg">Informasi Dasar</h3>
+              <h3 className="font-semibold text-lg">Basic Information</h3>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-sm text-muted-foreground">Judul</p>
+                  <p className="text-sm text-muted-foreground">Title</p>
                   <p className="font-medium">{book.title}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Penulis</p>
+                  <p className="text-sm text-muted-foreground">Author</p>
                   <p className="font-medium">{book.author}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Penerbit</p>
+                  <p className="text-sm text-muted-foreground">Publisher</p>
                   <p className="font-medium">{book.publisher || "-"}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Tahun Terbit</p>
+                  <p className="text-sm text-muted-foreground">Publication Year</p>
                   <p className="font-medium">{book.publication_year || "-"}</p>
                 </div>
                 <div>
@@ -166,11 +166,11 @@ export default function BookDetailClient() {
                   <p className="font-medium">{book.isbn || "-"}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Bahasa</p>
+                  <p className="text-sm text-muted-foreground">Language</p>
                   <p className="font-medium">{book.language || "-"}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Salinan</p>
+                  <p className="text-sm text-muted-foreground">Total Copies</p>
                   <p className="font-medium">{book.copies?.length || 0}</p>
                 </div>
               </div>
@@ -178,7 +178,7 @@ export default function BookDetailClient() {
 
             
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg">Kategori</h3>
+              <h3 className="font-semibold text-lg">Categories</h3>
               {book.categories && book.categories.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {book.categories.map((category) => (

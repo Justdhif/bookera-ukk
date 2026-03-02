@@ -21,7 +21,7 @@ import {
   Eye,
   ClipboardList,
   QrCode,
-  Trash2,
+  Trash,
   Loader2,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -49,7 +49,7 @@ export default function MyBorrowPageClient() {
 
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [qrDialog, setQrDialog] = useState<BorrowRequest | null>(null);
 
   useEffect(() => {
@@ -72,26 +72,30 @@ export default function MyBorrowPageClient() {
   const fetchRequests = async () => {
     setLoadingRequests(true);
     try {
-      const res = await borrowRequestService.getMyRequests();
-      setRequests(res.data.data);
+      const response = await borrowRequestService.getMyRequests();
+      setRequests(response.data.data);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal memuat permintaan peminjaman");
+      toast.error(
+        error.response?.data?.message || "Failed to load borrow requests",
+      );
     } finally {
       setLoadingRequests(false);
     }
   };
 
   const handleDeleteRequest = async (id: number) => {
-    if (!confirm("Yakin ingin membatalkan permintaan ini?")) return;
-    setDeletingId(id);
+    if (!confirm("Are you sure you want to cancel this request?")) return;
+    setDeleteId(id);
     try {
       await borrowRequestService.cancelRequest(id);
-      toast.success("Permintaan berhasil dibatalkan");
+      toast.success("Request cancelled successfully");
       fetchRequests();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal membatalkan permintaan");
+      toast.error(
+        error.response?.data?.message || "Failed to cancel request",
+      );
     } finally {
-      setDeletingId(null);
+      setDeleteId(null);
     }
   };
 
@@ -128,14 +132,16 @@ export default function MyBorrowPageClient() {
       lost: { className: "bg-red-100 text-red-800" },
     };
     return (
-      <Badge variant="outline" className={`text-xs ${config[status]?.className ?? ""}`}>
+      <Badge
+        variant="outline"
+        className={`text-xs ${config[status]?.className ?? ""}`}
+      >
         {status}
       </Badge>
     );
   };
 
-  const canReturn = (borrow: Borrow) =>
-    borrow.status === "open";
+  const canReturn = (borrow: Borrow) => borrow.status === "open";
 
   const borrowsSkeleton = (
     <div className="grid gap-4">
@@ -155,7 +161,7 @@ export default function MyBorrowPageClient() {
 
   const requestsSkeleton = (
     <div className="space-y-4">
-      {[...Array(3)].map((_, i) => (
+      {Array.from({ length: 3 }).map((_, i) => (
         <Skeleton key={i} className="h-36 w-full rounded-xl" />
       ))}
     </div>
@@ -206,12 +212,16 @@ export default function MyBorrowPageClient() {
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          {new Date(borrow.borrow_date).toLocaleDateString("id-ID")}
+                          {new Date(borrow.borrow_date).toLocaleDateString(
+                            "en-US",
+                          )}
                         </span>
                         <span className="flex items-center gap-1 text-destructive">
                           <Calendar className="h-3 w-3" />
                           Return:{" "}
-                          {new Date(borrow.return_date).toLocaleDateString("id-ID")}
+                          {new Date(borrow.return_date).toLocaleDateString(
+                            "en-US",
+                          )}
                         </span>
                       </div>
                     </div>
@@ -232,7 +242,9 @@ export default function MyBorrowPageClient() {
                         <Button
                           variant="submit"
                           size="sm"
-                          onClick={() => setReturnDialog({ open: true, borrow })}
+                          onClick={() =>
+                            setReturnDialog({ open: true, borrow })
+                          }
                           className="flex items-center gap-2"
                         >
                           <PackageX className="h-4 w-4" />
@@ -243,7 +255,9 @@ export default function MyBorrowPageClient() {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => setReportLostDialog({ open: true, borrow })}
+                          onClick={() =>
+                            setReportLostDialog({ open: true, borrow })
+                          }
                           className="flex items-center gap-2"
                         >
                           <AlertCircle className="h-4 w-4" />
@@ -304,13 +318,16 @@ export default function MyBorrowPageClient() {
           ) : requests.length === 0 ? (
             <EmptyState
               icon={<ClipboardList className="h-16 w-16" />}
-              title="Belum ada permintaan"
-              description="Kamu belum mengajukan permintaan peminjaman. Cari buku dan klik 'Add to Request' untuk mulai."
+              title="No Requests Yet"
+              description="You haven't submitted a borrow request yet. Find a book and click 'Add to Request' to get started."
             />
           ) : (
             <div className="space-y-3">
               {requests.map((req) => (
-                <Card key={req.id} className="hover:shadow-md transition-shadow">
+                <Card
+                  key={req.id}
+                  className="hover:shadow-md transition-shadow"
+                >
                   <CardHeader className="pb-2">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <p className="font-mono font-semibold text-base">
@@ -320,7 +337,7 @@ export default function MyBorrowPageClient() {
                         variant="secondary"
                         className="text-violet-700 bg-violet-100 hover:bg-violet-100 w-fit"
                       >
-                        Menunggu diproses
+                        Awaiting processing
                       </Badge>
                     </div>
                   </CardHeader>
@@ -329,13 +346,16 @@ export default function MyBorrowPageClient() {
                       <div className="flex items-center gap-1.5">
                         <Calendar className="h-3.5 w-3.5" />
                         <span>
-                          {format(new Date(req.borrow_date), "dd MMM yyyy")} &rarr;{" "}
+                          {format(new Date(req.borrow_date), "dd MMM yyyy")}{" "}
+                          &rarr;{" "}
                           {format(new Date(req.return_date), "dd MMM yyyy")}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <BookOpen className="h-3.5 w-3.5" />
-                        <span>{req.borrow_request_details?.length ?? 0} buku</span>
+                        <span>
+                          {req.borrow_request_details?.length ?? 0} book(s)
+                        </span>
                       </div>
                     </div>
 
@@ -361,20 +381,20 @@ export default function MyBorrowPageClient() {
                         onClick={() => setQrDialog(req)}
                       >
                         <QrCode className="h-3.5 w-3.5 mr-1" />
-                        Lihat QR
+                        View QR
                       </Button>
                       <Button
                         size="sm"
                         variant="destructive"
                         onClick={() => handleDeleteRequest(req.id)}
-                        disabled={deletingId === req.id}
+                        disabled={deleteId === req.id}
                       >
-                        {deletingId === req.id ? (
+                        {deleteId === req.id ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
                         ) : (
-                          <Trash2 className="h-3.5 w-3.5 mr-1" />
+                          <Trash className="h-3.5 w-3.5 mr-1" />
                         )}
-                        Batalkan
+                        Cancel
                       </Button>
                     </div>
                   </CardContent>
@@ -409,9 +429,9 @@ export default function MyBorrowPageClient() {
       <Dialog open={!!qrDialog} onOpenChange={() => setQrDialog(null)}>
         <DialogContent className="max-w-xs text-center">
           <DialogHeader>
-            <DialogTitle>QR Code Permintaan</DialogTitle>
+            <DialogTitle>Request QR Code</DialogTitle>
             <DialogDescription>
-              Tunjukkan QR ini kepada petugas perpustakaan
+              Show this QR to the library staff
             </DialogDescription>
           </DialogHeader>
           {qrDialog?.qr_code_url ? (
@@ -430,7 +450,7 @@ export default function MyBorrowPageClient() {
           ) : (
             <div className="flex flex-col items-center gap-2 py-4 text-muted-foreground">
               <QrCode className="h-12 w-12 opacity-40" />
-              <p className="text-sm">QR belum tersedia</p>
+              <p className="text-sm">QR not available yet</p>
             </div>
           )}
         </DialogContent>

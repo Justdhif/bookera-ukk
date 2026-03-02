@@ -20,7 +20,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Category } from "@/types/category";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { FolderOpen, Edit, Trash, Tag } from "lucide-react";
+import { FolderOpen, Edit2, Trash, Tag } from "lucide-react";
 import { getIconByName } from "@/lib/icons";
 
 export default function CategoryTable({
@@ -104,7 +104,7 @@ export default function CategoryTable({
                     onClick={() => onEdit(item)}
                     className="h-8 gap-1"
                   >
-                    <Edit className="h-3.5 w-3.5" />
+                    <Edit2 className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">Edit</span>
                   </Button>
 

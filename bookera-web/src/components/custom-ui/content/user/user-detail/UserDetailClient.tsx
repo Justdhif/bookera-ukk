@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { userService, UpdateUserData } from "@/services/user.service";
-import { loanService } from "@/services/loan.service";
+import { borrowService } from "@/services/borrow.service";
 import { User } from "@/types/user";
-import { Loan } from "@/types/loan";
+import { Borrow } from "@/types/borrow";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save, X, Edit2 } from "lucide-react";
 import { toast } from "sonner";
@@ -19,7 +19,7 @@ export default function UserDetailClient() {
   const identificationNumber = params.identificationNumber as string;
 
   const [user, setUser] = useState<User | null>(null);
-  const [recentLoans, setRecentLoans] = useState<Loan[]>([]);
+  const [recentBorrows, setRecentBorrows] = useState<Borrow[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState<Partial<UpdateUserData>>({});
@@ -29,25 +29,25 @@ export default function UserDetailClient() {
 
   useEffect(() => {
     fetchUser();
-    fetchRecentLoans();
+    fetchRecentBorrows();
   }, [identificationNumber]);
 
-  const fetchRecentLoans = async () => {
+  const fetchRecentBorrows = async () => {
     try {
-      const res = await loanService.getAll();
-      const userLoans = res.data.data
+      const res = await borrowService.getAll();
+      const userBorrows = res.data.data
         .filter(
-          (loan) =>
-            loan.user?.profile?.identification_number === identificationNumber,
+          (borrow) =>
+            borrow.user?.profile?.identification_number === identificationNumber,
         )
         .sort(
           (a, b) =>
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
         )
         .slice(0, 3);
-      setRecentLoans(userLoans);
+      setRecentBorrows(userBorrows);
     } catch (error) {
-      console.error("Failed to fetch loans", error);
+      console.error("Failed to fetch borrows", error);
     }
   };
 
@@ -216,7 +216,7 @@ export default function UserDetailClient() {
             formData={formData}
             setFormData={setFormData}
             setAvatarPreview={setAvatarPreview}
-            recentLoans={recentLoans}
+            recentBorrows={recentBorrows}
           />
 
           <UserDetailForm

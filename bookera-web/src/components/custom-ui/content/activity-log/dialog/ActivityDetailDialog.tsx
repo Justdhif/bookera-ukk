@@ -85,7 +85,7 @@ export default function ActivityDetailDialog({
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Nama:</span>
+                  <span className="text-muted-foreground">Name:</span>
                   <span className="font-medium">
                     {detail.user?.profile?.full_name || "Unknown"}
                   </span>

@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { bookReturnService } from "@/services/book-return.service";
-import { loanService } from "@/services/loan.service";
+import { borrowService } from "@/services/borrow.service";
 import { lostBookService } from "@/services/lost-book.service";
-import { Loan } from "@/types/loan";
+import { Borrow } from "@/types/borrow";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,7 +15,7 @@ import { ReturnCard } from "./ReturnCard";
 import { ReturnSkeletonCard } from "./ReturnSkeletonCard";
 
 export default function ReturnClient() {
-  const [allLoans, setAllLoans] = useState<Loan[]>([]);
+  const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,11 +27,11 @@ export default function ReturnClient() {
   const fetchAllData = async () => {
     setLoading(true);
     try {
-      const loansRes = await loanService.getAll(searchQuery);
-      const filteredLoans = loansRes.data.data.filter(
-        (loan) => loan.status === "checking" || loan.status === "returned",
+      const borrowsRes = await borrowService.getAll(searchQuery);
+      const filteredBorrows = borrowsRes.data.data.filter(
+        (borrow) => borrow.book_returns && borrow.book_returns.length > 0,
       );
-      setAllLoans(filteredLoans);
+      setAllBorrows(filteredBorrows);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to load returns");
     } finally {
@@ -46,14 +46,14 @@ export default function ReturnClient() {
   const handleFinished = async (returnId: number) => {
     setActionLoading(returnId);
     try {
-      const loan = allLoans.find((l) =>
-        l.book_returns?.some((r) => r.id === returnId),
+      const borrow = allBorrows.find((b) =>
+        b.book_returns?.some((r) => r.id === returnId),
       );
 
-      const hasLostBooks = loan?.lost_books && loan.lost_books.length > 0;
+      const hasLostBooks = borrow?.lost_books && borrow.lost_books.length > 0;
 
-      if (hasLostBooks && loan?.lost_books) {
-        const lostBookId = loan.lost_books[0].id;
+      if (hasLostBooks && borrow?.lost_books) {
+        const lostBookId = borrow.lost_books[0].id;
         const response = await lostBookService.finish(lostBookId);
         toast.success(response.data.message || "Lost book process completed");
       } else {
@@ -82,8 +82,8 @@ export default function ReturnClient() {
     }
   };
 
-  const renderLoanCards = (loans: Loan[], showActions = true) => {
-    if (loans.length === 0) {
+  const renderBorrowCards = (borrows: Borrow[], showActions = true) => {
+    if (borrows.length === 0) {
       return (
         <EmptyState
           icon={<PackageCheck className="h-16 w-16" />}
@@ -95,12 +95,12 @@ export default function ReturnClient() {
 
     return (
       <div className="grid gap-4">
-        {loans.map((loan) => {
-          const latestReturn = loan.book_returns?.[0];
+        {borrows.map((borrow) => {
+          const latestReturn = borrow.book_returns?.[0];
 
           if (!latestReturn) {
             console.warn(
-              `Loan #${loan.id} has status ${loan.status} but no book_returns`,
+              `Borrow #${borrow.id} has no book_returns`,
             );
             return null;
           }
@@ -109,7 +109,7 @@ export default function ReturnClient() {
             <ReturnCard
               key={latestReturn.id}
               bookReturn={latestReturn}
-              loan={loan}
+              borrow={borrow}
               showActions={showActions}
               actionLoading={actionLoading}
               onFinished={handleFinished}
@@ -121,8 +121,8 @@ export default function ReturnClient() {
     );
   };
 
-  const checkingLoans = allLoans.filter((loan) => loan.status === "checking");
-  const returnedLoans = allLoans.filter((loan) => loan.status === "returned");
+  const checkingBorrows = allBorrows.filter((borrow) => borrow.status === "open");
+  const returnedBorrows = allBorrows.filter((borrow) => borrow.status === "close");
 
   return (
     <div className="space-y-6">
@@ -154,12 +154,12 @@ export default function ReturnClient() {
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">All Returns ({allLoans.length})</TabsTrigger>
+          <TabsTrigger value="all">All Returns ({allBorrows.length})</TabsTrigger>
           <TabsTrigger value="checking">
-            Checking ({checkingLoans.length})
+            Checking ({checkingBorrows.length})
           </TabsTrigger>
           <TabsTrigger value="returned">
-            Returned ({returnedLoans.length})
+            Returned ({returnedBorrows.length})
           </TabsTrigger>
         </TabsList>
 
@@ -178,7 +178,7 @@ export default function ReturnClient() {
                 ))}
               </div>
             ) : (
-              renderLoanCards(allLoans)
+              renderBorrowCards(allBorrows)
             )}
           </div>
         </TabsContent>
@@ -198,7 +198,7 @@ export default function ReturnClient() {
                 ))}
               </div>
             ) : (
-              renderLoanCards(checkingLoans)
+              renderBorrowCards(checkingBorrows)
             )}
           </div>
         </TabsContent>
@@ -218,7 +218,7 @@ export default function ReturnClient() {
                 ))}
               </div>
             ) : (
-              renderLoanCards(returnedLoans, false)
+              renderBorrowCards(returnedBorrows, false)
             )}
           </div>
         </TabsContent>

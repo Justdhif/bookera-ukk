@@ -94,11 +94,11 @@ export default function SetupProfileClient() {
       setUser(res.data.data.user);
       toast.success("Profile created successfully!");
       router.push("/");
-    } catch (err: any) {
-      const errorData = err.response?.data;
+    } catch (error: any) {
+      const errorData = error.response?.data;
       if (errorData?.data && typeof errorData.data === "object") {
         const errors = Object.values(errorData.data).flat();
-        errors.forEach((error: any) => toast.error(error));
+        errors.forEach((msg: any) => toast.error(msg));
       } else {
         toast.error(errorData?.message ?? "Failed to create profile");
       }

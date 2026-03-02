@@ -72,7 +72,7 @@ export function BookFilter({ categories, onChange, isLoading = false }: Props) {
           <span className="flex items-center gap-1.5 text-white">All Categories</span>
         </Badge>
       </div>
-      {[...Array(5)].map((_, i) => (
+      {Array.from({ length: 5 }).map((_, i) => (
         <div key={i} className="shrink-0">
           <Skeleton className="h-9 w-24 rounded-md" />
         </div>
@@ -133,7 +133,7 @@ export function BookFilter({ categories, onChange, isLoading = false }: Props) {
                   rounded-md border
                   ${
                     isAllActive
-                      ? "bg-brand-primary text-primary-foreground border-brand-primary shadow-sm text-white"
+                      ? "bg-brand-primary border-brand-primary shadow-sm text-white"
                       : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50"
                   }
                 `}

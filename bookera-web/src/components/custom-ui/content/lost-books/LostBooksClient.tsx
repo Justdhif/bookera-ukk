@@ -24,9 +24,9 @@ export default function LostBooksClient() {
       toast.success("Lost book record deleted successfully");
       setDeleteId(null);
       fetchLostBooks();
-    } catch (err: any) {
+    } catch (error: any) {
       toast.error(
-        err.response?.data?.message || "Failed to delete lost book record"
+        error.response?.data?.message || "Failed to delete lost book record",
       );
     }
   };
@@ -36,7 +36,7 @@ export default function LostBooksClient() {
     try {
       const res = await lostBookService.getAll(searchQuery || undefined);
       setLostBooks(res.data.data);
-    } catch (err) {
+    } catch (error) {
       toast.error("Failed to load lost books");
     } finally {
       setLoading(false);
@@ -58,13 +58,11 @@ export default function LostBooksClient() {
     setActionLoading(id);
     try {
       await lostBookService.finish(id);
-      toast.success(
-        "Lost book process completed successfully"
-      );
+      toast.success("Lost book process completed successfully");
       fetchLostBooks();
-    } catch (err: any) {
+    } catch (error: any) {
       toast.error(
-        err.response?.data?.message || "Failed to complete lost book process"
+        error.response?.data?.message || "Failed to complete lost book process",
       );
     } finally {
       setActionLoading(null);
@@ -75,14 +73,10 @@ export default function LostBooksClient() {
     setActionLoading(id);
     try {
       const response = await lostBookService.processFine(id);
-      toast.success(
-        response.data.message || 'Denda berhasil diproses'
-      );
+      toast.success(response.data.message || "Fine processed successfully");
       fetchLostBooks();
-    } catch (err: any) {
-      toast.error(
-        err.response?.data?.message || 'Gagal memproses denda'
-      );
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to process fine");
     } finally {
       setActionLoading(null);
     }
@@ -97,7 +91,9 @@ export default function LostBooksClient() {
             {"Lost Books"}
           </h1>
           <p className="text-muted-foreground">
-            {"Manage lost book reports. Make sure the fine has been paid before completing the process."}
+            {
+              "Manage lost book reports. Make sure the fine has been paid before completing the process."
+            }
           </p>
         </div>
       </div>

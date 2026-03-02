@@ -15,7 +15,7 @@ export default function NotFoundPage() {
         <div className="relative overflow-hidden rounded-3xl border bg-card shadow-2xl">
           {/* Background Gradient */}
           <div className="absolute inset-0 bg-linear-to-br from-emerald-50/50 via-teal-50/30 to-cyan-50/50 dark:from-emerald-950/20 dark:via-teal-950/10 dark:to-cyan-950/20" />
-          
+
           {/* Decorative Elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-emerald-500/10 to-teal-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-linear-to-br from-teal-500/10 to-cyan-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
@@ -27,7 +27,7 @@ export default function NotFoundPage() {
               <div className="relative">
                 {/* Animated Ring */}
                 <div className="absolute inset-0 rounded-full bg-linear-to-br from-emerald-500 to-teal-500 opacity-20 animate-ping" />
-                
+
                 {/* Icon Container */}
                 <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-linear-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/30">
                   <BookX className="w-12 h-12 text-white" />
@@ -44,16 +44,18 @@ export default function NotFoundPage() {
 
             {/* Title */}
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 bg-linear-to-r from-emerald-700 to-teal-700 dark:from-emerald-300 dark:to-teal-300 bg-clip-text text-transparent">
-              Halaman Tidak Ditemukan
+              Page Not Found
             </h2>
 
             {/* Description */}
             <div className="max-w-md mx-auto space-y-3 mb-8">
               <p className="text-center text-muted-foreground">
-                Sepertinya Anda sedang mencari buku yang tidak ada di rak perpustakaan kami.
+                It looks like you're searching for a book that isn't on our
+                library shelves.
               </p>
               <p className="text-center text-sm text-muted-foreground/80">
-                Halaman yang Anda cari mungkin telah dipindahkan, dihapus, atau tidak pernah ada.
+                The page you're looking for may have been moved, deleted, or
+                never existed.
               </p>
             </div>
 
@@ -65,12 +67,12 @@ export default function NotFoundPage() {
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
-                    Saran untuk Anda:
+                    Suggestions for you:
                   </p>
                   <ul className="text-sm text-emerald-700 dark:text-emerald-300 space-y-1">
-                    <li>• Periksa kembali URL yang Anda masukkan</li>
-                    <li>• Gunakan menu navigasi untuk menemukan halaman</li>
-                    <li>• Kembali ke dashboard dan mulai dari sana</li>
+                    <li>• Double-check the URL you entered</li>
+                    <li>• Use the navigation menu to find the page</li>
+                    <li>• Go back to the dashboard and start from there</li>
                   </ul>
                 </div>
               </div>
@@ -86,7 +88,7 @@ export default function NotFoundPage() {
               >
                 <div className="absolute inset-0 bg-linear-to-r from-emerald-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                Kembali
+                Go Back
               </Button>
 
               <Link href="/admin" className="w-full sm:w-auto">
@@ -95,7 +97,7 @@ export default function NotFoundPage() {
                   className="w-full bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all"
                 >
                   <Home className="mr-2 h-4 w-4" />
-                  Ke Dashboard
+                  Go to Dashboard
                 </Button>
               </Link>
             </div>
@@ -104,7 +106,9 @@ export default function NotFoundPage() {
             <div className="mt-12 pt-8 border-t border-emerald-200/50 dark:border-emerald-800/50">
               <div className="flex items-center justify-center gap-2 text-muted-foreground/60">
                 <BookOpen className="h-4 w-4" />
-                <span className="text-sm font-medium">Bookera Library System</span>
+                <span className="text-sm font-medium">
+                  Bookera Library System
+                </span>
               </div>
             </div>
           </div>
@@ -113,12 +117,12 @@ export default function NotFoundPage() {
         {/* Help Text */}
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Butuh bantuan navigasi?{" "}
+            Need help navigating?{" "}
             <Link
               href="/admin"
               className="font-medium text-emerald-600 dark:text-emerald-400 hover:underline"
             >
-              Kembali ke Dashboard
+              Back to Dashboard
             </Link>
           </p>
         </div>
