@@ -15,9 +15,13 @@ class SendLostBookNotification
     public function handle(LostBookReported $event)
     {
         $lostBook = $event->lostBook;
-        $loan = $lostBook->loan;
+        $borrow = $lostBook->borrow;
         $bookCopy = $lostBook->bookCopy;
-        $user = $loan->user;
+        $user = $borrow?->user;
+
+        $userName = $user?->profile?->full_name ?? $user?->email ?? 'Unknown User';
+        $bookTitle = $bookCopy?->book?->title ?? 'Unknown';
+        $copyCode = $bookCopy?->copy_code ?? 'N/A';
 
         $admins = User::where('role', 'admin')->pluck('id');
 
@@ -25,10 +29,10 @@ class SendLostBookNotification
             NotificationService::send(
                 $adminId,
                 'Lost Book Reported',
-                "User {$user->profile->full_name} reported lost book: {$bookCopy->book->title} (Copy: {$bookCopy->copy_code}) - Loan #{$loan->id}",
+                "User {$userName} reported lost book: {$bookTitle} (Copy: {$copyCode}) - Borrow #{$borrow?->id}",
                 'lost_book_report',
                 'lost_book',
-                ['lost_book_id' => $lostBook->id, 'loan_id' => $loan->id]
+                ['lost_book_id' => $lostBook->id, 'borrow_id' => $borrow?->id]
             );
         }
     }

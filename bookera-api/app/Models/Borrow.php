@@ -11,6 +11,7 @@ class Borrow extends Model
 
     protected $fillable = [
         'user_id',
+        'borrow_request_id',
         'borrow_code',
         'qr_code_path',
         'borrow_date',
@@ -23,6 +24,11 @@ class Borrow extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function borrowRequest()
+    {
+        return $this->belongsTo(\App\Models\BorrowRequest::class);
     }
 
     public function borrowDetails()

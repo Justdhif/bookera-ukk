@@ -14,7 +14,7 @@ export default function SpeakerMarquee() {
   ];
 
   return (
-    <div className="relative pt-5">
+    <div className="relative pt-2">
       <div className="relative flex items-center h-12.5 overflow-visible rounded-2xl bg-linear-to-r from-[#0f0f1a] via-[#1a1a2e] to-[#16213e]">
         <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
           <svg

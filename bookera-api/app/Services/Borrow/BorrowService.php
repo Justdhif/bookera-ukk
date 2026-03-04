@@ -178,7 +178,11 @@ class BorrowService
     {
         return $borrow->load([
             'borrowDetails.bookCopy.book',
-            'user',
+            'borrowRequest.borrowRequestDetails.book',
+            'user.profile',
+            'bookReturns',
+            'fines.fineType',
+            'lostBooks.bookCopy.book',
         ]);
     }
 
@@ -186,6 +190,7 @@ class BorrowService
     {
         return Borrow::with([
             'borrowDetails.bookCopy.book',
+            'borrowRequest.borrowRequestDetails.book',
             'user.profile',
             'bookReturns.details.bookCopy.book',
             'fines.fineType',

@@ -36,6 +36,9 @@ export const fineService = {
   getByLoan: (loanId: number) =>
     api.get<ApiResponse<Fine[]>>(`/loans/${loanId}/fines`),
 
+  getByBorrow: (borrowId: number) =>
+    api.get<ApiResponse<Fine[]>>(`/borrows/${borrowId}/fines`),
+
   getMyFines: () => api.get<ApiResponse<Fine[]>>("/my-fines"),
 
   create: (loanId: number, payload: CreateFinePayload) =>

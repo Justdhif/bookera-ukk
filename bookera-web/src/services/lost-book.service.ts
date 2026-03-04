@@ -17,6 +17,7 @@ export const lostBookService = {
   report: (borrowId: number, data: {
     book_copy_id: number;
     notes?: string;
+    estimated_lost_date?: string;
   }) =>
     api.post<ApiResponse<LostBook>>(`/borrows/${borrowId}/report-lost`, data),
 

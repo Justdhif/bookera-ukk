@@ -13,27 +13,27 @@ class SendFineNotification
 
     public function handle(FineCreated $event)
     {
-        $fine = $event->fine;
-        $loan = $fine->loan;
-        $userId = $loan->user_id;
+        $fine   = $event->fine;
+        $borrow = $fine->borrow;
+        $userId = $borrow->user_id;
 
-        $bookTitles = $loan->details->map(function($detail) {
+        $bookTitles = $borrow->borrowDetails->map(function ($detail) {
             return $detail->bookCopy->book->title ?? 'Unknown';
         })->take(2)->implode(', ');
 
-        $totalBooks = $loan->details->count();
-        $moreText = $totalBooks > 2 ? " and " . ($totalBooks - 2) . " more" : "";
+        $totalBooks = $borrow->borrowDetails->count();
+        $moreText   = $totalBooks > 2 ? ' dan ' . ($totalBooks - 2) . ' lainnya' : '';
 
-        $fineTypeName = $fine->fineType->name ?? 'Damaged Book';
-        $amount = number_format($fine->amount, 0, ',', '.');
+        $fineTypeName = $fine->fineType->name ?? 'Denda';
+        $amount       = number_format($fine->amount, 0, ',', '.');
 
         NotificationService::send(
             $userId,
-            'Fine Issued',
-            "A fine of Rp {$amount} has been issued for {$bookTitles}{$moreText} ({$fineTypeName}). Please check My Fines page.",
+            'Denda Baru Dikenakan',
+            "Denda sebesar Rp {$amount} telah dikenakan untuk buku {$bookTitles}{$moreText} ({$fineTypeName}). Cek halaman Denda Saya.",
             'fine_created',
             'fine',
-            ['fine_id' => $fine->id, 'loan_id' => $loan->id]
+            ['fine_id' => $fine->id, 'borrow_id' => $borrow->id]
         );
     }
 }

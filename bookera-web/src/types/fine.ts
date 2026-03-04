@@ -10,7 +10,7 @@ export interface FineType {
 
 export interface Fine {
   id: number;
-  loan_id: number;
+  borrow_id: number;
   fine_type_id: number;
   amount: number;
   paid_at?: string;
@@ -20,8 +20,9 @@ export interface Fine {
   created_at: string;
   updated_at: string;
   fine_type?: FineType;
-  loan?: {
+  borrow?: {
     id: number;
+    borrow_code?: string;
     user?: {
       id: number;
       email: string;
@@ -29,7 +30,7 @@ export interface Fine {
         full_name: string;
       };
     };
-    details?: Array<{
+    borrow_details?: Array<{
       id: number;
       book_copy?: {
         id: number;

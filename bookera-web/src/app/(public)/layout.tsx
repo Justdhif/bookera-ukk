@@ -12,13 +12,11 @@ export default function PublicLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="hidden lg:block">
-        <PublicSidebar />
-      </div>
+      <PublicSidebar />
 
-      <SidebarInset className="h-screen flex flex-col overflow-hidden">
+      <SidebarInset className="h-screen flex flex-col overflow-hidden min-w-0">
         <PublicHeader />
-        
+
         <main className="flex-1 overflow-y-auto bg-linear-to-b from-background to-muted/20">
           <div className="p-4 md:p-6">
             {children}

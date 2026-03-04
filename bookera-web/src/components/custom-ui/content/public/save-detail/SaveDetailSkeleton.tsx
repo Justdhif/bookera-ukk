@@ -1,12 +1,11 @@
 "use client";
+
 import { useRouter } from "next/navigation";
-
-import { ArrowLeft, Edit2, Trash } from "lucide-react";
-
+import { ArrowLeft, Edit, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import BookListSkeleton from "@/components/custom-ui/content/public/BookListSkeleton";
+import BookListSkeleton from "@/components/custom-ui/content/public/book/BookListSkeleton";
 
 export default function SaveDetailSkeleton() {
   const router = useRouter();
@@ -53,7 +52,7 @@ export default function SaveDetailSkeleton() {
                 className="h-8 gap-1.5"
                 disabled
               >
-                <Edit2 className="h-3.5 w-3.5" />
+                <Edit className="h-3.5 w-3.5" />
                 {"Edit"}
               </Button>
               <Button

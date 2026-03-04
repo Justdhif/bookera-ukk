@@ -21,7 +21,9 @@ interface SaveDetailClientProps {
   saveIdentifier: string;
 }
 
-export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientProps) {
+export default function SaveDetailClient({
+  saveIdentifier,
+}: SaveDetailClientProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
   const [save, setSave] = useState<Save | null>(null);
@@ -56,7 +58,7 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
       await saveService.removeBook(save.id, bookId);
       toast.success("Book removed from collection");
       fetchSave();
-      window.dispatchEvent(new Event('refreshSavesList'));
+      window.dispatchEvent(new Event("refreshSavesList"));
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to remove book");
     }
@@ -66,7 +68,7 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
     setSelectedBooks((prev) =>
       prev.includes(bookId)
         ? prev.filter((id) => id !== bookId)
-        : [...prev, bookId]
+        : [...prev, bookId],
     );
   };
 
@@ -85,7 +87,7 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
     setLoadingCopies(true);
     try {
       const booksData = await Promise.all(
-        selectedBooks.map((bookId) => bookService.show(bookId))
+        selectedBooks.map((bookId) => bookService.show(bookId)),
       );
       setBooksWithCopies(booksData.map((res) => res.data.data));
       setShowBorrowDialog(true);
@@ -102,10 +104,12 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
     try {
       await saveService.delete(save.id);
       toast.success("Collection deleted successfully");
-      window.dispatchEvent(new Event('refreshSavesList'));
+      window.dispatchEvent(new Event("refreshSavesList"));
       router.push("/");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to delete collection");
+      toast.error(
+        error.response?.data?.message || "Failed to delete collection",
+      );
       throw error;
     }
   };
@@ -138,6 +142,7 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
               onClick={handleBorrowClick}
               disabled={selectedBooks.length === 0 || loadingCopies}
               size="sm"
+              variant="brand"
             >
               {loadingCopies ? (
                 <>
@@ -161,7 +166,7 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
         save={save}
         onSuccess={() => {
           fetchSave();
-          window.dispatchEvent(new Event('refreshSavesList'));
+          window.dispatchEvent(new Event("refreshSavesList"));
         }}
       />
 
@@ -169,7 +174,7 @@ export default function SaveDetailClient({ saveIdentifier }: SaveDetailClientPro
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
         title={"Delete Collection"}
-        description={`${"This will permanently delete the collection"} "${save.name}". ${"Failed to delete collection".includes('cannot') ? 'This action cannot be undone.' : ''}`}
+        description={`${"This will permanently delete the collection"} "${save.name}". ${"Failed to delete collection".includes("cannot") ? "This action cannot be undone." : ""}`}
         onConfirm={handleDeleteConfirm}
       />
 

@@ -92,12 +92,55 @@ class LostBookService
                 $lostBook
             );
 
-            $lostBook->load(['borrow.user.profile', 'bookCopy.book']);
+            // Auto-create fine for the lost book
+            $this->autoCreateLostFine($borrow, $bookCopy);
+
+            $lostBook->load(['borrow.user.profile', 'bookCopy.book', 'borrow.fines.fineType']);
 
             event(new \App\Events\LostBookReported($lostBook));
 
             return $lostBook;
         });
+    }
+
+    private function autoCreateLostFine(Borrow $borrow, BookCopy $bookCopy): void
+    {
+        $lostFineType = FineType::where('type', 'lost')->first();
+
+        if (!$lostFineType) {
+            return;
+        }
+
+        $fineNotes = 'Denda buku hilang: ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
+
+        $existingFine = $borrow->fines()
+            ->where('notes', $fineNotes)
+            ->first();
+
+        if ($existingFine) {
+            return;
+        }
+
+        $fine = Fine::create([
+            'borrow_id'    => $borrow->id,
+            'fine_type_id' => $lostFineType->id,
+            'amount'       => $lostFineType->amount,
+            'status'       => 'unpaid',
+            'notes'        => $fineNotes,
+        ]);
+
+        ActivityLogger::log(
+            'create',
+            'fine',
+            "Fine auto-created for lost book in borrow #{$borrow->id}",
+            ['fine_id' => $fine->id, 'amount' => $fine->amount, 'book_copy_id' => $bookCopy->id],
+            null,
+            $fine
+        );
+
+        $fine->load('fineType', 'borrow.user', 'borrow.borrowDetails.bookCopy.book');
+
+        event(new \App\Events\FineCreated($fine));
     }
 
     public function updateLostBook(LostBook $lostBook, array $data): LostBook

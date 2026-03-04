@@ -1,6 +1,5 @@
 "use client";
 import { useRouter } from "next/navigation";
-
 import Link from "next/link";
 import { ShieldX, BookOpen, Home, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,102 +20,94 @@ export default function ForbiddenPage() {
   };
 
   return (
-    <div className="min-h-[90vh] flex items-center justify-center p-6">
-      <div className="max-w-2xl w-full">
-        {/* Error Card */}
-        <div className="relative overflow-hidden rounded-3xl border bg-card shadow-2xl">
-          {/* Background Gradient */}
-          <div className="absolute inset-0 bg-linear-to-br from-red-50/50 via-rose-50/30 to-orange-50/50 dark:from-red-950/20 dark:via-rose-950/10 dark:to-orange-950/20" />
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
+      {/* Background subtle radial glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(239,68,68,0.10),transparent)] dark:bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(239,68,68,0.06),transparent)]" />
 
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-red-500/10 to-rose-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-linear-to-br from-orange-500/10 to-amber-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+      {/* Dot grid pattern */}
+      <div
+        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, #ef4444 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
+        }}
+      />
 
-          {/* Content */}
-          <div className="relative p-8 md:p-12">
-            {/* Icon */}
-            <div className="flex justify-center mb-6">
-              <div className="relative">
-                {/* Animated Ring */}
-                <div className="absolute inset-0 rounded-full bg-linear-to-br from-red-500 to-rose-500 opacity-20 animate-ping" />
+      {/* Floating decorative blobs */}
+      <div className="absolute top-1/4 left-[8%] w-72 h-72 bg-red-500/5 dark:bg-red-500/8 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-[8%] w-80 h-80 bg-rose-500/5 dark:bg-rose-500/8 rounded-full blur-3xl pointer-events-none" />
 
-                {/* Icon Container */}
-                <div className="relative flex items-center justify-center w-24 h-24 rounded-full bg-linear-to-br from-red-500 to-rose-500 shadow-lg shadow-red-500/30">
-                  <ShieldX className="w-12 h-12 text-white" />
-                </div>
-              </div>
-            </div>
+      {/* Ghost watermark number */}
+      <span
+        aria-hidden="true"
+        className="absolute select-none font-black text-[22rem] leading-none text-red-500/4 dark:text-red-400/5 pointer-events-none"
+        style={{ letterSpacing: "-0.05em" }}
+      >
+        403
+      </span>
 
-            {/* Error Code */}
-            <div className="text-center mb-4">
-              <h1 className="text-8xl md:text-9xl font-black bg-linear-to-r from-red-600 via-rose-600 to-orange-600 dark:from-red-400 dark:via-rose-400 dark:to-orange-400 bg-clip-text text-transparent">
-                403
-              </h1>
-            </div>
-
-            {/* Title */}
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 bg-linear-to-r from-red-700 to-rose-700 dark:from-red-300 dark:to-rose-300 bg-clip-text text-transparent">
-              Access Denied
-            </h2>
-
-            {/* Description */}
-            <div className="max-w-md mx-auto space-y-3 mb-8">
-              <p className="text-center text-muted-foreground">
-                {getRoleMessage()}
-              </p>
-              <p className="text-center text-sm text-muted-foreground/80">
-                If you believe this is a mistake, please contact an
-                administrator to get appropriate access permissions.
-              </p>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Button
-                onClick={() => router.back()}
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto group relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-linear-to-r from-red-500/10 to-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                Go Back
-              </Button>
-
-              <Link href="/admin" className="w-full sm:w-auto">
-                <Button
-                  size="lg"
-                  className="w-full bg-linear-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-lg shadow-red-500/30 hover:shadow-red-500/50 transition-all"
-                >
-                  <Home className="mr-2 h-4 w-4" />
-                  Go to Dashboard
-                </Button>
-              </Link>
-            </div>
-
-            {/* Library Icon Footer */}
-            <div className="mt-12 pt-8 border-t border-red-200/50 dark:border-red-800/50">
-              <div className="flex items-center justify-center gap-2 text-muted-foreground/60">
-                <BookOpen className="h-4 w-4" />
-                <span className="text-sm font-medium">
-                  Bookera Library System
-                </span>
-              </div>
-            </div>
+      {/* Main content */}
+      <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-lg w-full">
+        {/* Icon */}
+        <div className="relative mb-8">
+          <div className="absolute inset-0 rounded-2xl bg-red-500/15 dark:bg-red-400/10 blur-xl scale-[1.8] animate-pulse" />
+          <div className="relative flex items-center justify-center w-20 h-20 rounded-2xl bg-red-500/10 dark:bg-red-400/10 border border-red-500/20 dark:border-red-400/20">
+            <ShieldX className="w-10 h-10 text-red-600 dark:text-red-400" />
           </div>
         </div>
 
-        {/* Help Text */}
-        <div className="mt-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            Need help?{" "}
-            <Link
-              href="/admin"
-              className="font-medium text-red-600 dark:text-red-400 hover:underline"
+        {/* Error badge */}
+        <p className="text-xs font-semibold tracking-widest uppercase text-red-600 dark:text-red-400 mb-3">
+          Error 403
+        </p>
+
+        {/* Heading */}
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
+          Access Denied
+        </h1>
+
+        {/* Description */}
+        <p className="text-muted-foreground text-base leading-relaxed mb-2">
+          {getRoleMessage()}
+        </p>
+        <p className="text-muted-foreground/60 text-sm mb-10">
+          If you believe this is a mistake, please contact an administrator to
+          get appropriate access permissions.
+        </p>
+
+        {/* Subtle divider */}
+        <div className="w-12 h-px bg-border mb-10" />
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <Button
+            onClick={() => router.back()}
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-auto group"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            Go Back
+          </Button>
+
+          <Link href="/admin" className="w-full sm:w-auto">
+            <Button
+              size="lg"
+              className="w-full bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white shadow-lg shadow-red-500/20 hover:shadow-red-500/30 transition-all"
             >
-              Contact Administrator
-            </Link>
-          </p>
+              <Home className="mr-2 h-4 w-4" />
+              Go to Dashboard
+            </Button>
+          </Link>
+        </div>
+
+        {/* Footer branding */}
+        <div className="mt-16 flex items-center gap-2 text-muted-foreground/40">
+          <BookOpen className="h-3.5 w-3.5" />
+          <span className="text-xs font-medium tracking-wide">
+            Bookera Library System
+          </span>
         </div>
       </div>
     </div>

@@ -9,16 +9,19 @@ use App\Http\Requests\Borrow\StoreBorrowRequest;
 use App\Http\Requests\Borrow\UpdateBorrowRequest;
 use App\Models\Borrow;
 use App\Services\Borrow\BorrowService;
+use App\Services\BorrowRequest\BorrowRequestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class BorrowController extends Controller
 {
     private BorrowService $borrowService;
+    private BorrowRequestService $borrowRequestService;
 
-    public function __construct(BorrowService $borrowService)
+    public function __construct(BorrowService $borrowService, BorrowRequestService $borrowRequestService)
     {
-        $this->borrowService = $borrowService;
+        $this->borrowService        = $borrowService;
+        $this->borrowRequestService = $borrowRequestService;
     }
 
     public function index(Request $request): JsonResponse
@@ -82,5 +85,22 @@ class BorrowController extends Controller
         $borrows = $this->borrowService->getBorrowsByUser($request->user());
 
         return ApiResponse::successResponse('Data peminjaman user', $borrows);
+    }
+
+    public function assignCopies(Request $request, Borrow $borrow): JsonResponse
+    {
+        if (! $borrow->borrow_request_id) {
+            return ApiResponse::errorResponse('Borrow ini tidak berasal dari request', null, 422);
+        }
+
+        if ($borrow->borrowDetails()->count() > 0) {
+            return ApiResponse::errorResponse('Buku salinan sudah pernah di-assign ke peminjaman ini', null, 422);
+        }
+
+        $copyIds = $request->input('copy_ids', []);
+
+        $borrow = $this->borrowRequestService->addCopiesToBorrow($borrow, $copyIds);
+
+        return ApiResponse::successResponse('Buku salinan berhasil di-assign ke peminjaman', $borrow);
     }
 }

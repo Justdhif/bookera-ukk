@@ -1,5 +1,5 @@
-import AdminBorrowDetailClient from "@/components/custom-ui/content/borrow/borrow-detail/AdminBorrowDetailClient";
+import BorrowDetailClient from "@/components/custom-ui/content/admin/borrow/borrow-detail/BorrowDetailClient";
 
 export default function AdminBorrowDetailPage() {
-  return <AdminBorrowDetailClient />;
+  return <BorrowDetailClient />;
 }

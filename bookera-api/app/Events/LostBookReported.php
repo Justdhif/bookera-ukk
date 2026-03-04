@@ -34,17 +34,21 @@ class LostBookReported implements ShouldBroadcastNow
 
     public function broadcastWith(): array
     {
-        $loan = $this->lostBook->loan;
+        $borrow = $this->lostBook->borrow;
         $bookCopy = $this->lostBook->bookCopy;
-        $user = $loan->user;
+        $user = $borrow?->user;
+
+        $userName = $user?->profile?->full_name ?? $user?->email ?? 'Unknown User';
+        $bookTitle = $bookCopy?->book?->title ?? 'Unknown';
+        $copyCode = $bookCopy?->copy_code ?? 'N/A';
 
         return [
             'lost_book_id' => $this->lostBook->id,
-            'loan_id' => $loan->id,
-            'user_name' => $user->profile->full_name ?? $user->email,
-            'book_title' => $bookCopy->book->title ?? 'Unknown',
-            'copy_code' => $bookCopy->copy_code,
-            'message' => "User {$user->profile->full_name} reported lost book: {$bookCopy->book->title} (Copy: {$bookCopy->copy_code})",
+            'borrow_id' => $borrow?->id,
+            'user_name' => $userName,
+            'book_title' => $bookTitle,
+            'copy_code' => $copyCode,
+            'message' => "User {$userName} reported lost book: {$bookTitle} (Copy: {$copyCode})",
             'type' => 'lost_book_report',
         ];
     }

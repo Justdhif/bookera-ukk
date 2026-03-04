@@ -12,7 +12,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, UserPlus, ShieldCheck } from "lucide-react";
-import PasswordRequirements, { isPasswordValid } from "@/components/custom-ui/content/auth/PasswordRequirements";
+import PasswordRequirements, { isPasswordValid } from "@/components/custom-ui/content/admin/auth/PasswordRequirements";
 
 interface RegisterFormProps {
   loading: boolean;

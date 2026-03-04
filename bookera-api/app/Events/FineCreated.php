@@ -23,7 +23,7 @@ class FineCreated implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('user.' . $this->fine->loan->user_id),
+            new PrivateChannel('user.' . $this->fine->borrow->user_id),
         ];
     }
 
@@ -34,26 +34,26 @@ class FineCreated implements ShouldBroadcastNow
 
     public function broadcastWith(): array
     {
-        $loan = $this->fine->loan;
-        $bookTitles = $loan->details->map(function($detail) {
+        $borrow = $this->fine->borrow;
+        $bookTitles = $borrow->borrowDetails->map(function($detail) {
             return $detail->bookCopy->book->title ?? 'Unknown';
         })->take(2)->implode(', ');
 
-        $totalBooks = $loan->details->count();
+        $totalBooks = $borrow->borrowDetails->count();
         $moreText = $totalBooks > 2 ? " and " . ($totalBooks - 2) . " more" : "";
 
-        $fineTypeName = $this->fine->fineType->name ?? 'Damaged Book';
+        $fineTypeName = $this->fine->fineType->name ?? 'Fine';
         $amount = number_format($this->fine->amount, 0, ',', '.');
 
         return [
-            'fine_id' => $this->fine->id,
-            'loan_id' => $this->fine->loan_id,
-            'amount' => $this->fine->amount,
-            'fine_type' => $fineTypeName,
-            'status' => $this->fine->status,
+            'fine_id'    => $this->fine->id,
+            'borrow_id'  => $this->fine->borrow_id,
+            'amount'     => $this->fine->amount,
+            'fine_type'  => $fineTypeName,
+            'status'     => $this->fine->status,
             'created_at' => $this->fine->created_at,
-            'message' => "A fine of Rp {$amount} has been issued for {$bookTitles}{$moreText} ({$fineTypeName}). Please check My Fines page.",
-            'type' => 'fine_created',
+            'message'    => "A fine of Rp {$amount} has been issued for {$bookTitles}{$moreText} ({$fineTypeName}). Please check My Fines page.",
+            'type'       => 'fine_created',
         ];
     }
 }

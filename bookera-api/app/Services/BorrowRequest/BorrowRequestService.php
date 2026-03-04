@@ -2,6 +2,10 @@
 
 namespace App\Services\BorrowRequest;
 
+use App\Events\BorrowRequestApproved;
+use App\Events\BorrowRequestCancelled;
+use App\Events\BorrowRequestCreated;
+use App\Events\BorrowRequestRejected;
 use App\Helpers\ActivityLogger;
 use App\Models\BookCopy;
 use App\Models\Borrow;
@@ -25,8 +29,7 @@ class BorrowRequestService
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('request_code', 'like', "%{$search}%")
-                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                $q->whereHas('user', function ($userQuery) use ($search) {
                         $userQuery->where('email', 'like', "%{$search}%")
                             ->orWhereHas('profile', function ($profileQuery) use ($search) {
                                 $profileQuery->where('full_name', 'like', "%{$search}%");
@@ -44,16 +47,12 @@ class BorrowRequestService
     public function createRequest(array $data, User $user): BorrowRequest
     {
         return DB::transaction(function () use ($data, $user) {
-            $requestCode = $this->generateRequestCode();
-
             $request = BorrowRequest::create([
-                'user_id'      => $user->id,
-                'request_code' => $requestCode,
-                'borrow_date'  => $data['borrow_date'],
-                'return_date'  => $data['return_date'],
+                'user_id'         => $user->id,
+                'borrow_date'     => $data['borrow_date'],
+                'return_date'     => $data['return_date'],
+                'approval_status' => 'processing',
             ]);
-
-            $request->update(['qr_code_path' => $this->generateQrCode($requestCode, $request->id)]);
 
             foreach ($data['book_ids'] as $bookId) {
                 $request->borrowRequestDetails()->create([
@@ -81,16 +80,10 @@ class BorrowRequestService
                 $request
             );
 
+            event(new BorrowRequestCreated($request));
+
             return $request;
         });
-    }
-
-    public function getRequestByCode(string $code): BorrowRequest
-    {
-        return BorrowRequest::with([
-            'borrowRequestDetails.book',
-            'user.profile',
-        ])->where('request_code', $code)->firstOrFail();
     }
 
     public function getRequestById(BorrowRequest $request): BorrowRequest
@@ -109,6 +102,104 @@ class BorrowRequestService
             ->where('user_id', $user->id)
             ->latest()
             ->get();
+    }
+
+    public function cancelRequest(BorrowRequest $request, User $user): BorrowRequest
+    {
+        abort_if(
+            $request->approval_status !== 'processing',
+            422,
+            'Only processing requests can be cancelled'
+        );
+
+        $request->update(['approval_status' => 'canceled']);
+
+        $request->load(['user.profile']);
+
+        ActivityLogger::log(
+            'update',
+            'borrow_request',
+            "User {$user->email} cancelled borrow request #{$request->id}",
+            ['request_id' => $request->id, 'status' => 'canceled'],
+            ['request_id' => $request->id, 'status' => 'processing'],
+            $request
+        );
+
+        event(new BorrowRequestCancelled($request));
+
+        return $request;
+    }
+
+    public function approveRequest(BorrowRequest $borrowRequest): Borrow
+    {
+        abort_if(
+            $borrowRequest->approval_status !== 'processing',
+            422,
+            'Only processing requests can be approved'
+        );
+
+        return DB::transaction(function () use ($borrowRequest) {
+            $borrowCode = $this->generateBorrowCode();
+
+            $borrow = Borrow::create([
+                'user_id'            => $borrowRequest->user_id,
+                'borrow_request_id'  => $borrowRequest->id,
+                'borrow_code'        => $borrowCode,
+                'borrow_date'        => $borrowRequest->borrow_date,
+                'return_date'        => $borrowRequest->return_date,
+                'status'             => 'open',
+            ]);
+
+            $borrow->update(['qr_code_path' => $this->generateBorrowQrCode($borrowCode, $borrow->id)]);
+
+            $borrowRequest->update(['approval_status' => 'approved']);
+
+            $borrowRequest->load(['borrowRequestDetails.book', 'user.profile']);
+
+            $borrow->load(['borrowDetails.bookCopy.book', 'user.profile']);
+
+            ActivityLogger::log(
+                'update',
+                'borrow_request',
+                "Borrow request #{$borrowRequest->id} approved — borrow #{$borrow->id} created",
+                ['request_id' => $borrowRequest->id, 'borrow_id' => $borrow->id, 'status' => 'approved'],
+                ['request_id' => $borrowRequest->id, 'status' => 'processing'],
+                $borrowRequest
+            );
+
+            event(new BorrowRequestApproved($borrowRequest, $borrow));
+
+            return $borrow;
+        });
+    }
+
+    public function rejectRequest(BorrowRequest $borrowRequest, ?string $rejectReason = null): BorrowRequest
+    {
+        abort_if(
+            $borrowRequest->approval_status !== 'processing',
+            422,
+            'Only processing requests can be rejected'
+        );
+
+        $borrowRequest->update([
+            'approval_status' => 'rejected',
+            'reject_reason'   => $rejectReason,
+        ]);
+
+        $borrowRequest->load(['borrowRequestDetails.book', 'user.profile']);
+
+        ActivityLogger::log(
+            'update',
+            'borrow_request',
+            "Borrow request #{$borrowRequest->id} rejected",
+            ['request_id' => $borrowRequest->id, 'status' => 'rejected', 'reason' => $rejectReason],
+            ['request_id' => $borrowRequest->id, 'status' => 'processing'],
+            $borrowRequest
+        );
+
+        event(new BorrowRequestRejected($borrowRequest));
+
+        return $borrowRequest;
     }
 
     /**
@@ -166,8 +257,8 @@ class BorrowRequestService
                 );
             }
 
-            // Delete the request after it's been fulfilled
-            $borrowRequest->delete();
+            // Mark request as approved after borrow is created
+            $borrowRequest->update(['approval_status' => 'approved']);
 
             $borrow->load([
                 'borrowDetails.bookCopy.book',
@@ -188,6 +279,9 @@ class BorrowRequestService
                 $borrow
             );
 
+            $borrowRequest->load(['borrowRequestDetails.book', 'user.profile']);
+            event(new BorrowRequestApproved($borrowRequest, $borrow));
+
             return $borrow;
         });
     }
@@ -197,16 +291,63 @@ class BorrowRequestService
         $request->delete();
     }
 
-    // ─── Helpers ─────────────────────────────────────────────────────────────
-
-    private function generateRequestCode(): string
+    /**
+     * Assign book copies to an already-created borrow (from an approved request).
+     * Must be called from the borrow detail page after approval.
+     */
+    public function addCopiesToBorrow(Borrow $borrow, array $copyIds): Borrow
     {
-        do {
-            $code = 'REQ-' . now()->format('Ymd') . '-' . strtoupper(Str::random(6));
-        } while (BorrowRequest::where('request_code', $code)->exists());
+        return DB::transaction(function () use ($borrow, $copyIds) {
+            $borrowRequest = BorrowRequest::with('borrowRequestDetails')
+                ->findOrFail($borrow->borrow_request_id);
 
-        return $code;
+            $details = $borrowRequest->borrowRequestDetails;
+
+            if (empty($copyIds) || count($copyIds) !== $details->count()) {
+                abort(422, 'Please provide a copy ID for each requested book');
+            }
+
+            foreach ($details as $index => $detail) {
+                $copy = BookCopy::where('id', $copyIds[$index])
+                    ->where('book_id', $detail->book_id)
+                    ->where('status', 'available')
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                BorrowDetail::create([
+                    'borrow_id'    => $borrow->id,
+                    'book_copy_id' => $copy->id,
+                    'status'       => 'borrowed',
+                ]);
+
+                $copy->update(['status' => 'borrowed']);
+
+                ActivityLogger::log(
+                    'update',
+                    'book_copy',
+                    "Book copy #{$copy->id} ({$copy->book->title}) assigned to borrow #{$borrow->id}",
+                    ['copy_id' => $copy->id, 'new_status' => 'borrowed', 'borrow_id' => $borrow->id],
+                    ['copy_id' => $copy->id, 'old_status' => 'available'],
+                    $copy
+                );
+            }
+
+            $borrow->load(['borrowDetails.bookCopy.book', 'user.profile']);
+
+            ActivityLogger::log(
+                'update',
+                'borrow',
+                "Book copies assigned to borrow #{$borrow->id} from request #{$borrowRequest->id}",
+                ['borrow_id' => $borrow->id, 'copies_assigned' => count($copyIds)],
+                null,
+                $borrow
+            );
+
+            return $borrow;
+        });
     }
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────
 
     private function generateBorrowCode(): string
     {
@@ -215,22 +356,6 @@ class BorrowRequestService
         } while (Borrow::where('borrow_code', $code)->exists());
 
         return $code;
-    }
-
-    private function generateQrCode(string $requestCode, int $requestId): string
-    {
-        Storage::disk('public')->makeDirectory('qr_codes');
-
-        $filename     = 'request_' . $requestId . '_' . $requestCode . '.svg';
-        $relativePath = 'qr_codes/' . $filename;
-        $absolutePath = storage_path('app/public/' . $relativePath);
-
-        QrCode::format('svg')
-            ->size(300)
-            ->errorCorrection('H')
-            ->generate($requestCode, $absolutePath);
-
-        return $relativePath;
     }
 
     private function generateBorrowQrCode(string $borrowCode, int $borrowId): string

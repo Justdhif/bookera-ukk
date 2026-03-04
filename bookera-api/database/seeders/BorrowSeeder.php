@@ -35,49 +35,42 @@ class BorrowSeeder extends Seeder
                 'borrow_date'  => Carbon::now()->subDays(10),
                 'return_date'  => Carbon::now()->subDays(3),
                 'status'       => 'close',
-                'approval_status' => 'approved',
+
             ],
             [
                 'borrow_date'  => Carbon::now()->subDays(8),
                 'return_date'  => Carbon::now()->subDays(1),
                 'status'       => 'close',
-                'approval_status' => 'approved',
             ],
             [
                 'borrow_date'  => Carbon::now()->subDays(7),
                 'return_date'  => Carbon::now()->addDays(7),
                 'status'       => 'open',
-                'approval_status' => 'approved',
             ],
             [
                 'borrow_date'  => Carbon::now()->subDays(6),
                 'return_date'  => Carbon::now()->addDays(8),
                 'status'       => 'open',
-                'approval_status' => 'approved',
             ],
             [
                 'borrow_date'  => Carbon::now()->subDays(5),
                 'return_date'  => Carbon::now()->addDays(9),
                 'status'       => 'open',
-                'approval_status' => 'approved',
             ],
             [
                 'borrow_date'  => Carbon::now()->subDays(4),
                 'return_date'  => Carbon::now()->addDays(10),
                 'status'       => 'open',
-                'approval_status' => 'pending',
             ],
             [
                 'borrow_date'  => Carbon::now()->subDays(15),
                 'return_date'  => Carbon::now()->subDays(8),
                 'status'       => 'close',
-                'approval_status' => 'approved',
             ],
             [
                 'borrow_date'  => Carbon::now()->subDays(3),
                 'return_date'  => Carbon::now()->addDays(11),
                 'status'       => 'open',
-                'approval_status' => 'approved',
             ],
             [
                 'borrow_date'  => Carbon::now()->subDays(2),
@@ -89,19 +82,16 @@ class BorrowSeeder extends Seeder
                 'borrow_date'  => Carbon::now()->subDays(1),
                 'return_date'  => Carbon::now()->addDays(13),
                 'status'       => 'open',
-                'approval_status' => 'approved',
             ],
             [
                 'borrow_date'  => Carbon::now()->subDays(12),
                 'return_date'  => Carbon::now()->subDays(5),
                 'status'       => 'close',
-                'approval_status' => 'approved',
             ],
             [
                 'borrow_date'  => Carbon::now()->subDays(20),
                 'return_date'  => Carbon::now()->subDays(13),
                 'status'       => 'close',
-                'approval_status' => 'approved',
             ],
         ];
 
@@ -135,7 +125,6 @@ class BorrowSeeder extends Seeder
             BorrowDetail::create([
                 'borrow_id'       => $borrow->id,
                 'book_copy_id'    => $bookCopy->id,
-                'approval_status' => $borrowData['approval_status'],
                 'status'          => $borrowData['status'] === 'close' ? 'returned' : 'borrowed',
             ]);
 

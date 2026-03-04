@@ -45,12 +45,16 @@ export default function PublicHeader() {
   const isHomePage = pathname === "/";
 
   return (
-    <header className="sticky top-0 bg-background/95 backdrop-blur-md z-40 border-b border-border shadow-sm">
+    <header className="sticky top-0 bg-background/95 backdrop-blur-md z-40">
       <div className="px-4 md:px-6 lg:px-8 py-3 md:py-4">
         <div className="flex items-center justify-between gap-2 md:gap-4">
           <div className="flex items-center gap-2 md:gap-4 flex-1 max-w-md">
             
-            <div className="lg:hidden">
+            <div className="hidden lg:block">
+              <SidebarTrigger />
+            </div>
+
+            <div>
               <Button
                 variant={isHomePage ? "secondary" : "ghost"}
                 size="icon"
@@ -66,9 +70,6 @@ export default function PublicHeader() {
               </Button>
             </div>
 
-            <div className="hidden lg:block">
-              <SidebarTrigger />
-            </div>
             <form onSubmit={handleSearch} className="relative flex-1">
               <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
               <Input

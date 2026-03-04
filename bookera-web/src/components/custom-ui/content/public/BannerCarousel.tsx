@@ -41,7 +41,7 @@ export default function BannerCarousel() {
           <CarouselItem key={banner.id}>
             <div
               className="relative w-full"
-              style={{ aspectRatio: "160/65" }}
+              style={{ aspectRatio: "160/69" }}
             >
               <Image
                 src={banner.image}

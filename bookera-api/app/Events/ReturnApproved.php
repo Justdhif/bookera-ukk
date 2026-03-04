@@ -31,7 +31,7 @@ class ReturnApproved implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('user.' . $this->bookReturn->loan->user_id),
+            new PrivateChannel('user.' . $this->bookReturn->borrow->user_id),
         ];
     }
 
@@ -49,10 +49,10 @@ class ReturnApproved implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'return_id' => $this->bookReturn->id,
-            'loan_id' => $this->bookReturn->loan_id,
-            'message' => 'Your return has been processed',
-            'type' => 'approved',
+            'return_id'  => $this->bookReturn->id,
+            'borrow_id'  => $this->bookReturn->borrow_id,
+            'message'    => 'Your return has been processed',
+            'type'       => 'approved',
         ];
     }
 }

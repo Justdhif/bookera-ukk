@@ -19,5 +19,8 @@ export const borrowService = {
 
   showAdminByCode: (code: string) => api.get<ApiResponse<Borrow>>(`/admin/borrows/code/${code}`),
 
+  assignCopies: (id: number, copyIds: number[]) =>
+    api.post<ApiResponse<Borrow>>(`/admin/borrows/${id}/assign-copies`, { copy_ids: copyIds }),
+
   getMyBorrows: () => api.get<ApiResponse<Borrow[]>>("/my-borrows"),
 };

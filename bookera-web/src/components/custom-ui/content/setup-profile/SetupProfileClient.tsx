@@ -8,10 +8,10 @@ import { authService } from "@/services/auth.service";
 import { AnimatePresence, motion } from "framer-motion";
 import { User, Camera, Briefcase, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import SetupStepIndicator from "./SetupStepIndicator";
-import SetupStepPersonal from "./SetupStepPersonal";
-import SetupStepProfessional from "./SetupStepProfessional";
-import SetupStepAvatar from "./SetupStepAvatar";
+import SetupStepIndicator from "./steps/SetupStepIndicator";
+import SetupStepPersonal from "./steps/SetupStepPersonal";
+import SetupStepProfessional from "./steps/SetupStepProfessional";
+import SetupStepAvatar from "./steps/SetupStepAvatar";
 
 export type SetupStep = "personal" | "professional" | "avatar";
 

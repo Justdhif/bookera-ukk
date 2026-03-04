@@ -2,7 +2,7 @@
 
 import { Save } from "@/types/save";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit2, Trash, BookMarked } from "lucide-react";
+import { ArrowLeft, Edit, Trash, BookMarked } from "lucide-react";
 import { format } from "date-fns";
 interface SaveHeaderProps {
   save: Save;
@@ -91,12 +91,12 @@ export default function SaveHeader({
           </div>
           <div className="mt-2 flex gap-2 shrink-0">
             <Button
-              variant="outline"
+              variant="brand"
               size="sm"
               onClick={onEdit}
               className="h-8 gap-1.5"
             >
-              <Edit2 className="h-3.5 w-3.5" />
+              <Edit className="h-3.5 w-3.5" />
               {"Edit"}
             </Button>
             <Button

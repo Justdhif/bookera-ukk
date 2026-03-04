@@ -20,20 +20,14 @@ import {
   AlertCircle,
   Eye,
   ClipboardList,
-  QrCode,
   Trash,
   Loader2,
+  XCircle,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+
 
 export default function MyBorrowPageClient() {
   const [borrows, setBorrows] = useState<Borrow[]>([]);
@@ -50,7 +44,6 @@ export default function MyBorrowPageClient() {
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [qrDialog, setQrDialog] = useState<BorrowRequest | null>(null);
 
   useEffect(() => {
     fetchBorrows();
@@ -87,7 +80,7 @@ export default function MyBorrowPageClient() {
     if (!confirm("Are you sure you want to cancel this request?")) return;
     setDeleteId(id);
     try {
-      await borrowRequestService.cancelRequest(id);
+      await borrowRequestService.cancel(id);
       toast.success("Request cancelled successfully");
       fetchRequests();
     } catch (error: any) {
@@ -330,15 +323,23 @@ export default function MyBorrowPageClient() {
                 >
                   <CardHeader className="pb-2">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <p className="font-mono font-semibold text-base">
-                        {req.request_code}
+                      <p className="font-semibold text-base">
+                        Request #{req.id}
                       </p>
-                      <Badge
-                        variant="secondary"
-                        className="text-violet-700 bg-violet-100 hover:bg-violet-100 w-fit"
-                      >
-                        Awaiting processing
-                      </Badge>
+                      {(() => {
+                        const approvalStatusConfig: Record<string, { label: string; className: string }> = {
+                          processing: { label: "Awaiting Processing", className: "text-violet-700 bg-violet-100 hover:bg-violet-100" },
+                          approved:   { label: "Approved",           className: "text-green-700 bg-green-100 hover:bg-green-100" },
+                          rejected:   { label: "Rejected",           className: "text-red-700 bg-red-100 hover:bg-red-100" },
+                          canceled:   { label: "Canceled",           className: "text-gray-600 bg-gray-100 hover:bg-gray-100" },
+                        };
+                        const cfg = approvalStatusConfig[req.approval_status] ?? approvalStatusConfig["processing"];
+                        return (
+                          <Badge variant="secondary" className={`${cfg.className} w-fit`}>
+                            {cfg.label}
+                          </Badge>
+                        );
+                      })()}
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0 space-y-3">
@@ -374,29 +375,30 @@ export default function MyBorrowPageClient() {
                         </div>
                       )}
 
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setQrDialog(req)}
-                      >
-                        <QrCode className="h-3.5 w-3.5 mr-1" />
-                        View QR
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleDeleteRequest(req.id)}
-                        disabled={deleteId === req.id}
-                      >
-                        {deleteId === req.id ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
-                        ) : (
-                          <Trash className="h-3.5 w-3.5 mr-1" />
-                        )}
-                        Cancel
-                      </Button>
-                    </div>
+                    {req.approval_status === "rejected" && req.reject_reason && (
+                      <div className="flex items-start gap-2 rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+                        <XCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                        <span><span className="font-medium">Rejection reason: </span>{req.reject_reason}</span>
+                      </div>
+                    )}
+
+                    {req.approval_status === "processing" && (
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteRequest(req.id)}
+                          disabled={deleteId === req.id}
+                        >
+                          {deleteId === req.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
+                          ) : (
+                            <Trash className="h-3.5 w-3.5 mr-1" />
+                          )}
+                          Cancel
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               ))}
@@ -426,35 +428,7 @@ export default function MyBorrowPageClient() {
         onSuccess={fetchBorrows}
       />
 
-      <Dialog open={!!qrDialog} onOpenChange={() => setQrDialog(null)}>
-        <DialogContent className="max-w-xs text-center">
-          <DialogHeader>
-            <DialogTitle>Request QR Code</DialogTitle>
-            <DialogDescription>
-              Show this QR to the library staff
-            </DialogDescription>
-          </DialogHeader>
-          {qrDialog?.qr_code_url ? (
-            <div className="flex flex-col items-center gap-3">
-              <div className="rounded-lg border p-3 bg-white">
-                <img
-                  src={qrDialog.qr_code_url}
-                  alt={qrDialog.request_code}
-                  className="w-56 h-56 object-contain"
-                />
-              </div>
-              <Badge variant="outline" className="font-mono">
-                {qrDialog.request_code}
-              </Badge>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-2 py-4 text-muted-foreground">
-              <QrCode className="h-12 w-12 opacity-40" />
-              <p className="text-sm">QR not available yet</p>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 }

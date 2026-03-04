@@ -6,10 +6,10 @@ import { toast } from "sonner";
 import { authService } from "@/services/auth.service";
 import { AnimatePresence, motion } from "framer-motion";
 import { Mail, KeyRound, Lock } from "lucide-react";
-import ForgotStepMethod from "./ForgotStepMethod";
-import ForgotStepOtp from "./ForgotStepOtp";
-import ForgotStepReset from "./ForgotStepReset";
-import ForgotStepSuccess from "./ForgotStepSuccess";
+import ForgotStepMethod from "./steps/ForgotStepMethod";
+import ForgotStepOtp from "./steps/ForgotStepOtp";
+import ForgotStepReset from "./steps/ForgotStepReset";
+import ForgotStepSuccess from "./steps/ForgotStepSuccess";
 
 
 export type ForgotStep = "method" | "otp" | "reset" | "success";

@@ -10,7 +10,8 @@ let isSubscribed = false;
 let echoInstance: any = null;
 
 interface NotificationEvent {
-  loan_id?: number;
+  borrow_id?: number;
+  request_id?: number;
   return_id?: number;
   fine_id?: number;
   lost_book_id?: number;
@@ -18,6 +19,8 @@ interface NotificationEvent {
   message: string;
   type: string;
   reason?: string;
+  reject_reason?: string;
+  borrow_code?: string;
 }
 
 export const useRealTimeNotifications = (
@@ -28,38 +31,47 @@ export const useRealTimeNotifications = (
 
   const handleNotification = useCallback(
     (event: NotificationEvent) => {
-      const notificationConfig: Record<string, { 
+      const notificationConfig: Record<string, {
         variant: 'success' | 'warning' | 'info' | 'error'
       }> = {
-        borrow_request: { variant: 'info' },
-        return_request: { variant: 'info' },
-        fine_created: { variant: 'warning' },
-        lost_book_report: { variant: 'warning' },
+        borrow_request:           { variant: 'info' },
+        borrow_request_created:   { variant: 'info' },
+        borrow_request_approved:  { variant: 'success' },
+        borrow_request_rejected:  { variant: 'error' },
+        borrow_request_cancelled: { variant: 'warning' },
+        return_request:           { variant: 'info' },
+        return_approved:          { variant: 'success' },
+        fine_created:             { variant: 'warning' },
+        lost_book_report:         { variant: 'warning' },
       };
 
       const config = notificationConfig[event.type] || { variant: 'info' };
-      
+
       const toastMethod = config.variant === 'success' ? toast.success :
                           config.variant === 'warning' ? toast.warning :
-                          config.variant === 'error' ? toast.error :
+                          config.variant === 'error'   ? toast.error   :
                           toast.info;
 
       toastMethod(event.message, {
         duration: 5000,
-        action: event.loan_id || event.fine_id || event.lost_book_id
+        action: event.request_id || event.borrow_id || event.fine_id || event.lost_book_id
           ? {
               label: "View",
               onClick: () => {
                 if (event.fine_id) {
-                  window.location.href = user?.role === "admin" 
+                  window.location.href = user?.role === "admin"
                     ? `/admin/fines/${event.fine_id}`
                     : `/my-fines`;
                 } else if (event.lost_book_id) {
                   window.location.href = `/admin/lost-books`;
-                } else if (event.loan_id) {
-                  window.location.href = user?.role === "admin" 
-                    ? `/admin/loans`
-                    : `/loans/${event.loan_id}`;
+                } else if (event.request_id) {
+                  window.location.href = user?.role === "admin"
+                    ? `/admin/borrows`
+                    : `/borrows/${event.request_id}`;
+                } else if (event.borrow_id) {
+                  window.location.href = user?.role === "admin"
+                    ? `/admin/borrows`
+                    : `/borrows/${event.borrow_id}`;
                 }
               },
             }
@@ -87,7 +99,7 @@ export const useRealTimeNotifications = (
     };
 
     window.addEventListener("notification-read", handleNotificationRead);
-    
+
     return () => {
       window.removeEventListener("notification-read", handleNotificationRead);
     };
@@ -108,7 +120,13 @@ export const useRealTimeNotifications = (
     if (user.role === "admin") {
       echo
         .private("admin")
-        .listen(".loan.requested", (event: NotificationEvent) => {
+        .listen(".borrow_request.created", (event: NotificationEvent) => {
+          handleNotification(event);
+        })
+        .listen(".borrow.requested", (event: NotificationEvent) => {
+          handleNotification(event);
+        })
+        .listen(".borrow_request.cancelled", (event: NotificationEvent) => {
           handleNotification(event);
         })
         .listen(".return.requested", (event: NotificationEvent) => {
@@ -120,6 +138,12 @@ export const useRealTimeNotifications = (
     } else {
       echo
         .private(`user.${user.id}`)
+        .listen(".borrow_request.approved", (event: NotificationEvent) => {
+          handleNotification(event);
+        })
+        .listen(".borrow_request.rejected", (event: NotificationEvent) => {
+          handleNotification(event);
+        })
         .listen(".return.approved", (event: NotificationEvent) => {
           handleNotification(event);
         })
@@ -132,7 +156,7 @@ export const useRealTimeNotifications = (
 
     return () => {
       isSubscribed = false;
-      
+
       if (echoInstance && user) {
         if (user.role === "admin") {
           echoInstance.leave("admin");
@@ -140,7 +164,7 @@ export const useRealTimeNotifications = (
           echoInstance.leave(`user.${user.id}`);
         }
       }
-      
+
       echoInstance = null;
     };
   }, [token, user, handleNotification]);

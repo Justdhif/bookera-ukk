@@ -4,7 +4,6 @@ namespace App\Helpers;
 
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 
 class ActivityLogger
 {
@@ -12,8 +11,8 @@ class ActivityLogger
         string $action,
         string $module,
         string $description,
-        array $newData = null,
-        array $oldData = null,
+        ?array $newData = null,
+        ?array $oldData = null,
         $subject = null
     ): void {
         $request = request();

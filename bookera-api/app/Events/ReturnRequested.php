@@ -49,11 +49,11 @@ class ReturnRequested implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'return_id' => $this->bookReturn->id,
-            'loan_id' => $this->bookReturn->loan_id,
-            'user_name' => $this->bookReturn->loan->user->profile->full_name ?? 'Unknown',
-            'message' => 'New return request',
-            'type' => 'return_request',
+            'return_id'  => $this->bookReturn->id,
+            'borrow_id'  => $this->bookReturn->borrow_id,
+            'user_name'  => $this->bookReturn->borrow->user->profile->full_name ?? 'Unknown',
+            'message'    => 'New return request',
+            'type'       => 'return_request',
         ];
     }
 }

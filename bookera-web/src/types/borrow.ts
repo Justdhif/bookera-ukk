@@ -4,6 +4,7 @@ import { Book } from "./book";
 import { BookReturn } from "./book-return";
 import { Fine } from "./fine";
 import { LostBook } from "./lost-book";
+import { BorrowRequest } from "./borrow-request";
 
 export interface BorrowDetail {
   id: number;
@@ -19,6 +20,7 @@ export interface BorrowDetail {
 export interface Borrow {
   id: number;
   user_id: number;
+  borrow_request_id?: number | null;
   borrow_code: string;
   qr_code_url?: string;
   borrow_date: string;
@@ -27,6 +29,7 @@ export interface Borrow {
 
   user?: User;
   borrow_details: BorrowDetail[];
+  borrow_request?: BorrowRequest | null;
   book_returns?: BookReturn[];
   fines?: Fine[];
   lost_books?: LostBook[];

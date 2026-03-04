@@ -11,10 +11,10 @@ export interface BorrowRequestDetail {
 export interface BorrowRequest {
   id: number;
   user_id: number;
-  request_code: string;
-  qr_code_url?: string;
   borrow_date: string;
   return_date: string;
+  approval_status: 'processing' | 'canceled' | 'approved' | 'rejected';
+  reject_reason?: string | null;
 
   user?: User;
   borrow_request_details: BorrowRequestDetail[];

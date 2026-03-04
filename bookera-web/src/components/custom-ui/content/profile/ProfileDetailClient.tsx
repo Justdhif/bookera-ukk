@@ -6,11 +6,11 @@ import { authService } from "@/services/auth.service";
 import { userService, UpdateUserData } from "@/services/user.service";
 import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, X, Edit2 } from "lucide-react";
+import { ArrowLeft, Save, X, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProfileAvatarCard from "./ProfileAvatarCard";
-import UserDetailForm from "../user/UserDetailForm";
+import UserDetailForm from "../admin/user/UserDetailForm";
 
 type ProfileVariant = "public" | "admin";
 
@@ -182,7 +182,7 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
             variant="brand"
             className="h-8 gap-1"
           >
-            <Edit2 className="h-3.5 w-3.5" />
+            <Edit className="h-3.5 w-3.5" />
             {"Edit User"}
           </Button>
         )}

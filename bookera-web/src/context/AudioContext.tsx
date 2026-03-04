@@ -3,10 +3,23 @@
 import React, {
   createContext,
   useContext,
-  useRef,
   useState,
   useEffect,
+  useCallback,
 } from "react";
+
+export const musicTracks = [
+  {
+    id: "sinar-matahari",
+    name: "Sinar Matahari",
+    file: "/audios/sinar-matahari.mp3",
+  },
+  {
+    id: "chill-music",
+    name: "Chill Vibes - Lofi Girl",
+    file: "/audios/chill-music.mp3",
+  },
+];
 
 interface AudioContextType {
   isMusicEnabled: boolean;
@@ -14,124 +27,189 @@ interface AudioContextType {
   volume: number;
   currentTime: number;
   duration: number;
+  currentTrackId: string;
+  tracks: typeof musicTracks;
   toggleMusic: () => void;
   togglePlayPause: () => void;
   setVolume: (volume: number) => void;
+  switchTrack: (trackId: string) => void;
   formatTime: (seconds: number) => string;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
-const musicTrack = {
-  id: "chill-music",
-  name: "Chill Vibes - Lofi Girl",
-  file: "/audios/chill-music.mp3",
-  duration: "1:10:39",
-};
+const audioInstances: Map<string, HTMLAudioElement> = new Map();
+const savedPositions: Map<string, number> = new Map();
 
-let globalAudioInstance: HTMLAudioElement | null = null;
+let _currentTrackId = "sinar-matahari";
+let _isMusicEnabled = false;
+let _volume = 20;
+
+function getOrCreate(trackId: string): HTMLAudioElement {
+  if (!audioInstances.has(trackId)) {
+    const track = musicTracks.find((t) => t.id === trackId);
+    if (!track) throw new Error(`Unknown track: ${trackId}`);
+    const audio = new Audio(track.file);
+    audio.loop = true;
+    audio.volume = _volume / 100;
+    audioInstances.set(trackId, audio);
+  }
+  return audioInstances.get(trackId)!;
+}
+
+function startAudio(
+  audio: HTMLAudioElement,
+  onSuccess: () => void,
+) {
+  audio
+    .play()
+    .then(() => {
+      onSuccess();
+    })
+    .catch(() => {
+      const events = ["click", "keydown", "touchstart"] as const;
+      const unlock = () => {
+        audio
+          .play()
+          .then(() => {
+            onSuccess();
+            events.forEach((e) =>
+              document.removeEventListener(e, unlock),
+            );
+          })
+          .catch(() => {});
+      };
+      events.forEach((e) =>
+        document.addEventListener(e, unlock, { once: true }),
+      );
+    });
+}
 
 export function AudioProvider({ children }: { children: React.ReactNode }) {
-  const [isMusicEnabled, setIsMusicEnabled] = useState(false);
+  const [isMusicEnabled, setIsMusicEnabled] = useState(_isMusicEnabled);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolumeState] = useState(20);
+  const [volume, setVolumeState] = useState(_volume);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [currentTrackId, setCurrentTrackId] = useState(_currentTrackId);
 
-  useEffect(() => {
-    if (!globalAudioInstance) {
-      globalAudioInstance = new Audio(musicTrack.file);
-      globalAudioInstance.loop = true;
-      globalAudioInstance.volume = volume / 100;
+  const attachListeners = useCallback((audio: HTMLAudioElement) => {
+    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const onMetadata = () => setDuration(audio.duration);
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    const onEnded = () => setIsPlaying(false);
 
-      globalAudioInstance.addEventListener("loadedmetadata", () => {
-        if (globalAudioInstance) {
-          setDuration(globalAudioInstance.duration);
-        }
-      });
-
-      globalAudioInstance.addEventListener("timeupdate", () => {
-        if (globalAudioInstance) {
-          setCurrentTime(globalAudioInstance.currentTime);
-        }
-      });
-
-      globalAudioInstance.addEventListener("ended", () => {
-        setIsPlaying(false);
-        setCurrentTime(0);
-      });
-
-      globalAudioInstance.addEventListener("play", () => {
-        setIsPlaying(true);
-      });
-
-      globalAudioInstance.addEventListener("pause", () => {
-        setIsPlaying(false);
-      });
-    }
-
-    audioRef.current = globalAudioInstance;
-
-    if (globalAudioInstance) {
-      globalAudioInstance.volume = volume / 100;
-    }
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("loadedmetadata", onMetadata);
+    audio.addEventListener("play", onPlay);
+    audio.addEventListener("pause", onPause);
+    audio.addEventListener("ended", onEnded);
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current = null;
-      }
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("loadedmetadata", onMetadata);
+      audio.removeEventListener("play", onPlay);
+      audio.removeEventListener("pause", onPause);
+      audio.removeEventListener("ended", onEnded);
     };
   }, []);
 
   useEffect(() => {
-    if (globalAudioInstance) {
-      globalAudioInstance.volume = volume / 100;
-    }
+    musicTracks.forEach((t) => getOrCreate(t.id));
+
+    const defaultAudio = getOrCreate(_currentTrackId);
+    const cleanup = attachListeners(defaultAudio);
+
+    if (defaultAudio.duration) setDuration(defaultAudio.duration);
+    setCurrentTime(defaultAudio.currentTime);
+    setIsPlaying(!defaultAudio.paused && _isMusicEnabled);
+
+    return cleanup;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (currentTrackId === _currentTrackId) return;
+    const audio = getOrCreate(currentTrackId);
+    const cleanup = attachListeners(audio);
+    if (audio.duration) setDuration(audio.duration);
+    setCurrentTime(audio.currentTime);
+    return cleanup;
+  }, [currentTrackId, attachListeners]);
+
+  useEffect(() => {
+    _volume = volume;
+    audioInstances.forEach((a) => {
+      a.volume = volume / 100;
+    });
   }, [volume]);
 
-  const toggleMusic = () => {
-    if (!globalAudioInstance) return;
+  const toggleMusic = useCallback(() => {
+    const audio = getOrCreate(currentTrackId);
 
     if (isMusicEnabled) {
-      globalAudioInstance.pause();
+      audio.pause();
+      _isMusicEnabled = false;
       setIsMusicEnabled(false);
       setIsPlaying(false);
     } else {
-      globalAudioInstance.volume = volume / 100;
-      globalAudioInstance
-        .play()
-        .then(() => {
-          setIsMusicEnabled(true);
-          setIsPlaying(true);
-        })
-        .catch((error) => {
-          console.error("Audio playback failed:", error);
-        });
-    }
-  };
-
-  const togglePlayPause = () => {
-    if (!globalAudioInstance || !isMusicEnabled) return;
-
-    if (isPlaying) {
-      globalAudioInstance.pause();
-    } else {
-      globalAudioInstance.play().catch((error) => {
-        console.error("Audio playback failed:", error);
+      audio.volume = volume / 100;
+      startAudio(audio, () => {
+        _isMusicEnabled = true;
+        setIsMusicEnabled(true);
+        setIsPlaying(true);
       });
     }
-  };
+  }, [currentTrackId, isMusicEnabled, volume]);
 
-  const setVolume = (value: number) => {
+  const togglePlayPause = useCallback(() => {
+    if (!isMusicEnabled) return;
+    const audio = getOrCreate(currentTrackId);
+
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play().catch((err) => console.error("Audio playback failed:", err));
+    }
+  }, [currentTrackId, isMusicEnabled, isPlaying]);
+
+  const switchTrack = useCallback(
+    (trackId: string) => {
+      if (trackId === currentTrackId) return;
+
+      const currentAudio = getOrCreate(currentTrackId);
+      savedPositions.set(currentTrackId, currentAudio.currentTime);
+      currentAudio.pause();
+
+      _currentTrackId = trackId;
+      setCurrentTrackId(trackId);
+
+      const newAudio = getOrCreate(trackId);
+      newAudio.volume = volume / 100;
+      const restored = savedPositions.get(trackId) ?? 0;
+      newAudio.currentTime = restored;
+      setCurrentTime(restored);
+      setDuration(newAudio.duration || 0);
+
+      if (isMusicEnabled) {
+        newAudio
+          .play()
+          .catch((err) => console.error("Audio playback failed:", err));
+      }
+    },
+    [currentTrackId, isMusicEnabled, volume],
+  );
+
+  const setVolume = useCallback((value: number) => {
     setVolumeState(value);
-  };
+  }, []);
 
-  const formatTime = (seconds: number) => {
+  const formatTime = useCallback((seconds: number) => {
+    if (!isFinite(seconds) || isNaN(seconds)) return "0:00";
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
+  }, []);
 
   return (
     <AudioContext.Provider
@@ -141,9 +219,12 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         volume,
         currentTime,
         duration,
+        currentTrackId,
+        tracks: musicTracks,
         toggleMusic,
         togglePlayPause,
         setVolume,
+        switchTrack,
         formatTime,
       }}
     >

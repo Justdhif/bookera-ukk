@@ -1,6 +1,7 @@
 import { Borrow } from "./borrow";
 import { BookCopy } from "./book-copy";
 import { Book } from "./book";
+import { Fine } from "./fine";
 
 export interface BookReturnDetail {
   id: number;
@@ -19,7 +20,9 @@ export interface BookReturn {
   borrow_id: number;
   return_date: string;
   
-  borrow: Borrow;
+  borrow: Borrow & {
+    fines?: Fine[];
+  };
   details: BookReturnDetail[];
   
   created_at: string;

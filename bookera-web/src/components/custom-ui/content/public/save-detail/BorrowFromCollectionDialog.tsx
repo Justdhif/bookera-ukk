@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { borrowRequestService } from "@/services/borrow-request.service";
 import { Book } from "@/types/book";
 import { toast } from "sonner";
@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
 import { BookPlus, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import Image from "next/image";
 
 interface BorrowFromCollectionDialogProps {
   open: boolean;
@@ -32,7 +33,7 @@ export function BorrowFromCollectionDialog({
   selectedBooks,
   onSuccess,
 }: BorrowFromCollectionDialogProps) {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [borrowDate, setBorrowDate] = useState<Date | undefined>(undefined);
   const [returnDate, setReturnDate] = useState<Date | undefined>(undefined);
 
@@ -43,30 +44,32 @@ export function BorrowFromCollectionDialog({
     }
   }, [open]);
 
+  const isFormValid = (): boolean => {
+    if (selectedBooks.length === 0) return false;
+    if (!borrowDate || !returnDate) return false;
+    if (returnDate <= borrowDate) return false;
+    return true;
+  };
+
+  const isSubmitDisabled = (): boolean => {
+    return isLoading || !isFormValid();
+  };
+
   const handleSubmit = async () => {
-    if (selectedBooks.length === 0) {
-      toast.error("No books selected");
-      return;
-    }
-    if (!borrowDate) {
-      toast.error("Borrow date is required");
-      return;
-    }
-    if (!returnDate) {
-      toast.error("Return date is required");
-      return;
-    }
-    if (returnDate <= borrowDate) {
-      toast.error("Return date must be after borrow date");
+    if (!isFormValid()) {
+      if (selectedBooks.length === 0) toast.error("No books selected");
+      else if (!borrowDate) toast.error("Borrow date is required");
+      else if (!returnDate) toast.error("Return date is required");
+      else toast.error("Return date must be after borrow date");
       return;
     }
 
-    setLoading(true);
+    setIsLoading(true);
     try {
       await borrowRequestService.create({
         book_ids: selectedBooks.map((b) => b.id),
-        borrow_date: format(borrowDate, "yyyy-MM-dd"),
-        return_date: format(returnDate, "yyyy-MM-dd"),
+        borrow_date: format(borrowDate!, "yyyy-MM-dd"),
+        return_date: format(returnDate!, "yyyy-MM-dd"),
       });
       toast.success("Borrow request created successfully!");
       onOpenChange(false);
@@ -76,7 +79,7 @@ export function BorrowFromCollectionDialog({
         error.response?.data?.message || "Failed to create borrow request",
       );
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -86,10 +89,10 @@ export function BorrowFromCollectionDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BookPlus className="h-5 w-5" />
-            {"Borrow Request"} - {selectedBooks.length} {"books selected"}
+            Borrow request - {selectedBooks.length} books selected
           </DialogTitle>
           <DialogDescription>
-            {"Set the borrow date and return date for your borrow request"}
+            Please review the selected books and choose your borrow and return dates.
           </DialogDescription>
         </DialogHeader>
 
@@ -98,9 +101,11 @@ export function BorrowFromCollectionDialog({
             {selectedBooks.map((book) => (
               <div key={book.id} className="flex gap-3 items-center">
                 {book.cover_image_url && (
-                  <img
+                  <Image
                     src={book.cover_image_url}
                     alt={book.title}
+                    width={48}
+                    height={64}
                     className="w-12 h-16 object-cover rounded shadow-sm shrink-0"
                   />
                 )}
@@ -117,25 +122,25 @@ export function BorrowFromCollectionDialog({
 
         <div className="space-y-4 mt-2">
           <div className="space-y-2">
-            <Label variant="required">{"Borrow Date"}</Label>
+            <Label variant="required">Borrow Date</Label>
             <DatePicker
               value={borrowDate}
               onChange={setBorrowDate}
-              placeholder={"Select borrow date"}
+              placeholder="Select borrow date"
               dateMode="future"
             />
           </div>
 
           <div className="space-y-2">
-            <Label variant="required">{"Return Date"}</Label>
+            <Label variant="required">Return Date</Label>
             <DatePicker
               value={returnDate}
               onChange={setReturnDate}
-              placeholder={"Select return date"}
+              placeholder="Select return date"
               dateMode="future"
             />
             <p className="text-xs text-muted-foreground">
-              {"Return date must be after borrow date"}
+              Return date must be after borrow date.
             </p>
           </div>
         </div>
@@ -144,16 +149,17 @@ export function BorrowFromCollectionDialog({
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={loading}
+            disabled={isLoading}
           >
-            {"Cancel"}
+            Cancel
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={loading || selectedBooks.length === 0}
+            disabled={isSubmitDisabled()}
+            loading={isLoading}
+            variant="submit"
           >
-            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            {loading ? "Processing..." : "Submit Request"}
+            {isLoading ? "Processing..." : "Submit Request"}
           </Button>
         </DialogFooter>
       </DialogContent>

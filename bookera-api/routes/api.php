@@ -119,19 +119,23 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [BorrowController::class, 'index']);
             Route::post('/', [BorrowController::class, 'storeAdminBorrow']);
             Route::get('/code/{code}', [BorrowController::class, 'showByCode']);
+            Route::post('/{borrow}/assign-copies', [BorrowController::class, 'assignCopies']);
         });
 
         Route::prefix('borrow-requests')->group(function () {
             Route::get('/', [BorrowRequestController::class, 'index']);
-            Route::get('/code/{code}', [BorrowRequestController::class, 'showByCode']);
             Route::get('/{borrowRequest}', [BorrowRequestController::class, 'show']);
             Route::post('/{borrowRequest}/assign', [BorrowRequestController::class, 'assignBorrow']);
+            Route::patch('/{borrowRequest}/approve', [BorrowRequestController::class, 'approve']);
+            Route::patch('/{borrowRequest}/reject', [BorrowRequestController::class, 'reject']);
             Route::delete('/{borrowRequest}', [BorrowRequestController::class, 'destroy']);
         });
 
         Route::prefix('book-returns')->group(function () {
             Route::post('/{bookReturn}/approve', [BookReturnController::class, 'approveReturn']);
             Route::post('/{bookReturn}/process-fine', [BookReturnController::class, 'processFine']);
+            Route::patch('/{bookReturn}/conditions', [BookReturnController::class, 'updateConditions']);
+            Route::post('/{bookReturn}/finish-fines', [BookReturnController::class, 'finishFines']);
         });
 
         Route::apiResource('fine-types', FineTypeController::class);
@@ -198,7 +202,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('borrow-requests')->group(function () {
         Route::post('/', [BorrowRequestController::class, 'store']);
         Route::get('/{borrowRequest}', [BorrowRequestController::class, 'show']);
-        Route::delete('/{borrowRequest}', [BorrowRequestController::class, 'destroy']);
+        Route::patch('/{borrowRequest}/cancel', [BorrowRequestController::class, 'cancel']);
     });
 
     Route::get('my-borrow-requests', [BorrowRequestController::class, 'getMyRequests']);

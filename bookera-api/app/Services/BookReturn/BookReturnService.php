@@ -3,6 +3,7 @@
 namespace App\Services\BookReturn;
 
 use App\Helpers\ActivityLogger;
+use App\Models\BookCopy;
 use App\Models\BookReturn;
 use App\Models\Borrow;
 use App\Models\BorrowDetail;
@@ -89,6 +90,12 @@ class BookReturnService
     {
         $borrow = $bookReturn->borrow;
 
+        // Prevent approving if there are unpaid fines
+        $unpaidFines = $borrow->fines()->where('status', 'unpaid')->count();
+        if ($unpaidFines > 0) {
+            throw new \Exception('Tidak dapat menyelesaikan pengembalian. Masih ada ' . $unpaidFines . ' denda yang belum dibayar.');
+        }
+
         DB::transaction(function () use ($borrow, $bookReturn) {
             foreach ($bookReturn->details as $detail) {
                 $bookCopy = $detail->bookCopy;
@@ -146,6 +153,127 @@ class BookReturnService
         });
 
         return $bookReturn->load('details.bookCopy.book', 'borrow');
+    }
+
+    /**
+     * Update conditions for book return details and auto-create fines for damaged books.
+     */
+    public function updateConditions(BookReturn $bookReturn, array $conditions): BookReturn
+    {
+        return DB::transaction(function () use ($bookReturn, $conditions) {
+            $borrow = $bookReturn->borrow;
+
+            foreach ($conditions as $detailId => $condition) {
+                $detail = $bookReturn->details()->find($detailId);
+                if (!$detail) {
+                    continue;
+                }
+
+                $oldCondition = $detail->condition;
+                $detail->update(['condition' => $condition]);
+
+                // Auto-create fine for damaged books
+                if ($condition === 'damaged' && $oldCondition !== 'damaged') {
+                    $this->autoCreateDamagedFine($borrow, $detail->bookCopy);
+                }
+
+                ActivityLogger::log(
+                    'update',
+                    'book_return_detail',
+                    "Return detail #{$detail->id} condition updated to '{$condition}'",
+                    ['detail_id' => $detail->id, 'new_condition' => $condition],
+                    ['detail_id' => $detail->id, 'old_condition' => $oldCondition],
+                    $detail
+                );
+            }
+
+            return $bookReturn->fresh(['details.bookCopy.book', 'borrow.fines.fineType']);
+        });
+    }
+
+    private function autoCreateDamagedFine(Borrow $borrow, BookCopy $bookCopy): void
+    {
+        $damagedFineType = FineType::where('type', 'damaged')->first();
+        if (!$damagedFineType) {
+            return;
+        }
+
+        $fineNotes = 'Denda buku rusak: ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
+
+        $existingFine = $borrow->fines()
+            ->where('notes', $fineNotes)
+            ->first();
+
+        if ($existingFine) {
+            return;
+        }
+
+        $fine = Fine::create([
+            'borrow_id'    => $borrow->id,
+            'fine_type_id' => $damagedFineType->id,
+            'amount'       => $damagedFineType->amount,
+            'status'       => 'unpaid',
+            'notes'        => $fineNotes,
+        ]);
+
+        ActivityLogger::log(
+            'create',
+            'fine',
+            "Fine auto-created for damaged book in borrow #{$borrow->id}",
+            ['fine_id' => $fine->id, 'amount' => $fine->amount, 'book_copy_id' => $bookCopy->id],
+            null,
+            $fine
+        );
+
+        $fine->load('fineType', 'borrow.user', 'borrow.borrowDetails.bookCopy.book');
+        event(new FineCreated($fine));
+    }
+
+    /**
+     * Mark all unpaid fines for this return's borrow as paid.
+     */
+    public function finishFines(BookReturn $bookReturn): array
+    {
+        $borrow = $bookReturn->borrow;
+
+        $unpaidFines = $borrow->fines()->where('status', 'unpaid')->get();
+
+        if ($unpaidFines->isEmpty()) {
+            throw new \Exception('Tidak ada denda yang belum dibayar untuk peminjaman ini.');
+        }
+
+        DB::transaction(function () use ($unpaidFines, $borrow) {
+            foreach ($unpaidFines as $fine) {
+                $fine->update([
+                    'status'  => 'paid',
+                    'paid_at' => now(),
+                ]);
+
+                ActivityLogger::log(
+                    'update',
+                    'fine',
+                    "Fine #{$fine->id} marked as paid via return finish-fines",
+                    ['fine_id' => $fine->id, 'status' => 'paid', 'paid_at' => $fine->paid_at],
+                    ['status' => 'unpaid'],
+                    $fine
+                );
+            }
+        });
+
+        return $borrow->fines()->with('fineType')->get()->toArray();
+    }
+
+    /**
+     * Get detailed return info including borrow details and fines.
+     */
+    public function getReturnDetail(BookReturn $bookReturn): BookReturn
+    {
+        return $bookReturn->load([
+            'details.bookCopy.book',
+            'borrow.user.profile',
+            'borrow.fines.fineType',
+            'borrow.borrowDetails.bookCopy.book',
+        ]);
     }
 
     public function canCreateReturn(Borrow $borrow): bool

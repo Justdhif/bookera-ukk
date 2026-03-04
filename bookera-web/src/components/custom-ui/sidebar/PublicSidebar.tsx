@@ -1,141 +1,130 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAuthStore } from "@/store/auth.store";
-import SavesList from "@/components/custom-ui/content/public/SavesList";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { BookOpen, ChevronRight, Layers, Sparkles } from "lucide-react";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
-import { Home, BookOpen, DollarSign } from "lucide-react";
-
-const mainNavItems = [
-  {
-    title: "Home",
-    href: "/",
-    icon: Home,
-    gradient: "from-blue-500 to-cyan-500",
-  },
-  {
-    title: "My Borrows",
-    href: "/my-borrows",
-    icon: BookOpen,
-    gradient: "from-orange-500 to-red-500",
-  },
-  {
-    title: "My Fines",
-    href: "/my-fines",
-    icon: DollarSign,
-    gradient: "from-rose-500 to-red-500",
-  },
-];
+import SavesList from "@/components/custom-ui/content/public/saves/SavesList";
 
 export default function PublicSidebar() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
   const { open } = useSidebar();
 
-  const handleNavClick = (href: string) => {
-    if (
-      (href === "/my-borrows" || href === "/my-fines") &&
-      !isAuthenticated
-    ) {
-      router.push("/login");
-      return;
-    }
-    router.push(href);
-  };
-
-  const isActive = (href: string) => {
-    if (href === "/") {
-      return pathname === "/";
-    }
-    return pathname.startsWith(href);
-  };
-
   return (
-    <Sidebar collapsible="icon" variant="floating">
-      <SidebarHeader className="border-b bg-linear-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20">
-        <div className={`flex items-center gap-3 py-4 ${open ? "px-4" : "justify-center"}`}>
-          <div className="relative flex h-10 w-10 items-center justify-center shrink-0">
-            <Image
-              src={BookeraLogo}
-              alt="Bookera"
-              className="h-10 w-10 object-contain brightness-0 dark:invert"
-            />
-          </div>
-          {open && (
-            <div className="flex flex-col flex-1">
-              <span className="text-lg font-bold bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
-                Bookera
-              </span>
+    <Sidebar collapsible="icon" className="bg-linear-to-b from-background to-muted/20">
+      <SidebarHeader className="p-0 overflow-hidden border-b-0">
+        <div className="relative bg-linear-to-135deg from-brand-primary-dark via-brand-primary to-brand-primary-light overflow-hidden">
+          <div className="absolute -top-6 -right-6 h-20 w-20 rounded-full bg-primary/8" />
+          <div className="absolute -bottom-4 -left-4 h-14 w-14 rounded-full bg-primary/8" />
+
+          <div
+            className={`relative z-10 flex items-center gap-3 px-4 py-4 ${
+              !open ? "justify-center px-0" : ""
+            }`}
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-primary shadow-md backdrop-blur-sm ring-1 ring-brand-primary/20">
+              <Image
+                src={BookeraLogo}
+                alt="Bookera"
+                className="h-6 w-6 object-contain brightness-0 invert"
+              />
             </div>
-          )}
+
+            {open && (
+              <div className="flex flex-col leading-tight">
+                <span className="text-[15px] font-bold tracking-wide text-brand-primary drop-shadow-sm">
+                  Bookera
+                </span>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  My Library
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-2 h-px bg-linear-to-r from-white/0 via-white/30 to-white/0" />
         </div>
+
+        {open && (
+          <div className="flex items-center gap-2 px-4 py-2 bg-muted/40 dark:bg-white/5 border-b border-border dark:border-white/10">
+            <div className="h-1.5 w-1.5 rounded-full bg-brand-primary/60 animate-pulse" />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground dark:text-white/60">
+              Collections
+            </span>
+          </div>
+        )}
       </SidebarHeader>
 
-      
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu className={!open ? "flex flex-col items-center" : ""}>
-              {mainNavItems.map((item) => {
-                const isActiveItem = isActive(item.href);
-                return (
-                  <SidebarMenuItem
-                    key={item.href}
-                    className={!open ? "w-full flex justify-center" : ""}
-                  >
-                    <SidebarMenuButton
-                      isActive={isActiveItem}
-                      onClick={() => handleNavClick(item.href)}
-                      tooltip={{
-                        content: item.title,
-                        gradient: item.gradient,
-                        className: "font-medium",
-                      }}
-                      className={`group/item ${!open && "justify-center px-0 mx-auto"}`}
-                    >
-                      <div
-                        className={`${
-                          open ? "p-1.5" : "p-2"
-                        } rounded-lg bg-linear-to-br ${item.gradient} text-white shadow-sm group-hover/item:shadow-md transition-shadow`}
-                      >
-                        <item.icon className="h-3.5 w-3.5" />
-                      </div>
-                      {open && <span className="font-medium">{item.title}</span>}
-                      {isActiveItem && open && (
-                        <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                      )}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        
-        <SidebarGroup className="flex-1 mt-4">
-          <div className="h-full">
+      <SidebarContent className="overflow-hidden">
+        <SidebarGroup className="flex-1 p-0 overflow-hidden">
+          <div className="h-full overflow-hidden">
             <SavesList mode="sidebar" isCollapsed={!open} />
           </div>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="p-0 border-t border-border/60 dark:border-white/10">
+        <TooltipProvider>
+          {open ? (
+            <div className="px-3 py-3 space-y-2">
+              <Link href="/books">
+                <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 bg-brand-primary/8 hover:bg-brand-primary/15 dark:bg-brand-primary/10 dark:hover:bg-brand-primary/20 border border-brand-primary/15 hover:border-brand-primary/30 transition-all cursor-pointer group">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-primary/15 group-hover:bg-brand-primary/25 transition-colors shrink-0">
+                    <BookOpen className="h-3.5 w-3.5 text-brand-primary" />
+                  </div>
+                  <span className="text-xs font-semibold text-brand-primary flex-1">Browse All Books</span>
+                  <ChevronRight className="h-3 w-3 text-brand-primary/50 group-hover:text-brand-primary group-hover:translate-x-0.5 transition-all" />
+                </div>
+              </Link>
+
+              <div className="flex items-center gap-2 px-1">
+                <div className="flex items-center gap-1.5">
+                  <Sparkles className="h-2.5 w-2.5 text-brand-primary/50" />
+                  <span className="text-[10px] font-medium text-muted-foreground/60">Bookera Library</span>
+                </div>
+                <div className="flex-1 h-px bg-border/50" />
+                <div className="flex items-center gap-1">
+                  <Layers className="h-2.5 w-2.5 text-muted-foreground/40" />
+                  <span className="text-[10px] text-muted-foreground/40">v1.0</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center py-3 gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link href="/books">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary/10 hover:bg-brand-primary/20 border border-brand-primary/15 hover:border-brand-primary/30 transition-all cursor-pointer">
+                      <BookOpen className="h-4 w-4 text-brand-primary" />
+                    </div>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="right">Browse All Books</TooltipContent>
+              </Tooltip>
+
+              <div className="h-px w-6 bg-border/50" />
+
+              <div className="flex h-5 w-5 items-center justify-center">
+                <Sparkles className="h-3 w-3 text-brand-primary/30" />
+              </div>
+            </div>
+          )}
+        </TooltipProvider>
+      </SidebarFooter>
     </Sidebar>
   );
 }

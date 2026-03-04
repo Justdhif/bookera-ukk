@@ -19,12 +19,57 @@ class BorrowRequestController extends Controller
         $this->borrowRequestService = $borrowRequestService;
     }
 
+    // ─── Admin ────────────────────────────────────────────────────────────────
+
     public function index(Request $request): JsonResponse
     {
         $requests = $this->borrowRequestService->getRequests($request->search);
 
         return ApiResponse::successResponse('Data permintaan peminjaman berhasil diambil', $requests);
     }
+
+    public function show(BorrowRequest $borrowRequest): JsonResponse
+    {
+        $borrowRequest = $this->borrowRequestService->getRequestById($borrowRequest);
+
+        return ApiResponse::successResponse('Detail permintaan peminjaman', $borrowRequest);
+    }
+
+    public function assignBorrow(Request $request, BorrowRequest $borrowRequest): JsonResponse
+    {
+        $copyIds = $request->input('copy_ids', []);
+        $borrow  = $this->borrowRequestService->assignBorrowFromRequest($borrowRequest, $copyIds);
+
+        return ApiResponse::successResponse(
+            'Peminjaman berhasil dibuat dari permintaan',
+            $borrow,
+            201
+        );
+    }
+
+    public function approve(BorrowRequest $borrowRequest): JsonResponse
+    {
+        $borrow = $this->borrowRequestService->approveRequest($borrowRequest);
+
+        return ApiResponse::successResponse('Permintaan peminjaman berhasil disetujui', $borrow, 201);
+    }
+
+    public function reject(Request $request, BorrowRequest $borrowRequest): JsonResponse
+    {
+        $rejectReason  = $request->input('reject_reason');
+        $borrowRequest = $this->borrowRequestService->rejectRequest($borrowRequest, $rejectReason);
+
+        return ApiResponse::successResponse('Permintaan peminjaman berhasil ditolak', $borrowRequest);
+    }
+
+    public function destroy(BorrowRequest $borrowRequest): JsonResponse
+    {
+        $this->borrowRequestService->deleteRequest($borrowRequest);
+
+        return ApiResponse::successResponse('Permintaan peminjaman berhasil dihapus');
+    }
+
+    // ─── User ─────────────────────────────────────────────────────────────────
 
     public function store(StoreBorrowRequestRequest $request): JsonResponse
     {
@@ -40,20 +85,6 @@ class BorrowRequestController extends Controller
         );
     }
 
-    public function show(BorrowRequest $borrowRequest): JsonResponse
-    {
-        $borrowRequest = $this->borrowRequestService->getRequestById($borrowRequest);
-
-        return ApiResponse::successResponse('Detail permintaan peminjaman', $borrowRequest);
-    }
-
-    public function showByCode(string $code): JsonResponse
-    {
-        $borrowRequest = $this->borrowRequestService->getRequestByCode($code);
-
-        return ApiResponse::successResponse('Detail permintaan peminjaman', $borrowRequest);
-    }
-
     public function getMyRequests(Request $request): JsonResponse
     {
         $requests = $this->borrowRequestService->getRequestsByUser($request->user());
@@ -61,29 +92,14 @@ class BorrowRequestController extends Controller
         return ApiResponse::successResponse('Data permintaan peminjaman user', $requests);
     }
 
-    public function assignBorrow(Request $request, BorrowRequest $borrowRequest): JsonResponse
+    public function cancel(Request $request, BorrowRequest $borrowRequest): JsonResponse
     {
-        $copyIds = $request->input('copy_ids', []);
-        $borrow = $this->borrowRequestService->assignBorrowFromRequest($borrowRequest, $copyIds);
-
-        return ApiResponse::successResponse(
-            'Peminjaman berhasil dibuat dari permintaan',
-            $borrow,
-            201
-        );
-    }
-
-    public function destroy(Request $request, BorrowRequest $borrowRequest): JsonResponse
-    {
-        $user = $request->user();
-
-        // Non-admin users can only delete their own requests
-        if (!in_array($user->role, ['admin', 'officer:management']) && $borrowRequest->user_id !== $user->id) {
-            return ApiResponse::errorResponse('Kamu tidak berhak menghapus permintaan ini', null, 403);
+        if ($borrowRequest->user_id !== $request->user()->id) {
+            return ApiResponse::errorResponse('Kamu tidak berhak membatalkan permintaan ini', null, 403);
         }
 
-        $this->borrowRequestService->deleteRequest($borrowRequest);
+        $borrowRequest = $this->borrowRequestService->cancelRequest($borrowRequest, $request->user());
 
-        return ApiResponse::successResponse('Permintaan peminjaman berhasil dihapus');
+        return ApiResponse::successResponse('Permintaan peminjaman berhasil dibatalkan', $borrowRequest);
     }
 }

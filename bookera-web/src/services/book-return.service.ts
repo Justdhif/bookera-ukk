@@ -25,9 +25,23 @@ export const bookReturnService = {
       `/admin/book-returns/${id}/approve`
     ),
 
+  /** Update conditions of each returned book (detailId → condition) */
+  updateConditions: (id: number, conditions: Record<number, "good" | "damaged" | "lost">) =>
+    api.patch<ApiResponse<BookReturn>>(
+      `/admin/book-returns/${id}/conditions`,
+      { conditions }
+    ),
+
+  /** Mark all unpaid fines for this return's borrow as paid */
+  finishFines: (id: number) =>
+    api.post<ApiResponse<any>>(
+      `/admin/book-returns/${id}/finish-fines`
+    ),
+
   
   processFine: (id: number) =>
     api.post<ApiResponse<any>>(
       `/admin/book-returns/${id}/process-fine`
     ),
 };
+
