@@ -299,12 +299,12 @@ class BorrowService
         // Ensure the directory exists
         Storage::disk('public')->makeDirectory('qr_codes');
 
-        $filename = 'borrow_' . $borrowId . '_' . $borrowCode . '.svg';
+        $filename = 'borrow_' . $borrowId . '_' . $borrowCode . '.png';
         $relativePath = 'qr_codes/' . $filename;
         $absolutePath = storage_path('app/public/' . $relativePath);
 
-        // Generate and save the QR code as an SVG file
-        QrCode::format('svg')
+        // Generate and save the QR code as a PNG file
+        QrCode::format('png')
             ->size(300)
             ->errorCorrection('H')
             ->generate($borrowCode, $absolutePath);

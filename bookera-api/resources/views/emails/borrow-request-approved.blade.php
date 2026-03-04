@@ -111,13 +111,13 @@
             </table>
 
             <!-- QR Code -->
-            @if($borrow->qr_code_url)
+            @if($borrow->qr_code_path && file_exists(storage_path('app/public/' . $borrow->qr_code_path)))
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
               <tr>
                 <td align="center">
                   <p style="color:#111827;font-size:14px;font-weight:600;margin:0 0 12px;">Your QR Code</p>
                   <div style="display:inline-block;border:1px solid #d1fae5;border-radius:12px;padding:16px;background:#f0fdf4;">
-                    <img src="{{ $borrow->qr_code_url }}" alt="Borrow QR Code" width="140" height="140" style="display:block;border-radius:6px;">
+                    <img src="{{ $message->embedFromStorageDisk('public', $borrow->qr_code_path) }}" alt="Borrow QR Code" width="140" height="140" style="display:block;border-radius:6px;">
                   </div>
                   <p style="color:#6b7280;font-size:12px;margin:10px 0 0;">Scan this QR code at the library for fast check-in</p>
                 </td>
