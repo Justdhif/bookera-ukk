@@ -34,6 +34,8 @@ import {
   AlertCircle,
   Tag,
   LayoutDashboard,
+  UserSquare,
+  Building2,
 } from "lucide-react";
 const getMenuGroups = () => [
   {
@@ -57,6 +59,18 @@ const getMenuGroups = () => [
         href: "/admin/categories",
         icon: Tag,
         gradient: "from-amber-500 to-orange-500",
+      },
+      {
+        title: "Authors",
+        href: "/admin/authors",
+        icon: UserSquare,
+        gradient: "from-violet-500 to-purple-500",
+      },
+      {
+        title: "Publishers",
+        href: "/admin/publishers",
+        icon: Building2,
+        gradient: "from-sky-500 to-blue-500",
       },
       {
         title: "Books",

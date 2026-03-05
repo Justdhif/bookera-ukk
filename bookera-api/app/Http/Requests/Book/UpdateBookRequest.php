@@ -15,7 +15,7 @@ class UpdateBookRequest extends FormRequest
     {
         return [
             'title' => 'required|string',
-            'author' => 'required|string',
+            'author' => 'nullable|string',
             'publisher' => 'nullable|string',
             'publication_year' => 'nullable|integer',
             'isbn' => 'nullable|string|unique:books,isbn,' . $this->book->id,
@@ -25,6 +25,10 @@ class UpdateBookRequest extends FormRequest
             'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'category_ids' => 'nullable|array',
             'category_ids.*' => 'integer|exists:categories,id',
+            'author_ids' => 'nullable|array',
+            'author_ids.*' => 'integer|exists:authors,id',
+            'publisher_ids' => 'nullable|array',
+            'publisher_ids.*' => 'integer|exists:publishers,id',
         ];
     }
 }

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Book } from "@/types/book";
 import { Category } from "@/types/category";
+import { Author } from "@/types/author";
+import { Publisher } from "@/types/publisher";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,17 +25,18 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
 } from "@/components/ui/command";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { Plus, UserSquare, Building2, X } from "lucide-react";
 import YearPicker from "@/components/custom-ui/YearPicker";
 
 interface FormData {
   title: string;
-  author: string;
-  publisher: string;
+  author_ids: number[];
+  publisher_ids: number[];
   publication_year: string;
   isbn: string;
   language: string;
@@ -44,14 +47,12 @@ interface FormData {
 
 interface FormErrors {
   title: boolean;
-  author: boolean;
-  publisher: boolean;
   isbn: boolean;
   language: boolean;
 }
 
-interface BookDetailFormProps {
-  book: Book;
+interface BookFormProps {
+  book?: Book;
   isEditMode: boolean;
   formData: FormData;
   setFormData: (data: FormData) => void;
@@ -60,11 +61,17 @@ interface BookDetailFormProps {
   ) => void;
   onYearChange?: (year: string) => void;
   onCategoryChange?: (categoryIds: number[]) => void;
+  onAuthorChange?: (authorIds: number[]) => void;
+  onPublisherChange?: (publisherIds: number[]) => void;
+  onAddAuthor?: () => void;
+  onAddPublisher?: () => void;
   categories: Category[];
+  authors: Author[];
+  publishers: Publisher[];
   onValidationChange?: (hasErrors: boolean) => void;
 }
 
-export default function BookDetailForm({
+export default function BookForm({
   book,
   isEditMode,
   formData,
@@ -72,13 +79,17 @@ export default function BookDetailForm({
   onInputChange,
   onYearChange,
   onCategoryChange,
+  onAuthorChange,
+  onPublisherChange,
+  onAddAuthor,
+  onAddPublisher,
   categories,
+  authors,
+  publishers,
   onValidationChange,
-}: BookDetailFormProps) {
+}: BookFormProps) {
   const [errors, setErrors] = useState<FormErrors>({
     title: false,
-    author: false,
-    publisher: false,
     isbn: false,
     language: false,
   });
@@ -119,6 +130,46 @@ export default function BookDetailForm({
         ...formData,
         category_ids: newCategoryIds,
       });
+    }
+  };
+
+  const handleAuthorSelect = (authorId: number) => {
+    const newIds = formData.author_ids.includes(authorId)
+      ? formData.author_ids.filter((id) => id !== authorId)
+      : [...formData.author_ids, authorId];
+    if (onAuthorChange) {
+      onAuthorChange(newIds);
+    } else {
+      setFormData({ ...formData, author_ids: newIds });
+    }
+  };
+
+  const handleRemoveAuthor = (authorId: number) => {
+    const newIds = formData.author_ids.filter((id) => id !== authorId);
+    if (onAuthorChange) {
+      onAuthorChange(newIds);
+    } else {
+      setFormData({ ...formData, author_ids: newIds });
+    }
+  };
+
+  const handlePublisherSelect = (publisherId: number) => {
+    const newIds = formData.publisher_ids.includes(publisherId)
+      ? formData.publisher_ids.filter((id) => id !== publisherId)
+      : [...formData.publisher_ids, publisherId];
+    if (onPublisherChange) {
+      onPublisherChange(newIds);
+    } else {
+      setFormData({ ...formData, publisher_ids: newIds });
+    }
+  };
+
+  const handleRemovePublisher = (publisherId: number) => {
+    const newIds = formData.publisher_ids.filter((id) => id !== publisherId);
+    if (onPublisherChange) {
+      onPublisherChange(newIds);
+    } else {
+      setFormData({ ...formData, publisher_ids: newIds });
     }
   };
 
@@ -184,46 +235,196 @@ export default function BookDetailForm({
               }
             />
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label
-              htmlFor="author"
-              variant={isEditMode ? "required" : "default"}
-            >
-              Author
-            </Label>
-            <Input
-              id="author"
-              name="author"
-              required={isEditMode}
-              value={formData.author || ""}
-              onChange={handleInputChange}
-              placeholder="Enter author name"
-              disabled={!isEditMode}
-              validationType={isEditMode ? "letters-only" : undefined}
-              onValidationChange={
-                isEditMode ? handleValidationChange("author") : undefined
-              }
-            />
+        {/* Authors Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              <UserSquare className="h-5 w-5" /> Authors
+            </h3>
+            {isEditMode && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onAddAuthor}
+                className="gap-1"
+              >
+                <Plus className="h-4 w-4" /> Add Author
+              </Button>
+            )}
           </div>
+          <div className="space-y-2">
+            {isEditMode ? (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                  >
+                    {formData.author_ids.length > 0
+                      ? `${formData.author_ids.length} author(s) selected`
+                      : "Select authors"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+                  <Command>
+                    <CommandInput placeholder="Search authors..." />
+                    <CommandEmpty>No authors found</CommandEmpty>
+                    <CommandGroup>
+                      {authors.map((author) => (
+                        <CommandItem
+                          key={author.id}
+                          onSelect={() => handleAuthorSelect(author.id)}
+                          className="cursor-pointer"
+                        >
+                          <Checkbox
+                            checked={formData.author_ids.includes(author.id)}
+                            className="mr-2"
+                          />
+                          {author.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            ) : null}
+            {formData.author_ids.length > 0 ? (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.author_ids.map((id) => {
+                  const author = authors.find((a) => a.id === id);
+                  return author ? (
+                    <Badge key={id} variant="secondary" className="gap-1">
+                      {author.name}
+                      {isEditMode && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleRemoveAuthor(id);
+                          }}
+                          className="h-4 w-4 p-0 ml-1 hover:bg-muted rounded-full"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </Badge>
+                  ) : null;
+                })}
+              </div>
+            ) : (
+              !isEditMode && (
+                <p className="text-sm text-muted-foreground">
+                  {book?.author || "No authors listed"}
+                </p>
+              )
+            )}
+          </div>
+        </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="publisher">Publisher</Label>
-              <Input
-                id="publisher"
-                name="publisher"
-                value={formData.publisher || ""}
-                onChange={handleInputChange}
-                placeholder="Enter publisher name"
-                disabled={!isEditMode}
-                validationType={isEditMode ? "alphanumeric" : undefined}
-                onValidationChange={
-                  isEditMode ? handleValidationChange("publisher") : undefined
-                }
-              />
-            </div>
+        {/* Publishers Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              <Building2 className="h-5 w-5" /> Publishers
+            </h3>
+            {isEditMode && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onAddPublisher}
+                className="gap-1"
+              >
+                <Plus className="h-4 w-4" /> Add Publisher
+              </Button>
+            )}
+          </div>
+          <div className="space-y-2">
+            {isEditMode ? (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                  >
+                    {formData.publisher_ids.length > 0
+                      ? `${formData.publisher_ids.length} publisher(s) selected`
+                      : "Select publishers"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+                  <Command>
+                    <CommandInput placeholder="Search publishers..." />
+                    <CommandEmpty>No publishers found</CommandEmpty>
+                    <CommandGroup>
+                      {publishers.map((publisher) => (
+                        <CommandItem
+                          key={publisher.id}
+                          onSelect={() => handlePublisherSelect(publisher.id)}
+                          className="cursor-pointer"
+                        >
+                          <Checkbox
+                            checked={formData.publisher_ids.includes(
+                              publisher.id,
+                            )}
+                            className="mr-2"
+                          />
+                          {publisher.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            ) : null}
+            {formData.publisher_ids.length > 0 ? (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.publisher_ids.map((id) => {
+                  const publisher = publishers.find((p) => p.id === id);
+                  return publisher ? (
+                    <Badge key={id} variant="secondary" className="gap-1">
+                      {publisher.name}
+                      {isEditMode && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleRemovePublisher(id);
+                          }}
+                          className="h-4 w-4 p-0 ml-1 hover:bg-muted rounded-full"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </Badge>
+                  ) : null;
+                })}
+              </div>
+            ) : (
+              !isEditMode && (
+                <p className="text-sm text-muted-foreground">
+                  {book?.publisher || "No publishers listed"}
+                </p>
+              )
+            )}
+          </div>
+        </div>
 
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg">Publication Details</h3>
+          <div className="space-y-2">
+            <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="publication_year">Publication Year</Label>
               <YearPicker
@@ -234,6 +435,7 @@ export default function BookDetailForm({
                 emptyText="Year not found"
                 disabled={!isEditMode}
               />
+            </div>
             </div>
           </div>
 
@@ -289,8 +491,9 @@ export default function BookDetailForm({
                     : "Select categories"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0" align="start">
+              <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
                 <Command>
+                  <CommandInput placeholder="Search categories..." />
                   <CommandEmpty>No categories found</CommandEmpty>
                   <CommandGroup>
                     {categories.map((cat) => (

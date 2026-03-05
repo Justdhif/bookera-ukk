@@ -3,15 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { userService, UpdateUserData } from "@/services/user.service";
-import { borrowService } from "@/services/borrow.service";
 import { User } from "@/types/user";
-import { Borrow } from "@/types/borrow";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, X, Edit } from "lucide-react";
+import { ArrowLeft, X, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import UserAvatarCard from "./UserAvatarCard";
-import UserDetailForm from "./UserDetailForm";
+import UserSideCard from "../UserSideCard";
+import UserProfileForm from "../UserProfileForm";
 
 export default function UserDetailClient() {
   const router = useRouter();
@@ -19,7 +17,6 @@ export default function UserDetailClient() {
   const identificationNumber = params.identificationNumber as string;
 
   const [user, setUser] = useState<User | null>(null);
-  const [recentBorrows, setRecentBorrows] = useState<Borrow[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState<Partial<UpdateUserData>>({});
@@ -29,27 +26,7 @@ export default function UserDetailClient() {
 
   useEffect(() => {
     fetchUser();
-    fetchRecentBorrows();
   }, [identificationNumber]);
-
-  const fetchRecentBorrows = async () => {
-    try {
-      const res = await borrowService.getAll();
-      const userBorrows = res.data.data
-        .filter(
-          (borrow) =>
-            borrow.user?.profile?.identification_number === identificationNumber,
-        )
-        .sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-        )
-        .slice(0, 3);
-      setRecentBorrows(userBorrows);
-    } catch (error) {
-      console.error("Failed to fetch borrows", error);
-    }
-  };
 
   const fetchUser = async () => {
     try {
@@ -209,22 +186,25 @@ export default function UserDetailClient() {
 
       <form id="user-form" onSubmit={handleSubmit}>
         <div className="grid gap-6 lg:grid-cols-3">
-          <UserAvatarCard
-            user={user}
-            avatarPreview={avatarPreview}
-            isEditMode={isEditMode}
-            formData={formData}
-            setFormData={setFormData}
-            setAvatarPreview={setAvatarPreview}
-            recentBorrows={recentBorrows}
-          />
+          <div className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
+            <UserSideCard
+              mode="detail"
+              user={user}
+              avatarPreview={avatarPreview}
+              isEditMode={isEditMode}
+              formData={formData}
+              setFormData={setFormData}
+              setAvatarPreview={setAvatarPreview}
+            />
+          </div>
 
-          <UserDetailForm
+          <UserProfileForm
             user={user}
             isEditMode={isEditMode}
             formData={formData}
             setFormData={setFormData}
             onFullNameValidChange={setIsFullNameValid}
+            hideAccount={true}
           />
         </div>
       </form>

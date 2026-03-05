@@ -25,7 +25,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
-interface BookCoverCardProps {
+interface BookSideCardProps {
   coverPreview: string;
   isEditMode?: boolean;
   formData: {
@@ -43,7 +43,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 const ALLOWED_FILE_EXTENSIONS = [".jpg", ".jpeg", ".png"];
 
-export default function BookCoverCard({
+export default function BookSideCard({
   coverPreview,
   isEditMode = true,
   formData,
@@ -53,7 +53,7 @@ export default function BookCoverCard({
   isCoverRequired = false,
   coverError = false,
   onCoverValidationChange,
-}: BookCoverCardProps) {
+}: BookSideCardProps) {
   const [localError, setLocalError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -144,7 +144,7 @@ export default function BookCoverCard({
   const errorMessage = localError || (coverError && "Cover image is required");
 
   return (
-    <Card className="flex flex-col h-full">
+    <Card className="flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
@@ -167,8 +167,8 @@ export default function BookCoverCard({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4 flex-1 flex flex-col pt-0">
-        <div className="flex flex-col gap-4 flex-1">
+      <CardContent className="space-y-4 pt-0">
+        <div className="flex flex-col gap-4">
           <div
             className={cn(
               "relative w-full rounded-xl overflow-hidden transition-all duration-200",

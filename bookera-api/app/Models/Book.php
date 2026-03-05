@@ -24,6 +24,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read int|null $copies_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Save> $saves
  * @property-read int|null $saves_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Author> $authors
+ * @property-read int|null $authors_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Publisher> $publishers
+ * @property-read int|null $publishers_count
  */
 class Book extends Model
 {
@@ -55,6 +59,18 @@ class Book extends Model
     public function saves()
     {
         return $this->belongsToMany(Save::class, 'save_items')
+            ->withTimestamps();
+    }
+
+    public function authors()
+    {
+        return $this->belongsToMany(Author::class, 'book_authors', 'book_id', 'author_id')
+            ->withTimestamps();
+    }
+
+    public function publishers()
+    {
+        return $this->belongsToMany(Publisher::class, 'book_publishers', 'book_id', 'publisher_id')
             ->withTimestamps();
     }
 }

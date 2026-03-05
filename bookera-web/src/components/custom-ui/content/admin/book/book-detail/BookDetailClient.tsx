@@ -4,11 +4,17 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { bookService } from "@/services/book.service";
 import { categoryService } from "@/services/category.service";
+import { authorService } from "@/services/author.service";
+import { publisherService } from "@/services/publisher.service";
 import { Book } from "@/types/book";
 import { Category } from "@/types/category";
+import { Author } from "@/types/author";
+import { Publisher } from "@/types/publisher";
 import BookCopyList from "./BookCopyList";
-import BookCoverCard from "../BookCoverCard";
-import BookDetailForm from "./BookDetailForm";
+import BookSideCard from "../BookSideCard";
+import BookForm from "../BookForm";
+import AuthorFormDialog from "@/components/custom-ui/content/admin/author/author-add/AuthorFormDialog";
+import PublisherFormDialog from "@/components/custom-ui/content/admin/publisher/publisher-add/PublisherFormDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, X, Edit } from "lucide-react";
@@ -17,8 +23,8 @@ import { toast } from "sonner";
 
 interface FormData {
   title: string;
-  author: string;
-  publisher: string;
+  author_ids: number[];
+  publisher_ids: number[];
   publication_year: string;
   isbn: string;
   language: string;
@@ -35,12 +41,16 @@ export default function BookDetailClient() {
 
   const [book, setBook] = useState<Book | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [authors, setAuthors] = useState<Author[]>([]);
+  const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [authorDialogOpen, setAuthorDialogOpen] = useState(false);
+  const [publisherDialogOpen, setPublisherDialogOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     title: "",
-    author: "",
-    publisher: "",
+    author_ids: [],
+    publisher_ids: [],
     publication_year: "",
     isbn: "",
     language: "",
@@ -57,6 +67,8 @@ export default function BookDetailClient() {
   useEffect(() => {
     fetchBook();
     fetchCategories();
+    fetchAuthors();
+    fetchPublishers();
   }, [slug]);
 
   const fetchCategories = async () => {
@@ -68,6 +80,24 @@ export default function BookDetailClient() {
     }
   };
 
+  const fetchAuthors = async () => {
+    try {
+      const res = await authorService.getAll();
+      setAuthors(res.data.data);
+    } catch (error) {
+      console.error("Error fetching authors:", error);
+    }
+  };
+
+  const fetchPublishers = async () => {
+    try {
+      const res = await publisherService.getAll();
+      setPublishers(res.data.data);
+    } catch (error) {
+      console.error("Error fetching publishers:", error);
+    }
+  };
+
   const fetchBook = async () => {
     try {
       setLoading(true);
@@ -76,8 +106,8 @@ export default function BookDetailClient() {
       setBook(bookData);
       setFormData({
         title: bookData.title,
-        author: bookData.author,
-        publisher: bookData.publisher || "",
+        author_ids: bookData.authors?.map((a: Author) => a.id) || [],
+        publisher_ids: bookData.publishers?.map((p: Publisher) => p.id) || [],
         publication_year: bookData.publication_year?.toString() || "",
         isbn: bookData.isbn || "",
         language: bookData.language || "",
@@ -96,15 +126,9 @@ export default function BookDetailClient() {
   };
 
   const isFormValid = (): boolean => {
-    const requiredFieldsFilled =
-      formData.title?.trim() !== "" && formData.author?.trim() !== "";
-
-    if (!requiredFieldsFilled) return false;
-
+    if (!formData.title?.trim()) return false;
     if (coverError) return false;
-
     if (formHasErrors) return false;
-
     return true;
   };
 
@@ -137,10 +161,15 @@ export default function BookDetailClient() {
   };
 
   const handleCategoryChange = (categoryIds: number[]) => {
-    setFormData((prev) => ({
-      ...prev,
-      category_ids: categoryIds,
-    }));
+    setFormData((prev) => ({ ...prev, category_ids: categoryIds }));
+  };
+
+  const handleAuthorChange = (authorIds: number[]) => {
+    setFormData((prev) => ({ ...prev, author_ids: authorIds }));
+  };
+
+  const handlePublisherChange = (publisherIds: number[]) => {
+    setFormData((prev) => ({ ...prev, publisher_ids: publisherIds }));
   };
 
   const handleCoverImageChange = (file: File | null, preview: string) => {
@@ -164,39 +193,15 @@ export default function BookDetailClient() {
     e.preventDefault();
     if (!book) return;
 
-    if (!formData.title?.trim() || !formData.author?.trim()) {
-      toast.error("Title and author are required");
+    if (!formData.title?.trim()) {
+      toast.error("Title is required");
       return;
     }
 
     try {
       setSubmitting(true);
-      const data = new FormData();
 
-      data.append("title", formData.title.trim());
-      data.append("author", formData.author.trim());
-      data.append("publisher", formData.publisher.trim());
-      data.append("language", formData.language.trim());
-      data.append("description", formData.description.trim());
-      data.append("is_active", formData.is_active ? "1" : "0");
-
-      if (formData.isbn) {
-        data.append("isbn", formData.isbn.trim());
-      }
-
-      if (formData.publication_year) {
-        data.append("publication_year", formData.publication_year);
-      }
-
-      formData.category_ids.forEach((id: number) =>
-        data.append("category_ids[]", String(id)),
-      );
-
-      if (formData.cover_image) {
-        data.append("cover_image", formData.cover_image);
-      }
-
-      await bookService.update(book.id, data);
+      await bookService.update(book.id, formData);
       toast.success("Book updated successfully");
       setIsEditMode(false);
       fetchBook();
@@ -211,8 +216,8 @@ export default function BookDetailClient() {
     if (book) {
       setFormData({
         title: book.title,
-        author: book.author,
-        publisher: book.publisher || "",
+        author_ids: book.authors?.map((a) => a.id) || [],
+        publisher_ids: book.publishers?.map((p) => p.id) || [],
         publication_year: book.publication_year?.toString() || "",
         isbn: book.isbn || "",
         language: book.language || "",
@@ -311,19 +316,21 @@ export default function BookDetailClient() {
 
       <form id="book-form" onSubmit={handleSubmit}>
         <div className="grid gap-6 lg:grid-cols-3">
-          <BookCoverCard
-            coverPreview={coverPreview}
-            isEditMode={isEditMode}
-            formData={{ is_active: formData.is_active }}
-            setFormData={setFormData}
-            onCoverImageChange={handleCoverImageChange}
-            onSwitchChange={handleSwitchChange}
-            isCoverRequired={false}
-            coverError={coverError}
-            onCoverValidationChange={handleCoverValidationChange}
-          />
+          <div className="lg:self-start lg:sticky lg:top-4">
+            <BookSideCard
+              coverPreview={coverPreview}
+              isEditMode={isEditMode}
+              formData={{ is_active: formData.is_active }}
+              setFormData={setFormData}
+              onCoverImageChange={handleCoverImageChange}
+              onSwitchChange={handleSwitchChange}
+              isCoverRequired={false}
+              coverError={coverError}
+              onCoverValidationChange={handleCoverValidationChange}
+            />
+          </div>
 
-          <BookDetailForm
+          <BookForm
             book={book}
             isEditMode={isEditMode}
             formData={formData}
@@ -331,7 +338,13 @@ export default function BookDetailClient() {
             onInputChange={handleInputChange}
             onYearChange={handleYearChange}
             onCategoryChange={handleCategoryChange}
+            onAuthorChange={handleAuthorChange}
+            onPublisherChange={handlePublisherChange}
+            onAddAuthor={() => setAuthorDialogOpen(true)}
+            onAddPublisher={() => setPublisherDialogOpen(true)}
             categories={categories}
+            authors={authors}
+            publishers={publishers}
             onValidationChange={handleFormValidationChange}
           />
         </div>
@@ -347,6 +360,17 @@ export default function BookDetailClient() {
           </CardContent>
         </Card>
       )}
+
+      <AuthorFormDialog
+        open={authorDialogOpen}
+        setOpen={setAuthorDialogOpen}
+        onSuccess={() => fetchAuthors()}
+      />
+      <PublisherFormDialog
+        open={publisherDialogOpen}
+        setOpen={setPublisherDialogOpen}
+        onSuccess={() => fetchPublishers()}
+      />
     </div>
   );
 }

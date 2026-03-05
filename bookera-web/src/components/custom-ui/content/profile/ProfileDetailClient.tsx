@@ -10,7 +10,7 @@ import { ArrowLeft, Save, X, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProfileAvatarCard from "./ProfileAvatarCard";
-import UserDetailForm from "../admin/user/UserDetailForm";
+import UserProfileForm from "../admin/user/UserProfileForm";
 
 type ProfileVariant = "public" | "admin";
 
@@ -199,7 +199,7 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
             setAvatarPreview={setAvatarPreview}
           />
 
-          <UserDetailForm
+          <UserProfileForm
             user={user}
             isEditMode={isEditMode}
             formData={formData}

@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\BorrowRequestController;
 use App\Http\Controllers\Api\LostBookController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PrivacyPolicyController;
+use App\Http\Controllers\Api\AuthorController;
+use App\Http\Controllers\Api\PublisherController;
 use App\Http\Controllers\Api\SaveController;
 use App\Http\Controllers\Api\TermsOfServiceController;
 use App\Http\Controllers\Api\UserController;
@@ -50,6 +52,12 @@ Route::get('books/slug/{slug}', [BookController::class, 'showBySlug']);
 Route::get('books/{id}', [BookController::class, 'show']);
 
 Route::get('categories', [CategoryController::class, 'index']);
+
+Route::get('authors', [AuthorController::class, 'list']);
+Route::get('authors/{author}', [AuthorController::class, 'show']);
+
+Route::get('publishers', [PublisherController::class, 'list']);
+Route::get('publishers/{publisher}', [PublisherController::class, 'show']);
 
 Route::get('content-pages', [ContentPageController::class, 'index']);
 Route::get('content-pages/{slug}', [ContentPageController::class, 'show']);
@@ -103,6 +111,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('book-copies/{bookCopy}', [BookCopyController::class, 'destroy']);
 
         Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
+
+        Route::prefix('authors')->group(function () {
+            Route::get('/', [AuthorController::class, 'index']);
+            Route::post('/', [AuthorController::class, 'store']);
+            Route::put('/{author}', [AuthorController::class, 'update']);
+            Route::patch('/{author}', [AuthorController::class, 'update']);
+            Route::delete('/{author}', [AuthorController::class, 'destroy']);
+        });
+
+        Route::prefix('publishers')->group(function () {
+            Route::get('/', [PublisherController::class, 'index']);
+            Route::post('/', [PublisherController::class, 'store']);
+            Route::put('/{publisher}', [PublisherController::class, 'update']);
+            Route::patch('/{publisher}', [PublisherController::class, 'update']);
+            Route::delete('/{publisher}', [PublisherController::class, 'destroy']);
+        });
     });
 
     Route::middleware('role:admin,officer:management')->prefix('admin')->group(function () {

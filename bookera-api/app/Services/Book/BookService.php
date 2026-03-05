@@ -4,7 +4,9 @@ namespace App\Services\Book;
 
 use App\Helpers\ActivityLogger;
 use App\Helpers\SlugGenerator;
+use App\Models\Author;
 use App\Models\Book;
+use App\Models\Publisher;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -57,13 +59,31 @@ class BookService
             $data['cover_image'] = $coverImage->store('books/covers', 'public');
         }
 
+        if (!empty($data['author_ids'])) {
+            $authorNames = Author::whereIn('id', $data['author_ids'])->pluck('name');
+            $data['author'] = $authorNames->join(', ');
+        }
+
+        if (!empty($data['publisher_ids'])) {
+            $publisherNames = Publisher::whereIn('id', $data['publisher_ids'])->pluck('name');
+            $data['publisher'] = $publisherNames->join(', ');
+        }
+
         $book = Book::create($data);
 
         if (!empty($data['category_ids'])) {
             $book->categories()->sync($data['category_ids']);
         }
 
-        $book->load(['categories', 'copies']);
+        if (!empty($data['author_ids'])) {
+            $book->authors()->sync($data['author_ids']);
+        }
+
+        if (!empty($data['publisher_ids'])) {
+            $book->publishers()->sync($data['publisher_ids']);
+        }
+
+        $book->load(['categories', 'authors', 'publishers', 'copies']);
         $book->cover_image_url = storage_image($book->cover_image);
 
         ActivityLogger::log(
@@ -113,6 +133,16 @@ class BookService
             $data['cover_image'] = $coverImage->store('books/covers', 'public');
         }
 
+        if (!empty($data['author_ids'])) {
+            $authorNames = Author::whereIn('id', $data['author_ids'])->pluck('name');
+            $data['author'] = $authorNames->join(', ');
+        }
+
+        if (!empty($data['publisher_ids'])) {
+            $publisherNames = Publisher::whereIn('id', $data['publisher_ids'])->pluck('name');
+            $data['publisher'] = $publisherNames->join(', ');
+        }
+
         $oldData = $book->toArray();
 
         $book->update($data);
@@ -121,7 +151,15 @@ class BookService
             $book->categories()->sync($data['category_ids']);
         }
 
-        $book->load(['categories', 'copies']);
+        if (array_key_exists('author_ids', $data)) {
+            $book->authors()->sync($data['author_ids'] ?? []);
+        }
+
+        if (array_key_exists('publisher_ids', $data)) {
+            $book->publishers()->sync($data['publisher_ids'] ?? []);
+        }
+
+        $book->load(['categories', 'authors', 'publishers', 'copies']);
         $book->cover_image_url = storage_image($book->cover_image);
 
         ActivityLogger::log(
@@ -165,6 +203,8 @@ class BookService
     {
         $book->load([
             'categories',
+            'authors',
+            'publishers',
             'copies' => function ($query) {
                 $query->orderBy('status')->orderBy('created_at');
             }
@@ -173,6 +213,14 @@ class BookService
         $book->cover_image_url = storage_image($book->cover_image);
         $book->total_copies = $book->copies->count();
         $book->available_copies = $book->copies->where('status', 'available')->count();
+
+        $book->authors->each(function ($author) {
+            $author->photo_url = storage_image($author->photo);
+        });
+
+        $book->publishers->each(function ($publisher) {
+            $publisher->photo_url = storage_image($publisher->photo);
+        });
 
         return $book;
     }

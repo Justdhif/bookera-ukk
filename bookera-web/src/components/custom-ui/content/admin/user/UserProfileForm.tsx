@@ -20,24 +20,41 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
+import { format } from "date-fns";
 
-interface UserDetailFormProps {
-  user: User;
+interface UserProfileFormProps {
+  user?: User;
   isEditMode: boolean;
   formData: any;
   setFormData: (data: any) => void;
   onFullNameValidChange?: (valid: boolean) => void;
   isProfileView?: boolean;
+  /** When true, hides the Account (email/password) section — use when UserSideCard handles it */
+  hideAccount?: boolean;
 }
 
-export default function UserDetailForm({
+export default function UserProfileForm({
   user,
   isEditMode,
   formData,
   setFormData,
   onFullNameValidChange,
   isProfileView,
-}: UserDetailFormProps) {
+  hideAccount = false,
+}: UserProfileFormProps) {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleBirthDateChange = (date: Date | undefined) => {
+    setFormData({
+      ...formData,
+      birth_date: date ? format(date, "yyyy-MM-dd") : undefined,
+    });
+  };
+
   useEffect(() => {
     if (isEditMode && onFullNameValidChange) {
       const val = formData.full_name || "";
@@ -55,47 +72,44 @@ export default function UserDetailForm({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Account</h3>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label
-                htmlFor="email"
-                variant={isEditMode ? "required" : "default"}
-              >
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                required={isEditMode}
-                value={formData.email || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                placeholder="Enter email"
-                disabled={!isEditMode || isProfileView}
-              />
-            </div>
-            {isEditMode && !isProfileView && (
+        {!hideAccount && (
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg">Account</h3>
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label
+                  htmlFor="email"
+                  variant={isEditMode ? "required" : "default"}
+                >
+                  Email
+                </Label>
                 <Input
-                  id="password"
-                  type="password"
-                  value={formData.password || ""}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      password: e.target.value,
-                    })
-                  }
-                  placeholder="Enter password (leave empty to keep current)"
+                  id="email"
+                  name="email"
+                  type="email"
+                  required={isEditMode}
+                  value={formData.email || ""}
+                  onChange={handleInputChange}
+                  placeholder="Enter email"
+                  disabled={!isEditMode || isProfileView}
                 />
               </div>
-            )}
+              {isEditMode && !isProfileView && (
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={formData.password || ""}
+                    onChange={handleInputChange}
+                    placeholder="Enter password (leave empty to keep current)"
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">Profile</h3>
@@ -109,14 +123,10 @@ export default function UserDetailForm({
               </Label>
               <Input
                 id="full_name"
+                name="full_name"
                 required={isEditMode}
                 value={formData.full_name || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    full_name: e.target.value,
-                  })
-                }
+                onChange={handleInputChange}
                 placeholder="Enter full name"
                 disabled={!isEditMode}
                 validationType={isEditMode ? "letters-only" : undefined}
@@ -131,13 +141,9 @@ export default function UserDetailForm({
               </Label>
               <Input
                 id="identification_number"
+                name="identification_number"
                 value={formData.identification_number || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    identification_number: e.target.value,
-                  })
-                }
+                onChange={handleInputChange}
                 placeholder="Enter identification number"
                 disabled={!isEditMode}
                 validationType={!isEditMode ? undefined : "numbers-only"}
@@ -147,19 +153,15 @@ export default function UserDetailForm({
               <Label htmlFor="phone_number">Phone Number</Label>
               <Input
                 id="phone_number"
+                name="phone_number"
                 value={formData.phone_number || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    phone_number: e.target.value,
-                  })
-                }
+                onChange={handleInputChange}
                 placeholder="Enter phone number"
                 disabled={!isEditMode}
                 validationType={!isEditMode ? undefined : "numbers-only"}
               />
             </div>
-            <div className="space-y-2 sm:col-span-2">
+            <div className="space-y-2">
               <Label htmlFor="gender">Gender</Label>
               <Select
                 value={formData.gender || ""}
@@ -169,7 +171,7 @@ export default function UserDetailForm({
                 disabled={!isEditMode}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select gender" />
+                  <SelectValue placeholder="Select gender" className="w-full" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="male">Male</SelectItem>
@@ -180,7 +182,7 @@ export default function UserDetailForm({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2 sm:col-span-2">
+            <div className="space-y-2">
               <Label htmlFor="birth_date">Birth Date</Label>
               <DatePicker
                 value={
@@ -188,22 +190,7 @@ export default function UserDetailForm({
                     ? new Date(formData.birth_date + "T00:00:00")
                     : undefined
                 }
-                onChange={(date) => {
-                  if (date) {
-                    const year = date.getFullYear();
-                    const month = String(date.getMonth() + 1).padStart(2, "0");
-                    const day = String(date.getDate()).padStart(2, "0");
-                    setFormData({
-                      ...formData,
-                      birth_date: `${year}-${month}-${day}`,
-                    });
-                  } else {
-                    setFormData({
-                      ...formData,
-                      birth_date: undefined,
-                    });
-                  }
-                }}
+                onChange={handleBirthDateChange}
                 placeholder="Select birth date"
                 disabled={!isEditMode}
                 dateMode="past"
@@ -213,13 +200,9 @@ export default function UserDetailForm({
               <Label htmlFor="occupation">Occupation</Label>
               <Input
                 id="occupation"
+                name="occupation"
                 value={formData.occupation || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    occupation: e.target.value,
-                  })
-                }
+                onChange={handleInputChange}
                 placeholder="Enter occupation"
                 disabled={!isEditMode}
                 validationType={!isEditMode ? undefined : "letters-only"}
@@ -229,13 +212,9 @@ export default function UserDetailForm({
               <Label htmlFor="institution">Institution</Label>
               <Input
                 id="institution"
+                name="institution"
                 value={formData.institution || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    institution: e.target.value,
-                  })
-                }
+                onChange={handleInputChange}
                 placeholder="Enter institution"
                 disabled={!isEditMode}
                 validationType={!isEditMode ? undefined : "alphanumeric"}
@@ -245,13 +224,9 @@ export default function UserDetailForm({
               <Label htmlFor="address">Address</Label>
               <Textarea
                 id="address"
+                name="address"
                 value={formData.address || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    address: e.target.value,
-                  })
-                }
+                onChange={handleInputChange}
                 placeholder="Enter address"
                 rows={2}
                 disabled={!isEditMode}
@@ -261,10 +236,9 @@ export default function UserDetailForm({
               <Label htmlFor="bio">Bio</Label>
               <Textarea
                 id="bio"
+                name="bio"
                 value={formData.bio || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, bio: e.target.value })
-                }
+                onChange={handleInputChange}
                 placeholder="Enter bio"
                 rows={3}
                 disabled={!isEditMode}

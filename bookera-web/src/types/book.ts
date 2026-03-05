@@ -1,5 +1,7 @@
 import { Category } from "./category";
 import { BookCopy } from "./book-copy";
+import { Author } from "./author";
+import { Publisher } from "./publisher";
 
 export interface Book {
   id: number;
@@ -18,6 +20,8 @@ export interface Book {
   is_active: boolean;
 
   categories: Category[];
+  authors?: Author[];
+  publishers?: Publisher[];
   copies: BookCopy[];
 
   total_copies?: number;
