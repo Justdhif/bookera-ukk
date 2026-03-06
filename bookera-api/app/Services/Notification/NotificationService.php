@@ -10,7 +10,7 @@ class NotificationService
 {
     public function getUserNotifications(User $user, ?string $filter = null, int $perPage = 15): LengthAwarePaginator
     {
-        $query = Notification::where('user_id', $user->id)->latest();
+        $query = Notification::where('user_id', $user->id)->latest()->orderByDesc('id');
 
         if ($filter === 'unread') {
             $query->whereNull('read_at');

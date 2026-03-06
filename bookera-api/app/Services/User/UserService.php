@@ -4,7 +4,7 @@ namespace App\Services\User;
 
 use App\Helpers\ActivityLogger;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class UserService
 {
-    public function getUsers(array $filters): Collection
+    public function getUsers(array $filters): LengthAwarePaginator
     {
         $query = User::with('profile');
 
@@ -36,11 +36,7 @@ class UserService
             $query->where('is_active', $isActive);
         }
 
-        if (!empty($filters['active'])) {
-            $query->where('is_active', true);
-        }
-
-        return $query->latest()->get();
+        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
     public function getUserById(User $user): User

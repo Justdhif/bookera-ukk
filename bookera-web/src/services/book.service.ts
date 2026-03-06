@@ -34,8 +34,20 @@ const buildBookFormData = (data: CreateBookData | UpdateBookData): FormData => {
   return formData;
 };
 
+export interface BookFilterParams {
+  search?: string;
+  category_ids?: number[];
+  status?: "active" | "inactive";
+  per_page?: number;
+  page?: number;
+}
+
 export const bookService = {
-  getAll: (params?: any) => api.get<ApiResponse<any>>("/books", { params }),
+  getAll: (filters?: BookFilterParams) => {
+    const { category_ids, ...params } = filters ?? {};
+    if (category_ids?.length) Object.assign(params, { category_ids: category_ids.join(",") });
+    return api.get<ApiResponse<any>>("/books", { params });
+  },
 
   show: (id: number) => api.get<ApiResponse<Book>>(`/books/${id}`),
 

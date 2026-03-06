@@ -14,7 +14,8 @@ class ActivityService
         $query = ActivityLog::query()
             ->with(['user.profile'])
             ->whereYear('created_at', $year)
-            ->latest();
+            ->latest()
+            ->orderByDesc('id');
 
         if (!empty($filters['user_id'])) {
             $query->where('user_id', $filters['user_id']);

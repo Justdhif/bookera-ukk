@@ -6,6 +6,7 @@ use App\Helpers\ActivityLogger;
 use App\Helpers\SlugGenerator;
 use App\Models\Publisher;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -21,6 +22,7 @@ class PublisherService
                 $query->where('is_active', $filters['is_active']);
             })
             ->latest()
+            ->orderByDesc('id')
             ->paginate($filters['per_page'] ?? 10);
 
         $publishers->getCollection()->transform(function ($publisher) {
@@ -31,10 +33,11 @@ class PublisherService
         return $publishers;
     }
 
-    public function getAllPublishers(): \Illuminate\Database\Eloquent\Collection
+    public function getAllPublishers(): Collection
     {
         return Publisher::where('is_active', true)
             ->latest()
+            ->orderByDesc('id')
             ->get()
             ->transform(function ($publisher) {
                 $publisher->photo_url = storage_image($publisher->photo);

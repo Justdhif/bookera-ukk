@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Publisher } from "@/types/publisher";
-import { publisherService } from "@/services/publisher.service";
+import { publisherService, PublisherFilterParams } from "@/services/publisher.service";
 import PublisherTable from "./PublisherTable";
 import PublisherFormDialog from "./publisher-add/PublisherFormDialog";
 import PublisherDetailDialog from "./publisher-detail/PublisherDetailDialog";
@@ -12,29 +12,64 @@ import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { PublisherTableSkeleton } from "./PublisherTableSkeleton";
 import { Building2, Plus, Search } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 
 export default function PublisherClient() {
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [meta, setMeta] = useState<any>(null);
+  const [filters, setFilters] = useState<PublisherFilterParams>({ per_page: 10 });
+  const [searchInput, setSearchInput] = useState("");
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
+
+  
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: searchInput || undefined, page: 1 }));
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [searchInput]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSearchInput(e.target.value);
+
+  const statusValue =
+    filters.is_active === undefined
+      ? "all"
+      : filters.is_active
+      ? "active"
+      : "inactive";
+  const handleStatusChange = (value: string) =>
+    setFilters((prev) => ({
+      ...prev,
+      is_active: value === "all" ? undefined : value === "active",
+      page: 1,
+    }));
 
   const [addOpen, setAddOpen] = useState(false);
   const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  const fetchPublishers = async (params?: { search?: string; page?: number }) => {
+  const fetchPublishers = async (activeFilters: PublisherFilterParams) => {
     setLoading(true);
     try {
-      const res = await publisherService.getAdminList({
-        search: params?.search ?? search,
-        per_page: 10,
-        ...(params?.page ? { page: params.page } : { page }),
-      } as any);
-      setPublishers(res.data.data.data ?? res.data.data);
-      setMeta(res.data.data.meta ?? res.data.data);
+      const res = await publisherService.getAdminList(activeFilters);
+      const paginatedData = res.data.data;
+      setPublishers(paginatedData.data ?? paginatedData);
+      setPagination({
+        current_page: paginatedData.current_page ?? 1,
+        last_page: paginatedData.last_page ?? 1,
+        total: paginatedData.total ?? 0,
+        from: paginatedData.from ?? 0,
+        to: paginatedData.to ?? 0,
+      });
     } catch {
       toast.error("Failed to load publishers");
     } finally {
@@ -43,14 +78,8 @@ export default function PublisherClient() {
   };
 
   useEffect(() => {
-    fetchPublishers();
-  }, []);
-
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    setPage(1);
-    fetchPublishers({ search: value, page: 1 });
-  };
+    fetchPublishers(filters);
+  }, [filters]);
 
   const handleView = (publisher: Publisher) => {
     setSelectedPublisher(publisher);
@@ -63,7 +92,7 @@ export default function PublisherClient() {
       await publisherService.delete(deleteId);
       toast.success("Publisher deleted successfully");
       setDeleteId(null);
-      fetchPublishers();
+      fetchPublishers(filters);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to delete publisher");
     }
@@ -92,42 +121,64 @@ export default function PublisherClient() {
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search publishers..."
-          value={search}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="pl-9"
-        />
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search publishers..."
+            value={searchInput}
+            onChange={handleSearchChange}
+            className="pl-9"
+          />
+        </div>
+        <Select
+          value={statusValue}
+          onValueChange={handleStatusChange}
+        >
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="All Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Table */}
-      {loading ? (
-        <PublisherTableSkeleton />
-      ) : (
-        <PublisherTable
-          data={publishers}
-          onView={handleView}
-          onDelete={(id) => setDeleteId(id)}
-        />
-      )}
+      <PaginatedContent
+        currentPage={pagination.current_page}
+        lastPage={pagination.last_page}
+        total={pagination.total}
+        from={pagination.from}
+        to={pagination.to}
+        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+      >
+        {loading ? (
+          <PublisherTableSkeleton />
+        ) : (
+          <PublisherTable
+            data={publishers}
+            onView={handleView}
+            onDelete={(id) => setDeleteId(id)}
+          />
+        )}
+      </PaginatedContent>
 
       {/* Dialogs */}
       <PublisherFormDialog
         open={addOpen}
         setOpen={setAddOpen}
-        onSuccess={fetchPublishers}
+        onSuccess={() => fetchPublishers(filters)}
       />
 
       <PublisherDetailDialog
         open={detailOpen}
         setOpen={setDetailOpen}
         publisher={selectedPublisher}
-        onSuccess={() => {
-          fetchPublishers();
-        }}
+        onSuccess={() => fetchPublishers(filters)}
       />
 
       <DeleteConfirmDialog

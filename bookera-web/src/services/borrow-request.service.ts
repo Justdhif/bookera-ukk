@@ -13,9 +13,8 @@ export const borrowRequestService = {
 
   cancel: (id: number) => api.patch(`/borrow-requests/${id}/cancel`),
 
-  // Admin
-  getAll: (search?: string) =>
-    api.get<ApiResponse<BorrowRequest[]>>("/admin/borrow-requests", { params: { search } }),
+  getAll: (filters?: { search?: string; approval_status?: string; per_page?: number; page?: number }) =>
+    api.get<ApiResponse<any>>("/admin/borrow-requests", { params: filters }),
 
   adminShow: (id: number) => api.get<ApiResponse<BorrowRequest>>(`/admin/borrow-requests/${id}`),
 

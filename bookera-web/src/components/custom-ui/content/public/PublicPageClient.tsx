@@ -21,7 +21,6 @@ export default function PublicPageClient() {
     setLoading(true);
 
     const res = await bookService.getAll({
-      category_id: categoryId ?? undefined,
       status: "active",
     });
 
@@ -59,7 +58,6 @@ export default function PublicPageClient() {
         <div className="lg:hidden">
           <SavesList mode="horizontal" />
         </div>
-        <CategoryBubble active={categoryId} onChange={setCategoryId} />
         <BookList books={books} loading={loading} />
       </div>
     </div>

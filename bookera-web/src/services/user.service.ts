@@ -27,19 +27,25 @@ export interface UpdateUserData extends Partial<CreateUserData> {
   full_name: string;
 }
 
-export const userService = {
-  
-  getAll: (search?: string, role?: string, status?: string) =>
-    api.get<ApiResponse<User[]>>("/admin/users", { params: { search, role, status } }),
+export interface UserFilterParams {
+  search?: string;
+  role?: string;
+  status?: string;
+  per_page?: number;
+  page?: number;
+}
 
-  
+export const userService = {
+  getAll: (filters?: UserFilterParams) =>
+    api.get<ApiResponse<any>>("/admin/users", { params: filters }),
+
   show: (id: number) => api.get<ApiResponse<User>>(`/admin/users/${id}`),
 
-  
   showByIdentification: (identificationNumber: string) =>
-    api.get<ApiResponse<User>>(`/admin/users/identification/${identificationNumber}`),
+    api.get<ApiResponse<User>>(
+      `/admin/users/identification/${identificationNumber}`,
+    ),
 
-  
   create: (data: CreateUserData) => {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
@@ -62,7 +68,6 @@ export const userService = {
     });
   },
 
-  
   update: (id: number, data: UpdateUserData) => {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
@@ -85,6 +90,5 @@ export const userService = {
     });
   },
 
-  
   delete: (id: number) => api.delete<ApiResponse<null>>(`/admin/users/${id}`),
 };

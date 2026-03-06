@@ -12,7 +12,7 @@ class ContentPageController extends Controller
 {
     public function index(): JsonResponse
     {
-        $pages = ContentPage::where('is_active', true)->get();
+        $pages = ContentPage::where('is_active', true)->latest()->get();
 
         return ApiResponse::successResponse('Data halaman konten berhasil diambil', $pages);
     }
@@ -49,7 +49,7 @@ class ContentPageController extends Controller
 
     public function adminIndex(): JsonResponse
     {
-        $pages = ContentPage::all();
+        $pages = ContentPage::latest()->get();
 
         return ApiResponse::successResponse('Data halaman konten berhasil diambil', $pages);
     }

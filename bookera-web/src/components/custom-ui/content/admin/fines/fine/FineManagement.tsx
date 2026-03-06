@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Fine, FineType } from "@/types/fine";
-import { fineService, fineTypeService } from "@/services/fine.service";
+import { fineService, fineTypeService, FineFilterParams } from "@/services/fine.service";
 import FineTable from "./FineTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,14 +17,35 @@ import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { FineTableSkeleton } from "./FineTableSkeleton";
 import { Search } from "lucide-react";
+import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 
 export default function FineManagement() {
   const [fines, setFines] = useState<Fine[]>([]);
   const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<FineFilterParams>({ per_page: 10 });
+  const [searchInput, setSearchInput] = useState("");
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
+
+  
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: searchInput || undefined, page: 1 }));
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [searchInput]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSearchInput(e.target.value);
+
+  const statusValue = filters.status ?? "all";
+  const handleStatusChange = (value: string) =>
+    setFilters((prev) => ({
+      ...prev,
+      status: value === "all" ? undefined : value,
+      page: 1,
+    }));
 
   const confirmDelete = async () => {
     if (!deleteId) return;
@@ -33,25 +54,25 @@ export default function FineManagement() {
       await fineService.delete(deleteId);
       toast.success("Fine deleted successfully");
       setDeleteId(null);
-      fetchFines();
+      fetchFines(filters);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to load fines");
     }
   };
 
-  const fetchFines = async () => {
+  const fetchFines = async (activeFilters: FineFilterParams) => {
     setLoading(true);
     try {
-      const params: any = {};
-      if (statusFilter !== "all") {
-        params.status = statusFilter;
-      }
-      if (searchQuery) {
-        params.search = searchQuery;
-      }
-
-      const res = await fineService.getAll(params);
-      setFines(res.data.data);
+      const res = await fineService.getAll(activeFilters);
+      const paginatedData = res.data.data;
+      setFines(paginatedData.data ?? paginatedData);
+      setPagination({
+        current_page: paginatedData.current_page ?? 1,
+        last_page: paginatedData.last_page ?? 1,
+        total: paginatedData.total ?? 0,
+        from: paginatedData.from ?? 0,
+        to: paginatedData.to ?? 0,
+      });
     } catch (err) {
       toast.error("Failed to load fines");
     } finally {
@@ -62,26 +83,25 @@ export default function FineManagement() {
   const fetchFineTypes = async () => {
     try {
       const res = await fineTypeService.getAll();
-      setFineTypes(res.data.data);
+      setFineTypes(res.data.data.data ?? res.data.data);
     } catch (err) {
       console.error("Failed to fetch fine types");
     }
   };
 
   useEffect(() => {
-    fetchFines();
     fetchFineTypes();
   }, []);
 
   useEffect(() => {
-    fetchFines();
-  }, [statusFilter, searchQuery]);
+    fetchFines(filters);
+  }, [filters]);
 
   const handleWaive = async (id: number) => {
     try {
       await fineService.waive(id);
       toast.success("Fine cancelled successfully");
-      fetchFines();
+      fetchFines(filters);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to waive fine");
     }
@@ -103,12 +123,14 @@ export default function FineManagement() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={"Search fines..."}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchInput}
+            onChange={handleSearchChange}
             className="pl-9"
           />
         </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select
+          value={statusValue}
+          onValueChange={handleStatusChange}>
           <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="Filter Status" />
           </SelectTrigger>
@@ -121,14 +143,23 @@ export default function FineManagement() {
         </Select>
       </div>
 
-      {loading ? (
-        <FineTableSkeleton />
-      ) : (
-        <FineTable
-          data={fines}
-          onDelete={(id) => setDeleteId(id)}
-        />
-      )}
+      <PaginatedContent
+        currentPage={pagination.current_page}
+        lastPage={pagination.last_page}
+        total={pagination.total}
+        from={pagination.from}
+        to={pagination.to}
+        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+      >
+        {loading ? (
+          <FineTableSkeleton />
+        ) : (
+          <FineTable
+            data={fines}
+            onDelete={(id) => setDeleteId(id)}
+          />
+        )}
+      </PaginatedContent>
 
       <DeleteConfirmDialog
         open={deleteId !== null}

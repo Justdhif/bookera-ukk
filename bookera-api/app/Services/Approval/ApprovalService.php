@@ -7,7 +7,7 @@ use App\Events\BorrowRejected;
 use App\Helpers\ActivityLogger;
 use App\Models\BookReturn;
 use App\Models\Borrow;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class ApprovalService
@@ -135,7 +135,7 @@ class ApprovalService
         });
     }
 
-    public function getPendingBorrows(?string $search = null): Collection
+    public function getPendingBorrows(array $filters = []): LengthAwarePaginator
     {
         $query = Borrow::with([
             'borrowDetails.bookCopy.book',
@@ -144,7 +144,8 @@ class ApprovalService
             ->where('approval_status', 'pending')
             ->where('status', 'open');
 
-        if ($search) {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
                     ->orWhereHas('user', function ($userQuery) use ($search) {
@@ -159,10 +160,10 @@ class ApprovalService
             });
         }
 
-        return $query->latest()->get();
+        return $query->latest()->paginate($filters['per_page'] ?? 15);
     }
 
-    public function getApprovedBorrows(?string $search = null): Collection
+    public function getApprovedBorrows(array $filters = []): LengthAwarePaginator
     {
         $query = Borrow::with([
             'borrowDetails.bookCopy.book',
@@ -171,7 +172,8 @@ class ApprovalService
             ->where('status', 'open')
             ->where('approval_status', 'approved');
 
-        if ($search) {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
                     ->orWhereHas('user', function ($userQuery) use ($search) {
@@ -186,10 +188,10 @@ class ApprovalService
             });
         }
 
-        return $query->latest()->get();
+        return $query->latest()->paginate($filters['per_page'] ?? 15);
     }
 
-    public function getAllReturns(?string $search = null): Collection
+    public function getAllReturns(array $filters = []): LengthAwarePaginator
     {
         $query = BookReturn::with([
             'borrow.user.profile',
@@ -197,7 +199,8 @@ class ApprovalService
             'details.bookCopy.book',
         ]);
 
-        if ($search) {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
                     ->orWhere('borrow_id', 'like', "%{$search}%")
@@ -213,6 +216,6 @@ class ApprovalService
             });
         }
 
-        return $query->latest()->get();
+        return $query->latest()->paginate($filters['per_page'] ?? 15);
     }
 }

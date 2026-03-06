@@ -39,6 +39,7 @@ class BookService
                 });
             })
             ->latest()
+            ->orderByDesc('id')
             ->paginate($filters['per_page'] ?? 10);
 
         $books->getCollection()->transform(function ($book) {

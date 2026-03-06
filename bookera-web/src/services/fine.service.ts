@@ -12,7 +12,7 @@ import {
 
 export const fineTypeService = {
   getAll: (params?: { type?: string; search?: string }) =>
-    api.get<ApiResponse<FineType[]>>("/admin/fine-types", { params }),
+    api.get<ApiResponse<any>>("/admin/fine-types", { params }),
 
   getById: (id: number) =>
     api.get<ApiResponse<FineType>>(`/admin/fine-types/${id}`),
@@ -27,9 +27,16 @@ export const fineTypeService = {
     api.delete<ApiResponse<null>>(`/admin/fine-types/${id}`),
 };
 
+export interface FineFilterParams {
+  search?: string;
+  status?: string;
+  per_page?: number;
+  page?: number;
+}
+
 export const fineService = {
-  getAll: (params?: { status?: string; search?: string }) =>
-    api.get<ApiResponse<Fine[]>>("/admin/fines", { params }),
+  getAll: (filters?: FineFilterParams) =>
+    api.get<ApiResponse<any>>("/admin/fines", { params: filters }),
 
   getById: (id: number) => api.get<ApiResponse<Fine>>(`/admin/fines/${id}`),
 

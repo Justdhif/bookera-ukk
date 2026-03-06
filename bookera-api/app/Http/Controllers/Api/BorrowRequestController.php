@@ -23,7 +23,13 @@ class BorrowRequestController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $requests = $this->borrowRequestService->getRequests($request->search);
+        $filters = [
+            'search'          => $request->search,
+            'approval_status' => $request->approval_status,
+            'per_page'        => $request->per_page,
+        ];
+
+        $requests = $this->borrowRequestService->getRequests($filters);
 
         return ApiResponse::successResponse('Data permintaan peminjaman berhasil diambil', $requests);
     }

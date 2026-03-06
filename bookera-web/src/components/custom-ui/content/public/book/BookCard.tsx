@@ -1,15 +1,30 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { motion } from "framer-motion";
 import { Book } from "@/types/book";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { BookOpen } from "lucide-react";
 export default function BookCard({ book }: { book: Book }) {
   const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [scrollOffset, setScrollOffset] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    if (containerRef.current && textRef.current) {
+      const overflow = textRef.current.scrollWidth - containerRef.current.clientWidth;
+      setScrollOffset(overflow > 0 ? overflow : 0);
+    }
+  }, [book.title]);
+
   return (
-    <div className="border rounded-lg p-3 space-y-3">
+    <div
+      className="border rounded-lg p-3 space-y-3"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
       <div className="relative">
         <img
           src={book.cover_image_url ?? "/placeholder.png"}
@@ -28,7 +43,41 @@ export default function BookCard({ book }: { book: Book }) {
       </div>
 
       <div>
-        <h3 className="font-semibold line-clamp-2">{book.title}</h3>
+        <div ref={containerRef} className="overflow-hidden">
+          <motion.span
+            ref={textRef}
+            className="font-semibold whitespace-nowrap inline-block"
+            animate={
+              isHovering && scrollOffset > 0
+                ? { x: [0, 0, -scrollOffset, -scrollOffset, 0] }
+                : { x: 0 }
+            }
+            transition={(() => {
+              if (isHovering && scrollOffset > 0) {
+                const scrollDuration = Math.max(1.5, scrollOffset / 50);
+                const pauseDuration = 2;
+                const returnDuration = Math.max(0.5, scrollDuration * 0.4);
+                const total = pauseDuration + scrollDuration + pauseDuration + returnDuration;
+                return {
+                  duration: total,
+                  times: [
+                    0,
+                    pauseDuration / total,
+                    (pauseDuration + scrollDuration) / total,
+                    (pauseDuration + scrollDuration + pauseDuration) / total,
+                    1,
+                  ],
+                  ease: ["linear", "linear", "linear", "easeInOut"],
+                  repeat: Infinity,
+                  repeatType: "loop" as const,
+                };
+              }
+              return { duration: 0.2 };
+            })()}
+          >
+            {book.title}
+          </motion.span>
+        </div>
         <p className="text-sm text-muted-foreground">{book.author}</p>
       </div>
 

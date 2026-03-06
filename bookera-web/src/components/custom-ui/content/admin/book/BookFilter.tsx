@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Category } from "@/types/category";
@@ -16,26 +16,43 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 interface Props {
   categories: Category[];
-  onChange: (params: Record<string, string | number[] | undefined>) => void;
+  onChange: (partial: { search?: string; category_ids?: number[]; status?: string }) => void;
   isLoading?: boolean;
 }
 
 export function BookFilter({ categories, onChange, isLoading = false }: Props) {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
-  const [statusValue, setStatusValue] = useState<string>();
+  const [statusSelect, setStatusSelect] = useState<string>();
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      onChange({ search: searchInput || undefined });
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [searchInput]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSearchInput(e.target.value);
+
+  const statusValue = statusSelect ?? "all";
+  const handleStatusChange = (v: string) => {
+    const newStatus = v === "all" ? undefined : v;
+    setStatusSelect(newStatus);
+    onChange({ status: newStatus });
+  };
 
   const handleCategoryToggle = (id: number | null) => {
+    let newIds: number[];
     if (id === null) {
-      setCategoryIds([]);
-      onChange({ category_ids: undefined });
+      newIds = [];
     } else {
-      const newIds = categoryIds.includes(id)
+      newIds = categoryIds.includes(id)
         ? categoryIds.filter((cId) => cId !== id)
         : [...categoryIds, id];
-      setCategoryIds(newIds);
-      onChange({ category_ids: newIds.length > 0 ? newIds : undefined });
     }
+    setCategoryIds(newIds);
+    onChange({ category_ids: newIds.length > 0 ? newIds : undefined });
   };
 
   const handleCategoryClick = (id: number | null) => {
@@ -87,24 +104,15 @@ export function BookFilter({ categories, onChange, isLoading = false }: Props) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search books..."
-            value={searchValue}
-            onChange={(e) => {
-              setSearchValue(e.target.value);
-              onChange({ search: e.target.value });
-            }}
+            value={searchInput}
+            onChange={handleSearchChange}
             className="pl-9"
-            disabled={isLoading}
           />
         </div>
 
         <Select
           value={statusValue}
-          onValueChange={(v) => {
-            const newValue = v === "all" ? undefined : v;
-            setStatusValue(newValue);
-            onChange({ status: newValue });
-          }}
-          disabled={isLoading}
+          onValueChange={handleStatusChange}
         >
           <SelectTrigger className="w-40">
             <SelectValue placeholder="All" />

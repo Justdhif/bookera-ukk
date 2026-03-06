@@ -6,6 +6,7 @@ use App\Helpers\ActivityLogger;
 use App\Helpers\SlugGenerator;
 use App\Models\Author;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -21,6 +22,7 @@ class AuthorService
                 $query->where('is_active', $filters['is_active']);
             })
             ->latest()
+            ->orderByDesc('id')
             ->paginate($filters['per_page'] ?? 10);
 
         $authors->getCollection()->transform(function ($author) {
@@ -31,10 +33,11 @@ class AuthorService
         return $authors;
     }
 
-    public function getAllAuthors(): \Illuminate\Database\Eloquent\Collection
+    public function getAllAuthors(): Collection
     {
         return Author::where('is_active', true)
             ->latest()
+            ->orderByDesc('id')
             ->get()
             ->transform(function ($author) {
                 $author->photo_url = storage_image($author->photo);

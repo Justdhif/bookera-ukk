@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -17,9 +17,27 @@ interface Props {
 }
 
 export default function UserFilter({ onChange }: Props) {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [roleValue, setRoleValue] = useState<string>();
-  const [statusValue, setStatusValue] = useState<string>();
+  const [statusSelect, setStatusSelect] = useState<string>();
+
+  // Debounce search → parent onChange
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      onChange({ search: searchInput || undefined });
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [searchInput]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSearchInput(e.target.value);
+
+  const statusValue = statusSelect ?? "all";
+  const handleStatusChange = (v: string) => {
+    const newValue = v === "all" ? undefined : v;
+    setStatusSelect(newValue);
+    onChange({ status: newValue });
+  };
 
   const roles = [
     { value: "admin", label: "Admin" },
@@ -60,22 +78,15 @@ export default function UserFilter({ onChange }: Props) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search users..."
-            value={searchValue}
-            onChange={(e) => {
-              setSearchValue(e.target.value);
-              onChange({ search: e.target.value });
-            }}
+            value={searchInput}
+            onChange={handleSearchChange}
             className="pl-9"
           />
         </div>
 
         <Select
           value={statusValue}
-          onValueChange={(v) => {
-            const newValue = v === "all" ? undefined : v;
-            setStatusValue(newValue);
-            onChange({ status: newValue });
-          }}
+          onValueChange={handleStatusChange}
         >
           <SelectTrigger className="w-40">
             <SelectValue placeholder="All Status" />

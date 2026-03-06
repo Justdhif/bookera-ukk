@@ -4,26 +4,27 @@ namespace App\Services\FineType;
 
 use App\Helpers\ActivityLogger;
 use App\Models\FineType;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class FineTypeService
 {
-    public function getAllFineTypes(?string $type = null, ?string $search = null): Collection
+    public function getAllFineTypes(array $filters = []): LengthAwarePaginator
     {
         $query = FineType::query();
 
-        if ($type) {
-            $query->where('type', $type);
+        if (!empty($filters['type'])) {
+            $query->where('type', $filters['type']);
         }
 
-        if ($search) {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
-        return $query->latest()->get();
+        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
     public function createFineType(array $data): FineType

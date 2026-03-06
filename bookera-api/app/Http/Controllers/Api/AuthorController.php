@@ -28,7 +28,6 @@ class AuthorController extends Controller
             'per_page' => $request->per_page,
         ];
 
-        // Remove null is_active so the when() guard in service works correctly
         if (is_null($filters['is_active'])) {
             unset($filters['is_active']);
         }

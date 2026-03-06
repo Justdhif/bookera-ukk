@@ -6,20 +6,22 @@ use App\Helpers\ActivityLogger;
 use App\Models\Borrow;
 use App\Models\Fine;
 use App\Models\FineType;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class FineService
 {
-    public function getAllFines(?string $status = null, ?string $search = null): Collection
+    public function getAllFines(array $filters = []): LengthAwarePaginator
     {
         $query = Fine::with(['borrow.user.profile', 'fineType']);
 
-        if ($status) {
-            $query->where('status', $status);
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
         }
 
-        if ($search) {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
                     ->orWhere('borrow_id', 'like', "%{$search}%")
@@ -35,7 +37,7 @@ class FineService
             });
         }
 
-        return $query->latest()->get();
+        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
     public function getBorrowFines(Borrow $borrow): Collection
@@ -43,6 +45,7 @@ class FineService
         return Fine::with(['fineType'])
             ->where('borrow_id', $borrow->id)
             ->latest()
+            ->orderByDesc('id')
             ->get();
     }
 
@@ -53,6 +56,7 @@ class FineService
                 $query->where('user_id', $userId);
             })
             ->latest()
+            ->orderByDesc('id')
             ->get();
     }
 

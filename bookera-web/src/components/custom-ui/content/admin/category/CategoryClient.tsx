@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { Category } from "@/types/category";
-import { categoryService } from "@/services/category.service";
+import { categoryService, CategoryFilterParams } from "@/services/category.service";
 import CategoryTable from "./CategoryTable";
 import CategoryFormDialog from "./CategoryFormDialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { CategoryTableSkeleton } from "./CategoryTableSkeleton";
-import { Plus, Tag } from "lucide-react";
+import { Plus, Search, Tag } from "lucide-react";
+import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 
 export default function CategoryClient() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -17,6 +19,20 @@ export default function CategoryClient() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [filters, setFilters] = useState<CategoryFilterParams>({ per_page: 10 });
+  const [searchInput, setSearchInput] = useState("");
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
+
+  
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: searchInput || undefined, page: 1 }));
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [searchInput]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSearchInput(e.target.value);
 
   const confirmDelete = async () => {
     if (!deleteId) {
@@ -27,19 +43,32 @@ export default function CategoryClient() {
     await categoryService.delete(deleteId);
     toast.success("Category deleted successfully");
     setDeleteId(null);
-    fetchCategories();
+    fetchCategories(filters);
   };
 
-  const fetchCategories = async () => {
+  const fetchCategories = async (activeFilters: CategoryFilterParams) => {
     setLoading(true);
-    const res = await categoryService.getAll();
-    setCategories(res.data.data);
-    setLoading(false);
+    try {
+      const res = await categoryService.getAll(activeFilters);
+      const paginatedData = res.data.data;
+      setCategories(paginatedData.data ?? paginatedData);
+      setPagination({
+        current_page: paginatedData.current_page ?? 1,
+        last_page: paginatedData.last_page ?? 1,
+        total: paginatedData.total ?? 0,
+        from: paginatedData.from ?? 0,
+        to: paginatedData.to ?? 0,
+      });
+    } catch {
+      toast.error("Failed to load categories");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    fetchCategories(filters);
+  }, [filters]);
 
   return (
     <div className="space-y-6">
@@ -68,18 +97,40 @@ export default function CategoryClient() {
         </Button>
       </div>
 
-      {loading ? (
-        <CategoryTableSkeleton />
-      ) : (
-        <CategoryTable
-          data={categories}
-          onEdit={(cat) => {
-            setEditing(cat);
-            setOpen(true);
-          }}
-          onDelete={(id) => setDeleteId(id)}
+      {/* Search */}
+      <div className="flex gap-3">
+        <div className="relative flex-1">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search categories..."
+          value={searchInput}
+          onChange={handleSearchChange}
+          className="pl-9"
         />
-      )}
+        </div>
+      </div>
+
+      <PaginatedContent
+        currentPage={pagination.current_page}
+        lastPage={pagination.last_page}
+        total={pagination.total}
+        from={pagination.from}
+        to={pagination.to}
+        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+      >
+        {loading ? (
+          <CategoryTableSkeleton />
+        ) : (
+          <CategoryTable
+            data={categories}
+            onEdit={(cat) => {
+              setEditing(cat);
+              setOpen(true);
+            }}
+            onDelete={(id) => setDeleteId(id)}
+          />
+        )}
+      </PaginatedContent>
 
       <DeleteConfirmDialog
         open={deleteId !== null}
@@ -93,7 +144,7 @@ export default function CategoryClient() {
         open={open}
         setOpen={setOpen}
         category={editing}
-        onSuccess={fetchCategories}
+        onSuccess={() => fetchCategories(filters)}
       />
     </div>
   );

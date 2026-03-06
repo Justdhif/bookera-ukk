@@ -22,7 +22,13 @@ class FineTypeController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $fineTypes = $this->fineTypeService->getAllFineTypes($request->type, $request->search);
+        $filters = [
+            'search'   => $request->search,
+            'type'     => $request->type,
+            'per_page' => $request->per_page,
+        ];
+
+        $fineTypes = $this->fineTypeService->getAllFineTypes($filters);
 
         return ApiResponse::successResponse('Data tipe denda', $fineTypes);
     }

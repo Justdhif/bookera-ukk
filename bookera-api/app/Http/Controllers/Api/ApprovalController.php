@@ -57,21 +57,36 @@ class ApprovalController extends Controller
 
     public function getPendingBorrows(Request $request): JsonResponse
     {
-        $borrows = $this->approvalService->getPendingBorrows($request->search);
+        $filters = [
+            'search'   => $request->search,
+            'per_page' => $request->per_page,
+        ];
+
+        $borrows = $this->approvalService->getPendingBorrows($filters);
 
         return ApiResponse::successResponse('Data peminjaman yang perlu diproses', $borrows);
     }
 
     public function getApprovedBorrows(Request $request): JsonResponse
     {
-        $borrows = $this->approvalService->getApprovedBorrows($request->search);
+        $filters = [
+            'search'   => $request->search,
+            'per_page' => $request->per_page,
+        ];
+
+        $borrows = $this->approvalService->getApprovedBorrows($filters);
 
         return ApiResponse::successResponse('Data peminjaman yang sudah di-approve dan menunggu penyerahan buku', $borrows);
     }
 
     public function getAllReturns(Request $request): JsonResponse
     {
-        $returns = $this->approvalService->getAllReturns($request->search);
+        $filters = [
+            'search'   => $request->search,
+            'per_page' => $request->per_page,
+        ];
+
+        $returns = $this->approvalService->getAllReturns($filters);
 
         return ApiResponse::successResponse('Data semua pengembalian buku', $returns);
     }

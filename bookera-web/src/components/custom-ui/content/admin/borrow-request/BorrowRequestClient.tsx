@@ -22,6 +22,7 @@ import {
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { format } from "date-fns";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
+import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 
 const approvalStatusConfig: Record<
   BorrowRequest["approval_status"],
@@ -49,18 +50,34 @@ export default function BorrowRequestClient() {
   const router = useRouter();
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<{ search?: string; per_page?: number; page?: number }>({ per_page: 10 });
+  const [searchInput, setSearchInput] = useState("");
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchRequests();
-  }, []);
+    const t = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: searchInput || undefined, page: 1 }));
+    }, 500);
+    return () => clearTimeout(t);
+  }, [searchInput]);
 
-  const fetchRequests = async () => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSearchInput(e.target.value);
+
+  const fetchRequests = async (activeFilters: { search?: string; per_page?: number; page?: number }) => {
     setLoading(true);
     try {
-      const res = await borrowRequestService.getAll(searchQuery);
-      setRequests(res.data.data);
+      const res = await borrowRequestService.getAll(activeFilters);
+      const paginatedData = res.data.data;
+      setRequests(paginatedData.data ?? paginatedData);
+      setPagination({
+        current_page: paginatedData.current_page ?? 1,
+        last_page: paginatedData.last_page ?? 1,
+        total: paginatedData.total ?? 0,
+        from: paginatedData.from ?? 0,
+        to: paginatedData.to ?? 0,
+      });
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || "Failed to load borrow requests",
@@ -70,9 +87,9 @@ export default function BorrowRequestClient() {
     }
   };
 
-  const handleSearch = () => {
-    fetchRequests();
-  };
+  useEffect(() => {
+    fetchRequests(filters);
+  }, [filters]);
 
   const handleDelete = (id: number) => {
     setDeleteId(id);
@@ -84,7 +101,7 @@ export default function BorrowRequestClient() {
       await borrowRequestService.destroy(deleteId);
       toast.success("Request deleted successfully");
       setDeleteId(null);
-      fetchRequests();
+      fetchRequests(filters);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to delete request");
     }
@@ -106,32 +123,36 @@ export default function BorrowRequestClient() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by name or book title..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            value={searchInput}
+            onChange={handleSearchChange}
             className="pl-9"
           />
         </div>
-        <Button onClick={handleSearch} variant="outline">
-          <Search className="h-4 w-4" />
-        </Button>
       </div>
 
-      {loading ? (
-        <div className="space-y-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-32 w-full" />
-          ))}
-        </div>
-      ) : requests.length === 0 ? (
-        <EmptyState
-          icon={<ClipboardList className="h-16 w-16" />}
-          title="No Requests"
-          description="No borrow requests from members yet"
-        />
-      ) : (
-        <div className="space-y-4">
-          {requests.map((req) => {
+      <PaginatedContent
+        currentPage={pagination.current_page}
+        lastPage={pagination.last_page}
+        total={pagination.total}
+        from={pagination.from}
+        to={pagination.to}
+        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+      >
+        {loading ? (
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-32 w-full" />
+            ))}
+          </div>
+        ) : requests.length === 0 ? (
+          <EmptyState
+            icon={<ClipboardList className="h-16 w-16" />}
+            title="No Requests"
+            description="No borrow requests from members yet"
+          />
+        ) : (
+          <div className="space-y-4">
+            {requests.map((req) => {
             const statusCfg =
               approvalStatusConfig[req.approval_status] ??
               approvalStatusConfig.processing;
@@ -204,7 +225,8 @@ export default function BorrowRequestClient() {
             );
           })}
         </div>
-      )}
+        )}
+      </PaginatedContent>
 
       <DeleteConfirmDialog
         open={deleteId !== null}

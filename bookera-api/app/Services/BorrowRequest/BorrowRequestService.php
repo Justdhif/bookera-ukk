@@ -12,7 +12,7 @@ use App\Models\Borrow;
 use App\Models\BorrowDetail;
 use App\Models\BorrowRequest;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -20,14 +20,15 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class BorrowRequestService
 {
-    public function getRequests(?string $search = null): Collection
+    public function getRequests(array $filters = []): LengthAwarePaginator
     {
         $query = BorrowRequest::with([
             'borrowRequestDetails.book',
             'user.profile',
         ]);
 
-        if ($search) {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($userQuery) use ($search) {
                         $userQuery->where('email', 'like', "%{$search}%")
@@ -41,7 +42,11 @@ class BorrowRequestService
             });
         }
 
-        return $query->latest()->get();
+        if (!empty($filters['approval_status'])) {
+            $query->where('approval_status', $filters['approval_status']);
+        }
+
+        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
     public function createRequest(array $data, User $user): BorrowRequest
@@ -347,7 +352,6 @@ class BorrowRequestService
         });
     }
 
-    // ─── Helpers ─────────────────────────────────────────────────────────────
 
     private function generateBorrowCode(): string
     {

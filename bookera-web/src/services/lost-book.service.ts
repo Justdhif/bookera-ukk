@@ -2,12 +2,16 @@ import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
 import { LostBook } from "@/types/lost-book";
 
+export interface LostBookFilterParams {
+  search?: string;
+  per_page?: number;
+  page?: number;
+}
+
 export const lostBookService = {
-  
-  getAll: (search?: string) =>
-    api.get<ApiResponse<LostBook[]>>("/admin/lost-books", {
-      params: { search },
-    }),
+
+  getAll: (filters?: LostBookFilterParams) =>
+    api.get<ApiResponse<any>>("/admin/lost-books", { params: filters }),
 
   
   show: (id: number) =>

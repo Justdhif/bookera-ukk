@@ -9,6 +9,7 @@ use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Services\Category\CategoryService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -19,9 +20,14 @@ class CategoryController extends Controller
         $this->categoryService = $categoryService;
     }
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $categories = $this->categoryService->getAllCategories();
+        $filters = [
+            'search'   => $request->search,
+            'per_page' => $request->per_page,
+        ];
+
+        $categories = $this->categoryService->getCategories($filters);
 
         return ApiResponse::successResponse('Data kategori berhasil diambil', $categories);
     }

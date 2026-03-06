@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FineType } from "@/types/fine";
 import { fineTypeService } from "@/services/fine.service";
 import FineTypeTable from "./FineTypeTable";
@@ -31,21 +31,24 @@ export default function FineTypeManagement() {
     }
   };
 
-  const fetchFineTypes = async () => {
+  const fetchFineTypes = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fineTypeService.getAll();
-      setFineTypes(res.data.data);
+      const res = await fineTypeService.getAll({ per_page: 10 } as any);
+      setFineTypes(res.data.data.data ?? res.data.data);
     } catch (err) {
       toast.error("Failed to load fine types");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchFineTypes();
-  }, []);
+    const timeoutId = setTimeout(() => {
+      fetchFineTypes();
+    }, 300);
+    return () => clearTimeout(timeoutId);
+  }, [fetchFineTypes]);
 
   return (
     <div className="space-y-6">

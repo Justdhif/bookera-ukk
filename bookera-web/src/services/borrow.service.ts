@@ -2,10 +2,17 @@ import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
 import { Borrow } from "@/types/borrow";
 
+export interface BorrowFilterParams {
+  search?: string;
+  status?: string;
+  per_page?: number;
+  page?: number;
+}
+
 export const borrowService = {
 
-  getAll: (search?: string) =>
-    api.get<ApiResponse<Borrow[]>>("/admin/borrows", { params: { search } }),
+  getAll: (filters?: BorrowFilterParams) =>
+    api.get<ApiResponse<any>>("/admin/borrows", { params: filters }),
 
   create: (data: { book_copy_ids: number[]; return_date: string }) =>
     api.post<ApiResponse<Borrow>>("/borrows", data),

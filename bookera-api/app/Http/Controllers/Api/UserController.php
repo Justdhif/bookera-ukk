@@ -23,10 +23,10 @@ class UserController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
-            'search' => $request->search,
-            'role' => $request->role,
-            'status' => $request->status,
-            'active' => $request->active,
+            'search'   => $request->search,
+            'role'     => $request->role,
+            'status'   => $request->status,
+            'per_page' => $request->per_page,
         ];
 
         $users = $this->userService->getUsers($filters);

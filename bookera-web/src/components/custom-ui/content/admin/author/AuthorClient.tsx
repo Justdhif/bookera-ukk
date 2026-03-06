@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Author } from "@/types/author";
-import { authorService } from "@/services/author.service";
+import { authorService, AuthorFilterParams } from "@/services/author.service";
 import AuthorTable from "./AuthorTable";
 import AuthorFormDialog from "./author-add/AuthorFormDialog";
 import AuthorDetailDialog from "./author-detail/AuthorDetailDialog";
@@ -12,29 +12,64 @@ import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { AuthorTableSkeleton } from "./AuthorTableSkeleton";
 import { Plus, Search, UserSquare } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 
 export default function AuthorClient() {
   const [authors, setAuthors] = useState<Author[]>([]);
   const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [meta, setMeta] = useState<any>(null);
+  const [filters, setFilters] = useState<AuthorFilterParams>({ per_page: 10 });
+  const [searchInput, setSearchInput] = useState("");
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
+
+  
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: searchInput || undefined, page: 1 }));
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [searchInput]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSearchInput(e.target.value);
+
+  const statusValue =
+    filters.is_active === undefined
+      ? "all"
+      : filters.is_active
+      ? "active"
+      : "inactive";
+  const handleStatusChange = (value: string) =>
+    setFilters((prev) => ({
+      ...prev,
+      is_active: value === "all" ? undefined : value === "active",
+      page: 1,
+    }));
 
   const [addOpen, setAddOpen] = useState(false);
   const [selectedAuthor, setSelectedAuthor] = useState<Author | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  const fetchAuthors = async (params?: { search?: string; page?: number }) => {
+  const fetchAuthors = async (activeFilters: AuthorFilterParams) => {
     setLoading(true);
     try {
-      const res = await authorService.getAdminList({
-        search: params?.search ?? search,
-        per_page: 10,
-        ...(params?.page ? { page: params.page } : { page }),
-      } as any);
-      setAuthors(res.data.data.data ?? res.data.data);
-      setMeta(res.data.data.meta ?? res.data.data);
+      const res = await authorService.getAdminList(activeFilters);
+      const paginatedData = res.data.data;
+      setAuthors(paginatedData.data ?? paginatedData);
+      setPagination({
+        current_page: paginatedData.current_page ?? 1,
+        last_page: paginatedData.last_page ?? 1,
+        total: paginatedData.total ?? 0,
+        from: paginatedData.from ?? 0,
+        to: paginatedData.to ?? 0,
+      });
     } catch {
       toast.error("Failed to load authors");
     } finally {
@@ -43,14 +78,8 @@ export default function AuthorClient() {
   };
 
   useEffect(() => {
-    fetchAuthors();
-  }, []);
-
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    setPage(1);
-    fetchAuthors({ search: value, page: 1 });
-  };
+    fetchAuthors(filters);
+  }, [filters]);
 
   const handleView = (author: Author) => {
     setSelectedAuthor(author);
@@ -63,7 +92,7 @@ export default function AuthorClient() {
       await authorService.delete(deleteId);
       toast.success("Author deleted successfully");
       setDeleteId(null);
-      fetchAuthors();
+      fetchAuthors(filters);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to delete author");
     }
@@ -92,42 +121,64 @@ export default function AuthorClient() {
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search authors..."
-          value={search}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="pl-9"
-        />
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search authors..."
+            value={searchInput}
+            onChange={handleSearchChange}
+            className="pl-9"
+          />
+        </div>
+        <Select
+          value={statusValue}
+          onValueChange={handleStatusChange}
+        >
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="All Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Table */}
-      {loading ? (
-        <AuthorTableSkeleton />
-      ) : (
-        <AuthorTable
-          data={authors}
-          onView={handleView}
-          onDelete={(id) => setDeleteId(id)}
-        />
-      )}
+      <PaginatedContent
+        currentPage={pagination.current_page}
+        lastPage={pagination.last_page}
+        total={pagination.total}
+        from={pagination.from}
+        to={pagination.to}
+        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+      >
+        {loading ? (
+          <AuthorTableSkeleton />
+        ) : (
+          <AuthorTable
+            data={authors}
+            onView={handleView}
+            onDelete={(id) => setDeleteId(id)}
+          />
+        )}
+      </PaginatedContent>
 
       {/* Dialogs */}
       <AuthorFormDialog
         open={addOpen}
         setOpen={setAddOpen}
-        onSuccess={fetchAuthors}
+        onSuccess={() => fetchAuthors(filters)}
       />
 
       <AuthorDetailDialog
         open={detailOpen}
         setOpen={setDetailOpen}
         author={selectedAuthor}
-        onSuccess={() => {
-          fetchAuthors();
-        }}
+        onSuccess={() => fetchAuthors(filters)}
       />
 
       <DeleteConfirmDialog

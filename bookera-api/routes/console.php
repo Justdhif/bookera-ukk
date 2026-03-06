@@ -8,9 +8,8 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Run overdue fine processing every day at midnight
-// withoutOverlapping() prevents double execution if the previous run is still going
 Schedule::command('borrows:process-overdue-fines')
-    ->dailyAt('00:00')
+    ->dailyAt('06:00')
+    ->timezone('Asia/Jakarta')
     ->withoutOverlapping()
     ->runInBackground();

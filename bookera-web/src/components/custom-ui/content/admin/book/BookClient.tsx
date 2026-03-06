@@ -1,8 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 
-import { useEffect, useState, useCallback } from "react";
-import { bookService } from "@/services/book.service";
+import { useEffect, useState } from "react";
+import { bookService, BookFilterParams } from "@/services/book.service";
 import { Book } from "@/types/book";
 import { BookTable } from "./BookTable";
 import { BookFilter } from "./BookFilter";
@@ -13,6 +13,7 @@ import { Category } from "@/types/category";
 import { categoryService } from "@/services/category.service";
 import { BookOpen, Plus } from "lucide-react";
 import { BookTableSkeleton } from "./BookTableSkeleton";
+import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 
 export default function BookClient() {
   const router = useRouter();
@@ -21,19 +22,15 @@ export default function BookClient() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
 
-  const [filters, setFilters] = useState<{
-    search?: string;
-    category_ids?: number[];
-    status?: "active" | "inactive";
-    has_stock?: boolean;
-  }>({});
+  const [filters, setFilters] = useState<BookFilterParams>({ per_page: 10 });
 
   const fetchCategories = async () => {
     setCategoriesLoading(true);
     try {
       const res = await categoryService.getAll();
-      setCategories(res.data.data || []);
+      setCategories(res.data.data.data || []);
     } catch (error) {
       toast.error("Failed to load categories");
       console.error("Error fetching categories:", error);
@@ -42,50 +39,34 @@ export default function BookClient() {
     }
   };
 
-  const fetchBooks = useCallback(async () => {
+  const fetchBooks = async (activeFilters: BookFilterParams) => {
     setLoading(true);
     try {
-      const params: any = {
-        per_page: 10,
-      };
-
-      if (filters.search) {
-        params.search = filters.search;
-      }
-
-      if (filters.category_ids && filters.category_ids.length > 0) {
-        params.category_ids = filters.category_ids.join(",");
-      }
-
-      if (filters.status) {
-        params.status = filters.status;
-      }
-
-      if (filters.has_stock) {
-        params.has_stock = filters.has_stock;
-      }
-
-      const res = await bookService.getAll(params);
-      setBooks(res.data.data.data);
+      const res = await bookService.getAll(activeFilters);
+      const paginatedData = res.data.data;
+      setBooks(paginatedData.data ?? paginatedData);
+      setPagination({
+        current_page: paginatedData.current_page ?? 1,
+        last_page: paginatedData.last_page ?? 1,
+        total: paginatedData.total ?? 0,
+        from: paginatedData.from ?? 0,
+        to: paginatedData.to ?? 0,
+      });
     } catch (error) {
       toast.error("Failed to load books");
       console.error("Error fetching books:", error);
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  };
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchBooks();
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [fetchBooks]);
+    fetchBooks(filters);
+  }, [filters]);
 
   const confirmDelete = async () => {
     if (!deleteId) {
@@ -96,16 +77,7 @@ export default function BookClient() {
     await bookService.delete(deleteId);
     toast.success("Book deleted successfully");
     setDeleteId(null);
-    fetchBooks();
-  };
-
-  const handleFilterChange = (
-    value: Record<string, string | number[] | undefined>,
-  ) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...value,
-    }));
+    fetchBooks(filters);
   };
 
   return (
@@ -132,15 +104,33 @@ export default function BookClient() {
 
       <BookFilter
         categories={categories}
-        onChange={handleFilterChange}
+        onChange={(partial) =>
+          setFilters((prev) => ({
+            ...prev,
+            ...partial,
+            page: 1,
+            status: partial.status !== undefined
+              ? (partial.status as BookFilterParams["status"])
+              : "status" in partial ? undefined : prev.status,
+          }))
+        }
         isLoading={loading}
       />
 
-      {loading ? (
-        <BookTableSkeleton />
-      ) : (
-        <BookTable data={books} onDelete={(id) => setDeleteId(id)} />
-      )}
+      <PaginatedContent
+        currentPage={pagination.current_page}
+        lastPage={pagination.last_page}
+        total={pagination.total}
+        from={pagination.from}
+        to={pagination.to}
+        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+      >
+        {loading ? (
+          <BookTableSkeleton />
+        ) : (
+          <BookTable data={books} onDelete={(id) => setDeleteId(id)} />
+        )}
+      </PaginatedContent>
 
       <DeleteConfirmDialog
         open={deleteId !== null}

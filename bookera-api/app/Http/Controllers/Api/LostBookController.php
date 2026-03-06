@@ -23,7 +23,12 @@ class LostBookController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $lostBooks = $this->lostBookService->getAllLostBooks($request->search);
+        $filters = [
+            'search'   => $request->search,
+            'per_page' => $request->per_page,
+        ];
+
+        $lostBooks = $this->lostBookService->getAllLostBooks($filters);
 
         return ApiResponse::successResponse('Data buku hilang', $lostBooks);
     }

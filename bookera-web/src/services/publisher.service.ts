@@ -16,12 +16,19 @@ export interface UpdatePublisherData {
   is_active?: boolean;
 }
 
+export interface PublisherFilterParams {
+  search?: string;
+  is_active?: boolean;
+  per_page?: number;
+  page?: number;
+}
+
 export const publisherService = {
   getAll: () =>
     api.get<ApiResponse<Publisher[]>>("/publishers"),
 
-  getAdminList: (params?: { search?: string; per_page?: number }) =>
-    api.get<ApiResponse<any>>("/admin/publishers", { params }),
+  getAdminList: (filters?: PublisherFilterParams) =>
+    api.get<ApiResponse<any>>("/admin/publishers", { params: filters }),
 
   show: (id: number) =>
     api.get<ApiResponse<Publisher>>(`/publishers/${id}`),

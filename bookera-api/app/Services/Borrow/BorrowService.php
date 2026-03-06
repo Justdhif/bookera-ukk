@@ -7,7 +7,7 @@ use App\Helpers\ActivityLogger;
 use App\Models\BookCopy;
 use App\Models\Borrow;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -15,7 +15,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class BorrowService
 {
-    public function getBorrows(?string $search = null): Collection
+    public function getBorrows(array $filters = []): LengthAwarePaginator
     {
         $query = Borrow::with([
             'borrowDetails.bookCopy.book',
@@ -25,7 +25,8 @@ class BorrowService
             'lostBooks.bookCopy.book',
         ]);
 
-        if ($search) {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
                     ->orWhereHas('user', function ($userQuery) use ($search) {
@@ -40,7 +41,11 @@ class BorrowService
             });
         }
 
-        return $query->latest()->get();
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
     public function createBorrow(array $data, User $user): Borrow
@@ -276,11 +281,6 @@ class BorrowService
             ->get();
     }
 
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-
-    /**
-     * Generate a unique borrow code, e.g. BRW-20260301-A3F9K2.
-     */
     private function generateBorrowCode(): string
     {
         do {
@@ -290,20 +290,14 @@ class BorrowService
         return $code;
     }
 
-    /**
-     * Generate a QR code PNG for the given borrow code, save it to storage,
-     * and return the relative storage path (e.g. qr_codes/borrow_1.png).
-     */
     private function generateQrCode(string $borrowCode, int $borrowId): string
     {
-        // Ensure the directory exists
         Storage::disk('public')->makeDirectory('qr_codes');
 
         $filename = 'borrow_' . $borrowId . '_' . $borrowCode . '.png';
         $relativePath = 'qr_codes/' . $filename;
         $absolutePath = storage_path('app/public/' . $relativePath);
 
-        // Generate and save the QR code as a PNG file
         QrCode::format('png')
             ->size(300)
             ->errorCorrection('H')

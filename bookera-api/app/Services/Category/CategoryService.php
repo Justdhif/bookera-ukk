@@ -5,13 +5,19 @@ namespace App\Services\Category;
 use App\Helpers\ActivityLogger;
 use App\Helpers\SlugGenerator;
 use App\Models\Category;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class CategoryService
 {
-    public function getAllCategories(): Collection
+    public function getCategories(array $filters): LengthAwarePaginator
     {
-        return Category::latest()->get();
+        return Category::query()
+            ->when($filters['search'] ?? null, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->orderByDesc('id')
+            ->paginate($filters['per_page'] ?? 15);
     }
 
     public function createCategory(array $data): Category

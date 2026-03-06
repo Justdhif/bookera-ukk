@@ -22,6 +22,7 @@ class BookReturnService
         return BookReturn::with(['details.bookCopy.book'])
             ->where('borrow_id', $borrow->id)
             ->latest()
+            ->orderByDesc('id')
             ->get();
     }
 

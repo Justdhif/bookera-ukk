@@ -8,12 +8,12 @@ use App\Models\Borrow;
 use App\Models\Fine;
 use App\Models\FineType;
 use App\Models\LostBook;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class LostBookService
 {
-    public function getAllLostBooks(?string $search = null): Collection
+    public function getAllLostBooks(array $filters = []): LengthAwarePaginator
     {
         $query = LostBook::with([
             'borrow.user.profile',
@@ -21,7 +21,8 @@ class LostBookService
             'bookCopy.book',
         ]);
 
-        if ($search) {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
                     ->orWhere('borrow_id', 'like', "%{$search}%")
@@ -37,7 +38,7 @@ class LostBookService
             });
         }
 
-        return $query->latest()->get();
+        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
     public function reportLostBook(Borrow $borrow, array $data): LostBook

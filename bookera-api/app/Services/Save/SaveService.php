@@ -22,6 +22,7 @@ class SaveService
                 $q->where('name', 'like', "%{$search}%");
             })
             ->latest()
+            ->orderByDesc('id')
             ->paginate($perPage);
 
         $saves->getCollection()->transform(function ($save) {

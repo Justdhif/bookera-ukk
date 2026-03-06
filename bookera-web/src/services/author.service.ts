@@ -16,12 +16,19 @@ export interface UpdateAuthorData {
   is_active?: boolean;
 }
 
+export interface AuthorFilterParams {
+  search?: string;
+  is_active?: boolean;
+  per_page?: number;
+  page?: number;
+}
+
 export const authorService = {
   getAll: () =>
     api.get<ApiResponse<Author[]>>("/authors"),
 
-  getAdminList: (params?: { search?: string; per_page?: number }) =>
-    api.get<ApiResponse<any>>("/admin/authors", { params }),
+  getAdminList: (filters?: AuthorFilterParams) =>
+    api.get<ApiResponse<any>>("/admin/authors", { params: filters }),
 
   show: (id: number) =>
     api.get<ApiResponse<Author>>(`/authors/${id}`),

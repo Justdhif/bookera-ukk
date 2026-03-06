@@ -24,7 +24,13 @@ class FineController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $fines = $this->fineService->getAllFines($request->status, $request->search);
+        $filters = [
+            'search'   => $request->search,
+            'status'   => $request->status,
+            'per_page' => $request->per_page,
+        ];
+
+        $fines = $this->fineService->getAllFines($filters);
 
         return ApiResponse::successResponse('Data denda', $fines);
     }
