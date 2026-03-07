@@ -65,7 +65,7 @@ export default function AddBookClient() {
   const fetchCategories = async () => {
     try {
       const res = await categoryService.getAll();
-      setCategories(res.data.data);
+      setCategories(res.data.data.data || []);
     } catch {
       toast.error("Failed to load categories");
     }

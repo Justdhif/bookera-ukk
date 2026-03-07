@@ -33,4 +33,9 @@ class Author extends Model
         return $this->belongsToMany(Book::class, 'book_authors', 'author_id', 'book_id')
             ->withTimestamps();
     }
+
+    public function followers()
+    {
+        return $this->morphMany(Follow::class, 'followable');
+    }
 }

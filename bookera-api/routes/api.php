@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PrivacyPolicyController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\PublisherController;
+use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\SaveController;
 use App\Http\Controllers\Api\TermsOfServiceController;
 use App\Http\Controllers\Api\UserController;
@@ -255,5 +256,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{save}', [SaveController::class, 'destroy']);
         Route::post('/{save}/books', [SaveController::class, 'addBook']);
         Route::delete('/{save}/books/{book}', [SaveController::class, 'removeBook']);
+    });
+
+    Route::prefix('follows')->group(function () {
+        Route::get('/authors', [FollowController::class, 'authors']);
+        Route::get('/publishers', [FollowController::class, 'publishers']);
+        Route::get('/check', [FollowController::class, 'check']);
+        Route::post('/', [FollowController::class, 'follow']);
+        Route::delete('/', [FollowController::class, 'unfollow']);
+        Route::get('/authors/{slug}', [FollowController::class, 'authorDetail']);
+        Route::get('/publishers/{slug}', [FollowController::class, 'publisherDetail']);
     });
 });

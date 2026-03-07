@@ -85,7 +85,7 @@ export default function AddToRequestButton({
   return (
     <>
       <Button
-        variant="outline"
+        variant="brand"
         size="sm"
         onClick={handleOpen}
         className="gap-2"

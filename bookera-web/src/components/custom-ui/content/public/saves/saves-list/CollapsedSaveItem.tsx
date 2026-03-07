@@ -29,9 +29,9 @@ export default function CollapsedSaveItem({ save }: CollapsedSaveItemProps) {
           />
         </Link>
       </TooltipTrigger>
-      <TooltipContent side="right">
-        <p className="font-medium">{save.name}</p>
-        <p className="text-xs text-muted-foreground">
+      <TooltipContent side="right" className="flex flex-col gap-1 py-2">
+        <p className="font-semibold text-sm">{save.name}</p>
+        <p className="text-xs text-primary-foreground/75">
           {save.total_books} {save.total_books === 1 ? t("book") : t("books")}
         </p>
       </TooltipContent>

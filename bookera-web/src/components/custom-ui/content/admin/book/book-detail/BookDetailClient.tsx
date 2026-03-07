@@ -77,7 +77,7 @@ export default function BookDetailClient() {
   const fetchCategories = async () => {
     try {
       const res = await categoryService.getAll();
-      setCategories(res.data.data);
+      setCategories(res.data.data.data || []);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }

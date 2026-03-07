@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             CategorySeeder::class,
+            AuthorSeeder::class,
+            PublisherSeeder::class,
             BookSeeder::class,
             BookCopySeeder::class,
             FineTypeSeeder::class,
@@ -26,6 +28,7 @@ class DatabaseSeeder extends Seeder
             BookReturnSeeder::class,
             TermsOfServiceSeeder::class,
             PrivacyPolicySeeder::class,
+            FollowSeeder::class,
         ]);
     }
 }

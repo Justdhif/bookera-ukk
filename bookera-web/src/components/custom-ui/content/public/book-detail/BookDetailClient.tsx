@@ -11,15 +11,20 @@ import AddToRequestButton from "./AddToRequestButton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BookOpen, CheckCircle, XCircle, ArrowLeft } from "lucide-react";
+import { BookOpen, CheckCircle, XCircle, ArrowLeft, Heart, HeartOff, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { followService } from "@/services/follow.service";
+import { useAuthStore } from "@/store/auth.store";
 export default function BookDetailClient() {
     const t = useTranslations("public");
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
+  const { isAuthenticated } = useAuthStore();
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
+  const [followStatus, setFollowStatus] = useState<Record<string, boolean>>({});
+  const [followLoadingIds, setFollowLoadingIds] = useState<Set<string>>(new Set());
 
   const fetchBook = async () => {
     try {
@@ -37,6 +42,44 @@ export default function BookDetailClient() {
     if (!slug) return;
     fetchBook();
   }, [slug]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !book) return;
+    const checks: Promise<void>[] = [];
+    (book.authors || []).forEach((author) => {
+      checks.push(
+        followService.check("author", author.id).then((res) => {
+          setFollowStatus((prev) => ({ ...prev, [`author-${author.id}`]: res.data.data.is_following }));
+        }).catch(() => {})
+      );
+    });
+    (book.publishers || []).forEach((publisher) => {
+      checks.push(
+        followService.check("publisher", publisher.id).then((res) => {
+          setFollowStatus((prev) => ({ ...prev, [`publisher-${publisher.id}`]: res.data.data.is_following }));
+        }).catch(() => {})
+      );
+    });
+  }, [book, isAuthenticated]);
+
+  const handleToggleFollow = async (type: "author" | "publisher", id: number, name: string) => {
+    const key = `${type}-${id}`;
+    setFollowLoadingIds((prev) => new Set(prev).add(key));
+    try {
+      if (followStatus[key]) {
+        await followService.unfollow(type, id);
+        setFollowStatus((prev) => ({ ...prev, [key]: false }));
+      } else {
+        await followService.follow(type, id);
+        setFollowStatus((prev) => ({ ...prev, [key]: true }));
+      }
+      window.dispatchEvent(new Event("refreshFollowsList"));
+    } catch {
+      // silently fail
+    } finally {
+      setFollowLoadingIds((prev) => { const s = new Set(prev); s.delete(key); return s; });
+    }
+  };
 
   return (
     <div className="container py-8 space-y-6">
@@ -177,6 +220,94 @@ export default function BookDetailClient() {
                 <p className="text-muted-foreground">{t("noCategoryPublic")}</p>
               )}
             </div>
+
+            {book.authors && book.authors.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">{t("authorsSection")}</h3>
+                <div className="flex flex-col gap-2">
+                  {book.authors.map((author) => {
+                    const key = `author-${author.id}`;
+                    const isFollowing = followStatus[key] ?? false;
+                    const isLoading = followLoadingIds.has(key);
+                    return (
+                      <div key={author.id} className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                          {author.photo_url ? (
+                            <img src={author.photo_url} alt={author.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full bg-muted flex items-center justify-center text-xs font-medium">
+                              {author.name.charAt(0)}
+                            </div>
+                          )}
+                        </div>
+                        <span className="flex-1 text-sm font-medium">{author.name}</span>
+                        {isAuthenticated && (
+                          <Button
+                            variant={isFollowing ? "outline" : "brand"}
+                            size="sm"
+                            className="h-7 gap-1 text-xs"
+                            disabled={isLoading}
+                            onClick={() => handleToggleFollow("author", author.id, author.name)}
+                          >
+                            {isLoading ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : isFollowing ? (
+                              <><HeartOff className="h-3 w-3" /> {t("unfollow")}</>
+                            ) : (
+                              <><Heart className="h-3 w-3" /> {t("follow")}</>
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {book.publishers && book.publishers.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">{t("publishersSection")}</h3>
+                <div className="flex flex-col gap-2">
+                  {book.publishers.map((publisher) => {
+                    const key = `publisher-${publisher.id}`;
+                    const isFollowing = followStatus[key] ?? false;
+                    const isLoading = followLoadingIds.has(key);
+                    return (
+                      <div key={publisher.id} className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                          {publisher.photo_url ? (
+                            <img src={publisher.photo_url} alt={publisher.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full bg-muted flex items-center justify-center text-xs font-medium">
+                              {publisher.name.charAt(0)}
+                            </div>
+                          )}
+                        </div>
+                        <span className="flex-1 text-sm font-medium">{publisher.name}</span>
+                        {isAuthenticated && (
+                          <Button
+                            variant={isFollowing ? "outline" : "brand"}
+                            size="sm"
+                            className="h-7 gap-1 text-xs"
+                            disabled={isLoading}
+                            onClick={() => handleToggleFollow("publisher", publisher.id, publisher.name)}
+                          >
+                            {isLoading ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : isFollowing ? (
+                              <><HeartOff className="h-3 w-3" /> {t("unfollow")}</>
+                            ) : (
+                              <><Heart className="h-3 w-3" /> {t("follow")}</>
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             
             <div className="space-y-4">

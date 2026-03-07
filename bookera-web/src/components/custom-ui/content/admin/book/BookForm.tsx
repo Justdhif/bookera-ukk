@@ -259,42 +259,42 @@ export default function BookForm({
             )}
           </div>
           <div className="space-y-2">
-            {isEditMode ? (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    {formData.author_ids.length > 0
-                      ? `${formData.author_ids.length} author(s) selected`
-                      : "Select authors"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
-                  <Command>
-                    <CommandInput placeholder={t("searchAuthors")} />
-                    <CommandEmpty>{t("noAuthorsFound")}</CommandEmpty>
-                    <CommandGroup>
-                      {authors.map((author) => (
-                        <CommandItem
-                          key={author.id}
-                          onSelect={() => handleAuthorSelect(author.id)}
-                          className="cursor-pointer"
-                        >
-                          <Checkbox
-                            checked={formData.author_ids.includes(author.id)}
-                            className="mr-2"
-                          />
-                          {author.name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            ) : null}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal"
+                  disabled={!isEditMode}
+                >
+                  {formData.author_ids.length > 0
+                    ? `${formData.author_ids.length} author(s) selected`
+                    : "Select authors"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+                <Command>
+                  <CommandInput placeholder={t("searchAuthors")} />
+                  <CommandEmpty>{t("noAuthorsFound")}</CommandEmpty>
+                  <CommandGroup>
+                    {authors.map((author) => (
+                      <CommandItem
+                        key={author.id}
+                        onSelect={() => isEditMode && handleAuthorSelect(author.id)}
+                        className="cursor-pointer"
+                      >
+                        <Checkbox
+                          checked={formData.author_ids.includes(author.id)}
+                          className="mr-2"
+                          disabled={!isEditMode}
+                        />
+                        {author.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
             {formData.author_ids.length > 0 ? (
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.author_ids.map((id) => {
@@ -321,13 +321,7 @@ export default function BookForm({
                   ) : null;
                 })}
               </div>
-            ) : (
-              !isEditMode && (
-                <p className="text-sm text-muted-foreground">
-                  {book?.author || "No authors listed"}
-                </p>
-              )
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -350,44 +344,44 @@ export default function BookForm({
             )}
           </div>
           <div className="space-y-2">
-            {isEditMode ? (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    {formData.publisher_ids.length > 0
-                      ? `${formData.publisher_ids.length} publisher(s) selected`
-                      : "Select publishers"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
-                  <Command>
-                    <CommandInput placeholder={t("searchPublishers")} />
-                    <CommandEmpty>{t("noPublishersFound")}</CommandEmpty>
-                    <CommandGroup>
-                      {publishers.map((publisher) => (
-                        <CommandItem
-                          key={publisher.id}
-                          onSelect={() => handlePublisherSelect(publisher.id)}
-                          className="cursor-pointer"
-                        >
-                          <Checkbox
-                            checked={formData.publisher_ids.includes(
-                              publisher.id,
-                            )}
-                            className="mr-2"
-                          />
-                          {publisher.name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            ) : null}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal"
+                  disabled={!isEditMode}
+                >
+                  {formData.publisher_ids.length > 0
+                    ? `${formData.publisher_ids.length} publisher(s) selected`
+                    : "Select publishers"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+                <Command>
+                  <CommandInput placeholder={t("searchPublishers")} />
+                  <CommandEmpty>{t("noPublishersFound")}</CommandEmpty>
+                  <CommandGroup>
+                    {publishers.map((publisher) => (
+                      <CommandItem
+                        key={publisher.id}
+                        onSelect={() => isEditMode && handlePublisherSelect(publisher.id)}
+                        className="cursor-pointer"
+                      >
+                        <Checkbox
+                          checked={formData.publisher_ids.includes(
+                            publisher.id,
+                          )}
+                          className="mr-2"
+                          disabled={!isEditMode}
+                        />
+                        {publisher.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
             {formData.publisher_ids.length > 0 ? (
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.publisher_ids.map((id) => {
@@ -414,13 +408,7 @@ export default function BookForm({
                   ) : null;
                 })}
               </div>
-            ) : (
-              !isEditMode && (
-                <p className="text-sm text-muted-foreground">
-                  {book?.publisher || "No publishers listed"}
-                </p>
-              )
-            )}
+            ) : null}
           </div>
         </div>
 

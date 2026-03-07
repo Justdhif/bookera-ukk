@@ -15,7 +15,8 @@ import SaveBookList from "./SaveBookList";
 import EditSaveDialog from "./EditSaveDialog";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { BorrowFromCollectionDialog } from "./BorrowFromCollectionDialog";
-import { Loader2, ShoppingCart } from "lucide-react";
+import AddBooksToCollectionDialog from "./AddBooksToCollectionDialog";
+import { Loader2, ShoppingCart, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SaveDetailSkeleton from "./SaveDetailSkeleton";
 
@@ -37,6 +38,7 @@ export default function SaveDetailClient({
   const [showBorrowDialog, setShowBorrowDialog] = useState(false);
   const [booksWithCopies, setBooksWithCopies] = useState<Book[]>([]);
   const [loadingCopies, setLoadingCopies] = useState(false);
+  const [showAddBooksDialog, setShowAddBooksDialog] = useState(false);
 
   const fetchSave = async () => {
     try {
@@ -139,6 +141,17 @@ export default function SaveDetailClient({
         selectedBooks={selectedBooks}
         onToggleBookSelection={toggleBookSelection}
         onRemoveBook={handleRemoveBook}
+        addBooksButton={
+          <Button
+            onClick={() => setShowAddBooksDialog(true)}
+            size="sm"
+            variant="outline"
+            className="gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Add Books
+          </Button>
+        }
         borrowButton={
           save.books && save.books.length > 0 ? (
             <Button
@@ -188,6 +201,16 @@ export default function SaveDetailClient({
         onSuccess={() => {
           setSelectedBooks([]);
           toast.success("Loan request created successfully");
+        }}
+      />
+
+      <AddBooksToCollectionDialog
+        open={showAddBooksDialog}
+        onOpenChange={setShowAddBooksDialog}
+        saveId={save.id}
+        onSuccess={() => {
+          fetchSave();
+          window.dispatchEvent(new Event("refreshSavesList"));
         }}
       />
     </div>

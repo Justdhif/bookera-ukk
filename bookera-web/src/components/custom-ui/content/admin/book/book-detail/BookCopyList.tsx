@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Trash } from "lucide-react";
 import { useTranslations } from "next-intl";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 
@@ -65,8 +66,10 @@ export default function BookCopyList({
               size="sm"
               variant="destructive"
               onClick={() => setDeleteId(copy.id)}
+              className="h-8 gap-1"
             >
-              {t("deleteCopy")}
+              <Trash className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{t("deleteCopy")}</span>
             </Button>
           </li>
         ))}

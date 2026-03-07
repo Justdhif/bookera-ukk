@@ -33,4 +33,9 @@ class Publisher extends Model
         return $this->belongsToMany(Book::class, 'book_publishers', 'publisher_id', 'book_id')
             ->withTimestamps();
     }
+
+    public function followers()
+    {
+        return $this->morphMany(Follow::class, 'followable');
+    }
 }

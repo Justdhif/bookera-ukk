@@ -17,6 +17,7 @@ interface SaveBookListProps {
   onToggleBookSelection: (bookId: number) => void;
   onRemoveBook: (bookId: number) => void;
   borrowButton?: React.ReactNode;
+  addBooksButton?: React.ReactNode;
 }
 
 type ViewMode = "grid" | "list";
@@ -27,6 +28,7 @@ export default function SaveBookList({
   onToggleBookSelection,
   onRemoveBook,
   borrowButton,
+  addBooksButton,
 }: SaveBookListProps) {
     const t = useTranslations("public");
   const router = useRouter();
@@ -36,7 +38,10 @@ export default function SaveBookList({
       <Card className="p-8 sm:p-12">
         <div className="text-center text-muted-foreground">
           <BookMarked className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 opacity-30" />
-          <p className="text-sm sm:text-base">{t("detail.noBooksYet")}</p>
+          <p className="text-sm sm:text-base mb-4">{t("detail.noBooksYet")}</p>
+          {addBooksButton && (
+            <div className="flex justify-center">{addBooksButton}</div>
+          )}
         </div>
       </Card>
     );
@@ -45,7 +50,10 @@ export default function SaveBookList({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        {borrowButton}
+        <div className="flex gap-2">
+          {addBooksButton}
+          {borrowButton}
+        </div>
         <ToggleGroup
           type="single"
           value={viewMode}

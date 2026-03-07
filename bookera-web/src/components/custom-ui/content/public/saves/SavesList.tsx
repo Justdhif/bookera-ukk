@@ -18,8 +18,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-
-import SaveCover from "./saves-list/SaveCover";
 import SidebarLoadingSkeletons from "./saves-list/SidebarLoadingSkeletons";
 import SidebarEmptyState from "./saves-list/SidebarEmptyState";
 import SidebarSaveItem from "./saves-list/SidebarSaveItem";
@@ -35,7 +33,7 @@ export default function SavesList({
   mode = "sidebar",
   isCollapsed = false,
 }: SavesListProps) {
-    const t = useTranslations("public");
+  const t = useTranslations("public");
   const { isAuthenticated } = useAuthStore();
   const [saves, setSaves] = useState<SaveListItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -60,7 +58,8 @@ export default function SavesList({
     fetchSaves();
     const handleRefreshSaves = () => fetchSaves();
     window.addEventListener("refreshSavesList", handleRefreshSaves);
-    return () => window.removeEventListener("refreshSavesList", handleRefreshSaves);
+    return () =>
+      window.removeEventListener("refreshSavesList", handleRefreshSaves);
   }, [isAuthenticated]);
 
   const handleCreateSave = async () => {
@@ -125,21 +124,19 @@ export default function SavesList({
           <BookMarked className="h-8 w-8 text-brand-primary dark:text-brand-primary-light" />
         </div>
         <h4 className="font-semibold text-foreground dark:text-white mb-1 text-sm">
-          
-                          {t("loginRequired")}
-                        </h4>
+          {t("loginRequired")}
+        </h4>
         <p className="text-xs text-muted-foreground dark:text-white/60 mb-5 leading-relaxed">
-          
-                          {t("loginRequiredDesc")}
-                        </p>
+          {t("loginRequiredDesc")}
+        </p>
         <Link
           href="/login"
           className="inline-flex gap-2 items-center bg-brand-primary hover:bg-brand-primary-dark text-white rounded-xl px-6 h-9 text-sm font-semibold shadow-sm shadow-brand-primary/20"
         >
           <LogIn className="h-3.5 w-3.5" />
-          
-                          {t("loginToContinue")}
-                        </Link>
+
+          {t("loginToContinue")}
+        </Link>
       </div>
     );
   }
@@ -151,7 +148,9 @@ export default function SavesList({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <BookMarked className="h-4 w-4 md:h-5 md:w-5 text-brand-primary" />
-              <h3 className="font-semibold text-sm md:text-base">{t("title")}</h3>
+              <h3 className="font-semibold text-sm md:text-base">
+                {t("title")}
+              </h3>
             </div>
             <Button
               size="sm"
@@ -185,9 +184,8 @@ export default function SavesList({
                   className="mt-1 h-auto p-0 text-xs md:text-sm text-brand-primary hover:text-brand-primary-dark"
                   onClick={() => setShowCreateDialog(true)}
                 >
-                  
-                                                      {t("createFirst")}
-                                                    </Button>
+                  {t("createFirst")}
+                </Button>
               </div>
             </Card>
           ) : (
@@ -225,38 +223,36 @@ export default function SavesList({
   if (isCollapsed) {
     return (
       <TooltipProvider>
-        <div className="h-full flex flex-col items-center pt-4 pb-2">
-          <ScrollArea className="flex-1 w-full">
-            <div className="flex flex-col items-center gap-2 py-1">
-              {loading ? (
-                <>
-                  {[1, 2, 3].map((i) => (
-                    <Skeleton key={i} className="h-12 w-12 rounded-lg" />
-                  ))}
-                </>
-              ) : saves.length === 0 ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="brand"
-                      onClick={() => setShowCreateDialog(true)}
-                      className="h-8 w-8 rounded-lg"
-                    >
-                      <Plus className="h-5 w-5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">
-                    <p>{t("createNew")}</p>
-                  </TooltipContent>
-                </Tooltip>
-              ) : (
-                saves.map((save) => (
-                  <CollapsedSaveItem key={save.id} save={save} />
-                ))
-              )}
-            </div>
-          </ScrollArea>
+        <div className="flex flex-col items-center pt-4 pb-2">
+          <div className="flex flex-col items-center gap-2 py-1 w-full">
+            {loading ? (
+              <>
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-12 w-12 rounded-lg" />
+                ))}
+              </>
+            ) : saves.length === 0 ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="brand"
+                    onClick={() => setShowCreateDialog(true)}
+                    className="h-8 w-8 rounded-lg"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>{t("createNew")}</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              saves.map((save) => (
+                <CollapsedSaveItem key={save.id} save={save} />
+              ))
+            )}
+          </div>
         </div>
 
         <CreateCollectionDialog {...dialogProps} />
@@ -266,14 +262,14 @@ export default function SavesList({
 
   return (
     <>
-      <div className="h-full flex flex-col">
+      <div className="flex flex-col">
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
           <div className="flex items-center gap-2">
             <div className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-primary/10 dark:bg-brand-primary/20">
               <Library className="h-3.5 w-3.5 text-brand-primary dark:text-brand-primary-light" />
             </div>
             <h3 className="text-xs font-semibold text-foreground dark:text-white">
-              Your Collections
+              {t("yourCollections")}
             </h3>
           </div>
 
@@ -287,19 +283,19 @@ export default function SavesList({
           </Button>
         </div>
 
-        <ScrollArea className="flex-1 px-3">
-          <div className="space-y-1.5 pb-4 pt-1">
+        <div className="px-3 pb-3">
+          <div className="space-y-1.5 pt-1">
             {loading ? (
               <SidebarLoadingSkeletons />
             ) : saves.length === 0 ? (
-              <SidebarEmptyState onCreateClick={() => setShowCreateDialog(true)} />
+              <SidebarEmptyState
+                onCreateClick={() => setShowCreateDialog(true)}
+              />
             ) : (
-              saves.map((save) => (
-                <SidebarSaveItem key={save.id} save={save} />
-              ))
+              saves.map((save) => <SidebarSaveItem key={save.id} save={save} />)
             )}
           </div>
-        </ScrollArea>
+        </div>
       </div>
 
       <CreateCollectionDialog {...dialogProps} />

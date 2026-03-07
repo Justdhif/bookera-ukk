@@ -21,6 +21,7 @@ import { BookOpen, ChevronRight, Layers, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import SavesList from "@/components/custom-ui/content/public/saves/SavesList";
+import FollowsList from "@/components/custom-ui/content/public/follows/FollowsList";
 
 export default function PublicSidebar() {
   const { open } = useSidebar();
@@ -71,11 +72,17 @@ export default function PublicSidebar() {
         )}
       </SidebarHeader>
 
-      <SidebarContent className="overflow-hidden">
-        <SidebarGroup className="flex-1 p-0 overflow-hidden">
-          <div className="h-full overflow-hidden">
-            <SavesList mode="sidebar" isCollapsed={!open} />
-          </div>
+      <SidebarContent className="overflow-y-auto">
+        <SidebarGroup className="p-0 flex-none">
+          <SavesList mode="sidebar" isCollapsed={!open} />
+        </SidebarGroup>
+
+        {open && (
+          <div className="mx-4 h-px bg-border/60 dark:bg-white/10" />
+        )}
+
+        <SidebarGroup className="p-0 flex-none">
+          <FollowsList isCollapsed={!open} />
         </SidebarGroup>
       </SidebarContent>
 
