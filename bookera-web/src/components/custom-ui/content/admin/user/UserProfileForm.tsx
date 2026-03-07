@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { User } from "@/types/user";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,7 @@ export default function UserProfileForm({
   isProfileView,
   hideAccount = false,
 }: UserProfileFormProps) {
+    const t = useTranslations("user");
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -66,23 +68,24 @@ export default function UserProfileForm({
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
-        <CardTitle>User Information</CardTitle>
+        <CardTitle>{t("userInformation")}</CardTitle>
         <CardDescription>
-          {isEditMode ? "Edit user information correctly" : "Full user details"}
+          {isEditMode ? t("editInfoDesc") : t("fullUserDetails")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {!hideAccount && (
           <div className="space-y-4">
-            <h3 className="font-semibold text-lg">Account</h3>
+            <h3 className="font-semibold text-lg">{t("accountSection")}</h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label
                   htmlFor="email"
                   variant={isEditMode ? "required" : "default"}
                 >
-                  Email
-                </Label>
+                  
+                                                    {t("email")}
+                                                  </Label>
                 <Input
                   id="email"
                   name="email"
@@ -90,7 +93,7 @@ export default function UserProfileForm({
                   required={isEditMode}
                   value={formData.email || ""}
                   onChange={handleInputChange}
-                  placeholder="Enter email"
+                  placeholder={t("enterEmail")}
                   disabled={!isEditMode || isProfileView}
                 />
               </div>
@@ -103,7 +106,7 @@ export default function UserProfileForm({
                     type="password"
                     value={formData.password || ""}
                     onChange={handleInputChange}
-                    placeholder="Enter password (leave empty to keep current)"
+                    placeholder={t("enterPassword")}
                   />
                 </div>
               )}
@@ -112,14 +115,14 @@ export default function UserProfileForm({
         )}
 
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Profile</h3>
+          <h3 className="font-semibold text-lg">{t("profileSection")}</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
               <Label
                 htmlFor="full_name"
                 variant={isEditMode ? "required" : "default"}
               >
-                Full Name
+                {t("fullName")}
               </Label>
               <Input
                 id="full_name"
@@ -127,7 +130,7 @@ export default function UserProfileForm({
                 required={isEditMode}
                 value={formData.full_name || ""}
                 onChange={handleInputChange}
-                placeholder="Enter full name"
+                placeholder={t("enterFullName")}
                 disabled={!isEditMode}
                 validationType={isEditMode ? "letters-only" : undefined}
                 onValidationChange={
@@ -137,32 +140,32 @@ export default function UserProfileForm({
             </div>
             <div className="space-y-2">
               <Label htmlFor="identification_number">
-                Identification Number
+                {t("identificationNumber")}
               </Label>
               <Input
                 id="identification_number"
                 name="identification_number"
                 value={formData.identification_number || ""}
                 onChange={handleInputChange}
-                placeholder="Enter identification number"
+                placeholder={t("enterIdNumber")}
                 disabled={!isEditMode}
                 validationType={!isEditMode ? undefined : "numbers-only"}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone_number">Phone Number</Label>
+              <Label htmlFor="phone_number">{t("phoneNumber")}</Label>
               <Input
                 id="phone_number"
                 name="phone_number"
                 value={formData.phone_number || ""}
                 onChange={handleInputChange}
-                placeholder="Enter phone number"
+                placeholder={t("enterPhone")}
                 disabled={!isEditMode}
                 validationType={!isEditMode ? undefined : "numbers-only"}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="gender">Gender</Label>
+              <Label htmlFor="gender">{t("gender")}</Label>
               <Select
                 value={formData.gender || ""}
                 onValueChange={(value: any) =>
@@ -171,19 +174,19 @@ export default function UserProfileForm({
                 disabled={!isEditMode}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select gender" className="w-full" />
+                  <SelectValue placeholder={t("selectGender")} className="w-full" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="male">Male</SelectItem>
-                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="male">{t("male")}</SelectItem>
+                  <SelectItem value="female">{t("female")}</SelectItem>
                   <SelectItem value="prefer_not_to_say">
-                    Prefer not to say
+                    {t("preferNotToSay")}
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="birth_date">Birth Date</Label>
+              <Label htmlFor="birth_date">{t("birthDate")}</Label>
               <DatePicker
                 value={
                   formData.birth_date
@@ -191,55 +194,55 @@ export default function UserProfileForm({
                     : undefined
                 }
                 onChange={handleBirthDateChange}
-                placeholder="Select birth date"
+                placeholder={t("selectBirthDate")}
                 disabled={!isEditMode}
                 dateMode="past"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="occupation">Occupation</Label>
+              <Label htmlFor="occupation">{t("occupation")}</Label>
               <Input
                 id="occupation"
                 name="occupation"
                 value={formData.occupation || ""}
                 onChange={handleInputChange}
-                placeholder="Enter occupation"
+                placeholder={t("enterOccupation")}
                 disabled={!isEditMode}
                 validationType={!isEditMode ? undefined : "letters-only"}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="institution">Institution</Label>
+              <Label htmlFor="institution">{t("institutionLabel")}</Label>
               <Input
                 id="institution"
                 name="institution"
                 value={formData.institution || ""}
                 onChange={handleInputChange}
-                placeholder="Enter institution"
+                placeholder={t("enterInstitution")}
                 disabled={!isEditMode}
                 validationType={!isEditMode ? undefined : "alphanumeric"}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address">{t("addressLabel")}</Label>
               <Textarea
                 id="address"
                 name="address"
                 value={formData.address || ""}
                 onChange={handleInputChange}
-                placeholder="Enter address"
+                placeholder={t("enterAddress")}
                 rows={2}
                 disabled={!isEditMode}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="bio">Bio</Label>
+              <Label htmlFor="bio">{t("bioLabel")}</Label>
               <Textarea
                 id="bio"
                 name="bio"
                 value={formData.bio || ""}
                 onChange={handleInputChange}
-                placeholder="Enter bio"
+                placeholder={t("enterBio")}
                 rows={3}
                 disabled={!isEditMode}
               />

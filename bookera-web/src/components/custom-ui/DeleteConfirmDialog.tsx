@@ -1,4 +1,6 @@
 "use client";
+
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +33,7 @@ export default function DeleteConfirmDialog({
   onConfirm,
   loading = false,
 }: DeleteConfirmDialogProps) {
+    const t = useTranslations("common");
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleConfirm = async () => {
@@ -56,7 +59,7 @@ export default function DeleteConfirmDialog({
           </div>
           <div className="text-center space-y-2">
             <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-              {title || "Delete Data"}
+              {title || t("deleteData")}
             </DialogTitle>
             <DialogDescription className="text-base text-gray-600 dark:text-gray-400 leading-relaxed">
               {description}
@@ -72,7 +75,7 @@ export default function DeleteConfirmDialog({
             disabled={isDeleting}
             className="w-full sm:w-auto sm:flex-1 h-11 font-medium border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 transition-all duration-200"
           >
-            {cancelText || "Cancel"}
+            {cancelText || t("cancel")}
           </Button>
           <Button
             type="button"
@@ -84,10 +87,10 @@ export default function DeleteConfirmDialog({
             {isDeleting ? (
               <span className="flex items-center justify-center">
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {"Loading..."}...
+                {t("loading")}...
               </span>
             ) : (
-              confirmText || "Delete"
+              confirmText || t("delete")
             )}
           </Button>
         </DialogFooter>

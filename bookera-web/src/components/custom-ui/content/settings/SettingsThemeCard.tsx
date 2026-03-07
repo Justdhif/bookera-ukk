@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -15,34 +16,41 @@ import ThemeDark from "@/assets/themes/dark-theme-icon.svg";
 import ThemeSystem from "@/assets/themes/system-theme-icon.svg";
 import { toast } from "sonner";
 
-const themeOptions = [
-  { value: "light", label: "Light", icon: Sun, image: ThemeLight },
-  { value: "dark", label: "Dark", icon: Moon, image: ThemeDark },
-  { value: "system", label: "System", icon: Monitor, image: ThemeSystem },
+const getThemeOptions = (t: any) => [
+  { value: "light", label: t("light"), icon: Sun, image: ThemeLight },
+  { value: "dark", label: t("dark"), icon: Moon, image: ThemeDark },
+  { value: "system", label: t("system"), icon: Monitor, image: ThemeSystem },
 ];
 
 export default function SettingsThemeCard() {
+  const t = useTranslations("settings");
   const { theme, setTheme } = useTheme();
+
+  const themeOptions = [
+    { value: "light", label: t("light"), icon: Sun, image: ThemeLight },
+    { value: "dark", label: t("dark"), icon: Moon, image: ThemeDark },
+    { value: "system", label: t("system"), icon: Monitor, image: ThemeSystem },
+  ];
 
   const handleThemeChange = (newTheme: string) => {
     setTheme(newTheme);
-    toast.success("Theme updated successfully");
+    toast.success(t("themeUpdated"));
   };
 
   return (
     <Card className="overflow-hidden border-none shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-3 text-2xl relative">
-          {"Theme"}
+          {t("themeTitle")}
           <div className="absolute -bottom-1 left-0 h-1 w-6 rounded-full bg-muted-foreground" />
         </CardTitle>
         <CardDescription className="text-base">
-          {"Choose your preferred theme"}
+          {t("themeDescription")}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {themeOptions.map((option) => {
+          {getThemeOptions(t).map((option) => {
             const Icon = option.icon;
             const isActive = theme === option.value;
 

@@ -1,12 +1,14 @@
 "use client";
+
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Book } from "@/types/book";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 export default function BookCard({ book }: { book: Book }) {
-  const router = useRouter();
+    const t = useTranslations("public");
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -14,7 +16,8 @@ export default function BookCard({ book }: { book: Book }) {
 
   useEffect(() => {
     if (containerRef.current && textRef.current) {
-      const overflow = textRef.current.scrollWidth - containerRef.current.clientWidth;
+      const overflow =
+        textRef.current.scrollWidth - containerRef.current.clientWidth;
       setScrollOffset(overflow > 0 ? overflow : 0);
     }
   }, [book.title]);
@@ -32,11 +35,19 @@ export default function BookCard({ book }: { book: Book }) {
         />
         {book.total_copies !== undefined && (
           <div className="absolute top-2 right-2 flex flex-col gap-1">
-            <Badge 
-              variant={book.available_copies && book.available_copies > 0 ? "default" : "secondary"}
-              className={book.available_copies && book.available_copies > 0 ? "bg-brand-primary hover:bg-brand-primary-dark text-white text-xs" : "text-xs"}
+            <Badge
+              variant={
+                book.available_copies && book.available_copies > 0
+                  ? "default"
+                  : "secondary"
+              }
+              className={
+                book.available_copies && book.available_copies > 0
+                  ? "bg-brand-primary hover:bg-brand-primary-dark text-white text-xs"
+                  : "text-xs"
+              }
             >
-              {book.available_copies || 0}/{book.total_copies} {"Available"}
+              {book.available_copies || 0}/{book.total_copies} {t("available")}
             </Badge>
           </div>
         )}
@@ -57,7 +68,11 @@ export default function BookCard({ book }: { book: Book }) {
                 const scrollDuration = Math.max(1.5, scrollOffset / 50);
                 const pauseDuration = 2;
                 const returnDuration = Math.max(0.5, scrollDuration * 0.4);
-                const total = pauseDuration + scrollDuration + pauseDuration + returnDuration;
+                const total =
+                  pauseDuration +
+                  scrollDuration +
+                  pauseDuration +
+                  returnDuration;
                 return {
                   duration: total,
                   times: [
@@ -81,14 +96,11 @@ export default function BookCard({ book }: { book: Book }) {
         <p className="text-sm text-muted-foreground">{book.author}</p>
       </div>
 
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => router.push(`/books/${book.slug}`)}
-        className="w-full"
-      >
-        {"Detail"}
-      </Button>
+      <Link href={`/books/${book.slug}`} className="block">
+        <Button size="sm" variant="outline" className="w-full">
+          {t("detail.detail")}
+        </Button>
+      </Link>
     </div>
   );
 }

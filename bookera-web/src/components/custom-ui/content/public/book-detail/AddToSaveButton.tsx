@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/auth.store";
 import { saveService } from "@/services/save.service";
@@ -25,6 +26,7 @@ interface AddToSaveButtonProps {
 }
 
 export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
+    const t = useTranslations("public");
   const { isAuthenticated } = useAuthStore();
   const [showDialog, setShowDialog] = useState(false);
   const [saves, setSaves] = useState<SaveListItem[]>([]);
@@ -64,7 +66,7 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
 
   const handleCreateAndAdd = async () => {
     if (!formData.name.trim()) {
-      toast.error("Please enter a name for your collection");
+      toast.error(t("nameRequired"));
       return;
     }
 
@@ -79,7 +81,7 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
       setFormData({ name: "", description: "" });
       window.dispatchEvent(new Event('refreshSavesList'));
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to create collection");
+      toast.error(error.response?.data?.message || t("createFailed"));
     } finally {
       setIsCreating(false);
     }
@@ -116,8 +118,9 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
                   onClick={() => setShowCreateNew(true)}
                 >
                   <Plus className="h-4 w-4" />
-                  Create New Collection
-                </Button>
+                  
+                                                    {t("createNew")}
+                                                  </Button>
               </div>
 
               <ScrollArea className="h-75 pr-4">
@@ -129,15 +132,16 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
                   ) : saves.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
                       <BookMarked className="h-12 w-12 mx-auto mb-2 opacity-30" />
-                      <p>No collections yet</p>
+                      <p>{t("noCollections")}</p>
                       <Button
                         variant="link"
                         size="sm"
                         onClick={() => setShowCreateNew(true)}
                         className="mt-2"
                       >
-                        Create your first collection
-                      </Button>
+                        
+                                                                          {t("createFirst")}
+                                                                        </Button>
                     </div>
                   ) : (
                     saves.map((save) => (
@@ -152,8 +156,8 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate">{save.name}</p>
                           <p className="text-xs text-muted-foreground">
-                            {save.total_books} books
-                          </p>
+                            {save.total_books}  {t("books")}
+                                                              </p>
                         </div>
                       </button>
                     ))
@@ -168,7 +172,7 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
                   <Label htmlFor="name">Name *</Label>
                   <Input
                     id="name"
-                    placeholder="e.g., My Favorites, To Read, etc."
+                    placeholder={t("namePlaceholder")}
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
@@ -177,10 +181,10 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">{t("detail.editDialog.description")}</Label>
                   <Textarea
                     id="description"
-                    placeholder="Optional description..."
+                    placeholder={t("descriptionPlaceholder")}
                     value={formData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
@@ -195,15 +199,16 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
                   onClick={() => setShowCreateNew(false)}
                   disabled={isCreating}
                 >
-                  Back
-                </Button>
+                  
+                                                        {t("detail.back")}
+                                                      </Button>
                 <Button
                   variant="submit"
                   onClick={handleCreateAndAdd}
                   disabled={isCreating}
                 >
                   {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {isCreating ? "Creating..." : "Create & Add Book"}
+                  {isCreating ? t("creating") : "Create & Add Book"}
                 </Button>
               </DialogFooter>
             </>

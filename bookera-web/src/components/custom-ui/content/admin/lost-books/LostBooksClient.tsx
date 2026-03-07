@@ -1,8 +1,12 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { LostBook } from "@/types/lost-book";
-import { lostBookService, LostBookFilterParams } from "@/services/lost-book.service";
+import {
+  lostBookService,
+  LostBookFilterParams,
+} from "@/services/lost-book.service";
 import LostBooksTable from "./LostBooksTable";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -10,40 +14,38 @@ import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { Search, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
+
 export default function LostBooksClient() {
+    const t = useTranslations("lost-books");
   const [lostBooks, setLostBooks] = useState<LostBook[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [filters, setFilters] = useState<LostBookFilterParams>({ per_page: 10 });
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [filters, setFilters] = useState<LostBookFilterParams>({
+    per_page: 10,
+  });
   const [searchInput, setSearchInput] = useState("");
-  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    from: 0,
+    to: 0,
+  });
 
-  
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setFilters((prev) => ({ ...prev, search: searchInput || undefined, page: 1 }));
+      setFilters((prev) => ({
+        ...prev,
+        search: searchInput || undefined,
+        page: 1,
+      }));
     }, 500);
     return () => clearTimeout(timeout);
   }, [searchInput]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSearchInput(e.target.value);
-  const [actionLoading, setActionLoading] = useState<number | null>(null);
-
-  const confirmDelete = async () => {
-    if (!deleteId) return;
-
-    try {
-      await lostBookService.delete(deleteId);
-      toast.success("Lost book record deleted successfully");
-      setDeleteId(null);
-      fetchLostBooks(filters);
-    } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || "Failed to delete lost book record",
-      );
-    }
-  };
 
   const fetchLostBooks = async (activeFilters: LostBookFilterParams) => {
     setLoading(true);
@@ -59,7 +61,7 @@ export default function LostBooksClient() {
         to: paginatedData.to ?? 0,
       });
     } catch (error) {
-      toast.error("Failed to load lost books");
+      toast.error(t("loadError"));
     } finally {
       setLoading(false);
     }
@@ -69,33 +71,37 @@ export default function LostBooksClient() {
     fetchLostBooks(filters);
   }, [filters]);
 
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await lostBookService.delete(deleteId);
+      toast.success(t("deleteSuccess"));
+      setDeleteId(null);
+      fetchLostBooks(filters);
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || t("deleteError"),
+      );
+    }
+  };
+
   const handleFinish = async (id: number) => {
     setActionLoading(id);
     try {
       await lostBookService.finish(id);
-      toast.success("Lost book process completed successfully");
+      toast.success(t("completeSuccess"));
       fetchLostBooks(filters);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Failed to complete lost book process",
+        error.response?.data?.message || t("completeError"),
       );
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleProcessFine = async (id: number) => {
-    setActionLoading(id);
-    try {
-      const response = await lostBookService.processFine(id);
-      toast.success(response.data.message || "Fine processed successfully");
-      fetchLostBooks(filters);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to process fine");
-    } finally {
-      setActionLoading(null);
-    }
-  };
+  // onProcessFine stub kept for LostBooksTable prop compatibility (not used in UI)
+  const handleProcessFine = async (_id: number) => {};
 
   return (
     <div className="space-y-6">
@@ -103,11 +109,11 @@ export default function LostBooksClient() {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <AlertCircle className="h-8 w-8 text-destructive" />
-            {"Lost Books"}
+            {t("title")}
           </h1>
           <p className="text-muted-foreground">
             {
-              "Manage lost book reports. Make sure the fine has been paid before completing the process."
+              t("description")
             }
           </p>
         </div>
@@ -117,7 +123,7 @@ export default function LostBooksClient() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={"Search lost books..."}
+            placeholder={t("searchPlaceholder")}
             value={searchInput}
             onChange={handleSearchChange}
             className="pl-9"
@@ -135,12 +141,46 @@ export default function LostBooksClient() {
       >
         {loading ? (
           <div className="space-y-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex items-center gap-4 p-4 border rounded">
-                <Skeleton className="h-12 w-12 rounded" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-3 w-3/4" />
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="border rounded-lg overflow-hidden">
+                {/* Borrow header */}
+                <div className="bg-muted/40 px-4 py-3 flex items-center justify-between border-b gap-4">
+                  <div className="flex items-center gap-2.5">
+                    <Skeleton className="size-8 rounded-full shrink-0" />
+                    <div className="space-y-1.5">
+                      <Skeleton className="h-3.5 w-32" />
+                      <Skeleton className="h-3 w-44" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-3 w-28" />
+                    <Skeleton className="h-5 w-14 rounded-full" />
+                  </div>
+                </div>
+                {/* Inner rows */}
+                <div className="divide-y">
+                  {Array.from({ length: 2 }).map((_, j) => (
+                    <div key={j} className="flex items-center gap-4 px-4 py-3">
+                      <Skeleton className="h-4 w-4 shrink-0" />
+                      <div className="flex items-start gap-2 w-[260px] shrink-0">
+                        <Skeleton className="h-4 w-4 mt-0.5 shrink-0" />
+                        <div className="space-y-1">
+                          <Skeleton className="h-4 w-36" />
+                          <Skeleton className="h-3 w-20" />
+                        </div>
+                      </div>
+                      <div className="w-[160px] shrink-0 space-y-1">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-3 w-28" />
+                      </div>
+                      <div className="flex-1">
+                        <Skeleton className="h-4 w-40" />
+                      </div>
+                      <div className="flex gap-1.5 ml-auto">
+                        <Skeleton className="h-8 w-20 rounded-md" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -159,8 +199,8 @@ export default function LostBooksClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title={"Delete Lost Book Record"}
-        description={"Deleted lost book records cannot be recovered."}
+        title={t("deleteLostBookRecord")}
+        description={t("deleteLostDesc")}
         onConfirm={confirmDelete}
       />
     </div>

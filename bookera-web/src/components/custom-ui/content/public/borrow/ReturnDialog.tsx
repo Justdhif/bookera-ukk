@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import {
   Dialog,
@@ -40,6 +41,7 @@ export function ReturnDialog({
   borrow,
   onSuccess,
 }: ReturnDialogProps) {
+    const t = useTranslations("public");
   const [selectedDetailIds, setSelectedDetailIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -101,7 +103,7 @@ export function ReturnDialog({
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
               <PackageOpen className="h-4 w-4 text-primary" />
             </div>
-            <span>Request Return</span>
+            <span>{t("requestReturn")}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -208,16 +210,17 @@ export function ReturnDialog({
 
           {selectedDetailIds.length > 0 && (
             <p className="text-xs text-muted-foreground pt-1">
-              {selectedDetailIds.length} book
-              {selectedDetailIds.length > 1 ? "s" : ""} selected for return
+              {selectedDetailIds.length}  {t("book")}
+                                        {selectedDetailIds.length > 1 ? "s" : ""} selected for return
             </p>
           )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={loading}>
-            Cancel
-          </Button>
+            
+                                  {t("detail.editDialog.cancel")}
+                                </Button>
           <Button
             onClick={handleSubmit}
             disabled={loading || selectedDetailIds.length === 0}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { TermsOfService } from "@/types/terms-of-service";
 import EmptyState from "@/components/custom-ui/EmptyState";
@@ -13,11 +14,12 @@ export default function TermsOfServiceList({
   onEdit: (item: TermsOfService) => void;
   onDelete: (id: number) => void;
 }) {
+    const t = useTranslations("terms-of-service");
   if (data.length === 0) {
     return (
       <EmptyState
-        title={"No Terms of Service yet"}
-        description={"Terms of Service will appear after you add it."}
+        title={t("noTerms")}
+        description={t("noTermsDesc")}
         icon={<FileText className="h-10 w-10" />}
       />
     );

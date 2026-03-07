@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { bookCopyService } from "@/services/book-copy.service";
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function BookCopyForm({ bookId, onSuccess }: Props) {
+  const t = useTranslations("book");
   const [formData, setFormData] = useState({
     copyCode: "",
   });
@@ -41,7 +43,7 @@ export function BookCopyForm({ bookId, onSuccess }: Props) {
     <div className="flex gap-2">
       <Input
         name="copyCode"
-        placeholder="Enter copy code (e.g., LIB-001)"
+        placeholder={t("enterCopyCode")}
         value={formData.copyCode}
         onChange={handleInputChange}
       />
@@ -49,7 +51,7 @@ export function BookCopyForm({ bookId, onSuccess }: Props) {
         onClick={handleSubmit}
         disabled={loading || !formData.copyCode.trim()}
       >
-        {loading ? "Adding..." : "Add Copy"}
+        {loading ? t("adding") : t("addCopy")}
       </Button>
     </div>
   );

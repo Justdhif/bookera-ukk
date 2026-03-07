@@ -1,7 +1,9 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+
 import { userService, UpdateUserData } from "@/services/user.service";
 import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
@@ -12,6 +14,7 @@ import UserSideCard from "../UserSideCard";
 import UserProfileForm from "../UserProfileForm";
 
 export default function UserDetailClient() {
+    const t = useTranslations("user");
   const router = useRouter();
   const params = useParams();
   const identificationNumber = params.identificationNumber as string;
@@ -73,11 +76,11 @@ export default function UserDetailClient() {
     try {
       setSubmitting(true);
       await userService.update(user.id, formData as UpdateUserData);
-      toast.success("User updated successfully");
+      toast.success(t("updateSuccess"));
       setIsEditMode(false);
       fetchUser();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to update user");
+      toast.error(error.response?.data?.message || t("updateError"));
     } finally {
       setSubmitting(false);
     }
@@ -131,8 +134,8 @@ export default function UserDetailClient() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push("/admin/users")}
             className="h-8 w-8"
+            onClick={() => router.back()}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -179,8 +182,9 @@ export default function UserDetailClient() {
             className="h-8 gap-1"
           >
             <Edit className="h-3.5 w-3.5" />
-            Edit User
-          </Button>
+            
+                                      {t("editUser")}
+                                    </Button>
         )}
       </div>
 

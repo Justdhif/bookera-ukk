@@ -20,8 +20,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
+import { useTranslations } from "next-intl";
 
 export default function AuthorClient() {
+  const t = useTranslations("author");
   const [authors, setAuthors] = useState<Author[]>([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<AuthorFilterParams>({ per_page: 10 });
@@ -71,7 +73,7 @@ export default function AuthorClient() {
         to: paginatedData.to ?? 0,
       });
     } catch {
-      toast.error("Failed to load authors");
+      toast.error(t("loadError"));
     } finally {
       setLoading(false);
     }
@@ -90,7 +92,7 @@ export default function AuthorClient() {
     if (!deleteId) return;
     try {
       await authorService.delete(deleteId);
-      toast.success("Author deleted successfully");
+      toast.success(t("deleteSuccess"));
       setDeleteId(null);
       fetchAuthors(filters);
     } catch (err: any) {
@@ -107,8 +109,8 @@ export default function AuthorClient() {
             <UserSquare className="h-8 w-8 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Authors</h1>
-            <p className="text-muted-foreground">Manage book authors</p>
+            <h1 className="text-3xl font-bold">{t("title")}</h1>
+            <p className="text-muted-foreground">{t("description")}</p>
           </div>
         </div>
         <Button
@@ -117,7 +119,7 @@ export default function AuthorClient() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          Add Author
+          {t("addAuthor")}
         </Button>
       </div>
 
@@ -126,7 +128,7 @@ export default function AuthorClient() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search authors..."
+            placeholder={t("searchAuthors")}
             value={searchInput}
             onChange={handleSearchChange}
             className="pl-9"
@@ -137,12 +139,12 @@ export default function AuthorClient() {
           onValueChange={handleStatusChange}
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="All Status" />
+            <SelectValue placeholder={t("allStatus")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="all">{t("allStatus")}</SelectItem>
+            <SelectItem value="active">{t("active")}</SelectItem>
+            <SelectItem value="inactive">{t("inactive")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -184,7 +186,7 @@ export default function AuthorClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={() => setDeleteId(null)}
-        title="Delete Author"
+        title={t("deleteAuthor")}
         description="Are you sure you want to delete this author? This action cannot be undone."
         onConfirm={confirmDelete}
       />

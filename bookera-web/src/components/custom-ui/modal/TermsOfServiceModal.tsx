@@ -102,7 +102,7 @@ export function TermsOfServiceModal({
               <div className="mb-4 flex justify-center opacity-50">
                 <FileText className="w-12 h-12" />
               </div>
-              <p>{"Content not available"}</p>
+              <p>Content not available</p>
             </div>
           )}
         </ScrollArea>

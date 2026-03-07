@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { toast } from "sonner";
@@ -13,12 +14,6 @@ import ForgotStepSuccess from "./steps/ForgotStepSuccess";
 
 
 export type ForgotStep = "method" | "otp" | "reset" | "success";
-
-export const FORGOT_STEPS = [
-  { key: "method" as ForgotStep, label: "Method", icon: Mail },
-  { key: "otp" as ForgotStep, label: "Verify", icon: KeyRound },
-  { key: "reset" as ForgotStep, label: "New Password", icon: Lock },
-];
 
 export const cardVariants = {
   enter: { x: 60, opacity: 0, scale: 0.96 },
@@ -34,6 +29,13 @@ export const cardTransition = {
 
 export default function ForgotPasswordClient() {
   const router = useRouter();
+  const t = useTranslations("forgot-password");
+
+  const FORGOT_STEPS = [
+    { key: "method" as ForgotStep, label: t("method"), icon: Mail },
+    { key: "otp" as ForgotStep, label: t("verify"), icon: KeyRound },
+    { key: "reset" as ForgotStep, label: t("newPassword"), icon: Lock },
+  ];
 
   const [step, setStep] = useState<ForgotStep>("method");
   const [email, setEmail] = useState("");
@@ -67,7 +69,7 @@ export default function ForgotPasswordClient() {
 
   const handleSendOtp = async () => {
     if (!email.trim()) {
-      toast.error("Please enter your email address");
+      toast.error(t("emailRequired"));
       return;
     }
     setSubmitting(true);
@@ -129,7 +131,7 @@ export default function ForgotPasswordClient() {
 
   const handleVerifyOtp = (otpCode: string) => {
     if (otpCode.length !== 6) {
-      toast.error("Please enter all 6 digits");
+      toast.error(t("otpRequired"));
       return;
     }
     setStep("reset");

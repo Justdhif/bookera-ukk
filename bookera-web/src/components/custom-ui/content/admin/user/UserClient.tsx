@@ -1,5 +1,7 @@
 "use client";
-import { useRouter } from "next/navigation";
+
+import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 import { useEffect, useState } from "react";
 import { User } from "@/types/user";
@@ -13,11 +15,17 @@ import { UserTableSkeleton } from "./UserTableSkeleton";
 import { Plus, User as UserIcon } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 export default function UserClient() {
-  const router = useRouter();
+    const t = useTranslations("user");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    from: 0,
+    to: 0,
+  });
 
   const [filters, setFilters] = useState<UserFilterParams>({ per_page: 10 });
 
@@ -25,7 +33,7 @@ export default function UserClient() {
     if (!deleteId) return;
 
     await userService.delete(deleteId);
-    toast.success("User deleted successfully");
+    toast.success(t("deleteSuccess"));
     setDeleteId(null);
     fetchUsers(filters);
   };
@@ -44,7 +52,7 @@ export default function UserClient() {
         to: paginatedData.to ?? 0,
       });
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to load users");
+      toast.error(error.response?.data?.message || t("loadError"));
     } finally {
       setLoading(false);
     }
@@ -62,20 +70,19 @@ export default function UserClient() {
             <UserIcon className="w-8 h-8 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Users</h1>
+            <h1 className="text-3xl font-bold">{t("title")}</h1>
             <p className="text-muted-foreground">
               Manage your library users and their roles
             </p>
           </div>
         </div>
-        <Button
-          onClick={() => router.push("/admin/users/add")}
-          variant="brand"
-          className="h-8 gap-1"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Add User
-        </Button>
+        <Link href="/admin/users/add">
+          <Button variant="brand" className="h-8 gap-1">
+            <Plus className="w-3.5 h-3.5" />
+            
+                                  {t("addUser")}
+                                </Button>
+        </Link>
       </div>
 
       <UserFilter
@@ -106,7 +113,7 @@ export default function UserClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Delete User"
+        title={t("deleteUser")}
         description="Are you sure you want to delete this user? This action cannot be undone."
         onConfirm={confirmDelete}
       />

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
+import { useTranslations } from "next-intl";
 
 interface BorrowDateCardProps {
   value: Date | undefined;
@@ -16,21 +17,22 @@ interface BorrowDateCardProps {
 }
 
 export default function BorrowDateCard({ value, onChange }: BorrowDateCardProps) {
+  const t = useTranslations("borrow");
   return (
     <Card>
       <CardHeader>
         <Label variant="required">
-          <CardTitle>Borrow Date</CardTitle>
+          <CardTitle>{t("borrowDateTitle")}</CardTitle>
         </Label>
         <CardDescription>
-          Select the date the borrow starts
+          {t("borrowDateDesc")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <DatePicker
           value={value}
           onChange={onChange}
-          placeholder="Select borrow date"
+          placeholder={t("borrowDatePlaceholder")}
           dateMode="future"
         />
       </CardContent>

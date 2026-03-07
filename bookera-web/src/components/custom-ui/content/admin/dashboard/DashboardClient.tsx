@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { dashboardService } from "@/services/dashboard.service";
 import {
@@ -17,6 +18,7 @@ import { BorrowMonthlyChartSkeleton, BorrowStatusChartSkeleton } from "./charts/
 import { LatestBorrowsTableSkeleton } from "./table/LatestBorrowsTableSkeleton";
 import { toast } from "sonner";
 export default function DashboardClient() {
+    const t = useTranslations("dashboard");
   const [totals, setTotals] = useState<DashboardTotals>();
   const [monthly, setMonthly] = useState<BorrowMonthly[]>([]);
   const [status, setStatus] = useState<BorrowStatus[]>([]);
@@ -38,7 +40,7 @@ export default function DashboardClient() {
         setLatestBorrows(latestRes.data.data);
       })
       .catch(() => {
-        toast.error("Failed to load dashboard");
+        toast.error(t("loadError"));
       })
       .finally(() => {
         setLoading(false);

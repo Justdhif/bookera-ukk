@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Table,
   TableBody,
@@ -32,11 +33,12 @@ export default function CategoryTable({
   onEdit: (category: Category) => void;
   onDelete: (id: number) => void;
 }) {
+  const t = useTranslations("category");
   if (data.length === 0) {
     return (
       <EmptyState
-        title="No categories found"
-        description="Get started by creating your first category"
+        title={t("noCategories")}
+        description={t("noCategoriesDesc")}
         icon={<FolderOpen className="h-10 w-10" />}
       />
     );
@@ -46,12 +48,12 @@ export default function CategoryTable({
     <Table>
       <TableHeader>
         <TableRow className="bg-muted/50 hover:bg-muted/50">
-          <TableHead className="w-16 text-center">#</TableHead>
-          <TableHead className="w-16 text-center font-semibold">Icon</TableHead>
-          <TableHead className="font-semibold">Category</TableHead>
-          <TableHead className="font-semibold">Slug</TableHead>
-          <TableHead className="font-semibold">Description</TableHead>
-          <TableHead className="font-semibold text-right">Actions</TableHead>
+          <TableHead className="w-16 text-center">{t("noCol")}</TableHead>
+          <TableHead className="w-16 text-center font-semibold">{t("iconCol")}</TableHead>
+          <TableHead className="font-semibold">{t("categoryCol")}</TableHead>
+          <TableHead className="font-semibold">{t("slugCol")}</TableHead>
+          <TableHead className="font-semibold">{t("descriptionCol")}</TableHead>
+          <TableHead className="font-semibold text-right">{t("actionsCol")}</TableHead>
         </TableRow>
       </TableHeader>
 
@@ -105,7 +107,7 @@ export default function CategoryTable({
                     className="h-8 gap-1"
                   >
                     <Edit className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Edit</span>
+                    <span className="hidden sm:inline">{t("edit")}</span>
                   </Button>
 
                   <Button
@@ -115,7 +117,7 @@ export default function CategoryTable({
                     className="h-8 gap-1"
                   >
                     <Trash className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Delete</span>
+                    <span className="hidden sm:inline">{t("delete")}</span>
                   </Button>
                 </div>
               </TableCell>

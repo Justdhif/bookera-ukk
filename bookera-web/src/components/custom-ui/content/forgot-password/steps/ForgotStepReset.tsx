@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ interface ForgotStepResetProps {
 }
 
 export default function ForgotStepReset({ loading, onReset }: ForgotStepResetProps) {
+  const t = useTranslations("forgot-password");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNew, setShowNew] = useState(false);
@@ -53,10 +55,10 @@ export default function ForgotStepReset({ loading, onReset }: ForgotStepResetPro
         </motion.div>
         <div>
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
-            Create New Password
+            {t("createNewPassword")}
           </CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-300 transition-colors mt-2">
-            Enter a new secure password for your account
+            {t("createNewPasswordDesc")}
           </CardDescription>
         </div>
       </CardHeader>
@@ -65,12 +67,12 @@ export default function ForgotStepReset({ loading, onReset }: ForgotStepResetPro
           <div className="space-y-1">
             <Label htmlFor="new-password" variant="required">
               <Lock className="w-4 h-4" />
-              New Password
+              {t("newPassword")}
             </Label>
             <div className="relative">
               <Input
                 id="new-password"
-                placeholder="Create a strong password"
+                placeholder={t("createPasswordPlaceholder")}
                 type={showNew ? "text" : "password"}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -99,12 +101,12 @@ export default function ForgotStepReset({ loading, onReset }: ForgotStepResetPro
           <div className="space-y-1">
             <Label htmlFor="confirm-password" variant="required">
               <ShieldCheck className="w-4 h-4" />
-              Confirm New Password
+              {t("confirmNewPassword")}
             </Label>
             <div className="relative">
               <Input
                 id="confirm-password"
-                placeholder="Re-enter your password"
+                placeholder={t("reEnterPassword")}
                 type={showConfirm ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -135,7 +137,7 @@ export default function ForgotStepReset({ loading, onReset }: ForgotStepResetPro
                 animate={{ opacity: 1, y: 0 }}
                 className="text-xs text-red-500"
               >
-                Passwords do not match
+                {t("passwordMismatch")}
               </motion.p>
             )}
           </div>
@@ -148,7 +150,7 @@ export default function ForgotStepReset({ loading, onReset }: ForgotStepResetPro
             className="w-full h-12 text-base font-semibold rounded-lg bg-linear-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
             spinnerClassName="text-white"
           >
-            {loading ? "Saving..." : (<>Reset Password<ArrowRight className="w-5 h-5 ml-2" /></>)}
+            {loading ? t("saving") : (<>{t("resetPassword")}<ArrowRight className="w-5 h-5 ml-2" /></>)}
           </Button>
         </form>
       </CardContent>

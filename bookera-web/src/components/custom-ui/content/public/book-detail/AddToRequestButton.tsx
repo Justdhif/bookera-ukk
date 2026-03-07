@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter, usePathname } from "next/navigation";
@@ -25,6 +26,7 @@ interface AddToRequestButtonProps {
 export default function AddToRequestButton({
   bookId,
 }: AddToRequestButtonProps) {
+    const t = useTranslations("public");
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -89,39 +91,39 @@ export default function AddToRequestButton({
         className="gap-2"
       >
         <BookPlus className="h-4 w-4" />
-        {"Add to Request"}
+        {t("addToRequest")}
       </Button>
 
       <Dialog open={showDialog} onOpenChange={handleClose}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{"Borrow Request"}</DialogTitle>
+            <DialogTitle>{t("borrowRequestTitle")}</DialogTitle>
             <DialogDescription>
-              {"Set the borrow date and return date for your borrow request"}
+              {t("borrowRequestDesc")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label variant="required">{"Borrow Date"}</Label>
+              <Label variant="required">{t("borrowDateLabel")}</Label>
               <DatePicker
                 value={borrowDate}
                 onChange={setBorrowDate}
-                placeholder={"Select borrow date"}
+                placeholder={t("selectBorrowDate")}
                 dateMode="future"
               />
             </div>
 
             <div className="space-y-2">
-              <Label variant="required">{"Return Date"}</Label>
+              <Label variant="required">{t("returnDateLabel")}</Label>
               <DatePicker
                 value={returnDate}
                 onChange={setReturnDate}
-                placeholder={"Select return date"}
+                placeholder={t("selectReturnDate")}
                 dateMode="future"
               />
               <p className="text-xs text-muted-foreground">
-                {"Return date must be after borrow date"}
+                {t("returnDateMustBeAfter")}
               </p>
             </div>
 
@@ -132,14 +134,14 @@ export default function AddToRequestButton({
                 className="flex-1"
                 disabled={loading}
               >
-                {"Cancel"}
+                {t("detail.editDialog.cancel")}
               </Button>
               <Button
                 onClick={handleSubmit}
                 className="flex-1"
                 disabled={loading}
               >
-                {loading ? "Processing..." : "Submit Request"}
+                {loading ? t("processingBtn") : t("submitRequest")}
               </Button>
             </div>
           </div>

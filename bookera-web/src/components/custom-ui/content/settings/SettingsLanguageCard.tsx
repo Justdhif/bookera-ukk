@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import {
   Card,
@@ -27,6 +28,7 @@ const languageOptions = [
 ];
 
 export default function SettingsLanguageCard() {
+    const t = useTranslations("settings");
   const currentLocale = useLocale();
   const [selectedLocale, setSelectedLocale] = useState<Locale>(currentLocale as Locale);
   const [isPending, startTransition] = useTransition();
@@ -35,7 +37,7 @@ export default function SettingsLanguageCard() {
     setSelectedLocale(locale);
     startTransition(() => {
       setUserLocale(locale);
-      toast.success("Language updated successfully");
+      toast.success(t("languageUpdated"));
     });
   };
 
@@ -43,17 +45,17 @@ export default function SettingsLanguageCard() {
     <Card className="overflow-hidden border-none shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-3 text-2xl relative">
-          {"Language"}
+          {t("languageTitle")}
           <div className="absolute -bottom-1 left-0 h-1 w-6 rounded-full bg-muted-foreground" />
         </CardTitle>
         <CardDescription className="text-base">
-          {"Choose your preferred language"}
+          {t("languageDescription")}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
         <div className="max-w-md">
           <Label htmlFor="language-select" className="text-base mb-2 block">
-            Select Language
+            {t("selectLanguage")}
           </Label>
           <Select
             value={selectedLocale}
@@ -61,7 +63,7 @@ export default function SettingsLanguageCard() {
             disabled={isPending}
           >
             <SelectTrigger id="language-select" className="w-full h-12 text-base">
-              <SelectValue placeholder="Choose a language">
+              <SelectValue placeholder={t("chooseLang")}>
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">
                     {languageOptions.find((l) => l.value === selectedLocale)?.flag}

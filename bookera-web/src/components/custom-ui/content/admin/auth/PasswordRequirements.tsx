@@ -2,6 +2,7 @@
 
 import { Check, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 interface Requirement {
   label: string;
@@ -13,27 +14,31 @@ interface PasswordRequirementsProps {
   visible: boolean;
 }
 
-function getRequirements(password: string): Requirement[] {
+function checkPasswordMet(password: string): boolean[] {
   return [
-    { label: "At least 8 characters", met: password.length >= 8 },
-    { label: "One uppercase letter", met: /[A-Z]/.test(password) },
-    { label: "One number (0–9)", met: /[0-9]/.test(password) },
-    {
-      label: "Special character (!@#$...)",
-      met: /[^a-zA-Z0-9]/.test(password),
-    },
+    password.length >= 8,
+    /[A-Z]/.test(password),
+    /[0-9]/.test(password),
+    /[^a-zA-Z0-9]/.test(password),
   ];
 }
 
 export function isPasswordValid(password: string): boolean {
-  return getRequirements(password).every((r) => r.met);
+  return checkPasswordMet(password).every(Boolean);
 }
 
 export default function PasswordRequirements({
   password,
   visible,
 }: PasswordRequirementsProps) {
-  const requirements = getRequirements(password);
+  const t = useTranslations("auth");
+  const metResults = checkPasswordMet(password);
+  const requirements: Requirement[] = [
+    { label: t("atLeast8Chars"), met: metResults[0] },
+    { label: t("oneUppercase"), met: metResults[1] },
+    { label: t("oneNumber"), met: metResults[2] },
+    { label: t("specialChar"), met: metResults[3] },
+  ];
   const allMet = requirements.every((r) => r.met);
 
   return (

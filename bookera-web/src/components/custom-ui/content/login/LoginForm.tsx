@@ -1,5 +1,6 @@
 "use client";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,7 @@ export default function LoginForm({
   onOpenTos,
   onOpenPrivacy,
 }: LoginFormProps) {
-  const router = useRouter();
+  const t = useTranslations("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -52,11 +53,11 @@ export default function LoginForm({
         <div className="flex items-center justify-center gap-2">
           <LogIn className="w-6 h-6 text-brand-primary" />
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
-            Sign In to Bookera
+            {t("signIn")}
           </CardTitle>
         </div>
         <CardDescription className="text-gray-600 dark:text-gray-300 transition-colors">
-          Sign in using your school account
+          {t("signInDesc")}
         </CardDescription>
       </CardHeader>
 
@@ -65,11 +66,11 @@ export default function LoginForm({
           <div className="space-y-2">
             <Label htmlFor="login-email">
               <Mail className="w-4 h-4" />
-              Email
+              {t("email")}
             </Label>
             <Input
               id="login-email"
-              placeholder="email@school.edu"
+              placeholder={t("emailPlaceholder")}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -82,7 +83,7 @@ export default function LoginForm({
           <div className="space-y-2">
             <Label htmlFor="login-password">
               <Lock className="w-4 h-4" />
-              Password
+              {t("password")}
             </Label>
             <div className="relative">
               <Input
@@ -124,18 +125,15 @@ export default function LoginForm({
                 htmlFor="remember"
                 className="text-sm text-gray-600 dark:text-gray-300 transition-colors font-normal cursor-pointer"
               >
-                Remember this device
+                {t("rememberDevice")}
               </Label>
             </div>
-            <Button
-              type="button"
-              variant="link"
-              onClick={() => router.push("/forgot-password")}
-              className="text-sm font-medium text-brand-primary hover:text-brand-primary-dark p-0 h-auto"
-              disabled={loading}
+            <Link
+              href="/forgot-password"
+              className="text-sm font-medium text-brand-primary hover:text-brand-primary-dark"
             >
-              Forgot password?
-            </Button>
+              {t("forgotPassword")}
+            </Link>
           </div>
 
           <Button
@@ -146,10 +144,10 @@ export default function LoginForm({
             spinnerClassName="text-white"
           >
             {loading ? (
-              "Signing in..."
+              t("signingIn")
             ) : (
               <>
-                Sign In
+                {t("signInButton")}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </>
             )}
@@ -165,13 +163,13 @@ export default function LoginForm({
                 className="font-semibold text-brand-primary hover:text-brand-primary-dark p-0 h-auto underline-offset-4"
                 disabled={loading}
               >
-                Register now
+                {t("registerNow")}
               </Button>
             </p>
           </div>
 
           <div className="text-center text-xs text-gray-500 dark:text-gray-400 space-y-1 transition-colors">
-            <p>By continuing, you agree to our</p>
+            <p>{t("agreeText")}</p>
             <div className="flex items-center justify-center gap-1 flex-wrap">
               <Button
                 type="button"
@@ -180,9 +178,9 @@ export default function LoginForm({
                 className="text-brand-primary hover:text-brand-primary-dark font-medium p-0 h-auto text-xs"
                 disabled={loading}
               >
-                Terms of Service
+                {t("termsOfService")}
               </Button>
-              <span>and</span>
+              <span>{t("and")}</span>
               <Button
                 type="button"
                 variant="link"
@@ -190,7 +188,7 @@ export default function LoginForm({
                 className="text-brand-primary hover:text-brand-primary-dark font-medium p-0 h-auto text-xs"
                 disabled={loading}
               >
-                Privacy Policy
+                {t("privacyPolicy")}
               </Button>
             </div>
           </div>

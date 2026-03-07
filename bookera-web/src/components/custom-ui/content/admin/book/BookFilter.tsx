@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Category } from "@/types/category";
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export function BookFilter({ categories, onChange, isLoading = false }: Props) {
+  const t = useTranslations("book");
   const [searchInput, setSearchInput] = useState("");
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
   const [statusSelect, setStatusSelect] = useState<string>();
@@ -86,7 +88,7 @@ export function BookFilter({ categories, onChange, isLoading = false }: Props) {
           `}
           onClick={() => handleCategoryClick(null)}
         >
-          <span className="flex items-center gap-1.5 text-white">All Categories</span>
+          <span className="flex items-center gap-1.5 text-white">{t("allCategories")}</span>
         </Badge>
       </div>
       {Array.from({ length: 5 }).map((_, i) => (
@@ -103,7 +105,7 @@ export function BookFilter({ categories, onChange, isLoading = false }: Props) {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search books..."
+            placeholder={t("searchBooks")}
             value={searchInput}
             onChange={handleSearchChange}
             className="pl-9"
@@ -115,12 +117,12 @@ export function BookFilter({ categories, onChange, isLoading = false }: Props) {
           onValueChange={handleStatusChange}
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="All" />
+            <SelectValue placeholder={t("allStatus")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="all">{t("allStatus")}</SelectItem>
+            <SelectItem value="active">{t("active")}</SelectItem>
+            <SelectItem value="inactive">{t("inactive")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -148,7 +150,7 @@ export function BookFilter({ categories, onChange, isLoading = false }: Props) {
                 onClick={() => handleCategoryClick(null)}
               >
                 <span className="flex items-center gap-1.5">
-                  All Categories
+                  {t("allCategories")}
                 </span>
               </Badge>
             </div>

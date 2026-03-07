@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,14 +34,18 @@ interface YearPickerProps {
 export default function YearPicker({
   value = "",
   onChange,
-  placeholder = "Select year",
+  placeholder,
   startYear = 1900,
   endYear = new Date().getFullYear(),
   className,
   disabled = false,
-  searchPlaceholder = "Search year...",
-  emptyText = "Year not found",
+  searchPlaceholder,
+  emptyText,
 }: YearPickerProps) {
+    const t = useTranslations("common");
+  const safePlaceholder = placeholder || t("selectYear");
+  const safeSearchPlaceholder = searchPlaceholder || t("searchYear");
+  const safeEmptyText = emptyText || t("yearNotFound");
   const [open, setOpen] = useState(false);
   const years = Array.from(
     { length: endYear - startYear + 1 },
@@ -68,14 +73,14 @@ export default function YearPicker({
         >
           <span className="flex items-center gap-2">
             <Calendar className="h-4 w-4 opacity-50" />
-            {value || placeholder}
+            {value || safePlaceholder}
           </span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-50 p-0" align="start">
         <Command>
-          <CommandInput placeholder={searchPlaceholder} />
-          <CommandEmpty>{emptyText}</CommandEmpty>
+          <CommandInput placeholder={safeSearchPlaceholder} />
+          <CommandEmpty>{safeEmptyText}</CommandEmpty>
           <CommandGroup>
             <ScrollArea className="h-75">
               {years.map((year) => (

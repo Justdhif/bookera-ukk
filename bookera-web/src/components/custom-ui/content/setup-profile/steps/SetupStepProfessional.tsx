@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import {
   CardHeader,
@@ -59,6 +60,7 @@ export default function SetupStepProfessional({
   onBack,
   onNext,
 }: SetupStepProfessionalProps) {
+  const t = useTranslations("setup-profile");
   const [errors, setErrors] = useState<FormErrors>({
     occupation: false,
     institution: false,
@@ -81,10 +83,10 @@ export default function SetupStepProfessional({
         </motion.div>
         <div>
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
-            Professional Details
+            {t("professionalTitle")}
           </CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-300 transition-colors mt-2">
-            Share your professional background (all optional)
+            {t("professionalDesc")}
           </CardDescription>
         </div>
       </CardHeader>
@@ -94,12 +96,12 @@ export default function SetupStepProfessional({
           <div className="space-y-2">
             <Label htmlFor="occupation">
               <Briefcase className="w-4 h-4" />
-              Occupation
+              {t("occupation")}
             </Label>
             <Input
               id="occupation"
               name="occupation"
-              placeholder="Student, Teacher, etc."
+              placeholder={t("occupationPlaceholder")}
               value={occupation}
               onChange={(e) => setOccupation(e.target.value)}
               validationType="letters-only"
@@ -113,12 +115,12 @@ export default function SetupStepProfessional({
           <div className="space-y-2">
             <Label htmlFor="institution">
               <Building2 className="w-4 h-4" />
-              Institution
+              {t("institution")}
             </Label>
             <Input
               id="institution"
               name="institution"
-              placeholder="School or organization"
+              placeholder={t("organizationPlaceholder")}
               value={institution}
               onChange={(e) => setInstitution(e.target.value)}
               validationType="alphanumeric"
@@ -133,11 +135,11 @@ export default function SetupStepProfessional({
         <div className="space-y-2">
           <Label htmlFor="address">
             <MapPin className="w-4 h-4" />
-            Address
+            {t("address")}
           </Label>
           <Textarea
             id="address"
-            placeholder="Enter your full address"
+            placeholder={t("addressPlaceholder")}
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             rows={2}
@@ -148,11 +150,11 @@ export default function SetupStepProfessional({
 
         <div className="space-y-2">
           <Label htmlFor="bio">
-            Bio
+            {t("bio")}
           </Label>
           <Textarea
             id="bio"
-            placeholder="Tell us a little about yourself..."
+            placeholder={t("bioPlaceholder")}
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             rows={3}
@@ -170,7 +172,7 @@ export default function SetupStepProfessional({
             className="h-12 px-5 rounded-lg border-gray-300 dark:border-gray-600 hover:border-brand-primary/50 transition-all"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
-            Back
+            {t("back")}
           </Button>
           <Button
             type="button"
@@ -179,7 +181,7 @@ export default function SetupStepProfessional({
             disabled={loading || !isValid}
             className="flex-1 h-12 text-base font-semibold rounded-lg bg-linear-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
           >
-            Continue
+            {t("continue")}
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
         </div>

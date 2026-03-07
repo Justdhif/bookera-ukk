@@ -14,6 +14,7 @@ import { Author } from "@/types/author";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Eye, Trash, UserSquare } from "lucide-react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 export default function AuthorTable({
   data,
@@ -24,11 +25,12 @@ export default function AuthorTable({
   onView: (author: Author) => void;
   onDelete: (id: number) => void;
 }) {
+  const t = useTranslations("author");
   if (data.length === 0) {
     return (
       <EmptyState
-        title="No authors found"
-        description="Get started by adding your first author"
+        title={t("noAuthors")}
+        description={t("noAuthorsDesc")}
         icon={<UserSquare className="h-10 w-10" />}
       />
     );
@@ -39,11 +41,11 @@ export default function AuthorTable({
       <TableHeader>
         <TableRow className="bg-muted/50 hover:bg-muted/50">
           <TableHead className="w-12 text-center">#</TableHead>
-          <TableHead className="w-16 text-center font-semibold">Photo</TableHead>
-          <TableHead className="font-semibold">Name</TableHead>
-          <TableHead className="font-semibold">Bio</TableHead>
-          <TableHead className="font-semibold">Status</TableHead>
-          <TableHead className="font-semibold text-right">Actions</TableHead>
+          <TableHead className="w-16 text-center font-semibold">{t("photo")}</TableHead>
+          <TableHead className="font-semibold">{t("name")}</TableHead>
+          <TableHead className="font-semibold">{t("bio")}</TableHead>
+          <TableHead className="font-semibold">{t("status")}</TableHead>
+          <TableHead className="font-semibold text-right">{t("actions")}</TableHead>
         </TableRow>
       </TableHeader>
 
@@ -89,13 +91,12 @@ export default function AuthorTable({
 
             <TableCell>
               <Badge
-                className={
-                  item.is_active
+                className={item.is_active
                     ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                     : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                 }
               >
-                {item.is_active ? "Active" : "Inactive"}
+                {item.is_active ? t("active") : t("inactive")}
               </Badge>
             </TableCell>
 
@@ -108,7 +109,7 @@ export default function AuthorTable({
                   className="h-8 gap-1"
                 >
                   <Eye className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">View</span>
+                  <span className="hidden sm:inline">{t("view")}</span>
                 </Button>
 
                 <Button
@@ -118,7 +119,7 @@ export default function AuthorTable({
                   className="h-8 gap-1"
                 >
                   <Trash className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Delete</span>
+                  <span className="hidden sm:inline">{t("delete")}</span>
                 </Button>
               </div>
             </TableCell>

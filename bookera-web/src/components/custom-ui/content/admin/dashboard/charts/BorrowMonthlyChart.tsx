@@ -1,5 +1,20 @@
 "use client";
-const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+import { useTranslations } from "next-intl";
+
+const getMonthNames = (t: any) => [
+  t("monthNames.1"),
+  t("monthNames.2"),
+  t("monthNames.3"),
+  t("monthNames.4"),
+  t("monthNames.5"),
+  t("monthNames.6"),
+  t("monthNames.7"),
+  t("monthNames.8"),
+  t("monthNames.9"),
+  t("monthNames.10"),
+  t("monthNames.11"),
+  t("monthNames.12"),
+];
 
 import {
   BarChart,
@@ -13,10 +28,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BorrowMonthly } from "@/types/dashboard";
 const CustomTooltip = ({ active, payload, label }: any) => {
+  const t = useTranslations("dashboard");
   if (active && payload && payload.length) {
     return (
       <div className="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-xl border-2 border-gray-100 dark:border-gray-800">
-        <p className="font-semibold text-gray-900 dark:text-white mb-2">{label}</p>
+        <p className="font-semibold text-gray-900 dark:text-white mb-2">
+          {label}
+        </p>
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center gap-2">
             <div
@@ -24,7 +42,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               style={{ backgroundColor: entry.color }}
             />
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {"Total"}:
+              {t("total")}:
             </span>
             <span className="text-sm font-bold text-gray-900 dark:text-white">
               {entry.value}
@@ -37,13 +55,18 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export default function BorrowMonthlyChart({ data }: { data: BorrowMonthly[] }) {
+export default function BorrowMonthlyChart({
+  data,
+}: {
+  data: BorrowMonthly[];
+}) {
+  const t = useTranslations("dashboard");
   const allMonths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-  
+
   const chartData = allMonths.map((month) => {
     const existingData = data.find((item) => item.month === month);
     return {
-      month: monthNames[month - 1],
+      month: getMonthNames(t)[month - 1],
       total: existingData ? existingData.total : 0,
     };
   });
@@ -56,7 +79,7 @@ export default function BorrowMonthlyChart({ data }: { data: BorrowMonthly[] }) 
       <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
         <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <div className="w-1 h-6 bg-linear-to-b from-emerald-500 to-teal-500 rounded-full" />
-          {`Monthly Borrows (${currentYear})`}
+          {t("monthlyBorrowsTitle", { year: currentYear })}
         </CardTitle>
       </CardHeader>
 
@@ -70,7 +93,11 @@ export default function BorrowMonthlyChart({ data }: { data: BorrowMonthly[] }) 
                   <stop offset="100%" stopColor="#14b8a6" stopOpacity={0.8} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-800" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#e5e7eb"
+                className="dark:stroke-gray-800"
+              />
               <XAxis
                 dataKey="month"
                 tick={{ fill: "#6b7280", fontSize: 12 }}
@@ -92,7 +119,7 @@ export default function BorrowMonthlyChart({ data }: { data: BorrowMonthly[] }) 
           </ResponsiveContainer>
         ) : (
           <div className="flex items-center justify-center h-87.5 text-muted-foreground">
-            {"No data available"}
+            {t("noData")}
           </div>
         )}
       </CardContent>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import {
   CardHeader,
@@ -72,6 +73,7 @@ export default function SetupStepPersonal({
   loading,
   onNext,
 }: SetupStepPersonalProps) {
+  const t = useTranslations("setup-profile");
   const [errors, setErrors] = useState<FormErrors>({
     full_name: false,
     phone_number: false,
@@ -110,10 +112,10 @@ export default function SetupStepPersonal({
         </motion.div>
         <div>
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
-            Personal Information
+            {t("personalInfoTitle")}
           </CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-300 transition-colors mt-2">
-            Tell us a bit about yourself
+            {t("personalInfoDesc")}
           </CardDescription>
           {user?.email && (
             <p className="text-sm text-brand-primary font-medium mt-2">
@@ -127,12 +129,12 @@ export default function SetupStepPersonal({
         <div className="space-y-2">
           <Label htmlFor="full-name" variant="required">
             <UserIcon className="w-4 h-4" />
-            Full Name
+            {t("fullName")}
           </Label>
           <Input
             id="full-name"
             name="full_name"
-            placeholder="Enter your full name"
+            placeholder={t("enterFullName")}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             required
@@ -148,7 +150,7 @@ export default function SetupStepPersonal({
           <div className="space-y-2">
             <Label>
               <UserIcon className="w-4 h-4" />
-              Gender
+              {t("gender")}
             </Label>
             <Select
               value={gender}
@@ -156,24 +158,24 @@ export default function SetupStepPersonal({
               disabled={loading}
             >
               <SelectTrigger className="h-10 w-full border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white hover:border-brand-primary/50 focus:border-brand-primary">
-                <SelectValue placeholder="Select gender" />
+                <SelectValue placeholder={t("selectGender")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
+                <SelectItem value="male">{t("male")}</SelectItem>
+                <SelectItem value="female">{t("female")}</SelectItem>
+                <SelectItem value="prefer_not_to_say">{t("preferNotToSay")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="birth-date">
-              Date of Birth
+              {t("dateOfBirth")}
             </Label>
             <DatePicker
               value={birthDate ? new Date(birthDate + "T00:00:00") : undefined}
               onChange={handleDateChange}
-              placeholder="Select birth date"
+              placeholder={t("selectBirthDate")}
               dateMode="past"
               disabled={loading}
             />
@@ -184,7 +186,7 @@ export default function SetupStepPersonal({
           <div className="space-y-2">
             <Label htmlFor="phone-number">
               <Phone className="w-4 h-4" />
-              Phone Number
+              {t("phoneNumber")}
             </Label>
             <Input
               id="phone-number"
@@ -203,12 +205,12 @@ export default function SetupStepPersonal({
           <div className="space-y-2">
             <Label htmlFor="identification-number">
               <CreditCard className="w-4 h-4" />
-              NISN / NIP / NIK
+              {t("idNumberLabel")}
             </Label>
             <Input
               id="identification-number"
               name="identification_number"
-              placeholder="ID number"
+              placeholder={t("idNumber")}
               value={identificationNumber}
               onChange={(e) => setIdentificationNumber(e.target.value)}
               validationType="numbers-only"
@@ -230,7 +232,7 @@ export default function SetupStepPersonal({
           disabled={loading || !isValid}
           className="w-full h-12 text-base font-semibold rounded-lg bg-linear-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
         >
-          Continue
+          {t("continue")}
           <ArrowRight className="w-5 h-5 ml-2" />
         </Button>
       </CardContent>

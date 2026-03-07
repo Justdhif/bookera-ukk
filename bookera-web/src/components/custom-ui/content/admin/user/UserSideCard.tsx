@@ -1,7 +1,8 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { User } from "@/types/user";
 import { Borrow } from "@/types/borrow";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,9 @@ import {
 } from "@/components/ui/select";
 import { Upload } from "lucide-react";
 import AvatarUploadModal from "./AvatarUploadModal";
-import PasswordRequirements, { isPasswordValid } from "@/components/custom-ui/content/admin/auth/PasswordRequirements";
+import PasswordRequirements, {
+  isPasswordValid,
+} from "@/components/custom-ui/content/admin/auth/PasswordRequirements";
 import Image from "next/image";
 
 interface UserSideCardProps {
@@ -50,7 +53,7 @@ export default function UserSideCard({
   recentBorrows,
   isProfileView,
 }: UserSideCardProps) {
-  const router = useRouter();
+    const t = useTranslations("user");
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
   const isAddMode = mode === "add";
@@ -73,11 +76,11 @@ export default function UserSideCard({
       case "admin":
         return "Admin";
       case "officer:catalog":
-        return "Catalog Officer";
+        return t("officerCatalog");
       case "officer:management":
-        return "Management Officer";
+        return t("officerManagement");
       case "user":
-        return "User";
+        return t("user");
       default:
         return "Select Role";
     }
@@ -98,13 +101,13 @@ export default function UserSideCard({
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Avatar</CardTitle>
+          <CardTitle>{t("avatarTitle")}</CardTitle>
           <CardDescription>
             {isAddMode
               ? "Upload a profile photo for the user"
               : isEditMode
-              ? "Upload user profile picture"
-              : "User photo"}
+                ? "Upload user profile picture"
+                : "User photo"}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
@@ -113,7 +116,7 @@ export default function UserSideCard({
               {avatarPreview ? (
                 <Image
                   src={avatarPreview}
-                  alt={user?.profile.full_name || formData.full_name || "User"}
+                  alt={user?.profile.full_name || formData.full_name || t("user")}
                   fill
                   sizes="128px"
                   className="object-cover"
@@ -121,11 +124,9 @@ export default function UserSideCard({
               ) : (
                 <div className="h-full w-full bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
                   <span className="text-4xl font-medium text-gray-600 dark:text-gray-400">
-                    {(
-                      formData.full_name ||
+                    {(formData.full_name ||
                       user?.profile.full_name ||
-                      "U"
-                    )[0]?.toUpperCase()}
+                      "U")[0]?.toUpperCase()}
                   </span>
                 </div>
               )}
@@ -140,19 +141,20 @@ export default function UserSideCard({
               className="w-full"
             >
               <Upload className="h-4 w-4 mr-2" />
-              Upload Avatar
+              {t("uploadAvatar")}
             </Button>
           )}
 
           <div className="w-full border-t pt-3 space-y-3">
-            <h4 className="font-semibold text-sm">Account</h4>
+            <h4 className="font-semibold text-sm">{t("accountSection")}</h4>
             <div className="space-y-1.5">
               <Label
                 htmlFor="sc-email"
                 variant={canEdit ? "required" : "default"}
               >
-                Email
-              </Label>
+                
+                                              {t("email")}
+                                            </Label>
               <Input
                 id="sc-email"
                 type="email"
@@ -160,7 +162,7 @@ export default function UserSideCard({
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                placeholder="Enter email address"
+                placeholder={t("enterEmailAddress")}
                 disabled={!canEdit || isProfileView}
                 required={canEdit}
               />
@@ -178,22 +180,24 @@ export default function UserSideCard({
                 )}
               </Label>
               <Input
-                  id="sc-password"
-                  type="password"
-                  value={formData.password || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  placeholder={
-                    isAddMode ? "Create a strong password" : "New password (optional)"
-                  }
-                  required={isAddMode}
-                  disabled={!canEdit}
-                />
-                <PasswordRequirements
-                  password={formData.password || ""}
-                  visible={true}
-                />
+                id="sc-password"
+                type="password"
+                value={formData.password || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                placeholder={
+                  isAddMode
+                    ? "Create a strong password"
+                    : "New password (optional)"
+                }
+                required={isAddMode}
+                disabled={!canEdit}
+              />
+              <PasswordRequirements
+                password={formData.password || ""}
+                visible={true}
+              />
             </div>
           </div>
 
@@ -213,14 +217,16 @@ export default function UserSideCard({
                   <SelectValue>{getRoleDisplay(formData.role)}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="admin">{t("admin")}</SelectItem>
                   <SelectItem value="officer:catalog">
-                    Catalog Officer
-                  </SelectItem>
+                    
+                                                          {t("officerCatalog")}
+                                                        </SelectItem>
                   <SelectItem value="officer:management">
-                    Management Officer
-                  </SelectItem>
-                  <SelectItem value="user">User</SelectItem>
+                    
+                                                          {t("officerManagement")}
+                                                        </SelectItem>
+                  <SelectItem value="user">{t("user")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -237,12 +243,12 @@ export default function UserSideCard({
               >
                 <SelectTrigger className="h-7 flex-1 text-xs">
                   <SelectValue>
-                    {formData.is_active ? "Active" : "Inactive"}
+                    {formData.is_active ? t("active") : t("inactive")}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="active">{t("active")}</SelectItem>
+                  <SelectItem value="inactive">{t("inactive")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -251,24 +257,21 @@ export default function UserSideCard({
           {recentBorrows !== undefined && (
             <div className="border-t pt-4 mt-2 w-full">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="font-semibold text-sm">Recent Borrows</h4>
-                <Button
-                  variant="link"
-                  className="h-auto p-0 text-xs cursor-pointer"
-                  onClick={() => router.push("/admin/borrows")}
+                <h4 className="font-semibold text-sm">{t("recentBorrows")}</h4>
+                <Link
+                  href="/admin/borrows"
+                  className="text-xs text-primary hover:underline"
                 >
                   View All
-                </Button>
+                </Link>
               </div>
               {recentBorrows.length > 0 ? (
                 <div className="space-y-2">
                   {recentBorrows.map((borrow) => (
-                    <div
+                    <Link
                       key={borrow.id}
-                      className="flex items-center justify-between p-2 rounded-md bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
-                      onClick={() =>
-                        router.push(`/admin/borrows/${borrow.borrow_code}`)
-                      }
+                      href={`/admin/borrows/${borrow.borrow_code}`}
+                      className="flex items-center justify-between p-2 rounded-md bg-muted/50 hover:bg-muted transition-colors"
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium truncate">
@@ -297,12 +300,12 @@ export default function UserSideCard({
                       >
                         {getStatusDisplay(borrow.status)}
                       </Badge>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  No recent borrows
+                  {t("noRecentBorrows")}
                 </p>
               )}
             </div>
@@ -315,7 +318,7 @@ export default function UserSideCard({
         onOpenChange={setAvatarModalOpen}
         currentAvatar={avatarPreview}
         onSave={handleAvatarImageChange}
-        userName={formData.full_name || user?.profile.full_name || "User"}
+        userName={formData.full_name || user?.profile.full_name || t("user")}
       />
     </>
   );

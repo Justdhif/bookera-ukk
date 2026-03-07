@@ -1,4 +1,6 @@
 "use client";
+
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useState, useEffect } from "react";
@@ -30,6 +32,7 @@ interface FormData {
 }
 
 export default function AddBookClient() {
+    const t = useTranslations("book");
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     title: "",
@@ -142,13 +145,13 @@ export default function AddBookClient() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push("/admin/books")}
             className="h-8 w-8"
+            onClick={() => router.back()}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Add Book</h1>
+            <h1 className="text-3xl font-bold">{t("addBook")}</h1>
             <p className="text-muted-foreground">
               Add a new book to the system
             </p>
@@ -162,7 +165,7 @@ export default function AddBookClient() {
           loading={submitting}
           className="h-8"
         >
-          {submitting ? "Saving..." : "Add Book"}
+          {submitting ? t("saving") : t("addBook")}
         </Button>
       </div>
 

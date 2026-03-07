@@ -1,5 +1,5 @@
-// components/ui/tooltip.tsx - PERBAIKAN
 "use client";
+// components/ui/tooltip.tsx - PERBAIKAN
 
 import * as React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";

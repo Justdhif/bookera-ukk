@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { borrowService } from "@/services/borrow.service";
 import { borrowRequestService } from "@/services/borrow-request.service";
@@ -30,6 +31,7 @@ import { format } from "date-fns";
 
 
 export default function MyBorrowPageClient() {
+    const t = useTranslations("public");
   const [borrows, setBorrows] = useState<Borrow[]>([]);
   const [loadingBorrows, setLoadingBorrows] = useState(true);
   const [returnDialog, setReturnDialog] = useState<{
@@ -163,9 +165,9 @@ export default function MyBorrowPageClient() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">My Library</h1>
+        <h1 className="text-2xl font-bold">{t("myLibrary")}</h1>
         <p className="text-sm text-muted-foreground">
-          Manage your borrows and borrow requests
+          {t("myLibraryDesc")}
         </p>
       </div>
 
@@ -173,11 +175,11 @@ export default function MyBorrowPageClient() {
         <TabsList className="mb-4">
           <TabsTrigger value="borrows" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" />
-            My Borrows
+            {t("myBorrows")}
           </TabsTrigger>
           <TabsTrigger value="requests" className="flex items-center gap-2">
             <ClipboardList className="h-4 w-4" />
-            My Requests
+            {t("myRequests")}
           </TabsTrigger>
         </TabsList>
 
@@ -187,8 +189,8 @@ export default function MyBorrowPageClient() {
           ) : borrows.length === 0 ? (
             <EmptyState
               icon={<BookOpen className="h-16 w-16" />}
-              title="No Borrows Yet"
-              description="You don't have any borrow history yet. Request a borrow through the library admin."
+              title={t("noBorrowsYet")}
+              description={t("noBorrowsYetDesc")}
             />
           ) : (
             <div className="grid gap-4">
@@ -198,7 +200,7 @@ export default function MyBorrowPageClient() {
                     <div className="space-y-2 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-base font-semibold">
-                          Borrow #{borrow.id}
+                          {t("borrowHash")}{borrow.id}
                         </span>
                         {getStatusBadge(borrow)}
                       </div>
@@ -211,7 +213,7 @@ export default function MyBorrowPageClient() {
                         </span>
                         <span className="flex items-center gap-1 text-destructive">
                           <Calendar className="h-3 w-3" />
-                          Return:{" "}
+                          {t("returnLabel")}:{" "}
                           {new Date(borrow.return_date).toLocaleDateString(
                             "en-US",
                           )}
@@ -227,7 +229,7 @@ export default function MyBorrowPageClient() {
                             className="flex items-center gap-1"
                           >
                             <Eye className="h-4 w-4" />
-                            Details
+                            {t("detailsBtn")}
                           </Button>
                         </Link>
                       )}
@@ -241,8 +243,9 @@ export default function MyBorrowPageClient() {
                           className="flex items-center gap-2"
                         >
                           <PackageX className="h-4 w-4" />
-                          Request Return
-                        </Button>
+                          
+                                                                {t("requestReturn")}
+                                                              </Button>
                       )}
                       {canReturn(borrow) && (
                         <Button
@@ -254,7 +257,7 @@ export default function MyBorrowPageClient() {
                           className="flex items-center gap-2"
                         >
                           <AlertCircle className="h-4 w-4" />
-                          Report Loss
+                          {t("reportLoss")}
                         </Button>
                       )}
                     </div>
@@ -262,7 +265,7 @@ export default function MyBorrowPageClient() {
 
                   <CardContent className="pt-4 space-y-2">
                     <div className="text-sm font-medium text-muted-foreground mb-3">
-                      Borrowed Books ({borrow.borrow_details.length}):
+                      {t("borrowedBooks")} ({borrow.borrow_details.length}):
                     </div>
                     <div className="grid gap-2">
                       {borrow.borrow_details.map((detail) => (
@@ -279,7 +282,7 @@ export default function MyBorrowPageClient() {
                                 </p>
                                 <div className="flex items-center gap-2 mt-0.5">
                                   <p className="text-xs text-muted-foreground">
-                                    Code:{" "}
+                                    {t("codeLabel")}:{" "}
                                     <span className="font-mono">
                                       {detail.book_copy.copy_code}
                                     </span>
@@ -290,7 +293,7 @@ export default function MyBorrowPageClient() {
                             </div>
                             {detail.note && (
                               <div className="text-xs text-destructive bg-destructive/10 p-2 rounded">
-                                <span className="font-medium">Note: </span>
+                                <span className="font-medium">{t("noteLabel")}: </span>
                                 {detail.note}
                               </div>
                             )}
@@ -311,8 +314,8 @@ export default function MyBorrowPageClient() {
           ) : requests.length === 0 ? (
             <EmptyState
               icon={<ClipboardList className="h-16 w-16" />}
-              title="No Requests Yet"
-              description="You haven't submitted a borrow request yet. Find a book and click 'Add to Request' to get started."
+              title={t("noRequestsYet")}
+              description={t("noRequestsYetDesc")}
             />
           ) : (
             <div className="space-y-3">
@@ -324,7 +327,7 @@ export default function MyBorrowPageClient() {
                   <CardHeader className="pb-2">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <p className="font-semibold text-base">
-                        Request #{req.id}
+                        {t("requestHash")}{req.id}
                       </p>
                       {(() => {
                         const approvalStatusConfig: Record<string, { label: string; className: string }> = {
@@ -378,7 +381,7 @@ export default function MyBorrowPageClient() {
                     {req.approval_status === "rejected" && req.reject_reason && (
                       <div className="flex items-start gap-2 rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
                         <XCircle className="h-4 w-4 mt-0.5 shrink-0" />
-                        <span><span className="font-medium">Rejection reason: </span>{req.reject_reason}</span>
+                        <span><span className="font-medium">{t("rejectionReason")}: </span>{req.reject_reason}</span>
                       </div>
                     )}
 
@@ -395,8 +398,9 @@ export default function MyBorrowPageClient() {
                           ) : (
                             <Trash className="h-3.5 w-3.5 mr-1" />
                           )}
-                          Cancel
-                        </Button>
+                          
+                                                                {t("detail.editDialog.cancel")}
+                                                              </Button>
                       </div>
                     )}
                   </CardContent>

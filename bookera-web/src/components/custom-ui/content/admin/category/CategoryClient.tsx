@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Category } from "@/types/category";
 import { categoryService, CategoryFilterParams } from "@/services/category.service";
@@ -14,6 +15,7 @@ import { Plus, Search, Tag } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 
 export default function CategoryClient() {
+    const t = useTranslations("category");
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -41,7 +43,7 @@ export default function CategoryClient() {
     }
 
     await categoryService.delete(deleteId);
-    toast.success("Category deleted successfully");
+    toast.success(t("deleteSuccess"));
     setDeleteId(null);
     fetchCategories(filters);
   };
@@ -60,7 +62,7 @@ export default function CategoryClient() {
         to: paginatedData.to ?? 0,
       });
     } catch {
-      toast.error("Failed to load categories");
+      toast.error(t("loadError"));
     } finally {
       setLoading(false);
     }
@@ -78,9 +80,9 @@ export default function CategoryClient() {
             <Tag className="h-8 w-8 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Categories</h1>
+            <h1 className="text-3xl font-bold">{t("title")}</h1>
             <p className="text-muted-foreground">
-              Manage your product categories
+              {t("managementDesc")}
             </p>
           </div>
         </div>
@@ -93,7 +95,7 @@ export default function CategoryClient() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          Add Category
+          {t("addCategory")}
         </Button>
       </div>
 
@@ -102,7 +104,7 @@ export default function CategoryClient() {
         <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search categories..."
+          placeholder={t("searchCategoriesPlaceholder")}
           value={searchInput}
           onChange={handleSearchChange}
           className="pl-9"
@@ -135,8 +137,8 @@ export default function CategoryClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={() => setDeleteId(null)}
-        title="Delete Category"
-        description="Are you sure you want to delete this category? This action cannot be undone."
+        title={t("deleteCategory")}
+        description={t("deleteDesc")}
         onConfirm={confirmDelete}
       />
 

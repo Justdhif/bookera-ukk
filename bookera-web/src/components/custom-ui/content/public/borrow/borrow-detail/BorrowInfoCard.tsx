@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Borrow } from "@/types/borrow";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,6 +16,7 @@ interface BorrowInfoCardProps {
 }
 
 export function BorrowInfoCard({ borrow }: BorrowInfoCardProps) {
+    const t = useTranslations("public");
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
@@ -95,7 +97,7 @@ export function BorrowInfoCard({ borrow }: BorrowInfoCardProps) {
                   key={ret.id}
                   className="rounded-lg border p-3 bg-muted/20 flex items-center justify-between"
                 >
-                  <p className="text-sm font-medium">Return #{ret.id}</p>
+                  <p className="text-sm font-medium">{t("returnNumber")}{ret.id}</p>
                   <div className="flex items-center gap-2">
                     {ret.return_date && (
                       <p className="text-xs text-muted-foreground">

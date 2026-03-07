@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { borrowRequestService } from "@/services/borrow-request.service";
 import { Book } from "@/types/book";
@@ -33,6 +34,7 @@ export function BorrowFromCollectionDialog({
   selectedBooks,
   onSuccess,
 }: BorrowFromCollectionDialogProps) {
+    const t = useTranslations("public");
   const [isLoading, setIsLoading] = useState(false);
   const [borrowDate, setBorrowDate] = useState<Date | undefined>(undefined);
   const [returnDate, setReturnDate] = useState<Date | undefined>(undefined);
@@ -151,8 +153,9 @@ export function BorrowFromCollectionDialog({
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
           >
-            Cancel
-          </Button>
+            
+                                  {t("detail.editDialog.cancel")}
+                                </Button>
           <Button
             onClick={handleSubmit}
             disabled={isSubmitDisabled()}

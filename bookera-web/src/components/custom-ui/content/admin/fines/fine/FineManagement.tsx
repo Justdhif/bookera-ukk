@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Fine, FineType } from "@/types/fine";
 import { fineService, fineTypeService, FineFilterParams } from "@/services/fine.service";
@@ -20,6 +21,7 @@ import { Search } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 
 export default function FineManagement() {
+    const t = useTranslations("fines");
   const [fines, setFines] = useState<Fine[]>([]);
   const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -111,9 +113,9 @@ export default function FineManagement() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h2 className="text-2xl font-bold">{"Fines"}</h2>
+          <h2 className="text-2xl font-bold">{t("title")}</h2>
           <p className="text-muted-foreground">
-            {"Manage fines imposed on borrowers"}
+            {t("finesTabDescription")}
           </p>
         </div>
       </div>
@@ -122,7 +124,7 @@ export default function FineManagement() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={"Search fines..."}
+            placeholder={t("searchFines")}
             value={searchInput}
             onChange={handleSearchChange}
             className="pl-9"
@@ -132,13 +134,13 @@ export default function FineManagement() {
           value={statusValue}
           onValueChange={handleStatusChange}>
           <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Filter Status" />
+            <SelectValue placeholder={t("filterStatus")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{"All Status"}</SelectItem>
-            <SelectItem value="unpaid">{"Unpaid"}</SelectItem>
-            <SelectItem value="paid">{"Paid"}</SelectItem>
-            <SelectItem value="waived">{"Waived"}</SelectItem>
+            <SelectItem value="all">{t("allStatus")}</SelectItem>
+            <SelectItem value="unpaid">{t("unpaid")}</SelectItem>
+            <SelectItem value="paid">{t("paid")}</SelectItem>
+            <SelectItem value="waived">{t("waived")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -164,8 +166,8 @@ export default function FineManagement() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title={"Delete Fine"}
-        description={"Deleted fines cannot be recovered."}
+        title={t("deleteFine")}
+        description={t("deleteFineConfirm")}
         onConfirm={confirmDelete}
       />
     </div>

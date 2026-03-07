@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useRef, useEffect } from "react";
 import {
   Dialog,
@@ -46,6 +47,7 @@ export default function AvatarUploadModal({
   userName,
   isRequired = false,
 }: AvatarUploadModalProps) {
+    const t = useTranslations("user");
   const [selectedAvatar, setSelectedAvatar] = useState<string | File>(
     currentAvatar,
   );
@@ -164,13 +166,13 @@ export default function AvatarUploadModal({
       <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            Upload Avatar
+            {t("uploadAvatar")}
             {isRequired && (
               <Badge
                 variant="destructive"
                 className="text-xs font-normal px-2 py-0 h-5"
               >
-                Required
+                {t("requiredField")}
               </Badge>
             )}
           </DialogTitle>
@@ -369,8 +371,9 @@ export default function AvatarUploadModal({
             onClick={handleSave}
             disabled={isDisabled}
           >
-            Save Avatar
-          </Button>
+            
+                                  {t("saveAvatar")}
+                                </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 
 export function ContentLoadingScreen() {
-  const t = useTranslations('admin.common');
+  const t = useTranslations('common');
   
   return (
     <div className="flex items-center justify-center h-full">

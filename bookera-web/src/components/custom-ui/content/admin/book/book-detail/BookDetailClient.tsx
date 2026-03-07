@@ -1,7 +1,9 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+
 import { bookService } from "@/services/book.service";
 import { categoryService } from "@/services/category.service";
 import { authorService } from "@/services/author.service";
@@ -35,6 +37,7 @@ interface FormData {
 }
 
 export default function BookDetailClient() {
+    const t = useTranslations("book");
   const router = useRouter();
   const params = useParams();
   const slug = params.slug as string;
@@ -202,11 +205,11 @@ export default function BookDetailClient() {
       setSubmitting(true);
 
       await bookService.update(book.id, formData);
-      toast.success("Book updated successfully");
+      toast.success(t("updateSuccess"));
       setIsEditMode(false);
       fetchBook();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to update book");
+      toast.error(error.response?.data?.message || t("updateError"));
     } finally {
       setSubmitting(false);
     }
@@ -240,8 +243,8 @@ export default function BookDetailClient() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push("/admin/books")}
             className="h-8 w-8"
+            onClick={() => router.back()}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -267,8 +270,8 @@ export default function BookDetailClient() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push("/admin/books")}
             className="h-8 w-8"
+            onClick={() => router.back()}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -299,7 +302,7 @@ export default function BookDetailClient() {
               loading={submitting}
               className="h-8"
             >
-              {submitting ? "Saving..." : "Save Changes"}
+              {submitting ? t("saving") : t("saveChanges")}
             </Button>
           </div>
         ) : (
@@ -309,8 +312,9 @@ export default function BookDetailClient() {
             className="h-8 gap-1"
           >
             <Edit className="h-3.5 w-3.5" />
-            Edit Book
-          </Button>
+            
+                                      {t("editBook")}
+                                    </Button>
         )}
       </div>
 

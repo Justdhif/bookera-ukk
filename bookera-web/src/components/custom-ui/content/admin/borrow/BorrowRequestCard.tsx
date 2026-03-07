@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOpen, Calendar, User, ArrowRight, Trash } from "lucide-react";
 import { format } from "date-fns";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface BorrowRequestCardProps {
   req: BorrowRequest;
@@ -36,7 +36,6 @@ const approvalStatusConfig: Record<
 };
 
 export function BorrowRequestCard({ req, onDelete }: BorrowRequestCardProps) {
-  const router = useRouter();
   const cfg =
     approvalStatusConfig[req.approval_status] ??
     approvalStatusConfig["processing"];
@@ -47,9 +46,7 @@ export function BorrowRequestCard({ req, onDelete }: BorrowRequestCardProps) {
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="space-y-2 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-base">
-                Request #{req.id}
-              </span>
+              <span className="font-semibold text-base">Request #{req.id}</span>
               <Badge variant="secondary" className={`${cfg.className} w-fit`}>
                 {cfg.label}
               </Badge>
@@ -73,7 +70,9 @@ export function BorrowRequestCard({ req, onDelete }: BorrowRequestCardProps) {
             <div className="flex items-start gap-1.5 text-sm">
               <BookOpen className="h-3.5 w-3.5 mt-0.5 text-muted-foreground shrink-0" />
               <span className="text-muted-foreground">
-                {req.borrow_request_details?.map((d) => d.book?.title).join(", ") || "-"}
+                {req.borrow_request_details
+                  ?.map((d) => d.book?.title)
+                  .join(", ") || "-"}
               </span>
             </div>
           </div>
@@ -86,14 +85,12 @@ export function BorrowRequestCard({ req, onDelete }: BorrowRequestCardProps) {
             >
               <Trash className="h-4 w-4" />
             </Button>
-            <Button
-              size="sm"
-              variant="brand"
-              onClick={() => router.push(`/admin/borrow-requests/${req.id}`)}
-            >
-              Detail
-              <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
+            <Link href={`/admin/borrow-requests/${req.id}`}>
+              <Button size="sm" variant="brand">
+                Detail
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
           </div>
         </div>
       </CardContent>

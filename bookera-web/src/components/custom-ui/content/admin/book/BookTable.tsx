@@ -1,5 +1,7 @@
 "use client";
-import { useRouter } from "next/navigation";
+
+import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 import {
   Table,
@@ -20,13 +22,12 @@ interface Props {
 }
 
 export function BookTable({ data, onDelete }: Props) {
-  const router = useRouter();
-
+    const t = useTranslations("book");
   if (data.length === 0) {
     return (
       <EmptyState
-        title="No books found"
-        description="Get started by adding your first book"
+        title={t("noBooksFound")}
+        description={t("noBooksFoundDesc")}
         icon={<BookOpen className="h-10 w-10" />}
       />
     );
@@ -37,16 +38,16 @@ export function BookTable({ data, onDelete }: Props) {
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
-            <TableHead className="w-16 text-center font-semibold">#</TableHead>
-            <TableHead className="w-24 font-semibold">Cover</TableHead>
-            <TableHead className="font-semibold">Title</TableHead>
-            <TableHead className="font-semibold">Author</TableHead>
-            <TableHead className="font-semibold">ISBN</TableHead>
-            <TableHead className="font-semibold">Publisher</TableHead>
-            <TableHead className="font-semibold">Year</TableHead>
-            <TableHead className="font-semibold">Status</TableHead>
+            <TableHead className="w-16 text-center font-semibold">{t("noCol")}</TableHead>
+            <TableHead className="w-24 font-semibold">{t("cover")}</TableHead>
+            <TableHead className="font-semibold">{t("title_col")}</TableHead>
+            <TableHead className="font-semibold">{t("author")}</TableHead>
+            <TableHead className="font-semibold">{t("isbn")}</TableHead>
+            <TableHead className="font-semibold">{t("publisher")}</TableHead>
+            <TableHead className="font-semibold">{t("year")}</TableHead>
+            <TableHead className="font-semibold">{t("status")}</TableHead>
             <TableHead className="font-semibold text-right pr-6">
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -122,20 +123,17 @@ export function BookTable({ data, onDelete }: Props) {
                       : "bg-gray-500 hover:bg-gray-600"
                   }`}
                 >
-                  {book.is_active ? "Active" : "Inactive"}
+                  {book.is_active ? t("active") : t("inactive")}
                 </Badge>
               </TableCell>
               <TableCell className="pr-6">
                 <div className="flex justify-end items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => router.push(`/admin/books/${book.slug}`)}
-                    className="h-8 gap-1"
-                  >
-                    <Eye className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">View</span>
-                  </Button>
+                  <Link href={`/admin/books/${book.slug}`}>
+                    <Button size="sm" variant="outline" className="h-8 gap-1">
+                      <Eye className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">View</span>
+                    </Button>
+                  </Link>
                   <Button
                     size="sm"
                     variant="destructive"

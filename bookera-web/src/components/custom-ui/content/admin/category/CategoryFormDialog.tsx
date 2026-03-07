@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -32,6 +33,7 @@ export default function CategoryFormDialog({
   category: Category | null;
   onSuccess: () => void;
 }) {
+  const t = useTranslations("category");
   const [formData, setFormData] = useState<FormData>({
     name: "",
     icon: "",
@@ -97,14 +99,14 @@ export default function CategoryFormDialog({
           icon: formData.icon || undefined,
           description: formData.description,
         });
-        toast.success("Category updated successfully");
+        toast.success(t("updateSuccess"));
       } else {
         await categoryService.create({
           name: formData.name,
           icon: formData.icon || undefined,
           description: formData.description,
         });
-        toast.success("Category added successfully");
+        toast.success(t("addSuccess"));
       }
 
       setFormData({
@@ -125,19 +127,19 @@ export default function CategoryFormDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{category ? "Edit" : "Add"} Category</DialogTitle>
+          <DialogTitle>{category ? t("editCategory") : t("addCategory")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name" variant="required">
-                Category Name
+                {t("categoryName")}
               </Label>
               <Input
                 id="name"
                 name="name"
-                placeholder="Enter category name"
+                placeholder={t("namePlaceholder")}
                 value={formData.name}
                 onChange={handleInputChange}
                 validationType="letters-only"
@@ -148,11 +150,11 @@ export default function CategoryFormDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t("descriptionLabel")}</Label>
               <Input
                 id="description"
                 name="description"
-                placeholder="Enter category description"
+                placeholder={t("descriptionPlaceholder")}
                 value={formData.description}
                 onChange={handleInputChange}
               />
@@ -174,11 +176,11 @@ export default function CategoryFormDialog({
           >
             {isLoading
               ? category
-                ? "Saving..."
-                : "Adding..."
+                ? t("saving")
+                : t("adding")
               : category
-                ? "Save Changes"
-                : "Add Category"}
+                ? t("saveChanges")
+                : t("addCategory")}
           </Button>
         </div>
       </DialogContent>

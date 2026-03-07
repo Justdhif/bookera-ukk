@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { borrowRequestService } from "@/services/borrow-request.service";
 import { BorrowRequest } from "@/types/borrow-request";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -48,6 +49,7 @@ const approvalStatusConfig: Record<
 
 export default function BorrowRequestClient() {
   const router = useRouter();
+  const t = useTranslations("borrow-request");
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<{ search?: string; per_page?: number; page?: number }>({ per_page: 10 });
@@ -56,10 +58,10 @@ export default function BorrowRequestClient() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       setFilters((prev) => ({ ...prev, search: searchInput || undefined, page: 1 }));
     }, 500);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [searchInput]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -80,7 +82,7 @@ export default function BorrowRequestClient() {
       });
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Failed to load borrow requests",
+        error.response?.data?.message || t("loadError"),
       );
     } finally {
       setLoading(false);
@@ -99,11 +101,11 @@ export default function BorrowRequestClient() {
     if (!deleteId) return;
     try {
       await borrowRequestService.destroy(deleteId);
-      toast.success("Request deleted successfully");
+      toast.success(t("deleteSuccess"));
       setDeleteId(null);
       fetchRequests(filters);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to delete request");
+      toast.error(error.response?.data?.message || t("deleteError"));
     }
   };
 
@@ -111,9 +113,9 @@ export default function BorrowRequestClient() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Borrow Requests</h1>
+          <h1 className="text-3xl font-bold">{t("title")}</h1>
           <p className="text-muted-foreground">
-            List of borrow requests from members
+            {t("description")}
           </p>
         </div>
       </div>
@@ -122,7 +124,7 @@ export default function BorrowRequestClient() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name or book title..."
+            placeholder={t("searchRequests")}
             value={searchInput}
             onChange={handleSearchChange}
             className="pl-9"
@@ -147,8 +149,8 @@ export default function BorrowRequestClient() {
         ) : requests.length === 0 ? (
           <EmptyState
             icon={<ClipboardList className="h-16 w-16" />}
-            title="No Requests"
-            description="No borrow requests from members yet"
+            title={t("noRequests")}
+            description={t("noRequestsDesc")}
           />
         ) : (
           <div className="space-y-4">
@@ -163,7 +165,7 @@ export default function BorrowRequestClient() {
                     <div className="space-y-2 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <Badge variant="secondary" className={`text-xs ${statusCfg.className}`}>
-                          {statusCfg.label}
+                          {t(req.approval_status)}
                         </Badge>
                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
                           <User className="h-3.5 w-3.5" />
@@ -177,14 +179,14 @@ export default function BorrowRequestClient() {
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3.5 w-3.5" />
                           <span>
-                            Borrow:{" "}
+                            {t("borrowLabel")}{" "}
                             {format(new Date(req.borrow_date), "dd MMM yyyy")}
                           </span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3.5 w-3.5" />
                           <span>
-                            Return:{" "}
+                            {t("returnLabel")}{" "}
                             {format(new Date(req.return_date), "dd MMM yyyy")}
                           </span>
                         </div>
@@ -215,7 +217,7 @@ export default function BorrowRequestClient() {
                           router.push(`/admin/borrow-requests/${req.id}`)
                         }
                       >
-                        Detail
+                        {t("detail")}
                         <ArrowRight className="h-4 w-4 ml-1" />
                       </Button>
                     </div>
@@ -231,8 +233,8 @@ export default function BorrowRequestClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Delete Borrow Request"
-        description="Are you sure you want to delete this borrow request? This action cannot be undone."
+        title={t("deleteRequest")}
+        description={t("deleteDesc")}
         onConfirm={confirmDelete}
       />
     </div>

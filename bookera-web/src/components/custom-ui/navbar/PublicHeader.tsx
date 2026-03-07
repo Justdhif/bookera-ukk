@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,13 +13,23 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Search, Bell, Home, Settings, User, LayoutDashboard, LogOut } from "lucide-react";
+import {
+  Search,
+  Bell,
+  Home,
+  Settings,
+  User,
+  LayoutDashboard,
+  LogOut,
+} from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import NotificationDropdown from "./NotificationDropdown";
 import LogoutConfirmDialog from "@/components/custom-ui/LogoutConfirmDialog";
 
 export default function PublicHeader() {
+  const t = useTranslations("navbar");
   const router = useRouter();
   const pathname = usePathname();
   const { user, logout, isAuthenticated, initialLoading } = useAuthStore();
@@ -49,31 +60,31 @@ export default function PublicHeader() {
       <div className="px-4 md:px-6 lg:px-8 py-3 md:py-4">
         <div className="flex items-center justify-between gap-2 md:gap-4">
           <div className="flex items-center gap-2 md:gap-4 flex-1 max-w-md">
-            
             <div className="hidden lg:block">
               <SidebarTrigger />
             </div>
 
             <div>
-              <Button
-                variant={isHomePage ? "secondary" : "ghost"}
-                size="icon"
-                onClick={() => router.push("/")}
-                className={`h-9 w-9 rounded-full ${
-                  isHomePage
-                    ? "bg-primary/10 text-primary hover:bg-primary/20"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                }`}
-                aria-label="Go to home"
-              >
-                <Home className="h-4 w-4 md:h-5 md:w-5" />
-              </Button>
+              <Link href="/">
+                <Button
+                  variant={isHomePage ? "secondary" : "ghost"}
+                  size="icon"
+                  className={`h-9 w-9 rounded-full ${
+                    isHomePage
+                      ? "bg-primary/10 text-primary hover:bg-primary/20"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  }`}
+                  aria-label={t("goToHome")}
+                >
+                  <Home className="h-4 w-4 md:h-5 md:w-5" />
+                </Button>
+              </Link>
             </div>
 
             <form onSubmit={handleSearch} className="relative flex-1">
               <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
               <Input
-                placeholder={"Search title, author, or ISBN..."}
+                placeholder={t("bookSearchPlaceholder")}
                 className="pl-9 md:pl-12 pr-3 md:pr-4 h-10 md:h-12 bg-muted/30 border-border focus-visible:ring-1 focus-visible:ring-ring rounded-full text-sm md:text-base"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -84,27 +95,29 @@ export default function PublicHeader() {
           <div className="flex items-center gap-1.5 md:gap-3">
             <NotificationDropdown isAuthenticated={isAuthenticated} />
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push("/settings")}
-              className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent"
-              aria-label="Go to settings"
-            >
-              <Settings className="h-4 w-4 md:h-5 md:w-5" />
-            </Button>
+            <Link href="/settings">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent"
+                aria-label={t("goToSettings")}
+              >
+                <Settings className="h-4 w-4 md:h-5 md:w-5" />
+              </Button>
+            </Link>
 
             <div className="shrink-0">
               {initialLoading ? (
                 <Skeleton className="h-8 w-8 md:h-10 md:w-10 rounded-full" />
               ) : !isAuthenticated ? (
-                <Button
-                  onClick={() => router.push("/login")}
-                  size="sm"
-                  className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 md:px-8 h-8 md:h-10 text-sm md:text-base"
-                >
-                  {"Login"}
-                </Button>
+                <Link href="/login">
+                  <Button
+                    size="sm"
+                    className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 md:px-8 h-8 md:h-10 text-sm md:text-base"
+                  >
+                    {t("login")}
+                  </Button>
+                </Link>
               ) : (
                 <DropdownMenu>
                   <DropdownMenuTrigger className="rounded-full ring-2 ring-transparent hover:ring-ring transition-all">
@@ -121,28 +134,34 @@ export default function PublicHeader() {
                   </DropdownMenuTrigger>
 
                   <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuItem disabled className="flex-col items-start font-semibold">
+                    <DropdownMenuItem
+                      disabled
+                      className="flex-col items-start font-semibold"
+                    >
                       <div className="relative">
                         <span>{user?.profile?.full_name}</span>
                         <div className="absolute -bottom-1 left-0 h-1 w-8 rounded-full bg-brand-primary"></div>
                       </div>
-                      <span className="text-muted-foreground text-xs">Role : {user?.role}</span>
+                      <span className="text-muted-foreground text-xs">
+                        {t("role")}: {user?.role}
+                      </span>
                     </DropdownMenuItem>
 
                     {(user?.role === "admin" ||
                       user?.role?.startsWith("officer:")) && (
-                      <DropdownMenuItem onClick={() => router.push("/admin")} className="gap-2">
-                        <LayoutDashboard className="h-4 w-4" />
-                        {"Dashboard"}
+                      <DropdownMenuItem asChild className="gap-2">
+                        <Link href="/admin">
+                          <LayoutDashboard className="h-4 w-4" />
+                          {t("dashboard")}
+                        </Link>
                       </DropdownMenuItem>
                     )}
 
-                    <DropdownMenuItem
-                      onClick={() => router.push("/profile")}
-                      className="gap-2"
-                    >
-                      <User className="h-4 w-4" />
-                      {"Profile"}
+                    <DropdownMenuItem asChild className="gap-2">
+                      <Link href="/profile">
+                        <User className="h-4 w-4" />
+                        {t("profile")}
+                      </Link>
                     </DropdownMenuItem>
 
                     <DropdownMenuItem
@@ -150,7 +169,7 @@ export default function PublicHeader() {
                       onClick={() => setIsLogoutDialogOpen(true)}
                     >
                       <LogOut className="h-4 w-4 text-red-600 dark:text-red-400" />
-                      {"Logout"}
+                      {t("logout")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

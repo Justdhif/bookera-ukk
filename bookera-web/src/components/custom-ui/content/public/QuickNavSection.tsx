@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useTheme } from "next-themes";
 import { BookOpen, DollarSign, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,10 +13,35 @@ function SlashLines({ color }: { color: string }) {
       fill="none"
     >
       <line x1="20" y1="0" x2="72" y2="52" stroke={color} strokeWidth="16" />
-      <line x1="40" y1="0" x2="72" y2="32" stroke={color} strokeWidth="8" opacity="0.6" />
-      <line x1="56" y1="0" x2="72" y2="16" strokeWidth="3.5" stroke={color} opacity="0.4" />
+      <line
+        x1="40"
+        y1="0"
+        x2="72"
+        y2="32"
+        stroke={color}
+        strokeWidth="8"
+        opacity="0.6"
+      />
+      <line
+        x1="56"
+        y1="0"
+        x2="72"
+        y2="16"
+        strokeWidth="3.5"
+        stroke={color}
+        opacity="0.4"
+      />
       <rect x="52" y="0" width="20" height="20" fill={color} opacity="0.45" />
-      <rect x="56" y="3" width="13" height="13" fill="none" stroke={color} strokeWidth="0.7" opacity="0.4" />
+      <rect
+        x="56"
+        y="3"
+        width="13"
+        height="13"
+        fill="none"
+        stroke={color}
+        strokeWidth="0.7"
+        opacity="0.4"
+      />
     </svg>
   );
 }
@@ -24,8 +49,11 @@ function SlashLines({ color }: { color: string }) {
 function HexGrid({ color }: { color: string }) {
   const hexPath = "M10,0 L20,6 L20,18 L10,24 L0,18 L0,6 Z";
   const positions = [
-    { x: -4, y: 8 }, { x: 12, y: -1 }, { x: 12, y: 17 },
-    { x: -4, y: 26 }, { x: 28, y: 8 },
+    { x: -4, y: 8 },
+    { x: 12, y: -1 },
+    { x: 12, y: 17 },
+    { x: -4, y: 26 },
+    { x: 28, y: 8 },
   ];
   return (
     <svg
@@ -56,9 +84,24 @@ function ArcDecor({ color }: { color: string }) {
       viewBox="0 0 52 52"
       fill="none"
     >
-      <path d="M52 52 A46 46 0 0 0 6 52" stroke={color} strokeWidth="0.9" opacity="0.7" />
-      <path d="M52 52 A30 30 0 0 0 22 52" stroke={color} strokeWidth="0.7" opacity="0.5" />
-      <path d="M52 52 A16 16 0 0 0 36 52" stroke={color} strokeWidth="0.6" opacity="0.35" />
+      <path
+        d="M52 52 A46 46 0 0 0 6 52"
+        stroke={color}
+        strokeWidth="0.9"
+        opacity="0.7"
+      />
+      <path
+        d="M52 52 A30 30 0 0 0 22 52"
+        stroke={color}
+        strokeWidth="0.7"
+        opacity="0.5"
+      />
+      <path
+        d="M52 52 A16 16 0 0 0 36 52"
+        stroke={color}
+        strokeWidth="0.6"
+        opacity="0.35"
+      />
       <circle cx="50" cy="50" r="1.5" fill={color} opacity="0.6" />
     </svg>
   );
@@ -113,17 +156,15 @@ const navItems = [
 ];
 
 export default function QuickNavSection() {
-  const router = useRouter();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
   return (
     <div className="flex h-full flex-row gap-2">
       {navItems.map((item) => (
-        <Button
+        <Link
           key={item.href}
-          variant="ghost"
-          onClick={() => router.push(item.href)}
+          href={item.href}
           style={{ background: isDark ? item.bgDark : item.bgLight }}
           className={`relative flex h-auto flex-1 flex-col items-center justify-center gap-0 overflow-hidden rounded-xl border py-5 transition-all duration-200 ${item.borderCls} ${item.hoverBg}`}
         >
@@ -149,13 +190,14 @@ export default function QuickNavSection() {
               <item.Icon size={18} strokeWidth={2} className="text-white" />
             </div>
 
-            <p className={`text-[11px] font-bold leading-tight tracking-tight ${item.labelCls}`}>
+            <p
+              className={`text-[11px] font-bold leading-tight tracking-tight ${item.labelCls}`}
+            >
               {item.label}
             </p>
           </div>
-        </Button>
+        </Link>
       ))}
     </div>
   );
 }
-

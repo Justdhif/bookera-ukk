@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { useState, useEffect } from "react";
 import { authService } from "@/services/auth.service";
@@ -20,6 +21,7 @@ interface ProfileDetailClientProps {
 
 export default function ProfileDetailClient({ variant }: ProfileDetailClientProps) {
   const router = useRouter();
+  const t = useTranslations("profile");
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -76,14 +78,14 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
       !formData.full_name?.trim() ||
       !formData.role
     ) {
-      toast.error("pleaseCompleteRequiredFields");
+      toast.error(t("requiredFields"));
       return;
     }
 
     try {
       setSubmitting(true);
       await userService.update(user.id, formData as UpdateUserData);
-      toast.success("User updated successfully");
+      toast.success(t("updateSuccess"));
       setIsEditMode(false);
       fetchUser();
     } catch (error: any) {
@@ -139,7 +141,7 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">My Profile</h1>
+            <h1 className="text-3xl font-bold">{t("myProfile")}</h1>
             <p className="text-muted-foreground">
               {isEditMode
                 ? `Edit ${user.profile.full_name}'s profile`

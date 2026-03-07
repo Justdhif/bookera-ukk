@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { FileWarning, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface FormData {
   name: string;
@@ -33,6 +34,7 @@ export default function AuthorFormDialog({
   setOpen: (v: boolean) => void;
   onSuccess: () => void;
 }) {
+  const t = useTranslations("author");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -104,7 +106,7 @@ export default function AuthorFormDialog({
 
   const handleSubmit = async () => {
     if (!photoImage) {
-      toast.error("Photo is required");
+      toast.error(t("photoRequired"));
       return;
     }
     setIsLoading(true);
@@ -115,7 +117,7 @@ export default function AuthorFormDialog({
         photo: photoImage,
         is_active: formData.is_active,
       });
-      toast.success("Author added successfully");
+      toast.success(t("addSuccess"));
       setOpen(false);
       onSuccess();
     } catch (err: any) {
@@ -129,12 +131,12 @@ export default function AuthorFormDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Add Author</DialogTitle>
+          <DialogTitle>{t("addAuthor")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5">
           <div className="space-y-2">
-            <Label variant="required">Photo</Label>
+            <Label variant="required">{t("photo")}</Label>
             <input
               ref={fileInputRef}
               type="file"
@@ -220,7 +222,7 @@ export default function AuthorFormDialog({
                       photoError && "text-red-600 dark:text-red-400",
                     )}
                   >
-                    {photoError ? photoError : "Drag and drop or click to upload"}
+                    {photoError ? photoError : t("dragDropUpload")}
                   </p>
                 </div>
               )}
@@ -233,33 +235,33 @@ export default function AuthorFormDialog({
                 className="w-full gap-2"
               >
                 <Upload className="h-4 w-4" />
-                {photoPreview ? "Change Photo" : "Browse Files"}
+                {photoPreview ? t("changePhoto") : t("browseFiles")}
               </Button>
               <p className="text-xs text-muted-foreground text-center">
-                Format: JPG, PNG, WEBP. Max 2MB
+                {t("formatHint")}
               </p>
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="name" variant="required">
-              Name
+              {t("name")}
             </Label>
             <Input
               id="name"
               name="name"
-              placeholder="Enter author name"
+              placeholder={t("namePlaceholder")}
               value={formData.name}
               onChange={handleInputChange}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="bio">Bio</Label>
+            <Label htmlFor="bio">{t("bio")}</Label>
             <Textarea
               id="bio"
               name="bio"
-              placeholder="Enter author bio (optional)"
+              placeholder={t("bioPlaceholder")}
               value={formData.bio}
               onChange={handleInputChange}
               rows={3}
@@ -269,10 +271,10 @@ export default function AuthorFormDialog({
           <div className="flex items-center justify-between rounded-lg border p-3">
             <div>
               <Label htmlFor="is_active" className="font-medium">
-                Active
+                {t("active")}
               </Label>
               <p className="text-xs text-muted-foreground">
-                Author will be visible and selectable when active
+                {t("activeDesc")}
               </p>
             </div>
             <Switch
@@ -289,7 +291,7 @@ export default function AuthorFormDialog({
             loading={isLoading}
             className="w-full"
           >
-            {isLoading ? "Adding..." : "Add Author"}
+            {t("addAuthor")}
           </Button>
         </div>
       </DialogContent>

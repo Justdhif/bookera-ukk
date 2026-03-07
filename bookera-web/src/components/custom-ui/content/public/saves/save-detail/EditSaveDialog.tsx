@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Save } from "@/types/save";
 import { saveService } from "@/services/save.service";
@@ -30,6 +31,7 @@ export default function EditSaveDialog({
   save,
   onSuccess,
 }: EditSaveDialogProps) {
+    const t = useTranslations("public");
   const [formData, setFormData] = useState({
     name: save.name,
     description: save.description || "",
@@ -38,7 +40,7 @@ export default function EditSaveDialog({
 
   const handleUpdate = async () => {
     if (!formData.name.trim()) {
-      toast.error("Please enter a name");
+      toast.error(t("detail.editDialog.nameRequired"));
       return;
     }
 
@@ -48,11 +50,11 @@ export default function EditSaveDialog({
         name: formData.name.trim(),
         description: formData.description.trim(),
       });
-      toast.success("Collection updated successfully");
+      toast.success(t("detail.editDialog.updateSuccess"));
       onOpenChange(false);
       onSuccess();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to update collection");
+      toast.error(error.response?.data?.message || t("detail.editDialog.updateError"));
     } finally {
       setIsUpdating(false);
     }
@@ -62,31 +64,31 @@ export default function EditSaveDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{"Edit Collection"}</DialogTitle>
+          <DialogTitle>{t("detail.editDialog.title")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="edit-name" variant="required">{"Name"}</Label>
+            <Label htmlFor="edit-name" variant="required">{t("detail.editDialog.name")}</Label>
             <Input
               id="edit-name"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
-              placeholder={"Enter collection name"}
+              placeholder={t("detail.editDialog.namePlaceholder")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-description">{"Description"}</Label>
+            <Label htmlFor="edit-description">{t("detail.editDialog.description")}</Label>
             <Textarea
               id="edit-description"
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              placeholder={"Enter collection description"}
+              placeholder={t("detail.editDialog.descriptionPlaceholder")}
             />
           </div>
         </div>
@@ -97,7 +99,7 @@ export default function EditSaveDialog({
             onClick={() => onOpenChange(false)}
             disabled={isUpdating}
           >
-            {"Cancel"}
+            {t("detail.editDialog.cancel")}
           </Button>
           <Button
             variant="submit"
@@ -105,7 +107,7 @@ export default function EditSaveDialog({
             disabled={isUpdating || !formData.name.trim()}
           >
             {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isUpdating ? "Updating..." : "Update"}
+            {isUpdating ? t("detail.editDialog.updating") : t("detail.editDialog.update")}
           </Button>
         </DialogFooter>
       </DialogContent>

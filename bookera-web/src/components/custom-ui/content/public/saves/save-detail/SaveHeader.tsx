@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Save } from "@/types/save";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Edit, Trash, BookMarked } from "lucide-react";
@@ -17,12 +18,13 @@ export default function SaveHeader({
   onDelete,
   onBack,
 }: SaveHeaderProps) {
+    const t = useTranslations("public");
   return (
     <div className="space-y-4 mb-6">
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {"Back"}
+          {t("detail.back")}
         </Button>
       </div>
 
@@ -73,7 +75,7 @@ export default function SaveHeader({
         )}
 
         <div className="flex flex-col justify-end flex-1">
-          <p className="text-muted-foreground text-sm">{"Collection"}</p>
+          <p className="text-muted-foreground text-sm">{t("detail.collection")}</p>
           <h1 className="lg:text-6xl sm:text-4xl font-bold wrap-break-word">
             {save.name}
           </h1>
@@ -83,10 +85,10 @@ export default function SaveHeader({
             </p>
           )}
           <div className="lg:mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <span className="font-medium">{save.total_books} books</span>
+            <span className="font-medium">{save.total_books}  {t("books")}</span>
             <span>•</span>
             <span>
-              {"Created"} {format(new Date(save.created_at), "MMM d, yyyy")}
+              {t("detail.created")} {format(new Date(save.created_at), "MMM d, yyyy")}
             </span>
           </div>
           <div className="mt-2 flex gap-2 shrink-0">
@@ -97,7 +99,7 @@ export default function SaveHeader({
               className="h-8 gap-1.5"
             >
               <Edit className="h-3.5 w-3.5" />
-              {"Edit"}
+              {t("detail.edit")}
             </Button>
             <Button
               variant="destructive"
@@ -106,7 +108,7 @@ export default function SaveHeader({
               className="h-8 gap-1.5"
             >
               <Trash className="h-3.5 w-3.5" />
-              {"Delete"}
+              {t("detail.delete")}
             </Button>
           </div>
         </div>

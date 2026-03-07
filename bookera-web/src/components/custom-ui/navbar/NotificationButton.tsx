@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
@@ -8,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { notificationService } from "@/services/notification.service";
 export default function NotificationButton() {
   const router = useRouter();
+  const t = useTranslations("navbar");
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export default function NotificationButton() {
       className="relative flex items-center gap-2 h-9 px-3"
     >
       <Bell className="h-4 w-4" />
-      <span className="hidden text-sm font-medium lg:block">Notifications</span>
+      <span className="hidden text-sm font-medium lg:block">{t("notifications")}</span>
       {unreadCount > 0 && (
         <Badge
           variant="destructive"

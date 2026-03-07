@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { PrivacyPolicy } from "@/types/privacy-policy";
 import { privacyPolicyService } from "@/services/privacy-policy.service";
@@ -11,6 +12,7 @@ import { PrivacyPolicyListSkeleton } from "./list/PrivacyPolicyListSkeleton";
 import { Plus } from "lucide-react";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 export default function PrivacyPolicyClient() {
+    const t = useTranslations("privacy-policy");
   const [items, setItems] = useState<PrivacyPolicy[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -22,12 +24,12 @@ export default function PrivacyPolicyClient() {
     
     try {
       await privacyPolicyService.delete(deleteId);
-      toast.success("Privacy Policy deleted successfully");
+      toast.success(t("deleteSuccess"));
       fetchData();
       setDeleteId(null);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Failed to delete Privacy Policy",
+        error.response?.data?.message || t("deleteError"),
       );
     }
   };
@@ -38,7 +40,7 @@ export default function PrivacyPolicyClient() {
       const res = await privacyPolicyService.getAll();
       setItems(res.data.data);
     } catch (error) {
-      toast.error("Failed to load data");
+      toast.error(t("loadError"));
     } finally {
       setLoading(false);
     }
@@ -52,9 +54,9 @@ export default function PrivacyPolicyClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">{"Privacy Policy"}</h1>
+          <h1 className="text-3xl font-bold">{t("title")}</h1>
           <p className="text-muted-foreground">
-            {"Manage privacy policy"}
+            {t("description")}
           </p>
         </div>
         <Button
@@ -66,7 +68,7 @@ export default function PrivacyPolicyClient() {
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />
-          {"Add Privacy Policy"}
+          {t("addPrivacyPolicy")}
         </Button>
       </div>
 
@@ -93,8 +95,8 @@ export default function PrivacyPolicyClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title={"Delete Privacy Policy"}
-        description={"Are you sure you want to delete this Privacy Policy? Deleted data cannot be recovered."}
+        title={t("deleteTitle")}
+        description={t("deleteConfirm")}
         onConfirm={confirmDelete}
       />
     </div>

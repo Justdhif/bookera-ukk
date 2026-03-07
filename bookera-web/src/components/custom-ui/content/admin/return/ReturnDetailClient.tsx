@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+
 import { bookReturnService } from "@/services/book-return.service";
 import { BookReturn } from "@/types/book-return";
 import { Fine } from "@/types/fine";
@@ -21,7 +22,9 @@ export default function ReturnDetailClient() {
 
   const [bookReturn, setBookReturn] = useState<BookReturn | null>(null);
   const [loading, setLoading] = useState(true);
-  const [conditions, setConditions] = useState<Record<number, "good" | "damaged" | "lost">>({});
+  const [conditions, setConditions] = useState<
+    Record<number, "good" | "damaged" | "lost">
+  >({});
   const [savingConditions, setSavingConditions] = useState(false);
   const [finishingFines, setFinishingFines] = useState(false);
   const [finishingBorrow, setFinishingBorrow] = useState(false);
@@ -38,12 +41,16 @@ export default function ReturnDetailClient() {
       setBookReturn(data);
 
       const initialConditions: Record<number, "good" | "damaged" | "lost"> = {};
-      data.details?.forEach((d: { id: number; condition: "good" | "damaged" | "lost" }) => {
-        initialConditions[d.id] = d.condition;
-      });
+      data.details?.forEach(
+        (d: { id: number; condition: "good" | "damaged" | "lost" }) => {
+          initialConditions[d.id] = d.condition;
+        },
+      );
       setConditions(initialConditions);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to load return details");
+      toast.error(
+        error.response?.data?.message || "Failed to load return details",
+      );
       router.push("/admin/returns");
     } finally {
       setLoading(false);
@@ -52,7 +59,7 @@ export default function ReturnDetailClient() {
 
   const handleConditionChange = (
     detailId: number,
-    condition: "good" | "damaged" | "lost"
+    condition: "good" | "damaged" | "lost",
   ) => {
     setConditions((prev) => ({ ...prev, [detailId]: condition }));
   };
@@ -65,7 +72,9 @@ export default function ReturnDetailClient() {
       toast.success("Book conditions saved successfully");
       fetchDetail();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to save book conditions");
+      toast.error(
+        error.response?.data?.message || "Failed to save book conditions",
+      );
     } finally {
       setSavingConditions(false);
     }
@@ -112,15 +121,16 @@ export default function ReturnDetailClient() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => router.push("/admin/returns")}
           className="h-8 w-8"
+          onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
           <h1 className="text-3xl font-bold">Return Detail</h1>
           <p className="text-muted-foreground">
-            Complete information about this return — Borrow #{bookReturn.borrow_id}
+            Complete information about this return — Borrow #
+            {bookReturn.borrow_id}
           </p>
         </div>
       </div>

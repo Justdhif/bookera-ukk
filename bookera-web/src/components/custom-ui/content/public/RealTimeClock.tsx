@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Thermometer, Droplets, MapPin, BookMarked } from "lucide-react";
 
 type Theme = {
@@ -202,7 +203,18 @@ function ArcDecor({ stroke }: { stroke: string }) {
   );
 }
 
+function getGreetingKey(h: number): string {
+  if (h >= 4 && h < 6) return "goodMorning";
+  if (h >= 6 && h < 10) return "goodMorning";
+  if (h >= 10 && h < 15) return "goodNoon";
+  if (h >= 15 && h < 17) return "goodAfternoon";
+  if (h >= 17 && h < 19) return "goodEvening";
+  if (h >= 19 && h < 23) return "goodNight";
+  return "goodNight";
+}
+
 export default function RealTimeClock() {
+  const t = useTranslations("clock");
   const [time, setTime] = useState(new Date());
   const [mounted, setMounted] = useState(false);
   const [pulse, setPulse] = useState(false);
@@ -242,8 +254,9 @@ export default function RealTimeClock() {
   const hour = time.getHours();
   const theme = getTheme(hour);
 
-  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const days = [t("sunday"), t("monday"), t("tuesday"), t("wednesday"), t("thursday"), t("friday"), t("saturday")];
+  const months = [t("january"), t("february"), t("march"), t("april"), t("may"), t("june"), t("july"), t("august"), t("september"), t("october"), t("november"), t("december")];
+  const greeting = t(getGreetingKey(hour));
 
   const dayName = days[time.getDay()];
   const dateNum = time.getDate();
@@ -300,11 +313,11 @@ export default function RealTimeClock() {
             fontSize: "9px", fontWeight: 700, letterSpacing: "0.18em",
             textTransform: "uppercase", color: theme.textMuted,
           }}>
-            Bookera Library
+            {t("bookeraLibrary")}
           </span>
           <span style={{ fontSize: "9px", color: theme.textMuted, opacity: 0.5, margin: "0 2px" }}>·</span>
           <MapPin size={9} color={theme.textMuted} strokeWidth={2} />
-          <span style={{ fontSize: "9px", color: theme.textMuted, letterSpacing: "0.1em" }}>Jakarta</span>
+          <span style={{ fontSize: "9px", color: theme.textMuted, letterSpacing: "0.1em" }}>{t("location")}</span>
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
@@ -312,7 +325,7 @@ export default function RealTimeClock() {
             fontSize: "20px", fontWeight: 800, color: theme.textPrimary,
             letterSpacing: "-0.025em", lineHeight: 1,
           }}>
-            {theme.greeting}
+            {greeting}
           </span>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: "11px", fontWeight: 600, color: theme.textDim, letterSpacing: "-0.01em" }}>
@@ -360,7 +373,7 @@ export default function RealTimeClock() {
               {ss}
             </span>
             <span style={{ fontSize: "8px", color: theme.textMuted, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-              sec
+              {t("sec")}
             </span>
           </div>
         </div>
@@ -373,9 +386,9 @@ export default function RealTimeClock() {
 
       <div style={{ position: "relative", zIndex: 1, display: "flex", gap: "8px" }}>
         {[
-          { label: "Temp.", value: tempVal, Icon: Thermometer, sub: "Jakarta" },
-          { label: "Humidity", value: humVal, Icon: Droplets, sub: "Relative" },
-          { label: "Time Zone", value: "WIB", Icon: MapPin, sub: "UTC+7" },
+          { label: t("temp"), value: tempVal, Icon: Thermometer, sub: t("location") },
+          { label: t("humidity"), value: humVal, Icon: Droplets, sub: t("relative") },
+          { label: t("timeZone"), value: "WIB", Icon: MapPin, sub: "UTC+7" },
         ].map(({ label, value, Icon, sub }) => (
           <div key={label} style={{
             flex: 1,

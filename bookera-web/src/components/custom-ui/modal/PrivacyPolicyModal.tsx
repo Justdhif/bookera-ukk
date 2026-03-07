@@ -102,7 +102,7 @@ export function PrivacyPolicyModal({
               <div className="mb-4 flex justify-center opacity-50">
                 <Shield className="w-12 h-12" />
               </div>
-              <p>{"Content not available"}</p>
+              <p>Content not available</p>
             </div>
           )}
         </ScrollArea>

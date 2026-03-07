@@ -1,14 +1,11 @@
+import { useTranslations } from "next-intl";
 import { QrCode } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface QrCodeImageProps {
-  /** Base64 data URI or URL of the QR code image */
   url?: string | null;
-  /** Code string displayed below the image */
   code: string;
-  /** Optional label shown above the code (default: "Code") */
   label?: string;
-  /** Image + placeholder size variant */
   size?: "sm" | "md" | "lg";
   className?: string;
 }
@@ -22,10 +19,12 @@ const sizeMap = {
 export function QrCodeImage({
   url,
   code,
-  label = "Code",
+  label,
   size = "md",
   className,
 }: QrCodeImageProps) {
+  const t = useTranslations("common");
+  const safeLabel = label || t("copyCode");
   const sz = sizeMap[size];
 
   return (
@@ -42,7 +41,7 @@ export function QrCodeImage({
         <div
           className={cn(
             sz.img,
-            "border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-2 bg-muted/30"
+            "border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-2 bg-muted/30",
           )}
         >
           <QrCode className={cn(sz.icon, "text-muted-foreground opacity-50")} />
@@ -53,7 +52,7 @@ export function QrCodeImage({
       )}
 
       <div className="text-center">
-        <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
+        <p className="text-xs text-muted-foreground mb-0.5">{safeLabel}</p>
         <p className="font-mono font-semibold text-sm">{code}</p>
       </div>
     </div>

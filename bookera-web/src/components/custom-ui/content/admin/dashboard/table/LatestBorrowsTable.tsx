@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -37,6 +38,7 @@ const statusColorMap: Record<string, string> = {
 };
 
 export default function LatestBorrowsTable({ data }: LatestBorrowsTableProps) {
+    const t = useTranslations("dashboard");
   const hasData = data && data.length > 0;
 
   return (
@@ -44,7 +46,7 @@ export default function LatestBorrowsTable({ data }: LatestBorrowsTableProps) {
       <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
         <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <div className="w-1 h-6 bg-linear-to-b from-purple-500 to-pink-500 rounded-full" />
-          {"Latest Borrows"}
+          {t("latestBorrows")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -54,16 +56,16 @@ export default function LatestBorrowsTable({ data }: LatestBorrowsTableProps) {
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-gray-100 dark:border-gray-800">
                   <TableHead className="font-semibold text-gray-700 dark:text-gray-300">
-                    {"Borrower"}
+                    {t("borrower")}
                   </TableHead>
                   <TableHead className="font-semibold text-gray-700 dark:text-gray-300">
-                    {"Book"}
+                    {t("book")}
                   </TableHead>
                   <TableHead className="font-semibold text-gray-700 dark:text-gray-300">
-                    {"Borrow Date"}
+                    {t("loanDate")}
                   </TableHead>
                   <TableHead className="font-semibold text-gray-700 dark:text-gray-300">
-                    {"Status"}
+                    {t("status")}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -93,7 +95,7 @@ export default function LatestBorrowsTable({ data }: LatestBorrowsTableProps) {
                         <BookOpen className="h-4 w-4 text-emerald-500" />
                         <span className="text-sm text-gray-700 dark:text-gray-300">
                           {borrow.borrow_details?.[0]?.book_copy?.book?.title ||
-                            `${borrow.borrow_details?.length || 0} ${"books"}`}
+                            `${borrow.borrow_details?.length || 0} ${t("books")}`}
                         </span>
                       </div>
                     </TableCell>

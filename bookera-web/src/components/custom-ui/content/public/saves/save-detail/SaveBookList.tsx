@@ -1,4 +1,6 @@
 "use client";
+
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useState } from "react";
@@ -26,6 +28,7 @@ export default function SaveBookList({
   onRemoveBook,
   borrowButton,
 }: SaveBookListProps) {
+    const t = useTranslations("public");
   const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   if (!books || books.length === 0) {
@@ -33,7 +36,7 @@ export default function SaveBookList({
       <Card className="p-8 sm:p-12">
         <div className="text-center text-muted-foreground">
           <BookMarked className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 opacity-30" />
-          <p className="text-sm sm:text-base">{"No books in this collection yet"}</p>
+          <p className="text-sm sm:text-base">{t("detail.noBooksYet")}</p>
         </div>
       </Card>
     );
@@ -48,10 +51,10 @@ export default function SaveBookList({
           value={viewMode}
           onValueChange={(value) => value && setViewMode(value as ViewMode)}
         >
-          <ToggleGroupItem value="grid" aria-label="Grid view">
+          <ToggleGroupItem value="grid" aria-label={t("gridView")}>
             <LayoutGrid className="h-4 w-4" />
           </ToggleGroupItem>
-          <ToggleGroupItem value="list" aria-label="List view">
+          <ToggleGroupItem value="list" aria-label={t("listView")}>
             <List className="h-4 w-4" />
           </ToggleGroupItem>
         </ToggleGroup>
@@ -97,7 +100,7 @@ export default function SaveBookList({
                     }
                   >
                     {book.available_copies || 0}/{book.total_copies || 0}{" "}
-                    {"Available"}
+                    {t("available")}
                   </Badge>
                 </div>
               </div>
@@ -118,7 +121,7 @@ export default function SaveBookList({
                   }}
                 >
                   <Eye className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{"Detail"}</span>
+                  <span className="hidden sm:inline">{t("detail.detail")}</span>
                 </Button>
                 <Button
                   variant="outline"
@@ -129,7 +132,7 @@ export default function SaveBookList({
                     onRemoveBook(book.id);
                   }}
                 >
-                  {"Remove"}
+                  {t("detail.remove")}
                 </Button>
               </div>
             </div>
@@ -204,7 +207,7 @@ export default function SaveBookList({
                         }
                       >
                         {book.available_copies || 0}/{book.total_copies || 0}{" "}
-                        {"Available"}
+                        {t("available")}
                       </Badge>
                     </div>
 
@@ -222,7 +225,7 @@ export default function SaveBookList({
                         className="h-8 gap-1"
                       >
                         <Eye className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">{"Detail"}</span>
+                        <span className="hidden sm:inline">{t("detail.detail")}</span>
                       </Button>
                       <Button
                         variant="destructive"
@@ -234,7 +237,7 @@ export default function SaveBookList({
                         className="h-8"
                       >
                         <Trash className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">{"Remove"}</span>
+                        <span className="hidden sm:inline">{t("detail.remove")}</span>
                       </Button>
                     </div>
                   </div>

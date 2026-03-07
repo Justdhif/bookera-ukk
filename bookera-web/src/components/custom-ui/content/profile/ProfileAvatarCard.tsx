@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +33,7 @@ export default function ProfileAvatarCard({
   setFormData,
   setAvatarPreview,
 }: ProfileAvatarCardProps) {
+  const t = useTranslations("profile");
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
   const handleAvatarSave = (avatar: string | File) => {
@@ -64,9 +66,9 @@ export default function ProfileAvatarCard({
     <>
       <Card className="lg:col-span-1">
         <CardHeader>
-          <CardTitle>Avatar</CardTitle>
+          <CardTitle>{t("avatar")}</CardTitle>
           <CardDescription>
-            {isEditMode ? "Upload user profile photo" : "User profile photo"}
+            {isEditMode ? t("uploadPhoto") : t("userPhoto")}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
@@ -84,20 +86,20 @@ export default function ProfileAvatarCard({
               className="w-full"
             >
               <Upload className="h-4 w-4 mr-2" />
-              {"Upload Avatar"}
+              {t("uploadAvatar")}
             </Button>
           )}
 
           <div className="space-y-2 w-full">
             <div className="flex items-center gap-2">
               <Label className="text-muted-foreground text-xs w-16">
-                {"Role"}:
+                {t("roleLabel")}
               </Label>
               <span className="flex-1 text-xs font-medium">{roleLabel}</span>
             </div>
             <div className="flex items-center gap-2">
               <Label className="text-muted-foreground text-xs w-16">
-                {"Status"}:
+                {t("statusLabel")}
               </Label>
               <span className="flex-1 text-xs font-medium">{statusLabel}</span>
             </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import {
   Dialog,
@@ -41,6 +42,7 @@ export function ReportLostDialog({
   borrow,
   onSuccess,
 }: ReportLostDialogProps) {
+    const t = useTranslations("public");
   const [selectedDetailIds, setSelectedDetailIds] = useState<number[]>([]);
   const [notes, setNotes] = useState<Record<number, string>>({});
   const [estimatedLostDate, setEstimatedLostDate] = useState<
@@ -107,7 +109,7 @@ export function ReportLostDialog({
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-destructive/10">
               <AlertTriangle className="h-4 w-4 text-destructive" />
             </div>
-            <span>Report Lost Book</span>
+            <span>{t("reportLostBookTitle")}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -116,7 +118,7 @@ export function ReportLostDialog({
           <div className="flex items-center gap-2 text-muted-foreground">
             <Hash className="h-3.5 w-3.5 shrink-0" />
             <span>
-              Borrow Code:{" "}
+              {t("borrowCodeLabel")}:{" "}
               <span className="font-medium text-foreground">
                 {borrow?.borrow_code ?? `#${borrow?.id}`}
               </span>
@@ -125,7 +127,7 @@ export function ReportLostDialog({
           <div className="flex items-center gap-2 text-muted-foreground">
             <CalendarClock className="h-3.5 w-3.5 shrink-0" />
             <span>
-              Due:{" "}
+              {t("dueLabel")}:{" "}
               <span className="font-medium text-foreground">
                 {borrow?.return_date
                   ? format(new Date(borrow.return_date), "dd MMM yyyy")
@@ -139,8 +141,7 @@ export function ReportLostDialog({
         <div className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
           <p>
-            Reporting a lost book will notify the library. A fine may be
-            applied based on the book&apos;s value.
+            {t("reportingLostWarning")}
           </p>
         </div>
 
@@ -150,7 +151,7 @@ export function ReportLostDialog({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-sm font-medium">
-              Select Lost Books
+              {t("selectLostBooksLabel")}
             </Label>
             {(borrowedDetails?.length ?? 0) > 0 && (
               <span className="text-xs text-muted-foreground">
@@ -164,7 +165,7 @@ export function ReportLostDialog({
             <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed py-8 text-center">
               <BookOpen className="h-8 w-8 text-muted-foreground/50" />
               <p className="text-sm text-muted-foreground">
-                No books available to report.
+                {t("noBooksAvailableReport")}
               </p>
             </div>
           ) : (
@@ -207,10 +208,10 @@ export function ReportLostDialog({
                     {selectedDetailIds.includes(detail.id) && (
                       <div className="ml-6 space-y-1">
                         <Label className="text-xs text-muted-foreground">
-                          Additional notes (optional)
+                          {t("additionalNotesLabel")}
                         </Label>
                         <Textarea
-                          placeholder="Describe how the book was lost..."
+                          placeholder={t("additionalNotesPlaceholder")}
                           value={notes[detail.id] || ""}
                           onChange={(e) =>
                             setNotes((prev) => ({
@@ -234,28 +235,28 @@ export function ReportLostDialog({
         <div className="space-y-2">
           <div className="flex items-center gap-1.5">
             <Label className="text-sm font-medium">
-              Estimated Date Lost
+              {t("estimatedDateLostLabel")}
             </Label>
             <Badge variant="secondary" className="text-xs font-normal py-0">
-              Optional
+              {t("optional")}
             </Badge>
           </div>
           <DatePicker
             value={estimatedLostDate}
             onChange={setEstimatedLostDate}
-            placeholder="Select approximate date book was lost"
+            placeholder={t("selectLostDate")}
             dateMode="all"
           />
           <p className="text-xs text-muted-foreground">
-            If you remember approximately when the book went missing, provide
-            the date.
+            {t("lostDateHelp")}
           </p>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={loading}>
-            Cancel
-          </Button>
+            
+                                  {t("detail.editDialog.cancel")}
+                                </Button>
           <Button
             variant="destructive"
             onClick={handleSubmit}
@@ -264,15 +265,15 @@ export function ReportLostDialog({
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Submitting...
+                {t("submitting")}
               </>
             ) : (
               <>
                 <AlertTriangle className="h-4 w-4" />
-                Report{" "}
+                {t("report")}{" "}
                 {selectedDetailIds.length > 0
                   ? `${selectedDetailIds.length} Book${selectedDetailIds.length > 1 ? "s" : ""}`
-                  : "Lost Book"}
+                  : t("reportLostBook")}
               </>
             )}
           </Button>

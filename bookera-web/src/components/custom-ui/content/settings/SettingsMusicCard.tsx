@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -15,6 +16,7 @@ import { useAudio } from "@/context/AudioContext";
 import { toast } from "sonner";
 
 export default function SettingsMusicCard() {
+  const t = useTranslations("settings");
   const {
     isMusicEnabled,
     isPlaying,
@@ -36,8 +38,8 @@ export default function SettingsMusicCard() {
     toggleMusic();
     toast.success(
       isMusicEnabled
-        ? "Background music turned off"
-        : "Background music is now playing",
+        ? t("musicTurnedOff")
+        : t("musicNowPlaying"),
     );
   };
 
@@ -49,16 +51,16 @@ export default function SettingsMusicCard() {
     <Card className="overflow-hidden border-none shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-3 text-2xl relative">
-          Background Music
+          {t("musicTitle")}
           <div className="absolute -bottom-1 left-0 h-1 w-6 rounded-full bg-muted-foreground" />
         </CardTitle>
         <CardDescription className="text-base">
-          Relax with ambient background music while using the application (auto-loop)
+          {t("musicDescription")}
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6 space-y-6">
         <div className="space-y-2">
-          <Label className="text-base">Select Track</Label>
+          <Label className="text-base">{t("selectTrack")}</Label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {tracks.map((track) => {
               const isActive = track.id === currentTrackId;
@@ -89,7 +91,7 @@ export default function SettingsMusicCard() {
                     </p>
                     {isActive && (
                       <p className="text-xs text-muted-foreground">
-                        Now selected • Auto-loop
+                        {t("nowSelectedAutoLoop")}
                       </p>
                     )}
                   </div>
@@ -109,7 +111,7 @@ export default function SettingsMusicCard() {
             </div>
             <div>
               <h3 className="font-semibold text-lg">{activeTrack.name}</h3>
-              <p className="text-sm text-muted-foreground">Auto-loop enabled</p>
+              <p className="text-sm text-muted-foreground">{t("autoLoopEnabled")}</p>
             </div>
           </div>
           <Button
@@ -120,7 +122,7 @@ export default function SettingsMusicCard() {
             }`}
             onClick={handleToggleMusic}
           >
-            {isMusicEnabled ? "Disable Music" : "Enable Music"}
+            {isMusicEnabled ? t("disableMusic") : t("enableMusic")}
           </Button>
         </div>
 
@@ -155,7 +157,7 @@ export default function SettingsMusicCard() {
             </div>
 
             <div className="space-y-3">
-              <Label className="text-base">Volume Control</Label>
+              <Label className="text-base">{t("volumeControl")}</Label>
               <div className="flex items-center gap-4">
                 <Button
                   variant="ghost"
@@ -193,11 +195,11 @@ export default function SettingsMusicCard() {
                 }`}
               />
               <span className="text-sm">
-                {isPlaying ? "Music is playing" : "Music is paused"}
+                {isPlaying ? t("musicPlaying") : t("musicPaused")}
               </span>
               {isPlaying && (
                 <span className="text-xs text-muted-foreground ml-auto">
-                  Auto-loop active
+                  {t("autoLoopActive")}
                 </span>
               )}
             </div>
@@ -207,14 +209,12 @@ export default function SettingsMusicCard() {
         {!isMusicEnabled && (
           <div className="text-center py-8 text-muted-foreground">
             <Music className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p>Background music is currently disabled</p>
+            <p>{t("musicDisabledHint")}</p>
             <p className="text-sm">
-              Click &quot;Enable Music&quot; to start playing ambient background
-              music
+              {t("enableMusicHint")}
             </p>
             <p className="text-xs mt-1 opacity-70">
-              Music auto-plays on page load — starts on your first interaction
-              if the browser requires it
+              {t("musicAutoPlayHint")}
             </p>
           </div>
         )}

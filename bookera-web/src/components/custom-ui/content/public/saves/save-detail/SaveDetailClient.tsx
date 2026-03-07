@@ -1,4 +1,6 @@
 "use client";
+
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
@@ -24,6 +26,7 @@ interface SaveDetailClientProps {
 export default function SaveDetailClient({
   saveIdentifier,
 }: SaveDetailClientProps) {
+    const t = useTranslations("public");
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
   const [save, setSave] = useState<Save | null>(null);
@@ -40,7 +43,7 @@ export default function SaveDetailClient({
       const res = await saveService.getOne(saveIdentifier);
       setSave(res.data.data);
     } catch (error) {
-      toast.error("Failed to load collection");
+      toast.error(t("detail.failedToLoad"));
       router.push("/");
     } finally {
       setLoading(false);
@@ -56,11 +59,11 @@ export default function SaveDetailClient({
 
     try {
       await saveService.removeBook(save.id, bookId);
-      toast.success("Book removed from collection");
+      toast.success(t("detail.bookRemoved"));
       fetchSave();
       window.dispatchEvent(new Event("refreshSavesList"));
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to remove book");
+      toast.error(error.response?.data?.message || t("detail.failedToRemove"));
     }
   };
 
@@ -74,13 +77,13 @@ export default function SaveDetailClient({
 
   const handleBorrowClick = async () => {
     if (!isAuthenticated) {
-      toast.error("Please login to borrow books");
+      toast.error(t("detail.pleaseLogin"));
       router.push("/login");
       return;
     }
 
     if (selectedBooks.length === 0) {
-      toast.error("Please select at least one book");
+      toast.error(t("detail.selectOne"));
       return;
     }
 
@@ -92,7 +95,7 @@ export default function SaveDetailClient({
       setBooksWithCopies(booksData.map((res) => res.data.data));
       setShowBorrowDialog(true);
     } catch (error) {
-      toast.error("Failed to load book details");
+      toast.error(t("detail.failedToLoadBooks"));
     } finally {
       setLoadingCopies(false);
     }
@@ -103,12 +106,12 @@ export default function SaveDetailClient({
 
     try {
       await saveService.delete(save.id);
-      toast.success("Collection deleted successfully");
+      toast.success(t("detail.deleted"));
       window.dispatchEvent(new Event("refreshSavesList"));
       router.push("/");
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Failed to delete collection",
+        error.response?.data?.message || t("detail.failedToDelete"),
       );
       throw error;
     }
@@ -147,12 +150,12 @@ export default function SaveDetailClient({
               {loadingCopies ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {"Loading..."}
+                  {t("detail.loading")}
                 </>
               ) : (
                 <>
                   <ShoppingCart className="h-4 w-4 mr-2" />
-                  {"Borrow Selected"} ({selectedBooks.length})
+                  {t("detail.borrowSelected")} ({selectedBooks.length})
                 </>
               )}
             </Button>
@@ -173,8 +176,8 @@ export default function SaveDetailClient({
       <DeleteConfirmDialog
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
-        title={"Delete Collection"}
-        description={`${"This will permanently delete the collection"} "${save.name}". ${"Failed to delete collection".includes("cannot") ? "This action cannot be undone." : ""}`}
+        title={t("detail.deleteTitle")}
+        description={`${t("detail.deleteConfirm")} "${save.name}". ${t("detail.failedToDelete").includes("cannot") ? "This action cannot be undone." : ""}`}
         onConfirm={handleDeleteConfirm}
       />
 

@@ -1,5 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { useEffect, useState } from "react";
 import { Bell, ChevronRight } from "lucide-react";
@@ -24,6 +26,7 @@ export default function NotificationDropdown({
   isAuthenticated,
 }: NotificationDropdownProps) {
   const router = useRouter();
+  const t = useTranslations("navbar");
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,24 +38,32 @@ export default function NotificationDropdown({
       fetchUnreadCount();
     };
 
-    window.addEventListener("notification-received", handleNotificationReceived);
+    window.addEventListener(
+      "notification-received",
+      handleNotificationReceived,
+    );
     return () => {
-      window.removeEventListener("notification-received", handleNotificationReceived);
+      window.removeEventListener(
+        "notification-received",
+        handleNotificationReceived,
+      );
     };
   }, []);
 
   useEffect(() => {
     const handleNotificationRead = (event: any) => {
       const notificationId = event.detail?.notificationId;
-      
+
       if (notificationId) {
         setNotifications(
           notifications.map((n) =>
-            n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
-          )
+            n.id === notificationId
+              ? { ...n, read_at: new Date().toISOString() }
+              : n,
+          ),
         );
       }
-      
+
       fetchUnreadCount();
     };
 
@@ -97,19 +108,21 @@ export default function NotificationDropdown({
     if (!notif.read_at) {
       try {
         await notificationService.markAsRead(notif.id);
-        
+
         setNotifications(
           notifications.map((n) =>
-            n.id === notif.id ? { ...n, read_at: new Date().toISOString() } : n
-          )
+            n.id === notif.id ? { ...n, read_at: new Date().toISOString() } : n,
+          ),
         );
-        
+
         fetchUnreadCount();
-        
+
         if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("notification-read", { 
-            detail: { notificationId: notif.id } 
-          }));
+          window.dispatchEvent(
+            new CustomEvent("notification-read", {
+              detail: { notificationId: notif.id },
+            }),
+          );
         }
       } catch (error) {
         console.error("Failed to mark as read:", error);
@@ -144,7 +157,9 @@ export default function NotificationDropdown({
           className="relative flex items-center gap-2 h-9 px-3"
         >
           <Bell className="h-4 w-4" />
-          <span className="hidden text-sm font-medium lg:block">Notifications</span>
+          <span className="hidden text-sm font-medium lg:block">
+            {t("notifications")}
+          </span>
           {isAuthenticated && unreadCount > 0 && (
             <Badge
               variant="destructive"
@@ -157,9 +172,9 @@ export default function NotificationDropdown({
       </PopoverTrigger>
       <PopoverContent className="w-96 p-0" align="end">
         <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="font-semibold text-lg">Notifications</h3>
+          <h3 className="font-semibold text-lg">{t("notifications")}</h3>
           {unreadCount > 0 && (
-            <Badge variant="secondary">{unreadCount} unread</Badge>
+            <Badge variant="secondary">{t("unread", { count: unreadCount })}</Badge>
           )}
         </div>
 
@@ -168,24 +183,21 @@ export default function NotificationDropdown({
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
               <Bell className="h-12 w-12 text-muted-foreground mb-3" />
               <p className="text-sm text-muted-foreground mb-4">
-                Please login to view notifications
+                {t("loginToView")}
               </p>
-              <Button
-                size="sm"
-                onClick={() => router.push("/login")}
-              >
-                Login
-              </Button>
+              <Link href="/login">
+                <Button size="sm">{t("login")}</Button>
+              </Link>
             </div>
           ) : isLoading ? (
             <div className="py-8 text-center text-sm text-muted-foreground">
-              Loading...
+              {t("loading")}
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
               <Bell className="h-12 w-12 text-muted-foreground mb-3" />
               <p className="text-sm text-muted-foreground">
-                No notifications yet
+                {t("noNotifications")}
               </p>
             </div>
           ) : (
@@ -196,7 +208,7 @@ export default function NotificationDropdown({
                   onClick={() => handleNotificationClick(notif)}
                   className={cn(
                     "p-4 hover:bg-muted/50 cursor-pointer transition-colors",
-                    !notif.read_at && "bg-blue-50/50 dark:bg-blue-950/20"
+                    !notif.read_at && "bg-blue-50/50 dark:bg-blue-950/20",
                   )}
                 >
                   <div className="flex gap-3">
@@ -218,7 +230,10 @@ export default function NotificationDropdown({
                         </p>
                       )}
                       <p className="text-xs text-muted-foreground mt-1">
-                        {format(new Date(notif.created_at), "MMM dd, yyyy HH:mm")}
+                        {format(
+                          new Date(notif.created_at),
+                          "MMM dd, yyyy HH:mm",
+                        )}
                       </p>
                     </div>
                   </div>
@@ -235,7 +250,7 @@ export default function NotificationDropdown({
               className="w-full justify-between"
               onClick={handleViewAllNotifications}
             >
-              <span>{"View all notifications"}</span>
+              <span>{t("viewAllNotifications")}</span>
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

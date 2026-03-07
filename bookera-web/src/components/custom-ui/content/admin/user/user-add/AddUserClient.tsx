@@ -1,4 +1,6 @@
-﻿"use client";
+"use client";
+
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useState } from "react";
@@ -28,6 +30,7 @@ interface FormData {
 }
 
 export default function AddUserClient() {
+    const t = useTranslations("user");
   const router = useRouter();
 
   const [formData, setFormData] = useState<FormData>({
@@ -67,10 +70,10 @@ export default function AddUserClient() {
     try {
       setSubmitting(true);
       await userService.create(formData as CreateUserData);
-      toast.success("User added successfully");
+      toast.success(t("addSuccess"));
       router.push("/admin/users");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to add user");
+      toast.error(error.response?.data?.message || t("addError"));
     } finally {
       setSubmitting(false);
     }
@@ -83,13 +86,13 @@ export default function AddUserClient() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push("/admin/users")}
             className="h-8 w-8"
+            onClick={() => router.back()}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Add User</h1>
+            <h1 className="text-3xl font-bold">{t("addUser")}</h1>
             <p className="text-muted-foreground">
               Add a new user to the system
             </p>
@@ -103,7 +106,7 @@ export default function AddUserClient() {
           loading={submitting}
           className="h-8"
         >
-          {submitting ? "Saving..." : "Add User"}
+          {submitting ? "Saving..." : t("addUser")}
         </Button>
       </div>
 

@@ -39,56 +39,56 @@ export interface IconOption {
   label: string;
 }
 
-// Daftar icon yang relevan untuk kategori buku
+// List of icons relevant to book categories
 export const AVAILABLE_ICONS: IconOption[] = [
-  // Buku & Pendidikan
-  { name: "Book", icon: Book, label: "Buku" },
-  { name: "BookOpen", icon: BookOpen, label: "Buku Terbuka" },
-  { name: "BookMarked", icon: BookMarked, label: "Buku Bookmark" },
-  { name: "Library", icon: Library, label: "Perpustakaan" },
-  { name: "GraduationCap", icon: GraduationCap, label: "Wisuda" },
-  { name: "Newspaper", icon: Newspaper, label: "Koran" },
-  { name: "FileText", icon: FileText, label: "Dokumen" },
-  
-  // Profesi & Bisnis
-  { name: "Briefcase", icon: Briefcase, label: "Tas Kerja" },
-  { name: "Code", icon: Code, label: "Kode" },
-  { name: "Microscope", icon: Microscope, label: "Mikroskop" },
-  
-  // Kreativitas & Seni
-  { name: "Palette", icon: Palette, label: "Palet" },
-  { name: "Music", icon: Music, label: "Musik" },
-  { name: "Camera", icon: Camera, label: "Kamera" },
-  
-  // Inspirasi & Motivasi
-  { name: "Lightbulb", icon: Lightbulb, label: "Lampu" },
-  { name: "Brain", icon: Brain, label: "Otak" },
-  { name: "Star", icon: Star, label: "Bintang" },
-  { name: "Trophy", icon: Trophy, label: "Piala" },
-  { name: "Sparkles", icon: Sparkles, label: "Kilau" },
-  { name: "Rocket", icon: Rocket, label: "Roket" },
-  
-  // Hiburan & Hobi
+  // Books & Education
+  { name: "Book", icon: Book, label: "Book" },
+  { name: "BookOpen", icon: BookOpen, label: "Open Book" },
+  { name: "BookMarked", icon: BookMarked, label: "Bookmarked Book" },
+  { name: "Library", icon: Library, label: "Library" },
+  { name: "GraduationCap", icon: GraduationCap, label: "Graduation" },
+  { name: "Newspaper", icon: Newspaper, label: "Newspaper" },
+  { name: "FileText", icon: FileText, label: "Document" },
+
+  // Profession & Business
+  { name: "Briefcase", icon: Briefcase, label: "Briefcase" },
+  { name: "Code", icon: Code, label: "Code" },
+  { name: "Microscope", icon: Microscope, label: "Microscope" },
+
+  // Creativity & Art
+  { name: "Palette", icon: Palette, label: "Palette" },
+  { name: "Music", icon: Music, label: "Music" },
+  { name: "Camera", icon: Camera, label: "Camera" },
+
+  // Inspiration & Motivation
+  { name: "Lightbulb", icon: Lightbulb, label: "Lightbulb" },
+  { name: "Brain", icon: Brain, label: "Brain" },
+  { name: "Star", icon: Star, label: "Star" },
+  { name: "Trophy", icon: Trophy, label: "Trophy" },
+  { name: "Sparkles", icon: Sparkles, label: "Sparkles" },
+  { name: "Rocket", icon: Rocket, label: "Rocket" },
+
+  // Entertainment & Hobbies
   { name: "Gamepad", icon: Gamepad, label: "Game" },
-  { name: "Coffee", icon: Coffee, label: "Kopi" },
+  { name: "Coffee", icon: Coffee, label: "Coffee" },
   { name: "Pizza", icon: Pizza, label: "Pizza" },
-  { name: "Smile", icon: Smile, label: "Senyum" },
-  
-  // Umum
-  { name: "Heart", icon: Heart, label: "Hati" },
-  { name: "Users", icon: Users, label: "Orang" },
-  { name: "Globe", icon: Globe, label: "Dunia" },
-  { name: "Plane", icon: Plane, label: "Pesawat" },
-  { name: "Leaf", icon: Leaf, label: "Daun" },
-  { name: "Cat", icon: Cat, label: "Kucing" },
-  { name: "Zap", icon: Zap, label: "Petir" },
-  { name: "Compass", icon: Compass, label: "Kompas" },
+  { name: "Smile", icon: Smile, label: "Smile" },
+
+  // General
+  { name: "Heart", icon: Heart, label: "Heart" },
+  { name: "Users", icon: Users, label: "Users" },
+  { name: "Globe", icon: Globe, label: "Globe" },
+  { name: "Plane", icon: Plane, label: "Plane" },
+  { name: "Leaf", icon: Leaf, label: "Leaf" },
+  { name: "Cat", icon: Cat, label: "Cat" },
+  { name: "Zap", icon: Zap, label: "Lightning" },
+  { name: "Compass", icon: Compass, label: "Compass" },
 ];
 
-// Helper function untuk mendapatkan icon berdasarkan nama
+// Helper function to get icon by name
 export function getIconByName(name: string): LucideIcon | null {
   const iconOption = AVAILABLE_ICONS.find(
-    (option) => option.name.toLowerCase() === name.toLowerCase()
+    (option) => option.name.toLowerCase() === name.toLowerCase(),
   );
   return iconOption ? iconOption.icon : null;
 }

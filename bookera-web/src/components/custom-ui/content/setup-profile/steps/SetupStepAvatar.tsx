@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import {
   CardHeader,
@@ -54,6 +55,7 @@ export default function SetupStepAvatar({
   onBack,
   onSubmit,
 }: SetupStepAvatarProps) {
+  const t = useTranslations("setup-profile");
   const [previewUrl, setPreviewUrl] = useState<string>(() => {
     if (typeof avatarFile === "string") return avatarFile;
     return "";
@@ -66,13 +68,13 @@ export default function SetupStepAvatar({
 
   const validateFile = (file: File): boolean => {
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      const msg = "Invalid file type. Please upload JPG, JPEG, or PNG only.";
+      const msg = t("invalidFileType");
       setLocalError(msg);
       toast.error(msg);
       return false;
     }
     if (file.size > MAX_FILE_SIZE) {
-      const msg = "File size exceeds 2MB limit. Please choose a smaller image.";
+      const msg = t("fileSizeExceed");
       setLocalError(msg);
       toast.error(msg);
       return false;
@@ -141,10 +143,10 @@ export default function SetupStepAvatar({
         </motion.div>
         <div>
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
-            Choose Your Avatar
+            {t("chooseAvatar")}
           </CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-300 transition-colors mt-2">
-            Pick a default avatar or upload your own photo (optional)
+            {t("chooseAvatarDesc")}
           </CardDescription>
         </div>
       </CardHeader>
@@ -174,7 +176,7 @@ export default function SetupStepAvatar({
                 <div className="relative h-full w-full rounded-full overflow-hidden ring-4 ring-brand-primary/20 dark:ring-brand-primary/30">
                   <Image
                     src={previewUrl}
-                    alt="Avatar preview"
+                    alt={t("avatarPreview")}
                     fill
                     sizes="112px"
                     className="object-cover"
@@ -192,11 +194,11 @@ export default function SetupStepAvatar({
                   className="absolute -top-2 -right-2 h-7 w-7 rounded-full shadow-lg"
                 >
                   <X className="h-3.5 w-3.5" />
-                  <span className="sr-only">Remove avatar</span>
+                  <span className="sr-only">{t("removeAvatar")}</span>
                 </Button>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Avatar selected
+                {t("avatarSelected")}
               </p>
             </>
           ) : (
@@ -228,7 +230,7 @@ export default function SetupStepAvatar({
                 {hasError ? (
                   <>
                     <p className="text-sm font-semibold text-red-700 dark:text-red-400">
-                      Upload failed
+                      {t("uploadFailed")}
                     </p>
                     <p className="text-xs text-red-600 dark:text-red-400/80 max-w-xs">
                       {localError}
@@ -237,10 +239,10 @@ export default function SetupStepAvatar({
                 ) : (
                   <>
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {isDragging ? "Drop your image here" : "No avatar selected"}
+                      {isDragging ? t("dropImageHere") : t("noAvatarSelected")}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Drag and drop or click to upload
+                      {t("dragDropHint")}
                     </p>
                   </>
                 )}
@@ -259,7 +261,7 @@ export default function SetupStepAvatar({
 
         <div className="space-y-3">
           <Label className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-            Default Avatars
+            {t("defaultAvatars")}
           </Label>
           <div className="grid grid-cols-6 gap-2">
             {DEFAULT_AVATARS.map((url) => {
@@ -284,7 +286,7 @@ export default function SetupStepAvatar({
                     <div className="relative h-12 w-12 rounded-full overflow-hidden border-2 border-white dark:border-gray-800">
                       <Image
                         src={url}
-                        alt="Default avatar option"
+                        alt={t("defaultAvatarOption")}
                         fill
                         sizes="48px"
                         className="object-cover"
@@ -308,7 +310,7 @@ export default function SetupStepAvatar({
 
         <div className="space-y-2">
           <Label className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-            Upload Your Own
+            {t("uploadYourOwn")}
           </Label>
           <Button
             type="button"
@@ -322,10 +324,10 @@ export default function SetupStepAvatar({
             disabled={loading}
           >
             <Upload className="h-4 w-4" />
-            {previewUrl ? "Change Photo" : "Browse Files"}
+            {previewUrl ? t("changePhoto") : t("browseFiles")}
           </Button>
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-            Format: JPG, PNG · Max 2MB
+            {t("formatHint")}
           </p>
         </div>
 
@@ -338,7 +340,7 @@ export default function SetupStepAvatar({
             className="h-12 px-5 rounded-lg border-gray-300 dark:border-gray-600 hover:border-brand-primary/50 transition-all"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
-            Back
+            {t("back")}
           </Button>
           <Button
             type="button"
@@ -349,9 +351,9 @@ export default function SetupStepAvatar({
             className="flex-1 h-12 text-base font-semibold rounded-lg bg-linear-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
             spinnerClassName="text-white"
           >
-            {loading ? "Saving..." : (
+            {loading ? t("saving") : (
               <>
-                Save & Start Exploring
+                {t("saveAndExplore")}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </>
             )}

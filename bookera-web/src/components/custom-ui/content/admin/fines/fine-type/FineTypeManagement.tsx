@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { FineType } from "@/types/fine";
 import { fineTypeService } from "@/services/fine.service";
@@ -12,6 +13,7 @@ import { FineTypeTableSkeleton } from "./FineTypeTableSkeleton";
 import { Plus } from "lucide-react";
 
 export default function FineTypeManagement() {
+    const t = useTranslations("fines");
   const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -54,9 +56,9 @@ export default function FineTypeManagement() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h2 className="text-2xl font-bold">{"Fine Types"}</h2>
+          <h2 className="text-2xl font-bold">{t("fineTypesTab")}</h2>
           <p className="text-muted-foreground">
-            {"Configure different types of fines"}
+            {t("fineTypesTabDescription")}
           </p>
         </div>
         <Button
@@ -88,8 +90,8 @@ export default function FineTypeManagement() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title={"Delete Fine Type"}
-        description={"Deleted fine types cannot be recovered."}
+        title="Delete Fine Type"
+        description="Deleted fine types cannot be recovered."
         onConfirm={confirmDelete}
       />
 

@@ -1,4 +1,6 @@
 "use client";
+
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
@@ -12,6 +14,7 @@ import NotificationList from "./NotificationList";
 import NotificationDetail from "./NotificationDetail";
 
 export default function NotificationPageClient() {
+    const t = useTranslations("notification");
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [selectedNotif, setSelectedNotif] = useState<Notification | null>(null);
@@ -184,7 +187,7 @@ export default function NotificationPageClient() {
     const matchesStatus =
       statusFilter === "all" ||
       (statusFilter === "read" && notif.read_at) ||
-      (statusFilter === "unread" && !notif.read_at);
+      (statusFilter === t("unreadCount") && !notif.read_at);
 
     return matchesSearch && matchesStatus;
   });
@@ -219,7 +222,7 @@ export default function NotificationPageClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Delete Notification"
+        title={t("deleteNotification")}
         description="Are you sure you want to delete this notification? This action cannot be undone."
         onConfirm={confirmDelete}
       />

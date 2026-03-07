@@ -158,8 +158,8 @@ export default function CreateBorrowClient() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push("/admin/borrows")}
             className="h-8 w-8"
+            onClick={() => router.back()}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -204,7 +204,10 @@ export default function CreateBorrowClient() {
             onBookToggle={handleBookToggle}
           />
 
-          <BorrowDateCard value={borrowDate} onChange={handleBorrowDateChange} />
+          <BorrowDateCard
+            value={borrowDate}
+            onChange={handleBorrowDateChange}
+          />
 
           <DueDateCard value={returnDate} onChange={handleReturnDateChange} />
         </div>

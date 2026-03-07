@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { Book } from "@/types/book";
 import BookCard from "./BookCard";
@@ -20,6 +21,7 @@ const variants = {
 };
 
 export default function BookList({ books, loading }: Props) {
+    const t = useTranslations("public");
   const [page, setPage] = useState(0);
   const direction = useRef(0);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -40,8 +42,8 @@ export default function BookList({ books, loading }: Props) {
   if (!books.length) {
     return (
       <EmptyState
-        title={"Books not found"}
-        description={"Try different keywords or categories"}
+        title={t("notFound")}
+        description={t("notFoundDesc")}
         icon={<BookOpen className="h-10 w-10" />}
       />
     );

@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { useState } from "react";
 import { toast } from "sonner";
@@ -14,12 +15,6 @@ import SetupStepProfessional from "./steps/SetupStepProfessional";
 import SetupStepAvatar from "./steps/SetupStepAvatar";
 
 export type SetupStep = "personal" | "professional" | "avatar";
-
-export const SETUP_STEPS = [
-  { key: "personal" as SetupStep, label: "Personal Info", icon: User },
-  { key: "professional" as SetupStep, label: "Professional", icon: Briefcase },
-  { key: "avatar" as SetupStep, label: "Avatar", icon: Camera },
-];
 
 export const cardVariants = {
   enter: { x: 60, opacity: 0, scale: 0.96 },
@@ -37,6 +32,13 @@ export default function SetupProfileClient() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
+  const t = useTranslations("setup-profile");
+
+  const SETUP_STEPS = [
+    { key: "personal" as SetupStep, label: t("personalInfo"), icon: User },
+    { key: "professional" as SetupStep, label: t("professional"), icon: Briefcase },
+    { key: "avatar" as SetupStep, label: t("avatarStep"), icon: Camera },
+  ];
 
   const [step, setStep] = useState<SetupStep>("personal");
   const [submitting, setSubmitting] = useState(false);
@@ -56,7 +58,7 @@ export default function SetupProfileClient() {
 
   const handleNextFromPersonal = () => {
     if (!fullName.trim()) {
-      toast.error("Full name is required");
+      toast.error(t("fullNameRequired"));
       return;
     }
     setStep("professional");
@@ -92,7 +94,7 @@ export default function SetupProfileClient() {
 
       const res = await authService.setupProfile(submitData);
       setUser(res.data.data.user);
-      toast.success("Profile created successfully!");
+      toast.success(t("profileCreated"));
       router.push("/");
     } catch (error: any) {
       const errorData = error.response?.data;

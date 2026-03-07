@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { borrowService, BorrowFilterParams } from "@/services/borrow.service";
 import { borrowRequestService } from "@/services/borrow-request.service";
 import { Borrow } from "@/types/borrow";
@@ -20,15 +21,20 @@ import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 
 export default function BorrowClient() {
-  const router = useRouter();
-
+  const t = useTranslations("borrow");
   const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
   const [loadingBorrows, setLoadingBorrows] = useState(false);
   const [borrowFilters, setBorrowFilters] = useState<BorrowFilterParams>({
     per_page: 10,
   });
   const [borrowSearch, setBorrowSearch] = useState("");
-  const [borrowPagination, setBorrowPagination] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
+  const [borrowPagination, setBorrowPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    from: 0,
+    to: 0,
+  });
 
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
@@ -38,7 +44,13 @@ export default function BorrowClient() {
     page?: number;
   }>({ per_page: 10 });
   const [requestSearch, setRequestSearch] = useState("");
-  const [requestPagination, setRequestPagination] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
+  const [requestPagination, setRequestPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    from: 0,
+    to: 0,
+  });
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const fetchBorrows = async (activeFilters: BorrowFilterParams) => {
@@ -55,7 +67,7 @@ export default function BorrowClient() {
         to: paginatedData.to ?? 0,
       });
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to load borrows");
+      toast.error(error.response?.data?.message || t("loadError"));
     } finally {
       setLoadingBorrows(false);
     }
@@ -80,7 +92,7 @@ export default function BorrowClient() {
       });
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Failed to load borrow requests",
+        error.response?.data?.message || t("loadRequestsError"),
       );
     } finally {
       setLoadingRequests(false);
@@ -89,14 +101,22 @@ export default function BorrowClient() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      setBorrowFilters((prev) => ({ ...prev, search: borrowSearch || undefined, page: 1 }));
+      setBorrowFilters((prev) => ({
+        ...prev,
+        search: borrowSearch || undefined,
+        page: 1,
+      }));
     }, 500);
     return () => clearTimeout(t);
   }, [borrowSearch]);
 
   useEffect(() => {
     const t = setTimeout(() => {
-      setRequestFilters((prev) => ({ ...prev, search: requestSearch || undefined, page: 1 }));
+      setRequestFilters((prev) => ({
+        ...prev,
+        search: requestSearch || undefined,
+        page: 1,
+      }));
     }, 500);
     return () => clearTimeout(t);
   }, [requestSearch]);
@@ -121,11 +141,11 @@ export default function BorrowClient() {
     if (!deleteId) return;
     try {
       await borrowRequestService.destroy(deleteId);
-      toast.success("Request deleted successfully");
+      toast.success(t("deleteRequestSuccess"));
       setDeleteId(null);
       fetchRequests(requestFilters);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to delete request");
+      toast.error(error.response?.data?.message || t("deleteRequestError"));
     }
   };
 
@@ -134,8 +154,8 @@ export default function BorrowClient() {
       return (
         <EmptyState
           icon={<Package className="h-16 w-16" />}
-          title="No Borrows Found"
-          description="There are no borrows to display at the moment."
+          title={t("noBorrowsFound")}
+          description={t("noBorrowsFoundDesc")}
         />
       );
     }
@@ -155,50 +175,49 @@ export default function BorrowClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">Borrow Management</h1>
+          <h1 className="text-3xl font-bold">{t("managementTitle")}</h1>
           <p className="text-muted-foreground">
-            Manage and track borrowing activities
+            {t("managementDesc")}
           </p>
         </div>
-        <Button
-          onClick={() => router.push("/admin/borrows/create")}
-          variant="brand"
-        >
-          <Plus className="h-4 w-4" />
-          Create Borrow
-        </Button>
+        <Link href="/admin/borrows/create">
+          <Button variant="brand">
+            <Plus className="h-4 w-4" />
+            {t("createBorrow")}
+          </Button>
+        </Link>
       </div>
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">All ({allBorrows.length})</TabsTrigger>
-          <TabsTrigger value="open">Open ({openBorrows.length})</TabsTrigger>
+          <TabsTrigger value="all">{t("all")} ({allBorrows.length})</TabsTrigger>
+          <TabsTrigger value="open">{t("open")} ({openBorrows.length})</TabsTrigger>
           <TabsTrigger value="closed">
-            Closed ({closedBorrows.length})
+            {t("closed")} ({closedBorrows.length})
           </TabsTrigger>
           <TabsTrigger value="requests" className="flex items-center gap-1">
             <ClipboardList className="h-3.5 w-3.5" />
-            Requests ({requests.length})
+            {t("requests")} ({requests.length})
           </TabsTrigger>
         </TabsList>
 
         {[
           {
             value: "all",
-            label: "All Borrows",
-            desc: "View and manage all borrow transactions",
+            label: t("allBorrows"),
+            desc: t("allBorrowsDesc"),
             data: allBorrows,
           },
           {
             value: "open",
-            label: "Open",
-            desc: "Currently active borrows",
+            label: t("openBorrows"),
+            desc: t("openBorrowsDesc"),
             data: openBorrows,
           },
           {
             value: "closed",
-            label: "Closed",
-            desc: "Completed borrows",
+            label: t("closedBorrows"),
+            desc: t("closedBorrowsDesc"),
             data: closedBorrows,
           },
         ].map(({ value, label, desc, data }) => (
@@ -212,7 +231,7 @@ export default function BorrowClient() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search by user or title..."
+                    placeholder={t("searchByUserOrTitle")}
                     value={borrowSearch}
                     onChange={handleBorrowSearchChange}
                     className="pl-10"
@@ -225,7 +244,9 @@ export default function BorrowClient() {
                 total={borrowPagination.total}
                 from={borrowPagination.from}
                 to={borrowPagination.to}
-                onPageChange={(page) => setBorrowFilters((prev) => ({ ...prev, page }))}
+                onPageChange={(page) =>
+                  setBorrowFilters((prev) => ({ ...prev, page }))
+                }
               >
                 {loadingBorrows ? (
                   <div className="grid gap-4">
@@ -244,16 +265,16 @@ export default function BorrowClient() {
         <TabsContent value="requests" className="space-y-4">
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold">Borrow Requests</h3>
+              <h3 className="text-lg font-semibold">{t("borrowRequests")}</h3>
               <p className="text-sm text-muted-foreground">
-                Borrow requests from members
+                {t("borrowRequestsDesc")}
               </p>
             </div>
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by name or book title..."
+                  placeholder={t("searchByNameOrTitle")}
                   value={requestSearch}
                   onChange={handleRequestSearchChange}
                   className="pl-9"
@@ -267,7 +288,9 @@ export default function BorrowClient() {
               total={requestPagination.total}
               from={requestPagination.from}
               to={requestPagination.to}
-              onPageChange={(page) => setRequestFilters((prev) => ({ ...prev, page }))}
+              onPageChange={(page) =>
+                setRequestFilters((prev) => ({ ...prev, page }))
+              }
             >
               {loadingRequests ? (
                 <div className="space-y-4">
@@ -278,8 +301,8 @@ export default function BorrowClient() {
               ) : requests.length === 0 ? (
                 <EmptyState
                   icon={<ClipboardList className="h-16 w-16" />}
-                  title="No Requests"
-                  description="No borrow requests from members yet"
+                  title={t("noRequestsFound")}
+                  description={t("noRequestsFoundDesc")}
                 />
               ) : (
                 <div className="space-y-4">
@@ -300,8 +323,8 @@ export default function BorrowClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Delete Borrow Request"
-        description="Are you sure you want to delete this borrow request? This action cannot be undone."
+        title={t("deleteBorrowRequest")}
+        description={t("deleteBorrowRequestDesc")}
         onConfirm={confirmDeleteRequest}
       />
     </div>

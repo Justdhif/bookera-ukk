@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { Settings } from "lucide-react";
 import SettingsThemeCard from "./SettingsThemeCard";
@@ -7,6 +8,7 @@ import SettingsLanguageCard from "./SettingsLanguageCard";
 import SettingsMusicCard from "./SettingsMusicCard";
 
 export default function SettingsClient() {
+    const t = useTranslations("settings");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -24,8 +26,8 @@ export default function SettingsClient() {
           <Settings className="h-8 w-8 text-white" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold">{"Settings"}</h1>
-          <p className="text-muted-foreground">{"Manage your application settings"}</p>
+          <h1 className="text-3xl font-bold">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("description")}</p>
         </div>
       </div>
 

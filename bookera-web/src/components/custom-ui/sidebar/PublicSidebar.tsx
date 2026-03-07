@@ -18,11 +18,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { BookOpen, ChevronRight, Layers, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import SavesList from "@/components/custom-ui/content/public/saves/SavesList";
 
 export default function PublicSidebar() {
   const { open } = useSidebar();
+  const t = useTranslations("navbar");
 
   return (
     <Sidebar collapsible="icon" className="bg-linear-to-b from-background to-muted/20">
@@ -50,7 +52,7 @@ export default function PublicSidebar() {
                   Bookera
                 </span>
                 <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                  My Library
+                  {t("myLibrary")}
                 </span>
               </div>
             )}
@@ -63,7 +65,7 @@ export default function PublicSidebar() {
           <div className="flex items-center gap-2 px-4 py-2 bg-muted/40 dark:bg-white/5 border-b border-border dark:border-white/10">
             <div className="h-1.5 w-1.5 rounded-full bg-brand-primary/60 animate-pulse" />
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground dark:text-white/60">
-              Collections
+              {t("collections")}
             </span>
           </div>
         )}
@@ -86,7 +88,7 @@ export default function PublicSidebar() {
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-primary/15 group-hover:bg-brand-primary/25 transition-colors shrink-0">
                     <BookOpen className="h-3.5 w-3.5 text-brand-primary" />
                   </div>
-                  <span className="text-xs font-semibold text-brand-primary flex-1">Browse All Books</span>
+                  <span className="text-xs font-semibold text-brand-primary flex-1">{t("browseAllBooks")}</span>
                   <ChevronRight className="h-3 w-3 text-brand-primary/50 group-hover:text-brand-primary group-hover:translate-x-0.5 transition-all" />
                 </div>
               </Link>
@@ -113,7 +115,7 @@ export default function PublicSidebar() {
                     </div>
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="right">Browse All Books</TooltipContent>
+                <TooltipContent side="right">{t("browseAllBooks")}</TooltipContent>
               </Tooltip>
 
               <div className="h-px w-6 bg-border/50" />

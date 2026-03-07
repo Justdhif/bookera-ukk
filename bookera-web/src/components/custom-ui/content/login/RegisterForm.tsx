@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +33,7 @@ export default function RegisterForm({
   onOpenTos,
   onOpenPrivacy,
 }: RegisterFormProps) {
+  const t = useTranslations("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -56,11 +58,11 @@ export default function RegisterForm({
         <div className="flex items-center justify-center gap-2">
           <UserPlus className="w-6 h-6 text-brand-primary" />
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
-            Create New Account
+            {t("createAccount")}
           </CardTitle>
         </div>
         <CardDescription className="text-gray-600 dark:text-gray-300 transition-colors">
-          Register to start using Bookera
+          {t("createAccountDesc")}
         </CardDescription>
       </CardHeader>
 
@@ -69,11 +71,11 @@ export default function RegisterForm({
           <div className="space-y-2">
             <Label htmlFor="register-email">
               <Mail className="w-4 h-4" />
-              Email
+              {t("email")}
             </Label>
             <Input
               id="register-email"
-              placeholder="email@example.com"
+              placeholder={t("registerEmailPlaceholder")}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -86,12 +88,12 @@ export default function RegisterForm({
           <div className="space-y-1">
             <Label htmlFor="register-password">
               <Lock className="w-4 h-4" />
-              Password
+              {t("password")}
             </Label>
             <div className="relative">
               <Input
                 id="register-password"
-                placeholder="Create a strong password"
+              placeholder={t("createPasswordPlaceholder")}
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -124,12 +126,12 @@ export default function RegisterForm({
           <div className="space-y-1">
             <Label htmlFor="register-password-confirm">
               <ShieldCheck className="w-4 h-4" />
-              Confirm Password
+              {t("confirmPassword")}
             </Label>
             <div className="relative">
               <Input
                 id="register-password-confirm"
-                placeholder="Re-enter your password"
+                placeholder={t("reEnterPassword")}
                 type={showPasswordConfirm ? "text" : "password"}
                 value={passwordConfirm}
                 onChange={(e) => setPasswordConfirm(e.target.value)}
@@ -159,7 +161,7 @@ export default function RegisterForm({
               </Button>
             </div>
             {confirmMismatch && (
-              <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
+              <p className="text-xs text-red-500 mt-1">{t("passwordMismatch")}</p>
             )}
           </div>
 
@@ -172,10 +174,10 @@ export default function RegisterForm({
             spinnerClassName="text-white"
           >
             {loading ? (
-              "Registering..."
+              t("registering")
             ) : (
               <>
-                Create Account
+                {t("createAccountButton")}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </>
             )}
@@ -191,13 +193,13 @@ export default function RegisterForm({
                 className="font-semibold text-brand-primary hover:text-brand-primary-dark p-0 h-auto underline-offset-4"
                 disabled={loading}
               >
-                Sign in here
+                {t("signInHere")}
               </Button>
             </p>
           </div>
 
           <div className="text-center text-xs text-gray-500 dark:text-gray-400 space-y-1 transition-colors">
-            <p>By registering, you agree to our</p>
+            <p>{t("agreeRegister")}</p>
             <div className="flex items-center justify-center gap-1 flex-wrap">
               <Button
                 type="button"
@@ -206,9 +208,9 @@ export default function RegisterForm({
                 className="text-brand-primary hover:text-brand-primary-dark font-medium p-0 h-auto text-xs"
                 disabled={loading}
               >
-                Terms of Service
+                {t("termsOfService")}
               </Button>
-              <span>and</span>
+              <span>{t("and")}</span>
               <Button
                 type="button"
                 variant="link"
@@ -216,7 +218,7 @@ export default function RegisterForm({
                 className="text-brand-primary hover:text-brand-primary-dark font-medium p-0 h-auto text-xs"
                 disabled={loading}
               >
-                Privacy Policy
+                {t("privacyPolicy")}
               </Button>
             </div>
           </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Book } from "@/types/book";
 import { Category } from "@/types/category";
@@ -88,6 +89,7 @@ export default function BookForm({
   publishers,
   onValidationChange,
 }: BookFormProps) {
+    const t = useTranslations("book");
   const [errors, setErrors] = useState<FormErrors>({
     title: false,
     isbn: false,
@@ -208,7 +210,7 @@ export default function BookForm({
         <CardDescription>
           {isEditMode
             ? "Edit book information correctly"
-            : "Complete book details"}
+            : t("bookDetailsComplete")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -219,15 +221,16 @@ export default function BookForm({
               htmlFor="title"
               variant={isEditMode ? "required" : "default"}
             >
-              Title
-            </Label>
+              
+                                        {t("title_col")}
+                                      </Label>
             <Input
               id="title"
               name="title"
               required={isEditMode}
               value={formData.title || ""}
               onChange={handleInputChange}
-              placeholder="Enter book title"
+              placeholder={t("enterBookTitle")}
               disabled={!isEditMode}
               validationType={isEditMode ? "alphanumeric" : undefined}
               onValidationChange={
@@ -251,7 +254,7 @@ export default function BookForm({
                 onClick={onAddAuthor}
                 className="gap-1"
               >
-                <Plus className="h-4 w-4" /> Add Author
+                <Plus className="h-4 w-4" /> {t("addAuthorBtn")}
               </Button>
             )}
           </div>
@@ -271,8 +274,8 @@ export default function BookForm({
                 </PopoverTrigger>
                 <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
                   <Command>
-                    <CommandInput placeholder="Search authors..." />
-                    <CommandEmpty>No authors found</CommandEmpty>
+                    <CommandInput placeholder={t("searchAuthors")} />
+                    <CommandEmpty>{t("noAuthorsFound")}</CommandEmpty>
                     <CommandGroup>
                       {authors.map((author) => (
                         <CommandItem
@@ -342,7 +345,7 @@ export default function BookForm({
                 onClick={onAddPublisher}
                 className="gap-1"
               >
-                <Plus className="h-4 w-4" /> Add Publisher
+                <Plus className="h-4 w-4" /> {t("addPublisherBtn")}
               </Button>
             )}
           </div>
@@ -362,8 +365,8 @@ export default function BookForm({
                 </PopoverTrigger>
                 <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
                   <Command>
-                    <CommandInput placeholder="Search publishers..." />
-                    <CommandEmpty>No publishers found</CommandEmpty>
+                    <CommandInput placeholder={t("searchPublishers")} />
+                    <CommandEmpty>{t("noPublishersFound")}</CommandEmpty>
                     <CommandGroup>
                       {publishers.map((publisher) => (
                         <CommandItem
@@ -430,8 +433,8 @@ export default function BookForm({
               <YearPicker
                 value={formData.publication_year || ""}
                 onChange={handleYearChange}
-                placeholder="Select year"
-                searchPlaceholder="Search year..."
+                placeholder={t("selectYear")}
+                searchPlaceholder={t("searchYear")}
                 emptyText="Year not found"
                 disabled={!isEditMode}
               />
@@ -441,13 +444,13 @@ export default function BookForm({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="isbn">ISBN</Label>
+              <Label htmlFor="isbn">{t("isbn")}</Label>
               <Input
                 id="isbn"
                 name="isbn"
                 value={formData.isbn || ""}
                 onChange={handleInputChange}
-                placeholder="Enter ISBN number"
+                placeholder={t("enterIsbn")}
                 disabled={!isEditMode}
                 validationType={isEditMode ? "alphanumeric" : undefined}
                 onValidationChange={
@@ -463,7 +466,7 @@ export default function BookForm({
                 name="language"
                 value={formData.language || ""}
                 onChange={handleInputChange}
-                placeholder="e.g., English, Indonesian"
+                placeholder={t("languagePlaceholder")}
                 disabled={!isEditMode}
                 validationType={isEditMode ? "letters-only" : undefined}
                 onValidationChange={
@@ -493,8 +496,8 @@ export default function BookForm({
               </PopoverTrigger>
               <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
                 <Command>
-                  <CommandInput placeholder="Search categories..." />
-                  <CommandEmpty>No categories found</CommandEmpty>
+                  <CommandInput placeholder={t("searchCategoriesPlaceholder")} />
+                  <CommandEmpty>{t("noCategoriesFound")}</CommandEmpty>
                   <CommandGroup>
                     {categories.map((cat) => (
                       <CommandItem
@@ -559,7 +562,7 @@ export default function BookForm({
               name="description"
               value={formData.description || ""}
               onChange={handleInputChange}
-              placeholder="Enter book description"
+              placeholder={t("enterDescription")}
               rows={10}
               className="resize-y"
               disabled={!isEditMode}

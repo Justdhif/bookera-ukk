@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import SaveDetailClient from "@/components/custom-ui/content/public/save-detail/SaveDetailClient";
+import SaveDetailClient from "@/components/custom-ui/content/public/saves/save-detail/SaveDetailClient";
 
 export default function SaveDetailPage() {
   const params = useParams();

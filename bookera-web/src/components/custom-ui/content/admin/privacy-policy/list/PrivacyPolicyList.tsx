@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { PrivacyPolicy } from "@/types/privacy-policy";
 import EmptyState from "@/components/custom-ui/EmptyState";
@@ -13,11 +14,12 @@ export default function PrivacyPolicyList({
   onEdit: (item: PrivacyPolicy) => void;
   onDelete: (id: number) => void;
 }) {
+    const t = useTranslations("privacy-policy");
   if (data.length === 0) {
     return (
       <EmptyState
-        title={"No Privacy Policy yet"}
-        description={"Privacy Policy will appear after you add it."}
+        title={t("noPrivacyPolicy")}
+        description={t("noPrivacyPolicyDesc")}
         icon={<Shield className="h-10 w-10" />}
       />
     );

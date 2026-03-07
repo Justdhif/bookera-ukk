@@ -1,5 +1,7 @@
 "use client";
-import { useRouter } from "next/navigation";
+
+import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 import {
   Table,
@@ -21,13 +23,12 @@ interface Props {
 }
 
 export default function UserTable({ data, onDelete }: Props) {
-  const router = useRouter();
-
+    const t = useTranslations("user");
   if (data.length === 0) {
     return (
       <EmptyState
-        title="No users found"
-        description="Get started by adding your first user"
+        title={t("noUsersFound")}
+        description={t("noUsersDesc")}
         icon={<Users className="h-10 w-10" />}
       />
     );
@@ -67,11 +68,11 @@ export default function UserTable({ data, onDelete }: Props) {
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="w-16 text-center font-semibold">#</TableHead>
-            <TableHead className="font-semibold">User</TableHead>
-            <TableHead className="font-semibold">Email</TableHead>
-            <TableHead className="font-semibold">Role</TableHead>
-            <TableHead className="font-semibold">Occupation</TableHead>
-            <TableHead className="font-semibold">Status</TableHead>
+            <TableHead className="font-semibold">{t("user")}</TableHead>
+            <TableHead className="font-semibold">{t("email")}</TableHead>
+            <TableHead className="font-semibold">{t("role")}</TableHead>
+            <TableHead className="font-semibold">{t("occupation")}</TableHead>
+            <TableHead className="font-semibold">{t("status")}</TableHead>
             <TableHead className="font-semibold text-right pr-6">
               Actions
             </TableHead>
@@ -132,25 +133,20 @@ export default function UserTable({ data, onDelete }: Props) {
                       : "bg-gray-500 hover:bg-gray-600"
                   }`}
                 >
-                  {item.is_active ? "Active" : "Inactive"}
+                  {item.is_active ? t("active") : t("inactive")}
                 </Badge>
               </TableCell>
 
               <TableCell className="pr-6">
                 <div className="flex justify-end items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() =>
-                      router.push(
-                        `/admin/users/${item.profile.identification_number}`,
-                      )
-                    }
-                    className="h-8 gap-1"
+                  <Link
+                    href={`/admin/users/${item.profile.identification_number}`}
                   >
-                    <Eye className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">View</span>
-                  </Button>
+                    <Button size="sm" variant="outline" className="h-8 gap-1">
+                      <Eye className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">{t("viewUser")}</span>
+                    </Button>
+                  </Link>
 
                   <Button
                     size="sm"
@@ -159,7 +155,7 @@ export default function UserTable({ data, onDelete }: Props) {
                     className="h-8 gap-1"
                   >
                     <Trash className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Delete</span>
+                    <span className="hidden sm:inline">{t("deleteUser")}</span>
                   </Button>
                 </div>
               </TableCell>

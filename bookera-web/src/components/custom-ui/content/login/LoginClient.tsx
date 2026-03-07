@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useState } from "react";
@@ -37,18 +38,19 @@ export const cardTransition = {
   scale: { duration: 0.25 },
 };
 
-const FEATURES = [
-  { icon: BookOpen, label: "Thousands of Digital Books" },
-  { icon: GraduationCap, label: "Learning Materials" },
-  { icon: Users, label: "Student Collaboration" },
-  { icon: Globe, label: "24/7 Access" },
-];
-
 export default function LoginClient() {
   const router = useRouter();
   const login = useAuthStore((s) => s.login);
   const register = useAuthStore((s) => s.register);
   const loading = useAuthStore((s) => s.loading);
+  const t = useTranslations("login");
+
+  const FEATURES = [
+    { icon: BookOpen, label: t("thousandsBooks") },
+    { icon: GraduationCap, label: t("learningMaterials") },
+    { icon: Users, label: t("studentCollaboration") },
+    { icon: Globe, label: t("access247") },
+  ];
 
   const [mode, setMode] = useState<AuthMode>("login");
   const [tosModalOpen, setTosModalOpen] = useState(false);
@@ -69,7 +71,7 @@ export default function LoginClient() {
         (typeof role === "string" && role.startsWith("officer:"));
       router.push(isAdmin ? "/admin" : "/");
     } catch (err: any) {
-      toast.error(err.response?.data?.message ?? "Login failed. Please check your credentials.");
+      toast.error(err.response?.data?.message ?? t("loginFailed"));
     }
   };
 
@@ -88,7 +90,7 @@ export default function LoginClient() {
         const errors = Object.values(errorData.data).flat();
         errors.forEach((error: any) => toast.error(error));
       } else {
-        toast.error(errorData?.message ?? "Registration failed");
+        toast.error(errorData?.message ?? t("registrationFailed"));
       }
     }
   };
@@ -116,12 +118,10 @@ export default function LoginClient() {
             <div className="space-y-3">
               <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight transition-colors">
                 Digital School
-                <span className="block text-brand-primary">Library</span>
+                <span className="block text-brand-primary">{t("library")}</span>
               </h1>
               <p className="text-gray-600 dark:text-gray-300 text-lg max-w-md transition-colors">
-                Access thousands of digital books, learning materials, and
-                educational resources from anywhere. Integrated platform for
-                students, teachers, and school staff.
+                {t("heroDesc")}
               </p>
             </div>
           </div>

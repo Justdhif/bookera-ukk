@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -11,16 +12,17 @@ import {
 } from "@/components/ui/table";
 
 export function FineTypeTableSkeleton() {
+    const t = useTranslations("fines");
   return (
     <Table>
       <TableHeader>
         <TableRow className="bg-muted/50 hover:bg-muted/50">
           <TableHead className="w-16 text-center">#</TableHead>
-          <TableHead className="font-semibold">Name</TableHead>
-          <TableHead className="font-semibold">Type</TableHead>
-          <TableHead className="font-semibold">Amount</TableHead>
+          <TableHead className="font-semibold">{t("name")}</TableHead>
+          <TableHead className="font-semibold">{t("type")}</TableHead>
+          <TableHead className="font-semibold">{t("amount")}</TableHead>
           <TableHead className="font-semibold">Description</TableHead>
-          <TableHead className="font-semibold text-right">Actions</TableHead>
+          <TableHead className="font-semibold text-right">{t("actions")}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { Edit, FileWarning, Save, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface FormData {
   name: string;
@@ -36,6 +37,7 @@ export default function PublisherDetailDialog({
   publisher: Publisher | null;
   onSuccess: () => void;
 }) {
+  const t = useTranslations("publisher");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -126,7 +128,7 @@ export default function PublisherDetailDialog({
   const handleSave = async () => {
     if (!publisher) return;
     if (!formData.name.trim()) {
-      toast.error("Name is required");
+      toast.error(t("nameRequired"));
       return;
     }
     setIsLoading(true);
@@ -137,7 +139,7 @@ export default function PublisherDetailDialog({
         photo: photoImage ?? undefined,
         is_active: formData.is_active,
       });
-      toast.success("Publisher updated successfully");
+      toast.success(t("updateSuccess"));
       setIsEditMode(false);
       setPhotoImage(null);
       onSuccess();
@@ -164,7 +166,7 @@ export default function PublisherDetailDialog({
         <DialogHeader>
           <div className="flex items-center justify-between pr-6">
             <DialogTitle>
-              {isEditMode ? "Edit Publisher" : "Publisher Details"}
+              {isEditMode ? t("editPublisher") : t("publisherDetails")}
             </DialogTitle>
             {!isEditMode && (
               <Button
@@ -182,7 +184,7 @@ export default function PublisherDetailDialog({
 
         <div className="space-y-5">
           <div className="space-y-2">
-            <Label variant={isEditMode ? "required" : "default"}>Photo</Label>
+            <Label variant={isEditMode ? "required" : "default"}>{t("photo")}</Label>
             <input
               ref={fileInputRef}
               type="file"
@@ -277,7 +279,7 @@ export default function PublisherDetailDialog({
                       photoError && "text-red-600 dark:text-red-400",
                     )}
                   >
-                    {photoError ? photoError : "Drag and drop or click to upload"}
+                    {photoError ? photoError : t("dragDropUpload")}
                   </p>
                 </div>
               )}
@@ -291,10 +293,10 @@ export default function PublisherDetailDialog({
                 disabled={!isEditMode}
               >
                 <Upload className="h-4 w-4" />
-                {photoPreview ? "Change Photo" : "Browse Files"}
+                {photoPreview ? t("changePhoto") : t("browseFiles")}
               </Button>
               <p className="text-xs text-muted-foreground text-center">
-                Format: JPG, PNG, WEBP. Max 2MB
+                {t("formatHint")}
               </p>
             </div>
           </div>
@@ -304,12 +306,12 @@ export default function PublisherDetailDialog({
               htmlFor="detail-name"
               variant={isEditMode ? "required" : "default"}
             >
-              Name
+              {t("name")}
             </Label>
             <Input
               id="detail-name"
               name="name"
-              placeholder="Enter publisher name"
+              placeholder={t("namePlaceholder")}
               value={formData.name}
               onChange={handleInputChange}
               disabled={!isEditMode}
@@ -317,11 +319,11 @@ export default function PublisherDetailDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="detail-description">Description</Label>
+            <Label htmlFor="detail-description">{t("descriptionLabel")}</Label>
             <Textarea
               id="detail-description"
               name="description"
-              placeholder="Enter publisher description (optional)"
+              placeholder={t("descriptionPlaceholder")}
               value={formData.description}
               onChange={handleInputChange}
               rows={3}
@@ -332,10 +334,10 @@ export default function PublisherDetailDialog({
           <div className="flex items-center justify-between rounded-lg border p-3">
             <div>
               <Label htmlFor="detail-active" className="font-medium">
-                Active
+                {t("active")}
               </Label>
               <p className="text-xs text-muted-foreground">
-                Publisher will be visible and selectable when active
+                {t("activeDesc")}
               </p>
             </div>
             <Switch

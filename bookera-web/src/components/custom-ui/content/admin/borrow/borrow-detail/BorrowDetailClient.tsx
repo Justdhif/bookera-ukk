@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+
 import { borrowService } from "@/services/borrow.service";
 import { Borrow } from "@/types/borrow";
 import { toast } from "sonner";
@@ -31,7 +32,9 @@ export default function BorrowDetailClient() {
       const res = await borrowService.showAdminByCode(borrowCode);
       setBorrow(res.data.data);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to load borrow details");
+      toast.error(
+        error.response?.data?.message || "Failed to load borrow details",
+      );
       router.push("/admin/borrows");
     } finally {
       setLoading(false);
@@ -47,14 +50,16 @@ export default function BorrowDetailClient() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => router.push("/admin/borrows")}
           className="h-8 w-8"
+          onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
           <h1 className="text-3xl font-bold">Borrow Detail</h1>
-          <p className="text-muted-foreground">Complete information about this borrow</p>
+          <p className="text-muted-foreground">
+            Complete information about this borrow
+          </p>
         </div>
       </div>
 
@@ -65,9 +70,10 @@ export default function BorrowDetailClient() {
 
       <BorrowBooksCard borrow={borrow} />
 
-      {borrow.borrow_request_id && (!borrow.borrow_details || borrow.borrow_details.length === 0) && (
-        <BorrowAssignCopiesCard borrow={borrow} onAssigned={fetchBorrow} />
-      )}
+      {borrow.borrow_request_id &&
+        (!borrow.borrow_details || borrow.borrow_details.length === 0) && (
+          <BorrowAssignCopiesCard borrow={borrow} onAssigned={fetchBorrow} />
+        )}
     </div>
   );
 }

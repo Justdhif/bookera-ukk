@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DashboardTotals } from "@/types/dashboard";
@@ -15,10 +16,11 @@ import {
   BarChart3,
 } from "lucide-react";
 export default function DashboardCards({ data }: { data: DashboardTotals }) {
+    const t = useTranslations("dashboard");
   const router = useRouter();
   const items = [
     {
-      label: "Total Users",
+      label: t("totalUsers"),
       value: data.total_users,
       icon: Users,
       gradient: "from-emerald-500 to-teal-500",
@@ -29,13 +31,13 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
         "group-hover:border-emerald-300 dark:group-hover:border-emerald-700",
       iconBg: "bg-linear-to-br from-emerald-500 to-teal-500",
       statIcon: Sparkles,
-      statText: "Active Users",
-      updatedText: "Recently Registered",
+      statText: t("activeUsers"),
+      updatedText: t("recentlyRegistered"),
       detailsHref: "/admin/users",
-      detailsText: "Manage Users",
+      detailsText: t("manageUsers"),
     },
     {
-      label: "Total Books",
+      label: t("totalBooks"),
       value: data.total_books,
       icon: BookOpen,
       gradient: "from-orange-500 to-red-500",
@@ -46,13 +48,13 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
         "group-hover:border-orange-300 dark:group-hover:border-orange-700",
       iconBg: "bg-linear-to-br from-orange-500 to-red-500",
       statIcon: Library,
-      statText: "In Collection",
-      updatedText: "New Additions Today",
+      statText: t("inCollection"),
+      updatedText: t("newAdditions"),
       detailsHref: "/admin/books",
-      detailsText: "Browse Catalog",
+      detailsText: t("browseCatalog"),
     },
     {
-      label: "Loans Today",
+      label: t("loansToday"),
       value: data.loans_today,
       icon: ArrowUpFromLine,
       gradient: "from-blue-500 to-cyan-500",
@@ -63,13 +65,13 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
         "group-hover:border-blue-300 dark:group-hover:border-blue-700",
       iconBg: "bg-linear-to-br from-blue-500 to-cyan-500",
       statIcon: CalendarClock,
-      statText: "Pending Loans",
-      updatedText: "Checked Out Today",
+      statText: t("pendingLoans"),
+      updatedText: t("checkedOutToday"),
       detailsHref: "/admin/loans",
-      detailsText: "View All Loans",
+      detailsText: t("viewAllLoans"),
     },
     {
-      label: "Returns Today",
+      label: t("returnsToday"),
       value: data.returns_today,
       icon: ArrowDownToLine,
       gradient: "from-amber-500 to-orange-500",
@@ -80,10 +82,10 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
         "group-hover:border-amber-300 dark:group-hover:border-amber-700",
       iconBg: "bg-linear-to-br from-amber-500 to-orange-500",
       statIcon: Clock,
-      statText: "Completed Returns",
-      updatedText: "Returned Today",
+      statText: t("completedReturns"),
+      updatedText: t("returnedToday"),
       detailsHref: "/admin/loans?tab=returns",
-      detailsText: "Check Returns",
+      detailsText: t("checkReturns"),
     },
   ];
 
@@ -142,7 +144,7 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
                   <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-linear-to-r from-white/50 to-white/30 dark:from-slate-800/50 dark:to-slate-900/50 backdrop-blur-sm border border-slate-200/30 dark:border-slate-700/30">
                     <BarChart3 className="h-3 w-3 text-slate-600 dark:text-slate-400" />
                     <span className="text-[10px] font-bold uppercase tracking-wider bg-linear-to-br from-slate-700 to-slate-900 dark:from-slate-300 dark:to-slate-100 bg-clip-text text-transparent">
-                      {"Stats"}
+                      {t("statsLabel")}
                     </span>
                   </div>
                 </div>
@@ -180,7 +182,7 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
                 </div>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground/60 font-medium">
                   <Clock className="h-3 w-3" />
-                  <span>{"Now"}</span>
+                  <span>{t("now")}</span>
                 </div>
               </div>
             </div>

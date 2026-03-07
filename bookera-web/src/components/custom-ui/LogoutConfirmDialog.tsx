@@ -1,4 +1,6 @@
 "use client";
+
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +24,7 @@ export default function LogoutConfirmDialog({
   onOpenChange,
   onConfirm,
 }: LogoutConfirmDialogProps) {
+    const t = useTranslations("common");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleConfirm = async () => {
@@ -64,8 +67,9 @@ export default function LogoutConfirmDialog({
             disabled={isLoggingOut}
             className="w-full sm:w-auto sm:flex-1 h-11 font-medium border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 transition-all duration-200"
           >
-            Cancel
-          </Button>
+            
+                                  {t("cancel")}
+                                </Button>
           <Button
             type="button"
             variant="destructive"
@@ -81,8 +85,9 @@ export default function LogoutConfirmDialog({
             ) : (
               <span className="flex items-center justify-center">
                 <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </span>
+                
+                                                  {t("logout")}
+                                                </span>
             )}
           </Button>
         </DialogFooter>

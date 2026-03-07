@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export default function UserFilter({ onChange }: Props) {
+    const t = useTranslations("user");
   const [searchInput, setSearchInput] = useState("");
   const [roleValue, setRoleValue] = useState<string>();
   const [statusSelect, setStatusSelect] = useState<string>();
@@ -40,10 +42,10 @@ export default function UserFilter({ onChange }: Props) {
   };
 
   const roles = [
-    { value: "admin", label: "Admin" },
-    { value: "officer:catalog", label: "Catalog Officer" },
-    { value: "officer:management", label: "Management Officer" },
-    { value: "user", label: "User" },
+    { value: "admin", label: t("admin") },
+    { value: "officer:catalog", label: t("officerCatalog") },
+    { value: "officer:management", label: t("officerManagement") },
+    { value: "user", label: t("user") },
   ];
 
   const handleRoleToggle = (value: string | null) => {
@@ -77,7 +79,7 @@ export default function UserFilter({ onChange }: Props) {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search users..."
+            placeholder={t("searchUsers")}
             value={searchInput}
             onChange={handleSearchChange}
             className="pl-9"
@@ -89,12 +91,12 @@ export default function UserFilter({ onChange }: Props) {
           onValueChange={handleStatusChange}
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="All Status" />
+            <SelectValue placeholder={t("allStatus")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="all">{t("allStatus")}</SelectItem>
+            <SelectItem value="active">{t("active")}</SelectItem>
+            <SelectItem value="inactive">{t("inactive")}</SelectItem>
           </SelectContent>
         </Select>
       </div>

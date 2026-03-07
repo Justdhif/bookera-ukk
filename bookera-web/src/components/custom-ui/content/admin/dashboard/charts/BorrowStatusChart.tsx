@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BorrowStatus } from "@/types/dashboard";
@@ -42,6 +43,7 @@ const renderCustomLabel = (entry: any) => {
 };
 
 export default function BorrowStatusChart({ data }: { data: BorrowStatus[] }) {
+    const t = useTranslations("dashboard");
   const hasData = data && data.length > 0;
 
   return (
@@ -49,7 +51,7 @@ export default function BorrowStatusChart({ data }: { data: BorrowStatus[] }) {
       <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4">
         <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <div className="w-1 h-6 bg-linear-to-b from-blue-500 to-cyan-500 rounded-full" />
-          {"Borrow Status"}
+          {t("borrowStatus")}
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
@@ -93,7 +95,7 @@ export default function BorrowStatusChart({ data }: { data: BorrowStatus[] }) {
           </ResponsiveContainer>
         ) : (
           <div className="flex items-center justify-center h-87.5 text-muted-foreground">
-            {"No data available"}
+            {t("noData")}
           </div>
         )}
       </CardContent>

@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Borrow } from "@/types/borrow";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -20,6 +21,7 @@ const statusConfig: Record<Borrow["status"], { label: string; className: string 
 };
 
 export function BorrowQrCard({ borrow }: BorrowQrCardProps) {
+    const t = useTranslations("public");
   const config = statusConfig[borrow.status];
 
   return (
@@ -40,7 +42,7 @@ export function BorrowQrCard({ borrow }: BorrowQrCardProps) {
         />
         <div className="flex flex-col gap-2 w-full">
           <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
-            <p className="text-sm font-medium">Status</p>
+            <p className="text-sm font-medium">{t("status")}</p>
             <Badge className={config?.className}>
               <PackageCheck className="h-3 w-3 mr-1" />
               {config?.label || borrow.status}

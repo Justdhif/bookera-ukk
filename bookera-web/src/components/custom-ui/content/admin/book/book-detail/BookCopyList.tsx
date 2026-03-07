@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 
 export default function BookCopyList({
@@ -15,12 +16,13 @@ export default function BookCopyList({
   book: Book;
   onChange: () => void;
 }) {
+  const t = useTranslations("book");
   const [copyCode, setCopyCode] = useState("");
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const handleAdd = async (copy_code: string) => {
     await bookCopyService.create(book.id, copy_code);
-    toast.success("Book copy added successfully");
+    toast.success(t("copyAddSuccess"));
     setCopyCode("");
     onChange();
   };
@@ -30,26 +32,26 @@ export default function BookCopyList({
 
     try {
       await bookCopyService.delete(deleteId);
-      toast.success("Book copy deleted successfully");
+      toast.success(t("copyDeleteSuccess"));
       onChange();
       setDeleteId(null);
     } catch (error) {
-      toast.error("Failed to delete book copy");
+      toast.error(t("copyDeleteError"));
     }
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="font-semibold">Book Copies</h2>
+      <h2 className="font-semibold">{t("bookCopies")}</h2>
 
       <div className="flex gap-2">
         <Input
-          placeholder="Enter copy code"
+          placeholder={t("enterCopyCodeShort")}
           value={copyCode}
           onChange={(e) => setCopyCode(e.target.value)}
         />
         <Button variant="submit" onClick={() => handleAdd(copyCode)}>
-          Add Copy
+          {t("addCopy")}
         </Button>
       </div>
 
@@ -64,7 +66,7 @@ export default function BookCopyList({
               variant="destructive"
               onClick={() => setDeleteId(copy.id)}
             >
-              Delete
+              {t("deleteCopy")}
             </Button>
           </li>
         ))}
@@ -73,8 +75,8 @@ export default function BookCopyList({
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
-        title="Delete Book Copy"
-        description="Are you sure you want to delete this book copy? This action cannot be undone."
+        title={t("deleteBookCopy")}
+        description={t("deleteCopyDesc")}
         onConfirm={confirmDelete}
       />
     </div>

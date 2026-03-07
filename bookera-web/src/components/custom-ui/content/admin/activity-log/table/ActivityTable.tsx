@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -59,6 +60,7 @@ export default function ActivityTable({
   filters,
   onFilterChange,
 }: ActivityTableProps) {
+    const t = useTranslations("activity-log");
   const [localFilters, setLocalFilters] = useState(filters);
 
   const handleApplyFilters = () => {
@@ -106,19 +108,18 @@ export default function ActivityTable({
     <Card className="overflow-hidden border-0 shadow-lg bg-white dark:bg-gray-900">
       <CardHeader className="border-b border-gray-100 dark:border-gray-800 pb-4 space-y-4">
         <CardTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          Daftar Aktivitas
-          <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
+          
+                            {t("title")}
+                            <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
             ({pagination.total} total)
           </span>
         </CardTitle>
 
-        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3">
-          
           <div className="relative md:col-span-2 lg:col-span-3">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search description..."
+              placeholder={t("searchDescription")}
               value={localFilters.search || ""}
               onChange={(e) =>
                 setLocalFilters({ ...localFilters, search: e.target.value })
@@ -128,7 +129,6 @@ export default function ActivityTable({
             />
           </div>
 
-          
           <div className="grid grid-cols-2 gap-3 md:col-span-1 lg:col-span-2">
             <Select
               value={localFilters.action || "all"}
@@ -140,15 +140,15 @@ export default function ActivityTable({
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Filter by action" />
+                <SelectValue placeholder={t("filterByAction")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Actions</SelectItem>
-                <SelectItem value="login">Login</SelectItem>
-                <SelectItem value="logout">Logout</SelectItem>
-                <SelectItem value="create">Create</SelectItem>
-                <SelectItem value="update">Update</SelectItem>
-                <SelectItem value="delete">Delete</SelectItem>
+                <SelectItem value="all">{t("allActions")}</SelectItem>
+                <SelectItem value="login">{t("login")}</SelectItem>
+                <SelectItem value="logout">{t("logout")}</SelectItem>
+                <SelectItem value="create">{t("create")}</SelectItem>
+                <SelectItem value="update">{t("update")}</SelectItem>
+                <SelectItem value="delete">{t("delete")}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -162,20 +162,19 @@ export default function ActivityTable({
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Filter by module" />
+                <SelectValue placeholder={t("filterByModule")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Modules</SelectItem>
-                <SelectItem value="auth">Auth</SelectItem>
-                <SelectItem value="user">User</SelectItem>
-                <SelectItem value="book">Book</SelectItem>
-                <SelectItem value="loan">Loan</SelectItem>
+                <SelectItem value="all">{t("allModules")}</SelectItem>
+                <SelectItem value="auth">{t("auth")}</SelectItem>
+                <SelectItem value="user">{t("user")}</SelectItem>
+                <SelectItem value="book">{t("book")}</SelectItem>
+                <SelectItem value="loan">{t("loan")}</SelectItem>
                 <SelectItem value="return">Return</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          
           <div className="flex gap-2 md:col-span-1 lg:col-span-2">
             <Button
               onClick={handleApplyFilters}
@@ -191,10 +190,10 @@ export default function ActivityTable({
               variant="outline"
               size="sm"
               className="px-3"
-              title="Reset filters"
+              title={t("resetFilters")}
             >
               <RotateCcw className="h-3.5 w-3.5" />
-              Reset
+              {t("resetFilters")}
             </Button>
           </div>
         </div>
@@ -204,13 +203,13 @@ export default function ActivityTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>No</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Action</TableHead>
-                <TableHead>Module</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>IP Address</TableHead>
-                <TableHead>Waktu</TableHead>
+                <TableHead>{t("noCol")}</TableHead>
+                <TableHead>{t("user")}</TableHead>
+                <TableHead>{t("actionCol")}</TableHead>
+                <TableHead>{t("moduleCol")}</TableHead>
+                <TableHead>{t("descriptionCol")}</TableHead>
+                <TableHead>{t("ipAddress")}</TableHead>
+                <TableHead>{t("timeCol")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -218,7 +217,7 @@ export default function ActivityTable({
                 <TableRow>
                   <TableCell colSpan={7} className="p-0">
                     <EmptyState
-                      title="No Activity Logs"
+                      title={t("noActivityLogs")}
                       description="There are no activity logs to display at the moment."
                       icon={
                         <svg
@@ -286,11 +285,11 @@ export default function ActivityTable({
           </Table>
         </div>
 
-        
         {logs.length > 0 && (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
             <p className="text-sm text-muted-foreground">
-              Showing {pagination.from} - {pagination.to} of {pagination.total} results
+              Showing {pagination.from} - {pagination.to} of {pagination.total}{" "}
+              results
             </p>
             <Pagination>
               <PaginationContent>
@@ -302,13 +301,13 @@ export default function ActivityTable({
                       }
                     }}
                     className={cn(
-                      pagination.current_page === 1 && "pointer-events-none opacity-50",
-                      "cursor-pointer"
+                      pagination.current_page === 1 &&
+                        "pointer-events-none opacity-50",
+                      "cursor-pointer",
                     )}
                   />
                 </PaginationItem>
 
-                
                 {Array.from({ length: pagination.last_page }, (_, i) => i + 1)
                   .filter((page) => {
                     const current = pagination.current_page;
@@ -353,7 +352,7 @@ export default function ActivityTable({
                     className={cn(
                       pagination.current_page === pagination.last_page &&
                         "pointer-events-none opacity-50",
-                      "cursor-pointer"
+                      "cursor-pointer",
                     )}
                   />
                 </PaginationItem>

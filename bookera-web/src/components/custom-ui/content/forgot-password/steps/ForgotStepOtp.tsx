@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ export default function ForgotStepOtp({
   onResend,
   onBack,
 }: ForgotStepOtpProps) {
+  const t = useTranslations("forgot-password");
   return (
     <Card className="w-full border-0 dark:border dark:border-gray-700 shadow-2xl backdrop-blur-sm bg-white/95 dark:bg-gray-900/95 transition-colors overflow-hidden">
       <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-1.5 bg-linear-to-r from-brand-primary to-brand-primary-light rounded-full" />
@@ -56,10 +58,10 @@ export default function ForgotStepOtp({
         </motion.div>
         <div>
           <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
-            OTP Verification
+            {t("otpVerification")}
           </CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-300 transition-colors mt-2">
-            Enter the 6-digit code sent to
+            {t("enterCodeSentTo")}
             <br />
             <span className="font-medium text-brand-primary">{email}</span>
           </CardDescription>
@@ -97,16 +99,12 @@ export default function ForgotStepOtp({
         </div>
         <div className="text-center">
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-            Didn&apos;t receive the code?
+            {t("didntReceiveCode")}
           </p>
           {cooldown > 0 ? (
             <p className="text-sm text-gray-400 dark:text-gray-500 inline-flex items-center gap-1.5">
               <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-              Resend in{" "}
-              <span className="font-bold text-brand-primary tabular-nums">
-                {cooldown}
-              </span>{" "}
-              seconds
+              {t("resendIn", { seconds: cooldown })}
             </p>
           ) : (
             <Button
@@ -117,7 +115,7 @@ export default function ForgotStepOtp({
               className="text-sm font-semibold text-brand-primary hover:text-brand-primary-dark p-0 h-auto inline-flex items-center gap-1.5"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              Resend Code
+              {t("resend")}
             </Button>
           )}
         </div>
@@ -130,7 +128,7 @@ export default function ForgotStepOtp({
           className="w-full h-12 text-base font-semibold rounded-lg bg-linear-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
           spinnerClassName="text-white"
         >
-          {loading ? "Verifying..." : (<>Verify Code<ArrowRight className="w-5 h-5 ml-2" /></>)}
+          {loading ? t("verifying") : (<>{t("verifyCode")}<ArrowRight className="w-5 h-5 ml-2" /></>)}
         </Button>
         <div className="text-center">
           <Button
@@ -141,7 +139,7 @@ export default function ForgotStepOtp({
             disabled={loading}
           >
             <ArrowLeft className="w-4 h-4" />
-            Change delivery method
+            {t("changeDeliveryMethod")}
           </Button>
         </div>
       </CardContent>

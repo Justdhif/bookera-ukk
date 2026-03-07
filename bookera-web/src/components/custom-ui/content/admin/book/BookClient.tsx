@@ -1,5 +1,7 @@
 "use client";
-import { useRouter } from "next/navigation";
+
+import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 import { useEffect, useState } from "react";
 import { bookService, BookFilterParams } from "@/services/book.service";
@@ -16,13 +18,19 @@ import { BookTableSkeleton } from "./BookTableSkeleton";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 
 export default function BookClient() {
-  const router = useRouter();
+    const t = useTranslations("book");
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    from: 0,
+    to: 0,
+  });
 
   const [filters, setFilters] = useState<BookFilterParams>({ per_page: 10 });
 
@@ -53,7 +61,7 @@ export default function BookClient() {
         to: paginatedData.to ?? 0,
       });
     } catch (error) {
-      toast.error("Failed to load books");
+      toast.error(t("loadError"));
       console.error("Error fetching books:", error);
     } finally {
       setLoading(false);
@@ -75,7 +83,7 @@ export default function BookClient() {
     }
 
     await bookService.delete(deleteId);
-    toast.success("Book deleted successfully");
+    toast.success(t("deleteSuccess"));
     setDeleteId(null);
     fetchBooks(filters);
   };
@@ -88,18 +96,17 @@ export default function BookClient() {
             <BookOpen className="h-8 w-8 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Books</h1>
+            <h1 className="text-3xl font-bold">{t("title")}</h1>
             <p className="text-muted-foreground">Manage your book collection</p>
           </div>
         </div>
-        <Button
-          onClick={() => router.push("/admin/books/add")}
-          variant="brand"
-          className="h-8 gap-1"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Add Book
-        </Button>
+        <Link href="/admin/books/add">
+          <Button variant="brand" className="h-8 gap-1">
+            <Plus className="w-3.5 h-3.5" />
+            
+                                  {t("addBook")}
+                                </Button>
+        </Link>
       </div>
 
       <BookFilter
@@ -109,9 +116,12 @@ export default function BookClient() {
             ...prev,
             ...partial,
             page: 1,
-            status: partial.status !== undefined
-              ? (partial.status as BookFilterParams["status"])
-              : "status" in partial ? undefined : prev.status,
+            status:
+              partial.status !== undefined
+                ? (partial.status as BookFilterParams["status"])
+                : "status" in partial
+                  ? undefined
+                  : prev.status,
           }))
         }
         isLoading={loading}
@@ -135,7 +145,7 @@ export default function BookClient() {
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={() => setDeleteId(null)}
-        title="Delete Book"
+        title={t("deleteBook")}
         description="Are you sure you want to delete this book?"
         onConfirm={confirmDelete}
       />

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { borrowService, BorrowFilterParams } from "@/services/borrow.service";
 import { Borrow } from "@/types/borrow";
@@ -13,6 +14,7 @@ import { ReturnSkeletonCard } from "./ReturnSkeletonCard";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 
 export default function ReturnClient() {
+    const t = useTranslations("return");
   const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<BorrowFilterParams>({ per_page: 10 });
@@ -47,7 +49,7 @@ export default function ReturnClient() {
         to: paginatedData.to ?? 0,
       });
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to load returns");
+      toast.error(error.response?.data?.message || t("loadError"));
     } finally {
       setLoading(false);
     }
@@ -62,8 +64,8 @@ export default function ReturnClient() {
       return (
         <EmptyState
           icon={<PackageCheck className="h-16 w-16" />}
-          title="No Returns Yet"
-          description="There are no returns to display at the moment."
+          title={t("noReturns")}
+          description={t("noReturnsDesc")}
         />
       );
     }
@@ -97,22 +99,22 @@ export default function ReturnClient() {
   const tabs = [
     {
       value: "all",
-      label: "All Returns",
-      desc: "View all return transactions",
+      label: t("allReturns"),
+      desc: t("allReturnsDesc"),
       data: allBorrows,
       showActions: true,
     },
     {
       value: "checking",
-      label: "Checking",
-      desc: "Returns that are being checked for condition",
+      label: t("checking"),
+      desc: t("checkingDesc"),
       data: checkingBorrows,
       showActions: true,
     },
     {
       value: "returned",
-      label: "Returned",
-      desc: "Completed returns that have been finalized",
+      label: t("returned"),
+      desc: t("returnedDesc"),
       data: returnedBorrows,
       showActions: false,
     },
@@ -122,21 +124,21 @@ export default function ReturnClient() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold">Return Management</h1>
+          <h1 className="text-3xl font-bold">{t("managementTitle")}</h1>
           <p className="text-muted-foreground">
-            Manage return approvals and track returned books
+            {t("managementDesc")}
           </p>
         </div>
       </div>
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="all">All ({allBorrows.length})</TabsTrigger>
+          <TabsTrigger value="all">{t("allReturns")} ({allBorrows.length})</TabsTrigger>
           <TabsTrigger value="checking">
-            Checking ({checkingBorrows.length})
+            {t("checking")} ({checkingBorrows.length})
           </TabsTrigger>
           <TabsTrigger value="returned">
-            Returned ({returnedBorrows.length})
+            {t("returned")} ({returnedBorrows.length})
           </TabsTrigger>
         </TabsList>
 
@@ -151,7 +153,7 @@ export default function ReturnClient() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search by user or title..."
+                    placeholder={t("searchByUserOrTitle")}
                     value={searchInput}
                     onChange={handleSearchChange}
                     className="pl-10"

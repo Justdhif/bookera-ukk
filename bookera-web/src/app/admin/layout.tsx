@@ -4,7 +4,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/custom-ui/sidebar/AdminSidebar";
 import AdminHeader from "@/components/custom-ui/navbar/AdminHeader";
 import { useAuthStore } from "@/store/auth.store";
-import { ContentLoadingScreen } from "@/components/ui/ContentLoadingScreen";
+import { ContentLoadingScreen } from "@/components/custom-ui/ContentLoadingScreen";
 import "@/app/globals.css";
 
 export default function AdminLayout({

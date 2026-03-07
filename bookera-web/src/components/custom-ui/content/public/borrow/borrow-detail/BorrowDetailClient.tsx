@@ -1,7 +1,9 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+
 import { borrowService } from "@/services/borrow.service";
 import { Borrow } from "@/types/borrow";
 import { toast } from "sonner";
@@ -15,17 +17,24 @@ import { BorrowInfoCard } from "./BorrowInfoCard";
 import { BorrowBooksCard } from "./BorrowBooksCard";
 
 export default function PublicBorrowDetailClient() {
+    const t = useTranslations("public");
   const router = useRouter();
   const params = useParams();
   const borrowCode = params.borrowCode as string;
 
   const [borrow, setBorrow] = useState<Borrow | null>(null);
   const [loading, setLoading] = useState(true);
-  const [returnDialog, setReturnDialog] = useState<{ open: boolean; borrow: Borrow | null }>({
+  const [returnDialog, setReturnDialog] = useState<{
+    open: boolean;
+    borrow: Borrow | null;
+  }>({
     open: false,
     borrow: null,
   });
-  const [reportLostDialog, setReportLostDialog] = useState<{ open: boolean; borrow: Borrow | null }>({
+  const [reportLostDialog, setReportLostDialog] = useState<{
+    open: boolean;
+    borrow: Borrow | null;
+  }>({
     open: false,
     borrow: null,
   });
@@ -40,7 +49,9 @@ export default function PublicBorrowDetailClient() {
       const res = await borrowService.showByCode(borrowCode);
       setBorrow(res.data.data);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to load borrow details");
+      toast.error(
+        error.response?.data?.message || "Failed to load borrow details",
+      );
       router.push("/my-borrows");
     } finally {
       setLoading(false);
@@ -59,14 +70,16 @@ export default function PublicBorrowDetailClient() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push("/my-borrows")}
             className="h-8 w-8"
+            onClick={() => router.back()}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
             <h1 className="text-2xl font-bold">Borrow Detail</h1>
-            <p className="text-muted-foreground text-sm">Details for your borrow record</p>
+            <p className="text-muted-foreground text-sm">
+              Details for your borrow record
+            </p>
           </div>
         </div>
         {canReturn && (
@@ -78,8 +91,9 @@ export default function PublicBorrowDetailClient() {
               className="flex items-center gap-2"
             >
               <PackageX className="h-4 w-4" />
-              Request Return
-            </Button>
+              
+                                        {t("requestReturn")}
+                                      </Button>
             <Button
               variant="destructive"
               size="sm"
@@ -111,7 +125,10 @@ export default function PublicBorrowDetailClient() {
       <ReportLostDialog
         open={reportLostDialog.open}
         onOpenChange={(open) =>
-          setReportLostDialog({ open, borrow: open ? reportLostDialog.borrow : null })
+          setReportLostDialog({
+            open,
+            borrow: open ? reportLostDialog.borrow : null,
+          })
         }
         borrow={reportLostDialog.borrow}
         onSuccess={fetchBorrow}
@@ -119,4 +136,3 @@ export default function PublicBorrowDetailClient() {
     </div>
   );
 }
-

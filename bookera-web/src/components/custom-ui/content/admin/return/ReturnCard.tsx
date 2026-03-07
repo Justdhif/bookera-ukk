@@ -1,4 +1,4 @@
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { BookReturn } from "@/types/book-return";
 import { Borrow } from "@/types/borrow";
 import { Badge } from "@/components/ui/badge";
@@ -41,19 +41,17 @@ export function ReturnCard({
   onFinished,
   onProcessFine,
 }: ReturnCardProps) {
-  const router = useRouter();
-
   const getBorrowStatusBadge = (status: Borrow["status"]) => {
     const variants: Record<
       Borrow["status"],
       { label: string; className: string }
     > = {
       open: {
-        label: "Aktif",
+        label: "Active",
         className: "bg-orange-100 text-orange-800 hover:bg-orange-100",
       },
       close: {
-        label: "Selesai",
+        label: "Finished",
         className: "bg-emerald-100 text-emerald-800 hover:bg-emerald-100",
       },
     };
@@ -68,17 +66,17 @@ export function ReturnCard({
   const getConditionBadge = (condition: "good" | "damaged" | "lost") => {
     const variants = {
       good: {
-        label: "Baik",
+        label: "Good",
         icon: <CheckCircle className="h-3 w-3 mr-1" />,
         className: "bg-green-100 text-green-800 hover:bg-green-100",
       },
       damaged: {
-        label: "Rusak",
+        label: "Damaged",
         icon: <AlertTriangle className="h-3 w-3 mr-1" />,
         className: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
       },
       lost: {
-        label: "Hilang",
+        label: "Lost",
         icon: <XCircleIcon className="h-3 w-3 mr-1" />,
         className: "bg-red-100 text-red-800 hover:bg-red-100",
       },
@@ -107,7 +105,8 @@ export function ReturnCard({
   const hasDamagedOrLostBooks = hasDamagedBooks || hasLostBooks;
 
   const shouldShowProcessFine = hasDamagedOrLostBooks && !hasFines;
-  const shouldShowFinished = !hasDamagedOrLostBooks || (hasFines && !hasUnpaidFines);
+  const shouldShowFinished =
+    !hasDamagedOrLostBooks || (hasFines && !hasUnpaidFines);
 
   return (
     <Card className="overflow-hidden">
@@ -121,13 +120,13 @@ export function ReturnCard({
               {hasUnpaidFines && (
                 <Badge className="bg-red-100 text-red-800">
                   <DollarSign className="h-3 w-3 mr-1" />
-                  Denda Rp {totalUnpaid.toLocaleString("id-ID")}
+                  Fine Rp {totalUnpaid.toLocaleString("id-ID")}
                 </Badge>
               )}
               {hasFines && !hasUnpaidFines && (
                 <Badge className="bg-green-100 text-green-800">
                   <CheckCircle2 className="h-3 w-3 mr-1" />
-                  Denda Lunas
+                  Fine Paid
                 </Badge>
               )}
             </div>
@@ -159,7 +158,7 @@ export function ReturnCard({
                       ) : (
                         <DollarSign className="h-4 w-4 mr-1" />
                       )}
-                      Proses Denda
+                      Process Fine
                     </Button>
                   )}
                   {shouldShowFinished && (
@@ -174,19 +173,17 @@ export function ReturnCard({
                       ) : (
                         <CheckCircle2 className="h-4 w-4 mr-1" />
                       )}
-                      Selesai
+                      Finish
                     </Button>
                   )}
                 </>
               )}
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => router.push(`/admin/returns/${bookReturn.id}`)}
-              >
-                <Eye className="h-4 w-4 mr-1" />
-                Lihat Detail
-              </Button>
+              <Link href={`/admin/returns/${bookReturn.id}`}>
+                <Button size="sm" variant="outline">
+                  <Eye className="h-4 w-4 mr-1" />
+                  View Details
+                </Button>
+              </Link>
             </div>
           )}
         </div>
@@ -194,7 +191,7 @@ export function ReturnCard({
       <CardContent>
         <div className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground mb-3">
-            Buku Dikembalikan ({bookReturn.details?.length || 0}):
+            Books Returned ({bookReturn.details?.length || 0}):
           </p>
           <div className="grid gap-2">
             {bookReturn.details?.map((detail) => (

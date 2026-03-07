@@ -2,18 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+
 import { borrowRequestService } from "@/services/borrow-request.service";
 import { BorrowRequest } from "@/types/borrow-request";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -63,6 +60,7 @@ const approvalStatusConfig: Record<
 export default function AdminBorrowRequestDetailClient() {
   const router = useRouter();
   const params = useParams();
+  const t = useTranslations("borrow-request");
   const requestId = Number(params.id);
 
   const [request, setRequest] = useState<BorrowRequest | null>(null);
@@ -85,7 +83,7 @@ export default function AdminBorrowRequestDetailClient() {
       setRequest(res.data.data);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Failed to load request details",
+        error.response?.data?.message || t("loadDetailError"),
       );
       router.push("/admin/borrows");
     } finally {
@@ -98,10 +96,10 @@ export default function AdminBorrowRequestDetailClient() {
     setApproving(true);
     try {
       await borrowRequestService.approve(request.id);
-      toast.success("Request approved!");
+      toast.success(t("approveSuccess"));
       router.push("/admin/borrows");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to approve request");
+      toast.error(error.response?.data?.message || t("approveError"));
     } finally {
       setApproving(false);
     }
@@ -112,12 +110,12 @@ export default function AdminBorrowRequestDetailClient() {
     setRejecting(true);
     try {
       await borrowRequestService.reject(request.id, rejectReason || undefined);
-      toast.success("Request rejected");
+      toast.success(t("rejectSuccess"));
       setRejectDialogOpen(false);
       setRejectReason("");
       fetchRequest();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to reject request");
+      toast.error(error.response?.data?.message || t("rejectError"));
     } finally {
       setRejecting(false);
     }
@@ -128,10 +126,10 @@ export default function AdminBorrowRequestDetailClient() {
     setDeleting(true);
     try {
       await borrowRequestService.destroy(request.id);
-      toast.success("Request deleted successfully");
+      toast.success(t("deleteSuccess"));
       router.push("/admin/borrows");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to delete request");
+      toast.error(error.response?.data?.message || t("deleteError"));
     } finally {
       setDeleting(false);
       setDeleteDialogOpen(false);
@@ -170,8 +168,8 @@ export default function AdminBorrowRequestDetailClient() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push("/admin/borrows")}
             className="h-8 w-8"
+            onClick={() => router.back()}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -179,11 +177,11 @@ export default function AdminBorrowRequestDetailClient() {
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold">Request #{request.id}</h1>
               <Badge variant="secondary" className={statusCfg.className}>
-                {statusCfg.label}
+                {t(request.approval_status)}
               </Badge>
             </div>
             <p className="text-muted-foreground">
-              Complete borrow request information
+              {t("requestInfoDesc")}
             </p>
           </div>
         </div>
@@ -196,7 +194,7 @@ export default function AdminBorrowRequestDetailClient() {
             className="h-8 gap-1"
           >
             <Trash className="h-4 w-4 mr-1" />
-            Delete
+            {t("delete")}
           </Button>
           {isProcessing && (
             <>
@@ -208,7 +206,7 @@ export default function AdminBorrowRequestDetailClient() {
                 disabled={approving || rejecting}
               >
                 <XCircle className="h-4 w-4 mr-1" />
-                Reject
+                {t("reject")}
               </Button>
               <Button
                 variant="outline"
@@ -222,9 +220,9 @@ export default function AdminBorrowRequestDetailClient() {
                 ) : (
                   <CheckCircle2 className="h-4 w-4 mr-1" />
                 )}
-                Approve
+                {t("approve")}
               </Button>
-              </>
+            </>
           )}
         </div>
       </div>
@@ -235,7 +233,7 @@ export default function AdminBorrowRequestDetailClient() {
           <CardContent className="p-4 flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 shrink-0" />
             <div>
-              <p className="font-medium text-sm text-red-700">Reject Reason</p>
+              <p className="font-medium text-sm text-red-700">{t("rejectReason")}</p>
               <p className="text-sm text-red-600 mt-0.5">
                 {request.reject_reason}
               </p>
@@ -249,7 +247,7 @@ export default function AdminBorrowRequestDetailClient() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Borrower Information
+              {t("borrowerInformation")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -265,12 +263,12 @@ export default function AdminBorrowRequestDetailClient() {
             <div className="space-y-2">
               <h3 className="font-semibold flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4" />
-                Dates
+                {t("dates")}
               </h3>
               <div className="grid sm:grid-cols-2 gap-3">
                 <div className="rounded-lg border p-3 bg-muted/30">
                   <p className="text-xs text-muted-foreground mb-1">
-                    Borrow Date
+                    {t("borrowDate")}
                   </p>
                   <p className="font-medium">
                     {format(new Date(request.borrow_date), "dd MMMM yyyy")}
@@ -278,7 +276,7 @@ export default function AdminBorrowRequestDetailClient() {
                 </div>
                 <div className="rounded-lg border p-3 bg-muted/30">
                   <p className="text-xs text-muted-foreground mb-1">
-                    Return Date
+                    {t("returnDate")}
                   </p>
                   <p className="font-medium">
                     {format(new Date(request.return_date), "dd MMMM yyyy")}
@@ -293,7 +291,7 @@ export default function AdminBorrowRequestDetailClient() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              Requested Books ({request.borrow_request_details?.length || 0})
+              {t("requestedBooks")} ({request.borrow_request_details?.length || 0})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -333,11 +331,9 @@ export default function AdminBorrowRequestDetailClient() {
             <div className="flex items-start gap-3">
               <PackageCheck className="h-5 w-5 mt-0.5 text-primary shrink-0" />
               <div>
-                <p className="font-medium text-sm">How to process a request</p>
+                <p className="font-medium text-sm">{t("howToProcess")}</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Click <strong>Approve</strong> to create a borrow record (code + QR) and
-                  be redirected to the borrow detail page where you can assign book copies to the user.
-                  Click <strong>Reject</strong> to decline the request and notify the user.
+                  {t.rich("howToProcessDesc", { strong: (chunks) => <strong>{chunks}</strong> })}
                 </p>
               </div>
             </div>
@@ -351,14 +347,14 @@ export default function AdminBorrowRequestDetailClient() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-destructive">
               <XCircle className="h-5 w-5" />
-              Reject Request
+              {t("rejectRequest")}
             </DialogTitle>
             <DialogDescription>
-              Provide a reason for rejecting this borrow request (optional).
+              {t("rejectDialogDesc")}
             </DialogDescription>
           </DialogHeader>
           <Textarea
-            placeholder="Enter reject reason..."
+            placeholder={t("rejectReasonPlaceholder")}
             value={rejectReason}
             onChange={(e) => setRejectReason(e.target.value)}
             rows={3}
@@ -369,7 +365,7 @@ export default function AdminBorrowRequestDetailClient() {
               onClick={() => setRejectDialogOpen(false)}
               disabled={rejecting}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -381,7 +377,7 @@ export default function AdminBorrowRequestDetailClient() {
               ) : (
                 <XCircle className="h-4 w-4 mr-1" />
               )}
-              Reject Request
+              {t("rejectRequest")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -392,8 +388,8 @@ export default function AdminBorrowRequestDetailClient() {
         onOpenChange={(open) => {
           if (!deleting) setDeleteDialogOpen(open);
         }}
-        title="Delete Borrow Request"
-        description="Are you sure you want to permanently delete this borrow request? This action cannot be undone."
+        title={t("deleteRequest")}
+        description={t("deleteDetailDesc")}
         onConfirm={handleDelete}
       />
     </div>

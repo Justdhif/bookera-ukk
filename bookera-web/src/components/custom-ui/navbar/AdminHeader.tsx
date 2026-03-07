@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,7 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,11 +20,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings, FileText, Shield } from "lucide-react";
+import { useTranslations } from "next-intl";
 import NotificationButton from "./NotificationButton";
 
 export default function AdminHeader() {
   const pathname = usePathname();
-  const router = useRouter();
+  const t = useTranslations("navbar");
   const segments = pathname.replace("/admin", "").split("/").filter(Boolean);
 
   const formatSegment = (seg: string) => {
@@ -32,12 +34,15 @@ export default function AdminHeader() {
   };
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b px-4">
+    <header
+      // suppressHydrationWarning
+      className="flex h-14 items-center gap-4 border-b px-4"
+    >
       <SidebarTrigger />
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/admin">{"Dashboard"}</BreadcrumbLink>
+            <BreadcrumbLink href="/admin">{t("dashboard")}</BreadcrumbLink>
           </BreadcrumbItem>
 
           {segments.map((seg, idx) => {
@@ -69,17 +74,23 @@ export default function AdminHeader() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => router.push("/admin/settings")}>
-              <Settings className="h-4 w-4 mr-2" />
-              {"Settings"}
+            <DropdownMenuItem asChild>
+              <Link href="/admin/settings">
+                <Settings className="h-4 w-4 mr-2" />
+                {t("settings")}
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/admin/terms-of-service")}>
-              <FileText className="h-4 w-4 mr-2" />
-              {"Terms of Service"}
+            <DropdownMenuItem asChild>
+              <Link href="/admin/terms-of-service">
+                <FileText className="h-4 w-4 mr-2" />
+                {t("termsOfService")}
+              </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push("/admin/privacy-policy")}>
-              <Shield className="h-4 w-4 mr-2" />
-              {"Privacy Policy"}
+            <DropdownMenuItem asChild>
+              <Link href="/admin/privacy-policy">
+                <Shield className="h-4 w-4 mr-2" />
+                {t("privacyPolicy")}
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

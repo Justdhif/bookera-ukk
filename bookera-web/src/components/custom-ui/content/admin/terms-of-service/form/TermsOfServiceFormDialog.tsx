@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -25,6 +26,7 @@ export default function TermsOfServiceFormDialog({
   item: TermsOfService | null;
   onSuccess: () => void;
 }) {
+    const t = useTranslations("terms-of-service");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -84,7 +86,7 @@ export default function TermsOfServiceFormDialog({
             </Label>
             <Input
               id="title"
-              placeholder={"example: Terms of Service - Bookera Library System"}
+              placeholder="example: Terms of Service - Bookera Library System"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -102,7 +104,7 @@ export default function TermsOfServiceFormDialog({
               rows={16}
               className="font-mono text-sm"
             />
-            <p className="text-xs text-muted-foreground">{"useHTMLTags"}</p>
+            <p className="text-xs text-muted-foreground">useHTMLTags</p>
           </div>
 
           <Button
@@ -117,7 +119,7 @@ export default function TermsOfServiceFormDialog({
                 ? "Saving..."
                 : "Adding..."
               : item
-                ? "Save Changes"
+                ? t("saveChanges")
                 : "Add"}
           </Button>
         </div>
