@@ -1,16 +1,16 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-
 import { useState, useEffect } from "react";
 import { authService } from "@/services/auth.service";
 import { userService, UpdateUserData } from "@/services/user.service";
 import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, X, Edit } from "lucide-react";
+import { ArrowLeft, Save, X, Edit, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import ProfileAvatarCard from "./ProfileAvatarCard";
+import UserSideCard from "../admin/user/UserSideCard";
 import UserProfileForm from "../admin/user/UserProfileForm";
 
 type ProfileVariant = "public" | "admin";
@@ -19,7 +19,9 @@ interface ProfileDetailClientProps {
   variant: ProfileVariant;
 }
 
-export default function ProfileDetailClient({ variant }: ProfileDetailClientProps) {
+export default function ProfileDetailClient({
+  variant,
+}: ProfileDetailClientProps) {
   const router = useRouter();
   const t = useTranslations("profile");
   const [user, setUser] = useState<User | null>(null);
@@ -48,7 +50,8 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
         phone_number: userData.profile.phone_number || undefined,
         address: userData.profile.address || undefined,
         bio: userData.profile.bio || undefined,
-        identification_number: userData.profile.identification_number || undefined,
+        identification_number:
+          userData.profile.identification_number || undefined,
         occupation: userData.profile.occupation || undefined,
         institution: userData.profile.institution || undefined,
       });
@@ -116,37 +119,34 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
     setIsEditMode(false);
   };
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Skeleton className="h-8 w-8" />
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-64" />
-          </div>
-        </div>
-        <div className="grid gap-6 lg:grid-cols-3">
-          <Skeleton className="h-96" />
-          <Skeleton className="lg:col-span-2 h-96" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) return null;
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
+          {variant === "public" ? (
+            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+              <ArrowLeft className="h-8 w-8" />
+            </Button>
+          ) : (
+            <div className="p-2 bg-brand-primary rounded-lg">
+              <UserIcon className="h-8 w-8 text-white" />
+            </div>
+          )}
           <div>
             <h1 className="text-3xl font-bold">{t("myProfile")}</h1>
-            <p className="text-muted-foreground">
-              {isEditMode
-                ? `Edit ${user.profile.full_name}'s profile`
-                : `View ${user.profile.full_name}'s profile`}
-            </p>
+            {loading ? (
+              <Skeleton className="h-4 w-48 mt-1" />
+            ) : (
+              <p className="text-muted-foreground">
+                {isEditMode
+                  ? t("editProfileDescription", {
+                      name: user?.profile.full_name ?? "",
+                    })
+                  : t("viewProfileDescription", {
+                      name: user?.profile.full_name ?? "",
+                    })}
+              </p>
+            )}
           </div>
         </div>
         {isEditMode ? (
@@ -183,6 +183,7 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
             onClick={() => setIsEditMode(true)}
             variant="brand"
             className="h-8 gap-1"
+            disabled={loading}
           >
             <Edit className="h-3.5 w-3.5" />
             {"Edit User"}
@@ -190,27 +191,39 @@ export default function ProfileDetailClient({ variant }: ProfileDetailClientProp
         )}
       </div>
 
-      <form id="profile-form" onSubmit={handleSubmit}>
+      {loading ? (
         <div className="grid gap-6 lg:grid-cols-3">
-          <ProfileAvatarCard
-            user={user}
-            avatarPreview={avatarPreview}
-            isEditMode={isEditMode}
-            formData={formData}
-            setFormData={setFormData}
-            setAvatarPreview={setAvatarPreview}
-          />
-
-          <UserProfileForm
-            user={user}
-            isEditMode={isEditMode}
-            formData={formData}
-            setFormData={setFormData}
-            onFullNameValidChange={setIsFullNameValid}
-            isProfileView={true}
-          />
+          <Skeleton className="h-96" />
+          <Skeleton className="lg:col-span-2 h-96" />
         </div>
-      </form>
+      ) : (
+        user && (
+          <form id="profile-form" onSubmit={handleSubmit}>
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
+                <UserSideCard
+                  mode="detail"
+                  user={user}
+                  avatarPreview={avatarPreview}
+                  isEditMode={isEditMode}
+                  formData={formData}
+                  setFormData={setFormData}
+                  setAvatarPreview={setAvatarPreview}
+                />
+              </div>
+
+              <UserProfileForm
+                user={user}
+                isEditMode={isEditMode}
+                formData={formData}
+                setFormData={setFormData}
+                onFullNameValidChange={setIsFullNameValid}
+                hideAccount={true}
+              />
+            </div>
+          </form>
+        )
+      )}
     </div>
   );
 }

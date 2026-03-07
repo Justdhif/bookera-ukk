@@ -1,17 +1,12 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Bell, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { motion, AnimatePresence } from "framer-motion";
 import { notificationService } from "@/services/notification.service";
 import { Notification } from "@/types/notification";
 import { cn } from "@/lib/utils";
@@ -19,74 +14,58 @@ import { format } from "date-fns";
 import { getNotificationIcon } from "@/components/custom-ui/content/notification/notification-utils";
 
 interface NotificationDropdownProps {
-  isAuthenticated: boolean;
+  isAuthenticated?: boolean;
 }
 
 export default function NotificationDropdown({
-  isAuthenticated,
+  isAuthenticated = true,
 }: NotificationDropdownProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslations("navbar");
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const isAdmin = pathname.startsWith("/admin");
+  const notificationsHref = isAdmin ? "/admin/notifications" : "/notifications";
 
   useEffect(() => {
     const handleNotificationReceived = () => {
       fetchNotifications();
       fetchUnreadCount();
     };
-
-    window.addEventListener(
-      "notification-received",
-      handleNotificationReceived,
-    );
-    return () => {
-      window.removeEventListener(
-        "notification-received",
-        handleNotificationReceived,
-      );
-    };
+    window.addEventListener("notification-received", handleNotificationReceived);
+    return () => window.removeEventListener("notification-received", handleNotificationReceived);
   }, []);
 
   useEffect(() => {
     const handleNotificationRead = (event: any) => {
       const notificationId = event.detail?.notificationId;
-
       if (notificationId) {
-        setNotifications(
-          notifications.map((n) =>
-            n.id === notificationId
-              ? { ...n, read_at: new Date().toISOString() }
-              : n,
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n,
           ),
         );
       }
-
       fetchUnreadCount();
     };
-
     window.addEventListener("notification-read", handleNotificationRead);
-    return () => {
-      window.removeEventListener("notification-read", handleNotificationRead);
-    };
-  }, [notifications]);
+    return () => window.removeEventListener("notification-read", handleNotificationRead);
+  }, []);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchUnreadCount();
-    }
+    if (isAuthenticated) fetchUnreadCount();
   }, [isAuthenticated]);
 
   const fetchNotifications = async () => {
     if (!isAuthenticated) return;
-
     setIsLoading(true);
     try {
-      const response = await notificationService.getNotifications({
-        per_page: 5,
-      });
+      const response = await notificationService.getNotifications({ per_page: 5 });
       setNotifications(response.data.data.data);
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
@@ -108,154 +87,165 @@ export default function NotificationDropdown({
     if (!notif.read_at) {
       try {
         await notificationService.markAsRead(notif.id);
-
-        setNotifications(
-          notifications.map((n) =>
+        setNotifications((prev) =>
+          prev.map((n) =>
             n.id === notif.id ? { ...n, read_at: new Date().toISOString() } : n,
           ),
         );
-
         fetchUnreadCount();
-
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(
-            new CustomEvent("notification-read", {
-              detail: { notificationId: notif.id },
-            }),
-          );
-        }
+        window.dispatchEvent(
+          new CustomEvent("notification-read", { detail: { notificationId: notif.id } }),
+        );
       } catch (error) {
         console.error("Failed to mark as read:", error);
       }
     }
 
-    if (notif.module === "borrow" && notif.data?.borrow_id) {
-      router.push(`/my-borrows/${notif.data.borrow_id}`);
-    } else if (notif.module === "return" && notif.data?.return_id) {
-      router.push(`/my-borrows/${notif.data.borrow_id}`);
+    if (isAdmin) {
+      if (notif.module === "borrow" && notif.data?.borrow_id) {
+        router.push(`/admin/borrows/${notif.data.borrow_id}`);
+      } else {
+        router.push("/admin/notifications");
+      }
     } else {
-      router.push("/notifications");
+      if (notif.module === "borrow" && notif.data?.borrow_id) {
+        router.push(`/my-borrows/${notif.data.borrow_id}`);
+      } else if (notif.module === "return" && notif.data?.borrow_id) {
+        router.push(`/my-borrows/${notif.data.borrow_id}`);
+      } else {
+        router.push("/notifications");
+      }
     }
+
+    setIsOpen(false);
   };
 
-  const handleViewAllNotifications = () => {
-    router.push("/notifications");
-  };
-
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
-    if (open && isAuthenticated) {
+  const handleMouseEnter = () => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    if (!isOpen) {
+      setIsOpen(true);
       fetchNotifications();
     }
   };
 
+  const handleMouseLeave = () => {
+    closeTimerRef.current = setTimeout(() => setIsOpen(false), 150);
+  };
+
   return (
-    <Popover open={isOpen} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          className="relative flex items-center gap-2 h-9 px-3"
-        >
-          <Bell className="h-4 w-4" />
-          <span className="hidden text-sm font-medium lg:block">
-            {t("notifications")}
-          </span>
-          {isAuthenticated && unreadCount > 0 && (
-            <Badge
-              variant="destructive"
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-            >
-              {unreadCount > 99 ? "99+" : unreadCount}
-            </Badge>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-96 p-0" align="end">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="font-semibold text-lg">{t("notifications")}</h3>
-          {unreadCount > 0 && (
-            <Badge variant="secondary">{t("unread", { count: unreadCount })}</Badge>
-          )}
-        </div>
-
-        <div className="max-h-100 overflow-y-auto">
-          {!isAuthenticated ? (
-            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <Bell className="h-12 w-12 text-muted-foreground mb-3" />
-              <p className="text-sm text-muted-foreground mb-4">
-                {t("loginToView")}
-              </p>
-              <Link href="/login">
-                <Button size="sm">{t("login")}</Button>
-              </Link>
-            </div>
-          ) : isLoading ? (
-            <div className="py-8 text-center text-sm text-muted-foreground">
-              {t("loading")}
-            </div>
-          ) : notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <Bell className="h-12 w-12 text-muted-foreground mb-3" />
-              <p className="text-sm text-muted-foreground">
-                {t("noNotifications")}
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y">
-              {notifications.map((notif) => (
-                <div
-                  key={notif.id}
-                  onClick={() => handleNotificationClick(notif)}
-                  className={cn(
-                    "p-4 hover:bg-muted/50 cursor-pointer transition-colors",
-                    !notif.read_at && "bg-blue-50/50 dark:bg-blue-950/20",
-                  )}
-                >
-                  <div className="flex gap-3">
-                    <div className="shrink-0 mt-1">
-                      {getNotificationIcon(notif.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="font-medium text-sm line-clamp-1">
-                          {notif.title}
-                        </p>
-                        {!notif.read_at && (
-                          <div className="h-2 w-2 rounded-full bg-blue-600 shrink-0 mt-1" />
-                        )}
-                      </div>
-                      {notif.message && (
-                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                          {notif.message}
-                        </p>
-                      )}
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {format(
-                          new Date(notif.created_at),
-                          "MMM dd, yyyy HH:mm",
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {isAuthenticated && notifications.length > 0 && (
-          <div className="border-t p-2">
-            <Button
-              variant="ghost"
-              className="w-full justify-between"
-              onClick={handleViewAllNotifications}
-            >
-              <span>{t("viewAllNotifications")}</span>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+    <div
+      className="relative"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <Button
+        variant="ghost"
+        className="relative flex items-center gap-2 h-9 px-3"
+      >
+        <Bell className="h-4 w-4" />
+        <span className="hidden text-sm font-medium lg:block">
+          {t("notifications")}
+        </span>
+        {isAuthenticated && unreadCount > 0 && (
+          <Badge
+            variant="destructive"
+            className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+          >
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </Badge>
         )}
-      </PopoverContent>
-    </Popover>
+      </Button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.96 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className="absolute right-0 top-full mt-1 z-50 w-96 rounded-xl border bg-popover shadow-lg"
+          >
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="font-semibold text-lg">{t("notifications")}</h3>
+              {unreadCount > 0 && (
+                <Badge variant="secondary">{t("unread", { count: unreadCount })}</Badge>
+              )}
+            </div>
+
+            <div className="max-h-100 overflow-y-auto">
+              {!isAuthenticated ? (
+                <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                  <Bell className="h-12 w-12 text-muted-foreground mb-3" />
+                  <p className="text-sm text-muted-foreground mb-4">{t("loginToView")}</p>
+                  <Link href="/login">
+                    <Button variant="brand" size="sm">{t("login")}</Button>
+                  </Link>
+                </div>
+              ) : isLoading ? (
+                <div className="py-8 text-center text-sm text-muted-foreground">
+                  {t("loading")}
+                </div>
+              ) : notifications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                  <Bell className="h-12 w-12 text-muted-foreground mb-3" />
+                  <p className="text-sm text-muted-foreground">{t("noNotifications")}</p>
+                </div>
+              ) : (
+                <div className="divide-y">
+                  {notifications.map((notif) => (
+                    <div
+                      key={notif.id}
+                      onClick={() => handleNotificationClick(notif)}
+                      className={cn(
+                        "p-4 hover:bg-muted/50 cursor-pointer transition-colors",
+                        !notif.read_at && "bg-blue-50/50 dark:bg-blue-950/20",
+                      )}
+                    >
+                      <div className="flex gap-3">
+                        <div className="shrink-0 mt-1">
+                          {getNotificationIcon(notif.type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="font-medium text-sm line-clamp-1">{notif.title}</p>
+                            {!notif.read_at && (
+                              <div className="h-2 w-2 rounded-full bg-blue-600 shrink-0 mt-1" />
+                            )}
+                          </div>
+                          {notif.message && (
+                            <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                              {notif.message}
+                            </p>
+                          )}
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {format(new Date(notif.created_at), "MMM dd, yyyy HH:mm")}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {isAuthenticated && notifications.length > 0 && (
+              <div className="border-t p-2">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-between"
+                  onClick={() => {
+                    router.push(notificationsHref);
+                    setIsOpen(false);
+                  }}
+                >
+                  <span>{t("viewAllNotifications")}</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

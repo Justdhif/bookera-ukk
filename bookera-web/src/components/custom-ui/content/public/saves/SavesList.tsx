@@ -267,7 +267,6 @@ export default function SavesList({
   return (
     <>
       <div className="h-full flex flex-col">
-        {/* Header */}
         <div className="flex items-center justify-between px-4 pt-3 pb-2">
           <div className="flex items-center gap-2">
             <div className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-primary/10 dark:bg-brand-primary/20">
@@ -288,7 +287,6 @@ export default function SavesList({
           </Button>
         </div>
 
-        {/* List */}
         <ScrollArea className="flex-1 px-3">
           <div className="space-y-1.5 pb-4 pt-1">
             {loading ? (

@@ -53,7 +53,7 @@ export default function UserSideCard({
   recentBorrows,
   isProfileView,
 }: UserSideCardProps) {
-    const t = useTranslations("user");
+  const t = useTranslations("user");
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
   const isAddMode = mode === "add";
@@ -116,7 +116,9 @@ export default function UserSideCard({
               {avatarPreview ? (
                 <Image
                   src={avatarPreview}
-                  alt={user?.profile.full_name || formData.full_name || t("user")}
+                  alt={
+                    user?.profile.full_name || formData.full_name || t("user")
+                  }
                   fill
                   sizes="128px"
                   className="object-cover"
@@ -133,17 +135,16 @@ export default function UserSideCard({
             </div>
           </div>
 
-          {canEdit && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setAvatarModalOpen(true)}
-              className="w-full"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              {t("uploadAvatar")}
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setAvatarModalOpen(true)}
+            className="w-full"
+            disabled={!canEdit}
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            {t("uploadAvatar")}
+          </Button>
 
           <div className="w-full border-t pt-3 space-y-3">
             <h4 className="font-semibold text-sm">{t("accountSection")}</h4>
@@ -152,9 +153,8 @@ export default function UserSideCard({
                 htmlFor="sc-email"
                 variant={canEdit ? "required" : "default"}
               >
-                
-                                              {t("email")}
-                                            </Label>
+                {t("email")}
+              </Label>
               <Input
                 id="sc-email"
                 type="email"
@@ -219,13 +219,11 @@ export default function UserSideCard({
                 <SelectContent>
                   <SelectItem value="admin">{t("admin")}</SelectItem>
                   <SelectItem value="officer:catalog">
-                    
-                                                          {t("officerCatalog")}
-                                                        </SelectItem>
+                    {t("officerCatalog")}
+                  </SelectItem>
                   <SelectItem value="officer:management">
-                    
-                                                          {t("officerManagement")}
-                                                        </SelectItem>
+                    {t("officerManagement")}
+                  </SelectItem>
                   <SelectItem value="user">{t("user")}</SelectItem>
                 </SelectContent>
               </Select>

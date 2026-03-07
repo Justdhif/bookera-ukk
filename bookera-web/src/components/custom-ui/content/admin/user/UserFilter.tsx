@@ -23,7 +23,6 @@ export default function UserFilter({ onChange }: Props) {
   const [roleValue, setRoleValue] = useState<string>();
   const [statusSelect, setStatusSelect] = useState<string>();
 
-  // Debounce search → parent onChange
   useEffect(() => {
     const timeout = setTimeout(() => {
       onChange({ search: searchInput || undefined });

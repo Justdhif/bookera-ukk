@@ -1,6 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-/** Loading skeletons untuk sidebar mode */
 export default function SidebarLoadingSkeletons() {
   return (
     <>

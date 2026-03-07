@@ -30,7 +30,6 @@ interface UserProfileFormProps {
   setFormData: (data: any) => void;
   onFullNameValidChange?: (valid: boolean) => void;
   isProfileView?: boolean;
-  /** When true, hides the Account (email/password) section — use when UserSideCard handles it */
   hideAccount?: boolean;
 }
 
@@ -43,7 +42,7 @@ export default function UserProfileForm({
   isProfileView,
   hideAccount = false,
 }: UserProfileFormProps) {
-    const t = useTranslations("user");
+  const t = useTranslations("user");
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -83,9 +82,8 @@ export default function UserProfileForm({
                   htmlFor="email"
                   variant={isEditMode ? "required" : "default"}
                 >
-                  
-                                                    {t("email")}
-                                                  </Label>
+                  {t("email")}
+                </Label>
                 <Input
                   id="email"
                   name="email"
@@ -164,7 +162,7 @@ export default function UserProfileForm({
                 validationType={!isEditMode ? undefined : "numbers-only"}
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 w-full">
               <Label htmlFor="gender">{t("gender")}</Label>
               <Select
                 value={formData.gender || ""}
@@ -173,8 +171,11 @@ export default function UserProfileForm({
                 }
                 disabled={!isEditMode}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("selectGender")} className="w-full" />
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={t("selectGender")}
+                    className="w-full"
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="male">{t("male")}</SelectItem>

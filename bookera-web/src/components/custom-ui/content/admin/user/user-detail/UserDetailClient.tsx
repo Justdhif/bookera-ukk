@@ -107,26 +107,6 @@ export default function UserDetailClient() {
     setIsEditMode(false);
   };
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Skeleton className="h-8 w-8" />
-          <div className="space-y-2">
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-64" />
-          </div>
-        </div>
-        <div className="grid gap-6 lg:grid-cols-3">
-          <Skeleton className="h-96" />
-          <Skeleton className="lg:col-span-2 h-96" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) return null;
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -180,38 +160,45 @@ export default function UserDetailClient() {
             onClick={() => setIsEditMode(true)}
             variant="brand"
             className="h-8 gap-1"
+            disabled={loading}
           >
             <Edit className="h-3.5 w-3.5" />
-            
-                                      {t("editUser")}
-                                    </Button>
+            {t("editUser")}
+          </Button>
         )}
       </div>
 
-      <form id="user-form" onSubmit={handleSubmit}>
+      {loading ? (
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
-            <UserSideCard
-              mode="detail"
+          <Skeleton className="h-96" />
+          <Skeleton className="lg:col-span-2 h-96" />
+        </div>
+      ) : user && (
+        <form id="user-form" onSubmit={handleSubmit}>
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
+              <UserSideCard
+                mode="detail"
+                user={user}
+                avatarPreview={avatarPreview}
+                isEditMode={isEditMode}
+                formData={formData}
+                setFormData={setFormData}
+                setAvatarPreview={setAvatarPreview}
+              />
+            </div>
+
+            <UserProfileForm
               user={user}
-              avatarPreview={avatarPreview}
               isEditMode={isEditMode}
               formData={formData}
               setFormData={setFormData}
-              setAvatarPreview={setAvatarPreview}
+              onFullNameValidChange={setIsFullNameValid}
+              hideAccount={true}
             />
           </div>
-
-          <UserProfileForm
-            user={user}
-            isEditMode={isEditMode}
-            formData={formData}
-            setFormData={setFormData}
-            onFullNameValidChange={setIsFullNameValid}
-            hideAccount={true}
-          />
-        </div>
-      </form>
+        </form>
+      )}
     </div>
   );
 }

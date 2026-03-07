@@ -13,7 +13,6 @@ export function FineTableSkeleton() {
     <div className="space-y-4">
       {Array.from({ length: 3 }).map((_, groupIndex) => (
         <div key={groupIndex} className="border rounded-lg overflow-hidden">
-          {/* Borrow header */}
           <div className="bg-muted/40 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b">
             <div className="flex items-center gap-2.5">
               <Skeleton className="size-8 rounded-full shrink-0" />
@@ -28,7 +27,6 @@ export function FineTableSkeleton() {
             </div>
           </div>
 
-          {/* Fines table */}
           <div className="overflow-x-auto">
             <Table className="table-fixed w-full">
               <colgroup>

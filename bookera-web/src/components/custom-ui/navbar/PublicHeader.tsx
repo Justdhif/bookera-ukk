@@ -21,6 +21,7 @@ import {
   User,
   LayoutDashboard,
   LogOut,
+  ArrowLeft,
 } from "lucide-react";
 import { useState, useEffect, useTransition } from "react";
 import { useTranslations } from "next-intl";
@@ -98,11 +99,14 @@ export default function PublicHeader() {
             <Link href="/settings">
               <Button
                 variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent"
+                size="sm"
+                className="flex items-center gap-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent px-3"
                 aria-label={t("goToSettings")}
               >
                 <Settings className="h-4 w-4 md:h-5 md:w-5" />
+                <span className="hidden md:inline text-sm font-medium">
+                  {t("settings")}
+                </span>
               </Button>
             </Link>
 

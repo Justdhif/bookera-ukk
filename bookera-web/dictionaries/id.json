@@ -591,7 +591,9 @@
     "roleLabel": "Peran:",
     "statusLabel": "Status:",
     "updateSuccess": "Pengguna berhasil diperbarui",
-    "requiredFields": "Harap lengkapi semua kolom yang wajib diisi"
+    "requiredFields": "Harap lengkapi semua kolom yang wajib diisi",
+    "editProfileDescription": "Edit profil {name}",
+    "viewProfileDescription": "Lihat profil {name}"
   },
   "public": {
     "notFound": "Buku tidak ditemukan",

@@ -38,33 +38,6 @@ export default function BookDetailClient() {
     fetchBook();
   }, [slug]);
 
-  if (loading) {
-    return (
-      <div className="container py-8 space-y-6">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.back()}
-            className="h-8 w-8"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">{t("bookDetailTitle")}</h1>
-            <p className="text-muted-foreground">{t("loadingBookData")}</p>
-          </div>
-        </div>
-        <div className="grid gap-6 lg:grid-cols-3">
-          <Skeleton className="h-96" />
-          <Skeleton className="lg:col-span-2 h-96" />
-        </div>
-      </div>
-    );
-  }
-  
-  if (!book) return null;
-
   return (
     <div className="container py-8 space-y-6">
       <div className="flex items-center gap-4">
@@ -80,10 +53,21 @@ export default function BookDetailClient() {
           <h1 className="text-3xl font-bold">{t("bookDetailTitle")}</h1>
           <p className="text-muted-foreground">{t("completeBookDesc")}</p>
         </div>
-        <AddToSaveButton bookId={book.id} />
-        <AddToRequestButton bookId={book.id} />
+        {book && (
+          <>
+            <AddToSaveButton bookId={book.id} />
+            <AddToRequestButton bookId={book.id} />
+          </>
+        )}
       </div>
 
+      {loading && (
+        <div className="grid gap-6 lg:grid-cols-3">
+          <Skeleton className="h-96" />
+          <Skeleton className="lg:col-span-2 h-96" />
+        </div>
+      )}
+      {book && (
       <div className="grid gap-6 lg:grid-cols-3">
         
         <Card className="flex flex-col h-full">
@@ -204,8 +188,8 @@ export default function BookDetailClient() {
           </CardContent>
         </Card>
       </div>
-
-      
+      )}
+      {book && (
       <Card>
         <CardHeader>
           <CardTitle className="text-xl">{t("availableCopiesTitle")}</CardTitle>
@@ -215,6 +199,7 @@ export default function BookDetailClient() {
           <BookCopyList copies={book.copies || []} />
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

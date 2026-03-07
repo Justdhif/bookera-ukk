@@ -591,7 +591,9 @@
     "roleLabel": "Role:",
     "statusLabel": "Status:",
     "updateSuccess": "User updated successfully",
-    "requiredFields": "Please complete all required fields"
+    "requiredFields": "Please complete all required fields",
+    "editProfileDescription": "Edit {name}'s profile",
+    "viewProfileDescription": "View {name}'s profile"
   },
   "public": {
     "notFound": "Books not found",

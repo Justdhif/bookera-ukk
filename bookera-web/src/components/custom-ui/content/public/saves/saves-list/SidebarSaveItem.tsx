@@ -8,7 +8,6 @@ interface SidebarSaveItemProps {
   save: SaveListItem;
 }
 
-/** Single save item untuk sidebar mode (full) */
 export default function SidebarSaveItem({ save }: SidebarSaveItemProps) {
     const t = useTranslations("public");
   return (

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Settings, FileText, Shield } from "lucide-react";
 import { useTranslations } from "next-intl";
-import NotificationButton from "./NotificationButton";
+import NotificationDropdown from "./NotificationDropdown";
 
 export default function AdminHeader() {
   const pathname = usePathname();
@@ -35,7 +35,6 @@ export default function AdminHeader() {
 
   return (
     <header
-      // suppressHydrationWarning
       className="flex h-14 items-center gap-4 border-b px-4"
     >
       <SidebarTrigger />
@@ -95,7 +94,7 @@ export default function AdminHeader() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <NotificationButton />
+        <NotificationDropdown isAuthenticated={true} />
       </div>
     </header>
   );

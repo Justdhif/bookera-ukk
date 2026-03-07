@@ -236,33 +236,6 @@ export default function BookDetailClient() {
     setIsEditMode(false);
   };
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => router.back()}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Book Detail</h1>
-            <p className="text-muted-foreground">Loading book data...</p>
-          </div>
-        </div>
-        <div className="grid gap-6 lg:grid-cols-3">
-          <Skeleton className="h-96" />
-          <Skeleton className="lg:col-span-2 h-96" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!book) return null;
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -310,59 +283,68 @@ export default function BookDetailClient() {
             onClick={() => setIsEditMode(true)}
             variant="brand"
             className="h-8 gap-1"
+            disabled={loading}
           >
             <Edit className="h-3.5 w-3.5" />
-            
-                                      {t("editBook")}
-                                    </Button>
+            {t("editBook")}
+          </Button>
         )}
       </div>
 
-      <form id="book-form" onSubmit={handleSubmit}>
+      {loading ? (
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:self-start lg:sticky lg:top-4">
-            <BookSideCard
-              coverPreview={coverPreview}
-              isEditMode={isEditMode}
-              formData={{ is_active: formData.is_active }}
-              setFormData={setFormData}
-              onCoverImageChange={handleCoverImageChange}
-              onSwitchChange={handleSwitchChange}
-              isCoverRequired={false}
-              coverError={coverError}
-              onCoverValidationChange={handleCoverValidationChange}
-            />
-          </div>
-
-          <BookForm
-            book={book}
-            isEditMode={isEditMode}
-            formData={formData}
-            setFormData={setFormData}
-            onInputChange={handleInputChange}
-            onYearChange={handleYearChange}
-            onCategoryChange={handleCategoryChange}
-            onAuthorChange={handleAuthorChange}
-            onPublisherChange={handlePublisherChange}
-            onAddAuthor={() => setAuthorDialogOpen(true)}
-            onAddPublisher={() => setPublisherDialogOpen(true)}
-            categories={categories}
-            authors={authors}
-            publishers={publishers}
-            onValidationChange={handleFormValidationChange}
-          />
+          <Skeleton className="h-96" />
+          <Skeleton className="lg:col-span-2 h-96" />
         </div>
-      </form>
+      ) : book && (
+        <>
+          <form id="book-form" onSubmit={handleSubmit}>
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="lg:self-start lg:sticky lg:top-4">
+                <BookSideCard
+                  coverPreview={coverPreview}
+                  isEditMode={isEditMode}
+                  formData={{ is_active: formData.is_active }}
+                  setFormData={setFormData}
+                  onCoverImageChange={handleCoverImageChange}
+                  onSwitchChange={handleSwitchChange}
+                  isCoverRequired={false}
+                  coverError={coverError}
+                  onCoverValidationChange={handleCoverValidationChange}
+                />
+              </div>
 
-      {!isEditMode && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Book Copies</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <BookCopyList book={book} onChange={fetchBook} />
-          </CardContent>
-        </Card>
+              <BookForm
+                book={book}
+                isEditMode={isEditMode}
+                formData={formData}
+                setFormData={setFormData}
+                onInputChange={handleInputChange}
+                onYearChange={handleYearChange}
+                onCategoryChange={handleCategoryChange}
+                onAuthorChange={handleAuthorChange}
+                onPublisherChange={handlePublisherChange}
+                onAddAuthor={() => setAuthorDialogOpen(true)}
+                onAddPublisher={() => setPublisherDialogOpen(true)}
+                categories={categories}
+                authors={authors}
+                publishers={publishers}
+                onValidationChange={handleFormValidationChange}
+              />
+            </div>
+          </form>
+
+          {!isEditMode && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">Book Copies</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <BookCopyList book={book} onChange={fetchBook} />
+              </CardContent>
+            </Card>
+          )}
+        </>
       )}
 
       <AuthorFormDialog

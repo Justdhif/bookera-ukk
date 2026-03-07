@@ -34,7 +34,6 @@ const getStatusLabels = (t: any): Record<string, string> => ({
   waived: t("waived"),
 });
 
-// Group fines by borrow_id
 function groupFinesByBorrow(fines: Fine[]) {
   const map = new Map<number, { borrow: Fine["borrow"]; fines: Fine[] }>();
   for (const fine of fines) {
@@ -105,7 +104,6 @@ export default function FineTable({
             key={borrowId ?? groupIndex}
             className="border rounded-lg overflow-hidden"
           >
-            {/* Borrow Parent Info */}
             <div className="bg-muted/40 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b">
               <div className="flex items-center gap-2.5">
                 <UserAvatar name={borrowerName} avatar={avatarUrl} />
@@ -138,7 +136,6 @@ export default function FineTable({
               </div>
             </div>
 
-            {/* Fines for this borrow */}
             {fines.length === 0 ? (
               <div className="px-4 py-3 text-sm text-muted-foreground italic">
                 No fines recorded for this borrow.
