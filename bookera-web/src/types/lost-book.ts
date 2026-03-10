@@ -1,6 +1,7 @@
 import { Borrow } from "./borrow";
 import { BookCopy } from "./book-copy";
 import { Book } from "./book";
+import { PaginatedResponse } from "./api";
 
 export interface LostBook {
   id: number;
@@ -8,7 +9,7 @@ export interface LostBook {
   book_copy_id: number;
   estimated_lost_date?: string;
   notes?: string;
-  
+
   borrow?: Borrow & {
     user?: {
       profile?: {
@@ -17,7 +18,7 @@ export interface LostBook {
       email: string;
     };
   };
-  
+
   book_copy?: BookCopy & {
     book: Book;
   };
@@ -25,3 +26,5 @@ export interface LostBook {
   created_at: string;
   updated_at: string;
 }
+
+export type LostBookListResponse = PaginatedResponse<LostBook>;

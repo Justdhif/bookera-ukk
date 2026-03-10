@@ -11,7 +11,7 @@ import { notificationService } from "@/services/notification.service";
 import { Notification } from "@/types/notification";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { getNotificationIcon } from "@/components/custom-ui/content/notification/notification-utils";
+import { NotificationIconBadge } from "@/components/custom-ui/content/notification/notification-utils";
 
 interface NotificationDropdownProps {
   isAuthenticated?: boolean;
@@ -198,18 +198,18 @@ export default function NotificationDropdown({
                       onClick={() => handleNotificationClick(notif)}
                       className={cn(
                         "p-4 hover:bg-muted/50 cursor-pointer transition-colors",
-                        !notif.read_at && "bg-blue-50/50 dark:bg-blue-950/20",
+                        !notif.read_at && "bg-primary/5 dark:bg-primary/10",
                       )}
                     >
                       <div className="flex gap-3">
-                        <div className="shrink-0 mt-1">
-                          {getNotificationIcon(notif.type)}
+                        <div className="shrink-0 mt-0.5">
+                          <NotificationIconBadge type={notif.type} module={notif.module} size="sm" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <p className="font-medium text-sm line-clamp-1">{notif.title}</p>
                             {!notif.read_at && (
-                              <div className="h-2 w-2 rounded-full bg-blue-600 shrink-0 mt-1" />
+                              <div className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1 shadow-sm shadow-primary/30" />
                             )}
                           </div>
                           {notif.message && (

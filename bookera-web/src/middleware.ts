@@ -20,8 +20,12 @@ export function middleware(req: NextRequest) {
   const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password";
   const isSetupProfile = pathname === "/setup-profile";
   const isAdminRoute = pathname.startsWith("/admin");
+  const isDiscussionRoute = pathname.startsWith("/discussion");
 
-  // Allow setup-profile for authenticated users
+  if (isDiscussionRoute && !token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
   if (isSetupProfile && !token) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
@@ -82,5 +86,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/login", "/register", "/setup-profile", "/forgot-password"],
+  matcher: ["/admin/:path*", "/login", "/register", "/setup-profile", "/forgot-password", "/discussion/:path*", "/discussion"],
 };

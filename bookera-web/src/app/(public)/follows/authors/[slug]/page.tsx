@@ -1,5 +1,5 @@
-import AuthorDetailClient from "@/components/custom-ui/content/public/follows/follow-detail/AuthorDetailClient";
+import FollowDetailClient from "@/components/custom-ui/content/public/follows/follow-detail/FollowDetailClient";
 
 export default function AuthorDetailPage() {
-  return <AuthorDetailClient />;
+  return <FollowDetailClient type="author" />;
 }

@@ -10,8 +10,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $title
  * @property string|null $isbn
  * @property string|null $description
- * @property string $author
- * @property string|null $publisher
  * @property int|null $publication_year
  * @property string|null $language
  * @property string|null $cover_image
@@ -38,8 +36,6 @@ class Book extends Model
         'title',
         'isbn',
         'description',
-        'author',
-        'publisher',
         'publication_year',
         'language',
         'cover_image',

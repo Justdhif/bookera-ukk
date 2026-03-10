@@ -1,3 +1,5 @@
+import { PaginatedResponse } from "./api";
+
 export interface Author {
   id: number;
   slug: string;
@@ -9,3 +11,5 @@ export interface Author {
   created_at: string;
   updated_at: string;
 }
+
+export type AuthorListResponse = PaginatedResponse<Author>;

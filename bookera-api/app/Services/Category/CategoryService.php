@@ -60,6 +60,10 @@ class CategoryService
 
     public function deleteCategory(Category $category): array
     {
+        if ($category->books()->count() > 0) {
+            throw new \Exception('Tidak dapat menghapus kategori yang masih memiliki buku. Hapus atau pindahkan buku terlebih dahulu.', 422);
+        }
+
         $deletedCategoryId = $category->id;
         $categoryData = $category->toArray();
         $categoryName = $category->name;

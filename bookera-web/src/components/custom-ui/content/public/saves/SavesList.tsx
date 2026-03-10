@@ -34,7 +34,7 @@ export default function SavesList({
   isCollapsed = false,
 }: SavesListProps) {
   const t = useTranslations("public");
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, initialLoading } = useAuthStore();
   const [saves, setSaves] = useState<SaveListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -55,12 +55,15 @@ export default function SavesList({
   };
 
   useEffect(() => {
-    fetchSaves();
+    // Only fetch when initial loading is complete
+    if (!initialLoading) {
+      fetchSaves();
+    }
     const handleRefreshSaves = () => fetchSaves();
     window.addEventListener("refreshSavesList", handleRefreshSaves);
     return () =>
       window.removeEventListener("refreshSavesList", handleRefreshSaves);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, initialLoading]);
 
   const handleCreateSave = async () => {
     if (!formData.name.trim()) {
@@ -89,6 +92,21 @@ export default function SavesList({
     isCreating,
     onSubmit: handleCreateSave,
   };
+
+  // Show loading skeleton during initial authentication check
+  if (initialLoading) {
+    if (mode === "horizontal") return null;
+
+    if (isCollapsed) {
+      return (
+        <div className="flex flex-col items-center py-6 gap-2">
+          <Skeleton className="h-14 w-14 rounded-lg" />
+        </div>
+      );
+    }
+
+    return <SidebarLoadingSkeletons />;
+  }
 
   if (!isAuthenticated) {
     if (mode === "horizontal") return null;

@@ -5,6 +5,7 @@ import { BookReturn } from "./book-return";
 import { Fine } from "./fine";
 import { LostBook } from "./lost-book";
 import { BorrowRequest } from "./borrow-request";
+import { PaginatedResponse } from "./api";
 
 export interface BorrowDetail {
   id: number;
@@ -37,3 +38,5 @@ export interface Borrow {
   created_at: string;
   updated_at: string;
 }
+
+export type BorrowListResponse = PaginatedResponse<Borrow>;

@@ -1,3 +1,5 @@
+import { PaginatedResponse } from "./api";
+
 export interface Category {
   id: number;
   slug: string;
@@ -7,3 +9,5 @@ export interface Category {
   created_at: string;
   updated_at: string;
 }
+
+export type CategoryListResponse = PaginatedResponse<Category>;

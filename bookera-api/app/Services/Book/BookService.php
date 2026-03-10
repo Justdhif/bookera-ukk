@@ -183,6 +183,11 @@ class BookService
             return false;
         }
 
+        $borrowedCopiesCount = $book->copies()->where('status', 'borrowed')->count();
+        if ($borrowedCopiesCount > 0) {
+            throw new \Exception('Tidak dapat menghapus buku yang memiliki salinan sedang dipinjam. Tunggu hingga semua salinan dikembalikan.', 422);
+        }
+
         $bookData = $book->toArray();
         $bookTitle = $book->title;
 

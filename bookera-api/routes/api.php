@@ -9,7 +9,6 @@ use App\Http\Controllers\Api\BookController;
 use App\Http\Controllers\Api\BookCopyController;
 use App\Http\Controllers\Api\BookReturnController;
 use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\Api\ContentPageController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\FineController;
 use App\Http\Controllers\Api\FineTypeController;
@@ -20,6 +19,9 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PrivacyPolicyController;
 use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\PublisherController;
+use App\Http\Controllers\Api\DiscussionPostController;
+use App\Http\Controllers\Api\DiscussionLikeController;
+use App\Http\Controllers\Api\DiscussionCommentController;
 use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\SaveController;
 use App\Http\Controllers\Api\TermsOfServiceController;
@@ -59,9 +61,6 @@ Route::get('authors/{author}', [AuthorController::class, 'show']);
 
 Route::get('publishers', [PublisherController::class, 'list']);
 Route::get('publishers/{publisher}', [PublisherController::class, 'show']);
-
-Route::get('content-pages', [ContentPageController::class, 'index']);
-Route::get('content-pages/{slug}', [ContentPageController::class, 'show']);
 
 Route::get('terms-of-services/active', [TermsOfServiceController::class, 'getActive']);
 Route::get('terms-of-services', [TermsOfServiceController::class, 'index']);
@@ -192,11 +191,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:admin')->prefix('admin')->group(function () {
 
-        Route::prefix('content-pages')->group(function () {
-            Route::get('/', [ContentPageController::class, 'adminIndex']);
-            Route::put('/{slug}', [ContentPageController::class, 'update']);
-        });
-
         Route::prefix('terms-of-services')->group(function () {
             Route::post('/', [TermsOfServiceController::class, 'store']);
             Route::put('/{termsOfService}', [TermsOfServiceController::class, 'update']);
@@ -261,10 +255,38 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('follows')->group(function () {
         Route::get('/authors', [FollowController::class, 'authors']);
         Route::get('/publishers', [FollowController::class, 'publishers']);
+        Route::get('/users', [FollowController::class, 'users']);
         Route::get('/check', [FollowController::class, 'check']);
         Route::post('/', [FollowController::class, 'follow']);
         Route::delete('/', [FollowController::class, 'unfollow']);
         Route::get('/authors/{slug}', [FollowController::class, 'authorDetail']);
         Route::get('/publishers/{slug}', [FollowController::class, 'publisherDetail']);
+    });
+
+    Route::prefix('discussion-posts')->group(function () {
+        Route::get('/', [DiscussionPostController::class, 'index']);
+        Route::post('/', [DiscussionPostController::class, 'store']);
+        Route::get('/feed/following', [DiscussionPostController::class, 'following']);
+        Route::get('/active-users', [DiscussionPostController::class, 'activeUsers']);
+        Route::get('/user/{userId}', [DiscussionPostController::class, 'byUser']);
+        Route::get('/{slug}', [DiscussionPostController::class, 'show']);
+        Route::put('/{slug}', [DiscussionPostController::class, 'update']);
+        Route::delete('/{slug}', [DiscussionPostController::class, 'destroy']);
+        Route::post('/{slug}/like', [DiscussionLikeController::class, 'toggle']);
+        Route::get('/{slug}/comments', [DiscussionCommentController::class, 'index']);
+        Route::post('/{slug}/comments', [DiscussionCommentController::class, 'store']);
+    });
+
+    Route::prefix('discussion-comments')->group(function () {
+        Route::put('/{comment}', [DiscussionCommentController::class, 'update']);
+        Route::delete('/{comment}', [DiscussionCommentController::class, 'destroy']);
+        Route::get('/{comment}/replies', [DiscussionCommentController::class, 'replies']);
+    });
+
+    Route::prefix('users')->group(function () {
+        Route::get('/{userId}/followers', [FollowController::class, 'userFollowers']);
+        Route::get('/{userId}/following', [FollowController::class, 'userFollowing']);
+        Route::get('/{userId}/follow-counts', [FollowController::class, 'userFollowCounts']);
+        Route::get('/{userId}/profile', [FollowController::class, 'userPublicProfile']);
     });
 });

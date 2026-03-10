@@ -102,6 +102,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
+    // Show loading state during logout
+    set({ initialLoading: true });
+    
     try {
       await authService.logout();
     } finally {
@@ -111,6 +114,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({
         user: null,
         isAuthenticated: false,
+        initialLoading: false,
       });
     }
   },

@@ -3,6 +3,8 @@ import { ApiResponse } from "@/types/api";
 import {
   Fine,
   FineType,
+  FineListResponse,
+  FineTypeListResponse,
   CreateFineTypePayload,
   UpdateFineTypePayload,
   CreateFinePayload,
@@ -12,7 +14,7 @@ import {
 
 export const fineTypeService = {
   getAll: (params?: { type?: string; search?: string }) =>
-    api.get<ApiResponse<any>>("/admin/fine-types", { params }),
+    api.get<ApiResponse<FineTypeListResponse>>("/admin/fine-types", { params }),
 
   getById: (id: number) =>
     api.get<ApiResponse<FineType>>(`/admin/fine-types/${id}`),
@@ -36,7 +38,7 @@ export interface FineFilterParams {
 
 export const fineService = {
   getAll: (filters?: FineFilterParams) =>
-    api.get<ApiResponse<any>>("/admin/fines", { params: filters }),
+    api.get<ApiResponse<FineListResponse>>("/admin/fines", { params: filters }),
 
   getById: (id: number) => api.get<ApiResponse<Fine>>(`/admin/fines/${id}`),
 

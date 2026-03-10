@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\Follow\FollowService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,22 +27,35 @@ class FollowController extends Controller
         return ApiResponse::successResponse('Daftar penerbit yang diikuti berhasil diambil', $publishers);
     }
 
+    public function users(): JsonResponse
+    {
+        $users = $this->followService->getFollowedUsers();
+
+        return ApiResponse::successResponse('Daftar pengguna yang diikuti berhasil diambil', $users);
+    }
+
     public function follow(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'type' => 'required|in:author,publisher',
+            'type' => 'required|in:author,publisher,user',
             'id'   => 'required|integer|min:1',
         ]);
 
-        $follow = $this->followService->follow($validated['type'], $validated['id']);
-
-        return ApiResponse::successResponse('Berhasil mengikuti', ['follow_id' => $follow->id], 201);
+        try {
+            $follow = $this->followService->follow($validated['type'], $validated['id']);
+            return ApiResponse::successResponse('Berhasil mengikuti', ['follow_id' => $follow->id], 201);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+            return ApiResponse::notFoundResponse('Data tidak ditemukan');
+        } catch (\Exception $e) {
+            $code = $e->getCode() >= 400 ? $e->getCode() : 422;
+            return ApiResponse::errorResponse($e->getMessage(), null, $code);
+        }
     }
 
     public function unfollow(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'type' => 'required|in:author,publisher',
+            'type' => 'required|in:author,publisher,user',
             'id'   => 'required|integer|min:1',
         ]);
 
@@ -57,7 +71,7 @@ class FollowController extends Controller
     public function check(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'type' => 'required|in:author,publisher',
+            'type' => 'required|in:author,publisher,user',
             'id'   => 'required|integer|min:1',
         ]);
 
@@ -68,23 +82,54 @@ class FollowController extends Controller
 
     public function authorDetail(string $slug): JsonResponse
     {
-        $author = $this->followService->getFollowedAuthorDetail($slug);
-
-        if (!$author) {
-            return ApiResponse::errorResponse('Penulis tidak ditemukan', null, 404);
-        }
-
-        return ApiResponse::successResponse('Detail penulis berhasil diambil', $author);
+        return $this->followableDetail('author', $slug);
     }
 
     public function publisherDetail(string $slug): JsonResponse
     {
-        $publisher = $this->followService->getFollowedPublisherDetail($slug);
+        return $this->followableDetail('publisher', $slug);
+    }
 
-        if (!$publisher) {
-            return ApiResponse::errorResponse('Penerbit tidak ditemukan', null, 404);
+    private function followableDetail(string $type, string $slug): JsonResponse
+    {
+        $detail = $this->followService->getFollowableDetail($type, $slug);
+
+        if (!$detail) {
+            $label = $type === 'author' ? 'Penulis' : 'Penerbit';
+            return ApiResponse::errorResponse("{$label} tidak ditemukan", null, 404);
         }
 
-        return ApiResponse::successResponse('Detail penerbit berhasil diambil', $publisher);
+        $label = $type === 'author' ? 'Penulis' : 'Penerbit';
+        return ApiResponse::successResponse("Detail {$label} berhasil diambil", $detail);
+    }
+
+    // ── User-follow public endpoints ─────────────────────────────────────────
+
+    public function userFollowers(Request $request, int $userId): JsonResponse
+    {
+        $followers = $this->followService->getUserFollowers($userId, (int) $request->get('per_page', 20));
+
+        return ApiResponse::successResponse('Daftar pengikut berhasil diambil', $followers);
+    }
+
+    public function userFollowing(Request $request, int $userId): JsonResponse
+    {
+        $following = $this->followService->getUserFollowing($userId, (int) $request->get('per_page', 20));
+
+        return ApiResponse::successResponse('Daftar following berhasil diambil', $following);
+    }
+
+    public function userFollowCounts(int $userId): JsonResponse
+    {
+        $counts = $this->followService->getUserFollowCounts($userId);
+
+        return ApiResponse::successResponse('Jumlah follower berhasil diambil', $counts);
+    }
+
+    public function userPublicProfile(int $userId): JsonResponse
+    {
+        $user = User::with('profile')->findOrFail($userId);
+
+        return ApiResponse::successResponse('Profil pengguna berhasil diambil', $user);
     }
 }

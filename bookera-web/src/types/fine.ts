@@ -1,3 +1,5 @@
+import { PaginatedResponse } from "./api";
+
 export interface FineType {
   id: number;
   name: string;
@@ -72,3 +74,6 @@ export interface UpdateFinePayload {
 export interface WaiveFinePayload {
   notes?: string;
 }
+
+export type FineTypeListResponse = PaginatedResponse<FineType>;
+export type FineListResponse = PaginatedResponse<Fine>;

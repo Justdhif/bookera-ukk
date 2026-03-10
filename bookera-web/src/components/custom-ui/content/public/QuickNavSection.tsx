@@ -140,7 +140,7 @@ const navItems = [
   },
   {
     label: "Discussion",
-    href: "/forum",
+    href: "/discussion",
     Icon: MessageSquare,
     iconGradient: "bg-linear-to-br from-violet-500 to-purple-600",
     borderCls: "border-violet-500/40 hover:border-violet-500/70",

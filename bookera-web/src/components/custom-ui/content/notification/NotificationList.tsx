@@ -3,14 +3,13 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Notification } from "@/types/notification";
-import { Card, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Loader2, Bell, Search, CheckCheck } from "lucide-react";
+import { Loader2, Bell, Search, CheckCheck, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { getNotificationIcon } from "./notification-utils";
+import { formatDistanceToNow } from "date-fns";
+import { NotificationIconBadge, getModuleBadgeStyle } from "./notification-utils";
 import { Button } from "@/components/ui/button";
+
 interface NotificationListProps {
   notifications: Notification[];
   loading: boolean;
@@ -34,7 +33,7 @@ export default function NotificationList({
   onMarkAllAsRead,
   isMarkingAll = false,
 }: NotificationListProps) {
-    const t = useTranslations("notification");
+  const t = useTranslations("notification");
   const [searchValue, setSearchValue] = useState("");
   const [statusValue, setStatusValue] = useState("all");
 
@@ -50,138 +49,176 @@ export default function NotificationList({
 
   const statusOptions = [
     { value: "all", label: t("allStatus") },
-    { value: t("unreadCount"), label: t("unread") },
+    { value: "unread", label: t("unread") },
     { value: "read", label: t("read") },
   ];
 
   return (
-    <Card className="h-[calc(100vh-7rem)]">
-      <CardHeader className="border-b pb-3">
+    <div className="flex flex-col h-[calc(100vh-7rem)] rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="px-4 pt-4 pb-3 border-b border-border bg-card/80 backdrop-blur-sm">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-lg">{t("allNotifications")}</h3>
-          {notifications.length > 0 && (
-            <Badge variant="secondary">{notifications.length}</Badge>
-          )}
-        </div>
-
-        {unreadCount > 0 && onMarkAllAsRead && (
-          <div className="mb-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onMarkAllAsRead}
-              disabled={isMarkingAll}
-              className="w-full justify-center"
-            >
-              {isMarkingAll ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <CheckCheck className="h-4 w-4 mr-2" />
-              )}
-              {t("markAllAsRead")}
-            </Button>
-          </div>
-        )}
-
-        <div className="space-y-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={t("searchNotifications")}
-              value={searchValue}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground">{t("statusFilter")}</p>
-            <div className="flex flex-wrap gap-2">
-              {statusOptions.map((option) => {
-                const isActive = statusValue === option.value;
-                return (
-                  <Badge
-                    key={option.value}
-                    variant={isActive ? "default" : "outline"}
-                    className={cn(
-                      "cursor-pointer whitespace-nowrap transition-all duration-200",
-                      "px-3 py-1.5 text-sm font-medium rounded-md border",
-                      isActive
-                        ? "bg-brand-primary text-primary-foreground border-brand-primary shadow-sm"
-                        : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground hover:border-primary/50",
-                    )}
-                    onClick={() => handleStatusClick(option.value)}
-                  >
-                    {option.label}
-                  </Badge>
-                );
-              })}
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+              <Bell className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-sm leading-tight">{t("allNotifications")}</h3>
+              <p className="text-xs text-muted-foreground">
+                {notifications.length} {t("notificationsCount")}
+                {unreadCount > 0 && (
+                  <span className="ml-1 font-medium text-primary">
+                    · {unreadCount} {t("unread")}
+                  </span>
+                )}
+              </p>
             </div>
           </div>
 
-          <div className="text-xs text-muted-foreground pt-1">
-            {notifications.length} {t("notificationsCount")}
-            {unreadCount > 0 && ` • ${unreadCount} ${t("unreadCount")}`}
+          {unreadCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onMarkAllAsRead}
+              disabled={isMarkingAll}
+              className="h-8 text-xs gap-1.5 text-primary hover:text-primary hover:bg-primary/10"
+            >
+              {isMarkingAll ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <CheckCheck className="h-3.5 w-3.5" />
+              )}
+              {t("markAllAsRead")}
+            </Button>
+          )}
+        </div>
+
+        {/* Search */}
+        <div className="relative mb-3">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Input
+            placeholder={t("searchNotifications")}
+            value={searchValue}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className="pl-9 h-8 text-sm bg-muted/40 border-border/60 focus:bg-background"
+          />
+        </div>
+
+        {/* Status filters */}
+        <div className="flex items-center gap-1.5">
+          <Filter className="h-3 w-3 text-muted-foreground shrink-0" />
+          <div className="flex gap-1.5">
+            {statusOptions.map((option) => {
+              const isActive = statusValue === option.value;
+              return (
+                <button
+                  key={option.value}
+                  onClick={() => handleStatusClick(option.value)}
+                  className={cn(
+                    "px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-150",
+                    isActive
+                      ? "bg-brand-primary text-white shadow-sm"
+                      : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  {option.label}
+                  {option.value === "unread" && unreadCount > 0 && (
+                    <span className={cn(
+                      "ml-1 inline-flex items-center justify-center rounded-full text-[10px] font-bold min-w-4 h-4 px-1",
+                      isActive ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary/15 text-primary"
+                    )}>
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </CardHeader>
+      </div>
 
-      <div className="overflow-y-auto h-[calc(100%-14rem)]">
+      {/* Notification list */}
+      <div className="flex-1 overflow-y-auto">
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center h-full gap-3">
+            <Loader2 className="h-7 w-7 animate-spin text-primary/60" />
+            <p className="text-sm text-muted-foreground">Loading...</p>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-            <Bell className="h-12 w-12 text-muted-foreground mb-3" />
-            <p className="text-lg font-medium mb-1">{t("noNotifications")}</p>
-            <p className="text-sm text-muted-foreground">
-              {t("noNotificationsMatch")}
-            </p>
+          <div className="flex flex-col items-center justify-center h-full gap-3 px-6 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/60">
+              <Bell className="h-7 w-7 text-muted-foreground/60" />
+            </div>
+            <div>
+              <p className="font-medium text-sm">{t("noNotifications")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("noNotificationsMatch")}</p>
+            </div>
           </div>
         ) : (
-          <div className="divide-y dark:divide-gray-700">
-            {notifications.map((notif) => (
-              <div
-                key={notif.id}
-                onClick={() => onSelectNotification(notif)}
-                className={cn(
-                  "p-4 hover:bg-muted/50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors",
-                  !notif.read_at && "bg-blue-50/50 dark:bg-blue-950/20",
-                  selectedId === notif.id &&
-                    "bg-brand-primary/10 dark:bg-brand-primary/20 border-l-4 border-brand-primary",
-                )}
-              >
-                <div className="flex gap-3">
-                  <div className="shrink-0 mt-1">
-                    {getNotificationIcon(notif.type)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <div className="flex items-center gap-2 flex-1">
-                        <p className="font-medium text-sm line-clamp-1">
-                          {notif.title}
-                        </p>
-                        {!notif.read_at && (
-                          <div className="h-2 w-2 rounded-full bg-blue-600 shrink-0" />
-                        )}
-                      </div>
-                    </div>
+          <div className="divide-y divide-border/50">
+            {notifications.map((notif) => {
+              const isSelected = selectedId === notif.id;
+              const isUnread = !notif.read_at;
+
+              return (
+                <div
+                  key={notif.id}
+                  onClick={() => onSelectNotification(notif)}
+                  className={cn(
+                    "relative flex gap-3 p-3.5 cursor-pointer transition-all duration-150 group",
+                    isSelected
+                      ? "bg-primary/8 dark:bg-primary/12"
+                      : isUnread
+                      ? "bg-blue-50/40 dark:bg-blue-950/10 hover:bg-muted/60"
+                      : "hover:bg-muted/50",
+                    isSelected && "border-l-[3px] border-l-primary pl-2.75"
+                  )}
+                >
+                  {/* Unread dot */}
+                  {isUnread && !isSelected && (
+                    <span className="absolute right-3 top-3.5 h-2 w-2 rounded-full bg-primary shadow-sm shadow-primary/30" />
+                  )}
+
+                  {/* Icon */}
+                  <NotificationIconBadge
+                    type={notif.type}
+                    module={notif.module}
+                    size="default"
+                  />
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0 pr-3">
+                    <p className={cn(
+                      "text-sm line-clamp-1 leading-snug",
+                      isUnread ? "font-semibold text-foreground" : "font-medium text-foreground/90"
+                    )}>
+                      {notif.title}
+                    </p>
                     {notif.message && (
-                      <p className="text-xs text-muted-foreground mb-1 line-clamp-2">
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">
                         {notif.message}
                       </p>
                     )}
-                    <div className="text-xs text-muted-foreground">
-                      {format(new Date(notif.created_at), "MMM dd, HH:mm")}
+                    <div className="flex items-center gap-2 mt-1.5">
+                      {notif.module && (
+                        <span className={cn(
+                          "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border",
+                          getModuleBadgeStyle(notif.module)
+                        )}>
+                          {notif.module}
+                        </span>
+                      )}
+                      <span className="text-[11px] text-muted-foreground/70">
+                        {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
+                      </span>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 }

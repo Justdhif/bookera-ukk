@@ -1,5 +1,6 @@
 import { Book } from "./book";
 import { User } from "./user";
+import { PaginatedResponse } from "./api";
 
 export interface BorrowRequestDetail {
   id: number;
@@ -13,7 +14,7 @@ export interface BorrowRequest {
   user_id: number;
   borrow_date: string;
   return_date: string;
-  approval_status: 'processing' | 'canceled' | 'approved' | 'rejected';
+  approval_status: "processing" | "canceled" | "approved" | "rejected";
   reject_reason?: string | null;
 
   user?: User;
@@ -22,3 +23,5 @@ export interface BorrowRequest {
   created_at: string;
   updated_at: string;
 }
+
+export type BorrowRequestListResponse = PaginatedResponse<BorrowRequest>;

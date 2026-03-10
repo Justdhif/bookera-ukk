@@ -44,7 +44,7 @@ class UpdateUserRequest extends FormRequest
             'identification_number' => ['nullable', 'string', Rule::unique('user_profiles', 'identification_number')->ignore($this->user->profile->id ?? null)],
             'occupation' => 'nullable|string|max:100',
             'institution' => 'nullable|string|max:255',
-            'avatar' => 'nullable',
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
     }
 }

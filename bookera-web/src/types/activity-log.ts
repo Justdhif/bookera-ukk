@@ -1,4 +1,5 @@
 import { User } from "./user";
+import { PaginatedResponse } from "./api";
 
 export interface ActivityLog {
   id: number;
@@ -23,20 +24,7 @@ export interface ActivityLog {
 }
 
 export interface ActivityLogIndexResponse {
-  logs: {
-    current_page: number;
-    data: ActivityLog[];
-    first_page_url: string;
-    from: number;
-    last_page: number;
-    last_page_url: string;
-    next_page_url: string | null;
-    path: string;
-    per_page: number;
-    prev_page_url: string | null;
-    to: number;
-    total: number;
-  };
+  logs: PaginatedResponse<ActivityLog>;
   charts: {
     monthly: MonthlyChartData[];
     modules: string[];

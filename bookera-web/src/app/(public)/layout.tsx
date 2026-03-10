@@ -3,6 +3,8 @@
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import PublicHeader from "@/components/custom-ui/navbar/PublicHeader";
 import PublicSidebar from "@/components/custom-ui/sidebar/PublicSidebar";
+import { useAuthStore } from "@/store/auth.store";
+import { ContentLoadingScreen } from "@/components/custom-ui/ContentLoadingScreen";
 import "@/app/globals.css";
 
 export default function PublicLayout({
@@ -10,6 +12,8 @@ export default function PublicLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const initialLoading = useAuthStore((s) => s.initialLoading);
+
   return (
     <SidebarProvider>
       <PublicSidebar />
@@ -18,9 +22,13 @@ export default function PublicLayout({
         <PublicHeader />
 
         <main className="flex-1 overflow-y-auto bg-linear-to-b from-background to-muted/20">
-          <div className="p-4 md:p-6">
-            {children}
-          </div>
+          {initialLoading ? (
+            <ContentLoadingScreen />
+          ) : (
+            <div className="p-4 md:p-6">
+              {children}
+            </div>
+          )}
         </main>
       </SidebarInset>
     </SidebarProvider>

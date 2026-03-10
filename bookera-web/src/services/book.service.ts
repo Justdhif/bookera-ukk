@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
-import { Book } from "@/types/book";
+import { Book, BookListResponse } from "@/types/book";
 
 export interface CreateBookData {
   title: string;
@@ -26,10 +26,15 @@ const buildBookFormData = (data: CreateBookData | UpdateBookData): FormData => {
   formData.append("description", (data.description ?? "").trim());
   formData.append("is_active", (data.is_active ?? true) ? "1" : "0");
   if (data.isbn) formData.append("isbn", data.isbn.trim());
-  if (data.publication_year) formData.append("publication_year", data.publication_year);
-  data.category_ids?.forEach((id) => formData.append("category_ids[]", String(id)));
+  if (data.publication_year)
+    formData.append("publication_year", data.publication_year);
+  data.category_ids?.forEach((id) =>
+    formData.append("category_ids[]", String(id)),
+  );
   data.author_ids?.forEach((id) => formData.append("author_ids[]", String(id)));
-  data.publisher_ids?.forEach((id) => formData.append("publisher_ids[]", String(id)));
+  data.publisher_ids?.forEach((id) =>
+    formData.append("publisher_ids[]", String(id)),
+  );
   if (data.cover_image) formData.append("cover_image", data.cover_image);
   return formData;
 };
@@ -45,13 +50,15 @@ export interface BookFilterParams {
 export const bookService = {
   getAll: (filters?: BookFilterParams) => {
     const { category_ids, ...params } = filters ?? {};
-    if (category_ids?.length) Object.assign(params, { category_ids: category_ids.join(",") });
-    return api.get<ApiResponse<any>>("/books", { params });
+    if (category_ids?.length)
+      Object.assign(params, { category_ids: category_ids.join(",") });
+    return api.get<ApiResponse<BookListResponse>>("/books", { params });
   },
 
   show: (id: number) => api.get<ApiResponse<Book>>(`/books/${id}`),
 
-  showBySlug: (slug: string) => api.get<ApiResponse<Book>>(`/books/slug/${slug}`),
+  showBySlug: (slug: string) =>
+    api.get<ApiResponse<Book>>(`/books/slug/${slug}`),
 
   create: (data: CreateBookData) =>
     api.post<ApiResponse<Book>>("/admin/books", buildBookFormData(data), {
@@ -59,9 +66,13 @@ export const bookService = {
     }),
 
   update: (id: number, data: UpdateBookData) =>
-    api.post<ApiResponse<Book>>(`/admin/books/${id}?_method=PUT`, buildBookFormData(data), {
-      headers: { "Content-Type": "multipart/form-data" },
-    }),
+    api.post<ApiResponse<Book>>(
+      `/admin/books/${id}?_method=PUT`,
+      buildBookFormData(data),
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      },
+    ),
 
   delete: (id: number) => api.delete<ApiResponse<null>>(`/admin/books/${id}`),
 };

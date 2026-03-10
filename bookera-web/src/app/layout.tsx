@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import Providers from "./providers";
-import { AudioProvider } from "@/context/AudioContext";
+import { AudioProvider } from "@/contexts/AudioContext";
 import "./globals.css";
 import TopLoader from "@/components/custom-ui/TopLoader";
 

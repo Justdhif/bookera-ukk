@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
-import { User } from "@/types/user";
+import { User, UserListResponse } from "@/types/user";
 
 export type UserRole = User["role"];
 
@@ -37,7 +37,7 @@ export interface UserFilterParams {
 
 export const userService = {
   getAll: (filters?: UserFilterParams) =>
-    api.get<ApiResponse<any>>("/admin/users", { params: filters }),
+    api.get<ApiResponse<UserListResponse>>("/admin/users", { params: filters }),
 
   show: (id: number) => api.get<ApiResponse<User>>(`/admin/users/${id}`),
 

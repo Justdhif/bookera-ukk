@@ -72,4 +72,31 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class);
     }
+
+    public function discussionPosts()
+    {
+        return $this->hasMany(DiscussionPost::class);
+    }
+
+    public function discussionLikes()
+    {
+        return $this->hasMany(DiscussionLike::class);
+    }
+
+    public function discussionComments()
+    {
+        return $this->hasMany(DiscussionComment::class);
+    }
+
+    /** Users that follow this user */
+    public function followers()
+    {
+        return $this->morphMany(Follow::class, 'followable');
+    }
+
+    /** Users that this user follows */
+    public function following()
+    {
+        return $this->hasMany(Follow::class, 'user_id')->where('followable_type', self::class);
+    }
 }

@@ -2,6 +2,7 @@ import { Category } from "./category";
 import { BookCopy } from "./book-copy";
 import { Author } from "./author";
 import { Publisher } from "./publisher";
+import { PaginatedResponse } from "./api";
 
 export interface Book {
   id: number;
@@ -30,3 +31,5 @@ export interface Book {
   created_at: string;
   updated_at: string;
 }
+
+export type BookListResponse = PaginatedResponse<Book>;

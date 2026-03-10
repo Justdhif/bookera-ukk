@@ -1,3 +1,5 @@
+import { PaginatedResponse } from "./api";
+
 export interface UserProfile {
   id: number;
   user_id: number;
@@ -5,6 +7,7 @@ export interface UserProfile {
   gender: "male" | "female" | "prefer_not_to_say" | null;
   birth_date: string | null;
   avatar: string;
+  avatar_url?: string;
   phone_number: string | null;
   address: string | null;
   bio: string | null;
@@ -24,6 +27,9 @@ export interface User {
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
+  is_following?: boolean;
 
   profile: UserProfile;
 }
+
+export type UserListResponse = PaginatedResponse<User>;

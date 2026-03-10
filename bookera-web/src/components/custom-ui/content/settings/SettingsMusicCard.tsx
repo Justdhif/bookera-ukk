@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Check, Music, Pause, Play, Volume2, VolumeX } from "lucide-react";
-import { useAudio } from "@/context/AudioContext";
+import { useAudio } from "@/contexts/AudioContext";
 import { toast } from "sonner";
 
 export default function SettingsMusicCard() {

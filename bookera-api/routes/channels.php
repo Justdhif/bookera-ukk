@@ -22,3 +22,9 @@ Broadcast::channel('user.{userId}', function ($user, $userId) {
 Broadcast::channel('admin', function ($user) {
     return $user->role === 'admin';
 });
+
+// Public channel untuk discussion post updates (likes/comments count)
+// No authorization needed - all users can listen to post updates
+Broadcast::channel('discussion-posts', function () {
+    return true;
+});

@@ -1,30 +1,52 @@
 import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
-import { BorrowRequest } from "@/types/borrow-request";
+import {
+  BorrowRequest,
+  BorrowRequestListResponse,
+} from "@/types/borrow-request";
 import { Borrow } from "@/types/borrow";
 
 export const borrowRequestService = {
-  create: (data: { book_ids: number[]; borrow_date: string; return_date: string }) =>
-    api.post<ApiResponse<BorrowRequest>>("/borrow-requests", data),
+  create: (data: {
+    book_ids: number[];
+    borrow_date: string;
+    return_date: string;
+  }) => api.post<ApiResponse<BorrowRequest>>("/borrow-requests", data),
 
-  show: (id: number) => api.get<ApiResponse<BorrowRequest>>(`/borrow-requests/${id}`),
+  show: (id: number) =>
+    api.get<ApiResponse<BorrowRequest>>(`/borrow-requests/${id}`),
 
-  getMyRequests: () => api.get<ApiResponse<BorrowRequest[]>>("/my-borrow-requests"),
+  getMyRequests: () =>
+    api.get<ApiResponse<BorrowRequest[]>>("/my-borrow-requests"),
 
   cancel: (id: number) => api.patch(`/borrow-requests/${id}/cancel`),
 
-  getAll: (filters?: { search?: string; approval_status?: string; per_page?: number; page?: number }) =>
-    api.get<ApiResponse<any>>("/admin/borrow-requests", { params: filters }),
+  getAll: (filters?: {
+    search?: string;
+    approval_status?: string;
+    per_page?: number;
+    page?: number;
+  }) =>
+    api.get<ApiResponse<BorrowRequestListResponse>>("/admin/borrow-requests", {
+      params: filters,
+    }),
 
-  adminShow: (id: number) => api.get<ApiResponse<BorrowRequest>>(`/admin/borrow-requests/${id}`),
+  adminShow: (id: number) =>
+    api.get<ApiResponse<BorrowRequest>>(`/admin/borrow-requests/${id}`),
 
   assignBorrow: (id: number, copyIds: number[] = []) =>
-    api.post<ApiResponse<Borrow>>(`/admin/borrow-requests/${id}/assign`, { copy_ids: copyIds }),
+    api.post<ApiResponse<Borrow>>(`/admin/borrow-requests/${id}/assign`, {
+      copy_ids: copyIds,
+    }),
 
-  approve: (id: number) => api.patch<ApiResponse<Borrow>>(`/admin/borrow-requests/${id}/approve`),
+  approve: (id: number) =>
+    api.patch<ApiResponse<Borrow>>(`/admin/borrow-requests/${id}/approve`),
 
   reject: (id: number, rejectReason?: string) =>
-    api.patch<ApiResponse<BorrowRequest>>(`/admin/borrow-requests/${id}/reject`, { reject_reason: rejectReason }),
+    api.patch<ApiResponse<BorrowRequest>>(
+      `/admin/borrow-requests/${id}/reject`,
+      { reject_reason: rejectReason },
+    ),
 
   destroy: (id: number) => api.delete(`/admin/borrow-requests/${id}`),
 };

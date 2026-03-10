@@ -547,11 +547,7 @@ function SidebarMenuButton({
     );
   }
 
-  const {
-    content,
-    gradient = "from-emerald-600 to-teal-600",
-    ...tooltipProps
-  } = tooltip;
+  const { content, ...tooltipProps } = tooltip;
 
   return (
     <Tooltip>
@@ -560,7 +556,6 @@ function SidebarMenuButton({
         side="right"
         align="center"
         hidden={state !== "collapsed" || isMobile}
-        gradient={gradient}
         {...tooltipProps}
       >
         {content || tooltipProps.children}

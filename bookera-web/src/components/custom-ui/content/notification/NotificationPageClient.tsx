@@ -4,11 +4,9 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
-import { notificationService } from "@/services/notification.service";
+import { notificationService, NotificationFilterParams } from "@/services/notification.service";
 import { Notification } from "@/types/notification";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { CheckCheck, Loader2 } from "lucide-react";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import NotificationList from "./NotificationList";
 import NotificationDetail from "./NotificationDetail";
@@ -85,9 +83,8 @@ export default function NotificationPageClient() {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const response = await notificationService.getNotifications({
-        per_page: 50,
-      });
+      const filters: NotificationFilterParams = { per_page: 50 };
+      const response = await notificationService.getNotifications(filters);
       setNotifications(response.data.data.data);
     } catch (error) {
       toast.error("failedToLoadNotifications");
@@ -187,14 +184,14 @@ export default function NotificationPageClient() {
     const matchesStatus =
       statusFilter === "all" ||
       (statusFilter === "read" && notif.read_at) ||
-      (statusFilter === t("unreadCount") && !notif.read_at);
+      (statusFilter === "unread" && !notif.read_at);
 
     return matchesSearch && matchesStatus;
   });
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         <div className="lg:col-span-5">
           <NotificationList
             notifications={filteredNotifications}

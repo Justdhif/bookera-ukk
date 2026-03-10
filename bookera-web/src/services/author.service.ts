@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
-import { Author } from "@/types/author";
+import { Author, AuthorListResponse } from "@/types/author";
 
 export interface CreateAuthorData {
   name: string;
@@ -24,14 +24,14 @@ export interface AuthorFilterParams {
 }
 
 export const authorService = {
-  getAll: () =>
-    api.get<ApiResponse<Author[]>>("/authors"),
+  getAll: () => api.get<ApiResponse<Author[]>>("/authors"),
 
   getAdminList: (filters?: AuthorFilterParams) =>
-    api.get<ApiResponse<any>>("/admin/authors", { params: filters }),
+    api.get<ApiResponse<AuthorListResponse>>("/admin/authors", {
+      params: filters,
+    }),
 
-  show: (id: number) =>
-    api.get<ApiResponse<Author>>(`/authors/${id}`),
+  show: (id: number) => api.get<ApiResponse<Author>>(`/authors/${id}`),
 
   create: (data: CreateAuthorData) => {
     const formData = new FormData();

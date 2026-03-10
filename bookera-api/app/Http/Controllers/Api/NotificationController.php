@@ -23,7 +23,8 @@ class NotificationController extends Controller
         $notifications = $this->notificationService->getUserNotifications(
             $request->user(),
             $request->get('filter'),
-            $request->get('per_page', 15)
+            $request->get('per_page', 15),
+            $request->get('module')
         );
 
         return ApiResponse::successResponse('Notifications retrieved successfully', $notifications);

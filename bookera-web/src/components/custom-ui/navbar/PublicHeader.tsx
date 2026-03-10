@@ -117,7 +117,8 @@ export default function PublicHeader() {
                 <Link href="/login">
                   <Button
                     size="sm"
-                    className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 md:px-8 h-8 md:h-10 text-sm md:text-base"
+                    variant="brand"
+                    className="rounded-full px-4 md:px-8 h-8 md:h-10 text-sm md:text-base"
                   >
                     {t("login")}
                   </Button>

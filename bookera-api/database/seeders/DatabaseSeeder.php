@@ -19,16 +19,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             CategorySeeder::class,
-            AuthorSeeder::class,
-            PublisherSeeder::class,
-            BookSeeder::class,
-            BookCopySeeder::class,
-            FineTypeSeeder::class,
-            BorrowSeeder::class,
-            BookReturnSeeder::class,
-            TermsOfServiceSeeder::class,
-            PrivacyPolicySeeder::class,
-            FollowSeeder::class,
         ]);
     }
 }

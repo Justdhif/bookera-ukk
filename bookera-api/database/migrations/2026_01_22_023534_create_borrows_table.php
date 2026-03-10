@@ -14,12 +14,15 @@ return new class extends Migration
         Schema::create('borrows', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('borrow_request_id')
+                ->nullable()
+                ->constrained('borrow_requests')
+                ->nullOnDelete();
             $table->string('borrow_code')->unique();
             $table->string('qr_code_path')->nullable();
             $table->date('borrow_date');
             $table->date('return_date');
             $table->enum('status', ['open', 'close'])->default('open');
-            $table->enum('approval_status', ['pending', 'approved', 'rejected', 'partial'])->default('pending');
             $table->timestamps();
         });
     }

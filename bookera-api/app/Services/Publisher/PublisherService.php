@@ -112,6 +112,10 @@ class PublisherService
 
     public function deletePublisher(Publisher $publisher): array
     {
+        if ($publisher->books()->count() > 0) {
+            throw new \Exception('Tidak dapat menghapus penerbit yang masih memiliki buku. Hapus atau pindahkan buku terlebih dahulu.', 422);
+        }
+
         $deletedPublisherId = $publisher->id;
         $publisherData = $publisher->toArray();
         $publisherName = $publisher->name;

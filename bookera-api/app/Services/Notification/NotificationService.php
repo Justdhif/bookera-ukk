@@ -8,7 +8,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class NotificationService
 {
-    public function getUserNotifications(User $user, ?string $filter = null, int $perPage = 15): LengthAwarePaginator
+    public function getUserNotifications(User $user, ?string $filter = null, int $perPage = 15, ?string $module = null): LengthAwarePaginator
     {
         $query = Notification::where('user_id', $user->id)->latest()->orderByDesc('id');
 
@@ -16,6 +16,10 @@ class NotificationService
             $query->whereNull('read_at');
         } elseif ($filter === 'read') {
             $query->whereNotNull('read_at');
+        }
+
+        if ($module !== null) {
+            $query->where('module', $module);
         }
 
         return $query->paginate($perPage);

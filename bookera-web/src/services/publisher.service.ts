@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
-import { Publisher } from "@/types/publisher";
+import { Publisher, PublisherListResponse } from "@/types/publisher";
 
 export interface CreatePublisherData {
   name: string;
@@ -24,14 +24,14 @@ export interface PublisherFilterParams {
 }
 
 export const publisherService = {
-  getAll: () =>
-    api.get<ApiResponse<Publisher[]>>("/publishers"),
+  getAll: () => api.get<ApiResponse<Publisher[]>>("/publishers"),
 
   getAdminList: (filters?: PublisherFilterParams) =>
-    api.get<ApiResponse<any>>("/admin/publishers", { params: filters }),
+    api.get<ApiResponse<PublisherListResponse>>("/admin/publishers", {
+      params: filters,
+    }),
 
-  show: (id: number) =>
-    api.get<ApiResponse<Publisher>>(`/publishers/${id}`),
+  show: (id: number) => api.get<ApiResponse<Publisher>>(`/publishers/${id}`),
 
   create: (data: CreatePublisherData) => {
     const formData = new FormData();

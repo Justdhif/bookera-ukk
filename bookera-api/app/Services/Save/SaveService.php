@@ -128,6 +128,10 @@ class SaveService
 
     public function deleteSave(Save $save): void
     {
+        if ($save->books()->count() > 0) {
+            throw new \Exception('Tidak dapat menghapus save yang masih memiliki buku. Hapus semua buku terlebih dahulu.', 422);
+        }
+
         $saveName = $save->name;
         $oldData = $save->toArray();
 

@@ -1,4 +1,5 @@
 import { Book } from "./book";
+import { PaginatedResponse } from "./api";
 
 export interface Save {
   id: number;
@@ -30,22 +31,4 @@ export interface SaveFormData {
   description?: string;
 }
 
-export interface PaginatedSaveResponse {
-  current_page: number;
-  data: SaveListItem[];
-  first_page_url: string;
-  from: number;
-  last_page: number;
-  last_page_url: string;
-  links: Array<{
-    url: string | null;
-    label: string;
-    active: boolean;
-  }>;
-  next_page_url: string | null;
-  path: string;
-  per_page: number;
-  prev_page_url: string | null;
-  to: number;
-  total: number;
-}
+export type PaginatedSaveResponse = PaginatedResponse<SaveListItem>;
