@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Models\User;
+use App\Services\FonnteService;
 use App\Services\NotificationService;
 use Illuminate\Support\Facades\Mail;
 
@@ -70,6 +71,8 @@ class SendBorrowNotification
         if ($event instanceof \App\Events\BorrowRequestApproved) {
             $borrowRequest = $event->borrowRequest;
             $borrow        = $event->borrow;
+            $user          = $borrowRequest->user;
+            $profile       = $user->profile;
 
             NotificationService::send(
                 $borrowRequest->user_id,
@@ -80,18 +83,50 @@ class SendBorrowNotification
                 ['request_id' => $borrowRequest->id, 'borrow_code' => $borrow->borrow_code]
             );
 
-            // Send email notification to the user
-            try {
-                Mail::to($borrowRequest->user->email)
-                    ->send(new \App\Mail\BorrowRequestApprovedMail($borrowRequest, $borrow));
-            } catch (\Exception $e) {
-                \Log::error('Failed to send borrow approval email: ' . $e->getMessage());
+            if ($profile && $profile->notification_enabled) {
+                $bookList = $borrowRequest->borrowRequestDetails->map(function ($detail) {
+                    return '  • ' . ($detail->book->title ?? 'Unknown');
+                })->implode("\n");
+
+                $message = "🎉 *BOOKERA — Peminjaman Disetujui!*\n"
+                    . "━━━━━━━━━━━━━━━━━━━━\n\n"
+                    . "Halo, *{$profile->full_name}*! 👋\n\n"
+                    . "Permintaan peminjaman Anda telah *disetujui* oleh petugas perpustakaan.\n\n"
+                    . "📋 *Detail Peminjaman:*\n"
+                    . "  🔖 No. Request   : #" . $borrowRequest->id . "\n"
+                    . "  🎫 Kode Pinjam   : *" . $borrow->borrow_code . "*\n"
+                    . "  📅 Tanggal Ambil : " . \Carbon\Carbon::parse($borrowRequest->borrow_date)->format('d M Y') . "\n"
+                    . "  🔄 Batas Kembali : " . \Carbon\Carbon::parse($borrowRequest->return_date)->format('d M Y') . "\n\n"
+                    . "📚 *Buku yang Dipinjam:*\n"
+                    . $bookList . "\n\n"
+                    . "━━━━━━━━━━━━━━━━━━━━\n"
+                    . "⚠️ Tunjukkan *kode pinjam* kepada petugas saat mengambil buku.\n\n"
+                    . "_Bookera — Perpustakaan Digital_";
+
+                if ($profile->notification_email) {
+                    try {
+                        Mail::to($user->email)
+                            ->send(new \App\Mail\BorrowRequestApprovedMail($borrowRequest, $borrow));
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send borrow approval email: ' . $e->getMessage());
+                    }
+                }
+
+                if ($profile->notification_whatsapp && $profile->phone_number) {
+                    try {
+                        (new FonnteService())->send($profile->phone_number, $message);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send borrow approval WhatsApp: ' . $e->getMessage());
+                    }
+                }
             }
         }
 
         // ── Borrow request rejected ────────────────────────────────────────────
         if ($event instanceof \App\Events\BorrowRequestRejected) {
             $borrowRequest = $event->borrowRequest;
+            $user          = $borrowRequest->user;
+            $profile       = $user->profile;
 
             $reason = $borrowRequest->reject_reason ? (' Reason: ' . $borrowRequest->reject_reason) : '';
 
@@ -104,12 +139,42 @@ class SendBorrowNotification
                 ['request_id' => $borrowRequest->id, 'reject_reason' => $borrowRequest->reject_reason]
             );
 
-            // Send email notification to the user
-            try {
-                Mail::to($borrowRequest->user->email)
-                    ->send(new \App\Mail\BorrowRequestRejectedMail($borrowRequest));
-            } catch (\Exception $e) {
-                \Log::error('Failed to send borrow rejection email: ' . $e->getMessage());
+            if ($profile && $profile->notification_enabled) {
+                $bookList = $borrowRequest->borrowRequestDetails->map(function ($detail) {
+                    return '  • ' . ($detail->book->title ?? 'Unknown');
+                })->implode("\n");
+
+                $reasonText = $borrowRequest->reject_reason
+                    ? "📝 *Alasan Penolakan:*\n  " . $borrowRequest->reject_reason . "\n\n"
+                    : '';
+
+                $message = "❌ *BOOKERA — Peminjaman Ditolak*\n"
+                    . "━━━━━━━━━━━━━━━━━━━━\n\n"
+                    . "Halo, *{$profile->full_name}*! 👋\n\n"
+                    . "Mohon maaf, permintaan peminjaman *#" . $borrowRequest->id . "* tidak dapat diproses.\n\n"
+                    . "📚 *Buku yang Diminta:*\n"
+                    . $bookList . "\n\n"
+                    . $reasonText
+                    . "💡 Anda dapat mengajukan permintaan baru dengan memilih buku yang tersedia.\n\n"
+                    . "━━━━━━━━━━━━━━━━━━━━\n"
+                    . "_Bookera — Perpustakaan Digital_";
+
+                if ($profile->notification_email) {
+                    try {
+                        Mail::to($user->email)
+                            ->send(new \App\Mail\BorrowRequestRejectedMail($borrowRequest));
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send borrow rejection email: ' . $e->getMessage());
+                    }
+                }
+
+                if ($profile->notification_whatsapp && $profile->phone_number) {
+                    try {
+                        (new FonnteService())->send($profile->phone_number, $message);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send borrow rejection WhatsApp: ' . $e->getMessage());
+                    }
+                }
             }
         }
 

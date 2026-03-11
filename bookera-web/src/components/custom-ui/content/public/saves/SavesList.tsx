@@ -19,10 +19,11 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import SidebarLoadingSkeletons from "./saves-list/SidebarLoadingSkeletons";
-import SidebarEmptyState from "./saves-list/SidebarEmptyState";
+import EmptyState from "@/components/custom-ui/EmptyState";
 import SidebarSaveItem from "./saves-list/SidebarSaveItem";
 import CollapsedSaveItem from "./saves-list/CollapsedSaveItem";
 import CreateCollectionDialog from "./saves-list/CreateCollectionDialog";
+import SidebarEmptyState from "./saves-list/SidebarEmptyState";
 
 interface SavesListProps {
   mode?: "sidebar" | "horizontal";
@@ -137,25 +138,15 @@ export default function SavesList({
     }
 
     return (
-      <div className="h-full flex flex-col justify-center items-center px-5 py-10 text-center">
-        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-primary/10 dark:bg-brand-primary/15 ring-1 ring-brand-primary/20 dark:ring-brand-primary/25">
-          <BookMarked className="h-8 w-8 text-brand-primary dark:text-brand-primary-light" />
-        </div>
-        <h4 className="font-semibold text-foreground dark:text-white mb-1 text-sm">
-          {t("loginRequired")}
-        </h4>
-        <p className="text-xs text-muted-foreground dark:text-white/60 mb-5 leading-relaxed">
-          {t("loginRequiredDesc")}
-        </p>
-        <Link
-          href="/login"
-          className="inline-flex gap-2 items-center bg-brand-primary hover:bg-brand-primary-dark text-white rounded-xl px-6 h-9 text-sm font-semibold shadow-sm shadow-brand-primary/20"
-        >
-          <LogIn className="h-3.5 w-3.5" />
-
-          {t("loginToContinue")}
-        </Link>
-      </div>
+      <EmptyState
+        variant="compact"
+        icon={<BookMarked className="h-8 w-8" />}
+        title={t("loginRequired")}
+        description={t("loginRequiredDesc")}
+        linkLabel={t("loginToContinue")}
+        linkHref="/login"
+        className="h-full px-5 py-10"
+      />
     );
   }
 
@@ -193,19 +184,13 @@ export default function SavesList({
               ))}
             </div>
           ) : saves.length === 0 ? (
-            <Card className="p-3 md:p-4">
-              <div className="text-center text-xs md:text-sm text-muted-foreground">
-                <p>{t("noCollections")}</p>
-                <Button
-                  variant="link"
-                  size="sm"
-                  className="mt-1 h-auto p-0 text-xs md:text-sm text-brand-primary hover:text-brand-primary-dark"
-                  onClick={() => setShowCreateDialog(true)}
-                >
-                  {t("createFirst")}
-                </Button>
-              </div>
-            </Card>
+            <EmptyState
+              variant="compact"
+              icon={<BookMarked className="h-5 w-5" />}
+              title={t("noCollections")}
+              actionLabel={t("createFirst")}
+              onAction={() => setShowCreateDialog(true)}
+            />
           ) : (
             <ScrollArea className="w-full">
               <div className="flex gap-2 md:gap-3 pb-2 -mx-4 px-4 md:mx-0 md:px-0">

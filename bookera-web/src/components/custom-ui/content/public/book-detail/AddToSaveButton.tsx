@@ -21,6 +21,7 @@ import { BookMarked, Plus, Loader2, Check } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import EmptyState from "@/components/custom-ui/EmptyState";
 
 interface AddToSaveButtonProps {
   bookId: number;
@@ -153,18 +154,13 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
                       <span className="text-sm">{t("loadingCollections")}</span>
                     </div>
                   ) : saves.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <BookMarked className="h-12 w-12 mx-auto mb-2 opacity-30" />
-                      <p className="text-sm">{t("noCollections")}</p>
-                      <Button
-                        variant="link"
-                        size="sm"
-                        onClick={() => setShowCreateNew(true)}
-                        className="mt-2"
-                      >
-                        {t("createFirst")}
-                      </Button>
-                    </div>
+                    <EmptyState
+                      variant="compact"
+                      icon={<BookMarked className="h-5 w-5" />}
+                      title={t("noCollections")}
+                      actionLabel={t("createFirst")}
+                      onAction={() => setShowCreateNew(true)}
+                    />
                   ) : (
                     saves.map((save) => {
                       const isSelected = selectedSaveIds.includes(save.id);

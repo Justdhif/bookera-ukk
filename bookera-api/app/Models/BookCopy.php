@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,6 +18,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class BookCopy extends Model
 {
+    /** @use HasFactory<\Database\Factories\BookCopyFactory> */
+    use HasFactory;
     protected $table = 'book_copies';
 
     protected $fillable = [

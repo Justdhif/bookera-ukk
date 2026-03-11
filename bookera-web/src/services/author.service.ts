@@ -5,14 +5,14 @@ import { Author, AuthorListResponse } from "@/types/author";
 export interface CreateAuthorData {
   name: string;
   bio?: string;
-  photo: File;
+  photo?: File | null;
   is_active?: boolean;
 }
 
 export interface UpdateAuthorData {
   name: string;
   bio?: string;
-  photo?: File;
+  photo?: File | null;
   is_active?: boolean;
 }
 
@@ -37,7 +37,7 @@ export const authorService = {
     const formData = new FormData();
     formData.append("name", data.name);
     if (data.bio) formData.append("bio", data.bio);
-    formData.append("photo", data.photo);
+    if (data.photo instanceof File) formData.append("photo", data.photo);
     if (data.is_active !== undefined) {
       formData.append("is_active", data.is_active ? "1" : "0");
     }

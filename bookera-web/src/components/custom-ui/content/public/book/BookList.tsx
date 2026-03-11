@@ -21,7 +21,7 @@ const variants = {
 };
 
 export default function BookList({ books, loading }: Props) {
-    const t = useTranslations("public");
+  const t = useTranslations("public");
   const [page, setPage] = useState(0);
   const direction = useRef(0);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -50,7 +50,10 @@ export default function BookList({ books, loading }: Props) {
   }
 
   const totalPages = Math.ceil(books.length / itemsPerPage);
-  const visibleBooks = books.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
+  const visibleBooks = books.slice(
+    page * itemsPerPage,
+    (page + 1) * itemsPerPage,
+  );
 
   const goNext = () => {
     if (page < totalPages - 1) {

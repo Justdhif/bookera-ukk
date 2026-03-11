@@ -1,29 +1,23 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
 import { authService } from "@/services/auth.service";
 import { userService, UpdateUserData } from "@/services/user.service";
 import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save, X, Edit, User as UserIcon } from "lucide-react";
-import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import UserSideCard from "../admin/user/UserSideCard";
-import UserProfileForm from "../admin/user/UserProfileForm";
+import { X, Edit, CircleUser } from "lucide-react";
+import { toast } from "sonner";
+import AvatarUploadModal from "@/components/custom-ui/content/admin/user/AvatarUploadModal";
+import ProfileLeftCard from "./ProfileLeftCard";
+import ProfileRightCard from "./ProfileRightCard";
 
-type ProfileVariant = "public" | "admin";
-
-interface ProfileDetailClientProps {
-  variant: ProfileVariant;
-}
-
-export default function ProfileDetailClient({
-  variant,
-}: ProfileDetailClientProps) {
+export default function ProfileClient() {
   const router = useRouter();
   const t = useTranslations("profile");
+
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -31,14 +25,13 @@ export default function ProfileDetailClient({
   const [avatarPreview, setAvatarPreview] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [isFullNameValid, setIsFullNameValid] = useState(true);
-
-  const backHref = variant === "admin" ? "/admin/users" : "/";
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
   const fetchUser = async () => {
     try {
       setLoading(true);
       const res = await authService.me();
-      const userData = res.data.data.user;
+      const userData: User = res.data.data.user;
       setUser(userData);
       setFormData({
         email: userData.email,
@@ -55,14 +48,14 @@ export default function ProfileDetailClient({
         occupation: userData.profile.occupation || undefined,
         institution: userData.profile.institution || undefined,
       });
-      setAvatarPreview(userData.profile.avatar);
+      setAvatarPreview(
+        userData.profile.avatar_url || userData.profile.avatar || "",
+      );
+      return userData;
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to load users");
-      if (error.response?.status === 401 && variant === "public") {
-        router.push("/login");
-      } else {
-        router.push(variant === "admin" ? "/admin" : "/");
-      }
+      toast.error(error.response?.data?.message || t("failedLoad"));
+      router.push("/");
+      return null;
     } finally {
       setLoading(false);
     }
@@ -76,12 +69,8 @@ export default function ProfileDetailClient({
     e.preventDefault();
     if (!user) return;
 
-    if (
-      !formData.email?.trim() ||
-      !formData.full_name?.trim() ||
-      !formData.role
-    ) {
-      toast.error(t("requiredFields"));
+    if (!formData.full_name?.trim()) {
+      toast.error(t("fullNameRequired"));
       return;
     }
 
@@ -92,7 +81,7 @@ export default function ProfileDetailClient({
       setIsEditMode(false);
       fetchUser();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to update user");
+      toast.error(error.response?.data?.message || t("failedUpdate"));
     } finally {
       setSubmitting(false);
     }
@@ -114,24 +103,32 @@ export default function ProfileDetailClient({
         occupation: user.profile.occupation || undefined,
         institution: user.profile.institution || undefined,
       });
-      setAvatarPreview(user.profile.avatar);
+      setAvatarPreview(
+        user.profile.avatar_url || user.profile.avatar || "",
+      );
     }
     setIsEditMode(false);
   };
 
+  const handleAvatarChange = (avatar: string | File) => {
+    if (typeof avatar === "string") {
+      setAvatarPreview(avatar);
+      setFormData((prev) => ({ ...prev, avatar }));
+    } else {
+      setFormData((prev) => ({ ...prev, avatar }));
+      const reader = new FileReader();
+      reader.onloadend = () => setAvatarPreview(reader.result as string);
+      reader.readAsDataURL(avatar);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div className="flex items-center gap-4">
-          {variant === "public" ? (
-            <Button variant="ghost" size="icon" onClick={() => router.back()}>
-              <ArrowLeft className="h-8 w-8" />
-            </Button>
-          ) : (
-            <div className="p-2 bg-brand-primary rounded-lg">
-              <UserIcon className="h-8 w-8 text-white" />
-            </div>
-          )}
+          <div className="p-2 bg-brand-primary rounded-lg">
+            <CircleUser className="h-8 w-8 text-white" />
+          </div>
           <div>
             <h1 className="text-3xl font-bold">{t("myProfile")}</h1>
             {loading ? (
@@ -139,12 +136,8 @@ export default function ProfileDetailClient({
             ) : (
               <p className="text-muted-foreground">
                 {isEditMode
-                  ? t("editProfileDescription", {
-                      name: user?.profile.full_name ?? "",
-                    })
-                  : t("viewProfileDescription", {
-                      name: user?.profile.full_name ?? "",
-                    })}
+                  ? t("editProfileDescription", { name: user?.profile.full_name ?? "" })
+                  : t("viewProfileDescription", { name: user?.profile.full_name ?? "" })}
               </p>
             )}
           </div>
@@ -159,23 +152,17 @@ export default function ProfileDetailClient({
               className="h-8"
             >
               <X className="h-3.5 w-3.5 mr-1.5" />
-              {"Cancel"}
+              {t("cancelEdit")}
             </Button>
             <Button
               type="submit"
               form="profile-form"
               variant="submit"
-              disabled={
-                submitting ||
-                !formData.email?.trim() ||
-                !formData.full_name?.trim() ||
-                !formData.role ||
-                !isFullNameValid
-              }
+              disabled={submitting || !formData.full_name?.trim() || !isFullNameValid}
               loading={submitting}
               className="h-8"
             >
-              {submitting ? "Saving..." : "Save Changes"}
+              {submitting ? t("saving") : t("saveChanges")}
             </Button>
           </div>
         ) : (
@@ -186,7 +173,7 @@ export default function ProfileDetailClient({
             disabled={loading}
           >
             <Edit className="h-3.5 w-3.5" />
-            {"Edit User"}
+            {t("editProfile")}
           </Button>
         )}
       </div>
@@ -200,29 +187,34 @@ export default function ProfileDetailClient({
         user && (
           <form id="profile-form" onSubmit={handleSubmit}>
             <div className="grid gap-6 lg:grid-cols-3">
-              <div className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
-                <UserSideCard
-                  mode="detail"
+              <div className="lg:col-span-1 lg:self-start lg:sticky lg:top-4 space-y-4">
+                <ProfileLeftCard
                   user={user}
                   avatarPreview={avatarPreview}
                   isEditMode={isEditMode}
-                  formData={formData}
-                  setFormData={setFormData}
-                  setAvatarPreview={setAvatarPreview}
+                  onOpenAvatarModal={() => setAvatarModalOpen(true)}
                 />
               </div>
 
-              <UserProfileForm
-                user={user}
+              <ProfileRightCard
                 isEditMode={isEditMode}
                 formData={formData}
                 setFormData={setFormData}
-                onFullNameValidChange={setIsFullNameValid}
-                hideAccount={true}
+                setIsFullNameValid={setIsFullNameValid}
               />
             </div>
           </form>
         )
+      )}
+
+      {user && (
+        <AvatarUploadModal
+          open={avatarModalOpen}
+          onOpenChange={setAvatarModalOpen}
+          currentAvatar={avatarPreview}
+          onSave={handleAvatarChange}
+          userName={user.profile.full_name}
+        />
       )}
     </div>
   );

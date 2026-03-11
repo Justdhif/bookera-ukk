@@ -12,18 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { authorService } from "@/services/author.service";
+import { authorService, CreateAuthorData } from "@/services/author.service";
 import { toast } from "sonner";
 import { FileWarning, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 
-interface FormData {
-  name: string;
-  bio: string;
-  is_active: boolean;
-}
 
 export default function AuthorFormDialog({
   open,
@@ -36,12 +31,12 @@ export default function AuthorFormDialog({
 }) {
   const t = useTranslations("author");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<CreateAuthorData>({
     name: "",
     bio: "",
     is_active: true,
+    photo: null,
   });
-  const [photoImage, setPhotoImage] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
@@ -49,8 +44,7 @@ export default function AuthorFormDialog({
 
   useEffect(() => {
     if (!open) {
-      setFormData({ name: "", bio: "", is_active: true });
-      setPhotoImage(null);
+      setFormData({ name: "", bio: "", is_active: true, photo: null });
       setPhotoPreview("");
       setPhotoError(null);
       setIsDragging(false);
@@ -83,7 +77,7 @@ export default function AuthorFormDialog({
       return;
     }
     setPhotoError(null);
-    setPhotoImage(file);
+    setFormData((prev) => ({ ...prev, photo: file }));
     const reader = new FileReader();
     reader.onloadend = () => setPhotoPreview(reader.result as string);
     reader.readAsDataURL(file);
@@ -95,28 +89,23 @@ export default function AuthorFormDialog({
   };
 
   const handleRemovePhoto = () => {
-    setPhotoImage(null);
+    setFormData((prev) => ({ ...prev, photo: null }));
     setPhotoPreview("");
     setPhotoError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const isSubmitDisabled = () =>
-    isLoading || !formData.name.trim() || !photoImage;
+    isLoading || !formData.name.trim() || !formData.photo;
 
   const handleSubmit = async () => {
-    if (!photoImage) {
+    if (!formData.photo) {
       toast.error(t("photoRequired"));
       return;
     }
     setIsLoading(true);
     try {
-      await authorService.create({
-        name: formData.name,
-        bio: formData.bio || undefined,
-        photo: photoImage,
-        is_active: formData.is_active,
-      });
+      await authorService.create(formData);
       toast.success(t("addSuccess"));
       setOpen(false);
       onSuccess();

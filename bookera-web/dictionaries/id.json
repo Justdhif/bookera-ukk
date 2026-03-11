@@ -443,7 +443,20 @@
     "success": "Berhasil",
     "error": "Kesalahan",
     "warning": "Peringatan",
-    "info": "Informasi"
+    "info": "Informasi",
+    "logoutTitle": "Konfirmasi Keluar",
+    "logoutDesc": "Apakah Anda yakin ingin keluar? Anda perlu masuk kembali untuk mengakses akun Anda.",
+    "loggingOut": "Sedang keluar..."
+  },
+  "borrowStatus": {
+    "open": "Aktif",
+    "close": "Selesai"
+  },
+  "bookCopyStatus": {
+    "available": "Tersedia",
+    "borrowed": "Dipinjam",
+    "lost": "Hilang",
+    "damaged": "Rusak"
   },
   "sidebar": {
     "admin": "Admin",
@@ -467,7 +480,10 @@
     "publishers": "Penerbit",
     "borrows": "Peminjaman",
     "signIn": "Masuk",
-    "signInToAccess": "Masuk untuk melanjutkan"
+    "signInToAccess": "Masuk untuk melanjutkan",
+    "account": "Akun",
+    "accountSettings": "Pengaturan Akun",
+    "back": "Kembali"
   },
   "navbar": {
     "notifications": "Notifikasi",
@@ -489,7 +505,10 @@
     "profile": "Profil",
     "logout": "Keluar",
     "bookSearchPlaceholder": "Cari judul, penulis, atau ISBN...",
-    "role": "Peran"
+    "role": "Peran",
+    "myBorrows": "Peminjaman Saya",
+    "myFines": "Denda Saya",
+    "myPosts": "Postingan Saya"
   },
   "modal": {},
   "forgot-password": {
@@ -601,7 +620,57 @@
     "updateSuccess": "Pengguna berhasil diperbarui",
     "requiredFields": "Harap lengkapi semua kolom yang wajib diisi",
     "editProfileDescription": "Edit profil {name}",
-    "viewProfileDescription": "Lihat profil {name}"
+    "viewProfileDescription": "Lihat profil {name}",
+    "editProfile": "Edit Profil",
+    "cancelEdit": "Batal",
+    "saveChanges": "Simpan Perubahan",
+    "saving": "Menyimpan...",
+    "failedLoad": "Gagal memuat profil",
+    "failedUpdate": "Gagal memperbarui profil",
+    "fullNameRequired": "Harap masukkan nama lengkap Anda",
+    "profilePhoto": "Foto Profil",
+    "uploadYourPicture": "Unggah foto profil Anda",
+    "yourProfilePhoto": "Foto profil Anda",
+    "active": "Aktif",
+    "inactive": "Tidak Aktif",
+    "idLabel": "ID",
+    "profileInformation": "Informasi Profil",
+    "editProfileDetails": "Edit detail profil Anda",
+    "viewProfileDetails": "Detail profil lengkap Anda",
+    "accountSection": "Akun",
+    "emailLabel": "Email",
+    "emailCannotChange": "Email tidak dapat diubah di sini",
+    "phoneNumberLabel": "Nomor Telepon",
+    "phoneCannotChange": "Nomor telepon tidak dapat diubah di sini",
+    "personalDetails": "Detail Pribadi",
+    "fullNameLabel": "Nama Lengkap",
+    "fullNamePlaceholder": "Masukkan nama lengkap Anda",
+    "identificationNumberLabel": "Nomor Identitas",
+    "idNumberPlaceholder": "Masukkan nomor identitas",
+    "genderLabel": "Jenis Kelamin",
+    "selectGender": "Pilih jenis kelamin",
+    "male": "Laki-laki",
+    "female": "Perempuan",
+    "preferNotToSay": "Tidak ingin menyebutkan",
+    "birthDateLabel": "Tanggal Lahir",
+    "selectBirthDate": "Pilih tanggal lahir",
+    "occupationLabel": "Pekerjaan",
+    "occupationPlaceholder": "Masukkan pekerjaan",
+    "institutionLabel": "Institusi",
+    "institutionPlaceholder": "Masukkan institusi",
+    "addressLabel": "Alamat",
+    "addressPlaceholder": "Masukkan alamat lengkap",
+    "bioLabel": "Bio",
+    "bioPlaceholder": "Ceritakan sesuatu tentang diri Anda",
+    "roleAdmin": "Admin",
+    "roleCatalogOfficer": "Petugas Katalog",
+    "roleManagementOfficer": "Petugas Manajemen",
+    "roleUser": "Pengguna",
+    "myPosts": "Postingan Saya",
+    "myPostsDesc": "Lihat dan kelola postingan diskusi Anda",
+    "noPosts": "Belum Ada Postingan",
+    "noPostsDesc": "Anda belum membuat postingan apapun.",
+    "loadMore": "Muat Lebih Banyak"
   },
   "public": {
     "notFound": "Buku tidak ditemukan",
@@ -800,7 +869,10 @@
     "notesLabel": "Catatan",
     "waivedLabel": "Dibebaskan",
     "returnDateLabel": "Tanggal Kembali",
-    "following": "Mengikuti"
+    "following": "Mengikuti",
+    "reportLostConfirmDesc": "Apakah Anda yakin ingin melaporkan buku ini sebagai hilang? Tindakan ini tidak dapat dibatalkan dan denda mungkin akan dikenakan.",
+    "reportLostConfirmBtn": "Ya, Laporkan Hilang",
+    "reportingBtn": "Melaporkan..."
   },
   "settings": {
     "title": "Pengaturan",
@@ -831,7 +903,23 @@
     "autoLoopActive": "Putar ulang otomatis aktif",
     "musicDisabledHint": "Musik latar saat ini dinonaktifkan",
     "enableMusicHint": "Klik \"Aktifkan Musik\" untuk mulai memutar musik latar",
-    "musicAutoPlayHint": "Musik otomatis diputar saat halaman dibuka — mulai pada interaksi pertama jika browser memerlukan izin"
+    "musicAutoPlayHint": "Musik otomatis diputar saat halaman dibuka — mulai pada interaksi pertama jika browser memerlukan izin",
+    "notificationTitle": "Notifikasi",
+    "notificationDescription": "Pilih cara Anda menerima notifikasi dari Bookera",
+    "notificationEnabled": "Aktifkan Notifikasi",
+    "notificationEnabledDescription": "Terima notifikasi tentang peminjaman, pengembalian, dan denda Anda",
+    "notificationChannels": "Saluran notifikasi",
+    "notificationEmail": "Email",
+    "notificationEmailDescription": "Terima notifikasi langsung ke kotak masuk email Anda",
+    "notificationWhatsapp": "WhatsApp",
+    "notificationWhatsappDescription": "Terima notifikasi melalui WhatsApp ke nomor telepon terdaftar Anda",
+    "notificationWhatsappNoPhone": "Harap isi nomor telepon Anda terlebih dahulu untuk mengaktifkan notifikasi WhatsApp.",
+    "notificationWhatsappGoToProfile": "Ke Profil",
+    "notificationUpdated": "Pengaturan notifikasi berhasil disimpan",
+    "notificationUpdateFailed": "Gagal menyimpan pengaturan notifikasi",
+    "saveChanges": "Simpan Perubahan",
+    "saving": "Menyimpan...",
+    "loading": "Memuat..."
   },
   "setup-profile": {
     "fullNameRequired": "Nama lengkap wajib diisi",

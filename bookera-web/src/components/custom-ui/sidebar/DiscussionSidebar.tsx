@@ -75,7 +75,7 @@ export default function DiscussionSidebar() {
       exact: false,
     },
     {
-      href: "/discussion/notifications",
+      href: "/notifications",
       icon: Bell,
       label: t("navNotifications"),
       exact: false,

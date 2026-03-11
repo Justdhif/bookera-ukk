@@ -5,14 +5,14 @@ import { Publisher, PublisherListResponse } from "@/types/publisher";
 export interface CreatePublisherData {
   name: string;
   description?: string;
-  photo: File;
+  photo?: File | null;
   is_active?: boolean;
 }
 
 export interface UpdatePublisherData {
   name: string;
   description?: string;
-  photo?: File;
+  photo?: File | null;
   is_active?: boolean;
 }
 
@@ -37,7 +37,7 @@ export const publisherService = {
     const formData = new FormData();
     formData.append("name", data.name);
     if (data.description) formData.append("description", data.description);
-    formData.append("photo", data.photo);
+    if (data.photo instanceof File) formData.append("photo", data.photo);
     if (data.is_active !== undefined) {
       formData.append("is_active", data.is_active ? "1" : "0");
     }

@@ -10,6 +10,16 @@ import {
   FollowCounts,
 } from "@/types/discussion";
 
+export interface CreatePostData {
+  caption?: string;
+  images?: File[];
+}
+
+export interface UpdatePostData {
+  caption?: string;
+  images?: File[];
+}
+
 export const discussionPostService = {
   getPosts: (params?: { per_page?: number; page?: number }) =>
     api.get<ApiResponse<DiscussionPostListResponse>>("/discussion-posts", {
@@ -34,16 +44,24 @@ export const discussionPostService = {
       { params },
     ),
 
-  createPost: (data: FormData) =>
-    api.post<ApiResponse<DiscussionPost>>("/discussion-posts", data, {
+  createPost: (data: CreatePostData) => {
+    const formData = new FormData();
+    if (data.caption) formData.append("caption", data.caption);
+    data.images?.forEach((f) => formData.append("images[]", f));
+    return api.post<ApiResponse<DiscussionPost>>("/discussion-posts", formData, {
       headers: { "Content-Type": "multipart/form-data" },
-    }),
+    });
+  },
 
-  updatePost: (slug: string, data: FormData) =>
-    api.post<ApiResponse<DiscussionPost>>(`/discussion-posts/${slug}`, data, {
+  updatePost: (slug: string, data: UpdatePostData) => {
+    const formData = new FormData();
+    if (data.caption) formData.append("caption", data.caption);
+    data.images?.forEach((f) => formData.append("images[]", f));
+    return api.post<ApiResponse<DiscussionPost>>(`/discussion-posts/${slug}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
       params: { _method: "PUT" },
-    }),
+    });
+  },
 
   deletePost: (slug: string) =>
     api.delete<ApiResponse<null>>(`/discussion-posts/${slug}`),

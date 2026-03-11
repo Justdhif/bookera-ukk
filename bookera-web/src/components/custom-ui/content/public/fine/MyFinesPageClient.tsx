@@ -73,10 +73,13 @@ export default function MyFinesPageClient() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6 space-y-6">
-        <div className="space-y-1">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-5 w-64" />
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-12 w-12 rounded-lg" />
+          <div className="space-y-1">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-5 w-64" />
+          </div>
         </div>
         <div className="grid gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -97,12 +100,15 @@ export default function MyFinesPageClient() {
 
   if (fines.length === 0) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">{t("myFines")}</h1>
-          <p className="text-muted-foreground">
-            {t("viewAllFinesDesc")}
-          </p>
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <div className="p-2 bg-brand-primary rounded-lg">
+            <DollarSign className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">{t("myFines")}</h1>
+            <p className="text-muted-foreground">{t("viewAllFinesDesc")}</p>
+          </div>
         </div>
         <EmptyState
           icon={<DollarSign className="h-16 w-16" />}
@@ -114,12 +120,15 @@ export default function MyFinesPageClient() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">{t("myFines")}</h1>
-        <p className="text-muted-foreground">
-          {t("viewAllFinesDesc")}
-        </p>
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="p-2 bg-brand-primary rounded-lg">
+          <DollarSign className="h-8 w-8 text-white" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold">{t("myFines")}</h1>
+          <p className="text-muted-foreground">{t("viewAllFinesDesc")}</p>
+        </div>
       </div>
 
       <div className="grid gap-4">

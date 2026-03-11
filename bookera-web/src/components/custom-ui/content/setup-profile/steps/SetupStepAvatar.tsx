@@ -263,7 +263,7 @@ export default function SetupStepAvatar({
           <Label className="text-sm font-semibold text-gray-700 dark:text-gray-200">
             {t("defaultAvatars")}
           </Label>
-          <div className="grid grid-cols-6 gap-2">
+          <div className="flex justify-between gap-2">
             {DEFAULT_AVATARS.map((url) => {
               const isSelected = previewUrl === url;
               return (

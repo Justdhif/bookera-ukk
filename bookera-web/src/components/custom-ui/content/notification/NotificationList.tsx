@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { NotificationIconBadge, getModuleBadgeStyle } from "./notification-utils";
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/custom-ui/EmptyState";
 
 interface NotificationListProps {
   notifications: Notification[];
@@ -145,15 +146,12 @@ export default function NotificationList({
             <p className="text-sm text-muted-foreground">Loading...</p>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full gap-3 px-6 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/60">
-              <Bell className="h-7 w-7 text-muted-foreground/60" />
-            </div>
-            <div>
-              <p className="font-medium text-sm">{t("noNotifications")}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{t("noNotificationsMatch")}</p>
-            </div>
-          </div>
+          <EmptyState
+            icon={<Bell className="h-8 w-8" />}
+            title={t("noNotifications")}
+            description={t("noNotificationsMatch")}
+            className="h-full border-0"
+          />
         ) : (
           <div className="divide-y divide-border/50">
             {notifications.map((notif) => {

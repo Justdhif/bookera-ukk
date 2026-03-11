@@ -13,18 +13,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Author } from "@/types/author";
-import { authorService } from "@/services/author.service";
+import { authorService, UpdateAuthorData } from "@/services/author.service";
 import { toast } from "sonner";
 import { Edit, FileWarning, Save, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 
-interface FormData {
-  name: string;
-  bio: string;
-  is_active: boolean;
-}
 
 export default function AuthorDetailDialog({
   open,
@@ -40,12 +35,12 @@ export default function AuthorDetailDialog({
   const t = useTranslations("author");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<UpdateAuthorData>({
     name: "",
     bio: "",
     is_active: true,
+    photo: null,
   });
-  const [photoImage, setPhotoImage] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
@@ -57,11 +52,11 @@ export default function AuthorDetailDialog({
         name: author.name,
         bio: author.bio ?? "",
         is_active: author.is_active,
+        photo: null,
       });
       setPhotoPreview(author.photo_url ?? author.photo ?? "");
     }
     setIsEditMode(false);
-    setPhotoImage(null);
     setPhotoError(null);
     setIsDragging(false);
   }, [author, open]);
@@ -83,9 +78,9 @@ export default function AuthorDetailDialog({
         name: author.name,
         bio: author.bio ?? "",
         is_active: author.is_active,
+        photo: null,
       });
       setPhotoPreview(author.photo_url ?? author.photo ?? "");
-      setPhotoImage(null);
       setPhotoError(null);
       setIsDragging(false);
     }
@@ -107,7 +102,7 @@ export default function AuthorDetailDialog({
       return;
     }
     setPhotoError(null);
-    setPhotoImage(file);
+    setFormData((prev) => ({ ...prev, photo: file }));
     const reader = new FileReader();
     reader.onloadend = () => setPhotoPreview(reader.result as string);
     reader.readAsDataURL(file);
@@ -119,7 +114,7 @@ export default function AuthorDetailDialog({
   };
 
   const handleRemovePhoto = () => {
-    setPhotoImage(null);
+    setFormData((prev) => ({ ...prev, photo: null }));
     setPhotoPreview(author?.photo_url ?? author?.photo ?? "");
     setPhotoError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -133,15 +128,9 @@ export default function AuthorDetailDialog({
     }
     setIsLoading(true);
     try {
-      await authorService.update(author.id, {
-        name: formData.name,
-        bio: formData.bio || undefined,
-        photo: photoImage ?? undefined,
-        is_active: formData.is_active,
-      });
+      await authorService.update(author.id, formData);
       toast.success(t("updateSuccess"));
       setIsEditMode(false);
-      setPhotoImage(null);
       onSuccess();
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to update author");

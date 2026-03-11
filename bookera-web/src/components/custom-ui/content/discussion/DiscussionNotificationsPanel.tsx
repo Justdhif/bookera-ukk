@@ -13,6 +13,7 @@ import { Notification } from "@/types/notification";
 import { useAuthStore } from "@/store/auth.store";
 import { NotificationIconBadge } from "@/components/custom-ui/content/notification/notification-utils";
 import { useTranslations } from "next-intl";
+import EmptyState from "@/components/custom-ui/EmptyState";
 
 export default function DiscussionNotificationsPanel() {
   const { isAuthenticated } = useAuthStore();
@@ -137,17 +138,13 @@ export default function DiscussionNotificationsPanel() {
       {/* Body */}
       <div className="flex-1 overflow-y-auto scrollbar-hide">
         {!isAuthenticated ? (
-          <div className="flex flex-col items-center justify-center h-40 gap-3 px-4 text-center">
-            <Bell className="h-8 w-8 text-muted-foreground/40" />
-            <p className="text-sm text-muted-foreground">
-              {t("loginToViewDiscussion")}
-            </p>
-            <Link href="/login">
-              <Button size="sm" variant="outline">
-                {tD("signIn")}
-              </Button>
-            </Link>
-          </div>
+          <EmptyState
+            variant="compact"
+            icon={<Bell className="h-6 w-6" />}
+            title={t("loginToViewDiscussion")}
+            linkLabel={tD("signIn")}
+            linkHref="/login"
+          />
         ) : loading ? (
           <div className="p-4 space-y-3">
             {[1, 2, 3, 4].map((i) => (
@@ -161,12 +158,11 @@ export default function DiscussionNotificationsPanel() {
             ))}
           </div>
         ) : notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-40 gap-2 text-center px-4">
-            <Bell className="h-8 w-8 text-muted-foreground/40" />
-            <p className="text-sm text-muted-foreground">
-              {t("noDiscussionNotifications")}
-            </p>
-          </div>
+          <EmptyState
+            variant="compact"
+            icon={<Bell className="h-6 w-6" />}
+            title={t("noDiscussionNotifications")}
+          />
         ) : (
           <div className="divide-y divide-border/40">
             {notifications.map((notif) => (

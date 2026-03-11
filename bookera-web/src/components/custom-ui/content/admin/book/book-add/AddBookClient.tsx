@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useState, useEffect } from "react";
-import { bookService } from "@/services/book.service";
+import { bookService, CreateBookData } from "@/services/book.service";
 import { categoryService } from "@/services/category.service";
 import { authorService } from "@/services/author.service";
 import { publisherService } from "@/services/publisher.service";
@@ -19,22 +19,11 @@ import BookForm from "../BookForm";
 import AuthorFormDialog from "@/components/custom-ui/content/admin/author/author-add/AuthorFormDialog";
 import PublisherFormDialog from "@/components/custom-ui/content/admin/publisher/publisher-add/PublisherFormDialog";
 
-interface FormData {
-  title: string;
-  author_ids: number[];
-  publisher_ids: number[];
-  publication_year: string;
-  isbn: string;
-  language: string;
-  description: string;
-  is_active: boolean;
-  category_ids: number[];
-}
 
 export default function AddBookClient() {
     const t = useTranslations("book");
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<CreateBookData>({
     title: "",
     author_ids: [],
     publisher_ids: [],
@@ -44,10 +33,10 @@ export default function AddBookClient() {
     description: "",
     is_active: true,
     category_ids: [],
+    cover_image: null,
   });
   const [coverError, setCoverError] = useState(false);
   const [formHasErrors, setFormHasErrors] = useState(false);
-  const [coverImage, setCoverImage] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -94,7 +83,7 @@ export default function AddBookClient() {
   };
 
   const handleCoverImageChange = (file: File | null, preview: string) => {
-    setCoverImage(file);
+    setFormData((prev) => ({ ...prev, cover_image: file }));
     setCoverPreview(preview);
     if (file) {
       setCoverError(false);
@@ -107,7 +96,7 @@ export default function AddBookClient() {
 
   const isFormValid = (): boolean => {
     if (!formData.title.trim()) return false;
-    if (!coverImage && !coverPreview) return false;
+    if (!formData.cover_image && !coverPreview) return false;
     if (coverError || formHasErrors) return false;
     return true;
   };
@@ -115,7 +104,7 @@ export default function AddBookClient() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!coverImage && !coverPreview) {
+    if (!formData.cover_image && !coverPreview) {
       setCoverError(true);
       toast.error("Cover image is required");
       return;
@@ -128,7 +117,7 @@ export default function AddBookClient() {
 
     try {
       setSubmitting(true);
-      await bookService.create({ ...formData, cover_image: coverImage });
+      await bookService.create(formData);
       toast.success("Book added successfully");
       router.push("/admin/books");
     } catch (error: any) {

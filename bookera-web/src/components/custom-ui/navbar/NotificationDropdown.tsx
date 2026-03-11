@@ -3,9 +3,10 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useState, useRef } from "react";
-import { Bell, ChevronRight } from "lucide-react";
+import { Bell, ChevronRight, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import EmptyState from "@/components/custom-ui/EmptyState";
 import { motion, AnimatePresence } from "framer-motion";
 import { notificationService } from "@/services/notification.service";
 import { Notification } from "@/types/notification";
@@ -30,7 +31,7 @@ export default function NotificationDropdown({
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isAdmin = pathname.startsWith("/admin");
-  const notificationsHref = isAdmin ? "/admin/notifications" : "/notifications";
+  const notificationsHref = "/notifications";
 
   useEffect(() => {
     const handleNotificationReceived = () => {
@@ -105,7 +106,7 @@ export default function NotificationDropdown({
       if (notif.module === "borrow" && notif.data?.borrow_id) {
         router.push(`/admin/borrows/${notif.data.borrow_id}`);
       } else {
-        router.push("/admin/notifications");
+        router.push("/notifications");
       }
     } else {
       if (notif.module === "borrow" && notif.data?.borrow_id) {
@@ -174,22 +175,23 @@ export default function NotificationDropdown({
 
             <div className="max-h-100 overflow-y-auto">
               {!isAuthenticated ? (
-                <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                  <Bell className="h-12 w-12 text-muted-foreground mb-3" />
-                  <p className="text-sm text-muted-foreground mb-4">{t("loginToView")}</p>
-                  <Link href="/login">
-                    <Button variant="brand" size="sm">{t("login")}</Button>
-                  </Link>
-                </div>
+                <EmptyState
+                  variant="compact"
+                  icon={<Bell className="h-6 w-6" />}
+                  title={t("loginToView")}
+                  linkLabel={t("login")}
+                  linkHref="/login"
+                />
               ) : isLoading ? (
                 <div className="py-8 text-center text-sm text-muted-foreground">
                   {t("loading")}
                 </div>
               ) : notifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                  <Bell className="h-12 w-12 text-muted-foreground mb-3" />
-                  <p className="text-sm text-muted-foreground">{t("noNotifications")}</p>
-                </div>
+                <EmptyState
+                  variant="compact"
+                  icon={<Bell className="h-6 w-6" />}
+                  title={t("noNotifications")}
+                />
               ) : (
                 <div className="divide-y">
                   {notifications.map((notif) => (

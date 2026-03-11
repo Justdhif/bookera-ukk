@@ -21,6 +21,7 @@ import {
 import { BookMarked, Loader2, Search } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import EmptyState from "@/components/custom-ui/EmptyState";
 
 interface Category {
   id: number;
@@ -188,13 +189,13 @@ export default function AddBooksToCollectionDialog({
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : books.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-                <BookMarked className="h-12 w-12 mb-3 opacity-25" />
-                <p className="text-sm font-medium">{t("noBooksFound")}</p>
-                <p className="text-xs mt-1 text-muted-foreground/70">
-                  {t("tryDifferentSearch")}
-                </p>
-              </div>
+              <EmptyState
+                variant="compact"
+                icon={<BookMarked className="h-8 w-8" />}
+                title={t("noBooksFound")}
+                description={t("tryDifferentSearch")}
+                className="py-16"
+              />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {books.map((book) => {

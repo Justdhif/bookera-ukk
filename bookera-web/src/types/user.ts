@@ -14,6 +14,9 @@ export interface UserProfile {
   identification_number: string | null;
   occupation: string | null;
   institution: string | null;
+  notification_enabled: boolean;
+  notification_email: boolean;
+  notification_whatsapp: boolean;
   created_at: string;
   updated_at: string;
 }

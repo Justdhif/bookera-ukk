@@ -443,7 +443,20 @@
     "success": "Success",
     "error": "Error",
     "warning": "Warning",
-    "info": "Information"
+    "info": "Information",
+    "logoutTitle": "Logout Confirmation",
+    "logoutDesc": "Are you sure you want to logout? You will need to login again to access your account.",
+    "loggingOut": "Logging out..."
+  },
+  "borrowStatus": {
+    "open": "Active",
+    "close": "Closed"
+  },
+  "bookCopyStatus": {
+    "available": "Available",
+    "borrowed": "Borrowed",
+    "lost": "Lost",
+    "damaged": "Damaged"
   },
   "sidebar": {
     "admin": "Admin",
@@ -467,7 +480,10 @@
     "publishers": "Publishers",
     "borrows": "Borrows",
     "signIn": "Sign In",
-    "signInToAccess": "Sign in to continue"
+    "signInToAccess": "Sign in to continue",
+    "account": "Account",
+    "accountSettings": "Account Settings",
+    "back": "Back"
   },
   "navbar": {
     "notifications": "Notifications",
@@ -489,7 +505,10 @@
     "profile": "Profile",
     "logout": "Logout",
     "bookSearchPlaceholder": "Search title, author, or ISBN...",
-    "role": "Role"
+    "role": "Role",
+    "myBorrows": "My Borrows",
+    "myFines": "My Fines",
+    "myPosts": "My Posts"
   },
   "modal": {},
   "forgot-password": {
@@ -601,7 +620,57 @@
     "updateSuccess": "User updated successfully",
     "requiredFields": "Please complete all required fields",
     "editProfileDescription": "Edit {name}'s profile",
-    "viewProfileDescription": "View {name}'s profile"
+    "viewProfileDescription": "View {name}'s profile",
+    "editProfile": "Edit Profile",
+    "cancelEdit": "Cancel",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "failedLoad": "Failed to load profile",
+    "failedUpdate": "Failed to update profile",
+    "fullNameRequired": "Please enter your full name",
+    "profilePhoto": "Profile Photo",
+    "uploadYourPicture": "Upload your profile picture",
+    "yourProfilePhoto": "Your profile photo",
+    "active": "Active",
+    "inactive": "Inactive",
+    "idLabel": "ID",
+    "profileInformation": "Profile Information",
+    "editProfileDetails": "Edit your profile details",
+    "viewProfileDetails": "Your full profile details",
+    "accountSection": "Account",
+    "emailLabel": "Email",
+    "emailCannotChange": "Email cannot be changed here",
+    "phoneNumberLabel": "Phone Number",
+    "phoneCannotChange": "Phone cannot be changed here",
+    "personalDetails": "Personal Details",
+    "fullNameLabel": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "identificationNumberLabel": "Identification Number",
+    "idNumberPlaceholder": "Enter ID number",
+    "genderLabel": "Gender",
+    "selectGender": "Select gender",
+    "male": "Male",
+    "female": "Female",
+    "preferNotToSay": "Prefer not to say",
+    "birthDateLabel": "Birth Date",
+    "selectBirthDate": "Select birth date",
+    "occupationLabel": "Occupation",
+    "occupationPlaceholder": "Enter occupation",
+    "institutionLabel": "Institution",
+    "institutionPlaceholder": "Enter institution",
+    "addressLabel": "Address",
+    "addressPlaceholder": "Enter full address",
+    "bioLabel": "Bio",
+    "bioPlaceholder": "Tell something about yourself",
+    "roleAdmin": "Admin",
+    "roleCatalogOfficer": "Catalog Officer",
+    "roleManagementOfficer": "Management Officer",
+    "roleUser": "User",
+    "myPosts": "My Posts",
+    "myPostsDesc": "Browse and manage your discussion posts",
+    "noPosts": "No Posts Yet",
+    "noPostsDesc": "You haven't created any posts yet.",
+    "loadMore": "Load More"
   },
   "public": {
     "notFound": "Books not found",
@@ -800,7 +869,10 @@
     "notesLabel": "Notes",
     "waivedLabel": "Waived",
     "returnDateLabel": "Return Date",
-    "following": "Following"
+    "following": "Following",
+    "reportLostConfirmDesc": "Are you sure you want to report this book as lost? This action cannot be undone and a fine may be applied.",
+    "reportLostConfirmBtn": "Yes, Report as Lost",
+    "reportingBtn": "Reporting..."
   },
   "settings": {
     "title": "Settings",
@@ -831,7 +903,23 @@
     "autoLoopActive": "Auto-loop active",
     "musicDisabledHint": "Background music is currently disabled",
     "enableMusicHint": "Click \"Enable Music\" to start playing ambient background music",
-    "musicAutoPlayHint": "Music auto-plays on page load — starts on your first interaction if the browser requires it"
+    "musicAutoPlayHint": "Music auto-plays on page load — starts on your first interaction if the browser requires it",
+    "notificationTitle": "Notifications",
+    "notificationDescription": "Choose how you want to receive notifications from Bookera",
+    "notificationEnabled": "Enable Notifications",
+    "notificationEnabledDescription": "Receive notifications about your borrows, returns, and fines",
+    "notificationChannels": "Notification channels",
+    "notificationEmail": "Email",
+    "notificationEmailDescription": "Receive notifications directly to your email inbox",
+    "notificationWhatsapp": "WhatsApp",
+    "notificationWhatsappDescription": "Receive notifications via WhatsApp to your registered phone number",
+    "notificationWhatsappNoPhone": "Please fill in your phone number first to enable WhatsApp notifications.",
+    "notificationWhatsappGoToProfile": "Go to Profile",
+    "notificationUpdated": "Notification settings saved",
+    "notificationUpdateFailed": "Failed to save notification settings",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "loading": "Loading..."
   },
   "setup-profile": {
     "fullNameRequired": "Full name is required",

@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 
-import { bookService } from "@/services/book.service";
+import { bookService, CreateBookData } from "@/services/book.service";
 import { categoryService } from "@/services/category.service";
 import { authorService } from "@/services/author.service";
 import { publisherService } from "@/services/publisher.service";
@@ -23,18 +23,6 @@ import { ArrowLeft, X, Edit } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
-interface FormData {
-  title: string;
-  author_ids: number[];
-  publisher_ids: number[];
-  publication_year: string;
-  isbn: string;
-  language: string;
-  description: string;
-  is_active: boolean;
-  category_ids: number[];
-  cover_image?: File | null;
-}
 
 export default function BookDetailClient() {
     const t = useTranslations("book");
@@ -50,7 +38,7 @@ export default function BookDetailClient() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [authorDialogOpen, setAuthorDialogOpen] = useState(false);
   const [publisherDialogOpen, setPublisherDialogOpen] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<CreateBookData>({
     title: "",
     author_ids: [],
     publisher_ids: [],

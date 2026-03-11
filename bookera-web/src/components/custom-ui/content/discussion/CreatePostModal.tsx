@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import { discussionPostService } from "@/services/discussion.service";
+import { discussionPostService, CreatePostData } from "@/services/discussion.service";
 import { DiscussionPost } from "@/types/discussion";
 
 interface Props {
@@ -25,8 +25,7 @@ interface Props {
 
 export default function CreatePostModal({ onClose, onCreated }: Props) {
   const t = useTranslations("discussion");
-  const [caption, setCaption] = useState("");
-  const [files, setFiles] = useState<File[]>([]);
+  const [formData, setFormData] = useState<CreatePostData>({ caption: "", images: [] });
   const [previews, setPreviews] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -34,32 +33,29 @@ export default function CreatePostModal({ onClose, onCreated }: Props) {
   const handleFiles = (incoming: FileList | null) => {
     if (!incoming) return;
     const valid = Array.from(incoming).filter((f) => f.type.startsWith("image/"));
-    const combined = [...files, ...valid].slice(0, 10);
-    setFiles(combined);
+    const combined = [...(formData.images ?? []), ...valid].slice(0, 10);
+    setFormData((prev) => ({ ...prev, images: combined }));
     setPreviews(combined.map((f) => URL.createObjectURL(f)));
   };
 
   const removeImage = (idx: number) => {
-    const nextFiles = files.filter((_, i) => i !== idx);
+    const nextFiles = (formData.images ?? []).filter((_, i) => i !== idx);
     const nextPreviews = previews.filter((_, i) => i !== idx);
-    setFiles(nextFiles);
+    setFormData((prev) => ({ ...prev, images: nextFiles }));
     setPreviews(nextPreviews);
   };
 
   const handleSubmit = async () => {
-    if (!caption.trim() && files.length === 0) {
+    if (!formData.caption?.trim() && (formData.images ?? []).length === 0) {
       toast.error(t("addCaptionOrImageFirst"));
       return;
     }
     setSubmitting(true);
     try {
-      const formData = new FormData();
-      if (caption.trim()) formData.append("caption", caption.trim());
-      files.forEach((f) => formData.append("images[]", f));
       const res = await discussionPostService.createPost(formData);
       onCreated(res.data.data);
-    } catch {
-      toast.error(t("failedCreatePost"));
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || t("failedCreatePost"));
     } finally {
       setSubmitting(false);
     }
@@ -78,14 +74,14 @@ export default function CreatePostModal({ onClose, onCreated }: Props) {
             <Textarea
               id="caption"
               placeholder={t("captionPlaceholder")}
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
+              value={formData.caption ?? ""}
+              onChange={(e) => setFormData((prev) => ({ ...prev, caption: e.target.value }))}
               rows={4}
               className="mt-1 resize-none"
               maxLength={1000}
             />
             <p className="text-xs text-muted-foreground text-right mt-1">
-              {caption.length}/1000
+              {(formData.caption ?? "").length}/1000
             </p>
           </div>
 
@@ -120,12 +116,12 @@ export default function CreatePostModal({ onClose, onCreated }: Props) {
             variant="outline"
             className="w-full"
             onClick={() => fileInputRef.current?.click()}
-            disabled={files.length >= 10}
+            disabled={(formData.images ?? []).length >= 10}
           >
             <ImagePlus className="h-4 w-4 mr-2" />
-            {files.length === 0
+            {(formData.images ?? []).length === 0
               ? t("addImage")
-              : t("addImageCount", { count: files.length })}
+              : t("addImageCount", { count: (formData.images ?? []).length })}
           </Button>
           <input
             ref={fileInputRef}
@@ -143,7 +139,7 @@ export default function CreatePostModal({ onClose, onCreated }: Props) {
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={submitting || (!caption.trim() && files.length === 0)}
+            disabled={submitting || (!formData.caption?.trim() && (formData.images ?? []).length === 0)}
           >
             {submitting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             {t("publish")}

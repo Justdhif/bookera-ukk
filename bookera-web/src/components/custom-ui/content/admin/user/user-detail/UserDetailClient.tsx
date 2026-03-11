@@ -14,7 +14,7 @@ import UserSideCard from "../UserSideCard";
 import UserProfileForm from "../UserProfileForm";
 
 export default function UserDetailClient() {
-    const t = useTranslations("user");
+  const t = useTranslations("user");
   const router = useRouter();
   const params = useParams();
   const identificationNumber = params.identificationNumber as string;
@@ -22,7 +22,11 @@ export default function UserDetailClient() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<Partial<UpdateUserData>>({});
+  const [formData, setFormData] = useState<UpdateUserData>({
+    email: "",
+    role: "user",
+    full_name: "",
+  });
   const [avatarPreview, setAvatarPreview] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [isFullNameValid, setIsFullNameValid] = useState(true);
@@ -75,7 +79,7 @@ export default function UserDetailClient() {
 
     try {
       setSubmitting(true);
-      await userService.update(user.id, formData as UpdateUserData);
+      await userService.update(user.id, formData);
       toast.success(t("updateSuccess"));
       setIsEditMode(false);
       fetchUser();
@@ -173,31 +177,33 @@ export default function UserDetailClient() {
           <Skeleton className="h-96" />
           <Skeleton className="lg:col-span-2 h-96" />
         </div>
-      ) : user && (
-        <form id="user-form" onSubmit={handleSubmit}>
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
-              <UserSideCard
-                mode="detail"
+      ) : (
+        user && (
+          <form id="user-form" onSubmit={handleSubmit}>
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
+                <UserSideCard
+                  mode="detail"
+                  user={user}
+                  avatarPreview={avatarPreview}
+                  isEditMode={isEditMode}
+                  formData={formData}
+                  setFormData={setFormData}
+                  setAvatarPreview={setAvatarPreview}
+                />
+              </div>
+
+              <UserProfileForm
                 user={user}
-                avatarPreview={avatarPreview}
                 isEditMode={isEditMode}
                 formData={formData}
                 setFormData={setFormData}
-                setAvatarPreview={setAvatarPreview}
+                onFullNameValidChange={setIsFullNameValid}
+                hideAccount={true}
               />
             </div>
-
-            <UserProfileForm
-              user={user}
-              isEditMode={isEditMode}
-              formData={formData}
-              setFormData={setFormData}
-              onFullNameValidChange={setIsFullNameValid}
-              hideAccount={true}
-            />
-          </div>
-        </form>
+          </form>
+        )
       )}
     </div>
   );

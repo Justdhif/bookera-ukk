@@ -12,34 +12,18 @@ import { isPasswordValid } from "@/components/custom-ui/content/admin/auth/Passw
 import UserSideCard from "../UserSideCard";
 import UserProfileForm from "../UserProfileForm";
 
-interface FormData {
-  email: string;
-  password: string;
-  full_name: string;
-  identification_number: string;
-  phone_number: string;
-  gender: string;
-  birth_date: string;
-  occupation: string;
-  institution: string;
-  address: string;
-  bio: string;
-  role: string;
-  is_active: boolean;
-  avatar?: string | File;
-}
 
 export default function AddUserClient() {
     const t = useTranslations("user");
   const router = useRouter();
 
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<CreateUserData>({
     email: "",
     password: "",
     full_name: "",
     identification_number: "",
     phone_number: "",
-    gender: "",
+    gender: undefined,
     birth_date: "",
     occupation: "",
     institution: "",
@@ -69,7 +53,7 @@ export default function AddUserClient() {
 
     try {
       setSubmitting(true);
-      await userService.create(formData as CreateUserData);
+      await userService.create(formData);
       toast.success(t("addSuccess"));
       router.push("/admin/users");
     } catch (error: any) {

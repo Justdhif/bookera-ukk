@@ -163,12 +163,15 @@ export default function MyBorrowPageClient() {
   );
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">{t("myLibrary")}</h1>
-        <p className="text-sm text-muted-foreground">
-          {t("myLibraryDesc")}
-        </p>
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="p-2 bg-brand-primary rounded-lg">
+          <BookOpen className="h-8 w-8 text-white" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold">{t("myLibrary")}</h1>
+          <p className="text-muted-foreground">{t("myLibraryDesc")}</p>
+        </div>
       </div>
 
       <Tabs defaultValue="borrows">

@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import { discussionPostService } from "@/services/discussion.service";
+import { discussionPostService, UpdatePostData } from "@/services/discussion.service";
 import { DiscussionPost, DiscussionPostImage } from "@/types/discussion";
 
 export default function EditPostClient() {
@@ -20,14 +20,11 @@ export default function EditPostClient() {
 
   const [post, setPost] = useState<DiscussionPost | null>(null);
   const [loading, setLoading] = useState(true);
-  const [caption, setCaption] = useState("");
+  const [formData, setFormData] = useState<UpdatePostData>({ caption: "", images: [] });
   const [existingImages, setExistingImages] = useState<DiscussionPostImage[]>([]);
-  const [newFiles, setNewFiles] = useState<File[]>([]);
   const [newPreviews, setNewPreviews] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // Derive storage base from API URL (strip /api suffix) - same as DiscussionPostCard
-  const storageBase = (process.env.NEXT_PUBLIC_API_URL ?? "").replace("/api", "");
 
   useEffect(() => {
     (async () => {
@@ -35,10 +32,10 @@ export default function EditPostClient() {
         const res = await discussionPostService.getPost(slug);
         const data = res.data.data;
         setPost(data);
-        setCaption(data.caption ?? "");
+        setFormData({ caption: data.caption ?? "", images: [] });
         setExistingImages(data.images ?? []);
-      } catch {
-        toast.error(t("failedLoadPost"));
+      } catch (err: any) {
+        toast.error(err.response?.data?.message || t("failedLoadPost"));
         router.push("/discussion");
       } finally {
         setLoading(false);
@@ -49,26 +46,23 @@ export default function EditPostClient() {
   const handleFiles = (incoming: FileList | null) => {
     if (!incoming) return;
     const valid = Array.from(incoming).filter((f) => f.type.startsWith("image/"));
-    const combined = [...newFiles, ...valid].slice(0, 10 - existingImages.length);
-    setNewFiles(combined);
+    const combined = [...(formData.images ?? []), ...valid].slice(0, 10 - existingImages.length);
+    setFormData((prev) => ({ ...prev, images: combined }));
     setNewPreviews(combined.map((f) => URL.createObjectURL(f)));
   };
 
   const handleSubmit = async () => {
-    if (!caption.trim() && existingImages.length === 0 && newFiles.length === 0) {
+    if (!formData.caption?.trim() && existingImages.length === 0 && (formData.images ?? []).length === 0) {
       toast.error(t("addCaptionOrImage"));
       return;
     }
     setSubmitting(true);
     try {
-      const formData = new FormData();
-      if (caption.trim()) formData.append("caption", caption.trim());
-      newFiles.forEach((f) => formData.append("images[]", f));
       await discussionPostService.updatePost(slug, formData);
       toast.success(t("postUpdated"));
       router.push(`/discussion/${slug}`);
-    } catch {
-      toast.error(t("failedUpdatePost"));
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || t("failedUpdatePost"));
     } finally {
       setSubmitting(false);
     }
@@ -103,15 +97,15 @@ export default function EditPostClient() {
           <Label htmlFor="caption">{t("caption")}</Label>
           <Textarea
             id="caption"
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
+            value={formData.caption ?? ""}
+            onChange={(e) => setFormData((prev) => ({ ...prev, caption: e.target.value }))}
             rows={4}
             className="mt-1 resize-none"
             maxLength={1000}
             placeholder={t("captionEditPlaceholder")}
           />
           <p className="text-xs text-muted-foreground text-right mt-1">
-            {caption.length}/1000
+            {(formData.caption ?? "").length}/1000
           </p>
         </div>
 
@@ -126,7 +120,7 @@ export default function EditPostClient() {
                   className="relative aspect-square rounded-lg overflow-hidden bg-muted"
                 >
                   <Image
-                    src={`${storageBase}/storage/${img.image_path}`}
+                    src={`${img.image_path}`}
                     alt={`Gambar ${img.order}`}
                     fill
                     className="object-cover"
@@ -154,7 +148,7 @@ export default function EditPostClient() {
                   <button
                     type="button"
                     onClick={() => {
-                      setNewFiles((prev) => prev.filter((_, j) => j !== i));
+                      setFormData((prev) => ({ ...prev, images: (prev.images ?? []).filter((_, j) => j !== i) }));
                       setNewPreviews((prev) => prev.filter((_, j) => j !== i));
                     }}
                     className="absolute top-1 right-1 h-5 w-5 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80"
@@ -172,7 +166,7 @@ export default function EditPostClient() {
           variant="outline"
           className="w-full"
           onClick={() => fileInputRef.current?.click()}
-          disabled={existingImages.length + newFiles.length >= 10}
+          disabled={existingImages.length + (formData.images ?? []).length >= 10}
         >
           <ImagePlus className="h-4 w-4 mr-2" />
           Tambah Gambar Baru

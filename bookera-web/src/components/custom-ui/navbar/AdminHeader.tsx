@@ -74,7 +74,7 @@ export default function AdminHeader() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem asChild>
-              <Link href="/admin/settings">
+              <Link href="/settings">
                 <Settings className="h-4 w-4 mr-2" />
                 {t("settings")}
               </Link>

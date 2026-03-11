@@ -28,12 +28,15 @@ interface SidebarUserFooterProps {
   backLabelKey?: string;
   /** Back-to-public href (defaults to "/") */
   backHref?: string;
+  /** When provided, the back button calls this instead of navigating to backHref */
+  onBack?: () => void;
 }
 
 export function SidebarUserFooter({
   t,
   backLabelKey,
   backHref = "/",
+  onBack,
 }: SidebarUserFooterProps) {
   const { open } = useSidebar();
   const pathname = usePathname();
@@ -43,7 +46,7 @@ export function SidebarUserFooter({
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = React.useState(false);
 
   const isAdmin = pathname.startsWith("/admin");
-  const profileHref = isAdmin ? "/admin/profile" : "/profile";
+  const profileHref = "/profile";
 
   const resolvedBackLabelKey = backLabelKey ?? "backToLibrary";
   const backLabel = t(resolvedBackLabelKey);
@@ -71,27 +74,45 @@ export function SidebarUserFooter({
             className={cn(!open && "w-full flex justify-center")}
           >
             <SidebarMenuButton
-              asChild
+              asChild={!onBack}
+              onClick={onBack}
               tooltip={{ content: backLabel }}
               className={cn(
                 "rounded-xl hover:bg-brand-primary/8 dark:hover:bg-brand-primary/15 transition-all group/back",
                 !open && "justify-center px-0 mx-auto",
               )}
             >
-              <Link href={backHref}>
-                <div
-                  className={cn(
-                    open ? "p-1.5" : "p-2",
-                    "rounded-lg bg-linear-to-br from-brand-primary to-brand-primary-dark text-white shadow-sm group-hover/back:shadow-md transition-shadow shrink-0",
+              {onBack ? (
+                <>
+                  <div
+                    className={cn(
+                      open ? "p-1.5" : "p-2",
+                      "rounded-lg bg-linear-to-br from-brand-primary to-brand-primary-dark text-white shadow-sm group-hover/back:shadow-md transition-shadow shrink-0",
+                    )}
+                  >
+                    <BookOpen className="h-3.5 w-3.5" />
+                  </div>
+                  {open && <span className="font-medium">{backLabel}</span>}
+                  {open && (
+                    <ChevronRight className="h-3 w-3 text-muted-foreground/50 group-hover/back:text-brand-primary group-hover/back:translate-x-0.5 transition-all ml-auto" />
                   )}
-                >
-                  <BookOpen className="h-3.5 w-3.5" />
-                </div>
-                {open && <span className="font-medium">{backLabel}</span>}
-                {open && (
-                  <ChevronRight className="h-3 w-3 text-muted-foreground/50 group-hover/back:text-brand-primary group-hover/back:translate-x-0.5 transition-all ml-auto" />
-                )}
-              </Link>
+                </>
+              ) : (
+                <Link href={backHref}>
+                  <div
+                    className={cn(
+                      open ? "p-1.5" : "p-2",
+                      "rounded-lg bg-linear-to-br from-brand-primary to-brand-primary-dark text-white shadow-sm group-hover/back:shadow-md transition-shadow shrink-0",
+                    )}
+                  >
+                    <BookOpen className="h-3.5 w-3.5" />
+                  </div>
+                  {open && <span className="font-medium">{backLabel}</span>}
+                  {open && (
+                    <ChevronRight className="h-3 w-3 text-muted-foreground/50 group-hover/back:text-brand-primary group-hover/back:translate-x-0.5 transition-all ml-auto" />
+                  )}
+                </Link>
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
 

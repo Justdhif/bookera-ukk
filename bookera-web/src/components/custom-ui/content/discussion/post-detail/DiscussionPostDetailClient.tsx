@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, MessageSquareOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
@@ -11,6 +11,7 @@ import { discussionPostService } from "@/services/discussion.service";
 import { DiscussionPost } from "@/types/discussion";
 import PostImageCarousel from "@/components/custom-ui/content/discussion/PostImageCarousel";
 import PostDetailPanel from "@/components/custom-ui/content/discussion/post-detail/PostDetailPanel";
+import EmptyState from "@/components/custom-ui/EmptyState";
 
 export default function DiscussionPostDetailClient() {
   const params = useParams();
@@ -50,12 +51,12 @@ export default function DiscussionPostDetailClient() {
 
   if (notFound || !post) {
     return (
-      <div className="flex flex-col items-center gap-4 py-16 text-center text-muted-foreground">
-        <p className="text-lg font-medium">{t("postNotFoundTitle")}</p>
-        <Button variant="outline" onClick={() => router.push("/discussion")}>
-          {t("backToFeed")}
-        </Button>
-      </div>
+      <EmptyState
+        icon={<MessageSquareOff className="h-10 w-10" />}
+        title={t("postNotFoundTitle")}
+        actionLabel={t("backToFeed")}
+        onAction={() => router.push("/discussion")}
+      />
     );
   }
 

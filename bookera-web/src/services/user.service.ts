@@ -4,6 +4,12 @@ import { User, UserListResponse } from "@/types/user";
 
 export type UserRole = User["role"];
 
+export interface NotificationSettings {
+  notification_enabled: boolean;
+  notification_email: boolean;
+  notification_whatsapp: boolean;
+}
+
 export interface CreateUserData {
   email: string;
   password: string;
@@ -91,4 +97,10 @@ export const userService = {
   },
 
   delete: (id: number) => api.delete<ApiResponse<null>>(`/admin/users/${id}`),
+
+  getNotificationSettings: () =>
+    api.get<ApiResponse<NotificationSettings>>("/settings/notifications"),
+
+  updateNotificationSettings: (data: NotificationSettings) =>
+    api.patch<ApiResponse<NotificationSettings>>("/settings/notifications", data),
 };

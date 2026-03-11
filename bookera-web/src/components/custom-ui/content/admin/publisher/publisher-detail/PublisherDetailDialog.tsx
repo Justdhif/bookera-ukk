@@ -13,18 +13,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Publisher } from "@/types/publisher";
-import { publisherService } from "@/services/publisher.service";
+import { publisherService, UpdatePublisherData } from "@/services/publisher.service";
 import { toast } from "sonner";
 import { Edit, FileWarning, Save, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 
-interface FormData {
-  name: string;
-  description: string;
-  is_active: boolean;
-}
 
 export default function PublisherDetailDialog({
   open,
@@ -40,12 +35,12 @@ export default function PublisherDetailDialog({
   const t = useTranslations("publisher");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<UpdatePublisherData>({
     name: "",
     description: "",
     is_active: true,
+    photo: null,
   });
-  const [photoImage, setPhotoImage] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
@@ -57,11 +52,11 @@ export default function PublisherDetailDialog({
         name: publisher.name,
         description: publisher.description ?? "",
         is_active: publisher.is_active,
+        photo: null,
       });
       setPhotoPreview(publisher.photo_url ?? publisher.photo ?? "");
     }
     setIsEditMode(false);
-    setPhotoImage(null);
     setPhotoError(null);
     setIsDragging(false);
   }, [publisher, open]);
@@ -83,9 +78,9 @@ export default function PublisherDetailDialog({
         name: publisher.name,
         description: publisher.description ?? "",
         is_active: publisher.is_active,
+        photo: null,
       });
       setPhotoPreview(publisher.photo_url ?? publisher.photo ?? "");
-      setPhotoImage(null);
       setPhotoError(null);
       setIsDragging(false);
     }
@@ -107,7 +102,7 @@ export default function PublisherDetailDialog({
       return;
     }
     setPhotoError(null);
-    setPhotoImage(file);
+    setFormData((prev) => ({ ...prev, photo: file }));
     const reader = new FileReader();
     reader.onloadend = () => setPhotoPreview(reader.result as string);
     reader.readAsDataURL(file);
@@ -119,7 +114,7 @@ export default function PublisherDetailDialog({
   };
 
   const handleRemovePhoto = () => {
-    setPhotoImage(null);
+    setFormData((prev) => ({ ...prev, photo: null }));
     setPhotoPreview(publisher?.photo_url ?? publisher?.photo ?? "");
     setPhotoError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -133,15 +128,9 @@ export default function PublisherDetailDialog({
     }
     setIsLoading(true);
     try {
-      await publisherService.update(publisher.id, {
-        name: formData.name,
-        description: formData.description || undefined,
-        photo: photoImage ?? undefined,
-        is_active: formData.is_active,
-      });
+      await publisherService.update(publisher.id, formData);
       toast.success(t("updateSuccess"));
       setIsEditMode(false);
-      setPhotoImage(null);
       onSuccess();
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to update publisher");

@@ -50,11 +50,10 @@ export default function LogoutConfirmDialog({
           </div>
           <div className="text-center space-y-2">
             <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-              Logout Confirmation
+              {t("logoutTitle")}
             </DialogTitle>
             <DialogDescription className="text-base text-gray-600 dark:text-gray-400 leading-relaxed">
-              Are you sure you want to logout? You will need to login again to
-              access your account.
+              {t("logoutDesc")}
             </DialogDescription>
           </div>
         </DialogHeader>
@@ -80,7 +79,7 @@ export default function LogoutConfirmDialog({
             {isLoggingOut ? (
               <span className="flex items-center justify-center">
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Logging out...
+                {t("loggingOut")}
               </span>
             ) : (
               <span className="flex items-center justify-center">

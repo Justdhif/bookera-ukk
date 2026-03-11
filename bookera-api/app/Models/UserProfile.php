@@ -19,6 +19,9 @@ use App\Helpers\AvatarHelper;
  * @property string|null $identification_number
  * @property string|null $occupation
  * @property string|null $institution
+ * @property bool $notification_enabled
+ * @property bool $notification_email
+ * @property bool $notification_whatsapp
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $user
@@ -39,6 +42,15 @@ class UserProfile extends Model
         'identification_number',
         'occupation',
         'institution',
+        'notification_enabled',
+        'notification_email',
+        'notification_whatsapp',
+    ];
+
+    protected $casts = [
+        'notification_enabled'    => 'boolean',
+        'notification_email'      => 'boolean',
+        'notification_whatsapp'   => 'boolean',
     ];
 
     public function user()
@@ -63,6 +75,24 @@ class UserProfile extends Model
                 return AvatarHelper::generateDefaultAvatar($this->user_id);
             },
             set: fn ($value) => $value
+        );
+    }
+
+    protected function phoneNumber(): Attribute
+    {
+        return Attribute::make(
+            set: function ($value) {
+                if ($value === null || $value === '') {
+                    return null;
+                }
+                // Remove all non-digit characters
+                $digits = preg_replace('/\D/', '', $value);
+                // Convert leading 0 to 62
+                if (str_starts_with($digits, '0')) {
+                    $digits = '62' . substr($digits, 1);
+                }
+                return $digits;
+            }
         );
     }
 }

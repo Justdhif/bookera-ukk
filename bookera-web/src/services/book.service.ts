@@ -4,14 +4,14 @@ import { Book, BookListResponse } from "@/types/book";
 
 export interface CreateBookData {
   title: string;
-  author_ids?: number[];
-  publisher_ids?: number[];
-  publication_year?: string;
-  isbn?: string;
-  language?: string;
-  description?: string;
+  author_ids: number[];
+  publisher_ids: number[];
+  publication_year: string;
+  isbn: string;
+  language: string;
+  description: string;
   is_active: boolean;
-  category_ids?: number[];
+  category_ids: number[];
   cover_image?: File | null;
 }
 

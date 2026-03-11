@@ -242,6 +242,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{notification}', [NotificationController::class, 'destroy']);
     });
 
+    Route::prefix('settings')->group(function () {
+        Route::get('/notifications', [\App\Http\Controllers\Api\NotificationSettingsController::class, 'show']);
+        Route::patch('/notifications', [\App\Http\Controllers\Api\NotificationSettingsController::class, 'update']);
+    });
+
     Route::prefix('saves')->group(function () {
         Route::get('/', [SaveController::class, 'index']);
         Route::post('/', [SaveController::class, 'store']);

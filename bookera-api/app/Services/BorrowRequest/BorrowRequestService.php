@@ -13,6 +13,7 @@ use App\Models\BorrowDetail;
 use App\Models\BorrowRequest;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -366,11 +367,11 @@ class BorrowRequestService
     {
         Storage::disk('public')->makeDirectory('qr_codes');
 
-        $filename     = 'borrow_' . $borrowId . '_' . $borrowCode . '.png';
+        $filename     = 'borrow_' . $borrowId . '_' . $borrowCode . '.svg';
         $relativePath = 'qr_codes/' . $filename;
         $absolutePath = storage_path('app/public/' . $relativePath);
 
-        QrCode::format('png')
+        QrCode::format('svg')
             ->size(300)
             ->errorCorrection('H')
             ->generate($borrowCode, $absolutePath);
