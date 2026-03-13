@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Helpers\AvatarHelper;
 
@@ -28,6 +29,8 @@ use App\Helpers\AvatarHelper;
  */
 class UserProfile extends Model
 {
+    use HasFactory;
+
     protected $table = 'user_profiles';
 
     protected $fillable = [

@@ -26,8 +26,7 @@ import {
   BookOpen,
   CalendarClock,
   Hash,
-  Loader2,
-} from "lucide-react";
+  Loader2, Eye } from "lucide-react";
 
 interface ReportLostDialogProps {
   open: boolean;
@@ -254,11 +253,10 @@ export function ReportLostDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={loading}>
-            
-                                  {t("detail.editDialog.cancel")}
-                                </Button>
+                      {t("detail.editDialog.cancel")}
+                  </Button>
           <Button
-            variant="destructive"
+            variant="submit"
             onClick={handleSubmit}
             disabled={loading || selectedDetailIds.length === 0}
           >

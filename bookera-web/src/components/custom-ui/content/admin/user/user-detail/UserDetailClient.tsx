@@ -116,7 +116,7 @@ export default function UserDetailClient() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
-            variant="ghost"
+            variant="brand"
             size="icon"
             className="h-8 w-8"
             onClick={() => router.back()}
@@ -134,7 +134,7 @@ export default function UserDetailClient() {
           <div className="flex gap-2">
             <Button
               type="button"
-              variant="outline"
+              variant="submit"
               onClick={handleCancelEdit}
               disabled={submitting}
               className="h-8"

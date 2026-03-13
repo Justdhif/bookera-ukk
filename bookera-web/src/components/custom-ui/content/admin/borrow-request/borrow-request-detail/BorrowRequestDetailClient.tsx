@@ -166,7 +166,7 @@ export default function AdminBorrowRequestDetailClient() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
           <Button
-            variant="ghost"
+            variant="brand"
             size="icon"
             className="h-8 w-8"
             onClick={() => router.back()}
@@ -199,7 +199,7 @@ export default function AdminBorrowRequestDetailClient() {
           {isProcessing && (
             <>
               <Button
-                variant="outline"
+                variant="brand"
                 size="sm"
                 className="h-8 border-red-300 text-red-600 hover:bg-red-50"
                 onClick={() => setRejectDialogOpen(true)}
@@ -209,7 +209,7 @@ export default function AdminBorrowRequestDetailClient() {
                 {t("reject")}
               </Button>
               <Button
-                variant="outline"
+                variant="brand"
                 size="sm"
                 className="h-8 border-green-300 text-green-600 hover:bg-green-50"
                 onClick={handleApprove}
@@ -361,14 +361,14 @@ export default function AdminBorrowRequestDetailClient() {
           />
           <DialogFooter>
             <Button
-              variant="outline"
+              variant="brand"
               onClick={() => setRejectDialogOpen(false)}
               disabled={rejecting}
             >
               {t("cancel")}
             </Button>
             <Button
-              variant="destructive"
+              variant="brand"
               onClick={handleReject}
               disabled={rejecting}
             >

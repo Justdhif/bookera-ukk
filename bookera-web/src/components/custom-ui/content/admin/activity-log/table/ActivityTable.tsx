@@ -187,7 +187,7 @@ export default function ActivityTable({
             </Button>
             <Button
               onClick={handleReset}
-              variant="outline"
+              variant="brand"
               size="sm"
               className="px-3"
               title={t("resetFilters")}
@@ -222,7 +222,6 @@ export default function ActivityTable({
                       icon={
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-16 w-16"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"

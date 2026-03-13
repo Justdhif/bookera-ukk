@@ -11,12 +11,13 @@ import { Book } from "@/types/book";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth.store";
 import SaveHeader from "./SaveHeader";
-import SaveBookList from "./SaveBookList";
+import BookList from "@/components/custom-ui/content/public/book/BookList";
+import { Card } from "@/components/ui/card";
 import EditSaveDialog from "./EditSaveDialog";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { BorrowFromCollectionDialog } from "./BorrowFromCollectionDialog";
 import AddBooksToCollectionDialog from "./AddBooksToCollectionDialog";
-import { Loader2, ShoppingCart, Plus } from "lucide-react";
+import { Loader2, ShoppingCart, Plus, BookMarked, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SaveDetailSkeleton from "./SaveDetailSkeleton";
 
@@ -34,7 +35,6 @@ export default function SaveDetailClient({
   const [loading, setLoading] = useState(true);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedBooks, setSelectedBooks] = useState<number[]>([]);
   const [showBorrowDialog, setShowBorrowDialog] = useState(false);
   const [booksWithCopies, setBooksWithCopies] = useState<Book[]>([]);
   const [loadingCopies, setLoadingCopies] = useState(false);
@@ -56,27 +56,6 @@ export default function SaveDetailClient({
     fetchSave();
   }, [saveIdentifier]);
 
-  const handleRemoveBook = async (bookId: number) => {
-    if (!save) return;
-
-    try {
-      await saveService.removeBook(save.id, bookId);
-      toast.success(t("detail.bookRemoved"));
-      fetchSave();
-      window.dispatchEvent(new Event("refreshSavesList"));
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || t("detail.failedToRemove"));
-    }
-  };
-
-  const toggleBookSelection = (bookId: number) => {
-    setSelectedBooks((prev) =>
-      prev.includes(bookId)
-        ? prev.filter((id) => id !== bookId)
-        : [...prev, bookId],
-    );
-  };
-
   const handleBorrowClick = async () => {
     if (!isAuthenticated) {
       toast.error(t("detail.pleaseLogin"));
@@ -84,15 +63,12 @@ export default function SaveDetailClient({
       return;
     }
 
-    if (selectedBooks.length === 0) {
-      toast.error(t("detail.selectOne"));
-      return;
-    }
+    if (!save?.books || save.books.length === 0) return;
 
     setLoadingCopies(true);
     try {
       const booksData = await Promise.all(
-        selectedBooks.map((bookId) => bookService.show(bookId)),
+        save.books.map((book) => bookService.show(book.id)),
       );
       setBooksWithCopies(booksData.map((res) => res.data.data));
       setShowBorrowDialog(true);
@@ -136,45 +112,61 @@ export default function SaveDetailClient({
         onBack={() => router.back()}
       />
 
-      <SaveBookList
-        books={save.books || []}
-        selectedBooks={selectedBooks}
-        onToggleBookSelection={toggleBookSelection}
-        onRemoveBook={handleRemoveBook}
-        addBooksButton={
+      <div className="space-y-4">
+        <div className="flex gap-2">
           <Button
             onClick={() => setShowAddBooksDialog(true)}
             size="sm"
-            variant="outline"
+            variant="submit"
             className="gap-2"
           >
             <Plus className="h-4 w-4" />
             Add Books
           </Button>
-        }
-        borrowButton={
-          save.books && save.books.length > 0 ? (
+          {save.books && save.books.length > 0 && (
             <Button
               onClick={handleBorrowClick}
-              disabled={selectedBooks.length === 0 || loadingCopies}
+              disabled={loadingCopies}
               size="sm"
-              variant="brand"
+              variant="outline"
             >
-              {loadingCopies ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {t("detail.loading")}
-                </>
-              ) : (
-                <>
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  {t("detail.borrowSelected")} ({selectedBooks.length})
-                </>
-              )}
-            </Button>
-          ) : undefined
-        }
-      />
+                          <Eye className="w-4 h-4 mr-2" /> {loadingCopies ? (
+                                          <>
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                            {t("detail.loading")}
+                                          </>
+                                        ) : (
+                                          <>
+                                            <ShoppingCart className="h-4 w-4 mr-2" />
+                                            {t("detail.borrowSelected")}
+                                          </>
+                                        )}
+                      </Button>
+          )}
+        </div>
+
+        {!save.books || save.books.length === 0 ? (
+          <Card className="p-8 sm:p-12">
+            <div className="text-center text-muted-foreground">
+              <BookMarked className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 opacity-30" />
+              <p className="text-sm sm:text-base mb-4">{t("detail.noBooksYet")}</p>
+              <div className="flex justify-center">
+                <Button
+                  onClick={() => setShowAddBooksDialog(true)}
+                  size="sm"
+                  variant="submit"
+                  className="gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Books
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ) : (
+          <BookList books={save.books} loading={false} />
+        )}
+      </div>
 
       <EditSaveDialog
         open={showEditDialog}
@@ -199,7 +191,6 @@ export default function SaveDetailClient({
         onOpenChange={setShowBorrowDialog}
         selectedBooks={booksWithCopies}
         onSuccess={() => {
-          setSelectedBooks([]);
           toast.success("Loan request created successfully");
         }}
       />

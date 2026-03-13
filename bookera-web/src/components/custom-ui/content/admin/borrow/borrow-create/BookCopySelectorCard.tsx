@@ -33,9 +33,7 @@ export default function BookCopySelectorCard({
           <EmptyState
             title="No Books Selected"
             description="Select books from the left to view available copies"
-            icon={
-              <BookOpen className="h-20 w-20 mx-auto opacity-20 text-muted-foreground" />
-            }
+            icon={<BookOpen />}
             className="border-none h-auto p-0"
           />
         </CardContent>

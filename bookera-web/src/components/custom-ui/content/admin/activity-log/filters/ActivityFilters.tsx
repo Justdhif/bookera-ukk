@@ -102,7 +102,7 @@ export default function ActivityFilters({
               <Search className="h-4 w-4 mr-2" />
               {t("applyFilter")}
             </Button>
-            <Button onClick={handleReset} variant="outline" size="icon" className="hover:bg-destructive hover:text-white hover:border-destructive transition-colors">
+            <Button onClick={handleReset} variant="brand" size="icon" className="hover:bg-destructive hover:text-white hover:border-destructive transition-colors">
               <X className="h-4 w-4" />
             </Button>
           </div>

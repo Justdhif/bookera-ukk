@@ -5,6 +5,7 @@ namespace App\Services\Auth;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Mail\ResetPasswordMail;
+use App\Helpers\SlugGenerator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -112,6 +113,13 @@ class AuthService
             } else {
                 $profileData['user_id'] = $user->id;
                 UserProfile::create($profileData);
+            }
+
+            // Generate slug from full_name if not set yet
+            if (empty($user->slug) && !empty($profileData['full_name'])) {
+                $user->update([
+                    'slug' => SlugGenerator::generate('users', 'slug', $profileData['full_name']),
+                ]);
             }
 
             DB::commit();

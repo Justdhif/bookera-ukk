@@ -44,7 +44,7 @@ export default function BookList({ books, loading }: Props) {
       <EmptyState
         title={t("notFound")}
         description={t("notFoundDesc")}
-        icon={<BookOpen className="h-10 w-10" />}
+        icon={<BookOpen />}
       />
     );
   }

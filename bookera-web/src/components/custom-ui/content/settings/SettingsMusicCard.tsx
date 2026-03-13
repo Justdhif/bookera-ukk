@@ -116,7 +116,7 @@ export default function SettingsMusicCard() {
           </div>
           <Button
             size="lg"
-            variant={isMusicEnabled ? "brand" : "outline"}
+            variant="brand"
             className={`relative transition-all ${
               isMusicEnabled ? "ring-4 ring-brand-primary/30" : ""
             }`}
@@ -143,7 +143,7 @@ export default function SettingsMusicCard() {
 
             <div className="flex items-center gap-4">
               <Button
-                variant="outline"
+                variant="brand"
                 size="icon"
                 className="h-12 w-12 rounded-full hover:bg-brand-primary hover:text-white transition-colors"
                 onClick={togglePlayPause}
@@ -160,7 +160,7 @@ export default function SettingsMusicCard() {
               <Label className="text-base">{t("volumeControl")}</Label>
               <div className="flex items-center gap-4">
                 <Button
-                  variant="ghost"
+                  variant="brand"
                   size="icon"
                   className="h-10 w-10"
                   onClick={() => setVolume(Math.max(0, volume - 10))}
@@ -175,7 +175,7 @@ export default function SettingsMusicCard() {
                   className="flex-1"
                 />
                 <Button
-                  variant="ghost"
+                  variant="brand"
                   size="icon"
                   className="h-10 w-10"
                   onClick={() => setVolume(Math.min(100, volume + 10))}

@@ -229,7 +229,7 @@ export default function BookDetailClient() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
-            variant="ghost"
+            variant="brand"
             size="icon"
             className="h-8 w-8"
             onClick={() => router.back()}
@@ -237,9 +237,9 @@ export default function BookDetailClient() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Book Detail</h1>
+            <h1 className="text-3xl font-bold">{t("bookDetail")}</h1>
             <p className="text-muted-foreground">
-              {isEditMode ? "Edit book information" : "View book details"}
+              {isEditMode ? t("editBookInfo") : t("viewBookDetails")}
             </p>
           </div>
         </div>
@@ -247,13 +247,13 @@ export default function BookDetailClient() {
           <div className="flex gap-2">
             <Button
               type="button"
-              variant="outline"
+              variant="submit"
               onClick={handleCancelEdit}
               disabled={submitting}
               className="h-8"
             >
               <X className="h-3.5 w-3.5 mr-1.5" />
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               type="submit"
@@ -325,7 +325,7 @@ export default function BookDetailClient() {
           {!isEditMode && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl">Book Copies</CardTitle>
+                <CardTitle className="text-xl">{t("bookCopies")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <BookCopyList book={book} onChange={fetchBook} />

@@ -17,6 +17,7 @@ class DiscussionPostService
     public function getPosts(?User $authUser, int $perPage = 15): LengthAwarePaginator
     {
         $posts = DiscussionPost::with(['user.profile', 'images'])
+            ->notTakenDown()
             ->latest()
             ->paginate($perPage);
 
@@ -48,10 +49,13 @@ class DiscussionPostService
         return $posts;
     }
 
-    public function getUserPosts(int $userId, ?User $authUser, int $perPage = 15): LengthAwarePaginator
+    public function getUserPosts(string $userSlug, ?User $authUser, int $perPage = 15): LengthAwarePaginator
     {
+        $targetUser = User::where('slug', $userSlug)->firstOrFail();
+
         $posts = DiscussionPost::with(['user.profile', 'images'])
-            ->where('user_id', $userId)
+            ->where('user_id', $targetUser->id)
+            ->notTakenDown()
             ->latest()
             ->paginate($perPage);
 
@@ -91,6 +95,7 @@ class DiscussionPostService
 
         $posts = DiscussionPost::with(['user.profile', 'images'])
             ->whereIn('user_id', $followingIds)
+            ->notTakenDown()
             ->latest()
             ->paginate($perPage);
 

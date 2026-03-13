@@ -132,14 +132,15 @@ export default function SaveBookList({
                   <span className="hidden sm:inline">{t("detail.detail")}</span>
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="destructive"
                   size="sm"
-                  className="flex-1"
+                  className="flex-1 gap-1"
                   onClick={(e) => {
                     e.stopPropagation();
                     onRemoveBook(book.id);
                   }}
                 >
+                  <Trash className="h-3.5 w-3.5" />
                   {t("detail.remove")}
                 </Button>
               </div>

@@ -21,8 +21,9 @@ export default function SearchPage() {
 
     const res = await bookService.getAll({
       search: query,
-      // category_id: categoryId ?? undefined,
+      ...(categoryId ? { category_ids: [categoryId] } : {}),
       status: "active",
+      per_page: 100,
     });
 
     setBooks(res.data.data.data);

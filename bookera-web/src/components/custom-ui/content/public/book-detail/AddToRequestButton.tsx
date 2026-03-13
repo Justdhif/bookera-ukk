@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
-import { BookPlus } from "lucide-react";
+import { BookPlus, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { borrowRequestService } from "@/services/borrow-request.service";
@@ -85,7 +85,7 @@ export default function AddToRequestButton({
   return (
     <>
       <Button
-        variant="brand"
+        variant="submit"
         size="sm"
         onClick={handleOpen}
         className="gap-2"
@@ -134,12 +134,12 @@ export default function AddToRequestButton({
                 className="flex-1"
                 disabled={loading}
               >
-                {t("detail.editDialog.cancel")}
-              </Button>
+                              {t("detail.editDialog.cancel")}
+                          </Button>
               <Button
                 onClick={handleSubmit}
                 className="flex-1"
-                disabled={loading}
+                disabled={loading} variant="submit"
               >
                 {loading ? t("processingBtn") : t("submitRequest")}
               </Button>

@@ -52,7 +52,7 @@ export default function DiscussionPostDetailClient() {
   if (notFound || !post) {
     return (
       <EmptyState
-        icon={<MessageSquareOff className="h-10 w-10" />}
+        icon={<MessageSquareOff />}
         title={t("postNotFoundTitle")}
         actionLabel={t("backToFeed")}
         onAction={() => router.push("/discussion")}
@@ -63,7 +63,7 @@ export default function DiscussionPostDetailClient() {
   return (
     <div className="space-y-4">
       <Button
-        variant="ghost"
+        variant="brand"
         size="sm"
         className="gap-2 -ml-2 text-muted-foreground hover:text-foreground"
         onClick={() => router.back()}

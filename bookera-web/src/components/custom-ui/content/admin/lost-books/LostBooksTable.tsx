@@ -12,10 +12,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LostBook } from "@/types/lost-book";
 import EmptyState from "@/components/custom-ui/EmptyState";
+import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
 import {
   AlertCircle,
   Trash,
@@ -33,32 +33,6 @@ interface LostBooksTableProps {
   onFinish: (id: number) => void;
   onProcessFine: (id: number) => void;
   actionLoading: number | null;
-}
-
-const borrowStatusConfig: Record<string, { label: string; className: string }> =
-  {
-    open: {
-      label: "Open",
-      className:
-        "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400",
-    },
-    close: {
-      label: "Closed",
-      className:
-        "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800/40 dark:text-gray-400",
-    },
-  };
-
-function getBorrowStatusBadge(status?: string) {
-  const config = status ? borrowStatusConfig[status] : undefined;
-  if (config) {
-    return (
-      <Badge variant="outline" className={config.className}>
-        {config.label}
-      </Badge>
-    );
-  }
-  return <Badge variant="secondary">{status || "-"}</Badge>;
 }
 
 function UserAvatar({ name, avatar }: { name: string; avatar?: string }) {
@@ -107,7 +81,7 @@ export default function LostBooksTable({
       <EmptyState
         title={t("noLostBooks")}
         description={t("noLostBooksDesc")}
-        icon={<AlertCircle className="h-10 w-10" />}
+        icon={<AlertCircle />}
       />
     );
   }
@@ -151,7 +125,7 @@ export default function LostBooksTable({
                     {borrowCode ? borrowCode : `#${borrowId}`}
                   </Link>
                 </span>
-                <span>{getBorrowStatusBadge(borrow?.status)}</span>
+                <span><BorrowStatusBadge status={(borrow?.status as "open" | "close") ?? "close"} /></span>
               </div>
             </div>
 
@@ -166,10 +140,10 @@ export default function LostBooksTable({
                 <Table className="table-fixed w-full">
                   <colgroup>
                     <col className="w-12" />
-                    <col className="w-[260px]" />
-                    <col className="w-[160px]" />
+                    <col className="w-65" />
+                    <col className="w-40" />
                     <col />
-                    <col className="w-[120px]" />
+                    <col className="w-30" />
                   </colgroup>
                   <TableHeader>
                     <TableRow className="bg-muted/20 hover:bg-muted/20">
@@ -270,7 +244,7 @@ export default function LostBooksTable({
                                   size="sm"
                                   onClick={() => onFinish(item.id)}
                                   disabled={isLoading}
-                                  className="h-8 gap-1 bg-green-600 hover:bg-green-700 text-white"
+                                  className="h-8 gap-1 bg-green-600 hover:bg-green-700 text-white" variant="brand"
                                 >
                                   {isLoading ? (
                                     <Loader2 className="h-3.5 w-3.5 animate-spin" />

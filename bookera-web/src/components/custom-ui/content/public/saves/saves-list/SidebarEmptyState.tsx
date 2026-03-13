@@ -11,7 +11,7 @@ export default function SidebarEmptyState({ onCreateClick }: SidebarEmptyStatePr
   return (
     <EmptyState
       variant="compact"
-      icon={<BookMarked className="h-5 w-5" />}
+      icon={<BookMarked />}
       title={t("noCollections")}
       actionLabel={t("createFirst")}
       onAction={onCreateClick}

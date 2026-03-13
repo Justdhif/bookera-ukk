@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class BorrowRequestDetail extends Model
 {
+    use HasFactory;
+
     protected $table = 'borrow_request_details';
 
     protected $fillable = [

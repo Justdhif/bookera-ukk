@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\SaveController;
 use App\Http\Controllers\Api\TermsOfServiceController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\DiscussionPostReportController;
 
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
@@ -187,6 +188,14 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [ActivityController::class, 'index']);
             Route::get('/{id}', [ActivityController::class, 'show']);
         });
+
+        // Discussion moderation
+        Route::prefix('discussion-posts')->group(function () {
+            Route::get('/reports', [DiscussionPostReportController::class, 'index']);
+            Route::patch('/reports/{report}', [DiscussionPostReportController::class, 'update']);
+            Route::patch('/{slug}/takedown', [DiscussionPostReportController::class, 'takedown']);
+            Route::patch('/{slug}/restore', [DiscussionPostReportController::class, 'restore']);
+        });
     });
 
     Route::middleware('role:admin')->prefix('admin')->group(function () {
@@ -273,7 +282,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [DiscussionPostController::class, 'store']);
         Route::get('/feed/following', [DiscussionPostController::class, 'following']);
         Route::get('/active-users', [DiscussionPostController::class, 'activeUsers']);
-        Route::get('/user/{userId}', [DiscussionPostController::class, 'byUser']);
+        Route::get('/user/{userSlug}', [DiscussionPostController::class, 'byUser']);
+        Route::post('/{slug}/report', [DiscussionPostReportController::class, 'store']);
         Route::get('/{slug}', [DiscussionPostController::class, 'show']);
         Route::put('/{slug}', [DiscussionPostController::class, 'update']);
         Route::delete('/{slug}', [DiscussionPostController::class, 'destroy']);
@@ -289,9 +299,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('users')->group(function () {
-        Route::get('/{userId}/followers', [FollowController::class, 'userFollowers']);
-        Route::get('/{userId}/following', [FollowController::class, 'userFollowing']);
-        Route::get('/{userId}/follow-counts', [FollowController::class, 'userFollowCounts']);
-        Route::get('/{userId}/profile', [FollowController::class, 'userPublicProfile']);
+        Route::get('/{userSlug}/followers', [FollowController::class, 'userFollowers']);
+        Route::get('/{userSlug}/following', [FollowController::class, 'userFollowing']);
+        Route::get('/{userSlug}/follow-counts', [FollowController::class, 'userFollowCounts']);
+        Route::get('/{userSlug}/profile', [FollowController::class, 'userPublicProfile']);
     });
 });

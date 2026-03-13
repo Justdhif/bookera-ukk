@@ -1,5 +1,5 @@
 import { Fine } from "@/types/fine";
-import { Badge } from "@/components/ui/badge";
+import FineStatusBadge from "@/components/custom-ui/badge/FineStatusBadge";
 import {
   Card,
   CardContent,
@@ -13,16 +13,6 @@ import { format } from "date-fns";
 
 interface ReturnFinesCardProps {
   fines: Fine[];
-}
-
-function FineStatusBadge({ status }: { status: Fine["status"] }) {
-  const config: Record<Fine["status"], { label: string; className: string }> = {
-    unpaid: { label: "Unpaid", className: "bg-red-100 text-red-800" },
-    paid: { label: "Paid", className: "bg-green-100 text-green-800" },
-    waived: { label: "Waived", className: "bg-gray-100 text-gray-800" },
-  };
-  const { label, className } = config[status];
-  return <Badge className={className}>{label}</Badge>;
 }
 
 export function ReturnFinesCard({ fines }: ReturnFinesCardProps) {

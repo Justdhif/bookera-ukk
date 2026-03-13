@@ -15,7 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { Author } from "@/types/author";
 import { authorService, UpdateAuthorData } from "@/services/author.service";
 import { toast } from "sonner";
-import { Edit, FileWarning, Save, Upload, X } from "lucide-react";
+import { Edit, FileWarning, Save, Upload, X, Trash, Eye } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
@@ -238,8 +238,8 @@ export default function AuthorDetailDialog({
                           handleRemovePhoto();
                         }}
                       >
-                        <X className="h-3 w-3" />
-                      </Button>
+                                              <Trash className="w-4 h-4 mr-2" /> <X className="h-3 w-3" />
+                                          </Button>
                     )}
                   </div>
                   {isEditMode && (
@@ -281,9 +281,8 @@ export default function AuthorDetailDialog({
                 className="w-full gap-2"
                 disabled={!isEditMode}
               >
-                <Upload className="h-4 w-4" />
-                {photoPreview ? t("changePhoto") : t("browseFiles")}
-              </Button>
+                              <Eye className="w-4 h-4 mr-2" /> <Upload className="h-4 w-4" />{photoPreview ? t("changePhoto") : t("browseFiles")}
+                          </Button>
               <p className="text-xs text-muted-foreground text-center">
                 {t("formatHint")}
               </p>
@@ -340,7 +339,7 @@ export default function AuthorDetailDialog({
           {isEditMode && (
             <div className="flex gap-2 pt-1">
               <Button
-                variant="outline"
+                variant="brand"
                 onClick={handleCancelEdit}
                 disabled={isLoading}
                 className="flex-1 h-9"

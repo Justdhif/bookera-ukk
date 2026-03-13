@@ -5,7 +5,6 @@ import { categoryService } from "@/services/category.service";
 import { Category } from "@/types/category";
 import CategoryBubbleSkeleton from "./CategoryBubbleSkeleton";
 import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
-import { getIconByName } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -89,7 +88,7 @@ export default function CategoryBubble({
     <div className="relative space-y-3">
       <div className="flex items-center gap-2 md:gap-3">
         <Button
-          variant="outline"
+          variant="brand"
           size="icon"
           onClick={handlePrevPage}
           disabled={currentPage === 0}
@@ -110,7 +109,6 @@ export default function CategoryBubble({
           >
             {visibleItems.map((item) => {
               const isActive = active === item.id;
-              const IconComponent = item.icon ? getIconByName(item.icon) : null;
 
               return (
                 <button
@@ -139,25 +137,14 @@ export default function CategoryBubble({
                         : "bg-emerald-100 dark:bg-emerald-900/30",
                     )}
                   >
-                    {IconComponent ? (
-                      <IconComponent
-                        className={cn(
-                          "h-7 w-7 md:h-8 md:w-8",
-                          isActive
-                            ? "text-white drop-shadow-md"
-                            : "text-emerald-600 dark:text-emerald-400",
-                        )}
-                      />
-                    ) : (
-                      <BookOpen
-                        className={cn(
-                          "h-7 w-7 md:h-8 md:w-8",
-                          isActive
-                            ? "text-white drop-shadow-md"
-                            : "text-emerald-600 dark:text-emerald-400",
-                        )}
-                      />
-                    )}
+                    <BookOpen
+                      className={cn(
+                        "h-7 w-7 md:h-8 md:w-8",
+                        isActive
+                          ? "text-white drop-shadow-md"
+                          : "text-emerald-600 dark:text-emerald-400",
+                      )}
+                    />
                   </div>
 
                   <span
@@ -181,7 +168,7 @@ export default function CategoryBubble({
         </div>
 
         <Button
-          variant="outline"
+          variant="brand"
           size="icon"
           onClick={handleNextPage}
           disabled={currentPage === totalPages - 1}

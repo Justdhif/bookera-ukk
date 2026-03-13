@@ -20,7 +20,7 @@ export default function TermsOfServiceList({
       <EmptyState
         title={t("noTerms")}
         description={t("noTermsDesc")}
-        icon={<FileText className="h-10 w-10" />}
+        icon={<FileText />}
       />
     );
   }

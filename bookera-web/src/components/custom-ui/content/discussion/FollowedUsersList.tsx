@@ -9,24 +9,24 @@ import { UserFollower, DiscussionUser } from "@/types/discussion";
 import DiscussionUserCard from "./DiscussionUserCard";
 
 interface FollowedUsersListProps {
-  userId: number;
+  userSlug: string;
 }
 
-export default function FollowedUsersList({ userId }: FollowedUsersListProps) {
+export default function FollowedUsersList({ userSlug }: FollowedUsersListProps) {
   const t = useTranslations("discussion");
   const [following, setFollowing] = React.useState<UserFollower[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    if (!userId) return;
+    if (!userSlug) return;
     userFollowerService
-      .getFollowing(userId, { per_page: 15, page: 1 })
+      .getFollowing(userSlug, { per_page: 15, page: 1 })
       .then((res) => {
         setFollowing(res.data.data?.data ?? []);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [userId]);
+  }, [userSlug]);
 
   if (!loading && following.length === 0) return null;
 

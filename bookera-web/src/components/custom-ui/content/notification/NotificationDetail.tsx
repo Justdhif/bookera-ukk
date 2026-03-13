@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Notification } from "@/types/notification";
 import { Button } from "@/components/ui/button";
-import { Bell, CheckCheck, X, ExternalLink, Trash2, Clock } from "lucide-react";
+import { Bell, CheckCheck, X, ExternalLink, Trash2, Clock, Eye } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { NotificationIconBadge, getModuleBadgeStyle, getNotificationIconConfig } from "./notification-utils";
 import { cn } from "@/lib/utils";
@@ -65,12 +65,11 @@ export default function NotificationDetail({
               onClick={() => onNavigate(notification)}
               className="h-7 text-xs gap-1.5 border-border/60"
             >
-              <ExternalLink className="h-3 w-3" />
-              {t("viewFullDetail")}
-            </Button>
+                          <Eye className="w-4 h-4 mr-2" /> <ExternalLink className="h-3 w-3" />{t("viewFullDetail")}
+                      </Button>
           )}
           <Button
-            variant="ghost"
+            variant="brand"
             size="icon"
             onClick={onClose}
             className="h-7 w-7 text-muted-foreground hover:text-foreground"
@@ -171,10 +170,10 @@ export default function NotificationDetail({
       {/* Footer */}
       <div className="px-5 py-3.5 border-t border-border bg-muted/20">
         <Button
-          variant="outline"
+          variant="destructive"
           size="sm"
           onClick={() => onDelete(notification.id)}
-          className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30 hover:border-destructive/50 h-8 text-xs"
+          className="gap-1.5 h-8 text-xs"
         >
           <Trash2 className="h-3.5 w-3.5" />
           {t("deleteNotification")}

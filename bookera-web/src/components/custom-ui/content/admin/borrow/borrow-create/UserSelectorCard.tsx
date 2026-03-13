@@ -58,7 +58,7 @@ export default function UserSelectorCard({
         <Popover open={popoverOpen} onOpenChange={onPopoverOpenChange}>
           <PopoverTrigger asChild>
             <Button
-              variant="outline"
+              variant="brand"
               role="combobox"
               className="w-full justify-between h-auto min-h-11"
             >

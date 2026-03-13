@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Trash } from "lucide-react";
+import BookCopyStatusBadge from "@/components/custom-ui/badge/BookCopyStatusBadge";
 import { useTranslations } from "next-intl";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 
@@ -59,8 +60,9 @@ export default function BookCopyList({
       <ul className="space-y-2">
         {book.copies.map((copy) => (
           <li key={copy.id} className="flex justify-between border p-2 rounded">
-            <span>
-              {copy.copy_code} ({copy.status})
+            <span className="flex items-center gap-2">
+              {copy.copy_code}
+              <BookCopyStatusBadge status={copy.status} />
             </span>
             <Button
               size="sm"

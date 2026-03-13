@@ -8,6 +8,8 @@ import { Borrow } from "@/types/borrow";
 import { BorrowRequest } from "@/types/borrow-request";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
+import BorrowDetailStatusBadge from "@/components/custom-ui/badge/BorrowDetailStatusBadge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
@@ -94,48 +96,6 @@ export default function MyBorrowPageClient() {
     }
   };
 
-  const getStatusBadge = (borrow: Borrow) => {
-    const statusConfig: Record<
-      Borrow["status"],
-      { variant: any; label: string; className?: string }
-    > = {
-      open: {
-        variant: "default",
-        label: "Active",
-        className: "bg-green-100 text-green-800 hover:bg-green-100",
-      },
-      close: {
-        variant: "outline",
-        label: "Closed",
-        className: "bg-gray-100 text-gray-800 hover:bg-gray-100",
-      },
-    };
-    return (
-      <Badge
-        variant={statusConfig[borrow.status]?.variant || "secondary"}
-        className={statusConfig[borrow.status]?.className}
-      >
-        {statusConfig[borrow.status]?.label || borrow.status}
-      </Badge>
-    );
-  };
-
-  const getDetailStatusBadge = (status: "borrowed" | "returned" | "lost") => {
-    const config: Record<typeof status, { className: string }> = {
-      borrowed: { className: "bg-orange-100 text-orange-800" },
-      returned: { className: "bg-green-100 text-green-800" },
-      lost: { className: "bg-red-100 text-red-800" },
-    };
-    return (
-      <Badge
-        variant="outline"
-        className={`text-xs ${config[status]?.className ?? ""}`}
-      >
-        {status}
-      </Badge>
-    );
-  };
-
   const canReturn = (borrow: Borrow) => borrow.status === "open";
 
   const borrowsSkeleton = (
@@ -191,7 +151,7 @@ export default function MyBorrowPageClient() {
             borrowsSkeleton
           ) : borrows.length === 0 ? (
             <EmptyState
-              icon={<BookOpen className="h-16 w-16" />}
+              icon={<BookOpen />}
               title={t("noBorrowsYet")}
               description={t("noBorrowsYetDesc")}
             />
@@ -205,7 +165,7 @@ export default function MyBorrowPageClient() {
                         <span className="text-base font-semibold">
                           {t("borrowHash")}{borrow.id}
                         </span>
-                        {getStatusBadge(borrow)}
+                        <BorrowStatusBadge status={borrow.status} />
                       </div>
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
@@ -252,7 +212,7 @@ export default function MyBorrowPageClient() {
                       )}
                       {canReturn(borrow) && (
                         <Button
-                          variant="destructive"
+                          variant="brand"
                           size="sm"
                           onClick={() =>
                             setReportLostDialog({ open: true, borrow })
@@ -290,7 +250,7 @@ export default function MyBorrowPageClient() {
                                       {detail.book_copy.copy_code}
                                     </span>
                                   </p>
-                                  {getDetailStatusBadge(detail.status)}
+                                  <BorrowDetailStatusBadge status={detail.status} />
                                 </div>
                               </div>
                             </div>
@@ -316,7 +276,7 @@ export default function MyBorrowPageClient() {
             requestsSkeleton
           ) : requests.length === 0 ? (
             <EmptyState
-              icon={<ClipboardList className="h-16 w-16" />}
+              icon={<ClipboardList />}
               title={t("noRequestsYet")}
               description={t("noRequestsYetDesc")}
             />

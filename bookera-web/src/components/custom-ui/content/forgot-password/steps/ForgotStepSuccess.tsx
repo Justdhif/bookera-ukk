@@ -45,7 +45,7 @@ export default function ForgotStepSuccess({ onBackToLogin }: ForgotStepSuccessPr
           <Button
             type="button"
             onClick={onBackToLogin}
-            className="h-12 px-8 text-base font-semibold rounded-lg bg-linear-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
+            className="h-12 px-8 text-base font-semibold rounded-lg bg-linear-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30" variant="brand"
           >
             Back to Login
             <ArrowRight className="w-5 h-5 ml-2" />

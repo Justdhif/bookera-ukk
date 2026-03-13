@@ -109,7 +109,7 @@ export default function ForgotStepOtp({
           ) : (
             <Button
               type="button"
-              variant="link"
+              variant="brand"
               onClick={onResend}
               disabled={loading}
               className="text-sm font-semibold text-brand-primary hover:text-brand-primary-dark p-0 h-auto inline-flex items-center gap-1.5"
@@ -133,7 +133,7 @@ export default function ForgotStepOtp({
         <div className="text-center">
           <Button
             type="button"
-            variant="link"
+            variant="brand"
             onClick={onBack}
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-brand-primary p-0 h-auto inline-flex items-center gap-1"
             disabled={loading}

@@ -166,7 +166,7 @@ export default function SetupStepProfessional({
         <div className="flex gap-3">
           <Button
             type="button"
-            variant="outline"
+            variant="brand"
             onClick={onBack}
             disabled={loading}
             className="h-12 px-5 rounded-lg border-gray-300 dark:border-gray-600 hover:border-brand-primary/50 transition-all"

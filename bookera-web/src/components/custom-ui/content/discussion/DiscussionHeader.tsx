@@ -37,7 +37,7 @@ export default function DiscussionHeader() {
 
         <div className="flex items-center gap-1">
           <Button
-            variant="ghost"
+            variant="submit"
             size="icon"
             className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground"
             onClick={() => {

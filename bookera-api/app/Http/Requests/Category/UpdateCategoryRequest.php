@@ -15,7 +15,6 @@ class UpdateCategoryRequest extends FormRequest
     {
         return [
             'name' => 'required|string|unique:categories,name,' . $this->category->id,
-            'icon' => 'nullable|string',
             'description' => 'nullable|string',
         ];
     }

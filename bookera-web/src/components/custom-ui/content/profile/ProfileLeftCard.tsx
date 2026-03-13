@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload } from "lucide-react";
 import RoleBadge from "@/components/custom-ui/badge/RoleBadge";
-import UserStatusBadge from "@/components/custom-ui/badge/UserStatusBadge";
+import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 
 interface ProfileLeftCardProps {
   user: User;
@@ -65,7 +65,7 @@ export default function ProfileLeftCard({
 
         <Button
           type="button"
-          variant="outline"
+          variant="brand"
           onClick={onOpenAvatarModal}
           className="w-full"
           disabled={!isEditMode}
@@ -82,7 +82,7 @@ export default function ProfileLeftCard({
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">{t("statusLabel")}</span>
-            <UserStatusBadge isActive={user.is_active} />
+            <ActiveStatusBadge isActive={user.is_active} />
           </div>
           {user.profile.identification_number && (
             <div className="flex items-center justify-between">

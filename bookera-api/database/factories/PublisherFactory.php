@@ -21,9 +21,11 @@ class PublisherFactory extends Factory
     public function definition(): array
     {
         $name = fake()->company();
+        $slugBase = Str::slug($name);
+        $slugSuffix = Str::lower((string) Str::ulid());
 
         return [
-            'slug'        => Str::slug($name) . '-' . fake()->unique()->numerify('###'),
+            'slug'        => $slugBase . '-' . $slugSuffix,
             'name'        => $name,
             'description' => fake()->optional(0.8)->paragraph(2),
             'photo'       => 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&size=200&background=random',

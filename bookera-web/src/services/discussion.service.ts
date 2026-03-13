@@ -6,8 +6,12 @@ import {
   DiscussionUser,
   DiscussionPostListResponse,
   DiscussionCommentListResponse,
+  DiscussionPostReportListResponse,
   UserFollowerListResponse,
   FollowCounts,
+  PostReportReason,
+  PostReportStatus,
+  DiscussionPostReport,
 } from "@/types/discussion";
 
 export interface CreatePostData {
@@ -27,11 +31,11 @@ export const discussionPostService = {
     }),
 
   getPostsByUser: (
-    userId: number,
+    userSlug: string,
     params?: { per_page?: number; page?: number },
   ) =>
     api.get<ApiResponse<DiscussionPostListResponse>>(
-      `/discussion-posts/user/${userId}`,
+      `/discussion-posts/user/${userSlug}`,
       { params },
     ),
 
@@ -65,6 +69,9 @@ export const discussionPostService = {
 
   deletePost: (slug: string) =>
     api.delete<ApiResponse<null>>(`/discussion-posts/${slug}`),
+
+  reportPost: (slug: string, data: { reason: PostReportReason; description?: string }) =>
+    api.post<ApiResponse<DiscussionPostReport>>(`/discussion-posts/${slug}/report`, data),
 
   getActiveUsers: () =>
     api.get<ApiResponse<DiscussionUser[]>>("/discussion-posts/active-users"),
@@ -130,28 +137,49 @@ export const userFollowerService = {
     }),
 
   getFollowers: (
-    userId: number,
+    userSlug: string,
     params?: { per_page?: number; page?: number },
   ) =>
     api.get<ApiResponse<UserFollowerListResponse>>(
-      `/users/${userId}/followers`,
+      `/users/${userSlug}/followers`,
       { params },
     ),
 
   getFollowing: (
-    userId: number,
+    userSlug: string,
     params?: { per_page?: number; page?: number },
   ) =>
     api.get<ApiResponse<UserFollowerListResponse>>(
-      `/users/${userId}/following`,
+      `/users/${userSlug}/following`,
       { params },
     ),
 
-  getFollowCounts: (userId: number) =>
-    api.get<ApiResponse<FollowCounts>>(`/users/${userId}/follow-counts`),
+  getFollowCounts: (userSlug: string) =>
+    api.get<ApiResponse<FollowCounts>>(`/users/${userSlug}/follow-counts`),
 
-  getUserPublicProfile: (userId: number) =>
+  getUserPublicProfile: (userSlug: string) =>
     api.get<ApiResponse<import("@/types/user").User>>(
-      `/users/${userId}/profile`,
+      `/users/${userSlug}/profile`,
     ),
+};
+
+export interface ReviewReportData {
+  status: PostReportStatus;
+  admin_note?: string;
+  takedown?: boolean;
+  takedown_reason?: string;
+}
+
+export const adminDiscussionService = {
+  getReports: (params?: { per_page?: number; page?: number; status?: PostReportStatus }) =>
+    api.get<ApiResponse<DiscussionPostReportListResponse>>("/admin/discussion-posts/reports", { params }),
+
+  reviewReport: (reportId: number, data: ReviewReportData) =>
+    api.patch<ApiResponse<DiscussionPostReport>>(`/admin/discussion-posts/reports/${reportId}`, data),
+
+  takedownPost: (slug: string, data?: { reason?: string }) =>
+    api.patch<ApiResponse<DiscussionPost>>(`/admin/discussion-posts/${slug}/takedown`, data ?? {}),
+
+  restorePost: (slug: string) =>
+    api.patch<ApiResponse<DiscussionPost>>(`/admin/discussion-posts/${slug}/restore`),
 };

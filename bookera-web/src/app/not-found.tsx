@@ -71,7 +71,7 @@ export default function NotFoundPage() {
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
           <Button
             onClick={() => router.back()}
-            variant="outline"
+            variant="brand"
             size="lg"
             className="w-full sm:w-auto group"
           >
@@ -81,8 +81,9 @@ export default function NotFoundPage() {
 
           <Link href="/admin" className="w-full sm:w-auto">
             <Button
+              variant="brand"
               size="lg"
-              className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all"
+              className="w-full"
             >
               <Home className="mr-2 h-4 w-4" />
               Go to Dashboard

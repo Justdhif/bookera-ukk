@@ -3,6 +3,7 @@
 namespace App\Services\User;
 
 use App\Helpers\ActivityLogger;
+use App\Helpers\SlugGenerator;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
@@ -66,6 +67,7 @@ class UserService
                 'password' => Hash::make($data['password']),
                 'role' => $data['role'],
                 'is_active' => $isActive,
+                'slug' => SlugGenerator::generate('users', 'slug', $data['full_name']),
             ]);
 
             $avatarPath = $this->handleAvatar($data['avatar'] ?? null);

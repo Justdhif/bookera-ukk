@@ -24,6 +24,8 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class User extends Authenticatable
 {
+    use HasFactory;
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
 
@@ -98,5 +100,17 @@ class User extends Authenticatable
     public function following()
     {
         return $this->hasMany(Follow::class, 'user_id')->where('followable_type', self::class);
+    }
+
+    /** Discussion Post Reports created by this user */
+    public function reportedPosts()
+    {
+        return $this->hasMany(DiscussionPostReport::class, 'reporter_id');
+    }
+
+    /** Discussion Post Reports reviewed by this admin/user */
+    public function reviewedReports()
+    {
+        return $this->hasMany(DiscussionPostReport::class, 'reviewed_by');
     }
 }

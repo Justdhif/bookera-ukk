@@ -14,6 +14,8 @@ import {
   Send,
   Shield,
   X,
+  Flag,
+  AlertTriangle,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +39,7 @@ import { useAuthStore } from "@/store/auth.store";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
 import { cn } from "@/lib/utils";
 import CommentSection, { CommentSectionHandle } from "../CommentSection";
+import ReportPostDialog from "../ReportPostDialog";
 
 interface Props {
   post: DiscussionPost;
@@ -57,9 +60,14 @@ export default function PostDetailPanel({ post, onDeleted, onCommentAdded, onCom
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [replyTo, setReplyTo] = useState<{ parentId: number; targetName: string } | null>(null);
+  const [captionExpanded, setCaptionExpanded] = useState(false);
   const commentSectionRef = useRef<CommentSectionHandle>(null);
 
   const isOwner = user?.id === post.user_id;
+  const isTakenDown = !!post.taken_down_at;
+  const userProfileHref = post.user.slug ? `/discussion/user/${post.user.slug}` : `/discussion/user/${post.user_id}`;
+  const [reportOpen, setReportOpen] = useState(false);
+  const hasLongCaption = !!post.caption && (post.caption.length > 140 || post.caption.includes("\n"));
 
   // Listen to real-time post updates
   useEffect(() => {
@@ -159,13 +167,27 @@ export default function PostDetailPanel({ post, onDeleted, onCommentAdded, onCom
     }
   };
 
+  const handleReportClick = () => {
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+    setReportOpen(true);
+  };
+
   return (
     <>
       <div className="flex flex-col h-full">
         {/* Author header — fixed */}
         <div className="shrink-0 flex items-center justify-between px-4 py-3.5 border-b border-border/50 bg-linear-to-r from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20">
+          {isTakenDown && (
+            <div className="absolute top-0 left-0 right-0 flex items-center gap-2 px-4 py-1.5 bg-destructive/10 text-destructive text-xs font-medium border-b border-destructive/20 z-10">
+              <AlertTriangle className="h-3.5 w-3.5" />
+              Postingan ini telah ditakedown oleh admin.
+            </div>
+          )}
           <Link
-            href={`/discussion/user/${post.user_id}`}
+            href={userProfileHref}
             className="flex items-center gap-3 group"
           >
             <Avatar className="h-10 w-10 ring-2 ring-purple-200 dark:ring-purple-800 group-hover:ring-purple-400 transition-all shadow-sm">
@@ -202,7 +224,7 @@ export default function PostDetailPanel({ post, onDeleted, onCommentAdded, onCom
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant="brand"
                   size="icon"
                   className="h-8 w-8 rounded-full"
                 >
@@ -234,12 +256,28 @@ export default function PostDetailPanel({ post, onDeleted, onCommentAdded, onCom
         <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3 space-y-3">
           {/* Caption */}
           {post.caption && (
-            <p className="text-sm leading-relaxed whitespace-pre-wrap wrap-break-word">
+            <div>
+              <p
+                className={cn(
+                  "text-sm leading-relaxed whitespace-pre-wrap wrap-break-word",
+                  !captionExpanded && "line-clamp-1",
+                )}
+              >
               <span className="font-semibold mr-1.5">
                 {post.user.profile?.full_name ?? post.user.email}
               </span>
               {post.caption}
-            </p>
+              </p>
+              {hasLongCaption && (
+                <button
+                  type="button"
+                  className="mt-1 text-xs font-medium text-primary hover:underline"
+                  onClick={() => setCaptionExpanded((prev) => !prev)}
+                >
+                  {captionExpanded ? t("seeLessCaption") : t("seeMoreCaption")}
+                </button>
+              )}
+            </div>
           )}
 
           {/* Comments */}
@@ -266,7 +304,7 @@ export default function PostDetailPanel({ post, onDeleted, onCommentAdded, onCom
         <div className="shrink-0 border-t border-border/50 px-4 py-3 space-y-2">
           <div className="flex items-center gap-1 -mx-1">
             <Button
-              variant="ghost"
+              variant="brand"
               size="sm"
               className={cn(
                 "gap-1.5 rounded-xl px-3",
@@ -285,6 +323,18 @@ export default function PostDetailPanel({ post, onDeleted, onCommentAdded, onCom
               <MessageCircle className="h-5 w-5" />
               <span className="text-sm font-medium">{commentsCount}</span>
             </div>
+
+            {!isOwner && (
+              <Button
+                variant="brand"
+                size="sm"
+                className="gap-1.5 rounded-xl px-3 text-muted-foreground hover:text-orange-600"
+                onClick={handleReportClick}
+              >
+                <Flag className="h-5 w-5" />
+                <span className="text-sm font-medium">{t("report")}</span>
+              </Button>
+            )}
           </div>
 
           {/* Comment input */}
@@ -347,6 +397,11 @@ export default function PostDetailPanel({ post, onDeleted, onCommentAdded, onCom
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         onConfirm={handleDelete}
+      />
+      <ReportPostDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        postSlug={post.slug}
       />
     </>
   );

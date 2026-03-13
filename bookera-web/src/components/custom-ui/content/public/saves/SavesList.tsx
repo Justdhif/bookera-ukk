@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookMarked, Plus, LogIn, Library } from "lucide-react";
+import { BookMarked, Plus, LogIn, Library, Lock } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -121,7 +121,7 @@ export default function SavesList({
                 <Link href="/login">
                   <Button
                     size="icon"
-                    variant="ghost"
+                    variant="brand"
                     className="h-14 w-14 rounded-lg hover:bg-muted/60 dark:hover:bg-white/10"
                   >
                     <LogIn className="h-6 w-6 text-muted-foreground dark:text-white/60" />
@@ -140,7 +140,7 @@ export default function SavesList({
     return (
       <EmptyState
         variant="compact"
-        icon={<BookMarked className="h-8 w-8" />}
+        icon={<Lock />}
         title={t("loginRequired")}
         description={t("loginRequiredDesc")}
         linkLabel={t("loginToContinue")}
@@ -163,7 +163,7 @@ export default function SavesList({
             </div>
             <Button
               size="sm"
-              variant="ghost"
+              variant="submit"
               onClick={() => setShowCreateDialog(true)}
               className="gap-1.5 h-8 text-xs md:text-sm hover:text-brand-primary hover:bg-brand-primary/10"
             >
@@ -186,7 +186,7 @@ export default function SavesList({
           ) : saves.length === 0 ? (
             <EmptyState
               variant="compact"
-              icon={<BookMarked className="h-5 w-5" />}
+              icon={<BookMarked />}
               title={t("noCollections")}
               actionLabel={t("createFirst")}
               onAction={() => setShowCreateDialog(true)}
@@ -239,7 +239,7 @@ export default function SavesList({
                 <TooltipTrigger asChild>
                   <Button
                     size="icon"
-                    variant="brand"
+                    variant="submit"
                     onClick={() => setShowCreateDialog(true)}
                     className="h-8 w-8 rounded-lg"
                   >
@@ -278,7 +278,7 @@ export default function SavesList({
 
           <Button
             size="sm"
-            variant="ghost"
+            variant="submit"
             className="h-7 w-7 p-0 text-muted-foreground dark:text-white/70 hover:text-brand-primary dark:hover:text-brand-primary-light hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 rounded-lg transition-colors"
             onClick={() => setShowCreateDialog(true)}
           >

@@ -77,7 +77,7 @@ export default function UserClient() {
           </div>
         </div>
         <Link href="/admin/users/add">
-          <Button variant="brand" className="h-8 gap-1">
+          <Button variant="submit" className="h-8 gap-1">
             <Plus className="w-3.5 h-3.5" />
             
                                   {t("addUser")}

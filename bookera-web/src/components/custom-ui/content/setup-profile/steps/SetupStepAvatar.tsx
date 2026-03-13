@@ -21,6 +21,8 @@ import {
   Check,
   FileWarning,
   User as UserIcon,
+  Trash,
+  Eye,
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -38,7 +40,6 @@ const iconPopTransition = {
   damping: 15,
   delay: 0.2,
 };
-
 
 interface SetupStepAvatarProps {
   avatarFile: File | string | null;
@@ -156,12 +157,13 @@ export default function SetupStepAvatar({
           className={cn(
             "relative flex flex-col items-center gap-4 p-6 rounded-xl transition-all duration-200",
             !previewUrl && "cursor-pointer border-2 border-dashed",
-            isDragging && "border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10",
+            isDragging &&
+              "border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10",
             hasError
               ? "border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/30"
               : !previewUrl
-              ? "border-gray-300 dark:border-gray-700"
-              : ""
+                ? "border-gray-300 dark:border-gray-700"
+                : "",
           )}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -193,7 +195,7 @@ export default function SetupStepAvatar({
                   }}
                   className="absolute -top-2 -right-2 h-7 w-7 rounded-full shadow-lg"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <Trash className="w-4 h-4 mr-2" />
                   <span className="sr-only">{t("removeAvatar")}</span>
                 </Button>
               </div>
@@ -209,8 +211,8 @@ export default function SetupStepAvatar({
                   isDragging
                     ? "bg-brand-primary/10 dark:bg-brand-primary/20"
                     : hasError
-                    ? "bg-red-100 dark:bg-red-900/50 animate-shake"
-                    : "bg-gray-100 dark:bg-gray-800"
+                      ? "bg-red-100 dark:bg-red-900/50 animate-shake"
+                      : "bg-gray-100 dark:bg-gray-800",
                 )}
               >
                 {hasError ? (
@@ -221,7 +223,9 @@ export default function SetupStepAvatar({
                   <Upload
                     className={cn(
                       "h-10 w-10",
-                      isDragging ? "text-brand-primary" : "text-gray-400 dark:text-gray-500"
+                      isDragging
+                        ? "text-brand-primary"
+                        : "text-gray-400 dark:text-gray-500",
                     )}
                   />
                 )}
@@ -270,7 +274,7 @@ export default function SetupStepAvatar({
                 <Button
                   key={url}
                   type="button"
-                  variant="ghost"
+                  variant="brand"
                   size="icon"
                   onClick={() => handleDefaultAvatarClick(url)}
                   className="relative h-auto w-auto p-0 hover:bg-transparent group"
@@ -280,7 +284,7 @@ export default function SetupStepAvatar({
                       "relative rounded-full transition-all duration-200",
                       isSelected
                         ? "ring-2 ring-offset-2 ring-brand-primary ring-offset-background scale-105"
-                        : "group-hover:scale-105 group-hover:ring-1 group-hover:ring-gray-300"
+                        : "group-hover:scale-105 group-hover:ring-1 group-hover:ring-gray-300",
                     )}
                   >
                     <div className="relative h-12 w-12 rounded-full overflow-hidden border-2 border-white dark:border-gray-800">
@@ -314,16 +318,16 @@ export default function SetupStepAvatar({
           </Label>
           <Button
             type="button"
-            variant={hasError ? "destructive" : "outline"}
+            variant="outline"
             onClick={() => fileInputRef.current?.click()}
             className={cn(
               "w-full gap-2 border-gray-300 dark:border-gray-600 hover:border-brand-primary/50 transition-all",
               hasError &&
-                "bg-red-50 hover:bg-red-100 text-red-700 border-red-300 dark:bg-red-950/30 dark:hover:bg-red-900/50 dark:text-red-400 dark:border-red-800"
+                "bg-red-50 hover:bg-red-100 text-red-700 border-red-300 dark:bg-red-950/30 dark:hover:bg-red-900/50 dark:text-red-400 dark:border-red-800",
             )}
             disabled={loading}
           >
-            <Upload className="h-4 w-4" />
+            <Eye className="w-4 h-4 mr-2" /> <Upload className="h-4 w-4" />
             {previewUrl ? t("changePhoto") : t("browseFiles")}
           </Button>
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
@@ -334,7 +338,7 @@ export default function SetupStepAvatar({
         <div className="flex gap-3">
           <Button
             type="button"
-            variant="outline"
+            variant="brand"
             onClick={onBack}
             disabled={loading}
             className="h-12 px-5 rounded-lg border-gray-300 dark:border-gray-600 hover:border-brand-primary/50 transition-all"
@@ -351,7 +355,9 @@ export default function SetupStepAvatar({
             className="flex-1 h-12 text-base font-semibold rounded-lg bg-linear-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
             spinnerClassName="text-white"
           >
-            {loading ? t("saving") : (
+            {loading ? (
+              t("saving")
+            ) : (
               <>
                 {t("saveAndExplore")}
                 <ArrowRight className="w-5 h-5 ml-2" />

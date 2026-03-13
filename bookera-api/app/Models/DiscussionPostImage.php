@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property int $id
@@ -16,6 +17,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class DiscussionPostImage extends Model
 {
+    use HasFactory;
+
     protected $table = 'discussion_post_images';
 
     protected $fillable = [

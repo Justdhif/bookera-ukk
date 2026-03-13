@@ -23,7 +23,7 @@ export function ReturnActionsCard({
         <div className="flex flex-col sm:flex-row gap-3 justify-end">
           {hasUnpaidFines && (
             <Button
-              variant="outline"
+              variant="brand"
               onClick={onFinishFines}
               disabled={finishingFines || finishingBorrow}
               className="border-amber-500 text-amber-600 hover:bg-amber-50"
@@ -45,7 +45,7 @@ export function ReturnActionsCard({
               hasUnpaidFines
                 ? "Settle all fines before closing the borrow"
                 : undefined
-            }
+            } variant="brand"
           >
             {finishingBorrow ? (
               <Loader2 className="h-4 w-4 animate-spin mr-2" />

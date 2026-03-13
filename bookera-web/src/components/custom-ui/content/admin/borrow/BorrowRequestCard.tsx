@@ -4,7 +4,7 @@ import { BorrowRequest } from "@/types/borrow-request";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { BookOpen, Calendar, User, ArrowRight, Trash } from "lucide-react";
+import { BookOpen, Calendar, User, Eye, Trash } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
 
@@ -86,9 +86,9 @@ export function BorrowRequestCard({ req, onDelete }: BorrowRequestCardProps) {
               <Trash className="h-4 w-4" />
             </Button>
             <Link href={`/admin/borrow-requests/${req.id}`}>
-              <Button size="sm" variant="brand">
+              <Button size="sm" variant="outline" className="h-8 gap-1">
+                <Eye className="h-3.5 w-3.5" />
                 Detail
-                <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             </Link>
           </div>

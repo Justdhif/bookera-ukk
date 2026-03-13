@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { AVAILABLE_ICONS } from "@/lib/icons";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 interface IconPickerProps {
   value: string;
@@ -21,14 +21,13 @@ export default function IconPicker({ value, onChange, onClear }: IconPickerProps
         {value && (
           <Button
             type="button"
-            variant="ghost"
+            variant="destructive"
             size="sm"
             onClick={onClear}
             className="h-7 text-xs"
           >
-            <X className="h-3 w-3 mr-1" />
-            {t("delete")}
-          </Button>
+                      <Trash className="w-4 h-4 mr-2" /> <X className="h-3 w-3 mr-1" />{t("delete")}
+                  </Button>
         )}
       </div>
 

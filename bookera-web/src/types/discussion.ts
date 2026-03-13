@@ -18,10 +18,39 @@ export interface DiscussionPost {
   likes_count: number;
   comments_count: number;
   is_liked: boolean;
+  taken_down_at: string | null;
+  taken_down_reason: string | null;
   created_at: string;
   updated_at: string;
   user: User;
   images: DiscussionPostImage[];
+}
+
+export type PostReportReason =
+  | "spam"
+  | "harassment"
+  | "hate_speech"
+  | "misinformation"
+  | "inappropriate_content"
+  | "other";
+
+export type PostReportStatus = "pending" | "reviewed" | "dismissed";
+
+export interface DiscussionPostReport {
+  id: number;
+  reporter_id: number;
+  post_id: number;
+  reason: PostReportReason;
+  description: string | null;
+  status: PostReportStatus;
+  reviewed_by: number | null;
+  reviewed_at: string | null;
+  admin_note: string | null;
+  created_at: string;
+  updated_at: string;
+  reporter?: User;
+  post?: DiscussionPost;
+  reviewer?: User;
 }
 
 export interface DiscussionComment {
@@ -57,6 +86,7 @@ export interface FollowCounts {
 export interface DiscussionUser {
   id: number;
   email: string;
+  slug?: string;
   role: string;
   is_following: boolean;
   profile?: {
@@ -69,3 +99,4 @@ export interface DiscussionUser {
 export type DiscussionPostListResponse = PaginatedResponse<DiscussionPost>;
 export type DiscussionCommentListResponse = PaginatedResponse<DiscussionComment>;
 export type UserFollowerListResponse = PaginatedResponse<UserFollower>;
+export type DiscussionPostReportListResponse = PaginatedResponse<DiscussionPostReport>;

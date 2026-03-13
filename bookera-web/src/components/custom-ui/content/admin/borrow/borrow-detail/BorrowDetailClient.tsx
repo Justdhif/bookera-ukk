@@ -48,7 +48,7 @@ export default function BorrowDetailClient() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Button
-          variant="ghost"
+          variant="brand"
           size="icon"
           className="h-8 w-8"
           onClick={() => router.back()}

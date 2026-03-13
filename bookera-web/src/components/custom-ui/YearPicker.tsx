@@ -61,7 +61,7 @@ export default function YearPicker({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          variant="brand"
           role="combobox"
           aria-expanded={open}
           disabled={disabled}

@@ -1,5 +1,4 @@
 import { Borrow } from "@/types/borrow";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -7,9 +6,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { PackageCheck, QrCode } from "lucide-react";
+import { QrCode } from "lucide-react";
 import { QrCodeImage } from "@/components/custom-ui/QrCodeImage";
 import { useTranslations } from "next-intl";
+import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
 
 interface BorrowQrCardProps {
   borrow: Borrow;
@@ -17,10 +17,6 @@ interface BorrowQrCardProps {
 
 export function BorrowQrCard({ borrow }: BorrowQrCardProps) {
   const t = useTranslations("borrow");
-  const statusConfig: Record<Borrow["status"], { label: string; className: string }> = {
-    open: { label: t("statusOpen"), className: "bg-green-100 text-green-800 hover:bg-green-100" },
-    close: { label: t("statusClosed"), className: "bg-gray-100 text-gray-800 hover:bg-gray-100" },
-  };
   return (
     <Card className="flex flex-col">
       <CardHeader>
@@ -43,10 +39,7 @@ export function BorrowQrCard({ borrow }: BorrowQrCardProps) {
               <p className="text-sm font-medium">{t("borrowStatus")}</p>
               <p className="text-xs text-muted-foreground">{t("currentProcessingState")}</p>
             </div>
-            <Badge className={statusConfig[borrow.status]?.className}>
-              <PackageCheck className="h-3 w-3 mr-1" />
-              {statusConfig[borrow.status]?.label || borrow.status}
-            </Badge>
+            <BorrowStatusBadge status={borrow.status} />
           </div>
         </div>
       </CardContent>

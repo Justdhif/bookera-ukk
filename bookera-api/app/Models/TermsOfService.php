@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property int $id
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class TermsOfService extends Model
 {
+    use HasFactory;
+
     protected $table = 'terms_of_services';
 
     protected $fillable = [

@@ -14,11 +14,9 @@ import { Label } from "@/components/ui/label";
 import { Category } from "@/types/category";
 import { categoryService } from "@/services/category.service";
 import { toast } from "sonner";
-import IconPicker from "@/components/custom-ui/IconPicker";
 
 interface FormData {
   name: string;
-  icon: string;
   description: string;
 }
 
@@ -36,7 +34,6 @@ export default function CategoryFormDialog({
   const t = useTranslations("category");
   const [formData, setFormData] = useState<FormData>({
     name: "",
-    icon: "",
     description: "",
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +42,6 @@ export default function CategoryFormDialog({
   useEffect(() => {
     setFormData({
       name: category?.name ?? "",
-      icon: category?.icon ?? "",
       description: category?.description ?? "",
     });
   }, [category, open]);
@@ -57,20 +53,6 @@ export default function CategoryFormDialog({
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
-
-  const handleIconChange = (iconValue: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      icon: iconValue,
-    }));
-  };
-
-  const handleClearIcon = () => {
-    setFormData((prev) => ({
-      ...prev,
-      icon: "",
     }));
   };
 
@@ -96,14 +78,12 @@ export default function CategoryFormDialog({
       if (category) {
         await categoryService.update(category.id, {
           name: formData.name,
-          icon: formData.icon || undefined,
           description: formData.description,
         });
         toast.success(t("updateSuccess"));
       } else {
         await categoryService.create({
           name: formData.name,
-          icon: formData.icon || undefined,
           description: formData.description,
         });
         toast.success(t("addSuccess"));
@@ -111,7 +91,6 @@ export default function CategoryFormDialog({
 
       setFormData({
         name: "",
-        icon: "",
         description: "",
       });
       setOpen(false);
@@ -160,12 +139,6 @@ export default function CategoryFormDialog({
               />
             </div>
           </div>
-
-          <IconPicker
-            value={formData.icon}
-            onChange={handleIconChange}
-            onClear={handleClearIcon}
-          />
 
           <Button
             onClick={handleSubmit}

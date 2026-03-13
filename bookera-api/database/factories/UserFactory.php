@@ -2,43 +2,72 @@
 
 namespace Database\Factories;
 
+use App\Helpers\AvatarHelper;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
+    protected $model = User::class;
+
     protected static ?string $password;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'email'             => fake()->unique()->safeEmail(),
+            'slug'              => Str::slug(fake()->unique()->userName()),
+            'password'          => static::$password ??= Hash::make('password'),
+            'role'              => fake()->randomElement(['admin', 'officer:catalog', 'officer:management', 'user']),
+            'is_active'         => true,
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
+    public function admin(): static
+    {
+        return $this->state(['role' => 'admin']);
+    }
+
+    public function officerCatalog(): static
+    {
+        return $this->state(['role' => 'officer:catalog']);
+    }
+
+    public function officerManagement(): static
+    {
+        return $this->state(['role' => 'officer:management']);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(['is_active' => false]);
+    }
+
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this->state(['email_verified_at' => null]);
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->profile()->create([
+                'full_name'             => fake()->name(),
+                'gender'                => fake()->randomElement(['male', 'female', 'prefer_not_to_say']),
+                'phone_number'          => fake()->unique()->numerify('08##########'),
+                'address'               => fake()->address(),
+                'bio'                   => fake()->optional(0.7)->sentence(),
+                'identification_number' => strtoupper(fake()->unique()->bothify('??-####')),
+                'occupation'            => fake()->randomElement(['Student', 'Teacher', 'Staff', 'Public', 'Other']),
+                'institution'           => fake()->company(),
+                'avatar'                => AvatarHelper::generateDefaultAvatar($user->id),
+            ]);
+        });
     }
 }

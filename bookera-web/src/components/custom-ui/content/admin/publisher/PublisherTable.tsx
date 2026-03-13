@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import { Publisher } from "@/types/publisher";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Building2, Eye, Trash } from "lucide-react";
@@ -31,7 +31,7 @@ export default function PublisherTable({
       <EmptyState
         title={t("noPublishers")}
         description={t("noPublishersDesc")}
-        icon={<Building2 className="h-10 w-10" />}
+        icon={<Building2 />}
       />
     );
   }
@@ -90,15 +90,7 @@ export default function PublisherTable({
             </TableCell>
 
             <TableCell>
-              <Badge
-                className={
-                  item.is_active
-                    ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                    : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                }
-              >
-                {item.is_active ? t("active") : t("inactive")}
-              </Badge>
+              <ActiveStatusBadge isActive={item.is_active} />
             </TableCell>
 
             <TableCell>

@@ -27,15 +27,18 @@ class DiscussionPostController extends Controller
         return ApiResponse::successResponse('Posts retrieved successfully', $posts);
     }
 
-    public function byUser(Request $request, int $userId): JsonResponse
+    public function byUser(Request $request, string $userSlug): JsonResponse
     {
-        $posts = $this->postService->getUserPosts(
-            $userId,
-            auth('sanctum')->user(),
-            (int) $request->get('per_page', 15)
-        );
-
-        return ApiResponse::successResponse('User posts retrieved successfully', $posts);
+        try {
+            $posts = $this->postService->getUserPosts(
+                $userSlug,
+                auth('sanctum')->user(),
+                (int) $request->get('per_page', 15)
+            );
+            return ApiResponse::successResponse('User posts retrieved successfully', $posts);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+            return ApiResponse::notFoundResponse('User not found');
+        }
     }
 
     public function show(Request $request, string $slug): JsonResponse

@@ -4,15 +4,15 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-interface UserStatusBadgeProps {
+interface ActiveStatusBadgeProps {
   isActive: boolean;
   className?: string;
 }
 
-export default function UserStatusBadge({
+export default function ActiveStatusBadge({
   isActive,
   className,
-}: UserStatusBadgeProps) {
+}: ActiveStatusBadgeProps) {
   const t = useTranslations("profile");
 
   return (

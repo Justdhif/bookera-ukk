@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
-import { BookPlus, Loader2 } from "lucide-react";
+import { BookPlus, Loader2, Eye } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Image from "next/image";
 
@@ -153,9 +153,8 @@ export function BorrowFromCollectionDialog({
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
           >
-            
-                                  {t("detail.editDialog.cancel")}
-                                </Button>
+                      {t("detail.editDialog.cancel")}
+                  </Button>
           <Button
             onClick={handleSubmit}
             disabled={isSubmitDisabled()}

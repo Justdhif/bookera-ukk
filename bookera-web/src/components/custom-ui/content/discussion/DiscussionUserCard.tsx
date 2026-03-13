@@ -55,7 +55,7 @@ export default function DiscussionUserCard({ user }: Props) {
 
   return (
     <Link
-      href={`/discussion/user/${user.id}`}
+      href={`/discussion/user/${user.slug ?? user.id}`}
       className="flex flex-col items-center gap-3 p-4 rounded-2xl border border-border/60 bg-card hover:shadow-md hover:border-purple-300/50 dark:hover:border-purple-700/50 transition-all group w-36 shrink-0"
     >
       <div className="relative">
@@ -86,7 +86,7 @@ export default function DiscussionUserCard({ user }: Props) {
       {!isOwner && (
         <Button
           size="sm"
-          variant={following ? "outline" : "default"}
+          variant="brand"
           className={cn(
             "h-7 text-xs px-3 w-full rounded-full",
             following

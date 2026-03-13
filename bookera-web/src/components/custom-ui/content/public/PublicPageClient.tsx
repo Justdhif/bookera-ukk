@@ -1,36 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import CategoryBubble from "./category/CategoryBubble";
 import BookList from "./book/BookList";
+import BookListSkeleton from "./book/BookListSkeleton";
 import { bookService } from "@/services/book.service";
+import { categoryService } from "@/services/category.service";
 import { Book } from "@/types/book";
+import { Category } from "@/types/category";
 import SavesList from "./saves/SavesList";
 import BannerCarousel from "./BannerCarousel";
 import SpeakerMarquee from "./SpeakerMarquee";
 import RealTimeClock from "./RealTimeClock";
 import QuickNavSection from "./QuickNavSection";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function PublicPageClient() {
-  const [books, setBooks] = useState<Book[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [allBooks, setAllBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [categoryId, setCategoryId] = useState<number | null>(null);
-
-  const fetchBooks = async () => {
-    setLoading(true);
-
-    const res = await bookService.getAll({
-      status: "active",
-    });
-
-    setBooks(res.data.data.data);
-    setLoading(false);
-  };
-
   useEffect(() => {
-    fetchBooks();
-  }, [categoryId]);
+    const fetchAll = async () => {
+      setLoading(true);
+      const [catRes, bookRes] = await Promise.all([
+        categoryService.getAll({ per_page: 100 }),
+        bookService.getAll({ status: "active", per_page: 100 }),
+      ]);
+      setCategories(catRes.data.data.data);
+      setAllBooks(bookRes.data.data.data);
+      setLoading(false);
+    };
+    fetchAll();
+  }, []);
+
+  const booksByCategory = categories
+    .map((cat) => ({
+      category: cat,
+      books: allBooks.filter((book) =>
+        book.categories?.some((c) => c.id === cat.id),
+      ),
+    }))
+    .filter((group) => group.books.length > 0);
 
   return (
     <div className="space-y-8 pb-10">
@@ -58,7 +68,24 @@ export default function PublicPageClient() {
         <div className="lg:hidden">
           <SavesList mode="horizontal" />
         </div>
-        <BookList books={books} loading={loading} />
+
+        <div className="space-y-10">
+          {loading
+            ? Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="space-y-3">
+                  <Skeleton className="h-7 w-40" />
+                  <BookListSkeleton />
+                </div>
+              ))
+            : booksByCategory.map(({ category, books }) => (
+                <section key={category.id} className="space-y-3">
+                  <h2 className="text-xl font-bold border-l-4 border-brand-primary pl-3">
+                    {category.name}
+                  </h2>
+                  <BookList books={books} loading={false} />
+                </section>
+              ))}
+        </div>
       </div>
     </div>
   );

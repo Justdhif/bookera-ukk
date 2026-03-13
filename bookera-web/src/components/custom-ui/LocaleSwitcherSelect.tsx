@@ -40,7 +40,7 @@ export default function LocaleSwitcherSelect({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button 
-          variant="ghost" 
+          variant="brand" 
           size={iconOnly ? "icon" : "default"}
           className={iconOnly ? "h-9 w-9 rounded-full" : "flex items-center gap-2 h-9 px-3"} 
           title={label}

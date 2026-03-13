@@ -86,7 +86,7 @@ export default function ForgotStepReset({ loading, onReset }: ForgotStepResetPro
               />
               <Button
                 type="button"
-                variant="ghost"
+                variant="brand"
                 size="icon"
                 onClick={() => setShowNew(!showNew)}
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 text-gray-400 dark:text-gray-300 hover:text-brand-primary hover:bg-transparent"
@@ -122,7 +122,7 @@ export default function ForgotStepReset({ loading, onReset }: ForgotStepResetPro
               />
               <Button
                 type="button"
-                variant="ghost"
+                variant="brand"
                 size="icon"
                 onClick={() => setShowConfirm(!showConfirm)}
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 text-gray-400 dark:text-gray-300 hover:text-brand-primary hover:bg-transparent"

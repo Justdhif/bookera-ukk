@@ -16,9 +16,9 @@ class BookCopyFactory extends Factory
     public function definition(): array
     {
         return [
-            'book_id'   => Book::factory(),
+            'book_id'   => Book::query()->inRandomOrder()->value('id') ?? Book::factory(),
             'copy_code' => strtoupper(fake()->unique()->bothify('BK-####-??')),
-            'status'    => fake()->randomElement(['available', 'available', 'available', 'borrowed', 'damaged']),
+            'status'    => fake()->randomElement(['available','borrowed','lost','damaged']),
         ];
     }
 

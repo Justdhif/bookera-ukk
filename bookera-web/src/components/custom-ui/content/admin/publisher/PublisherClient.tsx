@@ -115,7 +115,7 @@ export default function PublisherClient() {
         </div>
         <Button
           onClick={() => setAddOpen(true)}
-          variant="brand"
+          variant="submit"
           className="h-8 gap-1"
         >
           <Plus className="w-3.5 h-3.5" />

@@ -68,7 +68,7 @@ export default function AddUserClient() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
-            variant="ghost"
+            variant="brand"
             size="icon"
             className="h-8 w-8"
             onClick={() => router.back()}

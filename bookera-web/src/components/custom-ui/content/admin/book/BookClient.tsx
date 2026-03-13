@@ -97,11 +97,11 @@ export default function BookClient() {
           </div>
           <div>
             <h1 className="text-3xl font-bold">{t("title")}</h1>
-            <p className="text-muted-foreground">Manage your book collection</p>
+            <p className="text-muted-foreground">{t("manageCollection")}</p>
           </div>
         </div>
         <Link href="/admin/books/add">
-          <Button variant="brand" className="h-8 gap-1">
+          <Button variant="submit" className="h-8 gap-1">
             <Plus className="w-3.5 h-3.5" />
             
                                   {t("addBook")}
@@ -146,7 +146,7 @@ export default function BookClient() {
         open={deleteId !== null}
         onOpenChange={() => setDeleteId(null)}
         title={t("deleteBook")}
-        description="Are you sure you want to delete this book?"
+        description={t("deleteBookDesc")}
         onConfirm={confirmDelete}
       />
     </div>

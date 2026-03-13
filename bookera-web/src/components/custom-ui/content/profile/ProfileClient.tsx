@@ -146,7 +146,7 @@ export default function ProfileClient() {
           <div className="flex gap-2">
             <Button
               type="button"
-              variant="outline"
+              variant="submit"
               onClick={handleCancelEdit}
               disabled={submitting}
               className="h-8"

@@ -132,10 +132,12 @@ class FollowService
             ->exists();
     }
 
-    public function getUserFollowers(int $userId, int $perPage = 20): LengthAwarePaginator
+    public function getUserFollowers(string $userSlug, int $perPage = 20): LengthAwarePaginator
     {
+        $targetUser = User::where('slug', $userSlug)->firstOrFail();
+
         return Follow::with('user.profile')
-            ->where('followable_id', $userId)
+            ->where('followable_id', $targetUser->id)
             ->where('followable_type', User::class)
             ->latest()
             ->paginate($perPage)
@@ -147,10 +149,12 @@ class FollowService
             });
     }
 
-    public function getUserFollowing(int $userId, int $perPage = 20): LengthAwarePaginator
+    public function getUserFollowing(string $userSlug, int $perPage = 20): LengthAwarePaginator
     {
+        $targetUser = User::where('slug', $userSlug)->firstOrFail();
+
         return Follow::with('followable.profile')
-            ->where('user_id', $userId)
+            ->where('user_id', $targetUser->id)
             ->where('followable_type', User::class)
             ->latest()
             ->paginate($perPage)
@@ -162,13 +166,15 @@ class FollowService
             });
     }
 
-    public function getUserFollowCounts(int $userId): array
+    public function getUserFollowCounts(string $userSlug): array
     {
+        $targetUser = User::where('slug', $userSlug)->firstOrFail();
+
         return [
-            'followers_count' => Follow::where('followable_id', $userId)
+            'followers_count' => Follow::where('followable_id', $targetUser->id)
                 ->where('followable_type', User::class)
                 ->count(),
-            'following_count' => Follow::where('user_id', $userId)
+            'following_count' => Follow::where('user_id', $targetUser->id)
                 ->where('followable_type', User::class)
                 ->count(),
         ];

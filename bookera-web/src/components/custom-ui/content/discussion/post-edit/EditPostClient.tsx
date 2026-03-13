@@ -81,7 +81,7 @@ export default function EditPostClient() {
   return (
     <div className="max-w-lg mx-auto space-y-6">
       <Button
-        variant="ghost"
+        variant="brand"
         size="sm"
         className="gap-2 -ml-2 text-muted-foreground hover:text-foreground"
         onClick={() => router.back()}
@@ -163,7 +163,7 @@ export default function EditPostClient() {
 
         <Button
           type="button"
-          variant="outline"
+          variant="submit"
           className="w-full"
           onClick={() => fileInputRef.current?.click()}
           disabled={existingImages.length + (formData.images ?? []).length >= 10}
@@ -184,7 +184,7 @@ export default function EditPostClient() {
       <Button
         className="w-full"
         onClick={handleSubmit}
-        disabled={submitting}
+        disabled={submitting} variant="submit"
       >
         {submitting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
         {t("saveChanges")}

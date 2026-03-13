@@ -96,7 +96,7 @@ export default function ForgotStepMethod({
         <div className="text-center pt-2">
           <Button
             type="button"
-            variant="link"
+            variant="brand"
             onClick={onBack}
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-brand-primary p-0 h-auto inline-flex items-center gap-1"
             disabled={loading}

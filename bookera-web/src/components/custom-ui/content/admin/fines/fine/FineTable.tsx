@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import FineStatusBadge from "@/components/custom-ui/badge/FineStatusBadge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Fine } from "@/types/fine";
 import EmptyState from "@/components/custom-ui/EmptyState";
@@ -20,19 +20,6 @@ import { DollarSign, Trash, Eye, BookOpen, Hash } from "lucide-react";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
-const statusColors: Record<string, string> = {
-  unpaid:
-    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200",
-  paid: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-green-200",
-  waived:
-    "bg-gray-100 text-gray-700 dark:bg-gray-800/40 dark:text-gray-300 border-gray-200",
-};
-
-const getStatusLabels = (t: any): Record<string, string> => ({
-  unpaid: t("unpaid"),
-  paid: t("paid"),
-  waived: t("waived"),
-});
 
 function groupFinesByBorrow(fines: Fine[]) {
   const map = new Map<number, { borrow: Fine["borrow"]; fines: Fine[] }>();
@@ -78,7 +65,7 @@ export default function FineTable({
       <EmptyState
         title={t("noFines")}
         description={t("noFinesDesc")}
-        icon={<DollarSign className="h-10 w-10" />}
+        icon={<DollarSign />}
       />
     );
   }
@@ -194,12 +181,7 @@ export default function FineTable({
                         </TableCell>
 
                         <TableCell>
-                          <Badge
-                            variant="outline"
-                            className={statusColors[item.status]}
-                          >
-                            {getStatusLabels(t)[item.status]}
-                          </Badge>
+                          <FineStatusBadge status={item.status} />
                         </TableCell>
 
                         <TableCell>

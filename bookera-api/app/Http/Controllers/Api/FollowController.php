@@ -105,30 +105,39 @@ class FollowController extends Controller
 
     // ── User-follow public endpoints ─────────────────────────────────────────
 
-    public function userFollowers(Request $request, int $userId): JsonResponse
+    public function userFollowers(Request $request, string $userSlug): JsonResponse
     {
-        $followers = $this->followService->getUserFollowers($userId, (int) $request->get('per_page', 20));
-
-        return ApiResponse::successResponse('Daftar pengikut berhasil diambil', $followers);
+        try {
+            $followers = $this->followService->getUserFollowers($userSlug, (int) $request->get('per_page', 20));
+            return ApiResponse::successResponse('Daftar pengikut berhasil diambil', $followers);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+            return ApiResponse::notFoundResponse('Pengguna tidak ditemukan');
+        }
     }
 
-    public function userFollowing(Request $request, int $userId): JsonResponse
+    public function userFollowing(Request $request, string $userSlug): JsonResponse
     {
-        $following = $this->followService->getUserFollowing($userId, (int) $request->get('per_page', 20));
-
-        return ApiResponse::successResponse('Daftar following berhasil diambil', $following);
+        try {
+            $following = $this->followService->getUserFollowing($userSlug, (int) $request->get('per_page', 20));
+            return ApiResponse::successResponse('Daftar following berhasil diambil', $following);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+            return ApiResponse::notFoundResponse('Pengguna tidak ditemukan');
+        }
     }
 
-    public function userFollowCounts(int $userId): JsonResponse
+    public function userFollowCounts(string $userSlug): JsonResponse
     {
-        $counts = $this->followService->getUserFollowCounts($userId);
-
-        return ApiResponse::successResponse('Jumlah follower berhasil diambil', $counts);
+        try {
+            $counts = $this->followService->getUserFollowCounts($userSlug);
+            return ApiResponse::successResponse('Jumlah follower berhasil diambil', $counts);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+            return ApiResponse::notFoundResponse('Pengguna tidak ditemukan');
+        }
     }
 
-    public function userPublicProfile(int $userId): JsonResponse
+    public function userPublicProfile(string $userSlug): JsonResponse
     {
-        $user = User::with('profile')->findOrFail($userId);
+        $user = User::with('profile')->where('slug', $userSlug)->firstOrFail();
 
         return ApiResponse::successResponse('Profil pengguna berhasil diambil', $user);
     }

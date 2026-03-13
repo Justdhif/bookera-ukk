@@ -24,7 +24,7 @@ export default function BookSearchBar({ search, onSearch, onRefresh }: Props) {
         />
       </div>
 
-      <Button variant="outline" onClick={onRefresh}>
+      <Button variant="brand" onClick={onRefresh}>
         <RotateCcw className="h-4 w-4 mr-2" />
         {t("refresh")}
       </Button>

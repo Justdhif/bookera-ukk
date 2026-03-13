@@ -41,7 +41,7 @@ export default function FineTypeTable({
       <EmptyState
         title={t("noFineTypes")}
         description={t("noFineTypesDesc")}
-        icon={<DollarSign className="h-10 w-10" />}
+        icon={<DollarSign />}
       />
     );
   }

@@ -30,7 +30,7 @@ export default function MyPostsPageClient() {
       else setLoading(true);
 
       try {
-        const res = await discussionPostService.getPostsByUser(user.id, {
+        const res = await discussionPostService.getPostsByUser(user.slug ?? String(user.id), {
           page,
           per_page: PER_PAGE,
         });
@@ -83,7 +83,7 @@ export default function MyPostsPageClient() {
         </div>
       ) : posts.length === 0 ? (
         <EmptyState
-          icon={<MessageSquare className="h-10 w-10" />}
+          icon={<MessageSquare />}
           title={t("noPosts")}
           description={t("noPostsDesc")}
         />
@@ -96,7 +96,7 @@ export default function MyPostsPageClient() {
           {hasMore && (
             <div className="flex justify-center pt-2">
               <Button
-                variant="outline"
+                variant="brand"
                 onClick={loadMore}
                 disabled={loadingMore}
               >

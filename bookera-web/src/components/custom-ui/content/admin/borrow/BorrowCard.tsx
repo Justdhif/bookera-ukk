@@ -1,5 +1,5 @@
 import { Borrow } from "@/types/borrow";
-import { Badge } from "@/components/ui/badge";
+import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
@@ -10,11 +10,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  PackageCheck,
   BookOpen,
   Calendar,
   User,
-  CheckCircle,
   Eye,
 } from "lucide-react";
 import { format } from "date-fns";
@@ -24,38 +22,6 @@ interface BorrowCardProps {
 }
 
 export function BorrowCard({ borrow }: BorrowCardProps) {
-  const getStatusBadge = (status: Borrow["status"]) => {
-    const variants: Record<
-      Borrow["status"],
-      { variant: any; label: string; icon: React.ReactNode; className?: string }
-    > = {
-      open: {
-        variant: "default",
-        label: "Open",
-        icon: <PackageCheck className="h-3 w-3 mr-1" />,
-        className: "bg-green-100 text-green-800 hover:bg-green-100",
-      },
-      close: {
-        variant: "outline",
-        label: "Closed",
-        icon: <CheckCircle className="h-3 w-3 mr-1" />,
-        className: "bg-gray-100 text-gray-800 hover:bg-gray-100",
-      },
-    };
-
-    return (
-      <Badge
-        variant={variants[status]?.variant || "secondary"}
-        className={variants[status]?.className}
-      >
-        <span className="flex items-center">
-          {variants[status]?.icon}
-          {variants[status]?.label || status}
-        </span>
-      </Badge>
-    );
-  };
-
   return (
     <Card className="overflow-hidden">
       <CardHeader className="pb-4">
@@ -63,7 +29,7 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
               <CardTitle className="text-lg">Borrow #{borrow.id}</CardTitle>
-              {getStatusBadge(borrow.status)}
+              <BorrowStatusBadge status={borrow.status} />
             </div>
             <CardDescription className="flex items-center gap-4 text-xs">
               <span className="flex items-center gap-1">

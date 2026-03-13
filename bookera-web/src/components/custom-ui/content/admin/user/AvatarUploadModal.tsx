@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Upload, X, Check, FileWarning } from "lucide-react";
+import { Upload, X, Check, FileWarning, Trash, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -223,9 +223,8 @@ export default function AvatarUploadModal({
                     }}
                     className="absolute -top-2 -right-2 h-8 w-8 rounded-full shadow-lg"
                   >
-                    <X className="h-4 w-4" />
-                    <span className="sr-only">Remove avatar</span>
-                  </Button>
+                                      <Trash className="w-4 h-4 mr-2" /> <X className="h-4 w-4" /><span className="sr-only">Remove avatar</span>
+                                  </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">Avatar Preview</p>
               </>
@@ -291,7 +290,7 @@ export default function AvatarUploadModal({
                   <Button
                     key={avatarUrl}
                     type="button"
-                    variant="ghost"
+                    variant="brand"
                     size="icon"
                     onClick={() => handleDefaultAvatarClick(avatarUrl)}
                     className="relative h-auto w-auto p-0 hover:bg-transparent group"
@@ -343,7 +342,7 @@ export default function AvatarUploadModal({
               />
               <Button
                 type="button"
-                variant={hasError ? "destructive" : "outline"}
+                variant="outline"
                 onClick={() => fileInputRef.current?.click()}
                 className={cn(
                   "w-full gap-2",
@@ -351,9 +350,8 @@ export default function AvatarUploadModal({
                     "bg-red-50 hover:bg-red-100 text-red-700 border-red-300 dark:bg-red-950/30 dark:hover:bg-red-900/50 dark:text-red-400 dark:border-red-800",
                 )}
               >
-                <Upload className="h-4 w-4" />
-                {previewUrl ? "Change Avatar" : "Browse Files"}
-              </Button>
+                              <Eye className="w-4 h-4 mr-2" /> <Upload className="h-4 w-4" />{previewUrl ? "Change Avatar" : "Browse Files"}
+                          </Button>
               <p className="text-xs text-muted-foreground text-center">
                 Format: JPG, PNG. Max 2MB
               </p>
@@ -362,7 +360,7 @@ export default function AvatarUploadModal({
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={handleCancel}>
+          <Button type="button" variant="brand" onClick={handleCancel}>
             Cancel
           </Button>
           <Button

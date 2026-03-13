@@ -3,8 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import {
   Card,
   CardContent,
@@ -16,10 +17,7 @@ import {
   BookOpen,
   Upload,
   X,
-  CheckCircle,
-  XCircle,
-  FileWarning,
-} from "lucide-react";
+  FileWarning, Trash, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -210,9 +208,8 @@ export default function BookSideCard({
                     }}
                     className="absolute top-2 right-2 h-8 w-8 rounded-full shadow-lg opacity-90 hover:opacity-100 transition-opacity"
                   >
-                    <X className="h-4 w-4" />
-                    <span className="sr-only">Remove cover</span>
-                  </Button>
+                                      <Trash className="w-4 h-4 mr-2" /> <X className="h-4 w-4" /><span className="sr-only">Remove cover</span>
+                                  </Button>
                 )}
               </>
             ) : (
@@ -293,7 +290,7 @@ export default function BookSideCard({
 
               <Button
                 type="button"
-                variant={hasError ? "destructive" : "outline"}
+                variant="outline"
                 onClick={() => document.getElementById("cover_image")?.click()}
                 className={cn(
                   "w-full gap-2 transition-colors",
@@ -301,9 +298,8 @@ export default function BookSideCard({
                     "bg-red-50 hover:bg-red-100 text-red-700 border-red-300 dark:bg-red-950/30 dark:hover:bg-red-900/50 dark:text-red-400 dark:border-red-800",
                 )}
               >
-                <Upload className="h-4 w-4" />
-                {coverPreview ? "Change Cover" : "Browse Files"}
-              </Button>
+                              <Eye className="w-4 h-4 mr-2" /> <Upload className="h-4 w-4" />{coverPreview ? "Change Cover" : "Browse Files"}
+                          </Button>
             </>
           )}
         </div>
@@ -327,26 +323,7 @@ export default function BookSideCard({
                 className="data-[state=checked]:bg-green-600 dark:data-[state=checked]:bg-green-500"
               />
             ) : (
-              <Badge
-                variant={formData.is_active ? "default" : "secondary"}
-                className={cn(
-                  "gap-1.5 px-3 py-1",
-                  formData.is_active &&
-                    "bg-green-100 text-green-700 hover:bg-green-100 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800",
-                )}
-              >
-                {formData.is_active ? (
-                  <>
-                    <CheckCircle className="h-3.5 w-3.5" />
-                    Active
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="h-3.5 w-3.5" />
-                    Inactive
-                  </>
-                )}
-              </Badge>
+              <ActiveStatusBadge isActive={formData.is_active} />
             )}
           </div>
         </div>

@@ -219,7 +219,7 @@ export default function SettingsNotificationCard() {
               <Button
                 onClick={handleSave}
                 disabled={saving}
-                className="bg-brand-primary hover:bg-brand-primary/90 text-white min-w-30"
+                className="bg-brand-primary hover:bg-brand-primary/90 text-white min-w-30" variant="submit"
               >
                 {saving ? (
                   <>

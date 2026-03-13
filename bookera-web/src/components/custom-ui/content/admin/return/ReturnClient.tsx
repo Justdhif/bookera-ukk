@@ -63,7 +63,7 @@ export default function ReturnClient() {
     if (borrows.length === 0) {
       return (
         <EmptyState
-          icon={<PackageCheck className="h-16 w-16" />}
+          icon={<PackageCheck />}
           title={t("noReturns")}
           description={t("noReturnsDesc")}
         />

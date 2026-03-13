@@ -1,5 +1,6 @@
 import { Borrow } from "@/types/borrow";
-import { Badge } from "@/components/ui/badge";
+import FineStatusBadge from "@/components/custom-ui/badge/FineStatusBadge";
+import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
 import {
   Card,
   CardContent,
@@ -103,16 +104,7 @@ export function BorrowInfoCard({ borrow }: BorrowInfoCardProps) {
                     <p className="font-semibold">
                       Rp {Number(fine.amount || 0).toLocaleString("id-ID")}
                     </p>
-                    <Badge
-                      variant={fine.status === "paid" ? "default" : "secondary"}
-                      className={
-                        fine.status === "paid"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-orange-100 text-orange-800"
-                      }
-                    >
-                      {fine.status}
-                    </Badge>
+                    <FineStatusBadge status={fine.status} />
                   </div>
                 </div>
               ))}
@@ -135,7 +127,7 @@ export function BorrowInfoCard({ borrow }: BorrowInfoCardProps) {
                 >
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium">Return #{ret.id}</p>
-                    <Badge variant="secondary">{ret.status}</Badge>
+                    <BorrowStatusBadge status={ret.status} />
                   </div>
                   {ret.return_date && (
                     <p className="text-xs text-muted-foreground">

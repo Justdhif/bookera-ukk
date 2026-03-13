@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, User2, Building2, BookOpen, Heart, HeartOff, Loader2 } from "lucide-react";
+import { ArrowLeft, User2, Building2, BookOpen, Heart, HeartOff, Loader2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { followService } from "@/services/follow.service";
 import { FollowableType, FollowableDetail } from "@/types/follow";
 import { useAuthStore } from "@/store/auth.store";
-import FollowDetailBookList from "./FollowDetailBookList";
+import BookList from "@/components/custom-ui/content/public/book/BookList";
 
 interface FollowDetailClientProps {
   type: "author" | "publisher";
@@ -104,7 +104,7 @@ export default function FollowDetailClient({ type }: FollowDetailClientProps) {
     <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 max-w-7xl">
       <div className="space-y-4 mb-6">
         <div className="flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <Button variant="brand" size="sm" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
@@ -148,33 +148,33 @@ export default function FollowDetailClient({ type }: FollowDetailClientProps) {
             <div className="mt-3 flex gap-2">
               {isAuthenticated && (
                 <Button
-                  variant={detail.is_following ? "outline" : "brand"}
+                  variant="outline"
                   size="sm"
                   onClick={handleToggleFollow}
                   disabled={followLoading}
                   className="h-8 gap-1.5"
                 >
-                  {followLoading ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : detail.is_following ? (
-                    <>
-                      <HeartOff className="h-3.5 w-3.5" />
-                      Unfollow
-                    </>
-                  ) : (
-                    <>
-                      <Heart className="h-3.5 w-3.5" />
-                      Follow
-                    </>
-                  )}
-                </Button>
+                                  <Eye className="w-4 h-4 mr-2" /> {followLoading ? (
+                                                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                                    ) : detail.is_following ? (
+                                                      <>
+                                                        <HeartOff className="h-3.5 w-3.5" />
+                                                        Unfollow
+                                                      </>
+                                                    ) : (
+                                                      <>
+                                                        <Heart className="h-3.5 w-3.5" />
+                                                        Follow
+                                                      </>
+                                                    )}
+                              </Button>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      <FollowDetailBookList books={detail.books || []} />
+      <BookList books={detail.books || []} loading={false} />
     </div>
   );
 }

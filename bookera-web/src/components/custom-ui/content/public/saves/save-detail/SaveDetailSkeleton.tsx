@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Edit, Trash } from "lucide-react";
+import { ArrowLeft, Edit, Trash, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -17,13 +17,12 @@ export default function SaveDetailSkeleton() {
         <div className="flex items-center justify-between">
           
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={() => router.back()}
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("detail.back")}
-          </Button>
+                      <Eye className="w-4 h-4 mr-2" /> <ArrowLeft className="h-4 w-4 mr-2" />{t("detail.back")}
+                  </Button>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
@@ -54,9 +53,8 @@ export default function SaveDetailSkeleton() {
                 className="h-8 gap-1.5"
                 disabled
               >
-                <Edit className="h-3.5 w-3.5" />
-                {t("detail.edit")}
-              </Button>
+                              <Eye className="w-4 h-4 mr-2" /> <Edit className="h-3.5 w-3.5" />{t("detail.edit")}
+                          </Button>
               <Button
                 variant="destructive"
                 size="sm"
@@ -75,9 +73,9 @@ export default function SaveDetailSkeleton() {
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           
-          <Button size="sm" disabled>
-            {t("detail.borrowSelected")}
-          </Button>
+          <Button size="sm" disabled variant="outline">
+                      {t("detail.borrowSelected")}
+                  </Button>
 
           <ToggleGroup type="single" value="grid">
             <ToggleGroupItem value="grid" aria-label="Grid view">

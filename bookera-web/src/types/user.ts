@@ -24,6 +24,7 @@ export interface UserProfile {
 export interface User {
   id: number;
   email: string;
+  slug?: string;
   role: "admin" | "officer:catalog" | "officer:management" | "user";
   is_active: boolean;
   last_login_at: string | null;

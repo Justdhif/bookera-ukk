@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Plus, Loader2 } from "lucide-react";
+import { Loader2, MessageSquare } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import PostCard from "./PostCard";
 import CreatePostModal from "./CreatePostModal";
 import DiscussionUserList from "./DiscussionUserList";
 import FollowedUsersList from "./FollowedUsersList";
+import EmptyState from "@/components/custom-ui/EmptyState";
 
 export default function DiscussionFeedPageClient() {
   const router = useRouter();
@@ -61,7 +62,7 @@ export default function DiscussionFeedPageClient() {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchPosts(1);
@@ -94,49 +95,60 @@ export default function DiscussionFeedPageClient() {
   if (!isAuthenticated) return null;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {user?.id && (
-        <FollowedUsersList userId={user.id} />
-      )}
+    <div className="mx-auto w-full max-w-5xl">
+      <div className="flex flex-col md:flex-row gap-6 md:items-start">
+        <div className="w-full md:flex-1 md:min-w-0 md:max-w-2xl space-y-6">
+          {posts.length === 0 ? (
+            <EmptyState icon={<MessageSquare />} description={t("noPosts")} />
+          ) : (
+            <div className="space-y-4">
+              {posts.map((post, index) => (
+                <div key={post.id}>
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onDeleted={handlePostDeleted}
+                    feedMode={true}
+                  />
+                  {userListInsertPositions.has(index) && (
+                    <DiscussionUserList key={`user-list-${index}`} />
+                  )}
+                </div>
+              ))}
 
-      {posts.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          {t("noPosts")}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {posts.map((post, index) => (
-            <div key={post.id}>
-              <PostCard
-                key={post.id}
-                post={post}
-                onDeleted={handlePostDeleted}
-                feedMode={true}
-              />
-              {userListInsertPositions.has(index) && (
-                <DiscussionUserList key={`user-list-${index}`} />
+              {page < lastPage && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    variant="brand"
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                  >
+                    {loadingMore ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : null}
+                    {t("loadMore")}
+                  </Button>
+                </div>
               )}
             </div>
-          ))}
+          )}
 
-          {page < lastPage && (
-            <div className="flex justify-center pt-4">
-              <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
-                {loadingMore ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                {t("loadMore")}
-              </Button>
-            </div>
+          {/* Create post modal */}
+          {showCreateModal && (
+            <CreatePostModal
+              onClose={() => setShowCreateModal(false)}
+              onCreated={handlePostCreated}
+            />
           )}
         </div>
-      )}
 
-      {/* Create post modal */}
-      {showCreateModal && (
-        <CreatePostModal
-          onClose={() => setShowCreateModal(false)}
-          onCreated={handlePostCreated}
-        />
-      )}
+        {user?.slug ? (
+          <div className="w-full md:w-80 shrink-0">
+            <FollowedUsersList userSlug={user.slug} />
+          </div>
+        ) : null}
+      </div>
+
     </div>
   );
 }

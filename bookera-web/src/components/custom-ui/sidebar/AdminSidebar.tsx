@@ -31,6 +31,7 @@ import {
   UserSquare,
   Building2,
   User,
+  Flag,
 } from "lucide-react";
 import { SidebarUserFooter } from "@/components/custom-ui/sidebar/SidebarUserFooter";
 import { cn } from "@/lib/utils";
@@ -101,6 +102,11 @@ const getMenuGroups = (t: any) => [
         title: t("lostBooks"),
         href: "/admin/lost-books",
         icon: AlertCircle,
+      },
+      {
+        title: t("discussionReports"),
+        href: "/admin/discussion",
+        icon: Flag,
       },
       {
         title: t("activityLogs"),

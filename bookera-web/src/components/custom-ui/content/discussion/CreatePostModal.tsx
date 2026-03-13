@@ -113,7 +113,7 @@ export default function CreatePostModal({ onClose, onCreated }: Props) {
 
           <Button
             type="button"
-            variant="outline"
+            variant="submit"
             className="w-full"
             onClick={() => fileInputRef.current?.click()}
             disabled={(formData.images ?? []).length >= 10}
@@ -134,12 +134,12 @@ export default function CreatePostModal({ onClose, onCreated }: Props) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={submitting}>
+          <Button variant="submit" onClick={onClose} disabled={submitting}>
             {t("cancel")}
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={submitting || (!formData.caption?.trim() && (formData.images ?? []).length === 0)}
+            disabled={submitting || (!formData.caption?.trim() && (formData.images ?? []).length === 0)} variant="submit"
           >
             {submitting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             {t("publish")}

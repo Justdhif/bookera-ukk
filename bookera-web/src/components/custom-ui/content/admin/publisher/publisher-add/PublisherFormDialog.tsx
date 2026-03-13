@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { publisherService, CreatePublisherData } from "@/services/publisher.service";
 import { toast } from "sonner";
-import { Building2, FileWarning, Upload, X } from "lucide-react";
+import { Building2, FileWarning, Upload, X, Trash, Eye } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
@@ -184,8 +184,8 @@ export default function PublisherFormDialog({
                         handleRemovePhoto();
                       }}
                     >
-                      <X className="h-3 w-3" />
-                    </Button>
+                                          <Trash className="w-4 h-4 mr-2" /> <X className="h-3 w-3" />
+                                      </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Click X to remove or drag a new photo
@@ -223,9 +223,8 @@ export default function PublisherFormDialog({
                 onClick={() => fileInputRef.current?.click()}
                 className="w-full gap-2"
               >
-                <Upload className="h-4 w-4" />
-                {photoPreview ? t("changePhoto") : t("browseFiles")}
-              </Button>
+                              <Eye className="w-4 h-4 mr-2" /> <Upload className="h-4 w-4" />{photoPreview ? t("changePhoto") : t("browseFiles")}
+                          </Button>
               <p className="text-xs text-muted-foreground text-center">
                 {t("formatHint")}
               </p>

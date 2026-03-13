@@ -20,7 +20,7 @@ export default function PrivacyPolicyList({
       <EmptyState
         title={t("noPrivacyPolicy")}
         description={t("noPrivacyPolicyDesc")}
-        icon={<Shield className="h-10 w-10" />}
+        icon={<Shield />}
       />
     );
   }

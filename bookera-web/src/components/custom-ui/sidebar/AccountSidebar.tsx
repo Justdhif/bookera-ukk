@@ -3,10 +3,11 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarHeader,
   SidebarMenu,
@@ -22,10 +23,10 @@ import {
   BookOpen,
   DollarSign,
   MessageSquare,
-  ArrowLeft,
 } from "lucide-react";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import { useTranslations } from "next-intl";
+import { SidebarUserFooter } from "@/components/custom-ui/sidebar/SidebarUserFooter";
 import { cn } from "@/lib/utils";
 
 type NavLabelKey =
@@ -54,7 +55,6 @@ export default function AccountSidebar() {
   const tNavbar = useTranslations("navbar");
   const { open } = useSidebar();
   const pathname = usePathname();
-  const router = useRouter();
 
   const navLabel = (key: NavLabelKey) => tNavbar(key);
 
@@ -151,34 +151,14 @@ export default function AccountSidebar() {
                 );
               })}
 
-              {/* Separator */}
-              <div
-                className={cn(
-                  "my-1 h-px bg-border/60 dark:bg-white/10",
-                  !open ? "w-8 mx-auto" : "w-full",
-                )}
-              />
-
-              {/* Back button */}
-              <SidebarMenuItem
-                className={cn(!open && "w-full flex justify-center")}
-              >
-                <SidebarMenuButton
-                  onClick={() => router.back()}
-                  tooltip={{ content: t("back") }}
-                  className={cn(
-                    "rounded-xl transition-all text-muted-foreground hover:text-foreground hover:bg-accent",
-                    !open && "justify-center px-0 mx-auto",
-                  )}
-                >
-                  <ArrowLeft className="h-5 w-5 shrink-0" />
-                  {open && <span className="font-medium">{t("back")}</span>}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </TooltipProvider>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="p-0 border-t border-border/60 dark:border-white/10">
+        <SidebarUserFooter t={t} />
+      </SidebarFooter>
     </Sidebar>
   );
 }

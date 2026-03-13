@@ -2,6 +2,8 @@ import Link from "next/link";
 import { BookReturn } from "@/types/book-return";
 import { Borrow } from "@/types/borrow";
 import { Badge } from "@/components/ui/badge";
+import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
+import ConditionBadge from "@/components/custom-ui/badge/ConditionBadge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,9 +16,6 @@ import {
   BookOpen,
   Calendar,
   User,
-  CheckCircle,
-  XCircleIcon,
-  AlertTriangle,
   Eye,
   DollarSign,
   CheckCircle2,
@@ -41,57 +40,6 @@ export function ReturnCard({
   onFinished,
   onProcessFine,
 }: ReturnCardProps) {
-  const getBorrowStatusBadge = (status: Borrow["status"]) => {
-    const variants: Record<
-      Borrow["status"],
-      { label: string; className: string }
-    > = {
-      open: {
-        label: "Active",
-        className: "bg-orange-100 text-orange-800 hover:bg-orange-100",
-      },
-      close: {
-        label: "Finished",
-        className: "bg-emerald-100 text-emerald-800 hover:bg-emerald-100",
-      },
-    };
-
-    return (
-      <Badge className={variants[status]?.className}>
-        {variants[status]?.label || status}
-      </Badge>
-    );
-  };
-
-  const getConditionBadge = (condition: "good" | "damaged" | "lost") => {
-    const variants = {
-      good: {
-        label: "Good",
-        icon: <CheckCircle className="h-3 w-3 mr-1" />,
-        className: "bg-green-100 text-green-800 hover:bg-green-100",
-      },
-      damaged: {
-        label: "Damaged",
-        icon: <AlertTriangle className="h-3 w-3 mr-1" />,
-        className: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100",
-      },
-      lost: {
-        label: "Lost",
-        icon: <XCircleIcon className="h-3 w-3 mr-1" />,
-        className: "bg-red-100 text-red-800 hover:bg-red-100",
-      },
-    };
-
-    return (
-      <Badge className={variants[condition]?.className}>
-        <span className="flex items-center">
-          {variants[condition]?.icon}
-          {variants[condition]?.label || condition}
-        </span>
-      </Badge>
-    );
-  };
-
   const fines = borrow.fines ?? [];
   const unpaidFines = fines.filter((f) => f.status === "unpaid");
   const hasFines = fines.length > 0;
@@ -115,7 +63,7 @@ export function ReturnCard({
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
               <CardTitle className="text-lg">Return #{bookReturn.id}</CardTitle>
-              {getBorrowStatusBadge(borrow.status)}
+              <BorrowStatusBadge status={borrow.status} />
               <Badge variant="outline">Borrow #{bookReturn.borrow_id}</Badge>
               {hasUnpaidFines && (
                 <Badge className="bg-red-100 text-red-800">
@@ -149,7 +97,7 @@ export function ReturnCard({
                   {shouldShowProcessFine && (
                     <Button
                       size="sm"
-                      variant="secondary"
+                      variant="brand"
                       onClick={() => onProcessFine?.(bookReturn.id)}
                       disabled={actionLoading === bookReturn.id}
                     >
@@ -166,7 +114,7 @@ export function ReturnCard({
                       size="sm"
                       className="bg-green-600 hover:bg-green-700 text-white"
                       onClick={() => onFinished?.(bookReturn.id)}
-                      disabled={actionLoading === bookReturn.id}
+                      disabled={actionLoading === bookReturn.id} variant="brand"
                     >
                       {actionLoading === bookReturn.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -208,7 +156,7 @@ export function ReturnCard({
                     Copy Code: {detail.book_copy?.copy_code}
                   </p>
                 </div>
-                {getConditionBadge(detail.condition)}
+                <ConditionBadge condition={detail.condition} />
               </div>
             ))}
           </div>

@@ -21,8 +21,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Category } from "@/types/category";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { FolderOpen, Edit, Trash, Tag } from "lucide-react";
-import { getIconByName } from "@/lib/icons";
+import { FolderOpen, Edit, Trash } from "lucide-react";
 
 export default function CategoryTable({
   data,
@@ -39,7 +38,7 @@ export default function CategoryTable({
       <EmptyState
         title={t("noCategories")}
         description={t("noCategoriesDesc")}
-        icon={<FolderOpen className="h-10 w-10" />}
+        icon={<FolderOpen />}
       />
     );
   }
@@ -49,7 +48,6 @@ export default function CategoryTable({
       <TableHeader>
         <TableRow className="bg-muted/50 hover:bg-muted/50">
           <TableHead className="w-16 text-center">{t("noCol")}</TableHead>
-          <TableHead className="w-16 text-center font-semibold">{t("iconCol")}</TableHead>
           <TableHead className="font-semibold">{t("categoryCol")}</TableHead>
           <TableHead className="font-semibold">{t("slugCol")}</TableHead>
           <TableHead className="font-semibold">{t("descriptionCol")}</TableHead>
@@ -59,8 +57,6 @@ export default function CategoryTable({
 
       <TableBody>
         {data.map((item, index) => {
-          const IconComponent = item.icon ? getIconByName(item.icon) : null;
-
           return (
             <TableRow
               key={item.id}
@@ -68,18 +64,6 @@ export default function CategoryTable({
             >
               <TableCell className="font-medium text-center text-muted-foreground">
                 {index + 1}
-              </TableCell>
-
-              <TableCell className="text-center">
-                <div className="flex justify-center">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    {IconComponent ? (
-                      <IconComponent className="h-4 w-4 text-primary" />
-                    ) : (
-                      <Tag className="h-4 w-4 text-primary" />
-                    )}
-                  </div>
-                </div>
               </TableCell>
 
               <TableCell>

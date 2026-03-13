@@ -17,7 +17,7 @@ import {
   User,
   Calendar,
   BookOpen,
-  ArrowRight,
+  Eye,
   Trash,
 } from "lucide-react";
 import EmptyState from "@/components/custom-ui/EmptyState";
@@ -148,7 +148,7 @@ export default function BorrowRequestClient() {
           </div>
         ) : requests.length === 0 ? (
           <EmptyState
-            icon={<ClipboardList className="h-16 w-16" />}
+            icon={<ClipboardList />}
             title={t("noRequests")}
             description={t("noRequestsDesc")}
           />
@@ -212,13 +212,14 @@ export default function BorrowRequestClient() {
                       </Button>
                       <Button
                         size="sm"
-                        variant="brand"
+                        variant="outline"
+                        className="h-8 gap-1"
                         onClick={() =>
                           router.push(`/admin/borrow-requests/${req.id}`)
                         }
                       >
+                        <Eye className="h-3.5 w-3.5" />
                         {t("detail")}
-                        <ArrowRight className="h-4 w-4 ml-1" />
                       </Button>
                     </div>
                   </div>

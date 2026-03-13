@@ -13,7 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -28,7 +27,10 @@ import AvatarUploadModal from "./AvatarUploadModal";
 import PasswordRequirements, {
   isPasswordValid,
 } from "@/components/custom-ui/content/admin/auth/PasswordRequirements";
+import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
 import Image from "next/image";
+import { BookOpen } from "lucide-react";
+import EmptyState from "@/components/custom-ui/EmptyState";
 
 interface UserSideCardProps {
   mode?: "add" | "detail";
@@ -86,17 +88,6 @@ export default function UserSideCard({
     }
   };
 
-  const getStatusDisplay = (status: string) => {
-    switch (status) {
-      case "open":
-        return "Open";
-      case "close":
-        return "Closed";
-      default:
-        return status;
-    }
-  };
-
   return (
     <>
       <Card>
@@ -137,7 +128,7 @@ export default function UserSideCard({
 
           <Button
             type="button"
-            variant="outline"
+            variant="brand"
             onClick={() => setAvatarModalOpen(true)}
             className="w-full"
             disabled={!canEdit}
@@ -282,29 +273,17 @@ export default function UserSideCard({
                           )}
                         </p>
                       </div>
-                      <Badge
-                        variant={
-                          borrow.status === "open"
-                            ? "secondary"
-                            : borrow.status === "close"
-                              ? "default"
-                              : "destructive"
-                        }
-                        className={`text-xs ${
-                          borrow.status === "close"
-                            ? "bg-green-600 hover:bg-green-700 text-white"
-                            : ""
-                        }`}
-                      >
-                        {getStatusDisplay(borrow.status)}
-                      </Badge>
+                      <BorrowStatusBadge status={borrow.status as "open" | "close"} />
                     </Link>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  {t("noRecentBorrows")}
-                </p>
+                <EmptyState
+                  icon={<BookOpen />}
+                  description={t("noRecentBorrows")}
+                  variant="compact"
+                  className="py-4 border-none"
+                />
               )}
             </div>
           )}

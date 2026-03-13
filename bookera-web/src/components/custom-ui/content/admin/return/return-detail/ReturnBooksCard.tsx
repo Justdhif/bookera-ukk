@@ -126,7 +126,7 @@ export function ReturnBooksCard({
           <div className="flex justify-end pt-2">
             <Button
               size="sm"
-              variant="outline"
+              variant="submit"
               onClick={onSaveConditions}
               disabled={savingConditions}
             >

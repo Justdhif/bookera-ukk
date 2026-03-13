@@ -16,7 +16,7 @@ class BookService
     public function getBooks(array $filters): LengthAwarePaginator
     {
         $books = Book::query()
-            ->with(['categories', 'copies'])
+            ->with(['categories', 'copies', 'authors', 'publishers'])
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($subQuery) use ($search) {
                     $subQuery->where('title', 'like', "%{$search}%")

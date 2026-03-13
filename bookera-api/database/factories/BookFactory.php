@@ -23,15 +23,19 @@ class BookFactory extends Factory
     public function definition(): array
     {
         $title = fake()->catchPhrase();
+        $slugBase = Str::slug($title);
+        $slugSuffix = Str::lower((string) Str::ulid());
+
+        $isbn = fake()->boolean(85) ? fake()->unique()->isbn13() : null;
 
         return [
-            'slug'             => Str::slug($title) . '-' . fake()->unique()->numerify('###'),
+            'slug'             => $slugBase . '-' . $slugSuffix,
             'title'            => $title,
-            'isbn'             => fake()->optional(0.85)->isbn13(),
+            'isbn'             => $isbn,
             'description'      => fake()->optional(0.9)->paragraphs(3, true),
             'publication_year' => fake()->optional(0.9)->year(),
             'language'         => fake()->randomElement(self::$languages),
-            'cover_image'      => null,
+            'cover_image'      => 'https://picsum.photos/seed/' . $slugBase . '-' . $slugSuffix . '/400/600',
             'is_active'        => fake()->boolean(90),
         ];
     }

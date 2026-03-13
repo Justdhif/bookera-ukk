@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/command";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Plus, UserSquare, Building2, X } from "lucide-react";
+import { Plus, UserSquare, Building2, X, Trash } from "lucide-react";
 import YearPicker from "@/components/custom-ui/YearPicker";
 
 interface FormData {
@@ -89,7 +89,7 @@ export default function BookForm({
   publishers,
   onValidationChange,
 }: BookFormProps) {
-    const t = useTranslations("book");
+  const t = useTranslations("book");
   const [errors, setErrors] = useState<FormErrors>({
     title: false,
     isbn: false,
@@ -206,24 +206,21 @@ export default function BookForm({
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
-        <CardTitle>Book Information</CardTitle>
+        <CardTitle>{t("bookInfo")}</CardTitle>
         <CardDescription>
-          {isEditMode
-            ? "Edit book information correctly"
-            : t("bookDetailsComplete")}
+          {isEditMode ? t("editBookInfoCorrectly") : t("bookDetailsComplete")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Basic Information</h3>
+          <h3 className="font-semibold text-lg">{t("basicInfo")}</h3>
           <div className="space-y-2">
             <Label
               htmlFor="title"
               variant={isEditMode ? "required" : "default"}
             >
-              
-                                        {t("title_col")}
-                                      </Label>
+              {t("title_col")}
+            </Label>
             <Input
               id="title"
               name="title"
@@ -244,12 +241,12 @@ export default function BookForm({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-lg flex items-center gap-2">
-              <UserSquare className="h-5 w-5" /> Authors
+              <UserSquare className="h-5 w-5" /> {t("authorsSection")}
             </h3>
             {isEditMode && (
               <Button
                 type="button"
-                variant="outline"
+                variant="submit"
                 size="sm"
                 onClick={onAddAuthor}
                 className="gap-1"
@@ -263,16 +260,21 @@ export default function BookForm({
               <PopoverTrigger asChild>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="brand"
                   className="w-full justify-start text-left font-normal"
                   disabled={!isEditMode}
                 >
                   {formData.author_ids.length > 0
-                    ? `${formData.author_ids.length} author(s) selected`
-                    : "Select authors"}
+                    ? t("authorsSelected", {
+                        count: formData.author_ids.length,
+                      })
+                    : t("selectAuthors")}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+              <PopoverContent
+                className="p-0"
+                style={{ width: "var(--radix-popover-trigger-width)" }}
+              >
                 <Command>
                   <CommandInput placeholder={t("searchAuthors")} />
                   <CommandEmpty>{t("noAuthorsFound")}</CommandEmpty>
@@ -280,7 +282,9 @@ export default function BookForm({
                     {authors.map((author) => (
                       <CommandItem
                         key={author.id}
-                        onSelect={() => isEditMode && handleAuthorSelect(author.id)}
+                        onSelect={() =>
+                          isEditMode && handleAuthorSelect(author.id)
+                        }
                         className="cursor-pointer"
                       >
                         <Checkbox
@@ -305,7 +309,7 @@ export default function BookForm({
                       {isEditMode && (
                         <Button
                           type="button"
-                          variant="ghost"
+                          variant="destructive"
                           size="icon"
                           onClick={(e) => {
                             e.preventDefault();
@@ -314,8 +318,8 @@ export default function BookForm({
                           }}
                           className="h-4 w-4 p-0 ml-1 hover:bg-muted rounded-full"
                         >
-                          <X className="h-3 w-3" />
-                        </Button>
+                                  <Trash className="w-4 h-4 mr-2" /> <X className="h-3 w-3" />
+                              </Button>
                       )}
                     </Badge>
                   ) : null;
@@ -329,12 +333,12 @@ export default function BookForm({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-lg flex items-center gap-2">
-              <Building2 className="h-5 w-5" /> Publishers
+              <Building2 className="h-5 w-5" /> {t("publishersSection")}
             </h3>
             {isEditMode && (
               <Button
                 type="button"
-                variant="outline"
+                variant="submit"
                 size="sm"
                 onClick={onAddPublisher}
                 className="gap-1"
@@ -348,16 +352,21 @@ export default function BookForm({
               <PopoverTrigger asChild>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="brand"
                   className="w-full justify-start text-left font-normal"
                   disabled={!isEditMode}
                 >
                   {formData.publisher_ids.length > 0
-                    ? `${formData.publisher_ids.length} publisher(s) selected`
-                    : "Select publishers"}
+                    ? t("publishersSelected", {
+                        count: formData.publisher_ids.length,
+                      })
+                    : t("selectPublishers")}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+              <PopoverContent
+                className="p-0"
+                style={{ width: "var(--radix-popover-trigger-width)" }}
+              >
                 <Command>
                   <CommandInput placeholder={t("searchPublishers")} />
                   <CommandEmpty>{t("noPublishersFound")}</CommandEmpty>
@@ -365,7 +374,9 @@ export default function BookForm({
                     {publishers.map((publisher) => (
                       <CommandItem
                         key={publisher.id}
-                        onSelect={() => isEditMode && handlePublisherSelect(publisher.id)}
+                        onSelect={() =>
+                          isEditMode && handlePublisherSelect(publisher.id)
+                        }
                         className="cursor-pointer"
                       >
                         <Checkbox
@@ -392,7 +403,7 @@ export default function BookForm({
                       {isEditMode && (
                         <Button
                           type="button"
-                          variant="ghost"
+                          variant="destructive"
                           size="icon"
                           onClick={(e) => {
                             e.preventDefault();
@@ -401,8 +412,8 @@ export default function BookForm({
                           }}
                           className="h-4 w-4 p-0 ml-1 hover:bg-muted rounded-full"
                         >
-                          <X className="h-3 w-3" />
-                        </Button>
+                                  <Trash className="w-4 h-4 mr-2" /> <X className="h-3 w-3" />
+                              </Button>
                       )}
                     </Badge>
                   ) : null;
@@ -413,20 +424,20 @@ export default function BookForm({
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Publication Details</h3>
+          <h3 className="font-semibold text-lg">{t("publicationDetails")}</h3>
           <div className="space-y-2">
             <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="publication_year">Publication Year</Label>
-              <YearPicker
-                value={formData.publication_year || ""}
-                onChange={handleYearChange}
-                placeholder={t("selectYear")}
-                searchPlaceholder={t("searchYear")}
-                emptyText="Year not found"
-                disabled={!isEditMode}
-              />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="publication_year">{t("publicationYear")}</Label>
+                <YearPicker
+                  value={formData.publication_year || ""}
+                  onChange={handleYearChange}
+                  placeholder={t("selectYear")}
+                  searchPlaceholder={t("searchYear")}
+                  emptyText={t("yearNotFound")}
+                  disabled={!isEditMode}
+                />
+              </div>
             </div>
           </div>
 
@@ -448,7 +459,7 @@ export default function BookForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="language">Language</Label>
+              <Label htmlFor="language">{t("language")}</Label>
               <Input
                 id="language"
                 name="language"
@@ -466,25 +477,32 @@ export default function BookForm({
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Categories</h3>
+          <h3 className="font-semibold text-lg">{t("categoriesSection")}</h3>
           <div className="space-y-2">
-            <Label>Select Categories</Label>
+            <Label>{t("selectCategoriesLabel")}</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="brand"
                   className="w-full justify-start text-left font-normal"
                   disabled={!isEditMode}
                 >
                   {formData.category_ids && formData.category_ids.length > 0
-                    ? `${formData.category_ids.length} categories selected`
-                    : "Select categories"}
+                    ? t("categoriesSelected", {
+                        count: formData.category_ids.length,
+                      })
+                    : t("selectCategoriesBtn")}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+              <PopoverContent
+                className="p-0"
+                style={{ width: "var(--radix-popover-trigger-width)" }}
+              >
                 <Command>
-                  <CommandInput placeholder={t("searchCategoriesPlaceholder")} />
+                  <CommandInput
+                    placeholder={t("searchCategoriesPlaceholder")}
+                  />
                   <CommandEmpty>{t("noCategoriesFound")}</CommandEmpty>
                   <CommandGroup>
                     {categories.map((cat) => (
@@ -518,7 +536,7 @@ export default function BookForm({
                       {isEditMode && (
                         <Button
                           type="button"
-                          variant="ghost"
+                          variant="destructive"
                           size="icon"
                           onClick={(e) => {
                             e.preventDefault();
@@ -527,11 +545,10 @@ export default function BookForm({
                           }}
                           className="h-4 w-4 p-0 ml-1 hover:bg-muted rounded-full"
                         >
-                          <X className="h-3 w-3" />
-                          <span className="sr-only">
-                            Remove {category.name}
-                          </span>
-                        </Button>
+                                  <Trash className="w-4 h-4 mr-2" /> <X className="h-3 w-3" /><span className="sr-only">
+                                                              Remove {category.name}
+                                                            </span>
+                              </Button>
                       )}
                     </Badge>
                   ) : null;
@@ -542,9 +559,9 @@ export default function BookForm({
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Description</h3>
+          <h3 className="font-semibold text-lg">{t("descriptionSection")}</h3>
           <div className="space-y-2">
-            <Label htmlFor="description">Book Description</Label>
+            <Label htmlFor="description">{t("bookDescLabel")}</Label>
             <Textarea
               id="description"
               name="description"

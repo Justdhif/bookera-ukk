@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -73,9 +73,8 @@ export default function CreateCollectionDialog({
             onClick={() => onOpenChange(false)}
             disabled={isCreating}
           >
-            
-                                  {t("detail.editDialog.cancel")}
-                                </Button>
+                      {t("detail.editDialog.cancel")}
+                  </Button>
           <Button
             variant="submit"
             onClick={onSubmit}

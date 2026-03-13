@@ -191,7 +191,7 @@ export default function AddBooksToCollectionDialog({
             ) : books.length === 0 ? (
               <EmptyState
                 variant="compact"
-                icon={<BookMarked className="h-8 w-8" />}
+                icon={<BookMarked />}
                 title={t("noBooksFound")}
                 description={t("tryDifferentSearch")}
                 className="py-16"
@@ -272,14 +272,14 @@ export default function AddBooksToCollectionDialog({
           )}
           <div className="flex gap-2 ml-auto">
             <Button
-              variant="outline"
+              variant="submit"
               onClick={() => handleOpenChange(false)}
               disabled={adding}
             >
               {t("cancel")}
             </Button>
             <Button
-              variant="brand"
+              variant="submit"
               onClick={handleConfirm}
               disabled={selectedBookIds.length === 0 || adding}
             >

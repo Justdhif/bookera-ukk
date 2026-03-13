@@ -88,7 +88,7 @@ export default function ReportLostConfirmDialog({
         <DialogFooter className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-2 mt-2">
           <Button
             type="button"
-            variant="outline"
+            variant="brand"
             onClick={() => onOpenChange(false)}
             disabled={isReporting}
             className="w-full sm:w-auto sm:flex-1 h-11 font-medium border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 transition-all duration-200"
@@ -97,7 +97,7 @@ export default function ReportLostConfirmDialog({
           </Button>
           <Button
             type="button"
-            variant="destructive"
+            variant="brand"
             onClick={handleConfirm}
             disabled={isReporting}
             className="w-full sm:w-auto sm:flex-1 h-11 font-medium shadow-sm transition-all duration-200"

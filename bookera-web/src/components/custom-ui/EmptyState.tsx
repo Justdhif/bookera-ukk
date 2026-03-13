@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -55,7 +55,14 @@ export default function EmptyState({
               : "mb-4 h-16 w-16 bg-brand-primary/10 dark:bg-brand-primary/15 ring-1 ring-brand-primary/20",
           )}
         >
-          {icon}
+          {React.isValidElement(icon)
+            ? React.cloneElement(icon as React.ReactElement<any>, {
+                className: cn(
+                  (icon.props as any).className,
+                  isCompact ? "w-6 h-6" : "w-8 h-8"
+                ),
+              })
+            : icon}
         </div>
       )}
 

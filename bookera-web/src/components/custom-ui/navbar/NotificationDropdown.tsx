@@ -3,7 +3,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useState, useRef } from "react";
-import { Bell, ChevronRight, LogIn } from "lucide-react";
+import { Bell, ChevronRight, LogIn, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import EmptyState from "@/components/custom-ui/EmptyState";
@@ -140,7 +140,7 @@ export default function NotificationDropdown({
       onMouseLeave={handleMouseLeave}
     >
       <Button
-        variant="ghost"
+        variant="brand"
         className="relative flex items-center gap-2 h-9 px-3"
       >
         <Bell className="h-4 w-4" />
@@ -177,7 +177,7 @@ export default function NotificationDropdown({
               {!isAuthenticated ? (
                 <EmptyState
                   variant="compact"
-                  icon={<Bell className="h-6 w-6" />}
+                  icon={<Bell />}
                   title={t("loginToView")}
                   linkLabel={t("login")}
                   linkHref="/login"
@@ -189,7 +189,7 @@ export default function NotificationDropdown({
               ) : notifications.length === 0 ? (
                 <EmptyState
                   variant="compact"
-                  icon={<Bell className="h-6 w-6" />}
+                  icon={<Bell />}
                   title={t("noNotifications")}
                 />
               ) : (
@@ -233,16 +233,15 @@ export default function NotificationDropdown({
             {isAuthenticated && notifications.length > 0 && (
               <div className="border-t p-2">
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   className="w-full justify-between"
                   onClick={() => {
                     router.push(notificationsHref);
                     setIsOpen(false);
                   }}
                 >
-                  <span>{t("viewAllNotifications")}</span>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+                                  <Eye className="w-4 h-4 mr-2" /> <span>{t("viewAllNotifications")}</span><ChevronRight className="h-4 w-4" />
+                              </Button>
               </div>
             )}
           </motion.div>

@@ -1,5 +1,6 @@
 import { Borrow } from "@/types/borrow";
 import { Badge } from "@/components/ui/badge";
+import BorrowDetailStatusBadge from "@/components/custom-ui/badge/BorrowDetailStatusBadge";
 import {
   Card,
   CardContent,
@@ -57,9 +58,7 @@ export function BorrowBooksCard({ borrow }: BorrowBooksCardProps) {
                             {detail.book_copy?.copy_code}
                           </span>
                         </p>
-                        <Badge variant="outline" className="text-xs">
-                          {detail.status}
-                        </Badge>
+                        <BorrowDetailStatusBadge status={detail.status} />
                       </div>
                     </div>
                   </div>

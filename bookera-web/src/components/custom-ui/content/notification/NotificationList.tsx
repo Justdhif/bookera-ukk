@@ -78,7 +78,7 @@ export default function NotificationList({
 
           {unreadCount > 0 && (
             <Button
-              variant="ghost"
+              variant="brand"
               size="sm"
               onClick={onMarkAllAsRead}
               disabled={isMarkingAll}
@@ -147,7 +147,7 @@ export default function NotificationList({
           </div>
         ) : notifications.length === 0 ? (
           <EmptyState
-            icon={<Bell className="h-8 w-8" />}
+            icon={<Bell />}
             title={t("noNotifications")}
             description={t("noNotificationsMatch")}
             className="h-full border-0"

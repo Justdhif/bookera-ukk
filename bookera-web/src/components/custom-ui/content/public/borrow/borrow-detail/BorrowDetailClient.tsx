@@ -68,7 +68,7 @@ export default function PublicBorrowDetailClient() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
-            variant="ghost"
+            variant="brand"
             size="icon"
             className="h-8 w-8"
             onClick={() => router.back()}
@@ -95,7 +95,7 @@ export default function PublicBorrowDetailClient() {
                                         {t("requestReturn")}
                                       </Button>
             <Button
-              variant="destructive"
+              variant="brand"
               size="sm"
               onClick={() => setReportLostDialog({ open: true, borrow })}
               className="flex items-center gap-2"

@@ -42,8 +42,5 @@ class BookSeeder extends Seeder
                 );
             }
         });
-
-        // Create 5 inactive books with covers
-        Book::factory(5)->inactive()->withCover()->create();
     }
 }

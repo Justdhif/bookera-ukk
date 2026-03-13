@@ -68,7 +68,7 @@ export default function PublicHeader() {
             <div>
               <Link href="/">
                 <Button
-                  variant={isHomePage ? "secondary" : "ghost"}
+                  variant="brand"
                   size="icon"
                   className={`h-9 w-9 rounded-full ${
                     isHomePage
@@ -98,7 +98,7 @@ export default function PublicHeader() {
 
             <Link href="/settings">
               <Button
-                variant="ghost"
+                variant="brand"
                 size="sm"
                 className="flex items-center gap-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent px-3"
                 aria-label={t("goToSettings")}

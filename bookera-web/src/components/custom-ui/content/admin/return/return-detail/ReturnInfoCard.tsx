@@ -1,5 +1,5 @@
 import { BookReturn } from "@/types/book-return";
-import { Badge } from "@/components/ui/badge";
+import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
 import {
   Card,
   CardContent,
@@ -15,8 +15,6 @@ interface ReturnInfoCardProps {
 }
 
 export function ReturnInfoCard({ bookReturn }: ReturnInfoCardProps) {
-  const borrowIsClosed = bookReturn.borrow?.status === "close";
-
   return (
     <Card>
       <CardHeader>
@@ -51,15 +49,7 @@ export function ReturnInfoCard({ bookReturn }: ReturnInfoCardProps) {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Borrow Status</p>
-              <Badge
-                className={
-                  borrowIsClosed
-                    ? "bg-emerald-100 text-emerald-800"
-                    : "bg-orange-100 text-orange-800"
-                }
-              >
-                {borrowIsClosed ? "Closed" : "Active"}
-              </Badge>
+              <BorrowStatusBadge status={bookReturn.borrow?.status ?? "open"} />
             </div>
           </div>
         </div>

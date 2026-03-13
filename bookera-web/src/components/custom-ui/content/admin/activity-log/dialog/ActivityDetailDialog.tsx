@@ -13,6 +13,7 @@ import { activityLogService } from "@/services/activity-log.service";
 import { ActivityLog } from "@/types/activity-log";
 import { toast } from "sonner";
 import { Calendar, Globe, Monitor, User } from "lucide-react";
+import RoleBadge from "@/components/custom-ui/badge/RoleBadge";
 
 interface ActivityDetailDialogProps {
   activityId: number | null;
@@ -96,7 +97,7 @@ export default function ActivityDetailDialog({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Role:</span>
-                  <Badge variant="outline">{detail.user?.role}</Badge>
+                  <RoleBadge role={detail.user?.role ?? "user"} />
                 </div>
               </div>
             </div>

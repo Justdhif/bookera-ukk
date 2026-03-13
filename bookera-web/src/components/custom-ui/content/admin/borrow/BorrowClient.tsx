@@ -153,7 +153,7 @@ export default function BorrowClient() {
     if (borrows.length === 0) {
       return (
         <EmptyState
-          icon={<Package className="h-16 w-16" />}
+          icon={<Package />}
           title={t("noBorrowsFound")}
           description={t("noBorrowsFoundDesc")}
         />
@@ -181,7 +181,7 @@ export default function BorrowClient() {
           </p>
         </div>
         <Link href="/admin/borrows/create">
-          <Button variant="brand">
+          <Button variant="submit">
             <Plus className="h-4 w-4" />
             {t("createBorrow")}
           </Button>
@@ -300,7 +300,7 @@ export default function BorrowClient() {
                 </div>
               ) : requests.length === 0 ? (
                 <EmptyState
-                  icon={<ClipboardList className="h-16 w-16" />}
+                  icon={<ClipboardList />}
                   title={t("noRequestsFound")}
                   description={t("noRequestsFoundDesc")}
                 />

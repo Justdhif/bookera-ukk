@@ -25,8 +25,7 @@ import {
   Hash,
   BookOpen,
   Loader2,
-  CheckSquare,
-} from "lucide-react";
+  CheckSquare, Eye } from "lucide-react";
 
 interface ReturnDialogProps {
   open: boolean;
@@ -218,28 +217,19 @@ export function ReturnDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={loading}>
-            
-                                  {t("detail.editDialog.cancel")}
-                                </Button>
+                      {t("detail.editDialog.cancel")}
+                  </Button>
           <Button
             onClick={handleSubmit}
             disabled={loading || selectedDetailIds.length === 0}
-            variant="brand"
+            variant="submit"
+            loading={loading}
           >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <PackageOpen className="h-4 w-4" />
-                Return{" "}
-                {selectedDetailIds.length > 0
-                  ? `${selectedDetailIds.length} Book${selectedDetailIds.length > 1 ? "s" : ""}`
-                  : "Books"}
-              </>
-            )}
+            <PackageOpen className="h-4 w-4" />
+            Return{" "}
+            {selectedDetailIds.length > 0
+              ? `${selectedDetailIds.length} Book${selectedDetailIds.length > 1 ? "s" : ""}`
+              : "Books"}
           </Button>
         </DialogFooter>
       </DialogContent>

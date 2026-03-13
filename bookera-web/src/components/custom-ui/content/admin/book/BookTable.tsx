@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Book } from "@/types/book";
 import EmptyState from "@/components/custom-ui/EmptyState";
+import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import { BookOpen, Eye, Trash } from "lucide-react";
 interface Props {
   data: Book[];
@@ -28,7 +29,7 @@ export function BookTable({ data, onDelete }: Props) {
       <EmptyState
         title={t("noBooksFound")}
         description={t("noBooksFoundDesc")}
-        icon={<BookOpen className="h-10 w-10" />}
+        icon={<BookOpen />}
       />
     );
   }
@@ -92,12 +93,16 @@ export function BookTable({ data, onDelete }: Props) {
                     }
                   >
                     {book.available_copies || 0}/{book.total_copies || 0}{" "}
-                    available
+                    {t("available")}
                   </Badge>
                 </div>
               </TableCell>
               <TableCell>
-                <span className="text-muted-foreground">{book.author}</span>
+                <span className="text-muted-foreground">
+                  {book.authors && book.authors.length > 0
+                    ? book.authors.map((a) => a.name).join(", ")
+                    : book.author || "-"}
+                </span>
               </TableCell>
               <TableCell>
                 <span className="text-muted-foreground font-mono text-sm">
@@ -106,7 +111,9 @@ export function BookTable({ data, onDelete }: Props) {
               </TableCell>
               <TableCell>
                 <span className="text-muted-foreground">
-                  {book.publisher || "-"}
+                  {book.publishers && book.publishers.length > 0
+                    ? book.publishers.map((p) => p.name).join(", ")
+                    : book.publisher || "-"}
                 </span>
               </TableCell>
               <TableCell>
@@ -115,23 +122,14 @@ export function BookTable({ data, onDelete }: Props) {
                 </span>
               </TableCell>
               <TableCell>
-                <Badge
-                  variant={book.is_active ? "default" : "secondary"}
-                  className={`text-white ${
-                    book.is_active
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-gray-500 hover:bg-gray-600"
-                  }`}
-                >
-                  {book.is_active ? t("active") : t("inactive")}
-                </Badge>
+                <ActiveStatusBadge isActive={book.is_active} />
               </TableCell>
               <TableCell className="pr-6">
                 <div className="flex justify-end items-center gap-2">
                   <Link href={`/admin/books/${book.slug}`}>
                     <Button size="sm" variant="outline" className="h-8 gap-1">
                       <Eye className="h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">View</span>
+                      <span className="hidden sm:inline">{t("view")}</span>
                     </Button>
                   </Link>
                   <Button
@@ -141,7 +139,7 @@ export function BookTable({ data, onDelete }: Props) {
                     className="h-8 gap-1"
                   >
                     <Trash className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Delete</span>
+                    <span className="hidden sm:inline">{t("delete")}</span>
                   </Button>
                 </div>
               </TableCell>

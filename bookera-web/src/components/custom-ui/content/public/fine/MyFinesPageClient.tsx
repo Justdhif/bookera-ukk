@@ -6,6 +6,7 @@ import { fineService } from "@/services/fine.service";
 import { Fine } from "@/types/fine";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import FineStatusBadge from "@/components/custom-ui/badge/FineStatusBadge";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { DollarSign, BookOpen, Calendar, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -29,38 +30,6 @@ export default function MyFinesPageClient() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const getStatusBadge = (status: Fine["status"]) => {
-    const statusConfig: Record<
-      Fine["status"],
-      { variant: any; label: string; className?: string }
-    > = {
-      unpaid: {
-        variant: "destructive",
-        label: "Unpaid",
-        className: "bg-red-100 text-white hover:bg-red-100",
-      },
-      paid: {
-        variant: "default",
-        label: "Paid",
-        className: "bg-green-100 text-white hover:bg-green-100",
-      },
-      waived: {
-        variant: "secondary",
-        label: "Waived",
-        className: "bg-gray-100 text-gray-800 hover:bg-gray-100",
-      },
-    };
-
-    return (
-      <Badge
-        variant={statusConfig[status]?.variant || "secondary"}
-        className={statusConfig[status]?.className}
-      >
-        {statusConfig[status]?.label || status}
-      </Badge>
-    );
   };
 
   const formatCurrency = (amount: number) => {
@@ -111,7 +80,7 @@ export default function MyFinesPageClient() {
           </div>
         </div>
         <EmptyState
-          icon={<DollarSign className="h-16 w-16" />}
+          icon={<DollarSign />}
           title={t("noFinesYet")}
           description={t("noFinesYetDesc")}
         />
@@ -139,7 +108,7 @@ export default function MyFinesPageClient() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
                     <CardTitle className="text-lg">Fine #{fine.id}</CardTitle>
-                    {getStatusBadge(fine.status)}
+                    <FineStatusBadge status={fine.status} />
                     {fine.borrow_id && (
                       <Badge variant="outline">{t("loanNumber")}{fine.borrow_id}</Badge>
                     )}

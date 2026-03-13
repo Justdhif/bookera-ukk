@@ -1,10 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import DiscussionSidebar from "@/components/custom-ui/sidebar/DiscussionSidebar";
 import DiscussionHeader from "@/components/custom-ui/content/discussion/DiscussionHeader";
-import DiscussionNotificationsPanel from "@/components/custom-ui/content/discussion/DiscussionNotificationsPanel";
 import { useAuthStore } from "@/store/auth.store";
 import { ContentLoadingScreen } from "@/components/custom-ui/ContentLoadingScreen";
 import { useRealTimeDiscussion } from "@/hooks/useRealTimeDiscussion";
@@ -14,8 +12,6 @@ export default function DiscussionLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const showNotificationsPanel = pathname === "/discussion";
   const initialLoading = useAuthStore((s) => s.initialLoading);
   
   // Initialize real-time discussion updates
@@ -34,11 +30,6 @@ export default function DiscussionLayout({
               <div className="p-4 md:p-6">{children}</div>
             )}
           </main>
-          {showNotificationsPanel && (
-            <div className="hidden md:block">
-              <DiscussionNotificationsPanel />
-            </div>
-          )}
         </div>
       </SidebarInset>
     </SidebarProvider>

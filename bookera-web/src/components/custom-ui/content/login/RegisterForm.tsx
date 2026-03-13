@@ -107,7 +107,7 @@ export default function RegisterForm({
               />
               <Button
                 type="button"
-                variant="ghost"
+                variant="brand"
                 size="icon"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 text-gray-400 dark:text-gray-300 hover:text-brand-primary hover:bg-transparent"
@@ -147,7 +147,7 @@ export default function RegisterForm({
               />
               <Button
                 type="button"
-                variant="ghost"
+                variant="brand"
                 size="icon"
                 onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 text-gray-400 dark:text-gray-300 hover:text-brand-primary hover:bg-transparent"
@@ -188,7 +188,7 @@ export default function RegisterForm({
               Already have an account?{" "}
               <Button
                 type="button"
-                variant="link"
+                variant="brand"
                 onClick={onSwitchToLogin}
                 className="font-semibold text-brand-primary hover:text-brand-primary-dark p-0 h-auto underline-offset-4"
                 disabled={loading}
@@ -203,7 +203,7 @@ export default function RegisterForm({
             <div className="flex items-center justify-center gap-1 flex-wrap">
               <Button
                 type="button"
-                variant="link"
+                variant="brand"
                 onClick={onOpenTos}
                 className="text-brand-primary hover:text-brand-primary-dark font-medium p-0 h-auto text-xs"
                 disabled={loading}
@@ -213,7 +213,7 @@ export default function RegisterForm({
               <span>{t("and")}</span>
               <Button
                 type="button"
-                variant="link"
+                variant="brand"
                 onClick={onOpenPrivacy}
                 className="text-brand-primary hover:text-brand-primary-dark font-medium p-0 h-auto text-xs"
                 disabled={loading}

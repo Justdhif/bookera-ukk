@@ -12,10 +12,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "@/types/user";
 import EmptyState from "@/components/custom-ui/EmptyState";
+import RoleBadge from "@/components/custom-ui/badge/RoleBadge";
+import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import { Users, Eye, Trash } from "lucide-react";
 interface Props {
   data: User[];
@@ -29,38 +30,10 @@ export default function UserTable({ data, onDelete }: Props) {
       <EmptyState
         title={t("noUsersFound")}
         description={t("noUsersDesc")}
-        icon={<Users className="h-10 w-10" />}
+        icon={<Users />}
       />
     );
   }
-
-  const getRoleBadge = (role: string) => {
-    const variants = {
-      admin: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
-      "officer:catalog":
-        "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
-      "officer:management":
-        "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
-      officer: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
-      user: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-    };
-
-    const roleLabels = {
-      admin: "ADMIN",
-      "officer:catalog": "CATALOG OFFICER",
-      "officer:management": "MANAGEMENT OFFICER",
-      officer: "OFFICER",
-      user: "USER",
-    };
-
-    return (
-      <Badge
-        className={variants[role as keyof typeof variants] || variants.user}
-      >
-        {roleLabels[role as keyof typeof roleLabels] || role.toUpperCase()}
-      </Badge>
-    );
-  };
 
   return (
     <div className="rounded-md border">
@@ -116,7 +89,7 @@ export default function UserTable({ data, onDelete }: Props) {
                 </span>
               </TableCell>
 
-              <TableCell>{getRoleBadge(item.role)}</TableCell>
+              <TableCell><RoleBadge role={item.role} /></TableCell>
 
               <TableCell>
                 <span className="text-muted-foreground">
@@ -125,16 +98,7 @@ export default function UserTable({ data, onDelete }: Props) {
               </TableCell>
 
               <TableCell>
-                <Badge
-                  variant={item.is_active ? "default" : "secondary"}
-                  className={`text-white ${
-                    item.is_active
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-gray-500 hover:bg-gray-600"
-                  }`}
-                >
-                  {item.is_active ? t("active") : t("inactive")}
-                </Badge>
+                <ActiveStatusBadge isActive={item.is_active} />
               </TableCell>
 
               <TableCell className="pr-6">

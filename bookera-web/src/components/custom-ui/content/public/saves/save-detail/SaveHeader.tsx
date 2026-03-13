@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Save } from "@/types/save";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, Trash, BookMarked } from "lucide-react";
+import { ArrowLeft, Edit, Trash, BookMarked, Eye } from "lucide-react";
 import { format } from "date-fns";
 interface SaveHeaderProps {
   save: Save;
@@ -22,10 +22,9 @@ export default function SaveHeader({
   return (
     <div className="space-y-4 mb-6">
       <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" onClick={onBack}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("detail.back")}
-        </Button>
+        <Button variant="outline" size="sm" onClick={onBack}>
+                  <Eye className="w-4 h-4 mr-2" /> <ArrowLeft className="h-4 w-4 mr-2" />{t("detail.back")}
+              </Button>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
@@ -93,14 +92,13 @@ export default function SaveHeader({
           </div>
           <div className="mt-2 flex gap-2 shrink-0">
             <Button
-              variant="brand"
+              variant="outline"
               size="sm"
               onClick={onEdit}
               className="h-8 gap-1.5"
             >
-              <Edit className="h-3.5 w-3.5" />
-              {t("detail.edit")}
-            </Button>
+                          <Eye className="w-4 h-4 mr-2" /> <Edit className="h-3.5 w-3.5" />{t("detail.edit")}
+                      </Button>
             <Button
               variant="destructive"
               size="sm"

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
@@ -10,6 +10,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { discussionPostService } from "@/services/discussion.service";
 import { DiscussionPost } from "@/types/discussion";
 import PostCard from "@/components/custom-ui/content/discussion/PostCard";
+import EmptyState from "@/components/custom-ui/EmptyState";
 
 export default function FollowingFeedPageClient() {
   const router = useRouter();
@@ -68,14 +69,12 @@ export default function FollowingFeedPageClient() {
       </p>
 
       {posts.length === 0 ? (
-        <div className="text-center py-16 space-y-3">
-          <p className="text-muted-foreground">
-            {t("noFollowingPosts")}
-          </p>
-          <Button variant="outline" onClick={() => router.push("/discussion")}>
-            {t("findPeopleToFollow")}
-          </Button>
-        </div>
+        <EmptyState
+          icon={<MessageSquare />}
+          description={t("noFollowingPosts")}
+          actionLabel={t("findPeopleToFollow")}
+          onAction={() => router.push("/discussion")}
+        />
       ) : (
         <div className="space-y-4">
           {posts.map((post) => (
@@ -90,7 +89,7 @@ export default function FollowingFeedPageClient() {
           {page < lastPage && (
             <div className="flex justify-center pt-4">
               <Button
-                variant="outline"
+                variant="brand"
                 onClick={() => {
                   const next = page + 1;
                   setPage(next);

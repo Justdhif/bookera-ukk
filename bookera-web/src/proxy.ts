@@ -12,7 +12,7 @@ const MANAGEMENT_ROUTES = [
   "/admin/activity-logs",
 ];
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
   const role = req.cookies.get("role")?.value;
   const pathname = req.nextUrl.pathname;

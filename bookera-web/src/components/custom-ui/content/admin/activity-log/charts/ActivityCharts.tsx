@@ -101,7 +101,7 @@ export default function ActivityCharts({ charts, onYearChange }: ActivityChartsP
           
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
+              variant="brand"
               size="icon"
               onClick={handlePrevYear}
               className="h-8 w-8"
@@ -123,7 +123,7 @@ export default function ActivityCharts({ charts, onYearChange }: ActivityChartsP
             </Select>
             
             <Button
-              variant="outline"
+              variant="brand"
               size="icon"
               onClick={handleNextYear}
               className="h-8 w-8"

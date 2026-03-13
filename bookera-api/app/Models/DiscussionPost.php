@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -32,6 +33,12 @@ class DiscussionPost extends Model
         'slug',
         'likes_count',
         'comments_count',
+        'taken_down_at',
+        'taken_down_reason',
+    ];
+
+    protected $casts = [
+        'taken_down_at' => 'datetime',
     ];
 
     protected static function boot(): void
@@ -63,5 +70,15 @@ class DiscussionPost extends Model
     public function comments()
     {
         return $this->hasMany(DiscussionComment::class, 'post_id');
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(DiscussionPostReport::class, 'post_id');
+    }
+
+    public function scopeNotTakenDown(Builder $query): Builder
+    {
+        return $query->whereNull('taken_down_at');
     }
 }

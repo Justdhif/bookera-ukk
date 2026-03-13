@@ -264,7 +264,7 @@ function SidebarTrigger({
     <Button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
-      variant="ghost"
+      variant="brand"
       size="icon"
       className={cn("size-7", className)}
       onClick={(event) => {
@@ -539,7 +539,6 @@ function SidebarMenuButton({
           side="right"
           align="center"
           hidden={state !== "collapsed" || isMobile}
-          gradient="from-emerald-600 to-teal-600"
         >
           {tooltip}
         </TooltipContent>

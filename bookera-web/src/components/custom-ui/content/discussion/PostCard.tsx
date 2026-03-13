@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
-import { Heart, MessageCircle, MoreHorizontal, Trash2, Pencil, UserPlus, UserCheck, Shield } from "lucide-react";
+import { Heart, MessageCircle, MoreHorizontal, Trash2, Pencil, UserPlus, UserCheck, Shield, Flag, AlertTriangle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import { discussionLikeService, discussionPostService, userFollowerService } fro
 import { useAuthStore } from "@/store/auth.store";
 import PostImageCarousel from "./PostImageCarousel";
 import DeleteConfirmDialog from "@/components/custom-ui/DeleteConfirmDialog";
+import ReportPostDialog from "./ReportPostDialog";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -43,9 +44,14 @@ export default function PostCard({ post, onDeleted, feedMode = true }: Props) {
   const [followLoading, setFollowLoading] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [captionExpanded, setCaptionExpanded] = useState(false);
 
   const isOwner = user?.id === post.user_id;
-  const avatarSrc = post.user.profile?.avatar || undefined;
+  const avatarSrc = post.user.profile?.avatar_url || post.user.profile?.avatar || undefined;
+  const isTakenDown = !!post.taken_down_at;
+  const userProfileHref = post.user.slug ? `/discussion/user/${post.user.slug}` : `/discussion/user/${post.user_id}`;
+  const hasLongCaption = !!post.caption && (post.caption.length > 140 || post.caption.includes("\n"));
 
   // Listen to real-time post updates
   useEffect(() => {
@@ -149,11 +155,26 @@ export default function PostCard({ post, onDeleted, feedMode = true }: Props) {
     }
   };
 
+  const handleReportClick = async () => {
+    if (!isAuthenticated) {
+      toast.error(t("loginToLike"));
+      router.push("/login");
+      return;
+    }
+    setReportOpen(true);
+  };
+
   return (
     <>
       <article className="bg-card rounded-2xl border border-border/60 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+        {isTakenDown && (
+          <div className="flex items-center gap-2 px-4 py-2 bg-destructive/10 border-b border-destructive/20 text-destructive text-xs font-medium">
+            <AlertTriangle className="h-3.5 w-3.5" />
+            {t("takenDown")}
+          </div>
+        )}
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
-          <Link href={`/discussion/user/${post.user_id}`} className="flex items-center gap-3 group">
+          <Link href={userProfileHref} className="flex items-center gap-3 group">
             <Avatar className="h-10 w-10 ring-2 ring-border group-hover:ring-purple-400 transition-all">
               <AvatarImage src={avatarSrc} alt={post.user.profile?.full_name} />
               <AvatarFallback className="bg-linear-to-br from-pink-500 to-purple-600 text-white text-xs font-bold">
@@ -185,7 +206,7 @@ export default function PostCard({ post, onDeleted, feedMode = true }: Props) {
             {!isOwner && (
               <Button
                 size="sm"
-                variant={following ? "outline" : "ghost"}
+                variant="brand"
                 className={cn(
                   "h-7 text-xs px-2.5 rounded-full",
                   following
@@ -205,7 +226,7 @@ export default function PostCard({ post, onDeleted, feedMode = true }: Props) {
             {isOwner && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                  <Button variant="brand" size="icon" className="h-8 w-8 rounded-full">
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -235,7 +256,7 @@ export default function PostCard({ post, onDeleted, feedMode = true }: Props) {
 
         <div className="flex items-center gap-1 px-3 py-3">
           <Button
-            variant="ghost"
+            variant="brand"
             size="sm"
             className={cn(
               "gap-1.5 rounded-xl px-3",
@@ -249,7 +270,7 @@ export default function PostCard({ post, onDeleted, feedMode = true }: Props) {
           </Button>
 
           <Button
-            variant="ghost"
+            variant="brand"
             size="sm"
             className="gap-1.5 rounded-xl px-3 text-muted-foreground hover:text-foreground"
             onClick={handleCommentClick}
@@ -257,16 +278,42 @@ export default function PostCard({ post, onDeleted, feedMode = true }: Props) {
             <MessageCircle className="h-5 w-5" />
             <span className="text-sm font-medium">{commentsCount}</span>
           </Button>
+
+          {!isOwner && (
+            <Button
+              variant="brand"
+              size="sm"
+              className="gap-1.5 rounded-xl px-3 text-muted-foreground hover:text-orange-600"
+              onClick={handleReportClick}
+            >
+              <Flag className="h-5 w-5" />
+              <span className="text-sm font-medium">{t("report")}</span>
+            </Button>
+          )}
         </div>
 
         {post.caption && (
           <div className="px-4 pb-3">
-            <p className="text-sm leading-relaxed whitespace-pre-wrap wrap-break-word">
+            <p
+              className={cn(
+                "text-sm leading-relaxed whitespace-pre-wrap wrap-break-word",
+                !captionExpanded && "line-clamp-1",
+              )}
+            >
               <span className="font-semibold mr-1.5">
                 {post.user.profile?.full_name ?? post.user.email}
               </span>
               {post.caption}
             </p>
+            {hasLongCaption && (
+              <button
+                type="button"
+                className="mt-1 text-xs font-medium text-primary hover:underline"
+                onClick={() => setCaptionExpanded((prev) => !prev)}
+              >
+                {captionExpanded ? t("seeLessCaption") : t("seeMoreCaption")}
+              </button>
+            )}
           </div>
         )}
       </article>
@@ -275,6 +322,11 @@ export default function PostCard({ post, onDeleted, feedMode = true }: Props) {
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         onConfirm={handleDelete}
+      />
+      <ReportPostDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        postSlug={post.slug}
       />
     </>
   );

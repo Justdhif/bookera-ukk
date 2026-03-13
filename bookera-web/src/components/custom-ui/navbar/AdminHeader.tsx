@@ -68,7 +68,7 @@ export default function AdminHeader() {
       <div className="ml-auto flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="brand" size="icon" className="relative">
               <Settings className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>

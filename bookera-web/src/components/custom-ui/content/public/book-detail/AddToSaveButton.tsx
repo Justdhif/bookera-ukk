@@ -114,7 +114,7 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
   return (
     <>
       <Button
-        variant="brand"
+        variant="submit"
         size="sm"
         onClick={() => setShowDialog(true)}
         className="gap-2"
@@ -138,7 +138,7 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
           {!showCreateNew ? (
             <div className="flex flex-col flex-1 min-h-0 px-6 py-4 gap-3 overflow-hidden">
               <Button
-                variant="outline"
+                variant="submit"
                 className="w-full justify-start gap-2 shrink-0"
                 onClick={() => setShowCreateNew(true)}
               >
@@ -156,7 +156,7 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
                   ) : saves.length === 0 ? (
                     <EmptyState
                       variant="compact"
-                      icon={<BookMarked className="h-5 w-5" />}
+                      icon={<BookMarked />}
                       title={t("noCollections")}
                       actionLabel={t("createFirst")}
                       onAction={() => setShowCreateNew(true)}
@@ -212,7 +212,7 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
               {saves.length > 0 && (
                 <DialogFooter className="gap-2 shrink-0 border-t pt-3">
                   <Button
-                    variant="outline"
+                    variant="submit"
                     onClick={() => {
                       setSelectedSaveIds([]);
                       setShowDialog(false);
@@ -223,7 +223,7 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
                     {t("cancel")}
                   </Button>
                   <Button
-                    variant="brand"
+                    variant="submit"
                     onClick={handleConfirmAdd}
                     disabled={selectedSaveIds.length === 0 || isAdding}
                     className="flex-1"
@@ -270,7 +270,7 @@ export default function AddToSaveButton({ bookId }: AddToSaveButtonProps) {
 
               <DialogFooter>
                 <Button
-                  variant="outline"
+                  variant="submit"
                   onClick={() => setShowCreateNew(false)}
                   disabled={isCreating}
                 >

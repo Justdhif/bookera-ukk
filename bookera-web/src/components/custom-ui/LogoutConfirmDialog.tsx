@@ -61,7 +61,7 @@ export default function LogoutConfirmDialog({
         <DialogFooter className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-2 mt-6">
           <Button
             type="button"
-            variant="outline"
+            variant="brand"
             onClick={() => onOpenChange(false)}
             disabled={isLoggingOut}
             className="w-full sm:w-auto sm:flex-1 h-11 font-medium border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 transition-all duration-200"
@@ -71,7 +71,7 @@ export default function LogoutConfirmDialog({
                                 </Button>
           <Button
             type="button"
-            variant="destructive"
+            variant="brand"
             onClick={handleConfirm}
             disabled={isLoggingOut}
             className="w-full sm:w-auto sm:flex-1 h-11 font-medium bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 shadow-sm transition-all duration-200"
