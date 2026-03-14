@@ -11,7 +11,8 @@ import { termsOfServiceService } from "@/services/terms-of-service.service";
 import { TermsOfService } from "@/types/terms-of-service";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TermsOfServiceModalProps {
   open: boolean;
@@ -58,8 +59,15 @@ export function TermsOfServiceModal({
 
         <ScrollArea className="mt-4 h-[calc(90vh-8rem)]">
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-brand-primary" />
+            <div className="space-y-4 pr-4 py-4">
+              <Skeleton className="h-10 w-full rounded-lg" />
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-5 w-2/3" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-11/12" />
+                </div>
+              ))}
             </div>
           ) : contents.length > 0 ? (
             <div className="space-y-6 pr-4">

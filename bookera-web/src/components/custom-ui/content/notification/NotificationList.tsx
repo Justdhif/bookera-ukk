@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Notification } from "@/types/notification";
 import { Input } from "@/components/ui/input";
 import { Loader2, Bell, Search, CheckCheck, Filter } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { NotificationIconBadge, getModuleBadgeStyle } from "./notification-utils";
@@ -141,9 +142,22 @@ export default function NotificationList({
       {/* Notification list */}
       <div className="flex-1 overflow-y-auto">
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-full gap-3">
-            <Loader2 className="h-7 w-7 animate-spin text-primary/60" />
-            <p className="text-sm text-muted-foreground">Loading...</p>
+          <div className="p-3">
+            <div className="space-y-2">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="flex gap-3 p-3.5">
+                  <Skeleton className="h-10 w-10 rounded-xl shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-3/5" />
+                    <Skeleton className="h-3 w-4/5" />
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-4 w-14 rounded" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : notifications.length === 0 ? (
           <EmptyState

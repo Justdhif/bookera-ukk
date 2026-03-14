@@ -491,6 +491,7 @@
     "lostBooks": "Lost Books",
     "activityLogs": "Activity Logs",
     "settings": "Settings",
+    "systemSettings": "System Settings",
     "authors": "Authors",
     "publishers": "Publishers",
     "borrows": "Borrows",
@@ -499,7 +500,10 @@
     "account": "Account",
     "accountSettings": "Account Settings",
     "discussionReports": "Discussion Reports",
-    "back": "Back"
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "back": "Back",
+    "backToLibrary": "Back to Library"
   },
   "navbar": {
     "notifications": "Notifications",
@@ -524,7 +528,9 @@
     "role": "Role",
     "myBorrows": "My Borrows",
     "myFines": "My Fines",
-    "myPosts": "My Posts"
+    "myPosts": "My Posts",
+    "signIn": "Sign In",
+    "signInToAccess": "Sign in to continue"
   },
   "modal": {},
   "forgot-password": {
@@ -700,6 +706,19 @@
     "unavailable": "Unavailable",
     "borrowed": "Borrowed",
     "copiesAvailable": "Available",
+    "search": {
+      "title": "Search Results",
+      "showingResultsFor": "Showing results for:",
+      "booksFound": "{count, plural, one {# book found} other {# books found}}",
+      "mostRelevant": "Most relevant",
+      "topPick": "Top pick",
+      "related": "Related",
+      "noRelated": "No other related results.",
+      "detail": "Detail",
+      "moreResults": "More results",
+      "previous": "Previous",
+      "next": "Next"
+    },
     "detail": {
       "back": "Back",
       "edit": "Edit",
@@ -1046,7 +1065,6 @@
   "author": {
     "title": "Authors",
     "description": "Manage book authors",
-    "addAuthor": "Add Author",
     "editAuthor": "Edit Author",
     "authorDetails": "Author Details",
     "photo": "Photo",
@@ -1642,10 +1660,13 @@
     "community": "Community",
     "communityLabel": "Bookera Community",
     "navHome": "Home",
+    "navExplore": "Explore",
     "navCreate": "Create Post",
     "navSearch": "Search",
+    "navProfile": "Profile",
     "navNotifications": "Notifications",
     "navSettings": "Settings",
+    "exploreSearchPlaceholder": "Search posts...",
     "backToLibrary": "Back to Library",
     "logout": "Logout",
     "createPost": "Create Post",
@@ -1746,6 +1767,7 @@
     "reason_inappropriate_content": "Inappropriate Content",
     "reason_other": "Other",
     "reportDescription": "Additional details",
+    "reportDescriptionRequired": "Description is required for other reason",
     "reportDescPlaceholder": "Describe the issue (optional)...",
     "optional": "optional",
     "submitReport": "Submit Report",
@@ -1790,6 +1812,8 @@
     "viewPost": "View post",
     "report": "Report",
     "seeMoreCaption": "See more",
-    "seeLessCaption": "See less"
+    "seeLessCaption": "See less",
+    "emptyStateFollowingTitle": "No posts yet",
+    "emptyStateFollowingDesc": "Posts from people you follow will appear here."
   }
 }

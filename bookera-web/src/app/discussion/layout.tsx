@@ -3,6 +3,7 @@
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import DiscussionSidebar from "@/components/custom-ui/sidebar/DiscussionSidebar";
 import DiscussionHeader from "@/components/custom-ui/content/discussion/DiscussionHeader";
+import DiscussionBottomBar from "@/components/custom-ui/navbar/DiscussionBottomBar";
 import { useAuthStore } from "@/store/auth.store";
 import { ContentLoadingScreen } from "@/components/custom-ui/ContentLoadingScreen";
 import { useRealTimeDiscussion } from "@/hooks/useRealTimeDiscussion";
@@ -23,7 +24,7 @@ export default function DiscussionLayout({
       <SidebarInset className="h-screen flex flex-col overflow-hidden min-w-0">
         <DiscussionHeader />
         <div className="flex flex-1 overflow-hidden">
-          <main className="flex-1 overflow-y-auto bg-background">
+          <main className="flex-1 overflow-y-auto bg-background pb-20 md:pb-0">
             {initialLoading ? (
               <ContentLoadingScreen />
             ) : (
@@ -31,6 +32,8 @@ export default function DiscussionLayout({
             )}
           </main>
         </div>
+
+        <DiscussionBottomBar />
       </SidebarInset>
     </SidebarProvider>
   );

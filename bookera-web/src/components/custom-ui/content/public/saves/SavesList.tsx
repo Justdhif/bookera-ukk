@@ -239,7 +239,7 @@ export default function SavesList({
                 <TooltipTrigger asChild>
                   <Button
                     size="icon"
-                    variant="submit"
+                    variant="outline"
                     onClick={() => setShowCreateDialog(true)}
                     className="h-8 w-8 rounded-lg"
                   >
@@ -278,7 +278,7 @@ export default function SavesList({
 
           <Button
             size="sm"
-            variant="submit"
+            variant="outline"
             className="h-7 w-7 p-0 text-muted-foreground dark:text-white/70 hover:text-brand-primary dark:hover:text-brand-primary-light hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 rounded-lg transition-colors"
             onClick={() => setShowCreateDialog(true)}
           >

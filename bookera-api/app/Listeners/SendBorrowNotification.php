@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Models\User;
 use App\Services\FonnteService;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class SendBorrowNotification
@@ -108,7 +109,7 @@ class SendBorrowNotification
                         Mail::to($user->email)
                             ->send(new \App\Mail\BorrowRequestApprovedMail($borrowRequest, $borrow));
                     } catch (\Exception $e) {
-                        \Log::error('Failed to send borrow approval email: ' . $e->getMessage());
+                        Log::error('Failed to send borrow approval email: ' . $e->getMessage());
                     }
                 }
 
@@ -116,7 +117,7 @@ class SendBorrowNotification
                     try {
                         (new FonnteService())->send($profile->phone_number, $message);
                     } catch (\Exception $e) {
-                        \Log::error('Failed to send borrow approval WhatsApp: ' . $e->getMessage());
+                        Log::error('Failed to send borrow approval WhatsApp: ' . $e->getMessage());
                     }
                 }
             }
@@ -164,7 +165,7 @@ class SendBorrowNotification
                         Mail::to($user->email)
                             ->send(new \App\Mail\BorrowRequestRejectedMail($borrowRequest));
                     } catch (\Exception $e) {
-                        \Log::error('Failed to send borrow rejection email: ' . $e->getMessage());
+                    Log::error('Failed to send borrow rejection email: ' . $e->getMessage());
                     }
                 }
 
@@ -172,7 +173,7 @@ class SendBorrowNotification
                     try {
                         (new FonnteService())->send($profile->phone_number, $message);
                     } catch (\Exception $e) {
-                        \Log::error('Failed to send borrow rejection WhatsApp: ' . $e->getMessage());
+                        Log::error('Failed to send borrow rejection WhatsApp: ' . $e->getMessage());
                     }
                 }
             }

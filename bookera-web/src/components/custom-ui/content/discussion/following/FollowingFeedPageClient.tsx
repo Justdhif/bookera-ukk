@@ -11,6 +11,39 @@ import { discussionPostService } from "@/services/discussion.service";
 import { DiscussionPost } from "@/types/discussion";
 import PostCard from "@/components/custom-ui/content/discussion/PostCard";
 import EmptyState from "@/components/custom-ui/EmptyState";
+import { Skeleton } from "@/components/ui/skeleton";
+
+function FollowingFeedSkeleton() {
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-4 w-72" />
+      </div>
+      <div className="space-y-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div
+            key={i}
+            className="rounded-2xl border border-border/60 bg-card overflow-hidden"
+          >
+            <div className="flex items-center gap-3 p-4">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+            </div>
+            <Skeleton className="h-80 w-full" />
+            <div className="p-4 space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-4/5" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function FollowingFeedPageClient() {
   const router = useRouter();
@@ -54,11 +87,7 @@ export default function FollowingFeedPageClient() {
   };
 
   if (initialLoading || loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <FollowingFeedSkeleton />;
   }
 
   return (
@@ -89,7 +118,7 @@ export default function FollowingFeedPageClient() {
           {page < lastPage && (
             <div className="flex justify-center pt-4">
               <Button
-                variant="brand"
+                variant="ghost"
                 onClick={() => {
                   const next = page + 1;
                   setPage(next);

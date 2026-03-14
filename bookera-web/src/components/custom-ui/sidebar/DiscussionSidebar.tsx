@@ -17,7 +17,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Home, PlusSquare, Search, Bell, Settings } from "lucide-react";
+import { Bell, Compass, Home, PlusSquare, Settings } from "lucide-react";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
@@ -69,9 +69,9 @@ export default function DiscussionSidebar() {
       isCreate: true,
     },
     {
-      href: "/discussion/search",
-      icon: Search,
-      label: t("navSearch"),
+      href: "/discussion/explore",
+      icon: Compass,
+      label: t("navExplore"),
       exact: false,
     },
     {

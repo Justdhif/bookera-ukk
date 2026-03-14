@@ -24,6 +24,7 @@ export interface DiscussionPost {
   updated_at: string;
   user: User;
   images: DiscussionPostImage[];
+  followed_likers?: User[];
 }
 
 export type PostReportReason =

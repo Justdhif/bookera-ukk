@@ -56,7 +56,7 @@ export function UserDiscussionProfileHeader({
 
           {!isOwnProfile && (
             <Button
-              variant="brand"
+              variant="ghost"
               size="sm"
               className={cn(
                 "rounded-full gap-1.5",

@@ -63,7 +63,7 @@ class UserFactory extends Factory
                 'phone_number'          => fake()->unique()->numerify('08##########'),
                 'address'               => fake()->address(),
                 'bio'                   => fake()->optional(0.7)->sentence(),
-                'identification_number' => strtoupper(fake()->unique()->bothify('??-####')),
+                'identification_number' => strtoupper(fake()->lexify('??')) . '-' . str_pad($user->id, 4, '0', STR_PAD_LEFT),
                 'occupation'            => fake()->randomElement(['Student', 'Teacher', 'Staff', 'Public', 'Other']),
                 'institution'           => fake()->company(),
                 'avatar'                => AvatarHelper::generateDefaultAvatar($user->id),

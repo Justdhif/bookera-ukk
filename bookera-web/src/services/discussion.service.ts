@@ -3,7 +3,6 @@ import { ApiResponse } from "@/types/api";
 import {
   DiscussionPost,
   DiscussionComment,
-  DiscussionUser,
   DiscussionPostListResponse,
   DiscussionCommentListResponse,
   DiscussionPostReportListResponse,
@@ -72,9 +71,6 @@ export const discussionPostService = {
 
   reportPost: (slug: string, data: { reason: PostReportReason; description?: string }) =>
     api.post<ApiResponse<DiscussionPostReport>>(`/discussion-posts/${slug}/report`, data),
-
-  getActiveUsers: () =>
-    api.get<ApiResponse<DiscussionUser[]>>("/discussion-posts/active-users"),
 };
 
 export const discussionLikeService = {

@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -96,8 +97,8 @@ class SaveCoverHelper
 
             return $path;
         } catch (\Exception $e) {
-            \Log::error('Failed to generate save cover collage: ' . $e->getMessage());
-            \Log::error('Trace: ' . $e->getTraceAsString());
+            Log::error('Failed to generate save cover collage: ' . $e->getMessage());
+            Log::error('Trace: ' . $e->getTraceAsString());
             return null;
         }
     }
@@ -118,14 +119,14 @@ class SaveCoverHelper
             $fullPath = storage_path("app/public/{$path}");
 
             if (!file_exists($fullPath)) {
-                \Log::warning("Image file not found: {$fullPath}");
+                Log::warning("Image file not found: {$fullPath}");
                 return null;
             }
 
             $image = $manager->read($fullPath);
             return $image->cover($width, $height);
         } catch (\Exception $e) {
-            \Log::error('Failed to load image: ' . $e->getMessage());
+            Log::error('Failed to load image: ' . $e->getMessage());
             return null;
         }
     }

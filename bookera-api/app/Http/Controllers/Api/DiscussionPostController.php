@@ -19,8 +19,11 @@ class DiscussionPostController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        /** @var \App\Models\User|null $user */
+        $user = auth('sanctum')->user();
+
         $posts = $this->postService->getPosts(
-            auth('sanctum')->user(),
+            $user,
             (int) $request->get('per_page', 15)
         );
 
@@ -30,9 +33,12 @@ class DiscussionPostController extends Controller
     public function byUser(Request $request, string $userSlug): JsonResponse
     {
         try {
+            /** @var \App\Models\User|null $user */
+            $user = auth('sanctum')->user();
+
             $posts = $this->postService->getUserPosts(
                 $userSlug,
-                auth('sanctum')->user(),
+                $user,
                 (int) $request->get('per_page', 15)
             );
             return ApiResponse::successResponse('User posts retrieved successfully', $posts);
@@ -44,7 +50,10 @@ class DiscussionPostController extends Controller
     public function show(Request $request, string $slug): JsonResponse
     {
         try {
-            $post = $this->postService->getPostBySlug($slug, auth('sanctum')->user());
+            /** @var \App\Models\User|null $user */
+            $user = auth('sanctum')->user();
+
+            $post = $this->postService->getPostBySlug($slug, $user);
             return ApiResponse::successResponse('Post retrieved successfully', $post);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Post not found');
@@ -53,7 +62,10 @@ class DiscussionPostController extends Controller
 
     public function store(StoreDiscussionPostRequest $request): JsonResponse
     {
-        $post = $this->postService->createPost($request->user(), [
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
+        $post = $this->postService->createPost($user, [
             'caption' => $request->input('caption'),
             'images'  => $request->file('images'),
         ]);
@@ -64,9 +76,11 @@ class DiscussionPostController extends Controller
     public function update(UpdateDiscussionPostRequest $request, string $slug): JsonResponse
     {
         try {
+            /** @var \App\Models\User $user */
+            $user = $request->user();
             $post = DiscussionPost::where('slug', $slug)->firstOrFail();
 
-            $post = $this->postService->updatePost($request->user(), $post, [
+            $post = $this->postService->updatePost($user, $post, [
                 'caption' => $request->input('caption'),
                 'images'  => $request->file('images') ?? [],
             ]);
@@ -86,8 +100,10 @@ class DiscussionPostController extends Controller
     public function destroy(Request $request, string $slug): JsonResponse
     {
         try {
+            /** @var \App\Models\User $user */
+            $user = $request->user();
             $post = DiscussionPost::where('slug', $slug)->firstOrFail();
-            $this->postService->deletePost($request->user(), $post);
+            $this->postService->deletePost($user, $post);
             return ApiResponse::successResponse('Post deleted successfully');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Post not found');
@@ -102,8 +118,11 @@ class DiscussionPostController extends Controller
      */
     public function following(Request $request): JsonResponse
     {
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
         $posts = $this->postService->getFollowingPosts(
-            $request->user(),
+            $user,
             (int) $request->get('per_page', 15)
         );
 
@@ -115,6 +134,7 @@ class DiscussionPostController extends Controller
      */
     public function activeUsers(Request $request): JsonResponse
     {
+        /** @var \App\Models\User|null $authUser */
         $authUser = auth('sanctum')->user();
 
         $users = User::with('profile')

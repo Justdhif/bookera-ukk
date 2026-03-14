@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Models\User;
 use App\Services\FonnteService;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\Log;
 
 class SendReturnNotification
 {
@@ -84,10 +85,9 @@ class SendReturnNotification
                 try {
                     (new FonnteService())->send($profile->phone_number, $message);
                 } catch (\Exception $e) {
-                    \Log::error('Failed to send return approved WhatsApp: ' . $e->getMessage());
+                    Log::error('Failed to send return approved WhatsApp: ' . $e->getMessage());
                 }
             }
         }
     }
 }
-

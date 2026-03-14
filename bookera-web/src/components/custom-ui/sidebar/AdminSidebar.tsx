@@ -32,11 +32,26 @@ import {
   Building2,
   User,
   Flag,
+  FileText,
+  Shield,
 } from "lucide-react";
 import { SidebarUserFooter } from "@/components/custom-ui/sidebar/SidebarUserFooter";
 import { cn } from "@/lib/utils";
 
-const getMenuGroups = (t: any) => [
+type MenuItem = {
+  title: string;
+  href: string;
+  icon: any;
+  roles?: string[];
+};
+
+type MenuGroup = {
+  title: string;
+  roles: string[];
+  items: MenuItem[];
+};
+
+const getMenuGroups = (t: any): MenuGroup[] => [
   {
     title: t("mainMenu"),
     roles: ["admin", "officer:catalog", "officer:management"],
@@ -112,6 +127,22 @@ const getMenuGroups = (t: any) => [
         title: t("activityLogs"),
         href: "/admin/activity-logs",
         icon: Activity,
+      },
+    ],
+  },
+  {
+    title: t("systemSettings"),
+    roles: ["admin"],
+    items: [
+      {
+        title: t("termsOfService"),
+        href: "/admin/terms-of-service",
+        icon: FileText,
+      },
+      {
+        title: t("privacyPolicy"),
+        href: "/admin/privacy-policy",
+        icon: Shield,
       },
     ],
   },
@@ -201,6 +232,10 @@ export function AdminSidebar() {
                   )}
 
                   {group.items.map((item) => {
+                    if (item.roles && user?.role && !item.roles.includes(user.role)) {
+                      return null;
+                    }
+
                     const isActive = pathname === item.href;
                     return (
                       <SidebarMenuItem

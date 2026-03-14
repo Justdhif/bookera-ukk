@@ -30,6 +30,8 @@ interface SidebarUserFooterProps {
   backHref?: string;
   /** When provided, the back button calls this instead of navigating to backHref */
   onBack?: () => void;
+  /** Whether to show the back button (defaults to true) */
+  showBackButton?: boolean;
 }
 
 export function SidebarUserFooter({
@@ -37,6 +39,7 @@ export function SidebarUserFooter({
   backLabelKey,
   backHref = "/",
   onBack,
+  showBackButton = true,
 }: SidebarUserFooterProps) {
   const { open } = useSidebar();
   const pathname = usePathname();
@@ -70,51 +73,53 @@ export function SidebarUserFooter({
           className={cn("p-2 space-y-1", !open && "flex flex-col items-center")}
         >
           {/* Back to public page */}
-          <SidebarMenuItem
-            className={cn(!open && "w-full flex justify-center")}
-          >
-            <SidebarMenuButton
-              asChild={!onBack}
-              onClick={onBack}
-              tooltip={{ content: backLabel }}
-              className={cn(
-                "rounded-xl hover:bg-brand-primary/8 dark:hover:bg-brand-primary/15 transition-all group/back",
-                !open && "justify-center px-0 mx-auto",
-              )}
+          {showBackButton && (
+            <SidebarMenuItem
+              className={cn(!open && "w-full flex justify-center")}
             >
-              {onBack ? (
-                <>
-                  <div
-                    className={cn(
-                      open ? "p-1.5" : "p-2",
-                      "rounded-lg bg-linear-to-br from-brand-primary to-brand-primary-dark text-white shadow-sm group-hover/back:shadow-md transition-shadow shrink-0",
+              <SidebarMenuButton
+                asChild={!onBack}
+                onClick={onBack}
+                tooltip={{ content: backLabel }}
+                className={cn(
+                  "rounded-xl hover:bg-brand-primary/8 dark:hover:bg-brand-primary/15 transition-all group/back",
+                  !open && "justify-center px-0 mx-auto",
+                )}
+              >
+                {onBack ? (
+                  <>
+                    <div
+                      className={cn(
+                        open ? "p-1.5" : "p-2",
+                        "rounded-lg bg-linear-to-br from-brand-primary to-brand-primary-dark text-white shadow-sm group-hover/back:shadow-md transition-shadow shrink-0",
+                      )}
+                    >
+                      <BookOpen className="h-3.5 w-3.5" />
+                    </div>
+                    {open && <span className="font-medium">{backLabel}</span>}
+                    {open && (
+                      <ChevronRight className="h-3 w-3 text-muted-foreground/50 group-hover/back:text-brand-primary group-hover/back:translate-x-0.5 transition-all ml-auto" />
                     )}
-                  >
-                    <BookOpen className="h-3.5 w-3.5" />
-                  </div>
-                  {open && <span className="font-medium">{backLabel}</span>}
-                  {open && (
-                    <ChevronRight className="h-3 w-3 text-muted-foreground/50 group-hover/back:text-brand-primary group-hover/back:translate-x-0.5 transition-all ml-auto" />
-                  )}
-                </>
-              ) : (
-                <Link href={backHref}>
-                  <div
-                    className={cn(
-                      open ? "p-1.5" : "p-2",
-                      "rounded-lg bg-linear-to-br from-brand-primary to-brand-primary-dark text-white shadow-sm group-hover/back:shadow-md transition-shadow shrink-0",
+                  </>
+                ) : (
+                  <Link href={backHref}>
+                    <div
+                      className={cn(
+                        open ? "p-1.5" : "p-2",
+                        "rounded-lg bg-linear-to-br from-brand-primary to-brand-primary-dark text-white shadow-sm group-hover/back:shadow-md transition-shadow shrink-0",
+                      )}
+                    >
+                      <BookOpen className="h-3.5 w-3.5" />
+                    </div>
+                    {open && <span className="font-medium">{backLabel}</span>}
+                    {open && (
+                      <ChevronRight className="h-3 w-3 text-muted-foreground/50 group-hover/back:text-brand-primary group-hover/back:translate-x-0.5 transition-all ml-auto" />
                     )}
-                  >
-                    <BookOpen className="h-3.5 w-3.5" />
-                  </div>
-                  {open && <span className="font-medium">{backLabel}</span>}
-                  {open && (
-                    <ChevronRight className="h-3 w-3 text-muted-foreground/50 group-hover/back:text-brand-primary group-hover/back:translate-x-0.5 transition-all ml-auto" />
-                  )}
-                </Link>
-              )}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+                  </Link>
+                )}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
 
           {/* Logout */}
           {isAuthenticated && (

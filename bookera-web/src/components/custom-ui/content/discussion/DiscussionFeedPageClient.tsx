@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, MessageSquare } from "lucide-react";
@@ -12,9 +12,55 @@ import { DiscussionPost } from "@/types/discussion";
 import { useAuthStore } from "@/store/auth.store";
 import PostCard from "./PostCard";
 import CreatePostModal from "./CreatePostModal";
-import DiscussionUserList from "./DiscussionUserList";
 import FollowedUsersList from "./FollowedUsersList";
 import EmptyState from "@/components/custom-ui/EmptyState";
+import { Skeleton } from "@/components/ui/skeleton";
+
+function DiscussionFeedSkeleton() {
+  return (
+    <div className="mx-auto w-full max-w-5xl">
+      <div className="flex flex-col md:flex-row gap-6 md:items-start">
+        <div className="w-full md:flex-1 md:min-w-0 md:max-w-2xl space-y-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-border/60 bg-card overflow-hidden"
+            >
+              <div className="flex items-center gap-3 p-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+              </div>
+              <Skeleton className="h-80 w-full" />
+              <div className="p-4 space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-4/5" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="hidden md:block w-80 space-y-4">
+          <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-3">
+            <Skeleton className="h-4 w-32" />
+            <div className="space-y-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-3 w-28" />
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function DiscussionFeedPageClient() {
   const router = useRouter();
@@ -33,18 +79,6 @@ export default function DiscussionFeedPageClient() {
       router.push("/login");
     }
   }, [isAuthenticated, initialLoading, router]);
-
-  // Random insertion positions for DiscussionUserList — recalculated when posts change
-  const userListInsertPositions = useMemo(() => {
-    if (posts.length < 2) return new Set<number>();
-    const positions = new Set<number>();
-    let cursor = Math.floor(Math.random() * 2) + 2; // first insertion after 2 or 3 posts
-    while (cursor < posts.length) {
-      positions.add(cursor - 1); // insert after post at index (cursor - 1)
-      cursor += Math.floor(Math.random() * 2) + 2;
-    }
-    return positions;
-  }, [posts.length]);
 
   const fetchPosts = useCallback(async (pageNum: number, append = false) => {
     try {
@@ -85,11 +119,7 @@ export default function DiscussionFeedPageClient() {
   };
 
   if (initialLoading || loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <DiscussionFeedSkeleton />;
   }
 
   if (!isAuthenticated) return null;
@@ -102,7 +132,7 @@ export default function DiscussionFeedPageClient() {
             <EmptyState icon={<MessageSquare />} description={t("noPosts")} />
           ) : (
             <div className="space-y-4">
-              {posts.map((post, index) => (
+              {posts.map((post) => (
                 <div key={post.id}>
                   <PostCard
                     key={post.id}
@@ -110,16 +140,13 @@ export default function DiscussionFeedPageClient() {
                     onDeleted={handlePostDeleted}
                     feedMode={true}
                   />
-                  {userListInsertPositions.has(index) && (
-                    <DiscussionUserList key={`user-list-${index}`} />
-                  )}
                 </div>
               ))}
 
               {page < lastPage && (
                 <div className="flex justify-center pt-4">
                   <Button
-                    variant="brand"
+                    variant="ghost"
                     onClick={handleLoadMore}
                     disabled={loadingMore}
                   >

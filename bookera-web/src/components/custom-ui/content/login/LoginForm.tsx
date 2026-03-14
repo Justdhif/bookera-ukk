@@ -98,7 +98,7 @@ export default function LoginForm({
               />
               <Button
                 type="button"
-                variant="brand"
+                variant="ghost"
                 size="icon"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 text-gray-400 dark:text-gray-300 hover:text-brand-primary hover:bg-transparent"
@@ -158,7 +158,7 @@ export default function LoginForm({
               Don&apos;t have an account?{" "}
               <Button
                 type="button"
-                variant="brand"
+                variant="link"
                 onClick={onSwitchToRegister}
                 className="font-semibold text-brand-primary hover:text-brand-primary-dark p-0 h-auto underline-offset-4"
                 disabled={loading}
@@ -173,7 +173,7 @@ export default function LoginForm({
             <div className="flex items-center justify-center gap-1 flex-wrap">
               <Button
                 type="button"
-                variant="brand"
+                variant="link"
                 onClick={onOpenTos}
                 className="text-brand-primary hover:text-brand-primary-dark font-medium p-0 h-auto text-xs"
                 disabled={loading}
@@ -183,7 +183,7 @@ export default function LoginForm({
               <span>{t("and")}</span>
               <Button
                 type="button"
-                variant="brand"
+                variant="link"
                 onClick={onOpenPrivacy}
                 className="text-brand-primary hover:text-brand-primary-dark font-medium p-0 h-auto text-xs"
                 disabled={loading}

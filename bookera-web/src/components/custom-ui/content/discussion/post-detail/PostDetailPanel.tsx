@@ -224,7 +224,7 @@ export default function PostDetailPanel({ post, onDeleted, onCommentAdded, onCom
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="brand"
+                  variant="ghost"
                   size="icon"
                   className="h-8 w-8 rounded-full"
                 >
@@ -304,7 +304,7 @@ export default function PostDetailPanel({ post, onDeleted, onCommentAdded, onCom
         <div className="shrink-0 border-t border-border/50 px-4 py-3 space-y-2">
           <div className="flex items-center gap-1 -mx-1">
             <Button
-              variant="brand"
+              variant="ghost"
               size="sm"
               className={cn(
                 "gap-1.5 rounded-xl px-3",
@@ -326,7 +326,7 @@ export default function PostDetailPanel({ post, onDeleted, onCommentAdded, onCom
 
             {!isOwner && (
               <Button
-                variant="brand"
+                variant="ghost"
                 size="sm"
                 className="gap-1.5 rounded-xl px-3 text-muted-foreground hover:text-orange-600"
                 onClick={handleReportClick}

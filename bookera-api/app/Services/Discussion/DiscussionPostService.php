@@ -17,36 +17,12 @@ class DiscussionPostService
     public function getPosts(?User $authUser, int $perPage = 15): LengthAwarePaginator
     {
         $posts = DiscussionPost::with(['user.profile', 'images'])
+            ->withCount(['likes', 'comments'])
             ->notTakenDown()
             ->latest()
             ->paginate($perPage);
 
-        if ($authUser) {
-            $likedIds = DiscussionLike::where('user_id', $authUser->id)
-                ->whereIn('post_id', $posts->pluck('id'))
-                ->pluck('post_id')
-                ->flip();
-
-            $followingUserIds = Follow::where('user_id', $authUser->id)
-                ->where('followable_type', User::class)
-                ->whereIn('followable_id', $posts->pluck('user_id'))
-                ->pluck('followable_id')
-                ->flip();
-
-            $posts->through(function (DiscussionPost $post) use ($likedIds, $followingUserIds) {
-                $post->setAttribute('is_liked', $likedIds->has($post->id));
-                $post->user->setAttribute('is_following', $followingUserIds->has($post->user_id));
-                return $post;
-            });
-        } else {
-            $posts->through(function (DiscussionPost $post) {
-                $post->setAttribute('is_liked', false);
-                $post->user->setAttribute('is_following', false);
-                return $post;
-            });
-        }
-
-        return $posts;
+        return $this->attachAuthDataToPosts($posts, $authUser);
     }
 
     public function getUserPosts(string $userSlug, ?User $authUser, int $perPage = 15): LengthAwarePaginator
@@ -54,37 +30,13 @@ class DiscussionPostService
         $targetUser = User::where('slug', $userSlug)->firstOrFail();
 
         $posts = DiscussionPost::with(['user.profile', 'images'])
+            ->withCount(['likes', 'comments'])
             ->where('user_id', $targetUser->id)
             ->notTakenDown()
             ->latest()
             ->paginate($perPage);
 
-        if ($authUser) {
-            $likedIds = DiscussionLike::where('user_id', $authUser->id)
-                ->whereIn('post_id', $posts->pluck('id'))
-                ->pluck('post_id')
-                ->flip();
-
-            $followingUserIds = Follow::where('user_id', $authUser->id)
-                ->where('followable_type', User::class)
-                ->whereIn('followable_id', $posts->pluck('user_id'))
-                ->pluck('followable_id')
-                ->flip();
-
-            $posts->through(function (DiscussionPost $post) use ($likedIds, $followingUserIds) {
-                $post->setAttribute('is_liked', $likedIds->has($post->id));
-                $post->user->setAttribute('is_following', $followingUserIds->has($post->user_id));
-                return $post;
-            });
-        } else {
-            $posts->through(function (DiscussionPost $post) {
-                $post->setAttribute('is_liked', false);
-                $post->user->setAttribute('is_following', false);
-                return $post;
-            });
-        }
-
-        return $posts;
+        return $this->attachAuthDataToPosts($posts, $authUser);
     }
 
     public function getFollowingPosts(User $authUser, int $perPage = 15): LengthAwarePaginator
@@ -94,34 +46,19 @@ class DiscussionPostService
             ->pluck('followable_id');
 
         $posts = DiscussionPost::with(['user.profile', 'images'])
+            ->withCount(['likes', 'comments'])
             ->whereIn('user_id', $followingIds)
             ->notTakenDown()
             ->latest()
             ->paginate($perPage);
 
-        $likedIds = DiscussionLike::where('user_id', $authUser->id)
-            ->whereIn('post_id', $posts->pluck('id'))
-            ->pluck('post_id')
-            ->flip();
-
-        $followingUserIds = Follow::where('user_id', $authUser->id)
-            ->where('followable_type', User::class)
-            ->whereIn('followable_id', $posts->pluck('user_id'))
-            ->pluck('followable_id')
-            ->flip();
-
-        $posts->through(function (DiscussionPost $post) use ($likedIds, $followingUserIds) {
-            $post->setAttribute('is_liked', $likedIds->has($post->id));
-            $post->user->setAttribute('is_following', $followingUserIds->has($post->user_id));
-            return $post;
-        });
-
-        return $posts;
+        return $this->attachAuthDataToPosts($posts, $authUser);
     }
 
     public function getPostBySlug(string $slug, ?User $authUser): DiscussionPost
     {
         $post = DiscussionPost::with(['user.profile', 'images'])
+            ->withCount(['likes', 'comments'])
             ->where('slug', $slug)
             ->firstOrFail();
 
@@ -136,8 +73,24 @@ class DiscussionPostService
                 ->exists()
             : false;
 
+        $followedLikers = collect();
+        if ($authUser) {
+            $followingIds = Follow::where('user_id', $authUser->id)
+                ->where('followable_type', User::class)
+                ->pluck('followable_id');
+
+            $followedLikers = DiscussionLike::with('user.profile')
+                ->where('post_id', $post->id)
+                ->whereIn('user_id', $followingIds)
+                ->latest()
+                ->take(3)
+                ->get()
+                ->map(fn ($like) => $like->user);
+        }
+
         $post->setAttribute('is_liked', $isLiked);
         $post->user->setAttribute('is_following', $isFollowing);
+        $post->setAttribute('followed_likers', $followedLikers);
 
         return $post;
     }
@@ -208,5 +161,52 @@ class DiscussionPostService
             }
             $post->delete();
         });
+    }
+
+    private function attachAuthDataToPosts(LengthAwarePaginator $posts, ?User $authUser): LengthAwarePaginator
+    {
+        if ($authUser && $posts->count() > 0) {
+            $likedIds = DiscussionLike::where('user_id', $authUser->id)
+                ->whereIn('post_id', $posts->pluck('id'))
+                ->pluck('post_id')
+                ->flip();
+
+            $followingUserIdsArray = Follow::where('user_id', $authUser->id)
+                ->where('followable_type', User::class)
+                ->pluck('followable_id')
+                ->toArray();
+                
+            $followingUserIds = collect($followingUserIdsArray)->flip();
+
+            // Load likes from followed users
+            $posts->load(['likes' => function ($query) use ($followingUserIdsArray) {
+                $query->whereIn('user_id', $followingUserIdsArray)
+                    ->with('user.profile')
+                    ->latest();
+            }]);
+
+            $posts->through(function (DiscussionPost $post) use ($likedIds, $followingUserIds) {
+                $post->setAttribute('is_liked', $likedIds->has($post->id));
+                $post->user->setAttribute('is_following', $followingUserIds->has($post->user_id));
+                
+                // Get up to 3 followed likers
+                $followedLikers = $post->likes->take(3)->map(fn ($like) => $like->user);
+                $post->setAttribute('followed_likers', $followedLikers);
+                
+                // Unset the full likes relation to avoid sending too much data
+                $post->unsetRelation('likes');
+                
+                return $post;
+            });
+        } else {
+            $posts->through(function (DiscussionPost $post) {
+                $post->setAttribute('is_liked', false);
+                $post->user->setAttribute('is_following', false);
+                $post->setAttribute('followed_likers', collect());
+                return $post;
+            });
+        }
+
+        return $posts;
     }
 }

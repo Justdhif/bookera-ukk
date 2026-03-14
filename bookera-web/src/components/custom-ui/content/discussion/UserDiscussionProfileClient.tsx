@@ -144,7 +144,7 @@ export default function UserDiscussionProfileClient() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <Button
-        variant="brand"
+        variant="ghost"
         size="sm"
         className="gap-1.5 -ml-2"
         onClick={() => router.back()}
@@ -195,7 +195,7 @@ export default function UserDiscussionProfileClient() {
 
             {hasMore && (
               <Button
-                variant="brand"
+                variant="ghost"
                 className="w-full"
                 onClick={handleLoadMore}
                 disabled={loadingMore}

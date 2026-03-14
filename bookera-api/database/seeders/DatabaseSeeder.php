@@ -22,7 +22,6 @@ class DatabaseSeeder extends Seeder
             'Author' => (int) $this->command->ask('Berapa banyak Author?', 5),
             'Publisher' => (int) $this->command->ask('Berapa banyak Publisher?', 5),
             'Book' => (int) $this->command->ask('Berapa banyak Book?', 20),
-            'BookCopy' => (int) $this->command->ask('Berapa banyak BookCopy (total)?', 50),
             'Borrow' => (int) $this->command->ask('Berapa banyak Borrow?', 15),
             'DiscussionPost' => (int) $this->command->ask('Berapa banyak Discussion Post?', 10),
             'Fine' => (int) $this->command->ask('Berapa banyak Fine (Denda)?', 5),
@@ -56,14 +55,16 @@ class DatabaseSeeder extends Seeder
 
         // 3. Book Copies
         $bookCopies = collect();
-        if ($counts['BookCopy'] > 0 && $books->count() > 0) {
-            $bookCopies = collect();
-            for ($i = 0; $i < $counts['BookCopy']; $i++) {
-                $bookCopies->push(
-                    BookCopy::factory()->create([
-                        'book_id' => $books->random()->id,
-                    ])
-                );
+        if ($books->count() > 0) {
+            foreach ($books as $book) {
+                $copyCount = rand(2, 5);
+                for ($i = 0; $i < $copyCount; $i++) {
+                    $bookCopies->push(
+                        BookCopy::factory()->create([
+                            'book_id' => $book->id,
+                        ])
+                    );
+                }
             }
         }
 

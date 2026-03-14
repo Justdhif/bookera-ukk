@@ -11,13 +11,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -48,6 +42,10 @@ export default function ReportPostDialog({ postSlug, open, onOpenChange }: Props
 
   const handleSubmit = async () => {
     if (!reason) return;
+    if (reason === "other" && !description.trim()) {
+      toast.error(t("reportDescriptionRequired"));
+      return;
+    }
     setSubmitting(true);
     try {
       await discussionPostService.reportPost(postSlug, {
@@ -64,6 +62,8 @@ export default function ReportPostDialog({ postSlug, open, onOpenChange }: Props
         toast.error(t("alreadyReported"));
       } else if (status === 403) {
         toast.error(t("cannotReportOwn"));
+      } else if (status === 422) {
+        toast.error(err?.response?.data?.message || t("failedReport"));
       } else {
         toast.error(t("failedReport"));
       }
@@ -84,46 +84,47 @@ export default function ReportPostDialog({ postSlug, open, onOpenChange }: Props
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="report-reason">{t("reportReason")}</Label>
-            <Select value={reason} onValueChange={(v) => setReason(v as PostReportReason)}>
-              <SelectTrigger id="report-reason">
-                <SelectValue placeholder={t("selectReason")} />
-              </SelectTrigger>
-              <SelectContent>
-                {REPORT_REASONS.map((r) => (
-                  <SelectItem key={r} value={r}>
+          <div className="space-y-3">
+            <Label className="text-base font-semibold">{t("reportReason")}</Label>
+            <RadioGroup value={reason} onValueChange={(v) => setReason(v as PostReportReason)}>
+              {REPORT_REASONS.map((r) => (
+                <div key={r} className="flex items-center space-x-2">
+                  <RadioGroupItem value={r} id={`reason-${r}`} />
+                  <Label htmlFor={`reason-${r}`} className="font-normal cursor-pointer text-sm">
                     {t(`reason_${r}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="report-desc">
-              {t("reportDescription")}
-            </Label>
-            <Textarea
-              id="report-desc"
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={t("reportDescPlaceholder")}
-              className="resize-none text-sm"
-              maxLength={500}
-            />
-          </div>
+          {reason === "other" && (
+            <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+              <Label htmlFor="report-desc">
+                {t("reportDescription")} <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="report-desc"
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={t("reportDescPlaceholder")}
+                className="resize-none text-sm"
+                maxLength={500}
+                required
+              />
+            </div>
+          )}
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="submit" onClick={() => onOpenChange(false)} disabled={submitting}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
             {t("cancel")}
           </Button>
           <Button
             variant="submit"
             onClick={handleSubmit}
-            disabled={!reason || submitting}
+            disabled={!reason || (reason === "other" && !description.trim()) || submitting}
           >
             {submitting ? t("loading") : t("submitReport")}
           </Button>

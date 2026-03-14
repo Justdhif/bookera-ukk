@@ -18,18 +18,21 @@ class DiscussionPostReportController extends Controller
      */
     public function store(Request $request, string $slug): JsonResponse
     {
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
         $post = DiscussionPost::where('slug', $slug)->firstOrFail();
 
-        if ($post->user_id === Auth::id()) {
+        if ($post->user_id === $user->id) {
             return ApiResponse::errorResponse('Kamu tidak dapat melaporkan postinganmu sendiri.', null, 422);
         }
 
         $validated = $request->validate([
             'reason' => 'required|in:spam,harassment,hate_speech,misinformation,inappropriate_content,other',
-            'description' => 'nullable|string|max:1000',
+            'description' => 'nullable|required_if:reason,other|string|max:1000',
         ]);
 
-        $alreadyReported = DiscussionPostReport::where('reporter_id', Auth::id())
+        $alreadyReported = DiscussionPostReport::where('reporter_id', $user->id)
             ->where('post_id', $post->id)
             ->exists();
 
@@ -38,7 +41,7 @@ class DiscussionPostReportController extends Controller
         }
 
         $report = DiscussionPostReport::create([
-            'reporter_id' => Auth::id(),
+            'reporter_id' => $user->id,
             'post_id'     => $post->id,
             'reason'      => $validated['reason'],
             'description' => $validated['description'] ?? null,
@@ -83,10 +86,13 @@ class DiscussionPostReportController extends Controller
             'takedown_reason' => 'nullable|string|max:500',
         ]);
 
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
         $report->update([
             'status'      => $validated['status'],
             'admin_note'  => $validated['admin_note'] ?? null,
-            'reviewed_by' => Auth::id(),
+            'reviewed_by' => $user->id,
             'reviewed_at' => now(),
         ]);
 

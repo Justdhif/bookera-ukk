@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\FineCreated;
 use App\Services\FonnteService;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\Log;
 
 class SendFineNotification
 {
@@ -60,9 +61,8 @@ class SendFineNotification
             try {
                 (new FonnteService())->send($profile->phone_number, $message);
             } catch (\Exception $e) {
-                \Log::error('Failed to send fine WhatsApp: ' . $e->getMessage());
+                Log::error('Failed to send fine WhatsApp: ' . $e->getMessage());
             }
         }
     }
 }
-

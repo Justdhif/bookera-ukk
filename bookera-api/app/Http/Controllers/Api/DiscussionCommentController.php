@@ -36,9 +36,12 @@ class DiscussionCommentController extends Controller
     public function store(StoreDiscussionCommentRequest $request, string $slug): JsonResponse
     {
         try {
+            /** @var \App\Models\User $user */
+            $user = $request->user();
+
             $post    = DiscussionPost::where('slug', $slug)->firstOrFail();
             $comment = $this->commentService->addComment(
-                $request->user(),
+                $user,
                 $post,
                 $request->input('content'),
                 $request->input('parent_id')
@@ -54,7 +57,10 @@ class DiscussionCommentController extends Controller
     public function update(UpdateDiscussionCommentRequest $request, DiscussionComment $comment): JsonResponse
     {
         try {
-            $updated = $this->commentService->updateComment($request->user(), $comment, $request->input('content'));
+            /** @var \App\Models\User $user */
+            $user = $request->user();
+
+            $updated = $this->commentService->updateComment($user, $comment, $request->input('content'));
             return ApiResponse::successResponse('Comment updated successfully', $updated);
         } catch (\Exception $e) {
             $code = $e->getCode() >= 400 ? $e->getCode() : 403;
@@ -65,7 +71,10 @@ class DiscussionCommentController extends Controller
     public function destroy(Request $request, DiscussionComment $comment): JsonResponse
     {
         try {
-            $this->commentService->deleteComment($request->user(), $comment);
+            /** @var \App\Models\User $user */
+            $user = $request->user();
+
+            $this->commentService->deleteComment($user, $comment);
             return ApiResponse::successResponse('Comment deleted successfully');
         } catch (\Exception $e) {
             $code = $e->getCode() >= 400 ? $e->getCode() : 403;

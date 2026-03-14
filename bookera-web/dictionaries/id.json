@@ -491,6 +491,7 @@
     "lostBooks": "Buku Hilang",
     "activityLogs": "Log Aktivitas",
     "settings": "Pengaturan",
+    "systemSettings": "Pengaturan Sistem",
     "authors": "Penulis",
     "publishers": "Penerbit",
     "borrows": "Peminjaman",
@@ -499,7 +500,10 @@
     "account": "Akun",
     "accountSettings": "Pengaturan Akun",
     "discussionReports": "Laporan Diskusi",
-    "back": "Kembali"
+    "termsOfService": "Syarat Layanan",
+    "privacyPolicy": "Kebijakan Privasi",
+    "back": "Kembali",
+    "backToLibrary": "Kembali ke Perpustakaan"
   },
   "navbar": {
     "notifications": "Notifikasi",
@@ -524,7 +528,9 @@
     "role": "Peran",
     "myBorrows": "Peminjaman Saya",
     "myFines": "Denda Saya",
-    "myPosts": "Postingan Saya"
+    "myPosts": "Postingan Saya",
+    "signIn": "Masuk",
+    "signInToAccess": "Masuk untuk melanjutkan"
   },
   "modal": {},
   "forgot-password": {
@@ -700,6 +706,19 @@
     "unavailable": "Tidak Tersedia",
     "borrowed": "Dipinjam",
     "copiesAvailable": "Tersedia",
+    "search": {
+      "title": "Hasil Pencarian",
+      "showingResultsFor": "Menampilkan hasil untuk:",
+      "booksFound": "{count} buku ditemukan",
+      "mostRelevant": "Paling relevan",
+      "topPick": "Pilihan teratas",
+      "related": "Masih relevan",
+      "noRelated": "Tidak ada hasil relevan lainnya.",
+      "detail": "Detail",
+      "moreResults": "Hasil lainnya",
+      "previous": "Sebelumnya",
+      "next": "Berikutnya"
+    },
     "detail": {
       "back": "Kembali",
       "edit": "Edit",
@@ -1046,7 +1065,6 @@
   "author": {
     "title": "Penulis",
     "description": "Kelola penulis buku",
-    "addAuthor": "Tambah Penulis",
     "editAuthor": "Edit Penulis",
     "authorDetails": "Detail Penulis",
     "photo": "Foto",
@@ -1642,10 +1660,13 @@
     "community": "Komunitas",
     "communityLabel": "Bookera Community",
     "navHome": "Beranda",
+    "navExplore": "Eksplor",
     "navCreate": "Buat Postingan",
     "navSearch": "Pencarian",
+    "navProfile": "Profil",
     "navNotifications": "Notifikasi",
     "navSettings": "Pengaturan",
+    "exploreSearchPlaceholder": "Cari postingan...",
     "backToLibrary": "Kembali ke Perpustakaan",
     "logout": "Keluar",
     "createPost": "Buat Postingan",
@@ -1746,6 +1767,7 @@
     "reason_inappropriate_content": "Konten Tidak Pantas",
     "reason_other": "Lainnya",
     "reportDescription": "Detail tambahan",
+    "reportDescriptionRequired": "Deskripsi wajib diisi untuk alasan lainnya",
     "reportDescPlaceholder": "Jelaskan masalahnya (opsional)...",
     "optional": "opsional",
     "submitReport": "Kirim Laporan",
@@ -1790,6 +1812,8 @@
     "viewPost": "Lihat postingan",
     "report": "Laporkan",
     "seeMoreCaption": "Lihat lebih banyak",
-    "seeLessCaption": "Lihat lebih sedikit"
+    "seeLessCaption": "Lihat lebih sedikit",
+    "emptyStateFollowingTitle": "Belum ada postingan",
+    "emptyStateFollowingDesc": "Postingan dari orang yang kamu ikuti akan muncul di sini."
   }
 }

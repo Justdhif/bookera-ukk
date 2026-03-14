@@ -7,6 +7,7 @@ import { ArrowLeft, ImagePlus, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { discussionPostService, UpdatePostData } from "@/services/discussion.service";
@@ -70,8 +71,28 @@ export default function EditPostClient() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="max-w-lg mx-auto space-y-6">
+        <Skeleton className="h-8 w-28 rounded" />
+        <Skeleton className="h-6 w-40 rounded" />
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-28 w-full rounded-md" />
+            <Skeleton className="h-3 w-20 ml-auto" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-32" />
+            <div className="grid grid-cols-3 gap-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-square w-full rounded-lg" />
+              ))}
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-9 w-32 rounded-md" />
+            <Skeleton className="h-9 flex-1 rounded-md" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -81,7 +102,7 @@ export default function EditPostClient() {
   return (
     <div className="max-w-lg mx-auto space-y-6">
       <Button
-        variant="brand"
+        variant="ghost"
         size="sm"
         className="gap-2 -ml-2 text-muted-foreground hover:text-foreground"
         onClick={() => router.back()}

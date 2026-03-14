@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from "react";
 import { Bell, ChevronRight, LogIn, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { motion, AnimatePresence } from "framer-motion";
 import { notificationService } from "@/services/notification.service";
@@ -140,7 +141,7 @@ export default function NotificationDropdown({
       onMouseLeave={handleMouseLeave}
     >
       <Button
-        variant="brand"
+        variant="outline"
         className="relative flex items-center gap-2 h-9 px-3"
       >
         <Bell className="h-4 w-4" />
@@ -183,8 +184,16 @@ export default function NotificationDropdown({
                   linkHref="/login"
                 />
               ) : isLoading ? (
-                <div className="py-8 text-center text-sm text-muted-foreground">
-                  {t("loading")}
+                <div className="p-4 space-y-3">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex gap-3">
+                      <Skeleton className="h-8 w-8 rounded-lg shrink-0" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-3/5" />
+                        <Skeleton className="h-3 w-4/5" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : notifications.length === 0 ? (
                 <EmptyState

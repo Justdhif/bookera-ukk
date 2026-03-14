@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { userFollowerService } from "@/services/discussion.service";
 import { UserFollower, DiscussionUser } from "@/types/discussion";
 import DiscussionUserCard from "./DiscussionUserCard";
+import EmptyState from "@/components/custom-ui/EmptyState";
 
 interface FollowedUsersListProps {
   userSlug: string;
@@ -28,8 +29,6 @@ export default function FollowedUsersList({ userSlug }: FollowedUsersListProps) 
       .finally(() => setLoading(false));
   }, [userSlug]);
 
-  if (!loading && following.length === 0) return null;
-
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
@@ -37,34 +36,52 @@ export default function FollowedUsersList({ userSlug }: FollowedUsersListProps) 
         <h3 className="text-sm font-semibold text-foreground">{t("followingSection")}</h3>
       </div>
 
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-        {loading
-          ? Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="flex flex-col items-center gap-3 p-4 rounded-2xl border border-border/60 bg-card w-36 shrink-0"
-              >
-                <Skeleton className="h-14 w-14 rounded-full" />
-                <Skeleton className="h-3 w-20 rounded" />
-                <Skeleton className="h-7 w-full rounded-full" />
+      <div className="flex flex-col gap-3 pb-2">
+        {loading ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 p-4 rounded-2xl border border-border/60 bg-card w-full"
+            >
+              <Skeleton className="h-14 w-14 rounded-full" />
+              <div className="flex flex-col gap-2 flex-1">
+                <Skeleton className="h-4 w-24 rounded" />
               </div>
-            ))
-          : following.map(({ followable: followedUser }) => {
-              if (!followedUser) return null;
-              const discUser: DiscussionUser = {
-                id: followedUser.id,
-                email: followedUser.email,
-                role: followedUser.role,
-                is_following: true,
-                profile: followedUser.profile
-                  ? {
-                      full_name: followedUser.profile.full_name,
-                      avatar_url: followedUser.profile.avatar_url,
-                    }
-                  : undefined,
-              };
-              return <DiscussionUserCard key={followedUser.id} user={discUser} />;
-            })}
+              <Skeleton className="h-7 w-20 rounded-full" />
+            </div>
+          ))
+        ) : following.length === 0 ? (
+          <EmptyState
+            title={t("emptyStateFollowingTitle")}
+            description={t("emptyStateFollowingDesc")}
+            icon={<Users />}
+            variant="compact"
+            className="border border-dashed h-48 py-4 px-4 bg-muted/40"
+          />
+        ) : (
+          following.map(({ followable: followedUser }) => {
+            if (!followedUser) return null;
+            const discUser: DiscussionUser = {
+              id: followedUser.id,
+              email: followedUser.email,
+              role: followedUser.role,
+              is_following: true,
+              profile: followedUser.profile
+                ? {
+                    full_name: followedUser.profile.full_name,
+                    avatar_url: followedUser.profile.avatar_url,
+                  }
+                : undefined,
+            };
+            return (
+              <DiscussionUserCard
+                key={followedUser.id}
+                user={discUser}
+                variant="row"
+              />
+            );
+          })
+        )}
       </div>
     </div>
   );

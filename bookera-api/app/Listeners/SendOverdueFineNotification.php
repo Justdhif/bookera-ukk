@@ -6,6 +6,7 @@ use App\Events\BorrowOverdue;
 use App\Services\FonnteService;
 use App\Services\NotificationService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class SendOverdueFineNotification
 {
@@ -68,7 +69,7 @@ class SendOverdueFineNotification
             try {
                 (new FonnteService())->send($profile->phone_number, $message);
             } catch (\Exception $e) {
-                \Log::error('Failed to send overdue WhatsApp: ' . $e->getMessage());
+                Log::error('Failed to send overdue WhatsApp: ' . $e->getMessage());
             }
         }
     }

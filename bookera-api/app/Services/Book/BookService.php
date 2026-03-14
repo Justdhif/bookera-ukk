@@ -4,9 +4,7 @@ namespace App\Services\Book;
 
 use App\Helpers\ActivityLogger;
 use App\Helpers\SlugGenerator;
-use App\Models\Author;
 use App\Models\Book;
-use App\Models\Publisher;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -20,8 +18,13 @@ class BookService
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($subQuery) use ($search) {
                     $subQuery->where('title', 'like', "%{$search}%")
-                        ->orWhere('author', 'like', "%{$search}%")
-                        ->orWhere('isbn', 'like', "%{$search}%");
+                        ->orWhere('isbn', 'like', "%{$search}%")
+                        ->orWhereHas('authors', function ($authorQuery) use ($search) {
+                            $authorQuery->where('name', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('publishers', function ($publisherQuery) use ($search) {
+                            $publisherQuery->where('name', 'like', "%{$search}%");
+                        });
                 });
             })
             ->when($filters['category_ids'] ?? null, function ($query, $categoryIds) {
@@ -46,6 +49,9 @@ class BookService
             $book->cover_image_url = storage_image($book->cover_image);
             $book->total_copies = $book->copies->count();
             $book->available_copies = $book->copies->where('status', 'available')->count();
+            // Backward-compatible string fields (books table doesn't store these columns)
+            $book->author = $book->authors->pluck('name')->join(', ');
+            $book->publisher = $book->publishers->pluck('name')->join(', ');
             return $book;
         });
 
@@ -58,16 +64,6 @@ class BookService
 
         if ($coverImage) {
             $data['cover_image'] = $coverImage->store('books/covers', 'public');
-        }
-
-        if (!empty($data['author_ids'])) {
-            $authorNames = Author::whereIn('id', $data['author_ids'])->pluck('name');
-            $data['author'] = $authorNames->join(', ');
-        }
-
-        if (!empty($data['publisher_ids'])) {
-            $publisherNames = Publisher::whereIn('id', $data['publisher_ids'])->pluck('name');
-            $data['publisher'] = $publisherNames->join(', ');
         }
 
         $book = Book::create($data);
@@ -86,6 +82,8 @@ class BookService
 
         $book->load(['categories', 'authors', 'publishers', 'copies']);
         $book->cover_image_url = storage_image($book->cover_image);
+        $book->author = $book->authors->pluck('name')->join(', ');
+        $book->publisher = $book->publishers->pluck('name')->join(', ');
 
         ActivityLogger::log(
             'create',
@@ -134,16 +132,6 @@ class BookService
             $data['cover_image'] = $coverImage->store('books/covers', 'public');
         }
 
-        if (!empty($data['author_ids'])) {
-            $authorNames = Author::whereIn('id', $data['author_ids'])->pluck('name');
-            $data['author'] = $authorNames->join(', ');
-        }
-
-        if (!empty($data['publisher_ids'])) {
-            $publisherNames = Publisher::whereIn('id', $data['publisher_ids'])->pluck('name');
-            $data['publisher'] = $publisherNames->join(', ');
-        }
-
         $oldData = $book->toArray();
 
         $book->update($data);
@@ -162,6 +150,8 @@ class BookService
 
         $book->load(['categories', 'authors', 'publishers', 'copies']);
         $book->cover_image_url = storage_image($book->cover_image);
+        $book->author = $book->authors->pluck('name')->join(', ');
+        $book->publisher = $book->publishers->pluck('name')->join(', ');
 
         ActivityLogger::log(
             'update',
@@ -219,6 +209,10 @@ class BookService
         $book->cover_image_url = storage_image($book->cover_image);
         $book->total_copies = $book->copies->count();
         $book->available_copies = $book->copies->where('status', 'available')->count();
+
+        // Backward-compatible string fields (books table doesn't store these columns)
+        $book->author = $book->authors->pluck('name')->join(', ');
+        $book->publisher = $book->publishers->pluck('name')->join(', ');
 
         $book->authors->each(function ($author) {
             $author->photo_url = storage_image($author->photo);
