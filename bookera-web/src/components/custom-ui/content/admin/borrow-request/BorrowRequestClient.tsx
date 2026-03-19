@@ -100,7 +100,7 @@ export default function BorrowRequestClient() {
   const confirmDelete = async () => {
     if (!deleteId) return;
     try {
-      await borrowRequestService.destroy(deleteId);
+      await borrowRequestService.delete(deleteId);
       toast.success(t("deleteSuccess"));
       setDeleteId(null);
       fetchRequests(filters);

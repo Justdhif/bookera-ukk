@@ -28,14 +28,14 @@ class FineTypeController extends Controller
             'per_page' => $request->per_page,
         ];
 
-        $fineTypes = $this->fineTypeService->getAllFineTypes($filters);
+        $fineTypes = $this->fineTypeService->getAll($filters);
 
         return ApiResponse::successResponse('Data tipe denda', $fineTypes);
     }
 
     public function store(StoreFineTypeRequest $request): JsonResponse
     {
-        $fineType = $this->fineTypeService->createFineType($request->validated());
+        $fineType = $this->fineTypeService->create($request->validated());
 
         return ApiResponse::successResponse('Tipe denda berhasil dibuat', $fineType, 201);
     }
@@ -47,7 +47,7 @@ class FineTypeController extends Controller
 
     public function update(UpdateFineTypeRequest $request, FineType $fineType): JsonResponse
     {
-        $fineType = $this->fineTypeService->updateFineType($fineType, $request->validated());
+        $fineType = $this->fineTypeService->update($fineType, $request->validated());
 
         return ApiResponse::successResponse('Tipe denda berhasil diupdate', $fineType);
     }
@@ -58,7 +58,7 @@ class FineTypeController extends Controller
             return ApiResponse::errorResponse('Tipe denda ini masih digunakan dan tidak dapat dihapus', null, 400);
         }
 
-        $this->fineTypeService->deleteFineType($fineType);
+        $this->fineTypeService->delete($fineType);
 
         return ApiResponse::successResponse('Tipe denda berhasil dihapus');
     }

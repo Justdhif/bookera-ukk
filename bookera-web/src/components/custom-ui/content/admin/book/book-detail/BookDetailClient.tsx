@@ -4,11 +4,11 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 
-import { bookService, CreateBookData } from "@/services/book.service";
+import { bookService } from "@/services/book.service";
 import { categoryService } from "@/services/category.service";
 import { authorService } from "@/services/author.service";
 import { publisherService } from "@/services/publisher.service";
-import { Book } from "@/types/book";
+import { Book, CreateBookData } from "@/types/book";
 import { Category } from "@/types/category";
 import { Author } from "@/types/author";
 import { Publisher } from "@/types/publisher";
@@ -73,7 +73,7 @@ export default function BookDetailClient() {
 
   const fetchAuthors = async () => {
     try {
-      const res = await authorService.getAll();
+      const res = await authorService.getAll({ is_active: true, per_page: "all" });
       setAuthors(res.data.data);
     } catch (error) {
       console.error("Error fetching authors:", error);
@@ -82,7 +82,7 @@ export default function BookDetailClient() {
 
   const fetchPublishers = async () => {
     try {
-      const res = await publisherService.getAll();
+      const res = await publisherService.getAll({ is_active: true, per_page: "all" });
       setPublishers(res.data.data);
     } catch (error) {
       console.error("Error fetching publishers:", error);
@@ -92,7 +92,7 @@ export default function BookDetailClient() {
   const fetchBook = async () => {
     try {
       setLoading(true);
-      const res = await bookService.showBySlug(slug);
+      const res = await bookService.getBySlug(slug);
       const bookData = res.data.data;
       setBook(bookData);
       setFormData({
@@ -104,10 +104,10 @@ export default function BookDetailClient() {
         language: bookData.language || "",
         description: bookData.description || "",
         is_active: bookData.is_active,
-        category_ids: bookData.categories?.map((c) => c.id) || [],
+        category_ids: bookData.categories?.map((c: Category) => c.id) || [],
         cover_image: null,
       });
-      setCoverPreview(bookData.cover_image_url || "");
+      setCoverPreview(bookData.cover_image || "");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to load book data");
       router.push("/admin/books");
@@ -217,7 +217,7 @@ export default function BookDetailClient() {
         category_ids: book.categories?.map((c) => c.id) || [],
         cover_image: null,
       });
-      setCoverPreview(book.cover_image_url || "");
+      setCoverPreview(book.cover_image || "");
       setCoverError(false);
       setFormHasErrors(false);
     }

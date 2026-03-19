@@ -1,13 +1,6 @@
 import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
-import { Borrow, BorrowListResponse } from "@/types/borrow";
-
-export interface BorrowFilterParams {
-  search?: string;
-  status?: string;
-  per_page?: number;
-  page?: number;
-}
+import { Borrow, BorrowListResponse, BorrowFilterParams } from "@/types/borrow";
 
 export const borrowService = {
   getAll: (filters?: BorrowFilterParams) =>
@@ -15,28 +8,18 @@ export const borrowService = {
       params: filters,
     }),
 
-  create: (data: { book_copy_ids: number[]; return_date: string }) =>
-    api.post<ApiResponse<Borrow>>("/borrows", data),
+  create: (data: any, isAdmin = false) =>
+    api.post<ApiResponse<Borrow>>(isAdmin ? "/admin/borrows" : "/borrows", data),
 
-  createAdminBorrow: (data: {
-    user_id: number;
-    book_copy_ids: number[];
-    borrow_date: string;
-    return_date: string;
-  }) => api.post<ApiResponse<Borrow>>("/admin/borrows", data),
+  getById: (id: number) => api.get<ApiResponse<Borrow>>(`/borrows/${id}`),
 
-  show: (id: number) => api.get<ApiResponse<Borrow>>(`/borrows/${id}`),
-
-  showByCode: (code: string) =>
-    api.get<ApiResponse<Borrow>>(`/borrows/code/${code}`),
-
-  showAdminByCode: (code: string) =>
-    api.get<ApiResponse<Borrow>>(`/admin/borrows/code/${code}`),
+  getByCode: (code: string, isAdmin = false) =>
+    api.get<ApiResponse<Borrow>>(isAdmin ? `/admin/borrows/code/${code}` : `/borrows/code/${code}`),
 
   assignCopies: (id: number, copyIds: number[]) =>
     api.post<ApiResponse<Borrow>>(`/admin/borrows/${id}/assign-copies`, {
       copy_ids: copyIds,
     }),
 
-  getMyBorrows: () => api.get<ApiResponse<Borrow[]>>("/my-borrows"),
+  getByUser: () => api.get<ApiResponse<Borrow[]>>("/my-borrows"),
 };

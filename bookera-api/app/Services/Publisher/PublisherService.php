@@ -12,9 +12,9 @@ use Illuminate\Support\Facades\Storage;
 
 class PublisherService
 {
-    public function getPublishers(array $filters): LengthAwarePaginator
+    public function getAll(array $filters): LengthAwarePaginator|Collection
     {
-        $publishers = Publisher::query()
+        $query = Publisher::query()
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })
@@ -22,50 +22,26 @@ class PublisherService
                 $query->where('is_active', $filters['is_active']);
             })
             ->latest()
-            ->orderByDesc('id')
-            ->paginate($filters['per_page'] ?? 10);
+            ->orderByDesc('id');
 
-        $publishers->getCollection()->transform(function ($publisher) {
-            $publisher->photo_url = storage_image($publisher->photo);
-            return $publisher;
-        });
-
-        return $publishers;
-    }
-
-    public function getAllPublishers(): Collection
-    {
-        return Publisher::where('is_active', true)
-            ->latest()
-            ->orderByDesc('id')
-            ->get()
-            ->transform(function ($publisher) {
-                $publisher->photo_url = storage_image($publisher->photo);
-                return $publisher;
-            });
-    }
-
-    public function getPublisherById(int $id): ?Publisher
-    {
-        $publisher = Publisher::find($id);
-
-        if (!$publisher) {
-            return null;
+        if (isset($filters['per_page']) && $filters['per_page'] === 'all') {
+            return $query->get();
         }
 
-        $publisher->photo_url = storage_image($publisher->photo);
-
-        return $publisher;
+        return $query->paginate($filters['per_page'] ?? 10);
     }
 
-    public function createPublisher(array $data, UploadedFile $photo): Publisher
+    public function getById(int $id): ?Publisher
+    {
+        return Publisher::find($id);
+    }
+
+    public function create(array $data, UploadedFile $photo): Publisher
     {
         $data['slug'] = SlugGenerator::generate('publishers', 'slug', $data['name']);
         $data['photo'] = $photo->store('publishers/photos', 'public');
 
         $publisher = Publisher::create($data);
-
-        $publisher->photo_url = storage_image($publisher->photo);
 
         ActivityLogger::log(
             'create',
@@ -79,7 +55,7 @@ class PublisherService
         return $publisher;
     }
 
-    public function updatePublisher(Publisher $publisher, array $data, ?UploadedFile $photo = null): Publisher
+    public function update(Publisher $publisher, array $data, ?UploadedFile $photo = null): Publisher
     {
         if ($data['name'] !== $publisher->name) {
             $data['slug'] = SlugGenerator::generate('publishers', 'slug', $data['name'], $publisher->id);
@@ -96,8 +72,6 @@ class PublisherService
 
         $publisher->update($data);
 
-        $publisher->photo_url = storage_image($publisher->photo);
-
         ActivityLogger::log(
             'update',
             'publisher',
@@ -110,7 +84,7 @@ class PublisherService
         return $publisher;
     }
 
-    public function deletePublisher(Publisher $publisher): array
+    public function delete(Publisher $publisher): array
     {
         if ($publisher->books()->count() > 0) {
             throw new \Exception('Tidak dapat menghapus penerbit yang masih memiliki buku. Hapus atau pindahkan buku terlebih dahulu.', 422);

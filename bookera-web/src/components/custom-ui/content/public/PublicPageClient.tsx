@@ -5,7 +5,6 @@ import BookList from "./book/BookList";
 import BookListSkeleton from "./book/BookListSkeleton";
 import { bookService } from "@/services/book.service";
 import { categoryService } from "@/services/category.service";
-import { Book } from "@/types/book";
 import { Category } from "@/types/category";
 import SavesList from "./saves/SavesList";
 import BannerCarousel from "./BannerCarousel";
@@ -13,34 +12,43 @@ import SpeakerMarquee from "./SpeakerMarquee";
 import RealTimeClock from "./RealTimeClock";
 import QuickNavSection from "./QuickNavSection";
 import { Skeleton } from "@/components/ui/skeleton";
+import CategoryBookRow from "./book/CategoryBookRow";
 
 export default function PublicPageClient() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [allBooks, setAllBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
+  const [categoryPage, setCategoryPage] = useState(1);
+  const [categoryTotalPages, setCategoryTotalPages] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
-    const fetchAll = async () => {
+    const fetchInitial = async () => {
       setLoading(true);
-      const [catRes, bookRes] = await Promise.all([
-        categoryService.getAll({ per_page: 100 }),
-        bookService.getAll({ status: "active", per_page: 100 }),
-      ]);
-      setCategories(catRes.data.data.data);
-      setAllBooks(bookRes.data.data.data);
+      try {
+        const catRes = await categoryService.getAll({ per_page: 10, page: 1 });
+        setCategories(catRes.data.data.data);
+        setCategoryTotalPages(catRes.data.data.last_page);
+      } catch (error) {
+        console.error(error);
+      }
       setLoading(false);
     };
-    fetchAll();
+    fetchInitial();
   }, []);
 
-  const booksByCategory = categories
-    .map((cat) => ({
-      category: cat,
-      books: allBooks.filter((book) =>
-        book.categories?.some((c) => c.id === cat.id),
-      ),
-    }))
-    .filter((group) => group.books.length > 0);
+  const loadMoreCategories = async () => {
+    if (categoryPage >= categoryTotalPages) return;
+    setLoadingMore(true);
+    try {
+      const nextPage = categoryPage + 1;
+      const catRes = await categoryService.getAll({ per_page: 10, page: nextPage });
+      setCategories((prev) => [...prev, ...catRes.data.data.data]);
+      setCategoryPage(nextPage);
+    } catch (error) {
+      console.error(error);
+    }
+    setLoadingMore(false);
+  };
 
   return (
     <div className="space-y-8 pb-10">
@@ -77,14 +85,21 @@ export default function PublicPageClient() {
                   <BookListSkeleton />
                 </div>
               ))
-            : booksByCategory.map(({ category, books }) => (
-                <section key={category.id} className="space-y-3">
-                  <h2 className="text-xl font-bold border-l-4 border-brand-primary pl-3">
-                    {category.name}
-                  </h2>
-                  <BookList books={books} loading={false} />
-                </section>
+            : categories.map((category) => (
+                <CategoryBookRow key={category.id} category={category} />
               ))}
+
+          {categoryPage < categoryTotalPages && (
+            <div className="flex justify-center pt-8 pb-4">
+               <button 
+                 onClick={loadMoreCategories} 
+                 disabled={loadingMore}
+                 className="px-8 py-2.5 rounded-full border-2 border-brand-primary text-brand-primary font-semibold hover:bg-brand-primary hover:text-white transition disabled:opacity-50"
+               >
+                 {loadingMore ? "Memuat..." : "Muat lebih banyak"}
+               </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -21,7 +21,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class BorrowRequestService
 {
-    public function getRequests(array $filters = []): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
         $query = BorrowRequest::with([
             'borrowRequestDetails.book',
@@ -32,11 +32,11 @@ class BorrowRequestService
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->where('email', 'like', "%{$search}%")
-                            ->orWhereHas('profile', function ($profileQuery) use ($search) {
-                                $profileQuery->where('full_name', 'like', "%{$search}%");
-                            });
-                    })
+                    $userQuery->where('email', 'like', "%{$search}%")
+                        ->orWhereHas('profile', function ($profileQuery) use ($search) {
+                            $profileQuery->where('full_name', 'like', "%{$search}%");
+                        });
+                })
                     ->orWhereHas('borrowRequestDetails.book', function ($bookQuery) use ($search) {
                         $bookQuery->where('title', 'like', "%{$search}%");
                     });
@@ -50,7 +50,7 @@ class BorrowRequestService
         return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
-    public function createRequest(array $data, User $user): BorrowRequest
+    public function create(array $data, User $user): BorrowRequest
     {
         return DB::transaction(function () use ($data, $user) {
             $request = BorrowRequest::create([
@@ -92,7 +92,7 @@ class BorrowRequestService
         });
     }
 
-    public function getRequestById(BorrowRequest $request): BorrowRequest
+    public function getById(BorrowRequest $request): BorrowRequest
     {
         return $request->load([
             'borrowRequestDetails.book',
@@ -100,7 +100,7 @@ class BorrowRequestService
         ]);
     }
 
-    public function getRequestsByUser(User $user): Collection
+    public function getByUser(User $user): Collection
     {
         return BorrowRequest::with([
             'borrowRequestDetails.book',
@@ -110,7 +110,7 @@ class BorrowRequestService
             ->get();
     }
 
-    public function cancelRequest(BorrowRequest $request, User $user): BorrowRequest
+    public function cancel(BorrowRequest $request, User $user): BorrowRequest
     {
         abort_if(
             $request->approval_status !== 'processing',
@@ -136,7 +136,7 @@ class BorrowRequestService
         return $request;
     }
 
-    public function approveRequest(BorrowRequest $borrowRequest): Borrow
+    public function approve(BorrowRequest $borrowRequest): Borrow
     {
         abort_if(
             $borrowRequest->approval_status !== 'processing',
@@ -179,7 +179,7 @@ class BorrowRequestService
         });
     }
 
-    public function rejectRequest(BorrowRequest $borrowRequest, ?string $rejectReason = null): BorrowRequest
+    public function reject(BorrowRequest $borrowRequest, ?string $rejectReason = null): BorrowRequest
     {
         abort_if(
             $borrowRequest->approval_status !== 'processing',
@@ -213,7 +213,7 @@ class BorrowRequestService
      * Creates a new Borrow with a fresh borrow_code and QR, then assigns an available
      * book copy for each requested book.
      */
-    public function assignBorrowFromRequest(BorrowRequest $borrowRequest, array $copyIds = []): Borrow
+    public function assignBorrow(BorrowRequest $borrowRequest, array $copyIds = []): Borrow
     {
         return DB::transaction(function () use ($borrowRequest, $copyIds) {
             $borrowCode = $this->generateBorrowCode();
@@ -292,7 +292,7 @@ class BorrowRequestService
         });
     }
 
-    public function deleteRequest(BorrowRequest $request): void
+    public function delete(BorrowRequest $request): void
     {
         $request->delete();
     }

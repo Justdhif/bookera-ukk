@@ -8,9 +8,7 @@ use App\Services\NotificationService;
 
 class SendLostBookNotification
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function handle(LostBookReported $event)
     {

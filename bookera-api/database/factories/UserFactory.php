@@ -20,11 +20,11 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'email'             => fake()->unique()->safeEmail(),
-            'slug'              => Str::slug(fake()->unique()->userName()),
-            'password'          => static::$password ??= Hash::make('password'),
-            'role'              => fake()->randomElement(['admin', 'officer:catalog', 'officer:management', 'user']),
-            'is_active'         => true,
+            'email' => fake()->unique()->safeEmail(),
+            'slug' => Str::slug(fake()->unique()->userName()),
+            'password' => static::$password ??= Hash::make('password'),
+            'role' => fake()->randomElement(['admin', 'officer:catalog', 'officer:management', 'user']),
+            'is_active' => true,
             'email_verified_at' => now(),
         ];
     }
@@ -58,15 +58,15 @@ class UserFactory extends Factory
     {
         return $this->afterCreating(function (User $user) {
             $user->profile()->create([
-                'full_name'             => fake()->name(),
-                'gender'                => fake()->randomElement(['male', 'female', 'prefer_not_to_say']),
-                'phone_number'          => fake()->unique()->numerify('08##########'),
-                'address'               => fake()->address(),
-                'bio'                   => fake()->optional(0.7)->sentence(),
-                'identification_number' => strtoupper(fake()->lexify('??')) . '-' . str_pad($user->id, 4, '0', STR_PAD_LEFT),
-                'occupation'            => fake()->randomElement(['Student', 'Teacher', 'Staff', 'Public', 'Other']),
-                'institution'           => fake()->company(),
-                'avatar'                => AvatarHelper::generateDefaultAvatar($user->id),
+                'full_name' => fake()->name(),
+                'gender' => fake()->randomElement(['male', 'female', 'prefer_not_to_say']),
+                'phone_number' => fake()->unique()->numerify('08##########'),
+                'address' => fake()->address(),
+                'bio' => fake()->optional(0.7)->sentence(),
+                'identification_number' => strtoupper(fake()->lexify('??')).'-'.str_pad($user->id, 4, '0', STR_PAD_LEFT),
+                'occupation' => fake()->randomElement(['Student', 'Teacher', 'Staff', 'Public', 'Other']),
+                'institution' => fake()->company(),
+                'avatar' => AvatarHelper::generateDefaultAvatar($user->id),
             ]);
         });
     }

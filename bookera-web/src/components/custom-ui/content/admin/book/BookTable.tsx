@@ -63,9 +63,9 @@ export function BookTable({ data, onDelete }: Props) {
                 {index + 1}
               </TableCell>
               <TableCell>
-                {book.cover_image_url ? (
+                {book.cover_image ? (
                   <img
-                    src={book.cover_image_url}
+                    src={book.cover_image}
                     alt={book.title}
                     className="w-12 h-16 object-cover rounded shadow-sm"
                   />

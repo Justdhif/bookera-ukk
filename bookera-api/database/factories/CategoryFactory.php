@@ -18,8 +18,8 @@ class CategoryFactory extends Factory
         $name = ucwords(fake()->unique()->words(rand(1, 2), true));
 
         return [
-            'slug'        => Str::slug($name),
-            'name'        => $name,
+            'slug' => Str::slug($name),
+            'name' => $name,
             'description' => fake()->sentence(),
         ];
     }

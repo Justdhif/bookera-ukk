@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 
 class BookReturnService
 {
-    public function getReturnsByBorrow(Borrow $borrow): Collection
+    public function getByBorrow(Borrow $borrow): Collection
     {
         return BookReturn::with(['details.bookCopy.book'])
             ->where('borrow_id', $borrow->id)
@@ -26,7 +26,7 @@ class BookReturnService
             ->get();
     }
 
-    public function createReturn(Borrow $borrow, array $data): BookReturn
+    public function create(Borrow $borrow, array $data): BookReturn
     {
         return DB::transaction(function () use ($borrow, $data) {
             $return = BookReturn::create([
@@ -87,7 +87,7 @@ class BookReturnService
         });
     }
 
-    public function approveReturn(BookReturn $bookReturn): BookReturn
+    public function approve(BookReturn $bookReturn): BookReturn
     {
         $borrow = $bookReturn->borrow;
 
@@ -102,7 +102,7 @@ class BookReturnService
                 $bookCopy = $detail->bookCopy;
                 $oldStatus = $bookCopy->status;
 
-                $newStatus = match($detail->condition) {
+                $newStatus = match ($detail->condition) {
                     'good'    => 'available',
                     'damaged' => 'damaged',
                     'lost'    => 'lost',
@@ -267,7 +267,7 @@ class BookReturnService
     /**
      * Get detailed return info including borrow details and fines.
      */
-    public function getReturnDetail(BookReturn $bookReturn): BookReturn
+    public function getDetail(BookReturn $bookReturn): BookReturn
     {
         return $bookReturn->load([
             'details.bookCopy.book',
@@ -277,12 +277,12 @@ class BookReturnService
         ]);
     }
 
-    public function canCreateReturn(Borrow $borrow): bool
+    public function canCreate(Borrow $borrow): bool
     {
         return $borrow->status === 'open';
     }
 
-    public function canApproveReturn(BookReturn $bookReturn): bool
+    public function canApprove(BookReturn $bookReturn): bool
     {
         $borrow = $bookReturn->borrow;
 

@@ -52,7 +52,7 @@ export function BorrowAssignCopiesCard({ borrow, onAssigned }: BorrowAssignCopie
     try {
       const options: BookCopyOption[] = [];
       for (const detail of requestDetails) {
-        const res = await bookService.show(detail.book_id);
+        const res = await bookService.getById(detail.book_id);
         const book = res.data.data;
         const available = (book.copies ?? []).filter(
           (c: BookCopy) => c.status === "available",

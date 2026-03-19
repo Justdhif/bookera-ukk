@@ -15,8 +15,7 @@ export interface Book {
   description?: string;
 
   language?: string;
-  cover_image?: string;
-  cover_image_url?: string;
+  cover_image: string;
 
   is_active: boolean;
 
@@ -33,3 +32,28 @@ export interface Book {
 }
 
 export type BookListResponse = PaginatedResponse<Book>;
+
+export interface CreateBookData {
+  title: string;
+  author_ids: number[];
+  publisher_ids: number[];
+  publication_year: string;
+  isbn: string;
+  language: string;
+  description: string;
+  is_active: boolean;
+  category_ids: number[];
+  cover_image?: File | null;
+}
+
+export interface UpdateBookData extends Partial<CreateBookData> {
+  title: string;
+}
+
+export interface BookFilterParams {
+  search?: string;
+  category_ids?: number[];
+  status?: "active" | "inactive";
+  per_page?: number;
+  page?: number;
+}

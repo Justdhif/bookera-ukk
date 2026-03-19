@@ -9,7 +9,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class CategoryService
 {
-    public function getCategories(array $filters): LengthAwarePaginator
+    public function getAll(array $filters): LengthAwarePaginator
     {
         return Category::query()
             ->when($filters['search'] ?? null, function ($query, $search) {
@@ -17,10 +17,10 @@ class CategoryService
             })
             ->latest()
             ->orderByDesc('id')
-            ->paginate($filters['per_page'] ?? 15);
+            ->paginate($filters['per_page'] ?? 10);
     }
 
-    public function createCategory(array $data): Category
+    public function create(array $data): Category
     {
         $data['slug'] = SlugGenerator::generate('categories', 'name', $data['name']);
 
@@ -38,7 +38,7 @@ class CategoryService
         return $category;
     }
 
-    public function updateCategory(Category $category, array $data): Category
+    public function update(Category $category, array $data): Category
     {
         $data['slug'] = SlugGenerator::generate('categories', 'name', $data['name']);
 
@@ -58,7 +58,7 @@ class CategoryService
         return $category;
     }
 
-    public function deleteCategory(Category $category): array
+    public function delete(Category $category): array
     {
         if ($category->books()->count() > 0) {
             throw new \Exception('Tidak dapat menghapus kategori yang masih memiliki buku. Hapus atau pindahkan buku terlebih dahulu.', 422);

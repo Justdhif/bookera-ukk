@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Publisher } from "@/types/publisher";
-import { publisherService, PublisherFilterParams } from "@/services/publisher.service";
+import { Publisher, PublisherFilterParams } from "@/types/publisher";
+import { publisherService } from "@/services/publisher.service";
 import PublisherTable from "./PublisherTable";
 import PublisherFormDialog from "./publisher-add/PublisherFormDialog";
 import PublisherDetailDialog from "./publisher-detail/PublisherDetailDialog";
@@ -62,7 +62,7 @@ export default function PublisherClient() {
   const fetchPublishers = async (activeFilters: PublisherFilterParams) => {
     setLoading(true);
     try {
-      const res = await publisherService.getAdminList(activeFilters);
+      const res = await publisherService.getAll(activeFilters, true);
       const paginatedData = res.data.data;
       setPublishers(paginatedData.data ?? paginatedData);
       setPagination({

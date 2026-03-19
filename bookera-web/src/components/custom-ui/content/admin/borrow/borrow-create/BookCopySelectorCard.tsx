@@ -71,9 +71,9 @@ export default function BookCopySelectorCard({
                     className="border rounded-lg p-4 bg-muted/20"
                   >
                     <div className="flex gap-3 items-start">
-                      {book.cover_image_url && (
+                      {book.cover_image && (
                         <img
-                          src={book.cover_image_url}
+                          src={book.cover_image}
                           alt={book.title}
                           className="w-16 h-24 object-cover rounded shadow-sm shrink-0"
                         />
@@ -106,9 +106,9 @@ export default function BookCopySelectorCard({
                   className="border rounded-lg overflow-hidden"
                 >
                   <div className="flex gap-3 p-4 bg-muted/30">
-                    {book.cover_image_url && (
+                    {book.cover_image && (
                       <img
-                        src={book.cover_image_url}
+                        src={book.cover_image}
                         alt={book.title}
                         className="w-16 h-24 object-cover rounded shadow-sm shrink-0"
                       />

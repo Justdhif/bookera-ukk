@@ -2,10 +2,28 @@
 
 namespace Database\Seeders;
 
+use App\Models\ActivityLog;
+use App\Models\Author;
+use App\Models\Book;
+use App\Models\BookCopy;
+use App\Models\BookReturn;
+use App\Models\BookReturnDetail;
+use App\Models\Borrow;
+use App\Models\BorrowDetail;
+use App\Models\Category;
+use App\Models\DiscussionComment;
+use App\Models\DiscussionLike;
+use App\Models\DiscussionPost;
+use App\Models\DiscussionPostImage;
+use App\Models\Fine;
+use App\Models\FineType;
+use App\Models\PrivacyPolicy;
+use App\Models\Publisher;
+use App\Models\TermsOfService;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
-use App\Models\{ActivityLog, Author, Book, BookCopy, BookReturn, BookReturnDetail, Borrow, BorrowDetail, BorrowRequest, BorrowRequestDetail, Category, DiscussionComment, DiscussionLike, DiscussionPost, DiscussionPostImage, DiscussionPostReport, Fine, FineType, Follow, LostBook, Notification, PrivacyPolicy, Publisher, Save, SaveItem, TermsOfService, User, UserProfile};
 
 class DatabaseSeeder extends Seeder
 {
@@ -40,8 +58,12 @@ class DatabaseSeeder extends Seeder
         $authors = $counts['Author'] > 0 ? Author::factory($counts['Author'])->create() : collect();
         $publishers = $counts['Publisher'] > 0 ? Publisher::factory($counts['Publisher'])->create() : collect();
 
-        if ($counts['PrivacyPolicy'] > 0) PrivacyPolicy::factory()->create();
-        if ($counts['TermsOfService'] > 0) TermsOfService::factory()->create();
+        if ($counts['PrivacyPolicy'] > 0) {
+            PrivacyPolicy::factory()->create();
+        }
+        if ($counts['TermsOfService'] > 0) {
+            TermsOfService::factory()->create();
+        }
 
         // 2. Books
         $books = collect();
@@ -70,7 +92,7 @@ class DatabaseSeeder extends Seeder
 
         // 4. Borrows & Returns
         if ($counts['Borrow'] > 0 && $users->count() > 0 && $bookCopies->count() > 0) {
-            Borrow::factory($counts['Borrow'])->make()->each(function ($borrow) use ($users, $bookCopies, $counts) {
+            Borrow::factory($counts['Borrow'])->make()->each(function ($borrow) use ($users, $bookCopies) {
                 $borrow->user_id = $users->random()->id;
                 $borrow->save();
 
@@ -99,7 +121,7 @@ class DatabaseSeeder extends Seeder
 
         // 5. Discussion Posts, Comments, Likes
         if ($counts['DiscussionPost'] > 0 && $users->count() > 0) {
-            DiscussionPost::factory($counts['DiscussionPost'])->make()->each(function ($post) use ($users, $books) {
+            DiscussionPost::factory($counts['DiscussionPost'])->make()->each(function ($post) use ($users) {
                 $post->user_id = $users->random()->id;
                 $post->save();
 
@@ -108,7 +130,7 @@ class DatabaseSeeder extends Seeder
                 for ($i = 0; $i < $imageCount; $i++) {
                     DiscussionPostImage::create([
                         'post_id' => $post->id,
-                        'image_path' => 'https://picsum.photos/seed/' . $post->slug . '-' . $i . '/800/600',
+                        'image_path' => 'https://picsum.photos/seed/'.$post->slug.'-'.$i.'/800/600',
                         'order' => $i,
                     ]);
                 }

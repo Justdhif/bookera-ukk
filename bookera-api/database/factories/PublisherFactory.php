@@ -25,11 +25,11 @@ class PublisherFactory extends Factory
         $slugSuffix = Str::lower((string) Str::ulid());
 
         return [
-            'slug'        => $slugBase . '-' . $slugSuffix,
-            'name'        => $name,
+            'slug' => $slugBase.'-'.$slugSuffix,
+            'name' => $name,
             'description' => fake()->optional(0.8)->paragraph(2),
-            'photo'       => 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&size=200&background=random',
-            'is_active'   => fake()->boolean(90),
+            'photo' => 'https://ui-avatars.com/api/?name='.urlencode($name).'&size=200&background=random',
+            'is_active' => fake()->boolean(90),
         ];
     }
 

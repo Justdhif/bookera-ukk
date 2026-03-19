@@ -11,10 +11,10 @@ class RoleMiddleware
     {
         $user = $request->user();
 
-        if (!$user || !$this->hasRole($user->role, $roles)) {
+        if (! $user || ! $this->hasRole($user->role, $roles)) {
             return response()->json([
                 'message' => 'Forbidden',
-                'error' => 'You do not have permission to access this resource'
+                'error' => 'You do not have permission to access this resource',
             ], 403);
         }
 

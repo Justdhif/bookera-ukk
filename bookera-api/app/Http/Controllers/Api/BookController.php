@@ -30,14 +30,14 @@ class BookController extends Controller
             'per_page' => $request->per_page
         ];
 
-        $books = $this->bookService->getBooks($filters);
+        $books = $this->bookService->getAll($filters);
 
         return ApiResponse::successResponse('Data buku berhasil diambil', $books);
     }
 
     public function store(StoreBookRequest $request): JsonResponse
     {
-        $book = $this->bookService->createBook(
+        $book = $this->bookService->create(
             $request->validated(),
             $request->file('cover_image')
         );
@@ -47,7 +47,7 @@ class BookController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $book = $this->bookService->getBookById($id);
+        $book = $this->bookService->getById($id);
 
         if (!$book) {
             return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
@@ -58,7 +58,7 @@ class BookController extends Controller
 
     public function showBySlug(string $slug): JsonResponse
     {
-        $book = $this->bookService->getBookBySlug($slug);
+        $book = $this->bookService->getBySlug($slug);
 
         if (!$book) {
             return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
@@ -69,7 +69,7 @@ class BookController extends Controller
 
     public function update(UpdateBookRequest $request, Book $book): JsonResponse
     {
-        $book = $this->bookService->updateBook(
+        $book = $this->bookService->update(
             $book,
             $request->validated(),
             $request->file('cover_image')
@@ -80,7 +80,7 @@ class BookController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
-        $deleted = $this->bookService->deleteBook($id);
+        $deleted = $this->bookService->delete($id);
 
         if (!$deleted) {
             return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
@@ -89,4 +89,3 @@ class BookController extends Controller
         return ApiResponse::successResponse('Buku berhasil dihapus', null);
     }
 }
-

@@ -4,7 +4,8 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useState, useEffect } from "react";
-import { bookService, CreateBookData } from "@/services/book.service";
+import { bookService } from "@/services/book.service";
+import { CreateBookData } from "@/types/book";
 import { categoryService } from "@/services/category.service";
 import { authorService } from "@/services/author.service";
 import { publisherService } from "@/services/publisher.service";
@@ -62,7 +63,7 @@ export default function AddBookClient() {
 
   const fetchAuthors = async () => {
     try {
-      const res = await authorService.getAll();
+      const res = await authorService.getAll({ is_active: true, per_page: "all" });
       setAuthors(res.data.data || []);
     } catch {
       toast.error("Failed to load authors");
@@ -71,7 +72,7 @@ export default function AddBookClient() {
 
   const fetchPublishers = async () => {
     try {
-      const res = await publisherService.getAll();
+      const res = await publisherService.getAll({ is_active: true, per_page: "all" });
       setPublishers(res.data.data || []);
     } catch {
       toast.error("Failed to load publishers");

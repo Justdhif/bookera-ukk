@@ -8,7 +8,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class FineTypeService
 {
-    public function getAllFineTypes(array $filters = []): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
         $query = FineType::query();
 
@@ -27,7 +27,7 @@ class FineTypeService
         return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
-    public function createFineType(array $data): FineType
+    public function create(array $data): FineType
     {
         $fineType = FineType::create($data);
 
@@ -48,7 +48,7 @@ class FineTypeService
         return $fineType;
     }
 
-    public function updateFineType(FineType $fineType, array $data): FineType
+    public function update(FineType $fineType, array $data): FineType
     {
         $oldData = $fineType->toArray();
         $fineType->update($data);
@@ -70,7 +70,7 @@ class FineTypeService
         return $fineType;
     }
 
-    public function deleteFineType(FineType $fineType): void
+    public function delete(FineType $fineType): void
     {
         ActivityLogger::log(
             'delete',

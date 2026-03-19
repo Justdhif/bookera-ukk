@@ -11,7 +11,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class DiscussionCommentService
 {
-    public function getComments(DiscussionPost $post, int $perPage = 20): LengthAwarePaginator
+    public function getAll(DiscussionPost $post, int $perPage = 20): LengthAwarePaginator
     {
         return DiscussionComment::with(['user.profile', 'replies.user.profile'])
             ->where('post_id', $post->id)
@@ -28,7 +28,7 @@ class DiscussionCommentService
             ->paginate($perPage);
     }
 
-    public function addComment(User $user, DiscussionPost $post, string $content, ?int $parentId = null): DiscussionComment
+    public function create(User $user, DiscussionPost $post, string $content, ?int $parentId = null): DiscussionComment
     {
         $parent = null;
         if ($parentId !== null) {
@@ -92,7 +92,7 @@ class DiscussionCommentService
         return $comment->load('user.profile');
     }
 
-    public function deleteComment(User $user, DiscussionComment $comment): void
+    public function delete(User $user, DiscussionComment $comment): void
     {
         if ($comment->user_id !== $user->id) {
             throw new \Exception('Unauthorized: you do not own this comment.', 403);
@@ -113,7 +113,7 @@ class DiscussionCommentService
         ));
     }
 
-    public function updateComment(User $user, DiscussionComment $comment, string $content): DiscussionComment
+    public function update(User $user, DiscussionComment $comment, string $content): DiscussionComment
     {
         if ($comment->user_id !== $user->id) {
             throw new \Exception('Unauthorized: you do not own this comment.', 403);

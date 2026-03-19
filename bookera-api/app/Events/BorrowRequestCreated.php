@@ -36,18 +36,18 @@ class BorrowRequestCreated implements ShouldBroadcastNow
     {
         $bookTitles = $this->borrowRequest->borrowRequestDetails
             ->take(2)
-            ->map(fn($d) => $d->book->title ?? 'Unknown')
+            ->map(fn ($d) => $d->book->title ?? 'Unknown')
             ->implode(', ');
 
-        $total     = $this->borrowRequest->borrowRequestDetails->count();
-        $moreText  = $total > 2 ? ' and ' . ($total - 2) . ' more' : '';
-        $userName  = $this->borrowRequest->user->profile->full_name ?? 'Unknown';
+        $total = $this->borrowRequest->borrowRequestDetails->count();
+        $moreText = $total > 2 ? ' and '.($total - 2).' more' : '';
+        $userName = $this->borrowRequest->user->profile->full_name ?? 'Unknown';
 
         return [
             'request_id' => $this->borrowRequest->id,
-            'user_name'  => $userName,
-            'message'    => "{$userName} wants to borrow {$bookTitles}{$moreText}",
-            'type'       => 'borrow_request_created',
+            'user_name' => $userName,
+            'message' => "{$userName} wants to borrow {$bookTitles}{$moreText}",
+            'type' => 'borrow_request_created',
         ];
     }
 }

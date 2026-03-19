@@ -29,14 +29,14 @@ class BorrowRequestController extends Controller
             'per_page'        => $request->per_page,
         ];
 
-        $requests = $this->borrowRequestService->getRequests($filters);
+        $requests = $this->borrowRequestService->getAll($filters);
 
         return ApiResponse::successResponse('Data permintaan peminjaman berhasil diambil', $requests);
     }
 
     public function show(BorrowRequest $borrowRequest): JsonResponse
     {
-        $borrowRequest = $this->borrowRequestService->getRequestById($borrowRequest);
+        $borrowRequest = $this->borrowRequestService->getById($borrowRequest);
 
         return ApiResponse::successResponse('Detail permintaan peminjaman', $borrowRequest);
     }
@@ -44,7 +44,7 @@ class BorrowRequestController extends Controller
     public function assignBorrow(Request $request, BorrowRequest $borrowRequest): JsonResponse
     {
         $copyIds = $request->input('copy_ids', []);
-        $borrow  = $this->borrowRequestService->assignBorrowFromRequest($borrowRequest, $copyIds);
+        $borrow  = $this->borrowRequestService->assignBorrow($borrowRequest, $copyIds);
 
         return ApiResponse::successResponse(
             'Peminjaman berhasil dibuat dari permintaan',
@@ -55,7 +55,7 @@ class BorrowRequestController extends Controller
 
     public function approve(BorrowRequest $borrowRequest): JsonResponse
     {
-        $borrow = $this->borrowRequestService->approveRequest($borrowRequest);
+        $borrow = $this->borrowRequestService->approve($borrowRequest);
 
         return ApiResponse::successResponse('Permintaan peminjaman berhasil disetujui', $borrow, 201);
     }
@@ -63,14 +63,14 @@ class BorrowRequestController extends Controller
     public function reject(Request $request, BorrowRequest $borrowRequest): JsonResponse
     {
         $rejectReason  = $request->input('reject_reason');
-        $borrowRequest = $this->borrowRequestService->rejectRequest($borrowRequest, $rejectReason);
+        $borrowRequest = $this->borrowRequestService->reject($borrowRequest, $rejectReason);
 
         return ApiResponse::successResponse('Permintaan peminjaman berhasil ditolak', $borrowRequest);
     }
 
     public function destroy(BorrowRequest $borrowRequest): JsonResponse
     {
-        $this->borrowRequestService->deleteRequest($borrowRequest);
+        $this->borrowRequestService->delete($borrowRequest);
 
         return ApiResponse::successResponse('Permintaan peminjaman berhasil dihapus');
     }
@@ -79,7 +79,7 @@ class BorrowRequestController extends Controller
 
     public function store(StoreBorrowRequestRequest $request): JsonResponse
     {
-        $borrowRequest = $this->borrowRequestService->createRequest(
+        $borrowRequest = $this->borrowRequestService->create(
             $request->validated(),
             $request->user()
         );
@@ -93,7 +93,7 @@ class BorrowRequestController extends Controller
 
     public function getMyRequests(Request $request): JsonResponse
     {
-        $requests = $this->borrowRequestService->getRequestsByUser($request->user());
+        $requests = $this->borrowRequestService->getByUser($request->user());
 
         return ApiResponse::successResponse('Data permintaan peminjaman user', $requests);
     }
@@ -104,7 +104,7 @@ class BorrowRequestController extends Controller
             return ApiResponse::errorResponse('Kamu tidak berhak membatalkan permintaan ini', null, 403);
         }
 
-        $borrowRequest = $this->borrowRequestService->cancelRequest($borrowRequest, $request->user());
+        $borrowRequest = $this->borrowRequestService->cancel($borrowRequest, $request->user());
 
         return ApiResponse::successResponse('Permintaan peminjaman berhasil dibatalkan', $borrowRequest);
     }

@@ -47,15 +47,11 @@ export default function SidebarFollowItem({
       onMouseLeave={() => setIsHovering(false)}
     >
       <div className="w-12 h-12 rounded-full shrink-0 shadow-sm ring-1 ring-border dark:ring-white/15 overflow-hidden bg-muted flex items-center justify-center">
-        {item.photo_url ? (
-          <img
-            src={item.photo_url}
-            alt={item.name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <FallbackIcon className="h-5 w-5 text-muted-foreground/50" />
-        )}
+        <img
+          src={item.photo}
+          alt={item.name}
+          className="w-full h-full object-cover"
+        />
       </div>
 
       <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
@@ -123,17 +119,11 @@ export function CollapsedFollowItem({ item, type }: CollapsedFollowItemProps) {
           href={href}
           className="w-10 h-10 rounded-full overflow-hidden shrink-0 block hover:ring-2 hover:ring-primary transition-all bg-muted"
         >
-          {item.photo_url ? (
-            <img
-              src={item.photo_url}
+          <img
+              src={item.photo}
               alt={item.name}
               className="w-full h-full object-cover"
             />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <FallbackIcon className="h-4 w-4 text-muted-foreground/50" />
-            </div>
-          )}
         </Link>
       </TooltipTrigger>
       <TooltipContent side="right" className="flex flex-col gap-1 py-2">

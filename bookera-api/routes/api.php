@@ -1,51 +1,51 @@
 <?php
 
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\BookController;
 use App\Http\Controllers\Api\BookCopyController;
 use App\Http\Controllers\Api\BookReturnController;
-use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\FineController;
-use App\Http\Controllers\Api\FineTypeController;
 use App\Http\Controllers\Api\BorrowController;
 use App\Http\Controllers\Api\BorrowRequestController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\DiscussionCommentController;
+use App\Http\Controllers\Api\DiscussionLikeController;
+use App\Http\Controllers\Api\DiscussionPostController;
+use App\Http\Controllers\Api\DiscussionPostReportController;
+use App\Http\Controllers\Api\FineController;
+use App\Http\Controllers\Api\FineTypeController;
+use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\LostBookController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PrivacyPolicyController;
-use App\Http\Controllers\Api\AuthorController;
 use App\Http\Controllers\Api\PublisherController;
-use App\Http\Controllers\Api\DiscussionPostController;
-use App\Http\Controllers\Api\DiscussionLikeController;
-use App\Http\Controllers\Api\DiscussionCommentController;
-use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\SaveController;
 use App\Http\Controllers\Api\TermsOfServiceController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\DiscussionPostReportController;
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Route;
 
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 Route::get('/', function () {
     return response()->json([
-        'message' => 'Welcome to the Bookera API'
+        'message' => 'Welcome to the Bookera API',
     ]);
 });
 
 Route::get('/test', function () {
     return response()->json([
-        'message' => 'API is working'
+        'message' => 'API is working',
     ]);
 });
 
 Route::get('/test-smtp', function () {
     Mail::raw('SMTP berhasil terkoneksi', function ($message) {
         $message->to('noob1234five@gmail.com')
-                ->subject('Test SMTP Laravel');
+            ->subject('Test SMTP Laravel');
     });
 
     return 'Email berhasil dikirim';
@@ -57,10 +57,10 @@ Route::get('books/{id}', [BookController::class, 'show']);
 
 Route::get('categories', [CategoryController::class, 'index']);
 
-Route::get('authors', [AuthorController::class, 'list']);
+Route::get('authors', [AuthorController::class, 'index']);
 Route::get('authors/{author}', [AuthorController::class, 'show']);
 
-Route::get('publishers', [PublisherController::class, 'list']);
+Route::get('publishers', [PublisherController::class, 'index']);
 Route::get('publishers/{publisher}', [PublisherController::class, 'show']);
 
 Route::get('terms-of-services/active', [TermsOfServiceController::class, 'getActive']);
@@ -236,8 +236,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('my-borrow-requests', [BorrowRequestController::class, 'getMyRequests']);
 
     Route::get('my-fines', [FineController::class, 'myFines']);
-
-
 
     Route::get('book-returns/{bookReturn}', [BookReturnController::class, 'show']);
 

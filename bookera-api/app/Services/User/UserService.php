@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class UserService
 {
-    public function getUsers(array $filters): LengthAwarePaginator
+    public function getAll(array $filters): LengthAwarePaginator
     {
         $query = User::with('profile');
 
@@ -40,12 +40,12 @@ class UserService
         return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
-    public function getUserById(User $user): User
+    public function getById(User $user): User
     {
         return $user->load('profile');
     }
 
-    public function getUserByIdentificationNumber(string $identificationNumber): User
+    public function getByIdentificationNumber(string $identificationNumber): User
     {
         return User::with('profile')
             ->whereHas('profile', function ($query) use ($identificationNumber) {
@@ -54,7 +54,7 @@ class UserService
             ->firstOrFail();
     }
 
-    public function createUser(array $data): User
+    public function create(array $data): User
     {
         return DB::transaction(function () use ($data) {
             $isActive = true;
@@ -100,7 +100,7 @@ class UserService
         });
     }
 
-    public function updateUser(User $user, array $data): User
+    public function update(User $user, array $data): User
     {
         return DB::transaction(function () use ($user, $data) {
             $isActive = $user->is_active;
@@ -165,7 +165,7 @@ class UserService
         });
     }
 
-    public function deleteUser(User $user): void
+    public function delete(User $user): void
     {
         $userData = $user->toArray();
         $userEmail = $user->email;

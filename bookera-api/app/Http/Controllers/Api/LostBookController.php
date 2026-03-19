@@ -28,7 +28,7 @@ class LostBookController extends Controller
             'per_page' => $request->per_page,
         ];
 
-        $lostBooks = $this->lostBookService->getAllLostBooks($filters);
+        $lostBooks = $this->lostBookService->getAll($filters);
 
         return ApiResponse::successResponse('Data buku hilang', $lostBooks);
     }
@@ -42,7 +42,7 @@ class LostBookController extends Controller
             return ApiResponse::errorResponse($errorMessage, null, 400);
         }
 
-        $lostBook = $this->lostBookService->reportLostBook($borrow, $validated);
+        $lostBook = $this->lostBookService->create($borrow, $validated);
 
         return ApiResponse::successResponse('Buku hilang berhasil dilaporkan', $lostBook, 201);
     }
@@ -56,14 +56,14 @@ class LostBookController extends Controller
 
     public function update(UpdateLostBookRequest $request, LostBook $lostBook): JsonResponse
     {
-        $lostBook = $this->lostBookService->updateLostBook($lostBook, $request->validated());
+        $lostBook = $this->lostBookService->update($lostBook, $request->validated());
 
         return ApiResponse::successResponse('Informasi buku hilang berhasil diupdate', $lostBook);
     }
 
     public function destroy(LostBook $lostBook): JsonResponse
     {
-        $this->lostBookService->deleteLostBook($lostBook);
+        $this->lostBookService->delete($lostBook);
 
         return ApiResponse::successResponse('Record buku hilang berhasil dihapus');
     }

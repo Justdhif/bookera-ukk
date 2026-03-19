@@ -6,7 +6,7 @@ export const saveService = {
   getAll: (params?: { search?: string; per_page?: number; page?: number }) =>
     api.get<ApiResponse<PaginatedSaveResponse>>("/saves", { params }),
 
-  getOne: (identifier: number | string) => api.get<ApiResponse<Save>>(`/saves/${identifier}`),
+  getByIdentifier: (identifier: number | string) => api.get<ApiResponse<Save>>(`/saves/${identifier}`),
 
   create: (data: SaveFormData) =>
     api.post<ApiResponse<Save>>("/saves", data),

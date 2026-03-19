@@ -10,7 +10,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class SaveService
 {
-    public function getUserSaves(?string $search = null, int $perPage = 10): LengthAwarePaginator
+    public function getAll(?string $search = null, int $perPage = 10): LengthAwarePaginator
     {
         $saves = Save::query()
             ->with(['books' => function ($query) {
@@ -46,7 +46,7 @@ class SaveService
         return $saves;
     }
 
-    public function getSaveByIdentifier(string $identifier): array
+    public function getByIdentifier(string $identifier): array
     {
         $query = Save::with(['books' => function ($query) {
             $query->with(['categories', 'copies'])
@@ -86,7 +86,7 @@ class SaveService
         ];
     }
 
-    public function createSave(array $data): Save
+    public function create(array $data): Save
     {
         $data['user_id'] = auth()->id();
         $data['slug'] = SlugGenerator::generate('saves', 'slug', $data['name']);
@@ -105,7 +105,7 @@ class SaveService
         return $save;
     }
 
-    public function updateSave(Save $save, array $data): Save
+    public function update(Save $save, array $data): Save
     {
         if (isset($data['name']) && $data['name'] !== $save->name) {
             $data['slug'] = SlugGenerator::generate('saves', 'slug', $data['name'], $save->id);
@@ -126,7 +126,7 @@ class SaveService
         return $save;
     }
 
-    public function deleteSave(Save $save): void
+    public function delete(Save $save): void
     {
         if ($save->books()->count() > 0) {
             throw new \Exception('Tidak dapat menghapus save yang masih memiliki buku. Hapus semua buku terlebih dahulu.', 422);
@@ -196,4 +196,5 @@ class SaveService
 
         $save->update(['cover' => $newCover]);
     }
+}
 }

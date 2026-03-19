@@ -33,14 +33,14 @@ class DiscussionLikeService
 
                 Notification::create([
                     'user_id' => $post->user_id,
-                    'title'   => 'Postinganmu disukai',
+                    'title' => 'Postinganmu disukai',
                     'message' => "{$actorName} menyukai postinganmu.",
-                    'type'    => 'discussion_like',
-                    'module'  => 'discussion',
-                    'data'    => [
-                        'post_id'   => $post->id,
+                    'type' => 'discussion_like',
+                    'module' => 'discussion',
+                    'data' => [
+                        'post_id' => $post->id,
                         'post_slug' => $post->slug,
-                        'actor_id'  => $user->id,
+                        'actor_id' => $user->id,
                     ],
                 ]);
             }
@@ -58,7 +58,7 @@ class DiscussionLikeService
         ));
 
         return [
-            'liked'       => $liked,
+            'liked' => $liked,
             'likes_count' => $post->likes_count,
         ];
     }

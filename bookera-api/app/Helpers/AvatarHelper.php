@@ -6,9 +6,6 @@ class AvatarHelper
 {
     /**
      * Generate DiceBear avatar URL with unique background color based on user ID
-     *
-     * @param int $userId
-     * @return string
      */
     public static function generateDefaultAvatar(int $userId): string
     {

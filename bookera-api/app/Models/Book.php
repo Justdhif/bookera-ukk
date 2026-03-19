@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -45,6 +46,36 @@ class Book extends Model
         'cover_image',
         'is_active',
     ];
+
+    protected $appends = ['author', 'publisher'];
+
+    protected function coverImage(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if ($value) {
+                    return storage_image($value);
+                }
+
+                return 'https://picsum.photos/seed/'.rawurlencode($this->slug).'/400/600';
+            },
+            set: fn ($value) => $value,
+        );
+    }
+
+    protected function author(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->authors->pluck('name')->join(', '),
+        );
+    }
+
+    protected function publisher(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->publishers->pluck('name')->join(', '),
+        );
+    }
 
     public function categories()
     {

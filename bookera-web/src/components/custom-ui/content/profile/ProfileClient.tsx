@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { authService } from "@/services/auth.service";
-import { userService, UpdateUserData } from "@/services/user.service";
-import { User } from "@/types/user";
+import { userService } from "@/services/user.service";
+import { User, UpdateUserData } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { X, Edit, CircleUser } from "lucide-react";
@@ -48,9 +48,7 @@ export default function ProfileClient() {
         occupation: userData.profile.occupation || undefined,
         institution: userData.profile.institution || undefined,
       });
-      setAvatarPreview(
-        userData.profile.avatar_url || userData.profile.avatar || "",
-      );
+      setAvatarPreview(userData.profile.avatar ?? "");
       return userData;
     } catch (error: any) {
       toast.error(error.response?.data?.message || t("failedLoad"));
@@ -103,9 +101,7 @@ export default function ProfileClient() {
         occupation: user.profile.occupation || undefined,
         institution: user.profile.institution || undefined,
       });
-      setAvatarPreview(
-        user.profile.avatar_url || user.profile.avatar || "",
-      );
+      setAvatarPreview(user.profile.avatar ?? "");
     }
     setIsEditMode(false);
   };

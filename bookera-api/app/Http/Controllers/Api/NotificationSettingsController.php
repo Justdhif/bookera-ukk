@@ -19,14 +19,14 @@ class NotificationSettingsController extends Controller
 
         $profile = $user->profile;
 
-        if (!$profile) {
+        if (! $profile) {
             return ApiResponse::errorResponse('Profil pengguna tidak ditemukan', 404);
         }
 
         return ApiResponse::successResponse('Pengaturan notifikasi berhasil diambil', [
-            'notification_enabled'    => (bool) $profile->notification_enabled,
-            'notification_email'      => (bool) $profile->notification_email,
-            'notification_whatsapp'   => (bool) $profile->notification_whatsapp,
+            'notification_enabled' => (bool) $profile->notification_enabled,
+            'notification_email' => (bool) $profile->notification_email,
+            'notification_whatsapp' => (bool) $profile->notification_whatsapp,
         ]);
     }
 
@@ -36,28 +36,28 @@ class NotificationSettingsController extends Controller
     public function update(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'notification_enabled'  => 'required|boolean',
-            'notification_email'    => 'required|boolean',
+            'notification_enabled' => 'required|boolean',
+            'notification_email' => 'required|boolean',
             'notification_whatsapp' => 'required|boolean',
         ]);
 
-        $user    = Auth::user()->load('profile');
+        $user = Auth::user()->load('profile');
         $profile = $user->profile;
 
-        if (!$profile) {
+        if (! $profile) {
             return ApiResponse::errorResponse('Profil pengguna tidak ditemukan', 404);
         }
 
         $profile->update([
-            'notification_enabled'  => $validated['notification_enabled'],
-            'notification_email'    => $validated['notification_email'],
+            'notification_enabled' => $validated['notification_enabled'],
+            'notification_email' => $validated['notification_email'],
             'notification_whatsapp' => $validated['notification_whatsapp'],
         ]);
 
         return ApiResponse::successResponse('Pengaturan notifikasi berhasil diperbarui', [
-            'notification_enabled'    => (bool) $profile->notification_enabled,
-            'notification_email'      => (bool) $profile->notification_email,
-            'notification_whatsapp'   => (bool) $profile->notification_whatsapp,
+            'notification_enabled' => (bool) $profile->notification_enabled,
+            'notification_email' => (bool) $profile->notification_email,
+            'notification_whatsapp' => (bool) $profile->notification_whatsapp,
         ]);
     }
 }

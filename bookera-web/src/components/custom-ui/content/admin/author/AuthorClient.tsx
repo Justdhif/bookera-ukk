@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Author } from "@/types/author";
-import { authorService, AuthorFilterParams } from "@/services/author.service";
+import { Author, AuthorFilterParams } from "@/types/author";
+import { authorService } from "@/services/author.service";
 import AuthorTable from "./AuthorTable";
 import AuthorFormDialog from "./author-add/AuthorFormDialog";
 import AuthorDetailDialog from "./author-detail/AuthorDetailDialog";
@@ -62,7 +62,7 @@ export default function AuthorClient() {
   const fetchAuthors = async (activeFilters: AuthorFilterParams) => {
     setLoading(true);
     try {
-      const res = await authorService.getAdminList(activeFilters);
+      const res = await authorService.getAll(activeFilters, true);
       const paginatedData = res.data.data;
       setAuthors(paginatedData.data ?? paginatedData);
       setPagination({

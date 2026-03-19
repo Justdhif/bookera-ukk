@@ -4,15 +4,12 @@ import {
   BookOpen,
   AlertTriangle,
   Clock,
-  MessageSquare,
-  Heart,
   RotateCcw,
   BookMarked,
   Bell,
   UserPlus,
   DollarSign,
   BookX,
-  AtSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,37 +23,6 @@ export const getNotificationIconConfig = (
   type: string | null,
   module: string | null
 ): NotificationIconConfig => {
-  // Discussion module icons
-  if (module === "discussion") {
-    switch (type) {
-      case "discussion_comment":
-        return {
-          icon: <MessageSquare className="h-4 w-4 text-violet-600 dark:text-violet-400" />,
-          bg: "bg-violet-100 dark:bg-violet-950/60",
-          ring: "ring-violet-200 dark:ring-violet-800",
-        };
-      case "discussion_reply":
-        return {
-          icon: <AtSign className="h-4 w-4 text-purple-600 dark:text-purple-400" />,
-          bg: "bg-purple-100 dark:bg-purple-950/60",
-          ring: "ring-purple-200 dark:ring-purple-800",
-        };
-      case "discussion_like":
-      case "post_liked":
-        return {
-          icon: <Heart className="h-4 w-4 text-rose-600 dark:text-rose-400" />,
-          bg: "bg-rose-100 dark:bg-rose-950/60",
-          ring: "ring-rose-200 dark:ring-rose-800",
-        };
-      default:
-        return {
-          icon: <MessageSquare className="h-4 w-4 text-violet-600 dark:text-violet-400" />,
-          bg: "bg-violet-100 dark:bg-violet-950/60",
-          ring: "ring-violet-200 dark:ring-violet-800",
-        };
-    }
-  }
-
   // Borrow / Loan module icons
   if (module === "borrow" || module === "loan") {
     switch (type) {
@@ -173,13 +139,6 @@ export const getNotificationIconConfig = (
         bg: "bg-orange-100 dark:bg-orange-950/60",
         ring: "ring-orange-200 dark:ring-orange-800",
       };
-    case "discussion_comment":
-    case "discussion_reply":
-      return {
-        icon: <MessageSquare className="h-4 w-4 text-violet-600 dark:text-violet-400" />,
-        bg: "bg-violet-100 dark:bg-violet-950/60",
-        ring: "ring-violet-200 dark:ring-violet-800",
-      };
     default:
       return {
         icon: <Bell className="h-4 w-4 text-slate-500 dark:text-slate-400" />,
@@ -228,8 +187,6 @@ export const getModuleBadgeStyle = (module: string | null): string => {
       return "bg-teal-100 text-teal-700 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800";
     case "fine":
       return "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800";
-    case "discussion":
-      return "bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-950/50 dark:text-violet-300 dark:border-violet-800";
     case "lost_book":
       return "bg-red-100 text-red-700 border-red-200 dark:bg-red-950/50 dark:text-red-300 dark:border-red-800";
     default:

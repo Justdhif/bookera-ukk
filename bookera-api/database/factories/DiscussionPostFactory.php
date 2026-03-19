@@ -21,7 +21,7 @@ class DiscussionPostFactory extends Factory
         return [
             'user_id' => User::query()->inRandomOrder()->value('id') ?? User::factory(),
             'caption' => $caption,
-            'slug' => Str::slug(Str::limit($caption ?? fake()->sentence(4), 40, '')) . '-' . Str::random(8),
+            'slug' => Str::slug(Str::limit($caption ?? fake()->sentence(4), 40, '')).'-'.Str::random(8),
             'likes_count' => 0,
             'comments_count' => 0,
             'taken_down_at' => null,

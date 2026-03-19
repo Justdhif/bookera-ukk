@@ -24,6 +24,7 @@ class DiscussionLikeController extends Controller
 
             $post = DiscussionPost::where('slug', $slug)->firstOrFail();
             $result = $this->likeService->toggle($user, $post);
+
             return ApiResponse::successResponse('Like toggled successfully', $result);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Post not found');

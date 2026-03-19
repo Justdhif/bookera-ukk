@@ -15,12 +15,13 @@ class BorrowRequestApprovedMail extends Mailable
     use Queueable, SerializesModels;
 
     public BorrowRequest $borrowRequest;
+
     public Borrow $borrow;
 
     public function __construct(BorrowRequest $borrowRequest, Borrow $borrow)
     {
         $this->borrowRequest = $borrowRequest;
-        $this->borrow        = $borrow;
+        $this->borrow = $borrow;
     }
 
     public function envelope(): Envelope

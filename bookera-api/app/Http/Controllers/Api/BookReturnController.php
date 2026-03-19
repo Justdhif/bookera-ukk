@@ -22,25 +22,25 @@ class BookReturnController extends Controller
 
     public function index(Borrow $borrow): JsonResponse
     {
-        $returns = $this->bookReturnService->getReturnsByBorrow($borrow);
+        $returns = $this->bookReturnService->getByBorrow($borrow);
 
         return ApiResponse::successResponse('Data pengembalian buku berhasil diambil', $returns);
     }
 
     public function store(StoreBookReturnRequest $request, Borrow $borrow): JsonResponse
     {
-        if (!$this->bookReturnService->canCreateReturn($borrow)) {
+        if (!$this->bookReturnService->canCreate($borrow)) {
             return ApiResponse::errorResponse('Peminjaman ini tidak dalam status open', null, 400);
         }
 
-        $bookReturn = $this->bookReturnService->createReturn($borrow, $request->validated());
+        $bookReturn = $this->bookReturnService->create($borrow, $request->validated());
 
         return ApiResponse::successResponse('Request pengembalian berhasil dibuat. Menunggu persetujuan admin.', $bookReturn, 201);
     }
 
     public function show(BookReturn $bookReturn): JsonResponse
     {
-        $detail = $this->bookReturnService->getReturnDetail($bookReturn);
+        $detail = $this->bookReturnService->getDetail($bookReturn);
 
         return ApiResponse::successResponse('Detail pengembalian buku', $detail);
     }
@@ -68,7 +68,7 @@ class BookReturnController extends Controller
     public function approveReturn(BookReturn $bookReturn): JsonResponse
     {
         try {
-            if (!$this->bookReturnService->canApproveReturn($bookReturn)) {
+            if (!$this->bookReturnService->canApprove($bookReturn)) {
                 $borrow = $bookReturn->borrow;
 
                 if ($borrow->status !== 'open') {
@@ -78,7 +78,7 @@ class BookReturnController extends Controller
                 return ApiResponse::errorResponse('Tidak dapat menyelesaikan return', null, 400);
             }
 
-            $result = $this->bookReturnService->approveReturn($bookReturn);
+            $result = $this->bookReturnService->approve($bookReturn);
             return ApiResponse::successResponse('Pengembalian berhasil diselesaikan', $result);
         } catch (\Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
@@ -95,4 +95,3 @@ class BookReturnController extends Controller
         }
     }
 }
-

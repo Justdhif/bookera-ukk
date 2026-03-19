@@ -14,6 +14,7 @@ export interface LostBook {
     user?: {
       profile?: {
         full_name: string;
+        avatar: string;
       };
       email: string;
     };
@@ -28,3 +29,10 @@ export interface LostBook {
 }
 
 export type LostBookListResponse = PaginatedResponse<LostBook>;
+
+export interface LostBookFilterParams {
+  search?: string;
+  borrow_status?: string;
+  per_page?: number;
+  page?: number;
+}

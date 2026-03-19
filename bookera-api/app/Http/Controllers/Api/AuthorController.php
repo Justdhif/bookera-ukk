@@ -32,21 +32,16 @@ class AuthorController extends Controller
             unset($filters['is_active']);
         }
 
-        $authors = $this->authorService->getAuthors($filters);
+        $authors = $this->authorService->getAll($filters);
 
         return ApiResponse::successResponse('Data penulis berhasil diambil', $authors);
     }
 
-    public function list(): JsonResponse
-    {
-        $authors = $this->authorService->getAllAuthors();
 
-        return ApiResponse::successResponse('Daftar penulis berhasil diambil', $authors);
-    }
 
     public function store(StoreAuthorRequest $request): JsonResponse
     {
-        $author = $this->authorService->createAuthor(
+        $author = $this->authorService->create(
             $request->validated(),
             $request->file('photo')
         );
@@ -56,7 +51,7 @@ class AuthorController extends Controller
 
     public function show(Author $author): JsonResponse
     {
-        $author = $this->authorService->getAuthorById($author->id);
+        $author = $this->authorService->getById($author->id);
 
         if (!$author) {
             return ApiResponse::errorResponse('Penulis tidak ditemukan', null, 404);
@@ -67,7 +62,7 @@ class AuthorController extends Controller
 
     public function update(UpdateAuthorRequest $request, Author $author): JsonResponse
     {
-        $author = $this->authorService->updateAuthor(
+        $author = $this->authorService->update(
             $author,
             $request->validated(),
             $request->file('photo')
@@ -78,7 +73,7 @@ class AuthorController extends Controller
 
     public function destroy(Author $author): JsonResponse
     {
-        $data = $this->authorService->deleteAuthor($author);
+        $data = $this->authorService->delete($author);
 
         return ApiResponse::successResponse('Penulis berhasil dihapus', $data);
     }

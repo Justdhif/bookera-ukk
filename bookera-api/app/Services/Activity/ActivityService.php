@@ -14,34 +14,28 @@ class ActivityService
         $query = ActivityLog::query()
             ->with(['user.profile'])
             ->whereYear('created_at', $year)
+            ->when(!empty($filters['user_id']), function ($query) use ($filters) {
+                $query->where('user_id', $filters['user_id']);
+            })
+            ->when(!empty($filters['action']), function ($query) use ($filters) {
+                $query->where('action', $filters['action']);
+            })
+            ->when(!empty($filters['module']), function ($query) use ($filters) {
+                $query->where('module', $filters['module']);
+            })
+            ->when(!empty($filters['start_date']), function ($query) use ($filters) {
+                $query->whereDate('created_at', '>=', $filters['start_date']);
+            })
+            ->when(!empty($filters['end_date']), function ($query) use ($filters) {
+                $query->whereDate('created_at', '<=', $filters['end_date']);
+            })
+            ->when(!empty($filters['search']), function ($query) use ($filters) {
+                $query->where('description', 'like', "%{$filters['search']}%");
+            })
             ->latest()
             ->orderByDesc('id');
 
-        if (!empty($filters['user_id'])) {
-            $query->where('user_id', $filters['user_id']);
-        }
-
-        if (!empty($filters['action'])) {
-            $query->where('action', $filters['action']);
-        }
-
-        if (!empty($filters['module'])) {
-            $query->where('module', $filters['module']);
-        }
-
-        if (!empty($filters['start_date'])) {
-            $query->whereDate('created_at', '>=', $filters['start_date']);
-        }
-
-        if (!empty($filters['end_date'])) {
-            $query->whereDate('created_at', '<=', $filters['end_date']);
-        }
-
-        if (!empty($filters['search'])) {
-            $query->where('description', 'like', "%{$filters['search']}%");
-        }
-
-        $activityLogs = $query->paginate($filters['per_page'] ?? 15);
+        $activityLogs = $query->paginate($filters['per_page'] ?? 10);
 
         $availableYears = ActivityLog::selectRaw('DISTINCT YEAR(created_at) as year')
             ->orderBy('year', 'desc')

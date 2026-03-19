@@ -21,7 +21,7 @@ class BookCopyController extends Controller
 
     public function store(StoreBookCopyRequest $request, Book $book): JsonResponse
     {
-        $copy = $this->bookCopyService->createBookCopy($book, $request->validated());
+        $copy = $this->bookCopyService->create($book, $request->validated());
 
         return ApiResponse::successResponse('Salinan buku berhasil ditambahkan', $copy, 201);
     }
@@ -29,7 +29,7 @@ class BookCopyController extends Controller
     public function destroy(BookCopy $bookCopy): JsonResponse
     {
         try {
-            $data = $this->bookCopyService->deleteBookCopy($bookCopy);
+            $data = $this->bookCopyService->delete($bookCopy);
 
             return ApiResponse::successResponse('Salinan buku berhasil dihapus', $data);
         } catch (\Exception $e) {
@@ -37,4 +37,3 @@ class BookCopyController extends Controller
         }
     }
 }
-

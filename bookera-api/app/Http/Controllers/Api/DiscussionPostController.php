@@ -22,7 +22,7 @@ class DiscussionPostController extends Controller
         /** @var \App\Models\User|null $user */
         $user = auth('sanctum')->user();
 
-        $posts = $this->postService->getPosts(
+        $posts = $this->postService->getAll(
             $user,
             (int) $request->get('per_page', 15)
         );
@@ -36,7 +36,7 @@ class DiscussionPostController extends Controller
             /** @var \App\Models\User|null $user */
             $user = auth('sanctum')->user();
 
-            $posts = $this->postService->getUserPosts(
+            $posts = $this->postService->getByUser(
                 $userSlug,
                 $user,
                 (int) $request->get('per_page', 15)
@@ -53,7 +53,7 @@ class DiscussionPostController extends Controller
             /** @var \App\Models\User|null $user */
             $user = auth('sanctum')->user();
 
-            $post = $this->postService->getPostBySlug($slug, $user);
+            $post = $this->postService->getBySlug($slug, $user);
             return ApiResponse::successResponse('Post retrieved successfully', $post);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Post not found');
@@ -65,7 +65,7 @@ class DiscussionPostController extends Controller
         /** @var \App\Models\User $user */
         $user = $request->user();
 
-        $post = $this->postService->createPost($user, [
+        $post = $this->postService->create($user, [
             'caption' => $request->input('caption'),
             'images'  => $request->file('images'),
         ]);
@@ -80,7 +80,7 @@ class DiscussionPostController extends Controller
             $user = $request->user();
             $post = DiscussionPost::where('slug', $slug)->firstOrFail();
 
-            $post = $this->postService->updatePost($user, $post, [
+            $post = $this->postService->update($user, $post, [
                 'caption' => $request->input('caption'),
                 'images'  => $request->file('images') ?? [],
             ]);
@@ -103,7 +103,7 @@ class DiscussionPostController extends Controller
             /** @var \App\Models\User $user */
             $user = $request->user();
             $post = DiscussionPost::where('slug', $slug)->firstOrFail();
-            $this->postService->deletePost($user, $post);
+            $this->postService->delete($user, $post);
             return ApiResponse::successResponse('Post deleted successfully');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Post not found');
@@ -121,7 +121,7 @@ class DiscussionPostController extends Controller
         /** @var \App\Models\User $user */
         $user = $request->user();
 
-        $posts = $this->postService->getFollowingPosts(
+        $posts = $this->postService->getByFollowing(
             $user,
             (int) $request->get('per_page', 15)
         );
@@ -161,4 +161,3 @@ class DiscussionPostController extends Controller
         return ApiResponse::successResponse('Discussion users retrieved', $users);
     }
 }
-

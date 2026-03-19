@@ -11,11 +11,12 @@ class BorrowRejected
     use Dispatchable, SerializesModels;
 
     public Borrow $borrow;
+
     public ?string $rejectionReason;
 
     public function __construct(Borrow $borrow, ?string $rejectionReason = null)
     {
-        $this->borrow          = $borrow;
+        $this->borrow = $borrow;
         $this->rejectionReason = $rejectionReason;
     }
 }

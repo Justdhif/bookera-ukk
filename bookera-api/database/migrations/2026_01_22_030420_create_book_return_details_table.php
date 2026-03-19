@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('book_return_id')->constrained()->cascadeOnDelete();
             $table->foreignId('book_copy_id')->constrained()->cascadeOnDelete();
-            $table->enum('condition', ['good','damaged','lost'])->default('good');
+            $table->enum('condition', ['good', 'damaged', 'lost'])->default('good');
             $table->timestamps();
         });
     }

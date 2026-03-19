@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class BorrowDetail extends Model
 {
@@ -19,7 +19,7 @@ class BorrowDetail extends Model
     ];
 
     protected $casts = [
-        'note'   => 'string',
+        'note' => 'string',
         'status' => 'string',
     ];
 

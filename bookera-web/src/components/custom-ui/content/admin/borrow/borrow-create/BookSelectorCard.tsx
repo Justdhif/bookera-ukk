@@ -75,9 +75,9 @@ export default function BookSelectorCard({
                     onClick={(e) => e.stopPropagation()}
                   />
 
-                  {book.cover_image_url ? (
+                  {book.cover_image ? (
                     <img
-                      src={book.cover_image_url}
+                      src={book.cover_image}
                       alt={book.title}
                       className="w-12 h-16 object-cover rounded shadow-sm shrink-0"
                     />

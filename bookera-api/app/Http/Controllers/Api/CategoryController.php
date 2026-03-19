@@ -27,30 +27,29 @@ class CategoryController extends Controller
             'per_page' => $request->per_page,
         ];
 
-        $categories = $this->categoryService->getCategories($filters);
+        $categories = $this->categoryService->getAll($filters);
 
         return ApiResponse::successResponse('Data kategori berhasil diambil', $categories);
     }
 
     public function store(StoreCategoryRequest $request): JsonResponse
     {
-        $category = $this->categoryService->createCategory($request->validated());
+        $category = $this->categoryService->create($request->validated());
 
         return ApiResponse::successResponse('Kategori berhasil ditambahkan', $category, 201);
     }
 
     public function update(UpdateCategoryRequest $request, Category $category): JsonResponse
     {
-        $category = $this->categoryService->updateCategory($category, $request->validated());
+        $category = $this->categoryService->update($category, $request->validated());
 
         return ApiResponse::successResponse('Kategori berhasil diperbarui', $category);
     }
 
     public function destroy(Category $category): JsonResponse
     {
-        $data = $this->categoryService->deleteCategory($category);
+        $data = $this->categoryService->delete($category);
 
         return ApiResponse::successResponse('Kategori berhasil dihapus', $data);
     }
 }
-

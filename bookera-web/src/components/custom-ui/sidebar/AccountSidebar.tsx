@@ -22,7 +22,6 @@ import {
   Settings,
   BookOpen,
   DollarSign,
-  MessageSquare,
 } from "lucide-react";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import { useTranslations } from "next-intl";
@@ -34,8 +33,7 @@ type NavLabelKey =
   | "settings"
   | "notifications"
   | "myBorrows"
-  | "myFines"
-  | "myPosts";
+  | "myFines";
 
 const NAV_ITEMS: Array<{
   href: string;
@@ -45,7 +43,6 @@ const NAV_ITEMS: Array<{
   { href: "/profile", icon: User, labelKey: "profile" },
   { href: "/my-borrows", icon: BookOpen, labelKey: "myBorrows" },
   { href: "/my-fines", icon: DollarSign, labelKey: "myFines" },
-  { href: "/my-posts", icon: MessageSquare, labelKey: "myPosts" },
   { href: "/settings", icon: Settings, labelKey: "settings" },
   { href: "/notifications", icon: Bell, labelKey: "notifications" },
 ];

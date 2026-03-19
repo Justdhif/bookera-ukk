@@ -46,7 +46,7 @@ export default function PublicBorrowDetailClient() {
   const fetchBorrow = async () => {
     try {
       setLoading(true);
-      const res = await borrowService.showByCode(borrowCode);
+      const res = await borrowService.getByCode(borrowCode);
       setBorrow(res.data.data);
     } catch (error: any) {
       toast.error(

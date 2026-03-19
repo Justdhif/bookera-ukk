@@ -14,10 +14,10 @@ class UpdatePublisherRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'        => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'photo'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'is_active'   => 'nullable|boolean',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'is_active' => 'nullable|boolean',
         ];
     }
 }

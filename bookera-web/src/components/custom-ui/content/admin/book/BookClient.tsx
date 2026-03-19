@@ -4,8 +4,8 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 import { useEffect, useState } from "react";
-import { bookService, BookFilterParams } from "@/services/book.service";
-import { Book } from "@/types/book";
+import { bookService } from "@/services/book.service";
+import { Book, BookFilterParams } from "@/types/book";
 import { BookTable } from "./BookTable";
 import { BookFilter } from "./BookFilter";
 import { Button } from "@/components/ui/button";

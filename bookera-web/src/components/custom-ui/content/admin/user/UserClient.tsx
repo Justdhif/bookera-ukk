@@ -4,8 +4,8 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 import { useEffect, useState } from "react";
-import { User } from "@/types/user";
-import { userService, UserFilterParams } from "@/services/user.service";
+import { User, UserFilterParams } from "@/types/user";
+import { userService } from "@/services/user.service";
 import UserTable from "./UserTable";
 import UserFilter from "./UserFilter";
 import { Button } from "@/components/ui/button";

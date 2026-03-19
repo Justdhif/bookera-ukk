@@ -8,7 +8,7 @@ use App\Models\BookCopy;
 
 class BookCopyService
 {
-    public function createBookCopy(Book $book, array $data): BookCopy
+    public function create(Book $book, array $data): BookCopy
     {
         $copy = $book->copies()->create($data);
         $copy->load('book');
@@ -25,7 +25,7 @@ class BookCopyService
         return $copy;
     }
 
-    public function deleteBookCopy(BookCopy $bookCopy): array
+    public function delete(BookCopy $bookCopy): array
     {
         if ($bookCopy->status !== 'available') {
             throw new \Exception('Salinan buku sedang dipinjam dan tidak dapat dihapus');

@@ -18,7 +18,7 @@ class UpdateBookRequest extends FormRequest
             'author' => 'nullable|string',
             'publisher' => 'nullable|string',
             'publication_year' => 'nullable|integer',
-            'isbn' => 'nullable|string|unique:books,isbn,' . $this->book->id,
+            'isbn' => 'nullable|string|unique:books,isbn,'.$this->book->id,
             'description' => 'nullable|string',
             'language' => 'nullable|string|max:50',
             'is_active' => 'nullable|boolean',

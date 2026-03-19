@@ -4,8 +4,8 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 
-import { userService, UpdateUserData } from "@/services/user.service";
-import { User } from "@/types/user";
+import { userService } from "@/services/user.service";
+import { User, UpdateUserData } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, X, Edit } from "lucide-react";
 import { toast } from "sonner";
@@ -38,7 +38,7 @@ export default function UserDetailClient() {
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const res = await userService.showByIdentification(identificationNumber);
+      const res = await userService.getByIdentification(identificationNumber);
       setUser(res.data.data);
       setFormData({
         email: res.data.data.email,

@@ -13,9 +13,9 @@ export const bookReturnService = {
   getByBorrow: (borrowId: number) =>
     api.get<ApiResponse<BookReturn[]>>(`/borrows/${borrowId}/returns`),
 
-  show: (id: number) => api.get<ApiResponse<BookReturn>>(`/book-returns/${id}`),
+  getById: (id: number) => api.get<ApiResponse<BookReturn>>(`/book-returns/${id}`),
 
-  approveReturn: (id: number) =>
+  approve: (id: number) =>
     api.post<ApiResponse<BookReturn>>(`/admin/book-returns/${id}/approve`),
 
   updateConditions: (

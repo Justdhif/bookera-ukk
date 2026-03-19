@@ -14,7 +14,7 @@ class UpdateBookReturnConditionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'conditions'   => 'required|array|min:1',
+            'conditions' => 'required|array|min:1',
             'conditions.*' => 'required|string|in:good,damaged,lost',
         ];
     }
@@ -22,9 +22,9 @@ class UpdateBookReturnConditionsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'conditions.required'   => 'Kondisi buku harus diisi.',
-            'conditions.array'      => 'Format kondisi buku tidak valid.',
-            'conditions.*.in'       => 'Kondisi harus salah satu dari: good, damaged, lost.',
+            'conditions.required' => 'Kondisi buku harus diisi.',
+            'conditions.array' => 'Format kondisi buku tidak valid.',
+            'conditions.*.in' => 'Kondisi harus salah satu dari: good, damaged, lost.',
         ];
     }
 }

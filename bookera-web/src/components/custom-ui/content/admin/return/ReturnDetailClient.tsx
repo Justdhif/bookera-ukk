@@ -36,7 +36,7 @@ export default function ReturnDetailClient() {
   const fetchDetail = async () => {
     try {
       setLoading(true);
-      const res = await bookReturnService.show(returnId);
+      const res = await bookReturnService.getById(returnId);
       const data = res.data.data;
       setBookReturn(data);
 
@@ -98,7 +98,7 @@ export default function ReturnDetailClient() {
     if (!bookReturn) return;
     setFinishingBorrow(true);
     try {
-      await bookReturnService.approveReturn(bookReturn.id);
+      await bookReturnService.approve(bookReturn.id);
       toast.success("Borrow closed successfully");
       router.push("/admin/returns");
     } catch (error: any) {

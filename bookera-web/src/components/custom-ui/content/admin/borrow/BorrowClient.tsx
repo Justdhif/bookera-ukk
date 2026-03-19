@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { borrowService, BorrowFilterParams } from "@/services/borrow.service";
+import { borrowService } from "@/services/borrow.service";
 import { borrowRequestService } from "@/services/borrow-request.service";
-import { Borrow } from "@/types/borrow";
+import { Borrow, BorrowFilterParams } from "@/types/borrow";
 import { BorrowRequest } from "@/types/borrow-request";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -140,7 +140,7 @@ export default function BorrowClient() {
   const confirmDeleteRequest = async () => {
     if (!deleteId) return;
     try {
-      await borrowRequestService.destroy(deleteId);
+      await borrowRequestService.delete(deleteId);
       toast.success(t("deleteRequestSuccess"));
       setDeleteId(null);
       fetchRequests(requestFilters);

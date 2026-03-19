@@ -42,7 +42,7 @@ export default function SaveDetailClient({
 
   const fetchSave = async () => {
     try {
-      const res = await saveService.getOne(saveIdentifier);
+      const res = await saveService.getByIdentifier(saveIdentifier);
       setSave(res.data.data);
     } catch (error) {
       toast.error(t("detail.failedToLoad"));
@@ -68,7 +68,7 @@ export default function SaveDetailClient({
     setLoadingCopies(true);
     try {
       const booksData = await Promise.all(
-        save.books.map((book) => bookService.show(book.id)),
+        save.books.map((book) => bookService.getById(book.id)),
       );
       setBooksWithCopies(booksData.map((res) => res.data.data));
       setShowBorrowDialog(true);

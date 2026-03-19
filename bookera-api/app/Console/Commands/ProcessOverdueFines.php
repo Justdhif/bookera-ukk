@@ -7,9 +7,9 @@ use App\Helpers\ActivityLogger;
 use App\Models\Borrow;
 use App\Models\Fine;
 use App\Models\FineType;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class ProcessOverdueFines extends Command
 {
@@ -30,8 +30,9 @@ class ProcessOverdueFines extends Command
     {
         $lateFineType = FineType::where('type', 'late')->first();
 
-        if (!$lateFineType) {
+        if (! $lateFineType) {
             $this->warn('Late fine type not found. Skipping overdue processing.');
+
             return Command::FAILURE;
         }
 
@@ -48,6 +49,7 @@ class ProcessOverdueFines extends Command
 
         if ($overdueBorrows->isEmpty()) {
             $this->info('No overdue borrows found without late fines.');
+
             return Command::SUCCESS;
         }
 
@@ -62,11 +64,11 @@ class ProcessOverdueFines extends Command
                     $totalAmount = $lateFineType->amount * max(1, $daysLate);
 
                     $fine = Fine::create([
-                        'borrow_id'    => $borrow->id,
+                        'borrow_id' => $borrow->id,
                         'fine_type_id' => $lateFineType->id,
-                        'amount'       => $totalAmount,
-                        'status'       => 'unpaid',
-                        'notes'        => "Denda keterlambatan {$daysLate} hari (due: {$borrow->return_date})",
+                        'amount' => $totalAmount,
+                        'status' => 'unpaid',
+                        'notes' => "Denda keterlambatan {$daysLate} hari (due: {$borrow->return_date})",
                     ]);
 
                     ActivityLogger::log(
@@ -74,10 +76,10 @@ class ProcessOverdueFines extends Command
                         'fine',
                         "Late fine auto-created for overdue borrow #{$borrow->id} ({$daysLate} days late)",
                         [
-                            'fine_id'    => $fine->id,
-                            'borrow_id'  => $borrow->id,
-                            'days_late'  => $daysLate,
-                            'amount'     => $totalAmount,
+                            'fine_id' => $fine->id,
+                            'borrow_id' => $borrow->id,
+                            'days_late' => $daysLate,
+                            'amount' => $totalAmount,
                         ],
                         null,
                         $fine
@@ -95,6 +97,7 @@ class ProcessOverdueFines extends Command
         }
 
         $this->info("Processed {$processedCount} overdue borrow(s) with late fines.");
+
         return Command::SUCCESS;
     }
 }

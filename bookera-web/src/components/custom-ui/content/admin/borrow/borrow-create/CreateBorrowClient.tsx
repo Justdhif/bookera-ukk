@@ -123,12 +123,12 @@ export default function CreateBorrowClient() {
 
     try {
       setLoading(true);
-      const response = await borrowService.createAdminBorrow({
+      const response = await borrowService.create({
         user_id: selectedUserId,
         book_copy_ids: selectedCopyIds,
         borrow_date: borrowDate.toISOString().split("T")[0],
         return_date: returnDate.toISOString().split("T")[0],
-      });
+      }, true);
 
       toast.success(response.data.message || "Borrow created successfully");
       router.push("/admin/borrows");

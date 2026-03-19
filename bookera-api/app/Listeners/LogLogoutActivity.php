@@ -2,9 +2,9 @@
 
 namespace App\Listeners;
 
-use Illuminate\Auth\Events\Logout;
 use App\Helpers\ActivityLogger;
 use App\Models\ActivityLog;
+use Illuminate\Auth\Events\Logout;
 
 class LogLogoutActivity
 {

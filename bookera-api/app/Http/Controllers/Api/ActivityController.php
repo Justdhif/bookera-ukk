@@ -42,4 +42,3 @@ class ActivityController extends Controller
         return ApiResponse::successResponse('Activity log detail retrieved successfully', $activityLog);
     }
 }
-

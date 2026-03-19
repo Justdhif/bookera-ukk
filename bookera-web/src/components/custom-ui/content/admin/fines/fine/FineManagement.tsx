@@ -2,8 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { Fine, FineType } from "@/types/fine";
-import { fineService, fineTypeService, FineFilterParams } from "@/services/fine.service";
+import { Fine, FineType, FineFilterParams } from "@/types/fine";
+import { fineService, fineTypeService } from "@/services/fine.service";
 import FineTable from "./FineTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

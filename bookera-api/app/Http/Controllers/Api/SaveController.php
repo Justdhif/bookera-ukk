@@ -23,21 +23,21 @@ class SaveController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $saves = $this->saveService->getUserSaves($request->search, $request->per_page ?? 10);
+        $saves = $this->saveService->getAll($request->search, $request->per_page ?? 10);
 
         return ApiResponse::successResponse('Data simpanan berhasil diambil', $saves);
     }
 
     public function show(string $identifier): JsonResponse
     {
-        $data = $this->saveService->getSaveByIdentifier($identifier);
+        $data = $this->saveService->getByIdentifier($identifier);
 
         return ApiResponse::successResponse('Detail simpanan berhasil diambil', $data);
     }
 
     public function store(StoreSaveRequest $request): JsonResponse
     {
-        $save = $this->saveService->createSave($request->validated());
+        $save = $this->saveService->create($request->validated());
 
         return ApiResponse::successResponse('Simpanan berhasil dibuat', $save, 201);
     }
@@ -46,7 +46,7 @@ class SaveController extends Controller
     {
         $save = Save::where('user_id', auth()->id())->findOrFail($id);
 
-        $save = $this->saveService->updateSave($save, $request->validated());
+        $save = $this->saveService->update($save, $request->validated());
 
         return ApiResponse::successResponse('Simpanan berhasil diperbarui', $save);
     }
@@ -55,7 +55,7 @@ class SaveController extends Controller
     {
         $save = Save::where('user_id', auth()->id())->findOrFail($id);
 
-        $this->saveService->deleteSave($save);
+        $this->saveService->delete($save);
 
         return ApiResponse::successResponse('Simpanan berhasil dihapus', null);
     }

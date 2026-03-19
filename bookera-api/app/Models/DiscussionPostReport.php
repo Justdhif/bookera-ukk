@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property int $post_id
  * @property string $reason
  * @property string|null $description
- * @property string $status  pending|reviewed|dismissed
+ * @property string $status pending|reviewed|dismissed
  * @property int|null $reviewed_by
  * @property \Illuminate\Support\Carbon|null $reviewed_at
  * @property string|null $admin_note

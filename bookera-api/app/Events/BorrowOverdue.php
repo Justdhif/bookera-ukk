@@ -15,18 +15,19 @@ class BorrowOverdue implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public Borrow $borrow;
+
     public Fine $fine;
 
     public function __construct(Borrow $borrow, Fine $fine)
     {
         $this->borrow = $borrow;
-        $this->fine   = $fine;
+        $this->fine = $fine;
     }
 
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('user.' . $this->borrow->user_id),
+            new PrivateChannel('user.'.$this->borrow->user_id),
         ];
     }
 
@@ -37,21 +38,21 @@ class BorrowOverdue implements ShouldBroadcastNow
 
     public function broadcastWith(): array
     {
-        $amount    = number_format($this->fine->amount, 0, ',', '.');
-        $dueDate   = $this->borrow->return_date;
+        $amount = number_format($this->fine->amount, 0, ',', '.');
+        $dueDate = $this->borrow->return_date;
         $bookTitles = $this->borrow->borrowDetails
-            ->map(fn($detail) => $detail->bookCopy->book->title ?? 'Unknown')
+            ->map(fn ($detail) => $detail->bookCopy->book->title ?? 'Unknown')
             ->take(2)
             ->implode(', ');
 
         return [
-            'borrow_id'   => $this->borrow->id,
+            'borrow_id' => $this->borrow->id,
             'borrow_code' => $this->borrow->borrow_code,
-            'fine_id'     => $this->fine->id,
-            'amount'      => $this->fine->amount,
-            'due_date'    => $dueDate,
-            'message'     => "Peminjaman buku \"{$bookTitles}\" telah melewati batas waktu pengembalian ({$dueDate}). Denda keterlambatan sebesar Rp {$amount} telah diterapkan.",
-            'type'        => 'borrow_overdue',
+            'fine_id' => $this->fine->id,
+            'amount' => $this->fine->amount,
+            'due_date' => $dueDate,
+            'message' => "Peminjaman buku \"{$bookTitles}\" telah melewati batas waktu pengembalian ({$dueDate}). Denda keterlambatan sebesar Rp {$amount} telah diterapkan.",
+            'type' => 'borrow_overdue',
         ];
     }
 }

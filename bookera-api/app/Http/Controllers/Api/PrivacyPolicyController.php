@@ -21,7 +21,7 @@ class PrivacyPolicyController extends Controller
 
     public function index(): JsonResponse
     {
-        $privacyPolicies = $this->privacyPolicyService->getAllPrivacyPolicies();
+        $privacyPolicies = $this->privacyPolicyService->getAll();
 
         return ApiResponse::successResponse('Data Privacy Policy berhasil diambil', $privacyPolicies);
     }
@@ -33,21 +33,21 @@ class PrivacyPolicyController extends Controller
 
     public function store(StorePrivacyPolicyRequest $request): JsonResponse
     {
-        $privacyPolicy = $this->privacyPolicyService->createPrivacyPolicy($request->validated());
+        $privacyPolicy = $this->privacyPolicyService->create($request->validated());
 
         return ApiResponse::successResponse('Privacy Policy berhasil ditambahkan', $privacyPolicy, 201);
     }
 
     public function update(UpdatePrivacyPolicyRequest $request, PrivacyPolicy $privacyPolicy): JsonResponse
     {
-        $privacyPolicy = $this->privacyPolicyService->updatePrivacyPolicy($privacyPolicy, $request->validated());
+        $privacyPolicy = $this->privacyPolicyService->update($privacyPolicy, $request->validated());
 
         return ApiResponse::successResponse('Privacy Policy berhasil diperbarui', $privacyPolicy);
     }
 
     public function destroy(PrivacyPolicy $privacyPolicy): JsonResponse
     {
-        $this->privacyPolicyService->deletePrivacyPolicy($privacyPolicy);
+        $this->privacyPolicyService->delete($privacyPolicy);
 
         return ApiResponse::successResponse('Privacy Policy berhasil dihapus');
     }

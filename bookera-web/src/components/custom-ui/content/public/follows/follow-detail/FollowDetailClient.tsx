@@ -114,17 +114,11 @@ export default function FollowDetailClient({ type }: FollowDetailClientProps) {
           {/* Photo */}
           <div className="shrink-0">
             <div className="w-40 h-40 lg:w-48 lg:h-48 rounded-full overflow-hidden shadow-lg ring-4 ring-border">
-              {detail.photo_url ? (
-                <img
-                  src={detail.photo_url}
-                  alt={detail.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-muted flex items-center justify-center">
-                  <Icon className="h-20 w-20 text-muted-foreground/30" />
-                </div>
-              )}
+              <img
+                src={detail.photo}
+                alt={detail.name}
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
 

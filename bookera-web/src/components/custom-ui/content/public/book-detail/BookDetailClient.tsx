@@ -31,7 +31,7 @@ export default function BookDetailClient() {
   const fetchBook = async () => {
     try {
       setLoading(true);
-      const res = await bookService.showBySlug(slug);
+      const res = await bookService.getBySlug(slug);
       setBook(res.data.data);
     } catch (error) {
       console.error("Error fetching book details:", error);
@@ -129,9 +129,9 @@ export default function BookDetailClient() {
                 </CardHeader>
                 <CardContent className="space-y-4 pt-0">
                   <div className="relative w-full rounded-xl overflow-hidden aspect-3/4">
-                    {book.cover_image_url ? (
+                    {book.cover_image ? (
                       <img
-                        src={book.cover_image_url}
+                        src={book.cover_image}
                         alt={book.title}
                         className="w-full h-full object-cover"
                       />
@@ -208,13 +208,7 @@ export default function BookDetailClient() {
                         return (
                           <div key={author.id} className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
-                              {author.photo_url ? (
-                                <img src={author.photo_url} alt={author.name} className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full bg-muted flex items-center justify-center text-xs font-medium">
-                                  {author.name.charAt(0)}
-                                </div>
-                              )}
+                              <img src={author.photo} alt={author.name} className="w-full h-full object-cover" />
                             </div>
                             <span className="flex-1 text-sm font-medium">{author.name}</span>
                             {isAuthenticated && (
@@ -255,13 +249,7 @@ export default function BookDetailClient() {
                         return (
                           <div key={publisher.id} className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
-                              {publisher.photo_url ? (
-                                <img src={publisher.photo_url} alt={publisher.name} className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full bg-muted flex items-center justify-center text-xs font-medium">
-                                  {publisher.name.charAt(0)}
-                                </div>
-                              )}
+                              <img src={publisher.photo} alt={publisher.name} className="w-full h-full object-cover" />
                             </div>
                             <span className="flex-1 text-sm font-medium">{publisher.name}</span>
                             {isAuthenticated && (

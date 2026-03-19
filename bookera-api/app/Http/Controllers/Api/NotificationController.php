@@ -20,7 +20,7 @@ class NotificationController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $notifications = $this->notificationService->getUserNotifications(
+        $notifications = $this->notificationService->getAll(
             $request->user(),
             $request->get('filter'),
             $request->get('per_page', 15),
@@ -33,7 +33,7 @@ class NotificationController extends Controller
     public function show(Request $request, Notification $notification): JsonResponse
     {
         try {
-            $notification = $this->notificationService->getNotificationById($request->user(), $notification);
+            $notification = $this->notificationService->getById($request->user(), $notification);
 
             return ApiResponse::successResponse('Notification retrieved successfully', $notification);
         } catch (\Exception $e) {
@@ -54,14 +54,20 @@ class NotificationController extends Controller
 
     public function markAllAsRead(Request $request): JsonResponse
     {
-        $updated = $this->notificationService->markAllAsRead($request->user());
+        $updated = $this->notificationService->markAllAsRead(
+            $request->user(),
+            $request->get('module')
+        );
 
         return ApiResponse::successResponse('All notifications marked as read', ['updated_count' => $updated]);
     }
 
     public function unreadCount(Request $request): JsonResponse
     {
-        $count = $this->notificationService->getUnreadCount($request->user());
+        $count = $this->notificationService->getUnreadCount(
+            $request->user(),
+            $request->get('module')
+        );
 
         return ApiResponse::successResponse('Unread count retrieved successfully', ['unread_count' => $count]);
     }
@@ -69,7 +75,7 @@ class NotificationController extends Controller
     public function destroy(Request $request, Notification $notification): JsonResponse
     {
         try {
-            $this->notificationService->deleteNotification($request->user(), $notification);
+            $this->notificationService->delete($request->user(), $notification);
 
             return ApiResponse::successResponse('Notification deleted successfully', null);
         } catch (\Exception $e) {
@@ -79,9 +85,11 @@ class NotificationController extends Controller
 
     public function deleteAllRead(Request $request): JsonResponse
     {
-        $deleted = $this->notificationService->deleteAllRead($request->user());
+        $deleted = $this->notificationService->deleteAllRead(
+            $request->user(),
+            $request->get('module')
+        );
 
         return ApiResponse::successResponse('All read notifications deleted', ['deleted_count' => $deleted]);
     }
 }
-

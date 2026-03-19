@@ -14,11 +14,11 @@ class StoreAdminBorrowRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id'         => 'required|integer|exists:users,id',
-            'book_copy_ids'   => 'required|array|min:1',
+            'user_id' => 'required|integer|exists:users,id',
+            'book_copy_ids' => 'required|array|min:1',
             'book_copy_ids.*' => 'required|integer|exists:book_copies,id',
-            'borrow_date'     => 'required|date|after_or_equal:today',
-            'return_date'     => 'required|date|after:borrow_date',
+            'borrow_date' => 'required|date|after_or_equal:today',
+            'return_date' => 'required|date|after:borrow_date',
         ];
     }
 }

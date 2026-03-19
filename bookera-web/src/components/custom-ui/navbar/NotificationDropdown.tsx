@@ -67,7 +67,7 @@ export default function NotificationDropdown({
     if (!isAuthenticated) return;
     setIsLoading(true);
     try {
-      const response = await notificationService.getNotifications({ per_page: 5 });
+      const response = await notificationService.getAll({ per_page: 5 });
       setNotifications(response.data.data.data);
     } catch (error) {
       console.error("Failed to fetch notifications:", error);

@@ -218,9 +218,9 @@ export default function AddBooksToCollectionDialog({
                         className="mt-0.5 shrink-0"
                       />
                       <div className="w-9 h-12 shrink-0 rounded overflow-hidden bg-muted">
-                        {book.cover_image_url ? (
+                        {book.cover_image ? (
                           <img
-                            src={book.cover_image_url}
+                            src={book.cover_image}
                             alt={book.title}
                             className="w-full h-full object-cover"
                           />

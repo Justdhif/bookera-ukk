@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class FineService
 {
-    public function getAllFines(array $filters = []): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
         $query = Fine::with(['borrow.user.profile', 'fineType']);
 
@@ -60,7 +60,7 @@ class FineService
             ->get();
     }
 
-    public function createFine(Borrow $borrow, array $data): Fine
+    public function create(Borrow $borrow, array $data): Fine
     {
         $fineType = FineType::findOrFail($data['fine_type_id']);
 
@@ -94,7 +94,7 @@ class FineService
         });
     }
 
-    public function updateFine(Fine $fine, array $data): Fine
+    public function update(Fine $fine, array $data): Fine
     {
         $oldData = $fine->toArray();
         $fine->update($data);
@@ -163,14 +163,14 @@ class FineService
         return $fine->load(['borrow.user.profile', 'fineType']);
     }
 
-    public function deleteFine(Fine $fine): void
+    public function delete(Fine $fine): void
     {
         ActivityLogger::log(
             'delete',
             'fine',
             "Fine #{$fine->id} deleted",
             [
-                    'fine_id'   => $fine->id,
+                'fine_id'   => $fine->id,
                 'borrow_id' => $fine->borrow_id,
                 'fine_type' => $fine->fineType->name ?? 'Unknown',
                 'amount' => $fine->amount,

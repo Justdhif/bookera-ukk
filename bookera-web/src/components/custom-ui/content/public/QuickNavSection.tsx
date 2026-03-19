@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { BookOpen, DollarSign, MessageSquare } from "lucide-react";
+import { BookOpen, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 function SlashLines({ color }: { color: string }) {
@@ -137,21 +137,6 @@ const navItems = [
     labelCls: "text-rose-900 dark:text-rose-100",
     bgLight: "linear-gradient(150deg,#ffe4e6 0%,#fda4af 50%,#fb7185 100%)",
     bgDark: "linear-gradient(150deg,#220008 0%,#3a000f 50%,#4e0015 100%)",
-  },
-  {
-    label: "Discussion",
-    href: "/discussion",
-    Icon: MessageSquare,
-    iconGradient: "bg-linear-to-br from-violet-500 to-purple-600",
-    borderCls: "border-violet-500/40 hover:border-violet-500/70",
-    hoverBg: "hover:bg-violet-500/10",
-    glowCls: "from-violet-500/30",
-    orbColor: "rgba(139,92,246,0.30)",
-    corakColor: "rgba(109,40,217,1)",
-    accentLine: "from-violet-500/50",
-    labelCls: "text-violet-900 dark:text-violet-100",
-    bgLight: "linear-gradient(150deg,#ede9fe 0%,#c4b5fd 50%,#a78bfa 100%)",
-    bgDark: "linear-gradient(150deg,#0f061e 0%,#1e0f44 50%,#2d185c 100%)",
   },
 ];
 

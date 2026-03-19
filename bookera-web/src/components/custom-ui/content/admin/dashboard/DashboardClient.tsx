@@ -28,10 +28,10 @@ export default function DashboardClient() {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      dashboardService.totals(),
-      dashboardService.loanMonthlyChart(),
-      dashboardService.loanStatusChart(),
-      dashboardService.latestBorrows(),
+      dashboardService.getTotals(),
+      dashboardService.getLoanMonthlyChart(),
+      dashboardService.getLoanStatusChart(),
+      dashboardService.getLatestBorrows(),
     ])
       .then(([totalsRes, monthlyRes, statusRes, latestRes]) => {
         setTotals(totalsRes.data.data);

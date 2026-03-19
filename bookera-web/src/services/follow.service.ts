@@ -8,23 +8,18 @@ import {
   FollowableDetail,
   UserFollowRecord,
 } from "@/types/follow";
-import { FollowCounts } from "@/types/discussion";
+import { FollowCounts } from "@/types/follow";
 import { User } from "@/types/user";
 
 export const followService = {
-  // ── Author / Publisher ──────────────────────────────────────────────────────
-
   getFollowedAuthors: () =>
     api.get<ApiResponse<FollowedAuthor[]>>("/follows/authors"),
 
   getFollowedPublishers: () =>
     api.get<ApiResponse<FollowedPublisher[]>>("/follows/publishers"),
 
-  /** Unified detail for author OR publisher */
   getFollowableDetail: (type: "author" | "publisher", slug: string) =>
     api.get<ApiResponse<FollowableDetail>>(`/follows/${type}s/${slug}`),
-
-  // ── User ────────────────────────────────────────────────────────────────────
 
   getFollowedUsers: () =>
     api.get<ApiResponse<FollowedUser[]>>("/follows/users"),
@@ -46,8 +41,6 @@ export const followService = {
 
   getUserPublicProfile: (userId: number) =>
     api.get<ApiResponse<User>>(`/users/${userId}/profile`),
-
-  // ── Generic (all types) ─────────────────────────────────────────────────────
 
   follow: (type: FollowableType, id: number) =>
     api.post<ApiResponse<{ follow_id: number }>>("/follows", { type, id }),

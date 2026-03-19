@@ -62,19 +62,13 @@ export default function AuthorTable({
             <TableCell className="text-center">
               <div className="flex justify-center">
                 <div className="h-10 w-10 rounded-full overflow-hidden bg-muted ring-2 ring-muted">
-                  {item.photo_url ? (
                     <Image
-                      src={item.photo_url}
+                      src={item.photo}
                       alt={item.name}
                       width={40}
                       height={40}
                       className="h-full w-full object-cover"
                     />
-                  ) : (
-                    <div className="h-full w-full flex items-center justify-center bg-primary/10">
-                      <UserSquare className="h-5 w-5 text-primary" />
-                    </div>
-                  )}
                 </div>
               </div>
             </TableCell>

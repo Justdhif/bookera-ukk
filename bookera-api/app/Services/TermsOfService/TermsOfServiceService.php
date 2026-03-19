@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Collection;
 
 class TermsOfServiceService
 {
-    public function getAllTermsOfServices(): Collection
+    public function getAll(): Collection
     {
         return TermsOfService::orderBy('created_at', 'desc')->get();
     }
 
-    public function createTermsOfService(array $data): TermsOfService
+    public function create(array $data): TermsOfService
     {
         $termsOfService = TermsOfService::create($data);
 
@@ -29,7 +29,7 @@ class TermsOfServiceService
         return $termsOfService;
     }
 
-    public function updateTermsOfService(TermsOfService $termsOfService, array $data): TermsOfService
+    public function update(TermsOfService $termsOfService, array $data): TermsOfService
     {
         $oldData = $termsOfService->toArray();
 
@@ -47,7 +47,7 @@ class TermsOfServiceService
         return $termsOfService;
     }
 
-    public function deleteTermsOfService(TermsOfService $termsOfService): void
+    public function delete(TermsOfService $termsOfService): void
     {
         $oldData = $termsOfService->toArray();
 

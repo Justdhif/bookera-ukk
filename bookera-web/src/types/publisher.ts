@@ -6,10 +6,30 @@ export interface Publisher {
   name: string;
   description?: string;
   photo: string;
-  photo_url?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export type PublisherListResponse = PaginatedResponse<Publisher>;
+
+export interface CreatePublisherData {
+  name: string;
+  description?: string;
+  photo?: File | null;
+  is_active?: boolean;
+}
+
+export interface UpdatePublisherData {
+  name: string;
+  description?: string;
+  photo?: File | null;
+  is_active?: boolean;
+}
+
+export interface PublisherFilterParams {
+  search?: string;
+  is_active?: boolean;
+  per_page?: number;
+  page?: number;
+}

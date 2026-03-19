@@ -90,7 +90,7 @@ export default function SaveBookList({
 
               <div className="relative">
                 <img
-                  src={book.cover_image_url || "/placeholder-book.png"}
+                  src={book.cover_image || "/placeholder-book.png"}
                   alt={book.title}
                   className="aspect-3/4 object-cover rounded w-full"
                 />
@@ -173,9 +173,9 @@ export default function SaveBookList({
                   </div>
 
                   <div className="w-12 h-16 shrink-0 relative overflow-hidden rounded">
-                    {book.cover_image_url ? (
+                    {book.cover_image ? (
                       <img
-                        src={book.cover_image_url}
+                        src={book.cover_image}
                         alt={book.title}
                         className="w-full h-full object-cover"
                       />

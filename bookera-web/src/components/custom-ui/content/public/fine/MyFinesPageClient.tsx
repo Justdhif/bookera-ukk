@@ -23,7 +23,7 @@ export default function MyFinesPageClient() {
   const fetchFines = async () => {
     setLoading(true);
     try {
-      const response = await fineService.getMyFines();
+      const response = await fineService.getByUser();
       setFines(response.data.data);
     } catch (error) {
       console.error("Failed to fetch fines:", error);

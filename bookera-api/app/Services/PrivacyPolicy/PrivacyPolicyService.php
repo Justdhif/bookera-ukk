@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Collection;
 
 class PrivacyPolicyService
 {
-    public function getAllPrivacyPolicies(): Collection
+    public function getAll(): Collection
     {
         return PrivacyPolicy::orderBy('created_at', 'desc')->get();
     }
 
-    public function createPrivacyPolicy(array $data): PrivacyPolicy
+    public function create(array $data): PrivacyPolicy
     {
         $privacyPolicy = PrivacyPolicy::create($data);
 
@@ -29,7 +29,7 @@ class PrivacyPolicyService
         return $privacyPolicy;
     }
 
-    public function updatePrivacyPolicy(PrivacyPolicy $privacyPolicy, array $data): PrivacyPolicy
+    public function update(PrivacyPolicy $privacyPolicy, array $data): PrivacyPolicy
     {
         $oldData = $privacyPolicy->toArray();
 
@@ -47,7 +47,7 @@ class PrivacyPolicyService
         return $privacyPolicy;
     }
 
-    public function deletePrivacyPolicy(PrivacyPolicy $privacyPolicy): void
+    public function delete(PrivacyPolicy $privacyPolicy): void
     {
         $oldData = $privacyPolicy->toArray();
 

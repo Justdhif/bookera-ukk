@@ -1,13 +1,10 @@
 import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
-import { LostBook, LostBookListResponse } from "@/types/lost-book";
-
-export interface LostBookFilterParams {
-  search?: string;
-  borrow_status?: string;
-  per_page?: number;
-  page?: number;
-}
+import {
+  LostBook,
+  LostBookListResponse,
+  LostBookFilterParams,
+} from "@/types/lost-book";
 
 export const lostBookService = {
   getAll: (filters?: LostBookFilterParams) =>
@@ -15,18 +12,17 @@ export const lostBookService = {
       params: filters,
     }),
 
-  show: (id: number) =>
+  getById: (id: number) =>
     api.get<ApiResponse<LostBook>>(`/admin/lost-books/${id}`),
 
-  report: (
+  create: (
     borrowId: number,
     data: {
       book_copy_id: number;
       notes?: string;
       estimated_lost_date?: string;
     },
-  ) =>
-    api.post<ApiResponse<LostBook>>(`/borrows/${borrowId}/report-lost`, data),
+  ) => api.post<ApiResponse<LostBook>>(`/borrows/${borrowId}/report-lost`, data),
 
   update: (
     id: number,

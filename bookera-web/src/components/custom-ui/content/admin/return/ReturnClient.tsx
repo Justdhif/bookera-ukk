@@ -2,8 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { borrowService, BorrowFilterParams } from "@/services/borrow.service";
-import { Borrow } from "@/types/borrow";
+import { borrowService } from "@/services/borrow.service";
+import { Borrow, BorrowFilterParams } from "@/types/borrow";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PackageCheck, Search } from "lucide-react";

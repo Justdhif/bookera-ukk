@@ -29,14 +29,14 @@ class UserController extends Controller
             'per_page' => $request->per_page,
         ];
 
-        $users = $this->userService->getUsers($filters);
+        $users = $this->userService->getAll($filters);
 
         return ApiResponse::successResponse('Data user berhasil diambil', $users);
     }
 
     public function show(User $user): JsonResponse
     {
-        $user = $this->userService->getUserById($user);
+        $user = $this->userService->getById($user);
 
         return ApiResponse::successResponse('Detail user', $user);
     }
@@ -44,7 +44,7 @@ class UserController extends Controller
     public function showByIdentification(string $identificationNumber): JsonResponse
     {
         try {
-            $user = $this->userService->getUserByIdentificationNumber($identificationNumber);
+            $user = $this->userService->getByIdentificationNumber($identificationNumber);
 
             return ApiResponse::successResponse('Detail user', $user);
         } catch (\Exception $e) {
@@ -63,7 +63,7 @@ class UserController extends Controller
                 $data['avatar'] = $request->avatar;
             }
 
-            $user = $this->userService->createUser($data);
+            $user = $this->userService->create($data);
 
             return ApiResponse::successResponse('User berhasil dibuat', $user, 201);
         } catch (\Exception $e) {
@@ -82,7 +82,7 @@ class UserController extends Controller
                 $data['avatar'] = $request->avatar;
             }
 
-            $user = $this->userService->updateUser($user, $data);
+            $user = $this->userService->update($user, $data);
 
             return ApiResponse::successResponse('User berhasil diupdate', $user);
         } catch (\Exception $e) {
@@ -93,13 +93,11 @@ class UserController extends Controller
     public function destroy(User $user): JsonResponse
     {
         try {
-            $this->userService->deleteUser($user);
+            $this->userService->delete($user);
 
             return ApiResponse::successResponse('User berhasil dihapus', null);
         } catch (\Exception $e) {
             return ApiResponse::errorResponse('Gagal menghapus user: ' . $e->getMessage(), null, 500);
         }
     }
-
 }
-

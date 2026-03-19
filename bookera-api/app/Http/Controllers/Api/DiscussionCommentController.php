@@ -20,7 +20,7 @@ class DiscussionCommentController extends Controller
     {
         try {
             $post     = DiscussionPost::where('slug', $slug)->firstOrFail();
-            $comments = $this->commentService->getComments($post, (int) $request->get('per_page', 20));
+            $comments = $this->commentService->getAll($post, (int) $request->get('per_page', 20));
             return ApiResponse::successResponse('Comments retrieved successfully', $comments);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Post not found');
@@ -40,7 +40,7 @@ class DiscussionCommentController extends Controller
             $user = $request->user();
 
             $post    = DiscussionPost::where('slug', $slug)->firstOrFail();
-            $comment = $this->commentService->addComment(
+            $comment = $this->commentService->create(
                 $user,
                 $post,
                 $request->input('content'),
@@ -60,7 +60,7 @@ class DiscussionCommentController extends Controller
             /** @var \App\Models\User $user */
             $user = $request->user();
 
-            $updated = $this->commentService->updateComment($user, $comment, $request->input('content'));
+            $updated = $this->commentService->update($user, $comment, $request->input('content'));
             return ApiResponse::successResponse('Comment updated successfully', $updated);
         } catch (\Exception $e) {
             $code = $e->getCode() >= 400 ? $e->getCode() : 403;
@@ -74,7 +74,7 @@ class DiscussionCommentController extends Controller
             /** @var \App\Models\User $user */
             $user = $request->user();
 
-            $this->commentService->deleteComment($user, $comment);
+            $this->commentService->delete($user, $comment);
             return ApiResponse::successResponse('Comment deleted successfully');
         } catch (\Exception $e) {
             $code = $e->getCode() >= 400 ? $e->getCode() : 403;

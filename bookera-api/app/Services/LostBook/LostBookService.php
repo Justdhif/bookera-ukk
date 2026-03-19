@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class LostBookService
 {
-    public function getAllLostBooks(array $filters = []): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
         $query = LostBook::with([
             'borrow.user.profile',
@@ -41,7 +41,7 @@ class LostBookService
         return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
-    public function reportLostBook(Borrow $borrow, array $data): LostBook
+    public function create(Borrow $borrow, array $data): LostBook
     {
         return DB::transaction(function () use ($borrow, $data) {
             $lostBook = LostBook::create([
@@ -144,7 +144,7 @@ class LostBookService
         event(new \App\Events\FineCreated($fine));
     }
 
-    public function updateLostBook(LostBook $lostBook, array $data): LostBook
+    public function update(LostBook $lostBook, array $data): LostBook
     {
         $lostBook->update($data);
 
@@ -164,7 +164,7 @@ class LostBookService
         return $lostBook->load(['borrow.user.profile', 'bookCopy.book']);
     }
 
-    public function deleteLostBook(LostBook $lostBook): void
+    public function delete(LostBook $lostBook): void
     {
         $bookCopy = $lostBook->bookCopy;
 

@@ -95,7 +95,6 @@ export default function LostBooksTable({
         const borrowerName = borrow?.user?.profile?.full_name || "-";
         const borrowerEmail = borrow?.user?.email || "-";
         const borrowCode = borrow?.borrow_code;
-        const avatarUrl = (borrow?.user?.profile as any)?.avatar;
 
         return (
           <div
@@ -105,7 +104,7 @@ export default function LostBooksTable({
             {/* Borrow Parent Info */}
             <div className="bg-muted/40 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b">
               <div className="flex items-center gap-2.5">
-                <UserAvatar name={borrowerName} avatar={avatarUrl} />
+                <UserAvatar name={borrowerName} avatar={borrow?.user?.profile?.avatar} />
                 <div>
                   <div className="text-sm font-semibold text-foreground leading-tight">
                     {borrowerName}

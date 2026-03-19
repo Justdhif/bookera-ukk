@@ -2,10 +2,9 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { LostBook } from "@/types/lost-book";
+import { LostBook, LostBookFilterParams } from "@/types/lost-book";
 import {
   lostBookService,
-  LostBookFilterParams,
 } from "@/services/lost-book.service";
 import LostBooksTable from "./LostBooksTable";
 import { Input } from "@/components/ui/input";

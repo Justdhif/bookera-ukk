@@ -32,14 +32,14 @@ class BorrowController extends Controller
             'per_page' => $request->per_page,
         ];
 
-        $borrows = $this->borrowService->getBorrows($filters);
+        $borrows = $this->borrowService->getAll($filters);
 
         return ApiResponse::successResponse('Data peminjaman berhasil diambil', $borrows);
     }
 
     public function store(StoreBorrowRequest $request): JsonResponse
     {
-        $borrow = $this->borrowService->createBorrow(
+        $borrow = $this->borrowService->create(
             $request->validated(),
             $request->user()
         );
@@ -53,7 +53,7 @@ class BorrowController extends Controller
 
     public function storeAdminBorrow(StoreAdminBorrowRequest $request): JsonResponse
     {
-        $borrow = $this->borrowService->createAdminBorrow(
+        $borrow = $this->borrowService->createAdmin(
             $request->validated(),
             $request->user()
         );
@@ -67,28 +67,28 @@ class BorrowController extends Controller
 
     public function show(Borrow $borrow): JsonResponse
     {
-        $borrow = $this->borrowService->getBorrowById($borrow);
+        $borrow = $this->borrowService->getById($borrow);
 
         return ApiResponse::successResponse('Detail peminjaman', $borrow);
     }
 
     public function showByCode(string $code): JsonResponse
     {
-        $borrow = $this->borrowService->getBorrowByCode($code);
+        $borrow = $this->borrowService->getByCode($code);
 
         return ApiResponse::successResponse('Detail peminjaman', $borrow);
     }
 
     public function update(UpdateBorrowRequest $request, Borrow $borrow): JsonResponse
     {
-        $borrow = $this->borrowService->updateBorrow($borrow, $request->validated());
+        $borrow = $this->borrowService->update($borrow, $request->validated());
 
         return ApiResponse::successResponse('Peminjaman berhasil diupdate', $borrow);
     }
 
     public function getBorrowByUser(Request $request): JsonResponse
     {
-        $borrows = $this->borrowService->getBorrowsByUser($request->user());
+        $borrows = $this->borrowService->getByUser($request->user());
 
         return ApiResponse::successResponse('Data peminjaman user', $borrows);
     }

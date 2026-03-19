@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Publisher } from "@/types/publisher";
-import { publisherService, UpdatePublisherData } from "@/services/publisher.service";
+import { Publisher, UpdatePublisherData } from "@/types/publisher";
+import { publisherService } from "@/services/publisher.service";
 import { toast } from "sonner";
 import { Edit, FileWarning, Save, Upload, X, Trash, Eye } from "lucide-react";
 import Image from "next/image";
@@ -54,7 +54,7 @@ export default function PublisherDetailDialog({
         is_active: publisher.is_active,
         photo: null,
       });
-      setPhotoPreview(publisher.photo_url ?? publisher.photo ?? "");
+      setPhotoPreview(publisher.photo ?? "");
     }
     setIsEditMode(false);
     setPhotoError(null);
@@ -80,7 +80,7 @@ export default function PublisherDetailDialog({
         is_active: publisher.is_active,
         photo: null,
       });
-      setPhotoPreview(publisher.photo_url ?? publisher.photo ?? "");
+      setPhotoPreview(publisher.photo ?? "");
       setPhotoError(null);
       setIsDragging(false);
     }
@@ -115,7 +115,7 @@ export default function PublisherDetailDialog({
 
   const handleRemovePhoto = () => {
     setFormData((prev) => ({ ...prev, photo: null }));
-    setPhotoPreview(publisher?.photo_url ?? publisher?.photo ?? "");
+    setPhotoPreview(publisher?.photo ?? "");
     setPhotoError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };

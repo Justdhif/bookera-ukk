@@ -40,3 +40,10 @@ export interface Borrow {
 }
 
 export type BorrowListResponse = PaginatedResponse<Borrow>;
+
+export interface BorrowFilterParams {
+  search?: string;
+  status?: string;
+  per_page?: number;
+  page?: number;
+}

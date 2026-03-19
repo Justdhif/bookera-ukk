@@ -11,10 +11,16 @@ use Illuminate\Support\Facades\Storage;
 
 class BookService
 {
-    public function getBooks(array $filters): LengthAwarePaginator
+    public function getAll(array $filters): LengthAwarePaginator
     {
-        $books = Book::query()
-            ->with(['categories', 'copies', 'authors', 'publishers'])
+        return Book::query()
+            ->with(['categories', 'authors', 'publishers'])
+            ->withCount([
+                'copies as total_copies',
+                'copies as available_copies' => function ($query) {
+                    $query->where('status', 'available');
+                }
+            ])
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($subQuery) use ($search) {
                     $subQuery->where('title', 'like', "%{$search}%")
@@ -33,8 +39,8 @@ class BookService
                     $categoryQuery->whereIn('categories.id', $categoryIds);
                 });
             })
-            ->when($filters['status'] ?? null, function ($query, $status) {
-                $query->where('is_active', $status === 'active');
+            ->when(isset($filters['status']), function ($query) use ($filters) {
+                $query->where('is_active', $filters['status'] === 'active');
             })
             ->when($filters['has_stock'] ?? false, function ($query) {
                 $query->whereHas('copies', function ($copyQuery) {
@@ -44,21 +50,9 @@ class BookService
             ->latest()
             ->orderByDesc('id')
             ->paginate($filters['per_page'] ?? 10);
-
-        $books->getCollection()->transform(function ($book) {
-            $book->cover_image_url = storage_image($book->cover_image);
-            $book->total_copies = $book->copies->count();
-            $book->available_copies = $book->copies->where('status', 'available')->count();
-            // Backward-compatible string fields (books table doesn't store these columns)
-            $book->author = $book->authors->pluck('name')->join(', ');
-            $book->publisher = $book->publishers->pluck('name')->join(', ');
-            return $book;
-        });
-
-        return $books;
     }
 
-    public function createBook(array $data, ?UploadedFile $coverImage = null): Book
+    public function create(array $data, ?UploadedFile $coverImage = null): Book
     {
         $data['slug'] = SlugGenerator::generate('books', 'slug', $data['title']);
 
@@ -81,9 +75,7 @@ class BookService
         }
 
         $book->load(['categories', 'authors', 'publishers', 'copies']);
-        $book->cover_image_url = storage_image($book->cover_image);
-        $book->author = $book->authors->pluck('name')->join(', ');
-        $book->publisher = $book->publishers->pluck('name')->join(', ');
+        $book->load(['categories', 'authors', 'publishers', 'copies']);
 
         ActivityLogger::log(
             'create',
@@ -97,7 +89,7 @@ class BookService
         return $book;
     }
 
-    public function getBookById(int $id): ?Book
+    public function getById(int $id): ?Book
     {
         $book = Book::find($id);
 
@@ -108,7 +100,7 @@ class BookService
         return $this->loadBookDetails($book);
     }
 
-    public function getBookBySlug(string $slug): ?Book
+    public function getBySlug(string $slug): ?Book
     {
         $book = Book::where('slug', $slug)->first();
 
@@ -119,7 +111,7 @@ class BookService
         return $this->loadBookDetails($book);
     }
 
-    public function updateBook(Book $book, array $data, ?UploadedFile $coverImage = null): Book
+    public function update(Book $book, array $data, ?UploadedFile $coverImage = null): Book
     {
         if ($data['title'] !== $book->title) {
             $data['slug'] = SlugGenerator::generate('books', 'slug', $data['title'], $book->id);
@@ -149,9 +141,7 @@ class BookService
         }
 
         $book->load(['categories', 'authors', 'publishers', 'copies']);
-        $book->cover_image_url = storage_image($book->cover_image);
-        $book->author = $book->authors->pluck('name')->join(', ');
-        $book->publisher = $book->publishers->pluck('name')->join(', ');
+        $book->load(['categories', 'authors', 'publishers', 'copies']);
 
         ActivityLogger::log(
             'update',
@@ -165,7 +155,7 @@ class BookService
         return $book;
     }
 
-    public function deleteBook(int $id): bool
+    public function delete(int $id): bool
     {
         $book = Book::find($id);
 
@@ -204,15 +194,12 @@ class BookService
             'copies' => function ($query) {
                 $query->orderBy('status')->orderBy('created_at');
             }
+        ])->loadCount([
+            'copies as total_copies',
+            'copies as available_copies' => function ($query) {
+                $query->where('status', 'available');
+            }
         ]);
-
-        $book->cover_image_url = storage_image($book->cover_image);
-        $book->total_copies = $book->copies->count();
-        $book->available_copies = $book->copies->where('status', 'available')->count();
-
-        // Backward-compatible string fields (books table doesn't store these columns)
-        $book->author = $book->authors->pluck('name')->join(', ');
-        $book->publisher = $book->publishers->pluck('name')->join(', ');
 
         $book->authors->each(function ($author) {
             $author->photo_url = storage_image($author->photo);

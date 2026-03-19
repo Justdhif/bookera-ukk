@@ -18,13 +18,14 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import RoleBadge from "@/components/custom-ui/badge/RoleBadge";
 import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import { Users, Eye, Trash } from "lucide-react";
+
 interface Props {
   data: User[];
   onDelete: (id: number) => void;
 }
 
 export default function UserTable({ data, onDelete }: Props) {
-    const t = useTranslations("user");
+  const t = useTranslations("user");
   if (data.length === 0) {
     return (
       <EmptyState
@@ -89,7 +90,9 @@ export default function UserTable({ data, onDelete }: Props) {
                 </span>
               </TableCell>
 
-              <TableCell><RoleBadge role={item.role} /></TableCell>
+              <TableCell>
+                <RoleBadge role={item.role} />
+              </TableCell>
 
               <TableCell>
                 <span className="text-muted-foreground">

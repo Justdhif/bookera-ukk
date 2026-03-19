@@ -37,8 +37,8 @@ class BorrowRequested implements ShouldBroadcastNow
         return [
             'borrow_id' => $this->borrow->id,
             'user_name' => $this->borrow->user->profile->full_name ?? 'Unknown',
-            'message'   => 'New borrow request from ' . ($this->borrow->user->profile->full_name ?? 'Unknown'),
-            'type'      => 'borrow_request',
+            'message' => 'New borrow request from '.($this->borrow->user->profile->full_name ?? 'Unknown'),
+            'type' => 'borrow_request',
         ];
     }
 }

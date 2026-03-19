@@ -40,7 +40,7 @@ export default function ActivityDetailDialog({
 
     setLoading(true);
     try {
-      const response = await activityLogService.show(activityId);
+      const response = await activityLogService.getById(activityId);
       setDetail(response.data.data);
     } catch (error) {
       toast.error("failedToLoadActivityLogDetail");

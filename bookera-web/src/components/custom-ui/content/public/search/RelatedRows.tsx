@@ -36,7 +36,7 @@ export default function RelatedRows({
           data-related-row
         >
           <img
-            src={book.cover_image_url ?? "/placeholder.png"}
+            src={book.cover_image ?? "/placeholder.png"}
             alt={book.title}
             className="h-16 w-12 rounded object-cover shrink-0"
           />

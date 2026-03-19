@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 
 class DiscussionPostService
 {
-    public function getPosts(?User $authUser, int $perPage = 15): LengthAwarePaginator
+    public function getAll(?User $authUser, int $perPage = 15): LengthAwarePaginator
     {
         $posts = DiscussionPost::with(['user.profile', 'images'])
             ->withCount(['likes', 'comments'])
@@ -25,7 +25,7 @@ class DiscussionPostService
         return $this->attachAuthDataToPosts($posts, $authUser);
     }
 
-    public function getUserPosts(string $userSlug, ?User $authUser, int $perPage = 15): LengthAwarePaginator
+    public function getByUser(string $userSlug, ?User $authUser, int $perPage = 15): LengthAwarePaginator
     {
         $targetUser = User::where('slug', $userSlug)->firstOrFail();
 
@@ -39,7 +39,7 @@ class DiscussionPostService
         return $this->attachAuthDataToPosts($posts, $authUser);
     }
 
-    public function getFollowingPosts(User $authUser, int $perPage = 15): LengthAwarePaginator
+    public function getByFollowing(User $authUser, int $perPage = 15): LengthAwarePaginator
     {
         $followingIds = Follow::where('user_id', $authUser->id)
             ->where('followable_type', User::class)
@@ -55,7 +55,7 @@ class DiscussionPostService
         return $this->attachAuthDataToPosts($posts, $authUser);
     }
 
-    public function getPostBySlug(string $slug, ?User $authUser): DiscussionPost
+    public function getBySlug(string $slug, ?User $authUser): DiscussionPost
     {
         $post = DiscussionPost::with(['user.profile', 'images'])
             ->withCount(['likes', 'comments'])
@@ -95,7 +95,7 @@ class DiscussionPostService
         return $post;
     }
 
-    public function createPost(User $user, array $data): DiscussionPost
+    public function create(User $user, array $data): DiscussionPost
     {
         return DB::transaction(function () use ($user, $data) {
             $post = DiscussionPost::create([
@@ -118,7 +118,7 @@ class DiscussionPostService
         });
     }
 
-    public function updatePost(User $user, DiscussionPost $post, array $data): DiscussionPost
+    public function update(User $user, DiscussionPost $post, array $data): DiscussionPost
     {
         if ($post->user_id !== $user->id) {
             throw new \Exception('Unauthorized: you do not own this post.', 403);
@@ -149,7 +149,7 @@ class DiscussionPostService
         });
     }
 
-    public function deletePost(User $user, DiscussionPost $post): void
+    public function delete(User $user, DiscussionPost $post): void
     {
         if ($post->user_id !== $user->id) {
             throw new \Exception('Unauthorized: you do not own this post.', 403);

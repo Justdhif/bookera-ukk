@@ -102,9 +102,9 @@ export function BorrowFromCollectionDialog({
           <div className="space-y-4 p-4">
             {selectedBooks.map((book) => (
               <div key={book.id} className="flex gap-3 items-center">
-                {book.cover_image_url && (
+                {book.cover_image && (
                   <Image
-                    src={book.cover_image_url}
+                    src={book.cover_image}
                     alt={book.title}
                     width={48}
                     height={64}

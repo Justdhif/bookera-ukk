@@ -80,7 +80,7 @@ export function ReportLostDialog({
       for (const detailId of selectedDetailIds) {
         const detail = borrow.borrow_details.find((d) => d.id === detailId);
         if (!detail) continue;
-        await lostBookService.report(borrow.id, {
+        await lostBookService.create(borrow.id, {
           book_copy_id: detail.book_copy.id,
           notes: notes[detailId] || undefined,
           estimated_lost_date: estimatedLostDate

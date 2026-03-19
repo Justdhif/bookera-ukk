@@ -44,4 +44,3 @@ class DashboardController extends Controller
         return ApiResponse::successResponse('Data peminjaman terbaru', $data);
     }
 }
-

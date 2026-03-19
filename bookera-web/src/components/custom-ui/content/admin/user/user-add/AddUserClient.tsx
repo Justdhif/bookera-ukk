@@ -4,7 +4,8 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useState } from "react";
-import { userService, CreateUserData } from "@/services/user.service";
+import { userService } from "@/services/user.service";
+import { CreateUserData } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";

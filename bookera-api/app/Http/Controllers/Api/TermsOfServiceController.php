@@ -21,7 +21,7 @@ class TermsOfServiceController extends Controller
 
     public function index(): JsonResponse
     {
-        $termsOfServices = $this->termsOfServiceService->getAllTermsOfServices();
+        $termsOfServices = $this->termsOfServiceService->getAll();
 
         return ApiResponse::successResponse('Data Terms of Service berhasil diambil', $termsOfServices);
     }
@@ -33,21 +33,21 @@ class TermsOfServiceController extends Controller
 
     public function store(StoreTermsOfServiceRequest $request): JsonResponse
     {
-        $termsOfService = $this->termsOfServiceService->createTermsOfService($request->validated());
+        $termsOfService = $this->termsOfServiceService->create($request->validated());
 
         return ApiResponse::successResponse('Terms of Service berhasil ditambahkan', $termsOfService, 201);
     }
 
     public function update(UpdateTermsOfServiceRequest $request, TermsOfService $termsOfService): JsonResponse
     {
-        $termsOfService = $this->termsOfServiceService->updateTermsOfService($termsOfService, $request->validated());
+        $termsOfService = $this->termsOfServiceService->update($termsOfService, $request->validated());
 
         return ApiResponse::successResponse('Terms of Service berhasil diperbarui', $termsOfService);
     }
 
     public function destroy(TermsOfService $termsOfService): JsonResponse
     {
-        $this->termsOfServiceService->deleteTermsOfService($termsOfService);
+        $this->termsOfServiceService->delete($termsOfService);
 
         return ApiResponse::successResponse('Terms of Service berhasil dihapus');
     }

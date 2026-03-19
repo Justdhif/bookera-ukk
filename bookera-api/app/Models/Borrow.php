@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Model;
 
 class Borrow extends Model
 {
@@ -70,17 +69,16 @@ class Borrow extends Model
             return null;
         }
 
-        $absolutePath = storage_path('app/public/' . $this->qr_code_path);
+        $absolutePath = storage_path('app/public/'.$this->qr_code_path);
 
-        if (!file_exists($absolutePath)) {
+        if (! file_exists($absolutePath)) {
             return null;
         }
 
         $content = file_get_contents($absolutePath);
         $extension = strtolower(pathinfo($this->qr_code_path, PATHINFO_EXTENSION));
-        $mimeType = $extension === 'svg' ? 'image/svg+xml' : 'image/' . $extension;
+        $mimeType = $extension === 'svg' ? 'image/svg+xml' : 'image/'.$extension;
 
-        return 'data:' . $mimeType . ';base64,' . base64_encode($content);
+        return 'data:'.$mimeType.';base64,'.base64_encode($content);
     }
-
 }

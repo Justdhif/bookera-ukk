@@ -20,7 +20,7 @@ class NotificationService
             'message' => $message,
             'type' => $type,
             'module' => $module,
-            'data' => $data
+            'data' => $data,
         ]);
     }
 }

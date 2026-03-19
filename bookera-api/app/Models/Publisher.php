@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,6 +32,20 @@ class Publisher extends Model
         'photo',
         'is_active',
     ];
+
+    protected function photo(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if ($value) {
+                    return storage_image($value);
+                }
+
+                return 'https://api.dicebear.com/7.x/initials/png?seed='.rawurlencode($this->name);
+            },
+            set: fn ($value) => $value,
+        );
+    }
 
     public function books()
     {

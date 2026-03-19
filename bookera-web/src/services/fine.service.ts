@@ -10,6 +10,7 @@ import {
   CreateFinePayload,
   UpdateFinePayload,
   WaiveFinePayload,
+  FineFilterParams,
 } from "@/types/fine";
 
 export const fineTypeService = {
@@ -29,16 +30,11 @@ export const fineTypeService = {
     api.delete<ApiResponse<null>>(`/admin/fine-types/${id}`),
 };
 
-export interface FineFilterParams {
-  search?: string;
-  status?: string;
-  per_page?: number;
-  page?: number;
-}
-
 export const fineService = {
   getAll: (filters?: FineFilterParams) =>
-    api.get<ApiResponse<FineListResponse>>("/admin/fines", { params: filters }),
+    api.get<ApiResponse<FineListResponse>>("/admin/fines", {
+      params: filters,
+    }),
 
   getById: (id: number) => api.get<ApiResponse<Fine>>(`/admin/fines/${id}`),
 
@@ -48,7 +44,7 @@ export const fineService = {
   getByBorrow: (borrowId: number) =>
     api.get<ApiResponse<Fine[]>>(`/borrows/${borrowId}/fines`),
 
-  getMyFines: () => api.get<ApiResponse<Fine[]>>("/my-fines"),
+  getByUser: () => api.get<ApiResponse<Fine[]>>("/my-fines"),
 
   create: (loanId: number, payload: CreateFinePayload) =>
     api.post<ApiResponse<Fine>>(`/admin/fines/loans/${loanId}`, payload),

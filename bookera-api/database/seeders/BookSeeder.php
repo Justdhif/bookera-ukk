@@ -15,7 +15,7 @@ class BookSeeder extends Seeder
      */
     public function run(): void
     {
-        $authors    = Author::where('is_active', true)->pluck('id');
+        $authors = Author::where('is_active', true)->pluck('id');
         $publishers = Publisher::where('is_active', true)->pluck('id');
         $categories = Category::pluck('id');
 

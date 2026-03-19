@@ -79,7 +79,7 @@ export default function AdminBorrowRequestDetailClient() {
   const fetchRequest = async () => {
     try {
       setLoading(true);
-      const res = await borrowRequestService.adminShow(requestId);
+      const res = await borrowRequestService.getById(requestId);
       setRequest(res.data.data);
     } catch (error: any) {
       toast.error(
@@ -125,7 +125,7 @@ export default function AdminBorrowRequestDetailClient() {
     if (!request) return;
     setDeleting(true);
     try {
-      await borrowRequestService.destroy(request.id);
+      await borrowRequestService.delete(request.id);
       toast.success(t("deleteSuccess"));
       router.push("/admin/borrows");
     } catch (error: any) {
@@ -301,9 +301,9 @@ export default function AdminBorrowRequestDetailClient() {
                   key={detail.id}
                   className="rounded-lg border p-3 bg-muted/30 flex items-center gap-3"
                 >
-                  {detail.book?.cover_image_url ? (
+                  {detail.book?.cover_image ? (
                     <img
-                      src={detail.book.cover_image_url}
+                      src={detail.book.cover_image}
                       alt={detail.book.title}
                       className="h-12 w-9 object-cover rounded"
                     />

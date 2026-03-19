@@ -45,7 +45,7 @@ export default function BookCard({ book }: { book: Book }) {
       {/* Cover */}
       <div className="relative">
         <img
-          src={book.cover_image_url ?? "/placeholder.png"}
+          src={book.cover_image ?? "/placeholder.png"}
           className="aspect-3/4 object-cover rounded w-full"
           alt={book.title}
         />

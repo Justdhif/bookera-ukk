@@ -32,21 +32,16 @@ class PublisherController extends Controller
             unset($filters['is_active']);
         }
 
-        $publishers = $this->publisherService->getPublishers($filters);
+        $publishers = $this->publisherService->getAll($filters);
 
         return ApiResponse::successResponse('Data penerbit berhasil diambil', $publishers);
     }
 
-    public function list(): JsonResponse
-    {
-        $publishers = $this->publisherService->getAllPublishers();
 
-        return ApiResponse::successResponse('Daftar penerbit berhasil diambil', $publishers);
-    }
 
     public function store(StorePublisherRequest $request): JsonResponse
     {
-        $publisher = $this->publisherService->createPublisher(
+        $publisher = $this->publisherService->create(
             $request->validated(),
             $request->file('photo')
         );
@@ -56,7 +51,7 @@ class PublisherController extends Controller
 
     public function show(Publisher $publisher): JsonResponse
     {
-        $publisher = $this->publisherService->getPublisherById($publisher->id);
+        $publisher = $this->publisherService->getById($publisher->id);
 
         if (!$publisher) {
             return ApiResponse::errorResponse('Penerbit tidak ditemukan', null, 404);
@@ -67,7 +62,7 @@ class PublisherController extends Controller
 
     public function update(UpdatePublisherRequest $request, Publisher $publisher): JsonResponse
     {
-        $publisher = $this->publisherService->updatePublisher(
+        $publisher = $this->publisherService->update(
             $publisher,
             $request->validated(),
             $request->file('photo')
@@ -78,7 +73,7 @@ class PublisherController extends Controller
 
     public function destroy(Publisher $publisher): JsonResponse
     {
-        $data = $this->publisherService->deletePublisher($publisher);
+        $data = $this->publisherService->delete($publisher);
 
         return ApiResponse::successResponse('Penerbit berhasil dihapus', $data);
     }

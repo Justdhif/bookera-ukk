@@ -6,10 +6,30 @@ export interface Author {
   name: string;
   bio?: string;
   photo: string;
-  photo_url?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export type AuthorListResponse = PaginatedResponse<Author>;
+
+export interface CreateAuthorData {
+  name: string;
+  bio?: string;
+  photo?: File | null;
+  is_active?: boolean;
+}
+
+export interface UpdateAuthorData {
+  name: string;
+  bio?: string;
+  photo?: File | null;
+  is_active?: boolean;
+}
+
+export interface AuthorFilterParams {
+  search?: string;
+  is_active?: boolean;
+  per_page?: number;
+  page?: number;
+}

@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Book;
 use App\Models\BookCopy;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class BookCopySeeder extends Seeder
 {
@@ -24,9 +23,9 @@ class BookCopySeeder extends Seeder
                 $copyCode = sprintf('BK-%03d-%02d', $bookId, $i);
 
                 BookCopy::create([
-                    'book_id'   => $bookId,
+                    'book_id' => $bookId,
                     'copy_code' => $copyCode,
-                    'status'    => $this->randomStatus(),
+                    'status' => $this->randomStatus(),
                 ]);
             }
         }
@@ -37,13 +36,13 @@ class BookCopySeeder extends Seeder
         // Weighted: mostly available
         $weights = [
             'available' => 75,
-            'borrowed'  => 18,
-            'damaged'   => 5,
-            'lost'      => 2,
+            'borrowed' => 18,
+            'damaged' => 5,
+            'lost' => 2,
         ];
 
         $total = array_sum($weights);
-        $rand  = rand(1, $total);
+        $rand = rand(1, $total);
         $cumulative = 0;
 
         foreach ($weights as $status => $weight) {

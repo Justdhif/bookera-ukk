@@ -8,14 +8,14 @@ import {
 } from "@/types/dashboard";
 
 export const dashboardService = {
-  totals: () => api.get<ApiResponse<DashboardTotals>>("/admin/dashboard/totals"),
+  getTotals: () => api.get<ApiResponse<DashboardTotals>>("/admin/dashboard/totals"),
 
-  loanMonthlyChart: () =>
+  getLoanMonthlyChart: () =>
     api.get<ApiResponse<BorrowMonthly[]>>("/admin/dashboard/loan-monthly-chart"),
 
-  loanStatusChart: () =>
+  getLoanStatusChart: () =>
     api.get<ApiResponse<BorrowStatus[]>>("/admin/dashboard/loan-status-chart"),
 
-  latestBorrows: () =>
+  getLatestBorrows: () =>
     api.get<ApiResponse<LatestBorrow[]>>("/admin/dashboard/latest"),
 };

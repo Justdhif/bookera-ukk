@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Http\Requests\Auth\SetupProfile;
-use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Http\Requests\Auth\SetupProfile;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -77,10 +77,10 @@ class AuthController extends Controller
             );
 
             return ApiResponse::successResponse('Profile berhasil diperbarui', [
-                'user' => $user
+                'user' => $user,
             ]);
         } catch (\Exception $e) {
-            return ApiResponse::errorResponse('Gagal memperbarui profile: ' . $e->getMessage(), 500);
+            return ApiResponse::errorResponse('Gagal memperbarui profile: '.$e->getMessage(), 500);
         }
     }
 

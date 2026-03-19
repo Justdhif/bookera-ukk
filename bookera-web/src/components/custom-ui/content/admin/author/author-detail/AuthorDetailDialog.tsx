@@ -13,7 +13,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Author } from "@/types/author";
-import { authorService, UpdateAuthorData } from "@/services/author.service";
+import { authorService } from "@/services/author.service";
+import { UpdateAuthorData } from "@/types/author";
 import { toast } from "sonner";
 import { Edit, FileWarning, Save, Upload, X, Trash, Eye } from "lucide-react";
 import Image from "next/image";
@@ -54,7 +55,7 @@ export default function AuthorDetailDialog({
         is_active: author.is_active,
         photo: null,
       });
-      setPhotoPreview(author.photo_url ?? author.photo ?? "");
+      setPhotoPreview(author.photo ?? "");
     }
     setIsEditMode(false);
     setPhotoError(null);
@@ -80,7 +81,7 @@ export default function AuthorDetailDialog({
         is_active: author.is_active,
         photo: null,
       });
-      setPhotoPreview(author.photo_url ?? author.photo ?? "");
+      setPhotoPreview(author.photo ?? "");
       setPhotoError(null);
       setIsDragging(false);
     }
@@ -115,7 +116,7 @@ export default function AuthorDetailDialog({
 
   const handleRemovePhoto = () => {
     setFormData((prev) => ({ ...prev, photo: null }));
-    setPhotoPreview(author?.photo_url ?? author?.photo ?? "");
+    setPhotoPreview(author?.photo ?? "");
     setPhotoError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };

@@ -8,7 +8,6 @@ use App\Models\DiscussionPost;
 use App\Models\DiscussionPostReport;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class DiscussionPostReportController extends Controller
 {
@@ -42,10 +41,10 @@ class DiscussionPostReportController extends Controller
 
         $report = DiscussionPostReport::create([
             'reporter_id' => $user->id,
-            'post_id'     => $post->id,
-            'reason'      => $validated['reason'],
+            'post_id' => $post->id,
+            'reason' => $validated['reason'],
             'description' => $validated['description'] ?? null,
-            'status'      => 'pending',
+            'status' => 'pending',
         ]);
 
         return ApiResponse::successResponse('Laporan berhasil dikirim.', $report, 201);
@@ -80,9 +79,9 @@ class DiscussionPostReportController extends Controller
     public function update(Request $request, DiscussionPostReport $report): JsonResponse
     {
         $validated = $request->validate([
-            'status'          => 'required|in:reviewed,dismissed',
-            'admin_note'      => 'nullable|string|max:1000',
-            'takedown'        => 'boolean',
+            'status' => 'required|in:reviewed,dismissed',
+            'admin_note' => 'nullable|string|max:1000',
+            'takedown' => 'boolean',
             'takedown_reason' => 'nullable|string|max:500',
         ]);
 
@@ -90,16 +89,16 @@ class DiscussionPostReportController extends Controller
         $user = $request->user();
 
         $report->update([
-            'status'      => $validated['status'],
-            'admin_note'  => $validated['admin_note'] ?? null,
+            'status' => $validated['status'],
+            'admin_note' => $validated['admin_note'] ?? null,
             'reviewed_by' => $user->id,
             'reviewed_at' => now(),
         ]);
 
         // If admin chose to takedown the post
-        if (!empty($validated['takedown'])) {
+        if (! empty($validated['takedown'])) {
             $report->post->update([
-                'taken_down_at'     => now(),
+                'taken_down_at' => now(),
                 'taken_down_reason' => $validated['takedown_reason'] ?? null,
             ]);
         }
@@ -122,7 +121,7 @@ class DiscussionPostReportController extends Controller
         ]);
 
         $post->update([
-            'taken_down_at'     => now(),
+            'taken_down_at' => now(),
             'taken_down_reason' => $validated['reason'] ?? null,
         ]);
 
@@ -138,7 +137,7 @@ class DiscussionPostReportController extends Controller
         $post = DiscussionPost::where('slug', $slug)->firstOrFail();
 
         $post->update([
-            'taken_down_at'     => null,
+            'taken_down_at' => null,
             'taken_down_reason' => null,
         ]);
 

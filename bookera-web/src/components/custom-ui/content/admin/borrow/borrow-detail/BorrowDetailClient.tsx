@@ -29,7 +29,7 @@ export default function BorrowDetailClient() {
   const fetchBorrow = async () => {
     try {
       setLoading(true);
-      const res = await borrowService.showAdminByCode(borrowCode);
+      const res = await borrowService.getByCode(borrowCode, true);
       setBorrow(res.data.data);
     } catch (error: any) {
       toast.error(

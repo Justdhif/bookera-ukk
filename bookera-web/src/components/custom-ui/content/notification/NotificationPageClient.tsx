@@ -84,7 +84,7 @@ export default function NotificationPageClient() {
     setLoading(true);
     try {
       const filters: NotificationFilterParams = { per_page: 50 };
-      const response = await notificationService.getNotifications(filters);
+      const response = await notificationService.getAll(filters);
       setNotifications(response.data.data.data);
     } catch (error) {
       toast.error("failedToLoadNotifications");
@@ -161,7 +161,7 @@ export default function NotificationPageClient() {
     if (!deleteId) return;
     
     try {
-      await notificationService.deleteNotification(deleteId);
+      await notificationService.delete(deleteId);
       setNotifications(notifications.filter((n) => n.id !== deleteId));
       toast.success("Notification deleted");
       fetchUnreadCount();

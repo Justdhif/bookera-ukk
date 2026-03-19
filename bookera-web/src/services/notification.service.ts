@@ -10,10 +10,10 @@ export interface NotificationFilterParams {
 }
 
 export const notificationService = {
-  getNotifications: (params?: NotificationFilterParams) =>
+  getAll: (params?: NotificationFilterParams) =>
     api.get<ApiResponse<NotificationListResponse>>("/notifications", { params }),
 
-  getNotification: (id: number) =>
+  getById: (id: number) =>
     api.get<ApiResponse<Notification>>(`/notifications/${id}`),
 
   getUnreadCount: () =>
@@ -25,7 +25,7 @@ export const notificationService = {
   markAllAsRead: () =>
     api.post<ApiResponse<{ updated_count: number }>>("/notifications/mark-all-read"),
 
-  deleteNotification: (id: number) =>
+  delete: (id: number) =>
     api.delete<ApiResponse<null>>(`/notifications/${id}`),
 
   deleteAllRead: () =>

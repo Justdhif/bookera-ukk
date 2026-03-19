@@ -23,7 +23,7 @@ class BorrowRequestRejected implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('user.' . $this->borrowRequest->user_id),
+            new PrivateChannel('user.'.$this->borrowRequest->user_id),
         ];
     }
 
@@ -35,10 +35,10 @@ class BorrowRequestRejected implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'request_id'    => $this->borrowRequest->id,
+            'request_id' => $this->borrowRequest->id,
             'reject_reason' => $this->borrowRequest->reject_reason,
-            'message'       => 'Your borrow request has been rejected',
-            'type'          => 'borrow_request_rejected',
+            'message' => 'Your borrow request has been rejected',
+            'type' => 'borrow_request_rejected',
         ];
     }
 }

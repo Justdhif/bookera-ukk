@@ -13,10 +13,10 @@ export const borrowRequestService = {
     return_date: string;
   }) => api.post<ApiResponse<BorrowRequest>>("/borrow-requests", data),
 
-  show: (id: number) =>
-    api.get<ApiResponse<BorrowRequest>>(`/borrow-requests/${id}`),
+  getById: (id: number, isAdmin = false) =>
+    api.get<ApiResponse<BorrowRequest>>(isAdmin ? `/admin/borrow-requests/${id}` : `/borrow-requests/${id}`),
 
-  getMyRequests: () =>
+  getByUser: () =>
     api.get<ApiResponse<BorrowRequest[]>>("/my-borrow-requests"),
 
   cancel: (id: number) => api.patch(`/borrow-requests/${id}/cancel`),
@@ -30,9 +30,6 @@ export const borrowRequestService = {
     api.get<ApiResponse<BorrowRequestListResponse>>("/admin/borrow-requests", {
       params: filters,
     }),
-
-  adminShow: (id: number) =>
-    api.get<ApiResponse<BorrowRequest>>(`/admin/borrow-requests/${id}`),
 
   assignBorrow: (id: number, copyIds: number[] = []) =>
     api.post<ApiResponse<Borrow>>(`/admin/borrow-requests/${id}/assign`, {
@@ -48,5 +45,5 @@ export const borrowRequestService = {
       { reject_reason: rejectReason },
     ),
 
-  destroy: (id: number) => api.delete(`/admin/borrow-requests/${id}`),
+  delete: (id: number) => api.delete(`/admin/borrow-requests/${id}`),
 };

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
@@ -22,7 +22,7 @@ class SaveItem extends Model
 
     protected $fillable = [
         'save_id',
-        'book_id'
+        'book_id',
     ];
 
     public function bookSave()

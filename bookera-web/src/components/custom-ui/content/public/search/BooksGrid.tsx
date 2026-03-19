@@ -22,7 +22,7 @@ export default function BooksGrid({ books }: { books: Book[] }) {
           aria-label={book.title}
         >
           <img
-            src={book.cover_image_url ?? "/placeholder.png"}
+            src={book.cover_image ?? "/placeholder.png"}
             alt={book.title}
             className="w-full aspect-3/4 object-cover transition-transform group-hover:scale-[1.02]"
           />

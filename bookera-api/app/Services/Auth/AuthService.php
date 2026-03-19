@@ -2,16 +2,15 @@
 
 namespace App\Services\Auth;
 
+use App\Helpers\SlugGenerator;
+use App\Mail\ResetPasswordMail;
 use App\Models\User;
 use App\Models\UserProfile;
-use App\Mail\ResetPasswordMail;
-use App\Helpers\SlugGenerator;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthService
 {
@@ -22,11 +21,11 @@ class AuthService
     {
         $user = User::where('email', $email)->first();
 
-        if (!$user || !Hash::check($password, $user->password)) {
+        if (! $user || ! Hash::check($password, $user->password)) {
             throw new \Exception('Email atau password salah');
         }
 
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             throw new \Exception('Akun tidak aktif', 403);
         }
 
@@ -39,7 +38,7 @@ class AuthService
 
         return [
             'token' => $token,
-            'user' => $user
+            'user' => $user,
         ];
     }
 
@@ -68,12 +67,12 @@ class AuthService
 
             return [
                 'token' => $token,
-                'user' => $user
+                'user' => $user,
             ];
 
         } catch (\Exception $e) {
             DB::rollBack();
-            throw new \Exception('Gagal melakukan registrasi: ' . $e->getMessage());
+            throw new \Exception('Gagal melakukan registrasi: '.$e->getMessage());
         }
     }
 
@@ -95,8 +94,8 @@ class AuthService
                 // Delete old avatar file if it was a local upload
                 if ($user->profile && $user->profile->getRawOriginal('avatar')) {
                     $oldAvatar = $user->profile->getRawOriginal('avatar');
-                    if (!str_starts_with($oldAvatar, 'http')) {
-                        $storagePath = storage_path('app/public/' . $oldAvatar);
+                    if (! str_starts_with($oldAvatar, 'http')) {
+                        $storagePath = storage_path('app/public/'.$oldAvatar);
                         if (file_exists($storagePath)) {
                             unlink($storagePath);
                         }
@@ -116,7 +115,7 @@ class AuthService
             }
 
             // Generate slug from full_name if not set yet
-            if (empty($user->slug) && !empty($profileData['full_name'])) {
+            if (empty($user->slug) && ! empty($profileData['full_name'])) {
                 $user->update([
                     'slug' => SlugGenerator::generate('users', 'slug', $profileData['full_name']),
                 ]);
@@ -128,10 +127,9 @@ class AuthService
 
         } catch (\Exception $e) {
             DB::rollBack();
-            throw new \Exception('Gagal mengupdate profile: ' . $e->getMessage());
+            throw new \Exception('Gagal mengupdate profile: '.$e->getMessage());
         }
     }
-
 
     /**
      * Send password reset token to user's email via SMTP
@@ -140,7 +138,7 @@ class AuthService
     {
         $user = User::where('email', $email)->first();
 
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('Email tidak terdaftar');
         }
 
@@ -172,7 +170,7 @@ class AuthService
             ->where('email', $email)
             ->first();
 
-        if (!$record) {
+        if (! $record) {
             throw new \Exception('Token reset password tidak ditemukan');
         }
 
@@ -188,14 +186,14 @@ class AuthService
         }
 
         // Verify the token
-        if (!Hash::check($token, $record->token)) {
+        if (! Hash::check($token, $record->token)) {
             throw new \Exception('Token reset password tidak valid');
         }
 
         // Update the user's password
         $user = User::where('email', $email)->first();
 
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('User tidak ditemukan');
         }
 

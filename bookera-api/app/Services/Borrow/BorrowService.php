@@ -16,7 +16,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class BorrowService
 {
-    public function getBorrows(array $filters = []): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
         $query = Borrow::with([
             'borrowDetails.bookCopy.book',
@@ -49,7 +49,7 @@ class BorrowService
         return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
-    public function createBorrow(array $data, User $user): Borrow
+    public function create(array $data, User $user): Borrow
     {
         return DB::transaction(function () use ($data, $user) {
             $borrowCode = $this->generateBorrowCode();
@@ -109,7 +109,7 @@ class BorrowService
         });
     }
 
-    public function createAdminBorrow(array $data, User $admin): Borrow
+    public function createAdmin(array $data, User $admin): Borrow
     {
         return DB::transaction(function () use ($data, $admin) {
             $borrowCode = $this->generateBorrowCode();
@@ -180,7 +180,7 @@ class BorrowService
         });
     }
 
-    public function getBorrowById(Borrow $borrow): Borrow
+    public function getById(Borrow $borrow): Borrow
     {
         return $borrow->load([
             'borrowDetails.bookCopy.book',
@@ -192,7 +192,7 @@ class BorrowService
         ]);
     }
 
-    public function getBorrowByCode(string $code): Borrow
+    public function getByCode(string $code): Borrow
     {
         return Borrow::with([
             'borrowDetails.bookCopy.book',
@@ -204,7 +204,7 @@ class BorrowService
         ])->where('borrow_code', $code)->firstOrFail();
     }
 
-    public function updateBorrow(Borrow $borrow, array $data): Borrow
+    public function update(Borrow $borrow, array $data): Borrow
     {
         return DB::transaction(function () use ($borrow, $data) {
             $oldReturnDate = $borrow->return_date;
@@ -269,7 +269,7 @@ class BorrowService
         });
     }
 
-    public function getBorrowsByUser(User $user): Collection
+    public function getByUser(User $user): Collection
     {
         return Borrow::with([
             'borrowDetails.bookCopy.book',

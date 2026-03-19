@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class BorrowRequest extends Model
 {
@@ -20,8 +20,8 @@ class BorrowRequest extends Model
     ];
 
     protected $casts = [
-        'borrow_date'     => 'date',
-        'return_date'     => 'date',
+        'borrow_date' => 'date',
+        'return_date' => 'date',
         'approval_status' => 'string',
     ];
 

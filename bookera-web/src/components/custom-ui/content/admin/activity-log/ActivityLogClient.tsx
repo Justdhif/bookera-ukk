@@ -31,7 +31,7 @@ export default function ActivityLogClient() {
   const fetchActivityLogs = async () => {
     setLoading(true);
     try {
-      const response = await activityLogService.getAll(filters);
+      const response = await activityLogService.getAll(filters, true);
       setData(response.data.data);
     } catch (error) {
       toast.error("loadError");

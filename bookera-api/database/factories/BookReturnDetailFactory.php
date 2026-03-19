@@ -19,7 +19,7 @@ class BookReturnDetailFactory extends Factory
         return [
             'book_return_id' => null, // Set in seeder
             'book_copy_id' => null, // Set in seeder
-            'condition' => fake()->randomElement(['good','damaged','lost']),
+            'condition' => fake()->randomElement(['good', 'damaged', 'lost']),
         ];
     }
 }

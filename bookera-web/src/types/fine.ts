@@ -30,6 +30,7 @@ export interface Fine {
       email: string;
       profile?: {
         full_name: string;
+        avatar: string;
       };
     };
     borrow_details?: Array<{
@@ -77,3 +78,10 @@ export interface WaiveFinePayload {
 
 export type FineTypeListResponse = PaginatedResponse<FineType>;
 export type FineListResponse = PaginatedResponse<Fine>;
+
+export interface FineFilterParams {
+  search?: string;
+  status?: string;
+  per_page?: number;
+  page?: number;
+}

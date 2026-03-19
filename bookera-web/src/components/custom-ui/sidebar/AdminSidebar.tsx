@@ -31,7 +31,6 @@ import {
   UserSquare,
   Building2,
   User,
-  Flag,
   FileText,
   Shield,
 } from "lucide-react";
@@ -117,11 +116,6 @@ const getMenuGroups = (t: any): MenuGroup[] => [
         title: t("lostBooks"),
         href: "/admin/lost-books",
         icon: AlertCircle,
-      },
-      {
-        title: t("discussionReports"),
-        href: "/admin/discussion",
-        icon: Flag,
       },
       {
         title: t("activityLogs"),

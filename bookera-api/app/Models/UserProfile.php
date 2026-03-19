@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Helpers\AvatarHelper;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
@@ -51,9 +51,9 @@ class UserProfile extends Model
     ];
 
     protected $casts = [
-        'notification_enabled'    => 'boolean',
-        'notification_email'      => 'boolean',
-        'notification_whatsapp'   => 'boolean',
+        'notification_enabled' => 'boolean',
+        'notification_email' => 'boolean',
+        'notification_whatsapp' => 'boolean',
     ];
 
     public function user()
@@ -92,8 +92,9 @@ class UserProfile extends Model
                 $digits = preg_replace('/\D/', '', $value);
                 // Convert leading 0 to 62
                 if (str_starts_with($digits, '0')) {
-                    $digits = '62' . substr($digits, 1);
+                    $digits = '62'.substr($digits, 1);
                 }
+
                 return $digits;
             }
         );

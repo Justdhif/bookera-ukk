@@ -1,16 +1,12 @@
 <?php
 
-if (!function_exists('storage_image')) {
+if (! function_exists('storage_image')) {
     /**
      * Generate full URL for storage image
-     *
-     * @param string|null $path
-     * @param string|null $default
-     * @return string|null
      */
     function storage_image(?string $path, ?string $default = null): ?string
     {
-        if (!$path) {
+        if (! $path) {
             return $default;
         }
 
@@ -18,6 +14,6 @@ if (!function_exists('storage_image')) {
             return $path;
         }
 
-        return asset('storage/' . ltrim($path, '/'));
+        return asset('storage/'.ltrim($path, '/'));
     }
 }

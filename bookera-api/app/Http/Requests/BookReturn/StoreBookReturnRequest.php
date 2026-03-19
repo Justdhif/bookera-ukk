@@ -14,7 +14,7 @@ class StoreBookReturnRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'borrow_detail_ids'   => 'required|array|min:1',
+            'borrow_detail_ids' => 'required|array|min:1',
             'borrow_detail_ids.*' => 'required|integer|exists:borrow_details,id',
         ];
     }

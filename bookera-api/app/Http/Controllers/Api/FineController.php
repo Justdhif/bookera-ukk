@@ -30,7 +30,7 @@ class FineController extends Controller
             'per_page' => $request->per_page,
         ];
 
-        $fines = $this->fineService->getAllFines($filters);
+        $fines = $this->fineService->getAll($filters);
 
         return ApiResponse::successResponse('Data denda', $fines);
     }
@@ -51,7 +51,7 @@ class FineController extends Controller
 
     public function store(StoreFineRequest $request, Borrow $borrow): JsonResponse
     {
-        $fine = $this->fineService->createFine($borrow, $request->validated());
+        $fine = $this->fineService->create($borrow, $request->validated());
 
         return ApiResponse::successResponse('Denda berhasil dibuat', $fine, 201);
     }
@@ -65,7 +65,7 @@ class FineController extends Controller
 
     public function update(UpdateFineRequest $request, Fine $fine): JsonResponse
     {
-        $fine = $this->fineService->updateFine($fine, $request->validated());
+        $fine = $this->fineService->update($fine, $request->validated());
 
         return ApiResponse::successResponse('Denda berhasil diupdate', $fine);
     }
@@ -95,7 +95,7 @@ class FineController extends Controller
 
     public function destroy(Fine $fine): JsonResponse
     {
-        $this->fineService->deleteFine($fine);
+        $this->fineService->delete($fine);
 
         return ApiResponse::successResponse('Denda berhasil dihapus');
     }

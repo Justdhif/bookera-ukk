@@ -57,7 +57,7 @@ export default function MyBorrowPageClient() {
   const fetchBorrows = async () => {
     setLoadingBorrows(true);
     try {
-      const response = await borrowService.getMyBorrows();
+      const response = await borrowService.getByUser();
       setBorrows(response.data.data);
     } catch (error) {
       console.error("Failed to fetch borrows:", error);
@@ -69,7 +69,7 @@ export default function MyBorrowPageClient() {
   const fetchRequests = async () => {
     setLoadingRequests(true);
     try {
-      const response = await borrowRequestService.getMyRequests();
+      const response = await borrowRequestService.getByUser();
       setRequests(response.data.data);
     } catch (error: any) {
       toast.error(

@@ -20,6 +20,7 @@ class BookCopy extends Model
 {
     /** @use HasFactory<\Database\Factories\BookCopyFactory> */
     use HasFactory;
+
     protected $table = 'book_copies';
 
     protected $fillable = [

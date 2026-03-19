@@ -29,14 +29,14 @@ class BookFactory extends Factory
         $isbn = fake()->boolean(85) ? fake()->unique()->isbn13() : null;
 
         return [
-            'slug'             => $slugBase . '-' . $slugSuffix,
-            'title'            => $title,
-            'isbn'             => $isbn,
-            'description'      => fake()->optional(0.9)->paragraphs(3, true),
+            'slug' => $slugBase.'-'.$slugSuffix,
+            'title' => $title,
+            'isbn' => $isbn,
+            'description' => fake()->optional(0.9)->paragraphs(3, true),
             'publication_year' => fake()->optional(0.9)->year(),
-            'language'         => fake()->randomElement(self::$languages),
-            'cover_image'      => 'https://picsum.photos/seed/' . $slugBase . '-' . $slugSuffix . '/400/600',
-            'is_active'        => fake()->boolean(90),
+            'language' => fake()->randomElement(self::$languages),
+            'cover_image' => 'https://picsum.photos/seed/'.$slugBase.'-'.$slugSuffix.'/400/600',
+            'is_active' => fake()->boolean(90),
         ];
     }
 
@@ -66,7 +66,7 @@ class BookFactory extends Factory
     public function withCover(): static
     {
         return $this->state(fn (array $attributes) => [
-            'cover_image' => 'https://picsum.photos/seed/' . fake()->word() . '/200/300',
+            'cover_image' => 'https://picsum.photos/seed/'.fake()->word().'/200/300',
         ]);
     }
 }

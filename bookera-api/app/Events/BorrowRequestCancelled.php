@@ -38,9 +38,9 @@ class BorrowRequestCancelled implements ShouldBroadcastNow
 
         return [
             'request_id' => $this->borrowRequest->id,
-            'user_name'  => $userName,
-            'message'    => "{$userName} cancelled borrow request #{$this->borrowRequest->id}",
-            'type'       => 'borrow_request_cancelled',
+            'user_name' => $userName,
+            'message' => "{$userName} cancelled borrow request #{$this->borrowRequest->id}",
+            'type' => 'borrow_request_cancelled',
         ];
     }
 }

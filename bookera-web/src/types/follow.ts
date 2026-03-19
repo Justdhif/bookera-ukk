@@ -9,7 +9,6 @@ export interface FollowedAuthor {
   name: string;
   bio?: string;
   photo: string;
-  photo_url?: string;
   is_active: boolean;
   books_count: number;
   follow_id: number;
@@ -23,7 +22,6 @@ export interface FollowedPublisher {
   name: string;
   description?: string;
   photo: string;
-  photo_url?: string;
   is_active: boolean;
   books_count: number;
   follow_id: number;
@@ -64,11 +62,15 @@ export interface FollowableDetail {
   bio?: string;
   description?: string;
   photo: string;
-  photo_url?: string;
   is_active: boolean;
   books_count: number;
   is_following: boolean;
   books: Book[];
   created_at: string;
   updated_at: string;
+}
+
+export interface FollowCounts {
+  followers_count: number;
+  following_count: number;
 }
