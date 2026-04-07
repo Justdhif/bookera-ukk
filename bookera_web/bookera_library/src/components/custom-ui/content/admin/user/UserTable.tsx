@@ -71,7 +71,7 @@ export default function UserTable({ data, onDelete }: Props) {
                       {item.profile.full_name}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {item.profile.identification_number || "N/A"}
+                      {item.slug || "N/A"}
                     </div>
                   </div>
                 </div>
@@ -94,14 +94,24 @@ export default function UserTable({ data, onDelete }: Props) {
               </TableCell>
               <TableCell className="pr-6">
                 <div className="flex justify-end items-center gap-2">
-                  <Link
-                    href={`/admin/users/${item.profile.identification_number}`}
-                  >
-                    <Button size="sm" variant="outline" className="h-8 gap-1">
+                  {item.slug ? (
+                    <Link href={`/admin/users/${item.slug}`}>
+                      <Button size="sm" variant="outline" className="h-8 gap-1">
+                        <Eye className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">{t("viewUser")}</span>
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8 gap-1"
+                      disabled
+                    >
                       <Eye className="h-3.5 w-3.5" />
                       <span className="hidden sm:inline">{t("viewUser")}</span>
                     </Button>
-                  </Link>
+                  )}
                   <Button
                     size="sm"
                     variant="destructive"

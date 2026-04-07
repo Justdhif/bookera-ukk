@@ -11,9 +11,9 @@ import UserFilter from "./UserFilter";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
-import { UserTableSkeleton } from "./UserTableSkeleton";
 import { Plus, User as UserIcon } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
+import DataLoading from "@/components/custom-ui/DataLoading";
 export default function UserClient() {
   const t = useTranslations("user");
   const [users, setUsers] = useState<User[]>([]);
@@ -89,7 +89,7 @@ export default function UserClient() {
         onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
       >
         {loading ? (
-          <UserTableSkeleton />
+          <DataLoading size="lg" />
         ) : (
           <UserTable data={users} onDelete={(id) => setDeleteId(id)} />
         )}

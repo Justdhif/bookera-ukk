@@ -13,13 +13,8 @@ import DashboardCards from "./cards/DashboardCards";
 import BorrowMonthlyChart from "./charts/BorrowMonthlyChart";
 import BorrowStatusChart from "./charts/BorrowStatusChart";
 import LatestBorrowsTable from "./table/LatestBorrowsTable";
-import { DashboardCardsSkeleton } from "./cards/DashboardCardsSkeleton";
-import {
-  BorrowMonthlyChartSkeleton,
-  BorrowStatusChartSkeleton,
-} from "./charts/ChartsSkeleton";
-import { LatestBorrowsTableSkeleton } from "./table/LatestBorrowsTableSkeleton";
 import { toast } from "sonner";
+import DataLoading from "@/components/custom-ui/DataLoading";
 
 export default function DashboardClient() {
   const t = useTranslations("dashboard");
@@ -58,24 +53,12 @@ export default function DashboardClient() {
         description={t("welcome")}
         isAdmin
       />
-      {loading ? <DashboardCardsSkeleton /> : <DashboardCards data={totals!} />}
+      {loading ? <DataLoading size="lg" /> : <DashboardCards data={totals!} />}
       <div className="grid gap-6 lg:grid-cols-2">
-        {loading ? (
-          <BorrowStatusChartSkeleton />
-        ) : (
-          <BorrowStatusChart data={status} />
-        )}
-        {loading ? (
-          <LatestBorrowsTableSkeleton />
-        ) : (
-          <LatestBorrowsTable data={latestBorrows} />
-        )}
+        {loading ? <DataLoading size="lg" /> : <BorrowStatusChart data={status} />}
+        {loading ? <DataLoading size="lg" /> : <LatestBorrowsTable data={latestBorrows} />}
       </div>
-      {loading ? (
-        <BorrowMonthlyChartSkeleton />
-      ) : (
-        <BorrowMonthlyChart data={monthly} />
-      )}
+      {loading ? <DataLoading size="lg" /> : <BorrowMonthlyChart data={monthly} />}
     </div>
   );
 }

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Book } from "@/types/book";
 import { favoriteService } from "@/services/favorite.service";
 import BookCard from "./BookCard";
-import BookListSkeleton from "./BookListSkeleton";
+import DataLoading from "@/components/custom-ui/DataLoading";
 import { AnimatePresence, motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useAuthStore } from "@/store/auth.store";
@@ -20,6 +20,8 @@ const variants = {
 export default function FavoriteBookRow() {
   const t = useTranslations("public");
   const { isAuthenticated } = useAuthStore();
+  const userSlug = useAuthStore((state) => state.user?.slug);
+  const favoritesHref = userSlug ? `/${userSlug}/favorites` : "/favorites";
   const { ref, inView } = useInView({
     triggerOnce: true,
     rootMargin: "200px 0px",
@@ -68,16 +70,13 @@ export default function FavoriteBookRow() {
         <div className="flex items-center justify-between border-l-4 border-brand-primary pl-3">
           <h2 className="text-xl font-bold">{t("favorites.title")}</h2>
           {!loading && books.length > 0 && (
-            <Link
-              href="/favorites"
-              className="text-sm font-medium text-brand-primary hover:underline"
-            >
+            <Link href={favoritesHref} className="text-sm font-medium text-brand-primary hover:underline">
               {t("favorites.viewAll")}
             </Link>
           )}
         </div>
         {loading && books.length === 0 ? (
-          <BookListSkeleton />
+          <DataLoading variant="card" size="lg" />
         ) : (
           <div className="relative">
             <div className="overflow-hidden">

@@ -8,9 +8,9 @@ import TermsOfServiceList from "./list/TermsOfServiceList";
 import TermsOfServiceFormDialog from "./form/TermsOfServiceFormDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { TermsOfServiceListSkeleton } from "./list/TermsOfServiceListSkeleton";
 import { Plus } from "lucide-react";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
+import DataLoading from "@/components/custom-ui/DataLoading";
 export default function TermsOfServiceClient() {
   const t = useTranslations("terms-of-service");
   const [items, setItems] = useState<TermsOfService[]>([]);
@@ -64,7 +64,7 @@ export default function TermsOfServiceClient() {
         }
       />
       {loading ? (
-        <TermsOfServiceListSkeleton />
+        <DataLoading size="lg" />
       ) : (
         <TermsOfServiceList
           data={items}

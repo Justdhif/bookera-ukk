@@ -6,6 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\DiscussionPost;
 use App\Models\DiscussionPostReport;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -17,7 +18,7 @@ class DiscussionPostReportController extends Controller
      */
     public function store(Request $request, string $slug): JsonResponse
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $request->user();
 
         $post = DiscussionPost::where('slug', $slug)->firstOrFail();
@@ -85,7 +86,7 @@ class DiscussionPostReportController extends Controller
             'takedown_reason' => 'nullable|string|max:500',
         ]);
 
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $request->user();
 
         $report->update([

@@ -23,7 +23,7 @@ export default function BookReviewDialog({ book, isOpen, onOpenChange, onReviewS
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] h-[90vh] flex flex-col p-0">
+      <DialogContent className="sm:max-w-175 h-[90vh] flex flex-col p-0">
         <DialogHeader className="p-6 pb-2 shrink-0">
           <DialogTitle>{t("reviewsTitle")}</DialogTitle>
           <DialogDescription>{t("reviewsDesc")}</DialogDescription>

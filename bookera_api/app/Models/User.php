@@ -2,28 +2,11 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-/**
- * @property int $id
- * @property string $email
- * @property string $password
- * @property string $role
- * @property bool $is_active
- * @property \Illuminate\Support\Carbon|null $email_verified_at
- * @property \Illuminate\Support\Carbon|null $last_login_at
- * @property string|null $remember_token
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
- * @property-read \App\Models\UserProfile|null $profile
- * @property-read \Illuminate\Database\Eloquent\Collection<\App\Models\Notification> $notifications
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Book> $favoriteBooks
- * @property-read int|null $favorite_books_count
- */
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -38,6 +21,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'email',
+        'slug',
         'password',
         'role',
         'is_active',

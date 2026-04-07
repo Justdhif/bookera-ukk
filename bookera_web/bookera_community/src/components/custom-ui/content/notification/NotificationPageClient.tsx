@@ -28,45 +28,6 @@ export default function NotificationPageClient() {
   const NOTIFICATION_MODULE = "discussion";
 
   useEffect(() => {
-    const handleNotificationReceived = () => {
-      fetchNotifications();
-      fetchUnreadCount();
-    };
-
-    window.addEventListener("notification-received", handleNotificationReceived);
-    return () => {
-      window.removeEventListener("notification-received", handleNotificationReceived);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleNotificationRead = (event: any) => {
-      const notificationId = event.detail?.notificationId;
-      
-      if (notificationId) {
-        setNotifications((prevNotifications) =>
-          prevNotifications.map((n) =>
-            n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
-          )
-        );
-        
-        setSelectedNotif((prevSelected) =>
-          prevSelected && prevSelected.id === notificationId
-            ? { ...prevSelected, read_at: new Date().toISOString() }
-            : prevSelected
-        );
-        
-        fetchUnreadCount();
-      }
-    };
-
-    window.addEventListener("notification-read", handleNotificationRead);
-    return () => {
-      window.removeEventListener("notification-read", handleNotificationRead);
-    };
-  }, []);
-
-  useEffect(() => {
     fetchNotifications();
     fetchUnreadCount();
   }, []);
@@ -126,12 +87,6 @@ export default function NotificationPageClient() {
         setSelectedNotif(updatedNotif);
         
         fetchUnreadCount();
-        
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("notification-read", { 
-            detail: { notificationId: notif.id } 
-          }));
-        }
       } catch (error) {
         console.error("Failed to mark as read:", error);
         setSelectedNotif(notif);

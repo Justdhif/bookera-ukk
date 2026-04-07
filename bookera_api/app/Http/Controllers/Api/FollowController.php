@@ -6,6 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\Follow\FollowService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -30,7 +31,7 @@ class FollowController extends Controller
         try {
             $follow = $this->followService->follow($validated['type'], $validated['id']);
             return ApiResponse::successResponse('Berhasil mengikuti', ['follow_id' => $follow->id], 201);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Data tidak ditemukan');
         } catch (\Exception $e) {
             $code = $e->getCode() >= 400 ? $e->getCode() : 422;
@@ -73,7 +74,7 @@ class FollowController extends Controller
         try {
             $followers = $this->followService->getUserFollowers($userSlug, (int) $request->get('per_page', 20));
             return ApiResponse::successResponse('Daftar pengikut berhasil diambil', $followers);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Pengguna tidak ditemukan');
         }
     }
@@ -83,7 +84,7 @@ class FollowController extends Controller
         try {
             $following = $this->followService->getUserFollowing($userSlug, (int) $request->get('per_page', 20));
             return ApiResponse::successResponse('Daftar following berhasil diambil', $following);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Pengguna tidak ditemukan');
         }
     }
@@ -93,7 +94,7 @@ class FollowController extends Controller
         try {
             $counts = $this->followService->getUserFollowCounts($userSlug);
             return ApiResponse::successResponse('Jumlah follower berhasil diambil', $counts);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Pengguna tidak ditemukan');
         }
     }

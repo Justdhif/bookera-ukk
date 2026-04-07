@@ -26,10 +26,9 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->text('bio')->nullable();
 
-            // Additional fields for identification
             $table->string('identification_number')->nullable()->unique();
-            $table->string('occupation')->nullable(); // Student, Teacher, Staff, etc
-            $table->string('institution')->nullable(); // School name, department, etc
+            $table->string('occupation')->nullable();
+            $table->string('institution')->nullable();
 
             $table->timestamps();
         });

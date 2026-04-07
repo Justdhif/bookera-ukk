@@ -45,6 +45,13 @@ class UserService
         return $user->load('profile');
     }
 
+    public function getBySlug(string $slug): User
+    {
+        return User::with('profile')
+            ->where('slug', $slug)
+            ->firstOrFail();
+    }
+
     public function getByIdentificationNumber(string $identificationNumber): User
     {
         return User::with('profile')

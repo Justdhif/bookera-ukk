@@ -8,8 +8,8 @@ import FineTypeFormDialog from "./FineTypeFormDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
-import { FineTypeTableSkeleton } from "./FineTypeTableSkeleton";
 import { Plus } from "lucide-react";
+import DataLoading from "@/components/custom-ui/DataLoading";
 
 export default function FineTypeManagement() {
   const t = useTranslations("fines");
@@ -73,7 +73,7 @@ export default function FineTypeManagement() {
       </div>
 
       {loading ? (
-        <FineTypeTableSkeleton />
+        <DataLoading size="lg" />
       ) : (
         <FineTypeTable
           data={fineTypes}

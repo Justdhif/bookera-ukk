@@ -35,31 +35,6 @@ export default function NotificationDropdown({
   const NOTIFICATION_MODULE = "discussion";
 
   useEffect(() => {
-    const handleNotificationReceived = () => {
-      fetchNotifications();
-      fetchUnreadCount();
-    };
-    window.addEventListener("notification-received", handleNotificationReceived);
-    return () => window.removeEventListener("notification-received", handleNotificationReceived);
-  }, []);
-
-  useEffect(() => {
-    const handleNotificationRead = (event: any) => {
-      const notificationId = event.detail?.notificationId;
-      if (notificationId) {
-        setNotifications((prev) =>
-          prev.map((n) =>
-            n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n,
-          ),
-        );
-      }
-      fetchUnreadCount();
-    };
-    window.addEventListener("notification-read", handleNotificationRead);
-    return () => window.removeEventListener("notification-read", handleNotificationRead);
-  }, []);
-
-  useEffect(() => {
     if (isAuthenticated) fetchUnreadCount();
   }, [isAuthenticated]);
 
@@ -100,9 +75,6 @@ export default function NotificationDropdown({
           ),
         );
         fetchUnreadCount();
-        window.dispatchEvent(
-          new CustomEvent("notification-read", { detail: { notificationId: notif.id } }),
-        );
       } catch (error) {
         console.error("Failed to mark as read:", error);
       }
@@ -123,6 +95,7 @@ export default function NotificationDropdown({
     if (!isOpen) {
       setIsOpen(true);
       fetchNotifications();
+      fetchUnreadCount();
     }
   };
 

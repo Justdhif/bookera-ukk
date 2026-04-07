@@ -1,4 +1,5 @@
 "use client";
+
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -13,7 +14,8 @@ import { notificationService } from "@/services/notification.service";
 import { Notification } from "@/types/notification";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { NotificationIconBadge } from "@/components/custom-ui/content/notification/notification-utils";
+import { NotificationIconBadge } from "@/components/custom-ui/content/account/notification/notification-utils";
+import { useAuthStore } from "@/store/auth.store";
 interface NotificationDropdownProps {
   isAuthenticated?: boolean;
 }
@@ -23,46 +25,16 @@ export default function NotificationDropdown({
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("navbar");
+  const userSlug = useAuthStore((state) => state.user?.slug);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isAdmin = pathname.startsWith("/admin");
-  const notificationsHref = "/notifications";
-  useEffect(() => {
-    const handleNotificationReceived = () => {
-      fetchNotifications();
-      fetchUnreadCount();
-    };
-    window.addEventListener(
-      "notification-received",
-      handleNotificationReceived,
-    );
-    return () =>
-      window.removeEventListener(
-        "notification-received",
-        handleNotificationReceived,
-      );
-  }, []);
-  useEffect(() => {
-    const handleNotificationRead = (event: any) => {
-      const notificationId = event.detail?.notificationId;
-      if (notificationId) {
-        setNotifications((prev) =>
-          prev.map((n) =>
-            n.id === notificationId
-              ? { ...n, read_at: new Date().toISOString() }
-              : n,
-          ),
-        );
-      }
-      fetchUnreadCount();
-    };
-    window.addEventListener("notification-read", handleNotificationRead);
-    return () =>
-      window.removeEventListener("notification-read", handleNotificationRead);
-  }, []);
+  const notificationsHref = userSlug
+    ? `/${userSlug}/notifications`
+    : "/notifications";
   useEffect(() => {
     if (isAuthenticated) fetchUnreadCount();
   }, [isAuthenticated]);
@@ -96,11 +68,6 @@ export default function NotificationDropdown({
           ),
         );
         fetchUnreadCount();
-        window.dispatchEvent(
-          new CustomEvent("notification-read", {
-            detail: { notificationId: notif.id },
-          }),
-        );
       } catch (error) {
         console.error("Failed to mark as read:", error);
       }
@@ -109,15 +76,21 @@ export default function NotificationDropdown({
       if (notif.module === "borrow" && notif.data?.borrow_id) {
         router.push(`/admin/borrows/${notif.data.borrow_id}`);
       } else {
-        router.push("/notifications");
+        router.push(notificationsHref);
       }
     } else {
       if (notif.module === "borrow" && notif.data?.borrow_id) {
-        router.push(`/my-borrows/${notif.data.borrow_id}`);
+        const borrowHref = userSlug
+          ? `/${userSlug}/my-borrows/${notif.data.borrow_id}`
+          : `/my-borrows/${notif.data.borrow_id}`;
+        router.push(borrowHref);
       } else if (notif.module === "return" && notif.data?.borrow_id) {
-        router.push(`/my-borrows/${notif.data.borrow_id}`);
+        const borrowHref = userSlug
+          ? `/${userSlug}/my-borrows/${notif.data.borrow_id}`
+          : `/my-borrows/${notif.data.borrow_id}`;
+        router.push(borrowHref);
       } else {
-        router.push("/notifications");
+        router.push(notificationsHref);
       }
     }
     setIsOpen(false);
@@ -127,6 +100,7 @@ export default function NotificationDropdown({
     if (!isOpen) {
       setIsOpen(true);
       fetchNotifications();
+      fetchUnreadCount();
     }
   };
   const handleMouseLeave = () => {

@@ -16,10 +16,8 @@ export const userService = {
 
   getById: (id: number) => api.get<ApiResponse<User>>(`/admin/users/${id}`),
 
-  getByIdentification: (identificationNumber: string) =>
-    api.get<ApiResponse<User>>(
-      `/admin/users/identification/${identificationNumber}`,
-    ),
+  getBySlug: (slug: string) =>
+    api.get<ApiResponse<User>>(`/admin/users/slug/${slug}`),
 
   create: (data: CreateUserData) =>
     api.post<ApiResponse<User>>("/admin/users", buildUserFormData(data), {

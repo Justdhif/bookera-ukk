@@ -10,6 +10,7 @@ use App\Models\DiscussionPost;
 use App\Models\Follow;
 use App\Models\User;
 use App\Services\Discussion\DiscussionPostService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,7 @@ class DiscussionPostController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        /** @var \App\Models\User|null $user */
+        /** @var User|null $user */
         $user = auth('sanctum')->user();
 
         $posts = $this->postService->getAll(
@@ -33,7 +34,7 @@ class DiscussionPostController extends Controller
     public function byUser(Request $request, string $userSlug): JsonResponse
     {
         try {
-            /** @var \App\Models\User|null $user */
+            /** @var User|null $user */
             $user = auth('sanctum')->user();
 
             $posts = $this->postService->getByUser(
@@ -42,7 +43,7 @@ class DiscussionPostController extends Controller
                 (int) $request->get('per_page', 15)
             );
             return ApiResponse::successResponse('User posts retrieved successfully', $posts);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return ApiResponse::notFoundResponse('User not found');
         }
     }
@@ -50,19 +51,19 @@ class DiscussionPostController extends Controller
     public function show(Request $request, string $slug): JsonResponse
     {
         try {
-            /** @var \App\Models\User|null $user */
+            /** @var User|null $user */
             $user = auth('sanctum')->user();
 
             $post = $this->postService->getBySlug($slug, $user);
             return ApiResponse::successResponse('Post retrieved successfully', $post);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Post not found');
         }
     }
 
     public function store(StoreDiscussionPostRequest $request): JsonResponse
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $request->user();
 
         $post = $this->postService->create($user, [
@@ -76,7 +77,7 @@ class DiscussionPostController extends Controller
     public function update(UpdateDiscussionPostRequest $request, string $slug): JsonResponse
     {
         try {
-            /** @var \App\Models\User $user */
+            /** @var User $user */
             $user = $request->user();
             $post = DiscussionPost::where('slug', $slug)->firstOrFail();
 
@@ -86,7 +87,7 @@ class DiscussionPostController extends Controller
             ]);
 
             return ApiResponse::successResponse('Post updated successfully', $post);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Post not found');
         } catch (\Exception $e) {
             $code = $e->getCode() >= 400 ? $e->getCode() : 403;
@@ -100,12 +101,12 @@ class DiscussionPostController extends Controller
     public function destroy(Request $request, string $slug): JsonResponse
     {
         try {
-            /** @var \App\Models\User $user */
+            /** @var User $user */
             $user = $request->user();
             $post = DiscussionPost::where('slug', $slug)->firstOrFail();
             $this->postService->delete($user, $post);
             return ApiResponse::successResponse('Post deleted successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Post not found');
         } catch (\Exception $e) {
             $code = $e->getCode() >= 400 ? $e->getCode() : 403;
@@ -118,7 +119,7 @@ class DiscussionPostController extends Controller
      */
     public function following(Request $request): JsonResponse
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $request->user();
 
         $posts = $this->postService->getByFollowing(
@@ -134,7 +135,7 @@ class DiscussionPostController extends Controller
      */
     public function activeUsers(Request $request): JsonResponse
     {
-        /** @var \App\Models\User|null $authUser */
+        /** @var User|null $authUser */
         $authUser = auth('sanctum')->user();
 
         $users = User::with('profile')

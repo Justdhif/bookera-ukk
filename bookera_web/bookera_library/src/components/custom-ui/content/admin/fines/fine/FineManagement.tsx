@@ -16,9 +16,9 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
-import { FineTableSkeleton } from "./FineTableSkeleton";
 import { Search } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
+import DataLoading from "@/components/custom-ui/DataLoading";
 
 export default function FineManagement() {
   const t = useTranslations("fines");
@@ -158,7 +158,7 @@ export default function FineManagement() {
         onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
       >
         {loading ? (
-          <FineTableSkeleton />
+          <DataLoading size="lg" />
         ) : (
           <FineTable data={fines} onDelete={(id) => setDeleteId(id)} />
         )}

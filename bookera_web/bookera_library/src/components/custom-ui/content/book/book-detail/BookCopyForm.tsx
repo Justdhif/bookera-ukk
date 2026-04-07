@@ -44,6 +44,7 @@ export function BookCopyForm({ bookId, onSuccess }: Props) {
         onClick={handleSubmit}
         disabled={loading || !formData.copyCode.trim()}
         variant="submit"
+        loading={loading}
       >
         {loading ? t("adding") : t("addCopy")}
       </Button>

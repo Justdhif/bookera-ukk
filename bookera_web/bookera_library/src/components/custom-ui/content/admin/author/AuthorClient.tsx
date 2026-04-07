@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
-import { AuthorTableSkeleton } from "./AuthorTableSkeleton";
 import { Plus, Search, UserSquare } from "lucide-react";
 import {
   Select,
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import { useTranslations } from "next-intl";
+import DataLoading from "@/components/custom-ui/DataLoading";
 
 export default function AuthorClient() {
   const t = useTranslations("author");
@@ -158,7 +158,7 @@ export default function AuthorClient() {
         onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
       >
         {loading ? (
-          <AuthorTableSkeleton />
+          <DataLoading size="lg" />
         ) : (
           <AuthorTable
             data={authors}

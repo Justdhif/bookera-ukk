@@ -517,42 +517,6 @@ api.interceptors.request.use((config) => {
 })
 ```
 
----
-
-### Real-time
-
-#### **Laravel Echo & Pusher JS**
-```json
-"laravel-echo": "^2.3.0",
-"pusher-js": "^8.4.0"
-```
-**Purpose:** Real-time WebSocket communication  
-**Used For:**
-- Real-time notifications
-- Live updates
-- Chat features
-
-**Example:**
-```typescript
-import Echo from 'laravel-echo'
-import Pusher from 'pusher-js'
-
-const echo = new Echo({
-  broadcaster: 'reverb',
-  key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY,
-  wsHost: process.env.NEXT_PUBLIC_WEBSOCKET_HOST,
-  wsPort: process.env.NEXT_PUBLIC_WEBSOCKET_PORT,
-})
-
-// Listen to events
-echo.channel('notifications')
-  .listen('LoanApproved', (data) => {
-    console.log(data)
-  })
-```
-
----
-
 ### Utilities
 
 #### **Date-fns**

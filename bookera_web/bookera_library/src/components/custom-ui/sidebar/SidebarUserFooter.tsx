@@ -39,7 +39,7 @@ export function SidebarUserFooter() {
   const showBackButton = isAdmin || hasAdminRole;
   const backHref = isAdmin ? "/" : "/admin";
   const backLabelKey = isAdmin ? "publicPage" : "dashboard";
-  const profileHref = "/profile";
+  const profileHref = user?.slug ? `/${user.slug}/profile` : "/profile";
 
   const backLabel = t(backLabelKey);
 

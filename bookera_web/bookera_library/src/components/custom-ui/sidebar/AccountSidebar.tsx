@@ -27,26 +27,28 @@ import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import { useTranslations } from "next-intl";
 import { SidebarUserFooter } from "@/components/custom-ui/sidebar/SidebarUserFooter";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth.store";
 type NavLabelKey =
   | "profile"
   | "myBorrows"
   | "myFines"
   | "myFavorites";
 const NAV_ITEMS: Array<{
-  href: string;
+  path: string;
   icon: React.ElementType;
   labelKey: NavLabelKey;
 }> = [
-  { href: "/profile", icon: User, labelKey: "profile" },
-  { href: "/my-borrows", icon: BookOpen, labelKey: "myBorrows" },
-  { href: "/my-fines", icon: DollarSign, labelKey: "myFines" },
-  { href: "/favorites", icon: Heart, labelKey: "myFavorites" },
+  { path: "/profile", icon: User, labelKey: "profile" },
+  { path: "/my-borrows", icon: BookOpen, labelKey: "myBorrows" },
+  { path: "/my-fines", icon: DollarSign, labelKey: "myFines" },
+  { path: "/favorites", icon: Heart, labelKey: "myFavorites" },
 ];
 export default function AccountSidebar() {
   const t = useTranslations("sidebar");
   const tNavbar = useTranslations("navbar");
   const { open } = useSidebar();
   const pathname = usePathname();
+  const userSlug = useAuthStore((state) => state.user?.slug);
   const navLabel = (key: NavLabelKey) => tNavbar(key);
   return (
     <Sidebar
@@ -99,8 +101,10 @@ export default function AccountSidebar() {
         <SidebarGroup className="p-2">
           <TooltipProvider delayDuration={0}>
             <SidebarMenu className={cn(!open && "flex flex-col items-center")}>
-              {NAV_ITEMS.map(({ href, icon: Icon, labelKey }) => {
-                const isActive = pathname === href;
+              {NAV_ITEMS.map(({ path, icon: Icon, labelKey }) => {
+                const href = userSlug ? `/${userSlug}${path}` : path;
+                const isActive =
+                  pathname === href || pathname.startsWith(`${href}/`);
                 const label = navLabel(labelKey);
                 return (
                   <SidebarMenuItem

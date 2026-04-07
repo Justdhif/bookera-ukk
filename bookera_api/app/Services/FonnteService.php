@@ -34,7 +34,7 @@ class FonnteService
         try {
             $response = Http::withHeaders([
                 'Authorization' => $this->token,
-            ])->asForm()->post($this->url, [
+            ])->timeout(5)->connectTimeout(5)->asForm()->post($this->url, [
                 'target' => $phone,
                 'message' => $message,
             ]);

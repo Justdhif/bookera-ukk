@@ -5,18 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @property int $id
- * @property int $borrow_id
- * @property \Illuminate\Support\Carbon $return_date
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Borrow $borrow
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BookReturnDetail> $bookReturnDetails
- * @property-read int|null $book_return_details_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BookReturnDetail> $details
- * @property-read int|null $details_count
- */
 class BookReturn extends Model
 {
     use HasFactory;

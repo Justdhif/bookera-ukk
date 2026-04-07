@@ -64,16 +64,20 @@ export function DatePicker({
         <Button
           variant="outline"
           className={cn(
-            "w-full justify-start text-left font-normal",
+            "h-11 w-full justify-start gap-3 rounded-2xl border-border/70 bg-background px-4 text-left font-medium shadow-sm transition-all hover:border-primary/40 hover:bg-accent/20 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/20",
             !value && "text-muted-foreground",
           )}
           disabled={disabled}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          <CalendarIcon className="h-4 w-4 shrink-0 text-primary/70" />
           {value ? format(value, "PPP") : <span>{effectivePlaceholder}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
+      <PopoverContent
+        align="start"
+        sideOffset={8}
+        className="w-auto overflow-hidden rounded-3xl border-border/60 bg-popover p-0 shadow-2xl shadow-black/10"
+      >
         <Calendar
           mode="single"
           selected={value}

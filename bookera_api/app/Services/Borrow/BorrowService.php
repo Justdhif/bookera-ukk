@@ -2,7 +2,7 @@
 
 namespace App\Services\Borrow;
 
-use App\Events\BorrowRequested;
+use App\Services\Borrow\BorrowNotificationService;
 use App\Helpers\ActivityLogger;
 use App\Models\BookCopy;
 use App\Models\Borrow;
@@ -51,7 +51,7 @@ class BorrowService
 
     public function create(array $data, User $user): Borrow
     {
-        return DB::transaction(function () use ($data, $user) {
+        $borrow = DB::transaction(function () use ($data, $user) {
             $borrowCode = $this->generateBorrowCode();
 
             $borrow = Borrow::create([
@@ -103,15 +103,17 @@ class BorrowService
                 $borrow
             );
 
-            event(new BorrowRequested($borrow));
-
             return $borrow;
         });
+
+        (new BorrowNotificationService())->notifyBorrowRequested($borrow);
+
+        return $borrow;
     }
 
     public function createAdmin(array $data, User $admin): Borrow
     {
-        return DB::transaction(function () use ($data, $admin) {
+        $borrow = DB::transaction(function () use ($data, $admin) {
             $borrowCode = $this->generateBorrowCode();
 
             $borrow = Borrow::create([
@@ -178,6 +180,10 @@ class BorrowService
 
             return $borrow;
         });
+
+        (new BorrowNotificationService())->notifyBorrowIssued($borrow);
+
+        return $borrow;
     }
 
     public function getById(Borrow $borrow): Borrow

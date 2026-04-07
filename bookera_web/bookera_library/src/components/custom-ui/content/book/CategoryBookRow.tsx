@@ -7,7 +7,7 @@ import { Category } from "@/types/category";
 import { bookService } from "@/services/book.service";
 import BookCard from "./BookCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import BookListSkeleton from "./BookListSkeleton";
+import DataLoading from "@/components/custom-ui/DataLoading";
 import { AnimatePresence, motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Button } from "@/components/ui/button";
@@ -88,7 +88,7 @@ export default function CategoryBookRow({ category }: Props) {
           {category.name}
         </h2>
         {loading && books.length === 0 ? (
-          <BookListSkeleton />
+          <DataLoading size="lg" />
         ) : (
           <div className="relative">
             <div className="overflow-hidden">

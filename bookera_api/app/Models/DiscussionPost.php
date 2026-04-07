@@ -7,20 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-/**
- * @property int $id
- * @property int $user_id
- * @property string|null $caption
- * @property string $slug
- * @property int $likes_count
- * @property int $comments_count
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
- * @property-read \App\Models\User $user
- * @property-read \Illuminate\Database\Eloquent\Collection<\App\Models\DiscussionPostImage> $images
- * @property-read \Illuminate\Database\Eloquent\Collection<\App\Models\DiscussionLike> $likes
- * @property-read \Illuminate\Database\Eloquent\Collection<\App\Models\DiscussionComment> $comments
- */
 class DiscussionPost extends Model
 {
     use HasFactory;

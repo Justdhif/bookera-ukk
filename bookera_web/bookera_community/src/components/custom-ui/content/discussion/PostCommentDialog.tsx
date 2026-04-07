@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { DiscussionPost } from "@/types/discussion";
-import { useAuthStore } from "@/store/auth.store";
 import PostImageCarousel from "./PostImageCarousel";
 import PostDetailPanel from "./post-detail/PostDetailPanel";
 
@@ -19,7 +18,6 @@ interface Props {
   onDeleted?: (postId: number) => void;
   onCommentAdded?: () => void;
   onCommentDeleted?: () => void;
-  onLikedChange?: (liked: boolean) => void;
 }
 
 export default function PostCommentDialog({
@@ -29,9 +27,7 @@ export default function PostCommentDialog({
   onDeleted,
   onCommentAdded,
   onCommentDeleted,
-  onLikedChange,
 }: Props) {
-  const { user } = useAuthStore();
   const [liked, setLiked] = useState(initialPost.is_liked);
   const [likesCount, setLikesCount] = useState(initialPost.likes_count);
   const [commentsCount, setCommentsCount] = useState(initialPost.comments_count);
@@ -44,37 +40,6 @@ export default function PostCommentDialog({
       setCommentsCount(initialPost.comments_count);
     }
   }, [initialPost.slug, initialPost.is_liked, initialPost.likes_count, initialPost.comments_count, open]);
-
-  // Listen to real-time post updates
-  useEffect(() => {
-    if (!open) return;
-
-    const handlePostUpdate = (event: CustomEvent<{
-      slug: string;
-      likesCount: number;
-      commentsCount: number;
-      userId?: number;
-      action?: 'liked' | 'unliked';
-    }>) => {
-      if (event.detail.slug === initialPost.slug) {
-        setLikesCount(event.detail.likesCount);
-        setCommentsCount(event.detail.commentsCount);
-        
-        // Update liked status if this is the current user's action
-        if (event.detail.userId === user?.id && event.detail.action) {
-          const newLiked = event.detail.action === 'liked';
-          setLiked(newLiked);
-          // Notify parent component
-          onLikedChange?.(newLiked);
-        }
-      }
-    };
-
-    window.addEventListener("discussion-post-updated", handlePostUpdate as EventListener);
-    return () => {
-      window.removeEventListener("discussion-post-updated", handlePostUpdate as EventListener);
-    };
-  }, [initialPost.slug, user?.id, open]);
 
   // Create updated post object with current state
   const post = useMemo(() => ({

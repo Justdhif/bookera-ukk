@@ -222,6 +222,56 @@ export default function BookForm({
           </div>
         </div>
         <div className="space-y-4">
+          <h3 className="font-semibold text-lg">{t("publicationDetails")}</h3>
+          <div className="space-y-2">
+            <div className="grid gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="publication_year">{t("publicationYear")}</Label>
+                <YearPicker
+                  value={formData.publication_year || ""}
+                  onChange={handleYearChange}
+                  placeholder={t("selectYear")}
+                  searchPlaceholder={t("searchYear")}
+                  emptyText={t("yearNotFound")}
+                  disabled={!isEditMode}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="isbn">{t("isbn")}</Label>
+              <Input
+                id="isbn"
+                name="isbn"
+                value={formData.isbn || ""}
+                onChange={handleInputChange}
+                placeholder={t("enterIsbn")}
+                disabled={!isEditMode}
+                validationType={isEditMode ? "alphanumeric" : undefined}
+                onValidationChange={
+                  isEditMode ? handleValidationChange("isbn") : undefined
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="language">{t("language")}</Label>
+              <Input
+                id="language"
+                name="language"
+                value={formData.language || ""}
+                onChange={handleInputChange}
+                placeholder={t("languagePlaceholder")}
+                disabled={!isEditMode}
+                validationType={isEditMode ? "letters-only" : undefined}
+                onValidationChange={
+                  isEditMode ? handleValidationChange("language") : undefined
+                }
+              />
+            </div>
+          </div>
+        </div>
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-lg flex items-center gap-2">
               <UserSquare className="h-5 w-5" /> {t("authorsSection")}
@@ -229,7 +279,7 @@ export default function BookForm({
             {isEditMode && (
               <Button
                 type="button"
-                variant="submit"
+                variant="outline"
                 size="sm"
                 onClick={onAddAuthor}
                 className="gap-1"
@@ -243,7 +293,7 @@ export default function BookForm({
               <PopoverTrigger asChild>
                 <Button
                   type="button"
-                  variant="brand"
+                  variant="outline"
                   className="w-full justify-start text-left font-normal"
                   disabled={!isEditMode}
                 >
@@ -319,7 +369,7 @@ export default function BookForm({
             {isEditMode && (
               <Button
                 type="button"
-                variant="submit"
+                variant="outline"
                 size="sm"
                 onClick={onAddPublisher}
                 className="gap-1"
@@ -333,7 +383,7 @@ export default function BookForm({
               <PopoverTrigger asChild>
                 <Button
                   type="button"
-                  variant="brand"
+                  variant="outline"
                   className="w-full justify-start text-left font-normal"
                   disabled={!isEditMode}
                 >
@@ -404,56 +454,6 @@ export default function BookForm({
           </div>
         </div>
         <div className="space-y-4">
-          <h3 className="font-semibold text-lg">{t("publicationDetails")}</h3>
-          <div className="space-y-2">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="publication_year">{t("publicationYear")}</Label>
-                <YearPicker
-                  value={formData.publication_year || ""}
-                  onChange={handleYearChange}
-                  placeholder={t("selectYear")}
-                  searchPlaceholder={t("searchYear")}
-                  emptyText={t("yearNotFound")}
-                  disabled={!isEditMode}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="isbn">{t("isbn")}</Label>
-              <Input
-                id="isbn"
-                name="isbn"
-                value={formData.isbn || ""}
-                onChange={handleInputChange}
-                placeholder={t("enterIsbn")}
-                disabled={!isEditMode}
-                validationType={isEditMode ? "alphanumeric" : undefined}
-                onValidationChange={
-                  isEditMode ? handleValidationChange("isbn") : undefined
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="language">{t("language")}</Label>
-              <Input
-                id="language"
-                name="language"
-                value={formData.language || ""}
-                onChange={handleInputChange}
-                placeholder={t("languagePlaceholder")}
-                disabled={!isEditMode}
-                validationType={isEditMode ? "letters-only" : undefined}
-                onValidationChange={
-                  isEditMode ? handleValidationChange("language") : undefined
-                }
-              />
-            </div>
-          </div>
-        </div>
-        <div className="space-y-4">
           <h3 className="font-semibold text-lg">{t("categoriesSection")}</h3>
           <div className="space-y-2">
             <Label>{t("selectCategoriesLabel")}</Label>
@@ -461,7 +461,7 @@ export default function BookForm({
               <PopoverTrigger asChild>
                 <Button
                   type="button"
-                  variant="brand"
+                  variant="outline"
                   className="w-full justify-start text-left font-normal"
                   disabled={!isEditMode}
                 >

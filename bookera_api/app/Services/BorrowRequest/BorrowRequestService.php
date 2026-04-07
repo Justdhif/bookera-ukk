@@ -2,16 +2,13 @@
 
 namespace App\Services\BorrowRequest;
 
-use App\Events\BorrowRequestApproved;
-use App\Events\BorrowRequestCancelled;
-use App\Events\BorrowRequestCreated;
-use App\Events\BorrowRequestRejected;
 use App\Helpers\ActivityLogger;
 use App\Models\BookCopy;
 use App\Models\Borrow;
 use App\Models\BorrowDetail;
 use App\Models\BorrowRequest;
 use App\Models\User;
+use App\Services\Borrow\BorrowNotificationService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -52,7 +49,7 @@ class BorrowRequestService
 
     public function create(array $data, User $user): BorrowRequest
     {
-        return DB::transaction(function () use ($data, $user) {
+        $request = DB::transaction(function () use ($data, $user) {
             $request = BorrowRequest::create([
                 'user_id'         => $user->id,
                 'borrow_date'     => $data['borrow_date'],
@@ -85,11 +82,12 @@ class BorrowRequestService
                 null,
                 $request
             );
-
-            event(new BorrowRequestCreated($request));
-
             return $request;
         });
+
+        (new BorrowNotificationService())->notifyBorrowRequestCreated($request);
+
+        return $request;
     }
 
     public function getById(BorrowRequest $request): BorrowRequest
@@ -131,7 +129,7 @@ class BorrowRequestService
             $request
         );
 
-        event(new BorrowRequestCancelled($request));
+        (new BorrowNotificationService())->notifyBorrowRequestCancelled($request);
 
         return $request;
     }
@@ -144,7 +142,7 @@ class BorrowRequestService
             'Only processing requests can be approved'
         );
 
-        return DB::transaction(function () use ($borrowRequest) {
+        $borrow = DB::transaction(function () use ($borrowRequest) {
             $borrowCode = $this->generateBorrowCode();
 
             $borrow = Borrow::create([
@@ -173,10 +171,12 @@ class BorrowRequestService
                 $borrowRequest
             );
 
-            event(new BorrowRequestApproved($borrowRequest, $borrow));
-
             return $borrow;
         });
+
+        (new BorrowNotificationService())->notifyBorrowRequestApproved($borrowRequest, $borrow);
+
+        return $borrow;
     }
 
     public function reject(BorrowRequest $borrowRequest, ?string $rejectReason = null): BorrowRequest
@@ -203,7 +203,7 @@ class BorrowRequestService
             $borrowRequest
         );
 
-        event(new BorrowRequestRejected($borrowRequest));
+        (new BorrowNotificationService())->notifyBorrowRequestRejected($borrowRequest);
 
         return $borrowRequest;
     }
@@ -215,7 +215,7 @@ class BorrowRequestService
      */
     public function assignBorrow(BorrowRequest $borrowRequest, array $copyIds = []): Borrow
     {
-        return DB::transaction(function () use ($borrowRequest, $copyIds) {
+        $borrow = DB::transaction(function () use ($borrowRequest, $copyIds) {
             $borrowCode = $this->generateBorrowCode();
 
             $borrow = Borrow::create([
@@ -286,10 +286,12 @@ class BorrowRequestService
             );
 
             $borrowRequest->load(['borrowRequestDetails.book', 'user.profile']);
-            event(new BorrowRequestApproved($borrowRequest, $borrow));
-
             return $borrow;
         });
+
+        (new BorrowNotificationService())->notifyBorrowRequestApproved($borrowRequest, $borrow);
+
+        return $borrow;
     }
 
     public function delete(BorrowRequest $request): void

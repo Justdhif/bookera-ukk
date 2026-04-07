@@ -5,19 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @property int $id
- * @property int $user_id
- * @property int $post_id
- * @property int|null $parent_id
- * @property string $content
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
- * @property-read \App\Models\User $user
- * @property-read \App\Models\DiscussionPost $post
- * @property-read \App\Models\DiscussionComment|null $parent
- * @property-read \Illuminate\Database\Eloquent\Collection<\App\Models\DiscussionComment> $replies
- */
 class DiscussionComment extends Model
 {
     use HasFactory;

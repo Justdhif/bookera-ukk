@@ -174,8 +174,8 @@ export default function AuthorPublisherSidebarSearch() {
                   <Skeleton className="h-8 w-8 rounded-full shrink-0" />
                   {open && (
                     <div className="flex flex-col gap-1.5 w-full overflow-hidden py-0.5">
-                      <Skeleton className="h-3.5 w-[120px]" />
-                      <Skeleton className="h-2.5 w-[80px]" />
+                      <Skeleton className="h-3.5 w-30" />
+                      <Skeleton className="h-2.5 w-20" />
                     </div>
                   )}
                 </SidebarMenuButton>

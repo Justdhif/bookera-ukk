@@ -15,11 +15,10 @@ import { Plus, Package, Search, ClipboardList } from "lucide-react";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Input } from "@/components/ui/input";
 import { BorrowCard } from "./BorrowCard";
-import { BorrowSkeletonCard } from "./BorrowSkeletonCard";
 import { BorrowRequestCard } from "./BorrowRequestCard";
-import { BorrowRequestSkeletonCard } from "./BorrowRequestSkeletonCard";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
+import DataLoading from "@/components/custom-ui/DataLoading";
 
 export default function BorrowClient() {
   const t = useTranslations("borrow");
@@ -251,7 +250,7 @@ export default function BorrowClient() {
                 {loadingBorrows ? (
                   <div className="grid gap-4">
                     {Array.from({ length: 3 }).map((_, i) => (
-                      <BorrowSkeletonCard key={i} />
+                      <DataLoading key={i} size="lg" />
                     ))}
                   </div>
                 ) : (
@@ -294,7 +293,7 @@ export default function BorrowClient() {
               {loadingRequests ? (
                 <div className="space-y-4">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <BorrowRequestSkeletonCard key={i} />
+                    <DataLoading key={i} size="lg" />
                   ))}
                 </div>
               ) : requests.length === 0 ? (

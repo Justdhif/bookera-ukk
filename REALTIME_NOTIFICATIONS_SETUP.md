@@ -4,9 +4,9 @@ Panduan lengkap untuk mengaktifkan notifikasi real-time menggunakan Laravel Broa
 
 ## 📋 Overview
 
-Sistem notifikasi real-time akan mengirim notifikasi secara instant menggunakan WebSocket ketika:
-- User melakukan request peminjaman buku → Admin menerima notifikasi
-- Admin approve/reject peminjaman → User menerima notifikasi
+Sistem notifikasi real-time masih dipakai untuk alur non-borrow yang memang berjalan via WebSocket. Untuk alur borrow, notifikasi sekarang dikirim lewat database notification, email, dan WhatsApp sesuai setting profil pengguna, tanpa WebSocket.
+
+Real-time yang masih aktif meliputi:
 - User melakukan request pengembalian → Admin menerima notifikasi
 - Admin memproses pengembalian → User menerima notifikasi
 
@@ -26,6 +26,8 @@ Pastikan sudah terinstall:
 ## 🚀 Quick Start
 
 ### 1. Backend Setup (Laravel)
+
+**Catatan:** Notifikasi borrow tidak lagi menggunakan broadcasting Reverb. Alurnya tetap membuat notifikasi di database, lalu email/WhatsApp dikirim sesuai `notification_enabled`, `notification_email`, dan `notification_whatsapp` di database `user_profiles`.
 
 #### Install Laravel Reverb
 

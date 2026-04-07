@@ -213,7 +213,7 @@ export default function BookReviewSection({
                   value={reviewText}
                   onChange={(e) => setReviewText(e.target.value)}
                   placeholder={t("reviewPlaceholder")}
-                  className="min-h-[120px] bg-background resize-none border-gray-200 dark:border-gray-800 transition-all focus:ring-brand-primary/20"
+                  className="min-h-40 bg-background resize-none border-gray-200 dark:border-gray-800 transition-all focus:ring-brand-primary/20"
                 />
                 <div className="flex gap-2 justify-end">
                   {isEditing && (

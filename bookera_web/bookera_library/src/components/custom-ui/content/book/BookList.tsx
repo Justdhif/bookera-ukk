@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { Book } from "@/types/book";
 import BookCard from "./BookCard";
 import EmptyState from "@/components/custom-ui/EmptyState";
+import DataLoading from "@/components/custom-ui/DataLoading";
 import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
-import BookListSkeleton from "./BookListSkeleton";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface Props {
@@ -37,7 +37,11 @@ export default function BookList({ books, loading }: Props) {
     setPage(0);
   }, [books, itemsPerPage]);
 
-  if (loading) return <BookListSkeleton />;
+  if (loading) {
+    return (
+      <DataLoading variant="card" size="lg" />
+    );
+  }
 
   if (!books.length) {
     return (

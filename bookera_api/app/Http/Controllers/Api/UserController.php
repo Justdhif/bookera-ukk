@@ -41,6 +41,17 @@ class UserController extends Controller
         return ApiResponse::successResponse('Detail user', $user);
     }
 
+    public function showBySlug(string $slug): JsonResponse
+    {
+        try {
+            $user = $this->userService->getBySlug($slug);
+
+            return ApiResponse::successResponse('Detail user', $user);
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse('User tidak ditemukan', 404);
+        }
+    }
+
     public function showByIdentification(string $identificationNumber): JsonResponse
     {
         try {

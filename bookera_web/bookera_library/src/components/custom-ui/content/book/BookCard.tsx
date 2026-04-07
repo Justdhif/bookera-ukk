@@ -63,14 +63,22 @@ export default function BookCard({
     <div
       className={cn(
         "border rounded-lg p-3 flex flex-col gap-2 relative transition-colors duration-200 hover:border-border",
+        showCheckbox && onCheckedChange && "cursor-pointer",
         isChecked ? "border-brand-primary bg-brand-primary/5" : "border-border",
       )}
+      onClick={() => {
+        if (showCheckbox && onCheckedChange) {
+          onCheckedChange(!isChecked);
+        }
+      }}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
+      role={showCheckbox && onCheckedChange ? "button" : undefined}
+      tabIndex={showCheckbox && onCheckedChange ? 0 : undefined}
     >
       {showCheckbox && (
         <div
-          className="absolute top-5 left-5 z-10 bg-background/90 rounded-[4px] shadow-sm flex items-center justify-center p-0.5 cursor-pointer"
+          className="absolute top-5 left-5 z-10 flex items-center justify-center cursor-pointer"
           onClick={handleCheckboxClick}
         >
           <Checkbox
@@ -223,7 +231,11 @@ export default function BookCard({
             {book.average_rating ? Number(book.average_rating).toFixed(1) : "0.0"}
           </div>
         </div>
-        <Link href={`/books/${book.slug}`} className="block">
+        <Link
+          href={`/books/${book.slug}`}
+          className="block"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Button size="sm" variant="outline" className="w-full gap-1">
             <Eye className="h-3.5 w-3.5" />
             {t("detail.detail")}

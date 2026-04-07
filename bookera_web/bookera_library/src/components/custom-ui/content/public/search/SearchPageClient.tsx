@@ -10,11 +10,10 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import BookCard from "@/components/custom-ui/content/book/BookCard";
 import { Button } from "@/components/ui/button";
 import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
-import { Skeleton } from "@/components/ui/skeleton";
+import DataLoading from "@/components/custom-ui/DataLoading";
 import { bookService } from "@/services/book.service";
 import { Book } from "@/types/book";
 import RelatedRows from "./RelatedRows";
-import RelevantSkeleton from "./RelevantSkeleton";
 
 const relatedVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 40 : -40, opacity: 0 }),
@@ -186,7 +185,10 @@ export default function SearchPageClient() {
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold">{t("mostRelevant")}</h2>
           {loading ? (
-            <Skeleton className="h-4 w-28" />
+            <DataLoading
+              variant="inline"
+              size="sm"
+            />
           ) : (
             <p className="text-sm text-muted-foreground">
               {t("booksFound", { count: books.length })}
@@ -195,7 +197,10 @@ export default function SearchPageClient() {
         </div>
 
         {loading ? (
-          <RelevantSkeleton />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <DataLoading className="lg:col-span-1" size="lg" />
+            <DataLoading className="lg:col-span-2" size="lg" />
+          </div>
         ) : books.length === 0 ? (
           <EmptyState
             icon={<Search />}
@@ -216,7 +221,7 @@ export default function SearchPageClient() {
                   {t("noRelated")}
                 </div>
               ) : (
-                <div className="rounded-lg border overflow-hidden bg-background lg:h-[665px]">
+                <div className="rounded-lg border overflow-hidden bg-background lg:h-166.25">
                   <div className="h-full flex flex-col">
                     <div className="flex-1 overflow-hidden">
                       <div
@@ -291,9 +296,7 @@ export default function SearchPageClient() {
         </h2>
 
         {moreBooksLoading && moreBooks.length === 0 ? (
-          <div className="space-y-3">
-            <Skeleton className="h-[250px] w-full" />
-          </div>
+          <DataLoading size="lg" />
         ) : (
           <div className="space-y-6">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">

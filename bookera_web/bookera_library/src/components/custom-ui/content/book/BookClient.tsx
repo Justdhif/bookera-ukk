@@ -14,8 +14,8 @@ import { toast } from "sonner";
 import { Category } from "@/types/category";
 import { categoryService } from "@/services/category.service";
 import { BookOpen, Plus } from "lucide-react";
-import { BookTableSkeleton } from "./BookTableSkeleton";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
+import DataLoading from "@/components/custom-ui/DataLoading";
 
 export default function BookClient() {
   const t = useTranslations("book");
@@ -129,7 +129,7 @@ export default function BookClient() {
         onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
       >
         {loading ? (
-          <BookTableSkeleton />
+          <DataLoading size="lg" />
         ) : (
           <BookTable data={books} onDelete={(id) => setDeleteId(id)} />
         )}

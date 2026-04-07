@@ -117,19 +117,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 # Base URL untuk API routes
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api
 
-
-# ===========================================
-# WEBSOCKET CONFIGURATION (Real-time)
-# ===========================================
-# Pusher/Reverb credentials untuk real-time notifications
-NEXT_PUBLIC_PUSHER_APP_KEY=your-pusher-app-key
-NEXT_PUBLIC_PUSHER_APP_CLUSTER=mt1
-
-# WebSocket host (Laravel Reverb)
-NEXT_PUBLIC_WEBSOCKET_HOST=localhost
-NEXT_PUBLIC_WEBSOCKET_PORT=8080
-NEXT_PUBLIC_WEBSOCKET_SCHEME=http
-
+# Real-time frontend notifications are disabled.
 
 # ===========================================
 # APPLICATION CONFIGURATION
@@ -177,24 +165,10 @@ NEXT_PUBLIC_DEFAULT_THEME=system
 - **Contoh**: `http://localhost:8000/api`
 - **Digunakan**: Untuk semua API calls
 
-#### 📡 WebSocket Configuration
+#### 📡 Real-time Notifications
 
-**`NEXT_PUBLIC_PUSHER_APP_KEY`**
-- **Deskripsi**: Application key dari Pusher/Reverb
-- **Cara mendapatkan**: 
-  - Cek di file `.env` backend Laravel
-  - Atau register di [pusher.com](https://pusher.com) untuk Pusher
-- **Contoh**: `abc123def456`
-
-**`NEXT_PUBLIC_WEBSOCKET_HOST`**
-- **Deskripsi**: Host untuk WebSocket server
-- **Development**: `localhost`
-- **Production**: Domain server Anda (tanpa protocol)
-
-**`NEXT_PUBLIC_WEBSOCKET_PORT`**
-- **Deskripsi**: Port WebSocket server (Laravel Reverb default: 8080)
-- **Development**: `8080`
-- **Production**: Sesuaikan dengan konfigurasi server
+- Frontend realtime notifications have been removed.
+- Borrow notifications now use API/database, email, and WhatsApp only.
 
 #### 🌍 Application Configuration
 
@@ -603,9 +577,7 @@ WebSocket connection to 'ws://localhost:8080' failed
 cd bookera-api
 php artisan reverb:start
 
-# Cek environment variables
-NEXT_PUBLIC_WEBSOCKET_HOST=localhost
-NEXT_PUBLIC_WEBSOCKET_PORT=8080
+# Notifikasi frontend sekarang memakai API/database, email, dan WhatsApp
 ```
 
 #### 5. API calls gagal (CORS)

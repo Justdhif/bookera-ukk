@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\BorrowRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -30,7 +31,7 @@ class Borrow extends Model
 
     public function borrowRequest()
     {
-        return $this->belongsTo(\App\Models\BorrowRequest::class);
+        return $this->belongsTo(BorrowRequest::class);
     }
 
     public function borrowDetails()

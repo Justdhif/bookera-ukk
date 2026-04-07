@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
-import { CategoryTableSkeleton } from "./CategoryTableSkeleton";
 import { Plus, Search, Tag } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
+import DataLoading from "@/components/custom-ui/DataLoading";
 export default function CategoryClient() {
   const t = useTranslations("category");
   const [categories, setCategories] = useState<Category[]>([]);
@@ -118,7 +118,7 @@ export default function CategoryClient() {
         onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
       >
         {loading ? (
-          <CategoryTableSkeleton />
+          <DataLoading size="lg" />
         ) : (
           <CategoryTable
             data={categories}

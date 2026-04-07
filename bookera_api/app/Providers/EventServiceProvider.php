@@ -2,23 +2,8 @@
 
 namespace App\Providers;
 
-use App\Events\BorrowOverdue;
-use App\Events\BorrowRequestApproved;
-use App\Events\BorrowRequestCancelled;
-use App\Events\BorrowRequestCreated;
-use App\Events\BorrowRequested;
-use App\Events\BorrowRequestRejected;
-use App\Events\FineCreated;
-use App\Events\LostBookReported;
-use App\Events\ReturnApproved;
-use App\Events\ReturnRequested;
 use App\Listeners\LogLoginActivity;
 use App\Listeners\LogLogoutActivity;
-use App\Listeners\SendBorrowNotification;
-use App\Listeners\SendFineNotification;
-use App\Listeners\SendLostBookNotification;
-use App\Listeners\SendOverdueFineNotification;
-use App\Listeners\SendReturnNotification;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -34,44 +19,6 @@ class EventServiceProvider extends ServiceProvider
             LogLogoutActivity::class,
         ],
 
-        BorrowRequested::class => [
-            SendBorrowNotification::class,
-        ],
-
-        BorrowRequestCreated::class => [
-            SendBorrowNotification::class,
-        ],
-
-        BorrowRequestApproved::class => [
-            SendBorrowNotification::class,
-        ],
-
-        BorrowRequestRejected::class => [
-            SendBorrowNotification::class,
-        ],
-
-        BorrowRequestCancelled::class => [
-            SendBorrowNotification::class,
-        ],
-
-        ReturnRequested::class => [
-            SendReturnNotification::class,
-        ],
-        ReturnApproved::class => [
-            SendReturnNotification::class,
-        ],
-
-        FineCreated::class => [
-            SendFineNotification::class,
-        ],
-
-        LostBookReported::class => [
-            SendLostBookNotification::class,
-        ],
-
-        BorrowOverdue::class => [
-            SendOverdueFineNotification::class,
-        ],
     ];
 
     public function boot(): void

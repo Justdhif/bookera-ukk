@@ -8,7 +8,9 @@ use App\Http\Requests\Discussion\StoreDiscussionCommentRequest;
 use App\Http\Requests\Discussion\UpdateDiscussionCommentRequest;
 use App\Models\DiscussionComment;
 use App\Models\DiscussionPost;
+use App\Models\User;
 use App\Services\Discussion\DiscussionCommentService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -22,7 +24,7 @@ class DiscussionCommentController extends Controller
             $post     = DiscussionPost::where('slug', $slug)->firstOrFail();
             $comments = $this->commentService->getAll($post, (int) $request->get('per_page', 20));
             return ApiResponse::successResponse('Comments retrieved successfully', $comments);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Post not found');
         }
     }
@@ -36,7 +38,7 @@ class DiscussionCommentController extends Controller
     public function store(StoreDiscussionCommentRequest $request, string $slug): JsonResponse
     {
         try {
-            /** @var \App\Models\User $user */
+            /** @var User $user */
             $user = $request->user();
 
             $post    = DiscussionPost::where('slug', $slug)->firstOrFail();
@@ -47,7 +49,7 @@ class DiscussionCommentController extends Controller
                 $request->input('parent_id')
             );
             return ApiResponse::successResponse('Comment added successfully', $comment, 201);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return ApiResponse::notFoundResponse('Post or parent comment not found');
         } catch (\Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 422);
@@ -57,7 +59,7 @@ class DiscussionCommentController extends Controller
     public function update(UpdateDiscussionCommentRequest $request, DiscussionComment $comment): JsonResponse
     {
         try {
-            /** @var \App\Models\User $user */
+            /** @var User $user */
             $user = $request->user();
 
             $updated = $this->commentService->update($user, $comment, $request->input('content'));
@@ -71,7 +73,7 @@ class DiscussionCommentController extends Controller
     public function destroy(Request $request, DiscussionComment $comment): JsonResponse
     {
         try {
-            /** @var \App\Models\User $user */
+            /** @var User $user */
             $user = $request->user();
 
             $this->commentService->delete($user, $comment);

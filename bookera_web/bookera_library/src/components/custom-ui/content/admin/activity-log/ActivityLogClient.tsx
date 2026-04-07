@@ -13,10 +13,8 @@ import ActivityStatistics from "./statistics/ActivityStatistics";
 import ActivityCharts from "./charts/ActivityCharts";
 import ActivityTable from "./table/ActivityTable";
 import ActivityDetailDialog from "./dialog/ActivityDetailDialog";
-import { ActivityStatisticsSkeleton } from "./statistics/ActivityStatisticsSkeleton";
-import { ActivityChartsSkeleton } from "./charts/ActivityChartsSkeleton";
-import { ActivityTableSkeleton } from "./table/ActivityTableSkeleton";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
+import DataLoading from "@/components/custom-ui/DataLoading";
 
 export default function ActivityLogClient() {
   const t = useTranslations("activity-log");
@@ -67,25 +65,12 @@ export default function ActivityLogClient() {
         isAdmin
       />
 
-      {loading ? (
-        <ActivityStatisticsSkeleton />
-      ) : (
-        data && <ActivityStatistics statistics={data.statistics} />
-      )}
+      {loading ? <DataLoading size="lg" /> : data && <ActivityStatistics statistics={data.statistics} />}
+
+      {loading ? <DataLoading size="lg" /> : data && <ActivityCharts charts={data.charts} onYearChange={handleYearChange} />}
 
       {loading ? (
-        <ActivityChartsSkeleton />
-      ) : (
-        data && (
-          <ActivityCharts
-            charts={data.charts}
-            onYearChange={handleYearChange}
-          />
-        )
-      )}
-
-      {loading ? (
-        <ActivityTableSkeleton />
+        <DataLoading size="lg" />
       ) : (
         data && (
           <PaginatedContent

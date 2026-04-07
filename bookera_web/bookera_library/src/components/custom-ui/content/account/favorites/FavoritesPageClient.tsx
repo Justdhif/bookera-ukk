@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
-import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { Heart } from "lucide-react";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -22,15 +21,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { BookPlus, Trash2 } from "lucide-react";
+import { BookPlus } from "lucide-react";
 import { toast } from "sonner";
 import BorrowRequestDialog from "@/components/custom-ui/content/book/BorrowRequestDialog";
-
-const variants = {
-  enter: (dir: number) => ({ x: dir > 0 ? 40 : -40, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? -40 : 40, opacity: 0 }),
-};
+import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
 
 function BooksGridSkeleton() {
   return (
@@ -55,11 +49,9 @@ export default function FavoritesPageClient() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [direction, setDirection] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [selectedBookIds, setSelectedBookIds] = useState<number[]>([]);
-  const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [showBorrowModal, setShowBorrowModal] = useState(false);
-  const prevPageRef = useRef(page);
 
   useEffect(() => {
     categoryService
@@ -76,21 +68,24 @@ export default function FavoritesPageClient() {
   }, [searchQuery]);
 
   useEffect(() => {
-    setDirection(page > prevPageRef.current ? 1 : -1);
-    prevPageRef.current = page;
-  }, [page]);
-
-  useEffect(() => {
+    setBooks([]);
+    setSelectedBookIds([]);
     setPage(1);
-    prevPageRef.current = 1;
   }, [debouncedQuery, selectedCategoryId]);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
 
   useEffect(() => {
     let cancelled = false;
     const fetchFavorites = async () => {
-      setLoading(true);
+      const appendPage = page > 1;
+
+      if (appendPage) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
+
       try {
         const res = await favoriteService.getAll({
           per_page: itemsPerPage,
@@ -102,14 +97,18 @@ export default function FavoritesPageClient() {
           const favoriteBooks = res.data.data.data
             .map((fav) => fav.book!)
             .filter(Boolean);
-          setBooks(favoriteBooks);
+          setBooks((prev) => (appendPage ? [...prev, ...favoriteBooks] : favoriteBooks));
           setTotalPages(res.data.data.last_page);
         }
       } catch (error) {
         console.error(error);
       } finally {
         if (!cancelled) {
-          setLoading(false);
+          if (appendPage) {
+            setLoadingMore(false);
+          } else {
+            setLoading(false);
+          }
         }
       }
     };
@@ -118,11 +117,6 @@ export default function FavoritesPageClient() {
       cancelled = true;
     };
   }, [page, debouncedQuery, selectedCategoryId, itemsPerPage]);
-
-  const toggleSelectionMode = () => {
-    setIsSelectionMode(!isSelectionMode);
-    setSelectedBookIds([]);
-  };
 
   const handleSelectBook = (bookId: number, checked: boolean) => {
     if (checked) {
@@ -176,21 +170,10 @@ export default function FavoritesPageClient() {
                 ))}
               </SelectContent>
             </Select>
-            <Button
-              variant={isSelectionMode ? "secondary" : "outline"}
-              onClick={toggleSelectionMode}
-              className="h-10 shrink-0"
-            >
-              {isSelectionMode ? tPublic("common.cancel") : tPublic("common.selectBook")}
-            </Button>
           </div>
         </div>
-        {isSelectionMode && books.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-dashed border-border"
-          >
+        {books.length > 0 && (
+          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-dashed border-border">
             <div className="flex items-center gap-3">
               <Checkbox
                 id="select-all"
@@ -216,7 +199,7 @@ export default function FavoritesPageClient() {
                 {tPublic("detail.borrowSelected")}
               </Button>
             </div>
-          </motion.div>
+          </div>
         )}
       </div>
       <section className="space-y-3">
@@ -238,60 +221,27 @@ export default function FavoritesPageClient() {
           />
         ) : (
           <div className="space-y-6">
-            <div className="relative overflow-hidden min-h-[300px]">
-              <AnimatePresence mode="wait" custom={direction}>
-                <motion.div
-                  key={page}
-                  custom={direction}
-                  variants={variants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
-                >
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    {books.map((book) => (
-                      <BookCard
-                        key={book.id}
-                        book={book}
-                        showCheckbox={isSelectionMode}
-                        isChecked={selectedBookIds.includes(book.id)}
-                        onCheckedChange={(checked) =>
-                          handleSelectBook(book.id, checked)
-                        }
-                      />
-                    ))}
-                  </div>
-                </motion.div>
-              </AnimatePresence>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {books.map((book) => (
+                <BookCard
+                  key={book.id}
+                  book={book}
+                  showCheckbox={true}
+                  isChecked={selectedBookIds.includes(book.id)}
+                  onCheckedChange={(checked) =>
+                    handleSelectBook(book.id, checked)
+                  }
+                />
+              ))}
             </div>
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 pt-2 pb-4">
-                <Button
-                  type="button"
+
+            {page < totalPages && (
+              <div className="flex justify-center pt-8 pb-4">
+                <LoadMoreButton
+                  onClick={() => setPage((p) => p + 1)}
+                  loading={loadingMore}
                   variant="outline"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  aria-label="Previous"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <span className="text-sm font-medium px-2">
-                  {page} / {totalPages}
-                </span>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page >= totalPages}
-                  aria-label="Next"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+                />
               </div>
             )}
           </div>
@@ -300,11 +250,11 @@ export default function FavoritesPageClient() {
 
       <BorrowRequestDialog
         bookIds={selectedBookIds}
+        initialBooks={books.filter((book) => selectedBookIds.includes(book.id))}
         isOpen={showBorrowModal}
         onClose={() => setShowBorrowModal(false)}
         onSuccess={() => {
           setShowBorrowModal(false);
-          setIsSelectionMode(false);
           setSelectedBookIds([]);
         }}
       />

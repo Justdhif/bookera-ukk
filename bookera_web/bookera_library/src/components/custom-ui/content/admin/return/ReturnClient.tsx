@@ -10,8 +10,8 @@ import { PackageCheck, Search } from "lucide-react";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Input } from "@/components/ui/input";
 import { ReturnCard } from "./ReturnCard";
-import { ReturnSkeletonCard } from "./ReturnSkeletonCard";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
+import DataLoading from "@/components/custom-ui/DataLoading";
 export default function ReturnClient() {
   const t = useTranslations("return");
   const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
@@ -172,7 +172,7 @@ export default function ReturnClient() {
                 {loading ? (
                   <div className="grid gap-4">
                     {Array.from({ length: 3 }).map((_, i) => (
-                      <ReturnSkeletonCard key={i} />
+                      <DataLoading key={i} size="lg" />
                     ))}
                   </div>
                 ) : (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
@@ -71,40 +71,6 @@ export default function PostCard({ post, onDeleted, onEdit, feedMode = true }: P
     !!post.caption &&
     (post.caption.length > 140 || post.caption.includes("\n"));
 
-  // Listen to real-time post updates
-  useEffect(() => {
-    const handlePostUpdate = (
-      event: CustomEvent<{
-        slug: string;
-        likesCount: number;
-        commentsCount: number;
-        userId?: number;
-        action?: "liked" | "unliked";
-      }>,
-    ) => {
-      if (event.detail.slug === post.slug) {
-        setLikesCount(event.detail.likesCount);
-        setCommentsCount(event.detail.commentsCount);
-
-        // Update liked status if this is the current user's action
-        if (event.detail.userId === user?.id && event.detail.action) {
-          setLiked(event.detail.action === "liked");
-        }
-      }
-    };
-
-    window.addEventListener(
-      "discussion-post-updated",
-      handlePostUpdate as EventListener,
-    );
-    return () => {
-      window.removeEventListener(
-        "discussion-post-updated",
-        handlePostUpdate as EventListener,
-      );
-    };
-  }, [post.slug, user?.id]);
-
   const getInitials = (name?: string | null) =>
     name
       ? name
@@ -132,7 +98,6 @@ export default function PostCard({ post, onDeleted, onEdit, feedMode = true }: P
 
     try {
       await discussionLikeService.toggleLike(post.slug);
-      // Don't update state here - let the broadcast event handle it
     } catch {
       // Rollback on error
       setLiked(previousLiked);

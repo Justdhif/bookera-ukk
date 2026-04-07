@@ -4,13 +4,12 @@ namespace App\Services\Favorite;
 
 use App\Models\BookFavorite;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 
 class FavoriteService
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
-        $query = BookFavorite::with(['book.authors', 'book.publisher', 'book.categories'])
+        $query = BookFavorite::with(['book.authors', 'book.publishers', 'book.categories', 'book.reviews.user.profile'])
             ->where('user_id', auth()->id());
 
         if (!empty($filters['search'])) {

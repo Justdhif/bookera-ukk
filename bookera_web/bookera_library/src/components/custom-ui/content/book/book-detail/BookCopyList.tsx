@@ -45,7 +45,7 @@ export default function BookCopyList({
           value={copyCode}
           onChange={(e) => setCopyCode(e.target.value)}
         />
-        <Button variant="submit" onClick={() => handleAdd(copyCode)}>
+        <Button variant="default" onClick={() => handleAdd(copyCode)}>
           {t("addCopy")}
         </Button>
       </div>

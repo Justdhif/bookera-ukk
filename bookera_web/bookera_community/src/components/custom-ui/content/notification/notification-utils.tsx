@@ -80,6 +80,13 @@ export const getNotificationIconConfig = (
           bg: "bg-orange-100 dark:bg-orange-950/60",
           ring: "ring-orange-200 dark:ring-orange-800",
         };
+      case "borrow_overdue":
+      case "overdue":
+        return {
+          icon: <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" />,
+          bg: "bg-orange-100 dark:bg-orange-950/60",
+          ring: "ring-orange-200 dark:ring-orange-800",
+        };
       default:
         return {
           icon: <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />,
@@ -154,6 +161,13 @@ export const getNotificationIconConfig = (
         icon: <BookMarked className="h-4 w-4 text-blue-600 dark:text-blue-400" />,
         bg: "bg-blue-100 dark:bg-blue-950/60",
         ring: "ring-blue-200 dark:ring-blue-800",
+      };
+    case "borrow_overdue":
+    case "overdue":
+      return {
+        icon: <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" />,
+        bg: "bg-orange-100 dark:bg-orange-950/60",
+        ring: "ring-orange-200 dark:ring-orange-800",
       };
     case "return_request":
       return {

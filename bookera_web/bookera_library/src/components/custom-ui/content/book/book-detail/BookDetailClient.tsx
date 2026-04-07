@@ -38,7 +38,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import DataLoading from "@/components/custom-ui/DataLoading";
 import { toast } from "sonner";
 import {
   BookOpen,
@@ -62,7 +62,6 @@ export default function BookDetailClient() {
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Admin states
   const [categories, setCategories] = useState<Category[]>([]);
   const [authors, setAuthors] = useState<Author[]>([]);
   const [publishers, setPublishers] = useState<Publisher[]>([]);
@@ -280,7 +279,7 @@ export default function BookDetailClient() {
               <div className="flex gap-2">
                 <Button
                   type="button"
-                  variant="submit"
+                  variant="outline"
                   onClick={handleCancelEdit}
                   disabled={submitting}
                   className="h-8"
@@ -293,7 +292,7 @@ export default function BookDetailClient() {
                   variant="submit"
                   disabled={isSubmitDisabled()}
                   loading={submitting}
-                  className="h-8"
+                  className="h-8 bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-primary/20 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 dark:focus-visible:ring-primary/40"
                 >
                   {submitting ? tAdmin("saving") : tAdmin("saveChanges")}
                 </Button>
@@ -301,7 +300,7 @@ export default function BookDetailClient() {
             ) : (
               <Button
                 onClick={() => setIsEditMode(true)}
-                variant="brand"
+                variant="default"
                 className="h-8 gap-1"
                 disabled={loading}
               >
@@ -323,8 +322,8 @@ export default function BookDetailClient() {
 
       {loading ? (
         <div className="grid gap-6 lg:grid-cols-3">
-          <Skeleton className="h-96" />
-          <Skeleton className="lg:col-span-2 h-96" />
+          <DataLoading className="lg:col-span-1" size="lg" />
+          <DataLoading className="lg:col-span-2" size="lg" />
         </div>
       ) : (
         book &&

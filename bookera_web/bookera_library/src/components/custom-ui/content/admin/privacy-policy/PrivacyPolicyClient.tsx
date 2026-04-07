@@ -8,9 +8,9 @@ import PrivacyPolicyList from "./list/PrivacyPolicyList";
 import PrivacyPolicyFormDialog from "./form/PrivacyPolicyFormDialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { PrivacyPolicyListSkeleton } from "./list/PrivacyPolicyListSkeleton";
 import { Plus } from "lucide-react";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
+import DataLoading from "@/components/custom-ui/DataLoading";
 
 export default function PrivacyPolicyClient() {
   const t = useTranslations("privacy-policy");
@@ -70,7 +70,7 @@ export default function PrivacyPolicyClient() {
       />
 
       {loading ? (
-        <PrivacyPolicyListSkeleton />
+        <DataLoading size="lg" />
       ) : (
         <PrivacyPolicyList
           data={items}

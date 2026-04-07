@@ -3,15 +3,13 @@
 namespace App\Services\BookReturn;
 
 use App\Helpers\ActivityLogger;
+use App\Services\Borrow\BorrowNotificationService;
 use App\Models\BookCopy;
 use App\Models\BookReturn;
 use App\Models\Borrow;
 use App\Models\BorrowDetail;
 use App\Models\Fine;
 use App\Models\FineType;
-use App\Events\ReturnRequested;
-use App\Events\ReturnApproved;
-use App\Events\FineCreated;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -65,7 +63,7 @@ class BookReturnService
                 );
             }
 
-            $return->load(['details.bookCopy.book']);
+            $return->load(['details.bookCopy.book', 'borrow.user.profile']);
 
             ActivityLogger::log(
                 'create',
@@ -81,7 +79,7 @@ class BookReturnService
                 $return
             );
 
-            event(new ReturnRequested($return));
+            (new BorrowNotificationService())->notifyReturnRequested($return);
 
             return $return;
         });
@@ -150,7 +148,7 @@ class BookReturnService
                 );
             }
 
-            event(new ReturnApproved($bookReturn));
+            (new BorrowNotificationService())->notifyReturnApproved($bookReturn);
         });
 
         return $bookReturn->load('details.bookCopy.book', 'borrow');
@@ -227,7 +225,7 @@ class BookReturnService
         );
 
         $fine->load('fineType', 'borrow.user', 'borrow.borrowDetails.bookCopy.book');
-        event(new FineCreated($fine));
+        (new BorrowNotificationService())->notifyFineCreated($fine);
     }
 
     /**
@@ -338,7 +336,7 @@ class BookReturnService
 
             $fine->load('fineType', 'borrow.user', 'borrow.borrowDetails.bookCopy.book');
 
-            event(new FineCreated($fine));
+            (new BorrowNotificationService())->notifyFineCreated($fine);
 
             return $fine;
         });

@@ -6,32 +6,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @property int $id
- * @property string $slug
- * @property string $title
- * @property string|null $isbn
- * @property string|null $description
- * @property int|null $publication_year
- * @property string|null $language
- * @property string|null $cover_image
- * @property bool $is_active
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Category> $categories
- * @property-read int|null $categories_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BookCopy> $copies
- * @property-read int|null $copies_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BookFavorite> $favorites
- * @property-read int|null $favorites_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Author> $authors
- * @property-read int|null $authors_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Publisher> $publishers
- * @property-read int|null $publishers_count
- */
 class Book extends Model
 {
-    /** @use HasFactory<\Database\Factories\BookFactory> */
     use HasFactory;
 
     protected $table = 'books';

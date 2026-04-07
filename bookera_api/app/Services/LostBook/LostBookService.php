@@ -2,6 +2,7 @@
 
 namespace App\Services\LostBook;
 
+use App\Services\Borrow\BorrowNotificationService;
 use App\Helpers\ActivityLogger;
 use App\Models\BookCopy;
 use App\Models\Borrow;
@@ -98,7 +99,7 @@ class LostBookService
 
             $lostBook->load(['borrow.user.profile', 'bookCopy.book', 'borrow.fines.fineType']);
 
-            event(new \App\Events\LostBookReported($lostBook));
+            (new BorrowNotificationService())->notifyLostBookReported($lostBook);
 
             return $lostBook;
         });
@@ -141,7 +142,7 @@ class LostBookService
 
         $fine->load('fineType', 'borrow.user', 'borrow.borrowDetails.bookCopy.book');
 
-        event(new \App\Events\FineCreated($fine));
+        (new BorrowNotificationService())->notifyFineCreated($fine);
     }
 
     public function update(LostBook $lostBook, array $data): LostBook
@@ -296,7 +297,7 @@ class LostBookService
 
             $fine->load('fineType', 'borrow.user', 'borrow.borrowDetails.bookCopy.book');
 
-            event(new \App\Events\FineCreated($fine));
+            (new BorrowNotificationService())->notifyFineCreated($fine);
 
             return $fine;
         });

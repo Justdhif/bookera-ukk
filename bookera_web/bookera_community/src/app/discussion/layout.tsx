@@ -6,7 +6,6 @@ import DiscussionHeader from "@/components/custom-ui/content/discussion/Discussi
 import DiscussionBottomBar from "@/components/custom-ui/navbar/DiscussionBottomBar";
 import { useAuthStore } from "@/store/auth.store";
 import { ContentLoadingScreen } from "@/components/custom-ui/ContentLoadingScreen";
-import { useRealTimeDiscussion } from "@/hooks/useRealTimeDiscussion";
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -19,9 +18,6 @@ export default function DiscussionLayout({
   const pathname = usePathname();
   const initialLoading = useAuthStore((s) => s.initialLoading);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  
-  // Initialize real-time discussion updates
-  useRealTimeDiscussion();
 
   useEffect(() => {
     if (!initialLoading && !isAuthenticated) {

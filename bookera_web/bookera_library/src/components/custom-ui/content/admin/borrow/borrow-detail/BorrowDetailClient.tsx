@@ -9,11 +9,11 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { BorrowDetailSkeleton } from "./BorrowDetailSkeleton";
 import { BorrowQrCard } from "./BorrowQrCard";
 import { BorrowInfoCard } from "./BorrowInfoCard";
 import { BorrowBooksCard } from "./BorrowBooksCard";
 import { BorrowAssignCopiesCard } from "./BorrowAssignCopiesCard";
+import DataLoading from "@/components/custom-ui/DataLoading";
 
 export default function BorrowDetailClient() {
   const t = useTranslations("borrow");
@@ -42,7 +42,7 @@ export default function BorrowDetailClient() {
     }
   };
 
-  if (loading) return <BorrowDetailSkeleton />;
+  if (loading) return <DataLoading size="lg" />;
   if (!borrow) return null;
 
   return (

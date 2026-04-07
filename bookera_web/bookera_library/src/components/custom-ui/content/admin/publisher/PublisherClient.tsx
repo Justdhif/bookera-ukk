@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
-import { PublisherTableSkeleton } from "./PublisherTableSkeleton";
 import { Building2, Plus, Search } from "lucide-react";
 import {
   Select,
@@ -21,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import { useTranslations } from "next-intl";
+import DataLoading from "@/components/custom-ui/DataLoading";
 export default function PublisherClient() {
   const t = useTranslations("publisher");
   const [publishers, setPublishers] = useState<Publisher[]>([]);
@@ -150,7 +150,7 @@ export default function PublisherClient() {
         onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
       >
         {loading ? (
-          <PublisherTableSkeleton />
+          <DataLoading size="lg" />
         ) : (
           <PublisherTable
             data={publishers}

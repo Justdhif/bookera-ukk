@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { SidebarUserFooter } from "@/components/custom-ui/sidebar/SidebarUserFooter";
 import { cn } from "@/lib/utils";
+
 type MenuItem = {
   title: string;
   href: string;

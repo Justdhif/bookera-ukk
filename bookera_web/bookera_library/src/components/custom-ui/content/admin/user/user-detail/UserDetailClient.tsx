@@ -15,7 +15,7 @@ export default function UserDetailClient() {
   const t = useTranslations("user");
   const router = useRouter();
   const params = useParams();
-  const identificationNumber = params.identificationNumber as string;
+  const slug = params.slug as string;
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -28,12 +28,13 @@ export default function UserDetailClient() {
   const [submitting, setSubmitting] = useState(false);
   const [isFullNameValid, setIsFullNameValid] = useState(true);
   useEffect(() => {
+    if (!slug) return;
     fetchUser();
-  }, [identificationNumber]);
+  }, [slug]);
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const res = await userService.getByIdentification(identificationNumber);
+      const res = await userService.getBySlug(slug);
       setUser(res.data.data);
       setFormData({
         email: res.data.data.email,

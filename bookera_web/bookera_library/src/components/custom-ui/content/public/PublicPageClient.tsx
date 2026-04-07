@@ -1,16 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import BookListSkeleton from "../book/BookListSkeleton";
 import { categoryService } from "@/services/category.service";
 import { Category } from "@/types/category";
 import BannerCarousel from "./BannerCarousel";
 import SpeakerMarquee from "./SpeakerMarquee";
-import { Skeleton } from "@/components/ui/skeleton";
 import CategoryBookRow from "../book/CategoryBookRow";
 import FavoriteBookRow from "../book/FavoriteBookRow";
 import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
+import DataLoading from "@/components/custom-ui/DataLoading";
 
 export default function PublicPageClient() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -64,10 +62,10 @@ export default function PublicPageClient() {
           <FavoriteBookRow />
           {loading
             ? Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="space-y-3">
-                  <Skeleton className="h-7 w-40" />
-                  <BookListSkeleton />
-                </div>
+                <DataLoading
+                  key={i}
+                  size="lg"
+                />
               ))
             : categories.map((category) => (
                 <CategoryBookRow key={category.id} category={category} />

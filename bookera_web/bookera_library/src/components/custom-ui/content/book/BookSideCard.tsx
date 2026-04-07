@@ -312,10 +312,13 @@ export default function BookSideCard({
               <Switch
                 checked={formData.is_active}
                 onCheckedChange={handleSwitchChange}
-                className="data-[state=checked]:bg-green-600 dark:data-[state=checked]:bg-green-500"
+                className="data-[state=checked]:bg-primary dark:data-[state=checked]:bg-primary"
               />
             ) : (
-              <ActiveStatusBadge isActive={formData.is_active} />
+              <ActiveStatusBadge
+                isActive={formData.is_active}
+                className="bg-primary/10 text-primary border-primary/20 dark:bg-primary/15 dark:text-primary dark:border-primary/30"
+              />
             )}
           </div>
         </div>

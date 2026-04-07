@@ -6,6 +6,7 @@ use App\Helpers\ActivityLogger;
 use App\Models\Borrow;
 use App\Models\Fine;
 use App\Models\FineType;
+use App\Services\Borrow\BorrowNotificationService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -90,7 +91,11 @@ class FineService
                 $fine
             );
 
-            return $fine->load(['borrow.user.profile', 'fineType']);
+            $fine->load(['borrow.user.profile', 'borrow.borrowDetails.bookCopy.book', 'fineType']);
+
+            (new BorrowNotificationService())->notifyFineCreated($fine);
+
+            return $fine;
         });
     }
 
