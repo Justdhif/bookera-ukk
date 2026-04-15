@@ -29,7 +29,6 @@ interface LostBooksTableProps {
   data: LostBook[];
   onDelete: (id: number) => void;
   onFinish: (id: number) => void;
-  onProcessFine: (id: number) => void;
   actionLoading: number | null;
 }
 
@@ -63,6 +62,29 @@ function groupLostBooksByBorrow(lostBooks: LostBook[]) {
     map.get(borrowId)!.items.push(lb);
   }
   return Array.from(map.values());
+}
+
+function getLostBookDetails(lostBook: LostBook) {
+  if (lostBook.details && lostBook.details.length > 0) {
+    return lostBook.details;
+  }
+
+  if (lostBook.book_copy_id || lostBook.book_copy) {
+    return [
+      {
+        id: lostBook.id,
+        lost_book_id: lostBook.id,
+        book_copy_id: lostBook.book_copy_id ?? lostBook.book_copy?.id ?? 0,
+        lost_date: lostBook.lost_date ?? lostBook.estimated_lost_date,
+        notes: lostBook.notes,
+        book_copy: lostBook.book_copy,
+        created_at: lostBook.created_at,
+        updated_at: lostBook.updated_at,
+      },
+    ];
+  }
+
+  return [];
 }
 
 export default function LostBooksTable({
@@ -160,12 +182,14 @@ export default function LostBooksTable({
                   <TableBody>
                     {items.map((item, index) => {
                       const isLoading = actionLoading === item.id;
+                      const details = getLostBookDetails(item);
                       const fines = item.borrow?.fines ?? [];
                       const hasUnpaidFines = fines.some(
                         (f: any) => f.status === "unpaid",
                       );
                       const canFinish =
                         borrow?.status === "open" &&
+                        details.length > 0 &&
                         fines.length > 0 &&
                         !hasUnpaidFines;
                       return (
@@ -177,35 +201,59 @@ export default function LostBooksTable({
                             {index + 1}
                           </TableCell>
                           <TableCell>
-                            <div className="flex items-start gap-2">
-                              <BookOpen className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                              <div className="min-w-0">
-                                <div className="font-medium text-foreground truncate">
-                                  {item.book_copy?.book?.title || "-"}
+                            <div className="space-y-3">
+                              {details.map((detail, detailIndex) => (
+                                <div
+                                  key={detail.id}
+                                  className={
+                                    detailIndex > 0
+                                      ? "pt-3 border-t border-dashed border-border/60"
+                                      : ""
+                                  }
+                                >
+                                  <div className="flex items-start gap-2">
+                                    <BookOpen className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                                    <div className="min-w-0">
+                                      <div className="font-medium text-foreground truncate">
+                                        {detail.book_copy?.book?.title || item.book_copy?.book?.title || "-"}
+                                      </div>
+                                      <div className="text-xs text-muted-foreground">
+                                        {detail.book_copy?.copy_code || item.book_copy?.copy_code || "-"}
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="text-xs text-muted-foreground">
-                                  {item.book_copy?.copy_code || "-"}
-                                </div>
-                              </div>
+                              ))}
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="text-sm">
-                              {item.estimated_lost_date ? (
-                                <div className="text-foreground">
-                                  {format(
-                                    new Date(item.estimated_lost_date),
-                                    "dd MMM yyyy",
-                                    { locale: localeId },
+                            <div className="space-y-3 text-sm">
+                              {details.map((detail, detailIndex) => (
+                                <div
+                                  key={detail.id}
+                                  className={
+                                    detailIndex > 0
+                                      ? "pt-3 border-t border-dashed border-border/60"
+                                      : ""
+                                  }
+                                >
+                                  {detail.lost_date ? (
+                                    <div className="text-foreground">
+                                      {format(
+                                        new Date(detail.lost_date),
+                                        "dd MMM yyyy",
+                                        { locale: localeId },
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <span className="text-muted-foreground italic text-xs">
+                                      {t("unknownDate")}
+                                    </span>
                                   )}
                                 </div>
-                              ) : (
-                                <span className="text-muted-foreground italic text-xs">
-                                  {t("unknownDate")}
-                                </span>
-                              )}
+                              ))}
                               <div className="text-xs text-muted-foreground">
-                                {t("reportedLabel")}
+                                {t("reportedLabel")}{" "}
                                 {format(
                                   new Date(item.created_at),
                                   "dd MMM yyyy",
@@ -217,15 +265,28 @@ export default function LostBooksTable({
                             </div>
                           </TableCell>
                           <TableCell>
-                            {item.notes ? (
-                              <p className="text-sm text-muted-foreground truncate">
-                                {item.notes}
-                              </p>
-                            ) : (
-                              <span className="text-muted-foreground italic text-xs">
-                                {t("noNotes")}
-                              </span>
-                            )}
+                            <div className="space-y-3">
+                              {details.map((detail, detailIndex) => (
+                                <div
+                                  key={detail.id}
+                                  className={
+                                    detailIndex > 0
+                                      ? "pt-3 border-t border-dashed border-border/60"
+                                      : ""
+                                  }
+                                >
+                                  {detail.notes ? (
+                                    <p className="text-sm text-muted-foreground truncate">
+                                      {detail.notes}
+                                    </p>
+                                  ) : (
+                                    <span className="text-muted-foreground italic text-xs">
+                                      {t("noNotes")}
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex justify-end items-center gap-1.5">

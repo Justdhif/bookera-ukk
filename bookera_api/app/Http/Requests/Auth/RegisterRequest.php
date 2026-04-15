@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
-use App\Services\RecaptchaService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Validation\ValidationException;
 
 class RegisterRequest extends FormRequest
 {

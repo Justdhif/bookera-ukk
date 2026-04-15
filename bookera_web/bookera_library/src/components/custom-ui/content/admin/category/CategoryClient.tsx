@@ -1,4 +1,6 @@
 "use client";
+
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
@@ -16,6 +18,7 @@ import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialo
 import { Plus, Search, Tag } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
+
 export default function CategoryClient() {
   const t = useTranslations("category");
   const [categories, setCategories] = useState<Category[]>([]);
@@ -24,7 +27,7 @@ export default function CategoryClient() {
   const [editing, setEditing] = useState<Category | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [filters, setFilters] = useState<CategoryFilterParams>({
-    per_page: 10,
+    per_page: ITEMS_PER_PAGE_OPTIONS[1],
   });
   const [searchInput, setSearchInput] = useState("");
   const [pagination, setPagination] = useState({
@@ -34,6 +37,7 @@ export default function CategoryClient() {
     from: 0,
     to: 0,
   });
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       setFilters((prev) => ({
@@ -44,6 +48,7 @@ export default function CategoryClient() {
     }, 500);
     return () => clearTimeout(timeout);
   }, [searchInput]);
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSearchInput(e.target.value);
   const confirmDelete = async () => {
@@ -56,6 +61,7 @@ export default function CategoryClient() {
     setDeleteId(null);
     fetchCategories(filters);
   };
+
   const fetchCategories = async (activeFilters: CategoryFilterParams) => {
     setLoading(true);
     try {
@@ -75,9 +81,11 @@ export default function CategoryClient() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchCategories(filters);
   }, [filters]);
+  
   return (
     <div className="space-y-6">
       <ContentHeader

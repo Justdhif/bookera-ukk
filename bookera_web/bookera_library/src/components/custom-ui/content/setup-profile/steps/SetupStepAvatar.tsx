@@ -2,7 +2,6 @@
 import { useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import ReCAPTCHA from "react-google-recaptcha";
 import {
   CardHeader,
   CardTitle,
@@ -47,9 +46,6 @@ interface SetupStepAvatarProps {
   loading: boolean;
   onBack: () => void;
   onSubmit: () => void;
-  siteKey: string;
-  recaptchaRef: React.RefObject<ReCAPTCHA | null>;
-  handleRecaptchaChange: (token: string | null) => void;
 }
 
 export default function SetupStepAvatar({
@@ -58,9 +54,6 @@ export default function SetupStepAvatar({
   loading,
   onBack,
   onSubmit,
-  siteKey,
-  recaptchaRef,
-  handleRecaptchaChange,
 }: SetupStepAvatarProps) {
   const t = useTranslations("setup-profile");
   const [previewUrl, setPreviewUrl] = useState<string>(() => {
@@ -335,13 +328,6 @@ export default function SetupStepAvatar({
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
             {t("formatHint")}
           </p>
-        </div>
-        <div className="flex justify-center py-2">
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            sitekey={siteKey}
-            onChange={handleRecaptchaChange}
-          />
         </div>
         <div className="flex gap-3">
           <Button

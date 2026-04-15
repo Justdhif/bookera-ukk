@@ -14,19 +14,29 @@ import { Button } from "@/components/ui/button";
 import { Settings, FileText, Shield } from "lucide-react";
 import { useTranslations } from "next-intl";
 import AppHeader from "./AppHeader";
+import { useAuthStore } from "@/store/auth.store";
 export default function AdminHeader() {
   const pathname = usePathname();
   const t = useTranslations("navbar");
+  const { user } = useAuthStore();
   const segments = pathname.replace("/admin", "").split("/").filter(Boolean);
   const formatSegment = (seg: string) => {
     const formatted = seg.charAt(0).toUpperCase() + seg.slice(1);
     return formatted;
   };
+
+  const dashboardHref =
+    user?.role === "officer:catalog"
+      ? "/admin/categories"
+      : user?.role === "officer:management"
+      ? "/admin/users"
+      : "/admin";
+
   const breadcrumbs = (
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink href="/admin">{t("dashboard")}</BreadcrumbLink>
+          <BreadcrumbLink href={dashboardHref}>{t("dashboard")}</BreadcrumbLink>
         </BreadcrumbItem>
         {segments.map((seg, idx) => {
           const href = `/admin/${segments.slice(0, idx + 1).join("/")}`;

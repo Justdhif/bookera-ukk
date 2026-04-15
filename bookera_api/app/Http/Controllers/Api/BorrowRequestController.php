@@ -53,9 +53,10 @@ class BorrowRequestController extends Controller
         );
     }
 
-    public function approve(BorrowRequest $borrowRequest): JsonResponse
+    public function approve(Request $request, BorrowRequest $borrowRequest): JsonResponse
     {
-        $borrow = $this->borrowRequestService->approve($borrowRequest);
+        $copyIds = $request->input('copy_ids', []);
+        $borrow  = $this->borrowRequestService->approve($borrowRequest, $copyIds);
 
         return ApiResponse::successResponse('Permintaan peminjaman berhasil disetujui', $borrow, 201);
     }

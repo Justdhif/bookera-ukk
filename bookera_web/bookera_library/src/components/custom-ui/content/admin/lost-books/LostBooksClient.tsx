@@ -1,4 +1,5 @@
 "use client";
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
@@ -9,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import { Search, AlertCircle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import DataLoading from "@/components/custom-ui/DataLoading";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 
 export default function LostBooksClient() {
@@ -19,7 +20,7 @@ export default function LostBooksClient() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [filters, setFilters] = useState<LostBookFilterParams>({
-    per_page: 10,
+    per_page: ITEMS_PER_PAGE_OPTIONS[1],
   });
   const [searchInput, setSearchInput] = useState("");
   const [pagination, setPagination] = useState({
@@ -93,8 +94,6 @@ export default function LostBooksClient() {
     }
   };
 
-  const handleProcessFine = async (_id: number) => {};
-
   return (
     <div className="space-y-6">
       <ContentHeader
@@ -124,55 +123,14 @@ export default function LostBooksClient() {
         onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
       >
         {loading ? (
-          <div className="space-y-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="border rounded-lg overflow-hidden">
-                <div className="bg-muted/40 px-4 py-3 flex items-center justify-between border-b gap-4">
-                  <div className="flex items-center gap-2.5">
-                    <Skeleton className="size-8 rounded-full shrink-0" />
-                    <div className="space-y-1.5">
-                      <Skeleton className="h-3.5 w-32" />
-                      <Skeleton className="h-3 w-44" />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-3 w-28" />
-                    <Skeleton className="h-5 w-14 rounded-full" />
-                  </div>
-                </div>
-                <div className="divide-y">
-                  {Array.from({ length: 2 }).map((_, j) => (
-                    <div key={j} className="flex items-center gap-4 px-4 py-3">
-                      <Skeleton className="h-4 w-4 shrink-0" />
-                      <div className="flex items-start gap-2 w-[260px] shrink-0">
-                        <Skeleton className="h-4 w-4 mt-0.5 shrink-0" />
-                        <div className="space-y-1">
-                          <Skeleton className="h-4 w-36" />
-                          <Skeleton className="h-3 w-20" />
-                        </div>
-                      </div>
-                      <div className="w-[160px] shrink-0 space-y-1">
-                        <Skeleton className="h-4 w-24" />
-                        <Skeleton className="h-3 w-28" />
-                      </div>
-                      <div className="flex-1">
-                        <Skeleton className="h-4 w-40" />
-                      </div>
-                      <div className="flex gap-1.5 ml-auto">
-                        <Skeleton className="h-8 w-20 rounded-md" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+          <div className="flex justify-center py-12">
+            <DataLoading variant="inline" size="lg" />
           </div>
         ) : (
           <LostBooksTable
             data={lostBooks}
             onDelete={(id) => setDeleteId(id)}
             onFinish={handleFinish}
-            onProcessFine={handleProcessFine}
             actionLoading={actionLoading}
           />
         )}

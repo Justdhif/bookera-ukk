@@ -52,11 +52,11 @@ export default function FavoriteButton({ bookId }: FavoriteButtonProps) {
 
   return (
     <Button
-      variant="brand"
+      variant={isFavorite ? "outline" : "brand"}
       size="sm"
       onClick={handleToggle}
       disabled={loading}
-      className={cn("gap-2", isFavorite && "text-red-400")}
+      className={cn("gap-2", isFavorite && "text-red-400 border border-red-400")}
     >
       {loading ? (
         <Loader2 className="h-4 w-4 animate-spin" />

@@ -18,12 +18,14 @@ class DiscussionPostImage extends Model
         'order',
     ];
 
-    protected function imagePath(): Attribute
+    public function getImagePathAttribute($value)
     {
-        return Attribute::make(
-            get: fn ($value) => $value ? storage_image($value) : null,
-            set: fn ($value) => $value,
-        );
+        return $value ? storage_image($value) : null;
+    }
+
+    public function setImagePathAttribute($value)
+    {
+        $this->attributes['image_path'] = $value;
     }
 
     public function post()

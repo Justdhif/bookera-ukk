@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { usePathnameCondition } from "@/hooks/usePathnameCondition";
 import { bookService } from "@/services/book.service";
+import { publicService } from "@/services/public.service";
 import { categoryService } from "@/services/category.service";
 import { authorService } from "@/services/author.service";
 import { publisherService } from "@/services/publisher.service";
@@ -13,21 +15,18 @@ import { Book, CreateBookData } from "@/types/book";
 import { Category } from "@/types/category";
 import { Author } from "@/types/author";
 import { Publisher } from "@/types/publisher";
-
 import BookCopyList from "./BookCopyList";
 import BookSideCard from "../BookSideCard";
 import BookForm from "../BookForm";
-import AuthorFormDialog from "@/components/custom-ui/content/admin/author/author-add/AuthorFormDialog";
-import PublisherFormDialog from "@/components/custom-ui/content/admin/publisher/publisher-add/PublisherFormDialog";
-
+import AuthorFormDialog from "@/components/custom-ui/content/admin/author/AuthorFormDialog";
+import PublisherFormDialog from "@/components/custom-ui/content/admin/publisher/PublisherFormDialog";
 import FavoriteButton from "./FavoriteButton";
 import AddToRequestButton from "./AddToRequestButton";
 import BookReviewSection from "./BookReviewSection";
-import BookReviewDialog from "./BookReviewDialog";
 import BookCopyStatusBadge from "@/components/custom-ui/badge/BookCopyStatusBadge";
 import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
-
+import PublicBookGrid from "../PublicBookGrid";
 import {
   Card,
   CardContent,
@@ -85,9 +84,6 @@ export default function BookDetailClient() {
   const [coverError, setCoverError] = useState(false);
   const [formHasErrors, setFormHasErrors] = useState(false);
 
-  // Public states
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-
   useEffect(() => {
     if (!slug) return;
     fetchBook();
@@ -113,7 +109,7 @@ export default function BookDetailClient() {
         is_active: true,
         per_page: "all",
       });
-      setAuthors(res.data.data);
+      setAuthors(res.data.data.data || []);
     } catch (error) {
       console.error("Error fetching authors:", error);
     }
@@ -125,7 +121,7 @@ export default function BookDetailClient() {
         is_active: true,
         per_page: "all",
       });
-      setPublishers(res.data.data);
+      setPublishers(res.data.data.data || []);
     } catch (error) {
       console.error("Error fetching publishers:", error);
     }
@@ -134,7 +130,9 @@ export default function BookDetailClient() {
   const fetchBook = async () => {
     try {
       setLoading(true);
-      const res = await bookService.getBySlug(slug);
+      const res = isAdmin 
+        ? await bookService.getBySlug(slug)
+        : await publicService.getBookBySlug(slug);
       const bookData = res.data.data;
       setBook(bookData);
 
@@ -292,7 +290,6 @@ export default function BookDetailClient() {
                   variant="submit"
                   disabled={isSubmitDisabled()}
                   loading={submitting}
-                  className="h-8 bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-primary/20 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90 dark:focus-visible:ring-primary/40"
                 >
                   {submitting ? tAdmin("saving") : tAdmin("saveChanges")}
                 </Button>
@@ -300,7 +297,7 @@ export default function BookDetailClient() {
             ) : (
               <Button
                 onClick={() => setIsEditMode(true)}
-                variant="default"
+                variant="brand"
                 className="h-8 gap-1"
                 disabled={loading}
               >
@@ -451,12 +448,7 @@ export default function BookDetailClient() {
                     </CardDescription>
                     {book.average_rating !== undefined && (
                       <div
-                        className="flex items-center gap-1.5 mt-2 bg-yellow-50 dark:bg-yellow-900/20 px-3 py-1.5 rounded-full w-fit lg:cursor-default cursor-pointer hover:bg-yellow-100 dark:hover:bg-yellow-900/40 transition-colors"
-                        onClick={() => {
-                          if (window.innerWidth < 1024) {
-                            setIsReviewModalOpen(true);
-                          }
-                        }}
+                        className="flex items-center gap-1.5 mt-2 bg-yellow-50 dark:bg-yellow-900/20 px-3 py-1.5 rounded-full w-fit"
                       >
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         <span className="font-semibold text-sm">
@@ -519,11 +511,12 @@ export default function BookDetailClient() {
                         </h3>
                         <div className="flex flex-col gap-2">
                           {book.authors.map((author) => (
-                            <div
+                            <Link
                               key={author.id}
-                              className="flex items-center gap-3"
+                              href={`/authors/${author.slug}`}
+                              className="flex items-center gap-3 w-fit hover:bg-muted/50 p-1.5 -m-1.5 rounded-lg transition-colors group"
                             >
-                              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-border group-hover:border-brand-primary transition-colors">
                                 <Image
                                   src={author.photo}
                                   alt={author.name}
@@ -533,10 +526,10 @@ export default function BookDetailClient() {
                                   unoptimized
                                 />
                               </div>
-                              <span className="text-sm font-medium">
+                              <span className="text-sm font-medium group-hover:text-brand-primary transition-colors underline-offset-4 group-hover:underline">
                                 {author.name}
                               </span>
-                            </div>
+                            </Link>
                           ))}
                         </div>
                       </div>
@@ -550,11 +543,12 @@ export default function BookDetailClient() {
                         </h3>
                         <div className="flex flex-col gap-2">
                           {book.publishers.map((publisher) => (
-                            <div
+                            <Link
                               key={publisher.id}
-                              className="flex items-center gap-3"
+                              href={`/publishers/${publisher.slug}`}
+                              className="flex items-center gap-3 w-fit hover:bg-muted/50 p-1.5 -m-1.5 rounded-lg transition-colors group"
                             >
-                              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-border group-hover:border-brand-primary transition-colors">
                                 <Image
                                   src={publisher.photo}
                                   alt={publisher.name}
@@ -564,10 +558,10 @@ export default function BookDetailClient() {
                                   unoptimized
                                 />
                               </div>
-                              <span className="text-sm font-medium">
+                              <span className="text-sm font-medium group-hover:text-brand-primary transition-colors underline-offset-4 group-hover:underline">
                                 {publisher.name}
                               </span>
-                            </div>
+                            </Link>
                           ))}
                         </div>
                       </div>
@@ -631,7 +625,7 @@ export default function BookDetailClient() {
               </div>
             </div>
 
-            <Card className="hidden lg:block">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-xl">
                   {tPublic("reviewsTitle")}
@@ -643,12 +637,17 @@ export default function BookDetailClient() {
               </CardContent>
             </Card>
 
-            <BookReviewDialog
-              book={book}
-              isOpen={isReviewModalOpen}
-              onOpenChange={setIsReviewModalOpen}
-              onReviewSubmit={fetchBook}
-            />
+            <div className="pt-6 border-t">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold tracking-tight">
+                  {tPublic("exploreOtherBooks") || "Explore Other Books"}
+                </h2>
+                <p className="text-muted-foreground">
+                  {tPublic("exploreOtherBooksDesc") || "Discover more books from our collection"}
+                </p>
+              </div>
+              <PublicBookGrid showBorrowActions={false} />
+            </div>
           </>
         ))
       )}

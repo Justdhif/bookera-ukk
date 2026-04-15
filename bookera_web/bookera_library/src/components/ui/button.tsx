@@ -78,7 +78,6 @@ function Button({
       disabled={isDisabled}
       {...props}
     >
-      {/* Tampilkan spinner jika loading */}
       {loading && variant === "submit" && (
         <Loader2
           className={cn(

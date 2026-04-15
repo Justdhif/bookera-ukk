@@ -8,16 +8,20 @@ export const bookReturnService = {
     data: {
       borrow_detail_ids: number[];
     },
-  ) => api.post<ApiResponse<BookReturn>>(`/borrows/${borrowId}/return`, data),
+  ) =>
+    api.post<ApiResponse<BookReturn>>(`/borrows/${borrowId}/return`, {
+      items: data.borrow_detail_ids.map((borrowDetailId) => ({
+        borrow_detail_id: borrowDetailId,
+        status: "returned" as const,
+        condition: "good" as const,
+      })),
+    }),
 
   getByBorrow: (borrowId: number) =>
     api.get<ApiResponse<BookReturn[]>>(`/borrows/${borrowId}/returns`),
 
   getById: (id: number) =>
     api.get<ApiResponse<BookReturn>>(`/book-returns/${id}`),
-
-  approve: (id: number) =>
-    api.post<ApiResponse<BookReturn>>(`/admin/book-returns/${id}/approve`),
 
   updateConditions: (
     id: number,
@@ -30,6 +34,4 @@ export const bookReturnService = {
   finishFines: (id: number) =>
     api.post<ApiResponse<any>>(`/admin/book-returns/${id}/finish-fines`),
 
-  processFine: (id: number) =>
-    api.post<ApiResponse<any>>(`/admin/book-returns/${id}/process-fine`),
 };

@@ -13,43 +13,104 @@ class BookService
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
-        return Book::query()
-            ->with(['categories', 'authors', 'publishers', 'reviews.user.profile', 'copies'])
-            ->withCount([
-                'copies as total_copies',
-                'copies as available_copies' => function ($query) {
-                    $query->where('status', 'available');
-                }
-            ])
-            ->when($filters['search'] ?? null, function ($query, $search) {
-                $query->where(function ($subQuery) use ($search) {
-                    $subQuery->where('title', 'like', "%{$search}%")
-                        ->orWhere('isbn', 'like', "%{$search}%")
-                        ->orWhereHas('authors', function ($authorQuery) use ($search) {
-                            $authorQuery->where('name', 'like', "%{$search}%");
-                        })
-                        ->orWhereHas('publishers', function ($publisherQuery) use ($search) {
-                            $publisherQuery->where('name', 'like', "%{$search}%");
-                        });
-                });
-            })
-            ->when($filters['category_ids'] ?? null, function ($query, $categoryIds) {
-                $categoryIds = is_array($categoryIds) ? $categoryIds : explode(',', $categoryIds);
-                $query->whereHas('categories', function ($categoryQuery) use ($categoryIds) {
-                    $categoryQuery->whereIn('categories.id', $categoryIds);
-                });
-            })
-            ->when(isset($filters['status']), function ($query) use ($filters) {
-                $query->where('is_active', $filters['status'] === 'active');
-            })
-            ->when($filters['has_stock'] ?? false, function ($query) {
-                $query->whereHas('copies', function ($copyQuery) {
-                    $copyQuery->where('status', 'available');
-                });
-            })
-            ->latest()
-            ->orderByDesc('id')
-            ->paginate($filters['per_page'] ?? 10);
+        $query = Book::query()
+            ->with(['categories', 'authors', 'publishers', 'reviews.user.profile', 'copies']);
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('title', 'like', "%{$search}%")
+                    ->orWhere('isbn', 'like', "%{$search}%")
+                    ->orWhereHas('authors', function ($authorQuery) use ($search) {
+                        $authorQuery->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('publishers', function ($publisherQuery) use ($search) {
+                        $publisherQuery->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if (!empty($filters['category_ids'])) {
+            $categoryIds = is_array($filters['category_ids'])
+                ? $filters['category_ids']
+                : explode(',', $filters['category_ids']);
+
+            $query->whereHas('categories', function ($categoryQuery) use ($categoryIds) {
+                $categoryQuery->whereIn('categories.id', $categoryIds);
+            });
+        }
+
+        if (isset($filters['min_rating']) && $filters['min_rating'] !== '') {
+            $operator = !empty($filters['min_rating_exclusive']) ? '>' : '>=';
+            $query->whereRaw(
+                "(SELECT COALESCE(AVG(rating), 0) FROM book_reviews WHERE book_reviews.book_id = books.id) {$operator} ?",
+                [(float) $filters['min_rating']]
+            );
+        }
+
+        if (isset($filters['max_rating']) && $filters['max_rating'] !== '') {
+            $operator = !empty($filters['max_rating_exclusive']) ? '<' : '<=';
+            $query->whereRaw(
+                "(SELECT COALESCE(AVG(rating), 0) FROM book_reviews WHERE book_reviews.book_id = books.id) {$operator} ?",
+                [(float) $filters['max_rating']]
+            );
+        }
+
+        if (isset($filters['min_reviews']) && $filters['min_reviews'] !== '') {
+            $query->has('reviews', '>=', (int) $filters['min_reviews']);
+        }
+
+        if (!empty($filters['author_ids'])) {
+            $authorIds = is_array($filters['author_ids'])
+                ? $filters['author_ids']
+                : explode(',', $filters['author_ids']);
+
+            $query->whereHas('authors', function ($authorQuery) use ($authorIds) {
+                $authorQuery->whereIn('authors.id', $authorIds);
+            });
+        }
+
+        if (!empty($filters['publisher_ids'])) {
+            $publisherIds = is_array($filters['publisher_ids'])
+                ? $filters['publisher_ids']
+                : explode(',', $filters['publisher_ids']);
+
+            $query->whereHas('publishers', function ($publisherQuery) use ($publisherIds) {
+                $publisherQuery->whereIn('publishers.id', $publisherIds);
+            });
+        }
+
+        if (!empty($filters['author_ids'])) {
+            $authorIds = is_array($filters['author_ids'])
+                ? $filters['author_ids']
+                : explode(',', $filters['author_ids']);
+
+            $query->whereHas('authors', function ($authorQuery) use ($authorIds) {
+                $authorQuery->whereIn('authors.id', $authorIds);
+            });
+        }
+
+        if (!empty($filters['publisher_ids'])) {
+            $publisherIds = is_array($filters['publisher_ids'])
+                ? $filters['publisher_ids']
+                : explode(',', $filters['publisher_ids']);
+
+            $query->whereHas('publishers', function ($publisherQuery) use ($publisherIds) {
+                $publisherQuery->whereIn('publishers.id', $publisherIds);
+            });
+        }
+
+        if (!empty($filters['status'])) {
+            $query->where('is_active', $filters['status'] === 'active');
+        }
+
+        if (isset($filters['has_stock']) && filter_var($filters['has_stock'], FILTER_VALIDATE_BOOLEAN)) {
+            $query->whereHas('copies', function ($copyQuery) {
+                $copyQuery->where('status', 'available');
+            });
+        }
+
+        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
     public function create(array $data, ?UploadedFile $coverImage = null): Book
@@ -192,11 +253,6 @@ class BookService
             'reviews.user.profile',
             'copies' => function ($query) {
                 $query->orderBy('status')->orderBy('created_at');
-            }
-        ])->loadCount([
-            'copies as total_copies',
-            'copies as available_copies' => function ($query) {
-                $query->where('status', 'available');
             }
         ]);
 

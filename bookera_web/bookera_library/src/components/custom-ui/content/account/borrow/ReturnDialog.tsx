@@ -84,12 +84,12 @@ export function ReturnDialog({
       await bookReturnService.create(borrow.id, {
         borrow_detail_ids: selectedDetailIds,
       });
-      toast.success("Return request submitted successfully");
+      toast.success(t("returnSuccess"));
       handleClose();
       onSuccess?.();
     } catch (error: any) {
       toast.error(
-        error?.response?.data?.message || "Failed to submit return request",
+        error?.response?.data?.message || t("returnError"),
       );
     } finally {
       setLoading(false);
@@ -112,28 +112,28 @@ export function ReturnDialog({
           <div className="flex items-center gap-2 text-muted-foreground">
             <Hash className="h-3.5 w-3.5 shrink-0" />
             <span>
-              Borrow Code:
+              {t("borrowCode")}:
               <span className="font-medium text-foreground">
-                {borrow?.borrow_code ?? `#${borrow?.id}`}
+                {" "}{borrow?.borrow_code ?? `#${borrow?.id}`}
               </span>
             </span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <CalendarClock className="h-3.5 w-3.5 shrink-0" />
             <span>
-              Due:
+              {t("dueLabel")}:
               <span
                 className={`font-medium ${
                   isOverdue ? "text-destructive" : "text-foreground"
                 }`}
               >
-                {borrow?.return_date
+                {" "}{borrow?.return_date
                   ? format(new Date(borrow.return_date), "dd MMM yyyy")
                   : "—"}
               </span>
               {isOverdue && (
                 <Badge variant="destructive" className="ml-2 text-xs py-0">
-                  Overdue
+                  {t("overdue")}
                 </Badge>
               )}
             </span>
@@ -145,16 +145,18 @@ export function ReturnDialog({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-sm font-medium">
-              Select Books to Return
+              {t("selectBooksToReturn")}
             </Label>
             {(borrowedDetails?.length ?? 0) > 0 && (
               <Button
                 type="button"
                 onClick={handleToggleAll}
                 className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors"
+                variant="ghost"
+                size="sm"
               >
                 <CheckSquare className="h-3.5 w-3.5" />
-                {allSelected ? "Deselect All" : "Select All"}
+                {allSelected ? t("deselectAll") : t("selectAll")}
               </Button>
             )}
           </div>
@@ -163,7 +165,7 @@ export function ReturnDialog({
             <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed py-8 text-center">
               <BookOpen className="h-8 w-8 text-muted-foreground/50" />
               <p className="text-sm text-muted-foreground">
-                No books available to return.
+                {t("noBooksAvailableToReturn")}
               </p>
             </div>
           ) : (
@@ -211,8 +213,7 @@ export function ReturnDialog({
 
           {selectedDetailIds.length > 0 && (
             <p className="text-xs text-muted-foreground pt-1">
-              {selectedDetailIds.length} {t("book")}
-              {selectedDetailIds.length > 1 ? "s" : ""} selected for return
+              {t("booksSelectedForReturn", { count: selectedDetailIds.length })}
             </p>
           )}
         </div>
@@ -234,12 +235,7 @@ export function ReturnDialog({
             ) : (
               <>
                 <PackageOpen className="h-4 w-4 mr-2" />
-                Return
-                {selectedDetailIds.length > 0
-                  ? `${selectedDetailIds.length} Book${
-                      selectedDetailIds.length > 1 ? "s" : ""
-                    }`
-                  : "Books"}
+                {t("returnBtn", { count: selectedDetailIds.length })}
               </>
             )}
           </Button>

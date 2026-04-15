@@ -28,7 +28,6 @@ interface ReturnCardProps {
   showActions?: boolean;
   actionLoading?: number | null;
   onFinished?: (returnId: number) => void;
-  onProcessFine?: (returnId: number) => void;
 }
 export function ReturnCard({
   bookReturn,
@@ -36,7 +35,6 @@ export function ReturnCard({
   showActions = true,
   actionLoading,
   onFinished,
-  onProcessFine,
 }: ReturnCardProps) {
   const fines = borrow.fines ?? [];
   const unpaidFines = fines.filter((f) => f.status === "unpaid");
@@ -48,7 +46,6 @@ export function ReturnCard({
   );
   const hasLostBooks = bookReturn.details?.some((d) => d.condition === "lost");
   const hasDamagedOrLostBooks = hasDamagedBooks || hasLostBooks;
-  const shouldShowProcessFine = hasDamagedOrLostBooks && !hasFines;
   const shouldShowFinished =
     !hasDamagedOrLostBooks || (hasFines && !hasUnpaidFines);
   return (
@@ -89,21 +86,6 @@ export function ReturnCard({
             <div className="flex gap-2">
               {borrow.status === "open" && (
                 <>
-                  {shouldShowProcessFine && (
-                    <Button
-                      size="sm"
-                      variant="brand"
-                      onClick={() => onProcessFine?.(bookReturn.id)}
-                      disabled={actionLoading === bookReturn.id}
-                    >
-                      {actionLoading === bookReturn.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <DollarSign className="h-4 w-4 mr-1" />
-                      )}
-                      Process Fine
-                    </Button>
-                  )}
                   {shouldShowFinished && (
                     <Button
                       size="sm"

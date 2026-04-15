@@ -8,7 +8,7 @@ import { Book } from "@/types/book";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { BookOpen, CalendarDays, Building2, Eye, Star } from "lucide-react";
+import { BookOpen, CalendarDays, Building2, Eye, Star, Heart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
@@ -83,6 +83,7 @@ export default function BookCard({
         >
           <Checkbox
             checked={isChecked}
+            variant="circle"
             className="data-[state=checked]:bg-brand-primary data-[state=checked]:border-brand-primary pointer-events-none"
           />
         </div>
@@ -226,9 +227,15 @@ export default function BookCard({
               {book.reviews_count || 0} {t("reviewsTotal")}
             </span>
           </div>
-          <div className="flex items-center gap-1 text-xs font-bold text-foreground">
-            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-            {book.average_rating ? Number(book.average_rating).toFixed(1) : "0.0"}
+          <div className="flex items-center gap-2 text-xs font-bold text-foreground">
+            <div className="flex items-center gap-1" title={t("detail.favorites") || "Favorites"}>
+              <Heart className="h-3 w-3 text-red-500 fill-red-500" />
+              <span>{book.favorites_count || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+              <span>{book.average_rating ? Number(book.average_rating).toFixed(1) : "0.0"}</span>
+            </div>
           </div>
         </div>
         <Link

@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
@@ -6,24 +7,25 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
 import { Search, Loader2, UserSquare, Building2, BookText } from "lucide-react";
-import { authorService } from "@/services/author.service";
-import { publisherService } from "@/services/publisher.service";
+import { publicService } from "@/services/public.service";
 import { Author } from "@/types/author";
 import { Publisher } from "@/types/publisher";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   useSidebar,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
+import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { cn } from "@/lib/utils";
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
+
 type TabAction = "author" | "publisher";
+
 export default function AuthorPublisherSidebarSearch() {
   const t = useTranslations("public");
-  const router = useRouter();
   const { open, setOpen } = useSidebar();
   const [activeTab, setActiveTab] = useState<TabAction>("author");
   const [searchTerm, setSearchTerm] = useState("");
@@ -52,11 +54,10 @@ export default function AuthorPublisherSidebarSearch() {
       }
       try {
         if (activeTab === "author") {
-          const res = await authorService.getAll({
+          const res = await publicService.getAuthors({
             search: debouncedSearchTerm,
-            per_page: 10,
+            per_page: ITEMS_PER_PAGE_OPTIONS[1],
             page: currentPage,
-            is_active: true,
           });
           const data = res.data.data;
           if (isLoadMore) {
@@ -66,11 +67,10 @@ export default function AuthorPublisherSidebarSearch() {
           }
           setLastPage(data.last_page);
         } else {
-          const res = await publisherService.getAll({
+          const res = await publicService.getPublishers({
             search: debouncedSearchTerm,
-            per_page: 10,
+            per_page: ITEMS_PER_PAGE_OPTIONS[1],
             page: currentPage,
-            is_active: true,
           });
           const data = res.data.data;
           if (isLoadMore) {
@@ -93,9 +93,7 @@ export default function AuthorPublisherSidebarSearch() {
   useEffect(() => {
     fetchData(false);
   }, [debouncedSearchTerm, activeTab]);
-  const handleEntityClick = (name: string, type: TabAction) => {
-    router.push(`/search?q=${encodeURIComponent(name)}`);
-  };
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div
@@ -158,30 +156,9 @@ export default function AuthorPublisherSidebarSearch() {
       </div>
       <div className="flex-1 overflow-y-auto p-2">
         {loading ? (
-          <SidebarMenu>
-            {[...Array(5)].map((_, i) => (
-              <SidebarMenuItem
-                key={`skeleton-${i}`}
-                className={!open ? "w-full flex justify-center" : ""}
-              >
-                <SidebarMenuButton
-                  disabled
-                  className={cn(
-                    "h-auto py-2 flex items-center gap-3 pointer-events-none",
-                    !open && "justify-center px-0 mx-auto",
-                  )}
-                >
-                  <Skeleton className="h-8 w-8 rounded-full shrink-0" />
-                  {open && (
-                    <div className="flex flex-col gap-1.5 w-full overflow-hidden py-0.5">
-                      <Skeleton className="h-3.5 w-30" />
-                      <Skeleton className="h-2.5 w-20" />
-                    </div>
-                  )}
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
+          <div className="flex justify-center py-6">
+            <DataLoading variant="inline" size="md" />
+          </div>
         ) : (
           <SidebarMenu>
             {activeTab === "author" && authors.length === 0 && (
@@ -207,38 +184,40 @@ export default function AuthorPublisherSidebarSearch() {
                   className={!open ? "w-full flex justify-center" : ""}
                 >
                   <SidebarMenuButton
-                    onClick={() => handleEntityClick(author.name, "author")}
+                    asChild
                     className={cn(
                       "h-auto py-2 flex items-center gap-3",
                       !open && "justify-center px-0 mx-auto",
                     )}
                     tooltip={!open ? author.name : undefined}
                   >
-                    <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
-                      {author.photo ? (
-                        <Image
-                          src={author.photo}
-                          alt={author.name}
-                          className="w-full h-full object-cover"
-                          width={300}
-                          height={400}
-                          unoptimized
-                        />
-                      ) : (
-                        <UserSquare className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </div>
-                    {open && (
-                      <div className="flex flex-col overflow-hidden">
-                        <span className="text-sm font-medium truncate">
-                          {author.name}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                          <BookText className="w-3 h-3" />
-                          {author.books_count || 0} Buku
-                        </span>
+                    <Link href={`/authors/${author.slug}`}>
+                      <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
+                        {author.photo ? (
+                          <Image
+                            src={author.photo}
+                            alt={author.name}
+                            className="w-full h-full object-cover"
+                            width={300}
+                            height={400}
+                            unoptimized
+                          />
+                        ) : (
+                          <UserSquare className="h-4 w-4 text-muted-foreground" />
+                        )}
                       </div>
-                    )}
+                      {open && (
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="text-sm font-medium truncate">
+                            {author.name}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                            <BookText className="w-3 h-3" />
+                            {author.books_count || 0} Buku
+                          </span>
+                        </div>
+                      )}
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -249,40 +228,40 @@ export default function AuthorPublisherSidebarSearch() {
                   className={!open ? "w-full flex justify-center" : ""}
                 >
                   <SidebarMenuButton
-                    onClick={() =>
-                      handleEntityClick(publisher.name, "publisher")
-                    }
+                    asChild
                     className={cn(
                       "h-auto py-2 flex items-center gap-3",
                       !open && "justify-center px-0 mx-auto",
                     )}
                     tooltip={!open ? publisher.name : undefined}
                   >
-                    <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
-                      {publisher.photo ? (
-                        <Image
-                          src={publisher.photo}
-                          alt={publisher.name}
-                          className="w-full h-full object-cover"
-                          width={300}
-                          height={400}
-                          unoptimized
-                        />
-                      ) : (
-                        <Building2 className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </div>
-                    {open && (
-                      <div className="flex flex-col overflow-hidden">
-                        <span className="text-sm font-medium truncate">
-                          {publisher.name}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                          <BookText className="w-3 h-3" />
-                          {publisher.books_count || 0} Buku
-                        </span>
+                    <Link href={`/publishers/${publisher.slug}`}>
+                      <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
+                        {publisher.photo ? (
+                          <Image
+                            src={publisher.photo}
+                            alt={publisher.name}
+                            className="w-full h-full object-cover"
+                            width={300}
+                            height={400}
+                            unoptimized
+                          />
+                        ) : (
+                          <Building2 className="h-4 w-4 text-muted-foreground" />
+                        )}
                       </div>
-                    )}
+                      {open && (
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="text-sm font-medium truncate">
+                            {publisher.name}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                            <BookText className="w-3 h-3" />
+                            {publisher.books_count || 0} Buku
+                          </span>
+                        </div>
+                      )}
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

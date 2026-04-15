@@ -11,13 +11,14 @@ class CategoryService
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
-        return Category::query()
-            ->when($filters['search'] ?? null, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%");
-            })
-            ->latest()
-            ->orderByDesc('id')
-            ->paginate($filters['per_page'] ?? 10);
+        $query = Category::query();
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
     public function create(array $data): Category

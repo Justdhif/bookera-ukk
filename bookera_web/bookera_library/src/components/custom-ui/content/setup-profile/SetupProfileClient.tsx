@@ -13,7 +13,6 @@ import SetupStepIndicator from "./steps/SetupStepIndicator";
 import SetupStepPersonal from "./steps/SetupStepPersonal";
 import SetupStepProfessional from "./steps/SetupStepProfessional";
 import SetupStepAvatar from "./steps/SetupStepAvatar";
-import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 export type SetupStep = "personal" | "professional" | "avatar";
 
@@ -47,13 +46,6 @@ export default function SetupProfileClient() {
 
   const [step, setStep] = useState<SetupStep>("personal");
   const [submitting, setSubmitting] = useState(false);
-  const {
-    siteKey,
-    recaptchaRef,
-    token,
-    handleRecaptchaChange,
-    reset: resetRecaptcha,
-  } = useRecaptcha();
 
   const [fullName, setFullName] = useState("");
   const [gender, setGender] = useState("");
@@ -84,10 +76,6 @@ export default function SetupProfileClient() {
   const handleBackToPersonal = () => setStep("personal");
 
   const handleSubmit = async () => {
-    if (!token) {
-      toast.error(t("verifyRecaptcha") || "Please verify reCAPTCHA");
-      return;
-    }
     setSubmitting(true);
     try {
       const submitData = new FormData();
@@ -107,14 +95,11 @@ export default function SetupProfileClient() {
         submitData.append("avatar_url", avatarFile);
       }
 
-      submitData.append("recaptcha_token", token);
-
       const res = await authService.setupProfile(submitData);
       setUser(res.data.data.user);
       toast.success(t("profileCreated"));
       router.push("/");
     } catch (error: any) {
-      resetRecaptcha();
       const errorData = error.response?.data;
       if (errorData?.data && typeof errorData.data === "object") {
         const errors = Object.values(errorData.data).flat();
@@ -216,9 +201,6 @@ export default function SetupProfileClient() {
                   loading={submitting}
                   onBack={handleBackToProfessional}
                   onSubmit={handleSubmit}
-                  siteKey={siteKey}
-                  recaptchaRef={recaptchaRef}
-                  handleRecaptchaChange={handleRecaptchaChange}
                 />
               </Card>
             </motion.div>

@@ -13,7 +13,7 @@ import { TermsOfServiceModal } from "@/components/custom-ui/modal/TermsOfService
 import { PrivacyPolicyModal } from "@/components/custom-ui/modal/PrivacyPolicyModal";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
-import { useRecaptcha } from "@/hooks/useRecaptcha";
+
 export type AuthMode = "login" | "register";
 export const cardVariants = {
   enter: (direction: number) => ({
@@ -48,28 +48,15 @@ export default function LoginClient() {
   const [mode, setMode] = useState<AuthMode>("login");
   const [tosModalOpen, setTosModalOpen] = useState(false);
   const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
-  const {
-    siteKey,
-    recaptchaRef,
-    token,
-    handleRecaptchaChange,
-    reset: resetRecaptcha,
-    ready: recaptchaReady,
-  } = useRecaptcha();
 
   const direction = mode === "register" ? 1 : -1;
 
   const handleLogin = async (email: string, password: string) => {
     try {
-      if (!token) {
-        toast.error(t("pleaseVerifyRecaptcha") || "Please verify reCAPTCHA");
-        return;
-      }
-      const message = await login(email, password, token);
+      const message = await login(email, password);
       toast.success(message || "Login successful!");
       router.push("/");
     } catch (err: any) {
-      resetRecaptcha();
       toast.error(err.response?.data?.message ?? t("loginFailed"));
     }
   };
@@ -172,10 +159,6 @@ export default function LoginClient() {
                   onSwitchToRegister={() => switchMode("register")}
                   onOpenTos={() => setTosModalOpen(true)}
                   onOpenPrivacy={() => setPrivacyModalOpen(true)}
-                  recaptchaRef={recaptchaRef}
-                  siteKey={siteKey}
-                  onRecaptchaChange={handleRecaptchaChange}
-                  recaptchaReady={recaptchaReady && !!token}
                 />
               </motion.div>
             ) : (

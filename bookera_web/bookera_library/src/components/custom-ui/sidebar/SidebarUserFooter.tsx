@@ -37,7 +37,13 @@ export function SidebarUserFooter() {
     user?.role === "admin" || user?.role?.startsWith("officer:");
 
   const showBackButton = isAdmin || hasAdminRole;
-  const backHref = isAdmin ? "/" : "/admin";
+  const backHref = isAdmin
+    ? "/"
+    : user?.role === "officer:catalog"
+    ? "/admin/categories"
+    : user?.role === "officer:management"
+    ? "/admin/users"
+    : "/admin";
   const backLabelKey = isAdmin ? "publicPage" : "dashboard";
   const profileHref = user?.slug ? `/${user.slug}/profile` : "/profile";
 

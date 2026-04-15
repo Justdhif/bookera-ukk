@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, KeyRound, ArrowLeft, Send } from "lucide-react";
-import ReCAPTCHA from "react-google-recaptcha";
 
 const iconPopTransition = {
   type: "spring" as const,
@@ -28,10 +27,6 @@ interface ForgotStepMethodProps {
   onSend: () => void;
   onBack: () => void;
   isAuthenticated: boolean;
-  siteKey: string;
-  recaptchaRef: React.RefObject<ReCAPTCHA | null>;
-  onRecaptchaChange: (token: string | null) => void;
-  recaptchaReady: boolean;
 }
 
 export default function ForgotStepMethod({
@@ -41,10 +36,6 @@ export default function ForgotStepMethod({
   onSend,
   onBack,
   isAuthenticated,
-  siteKey,
-  recaptchaRef,
-  onRecaptchaChange,
-  recaptchaReady,
 }: ForgotStepMethodProps) {
   const t = useTranslations("forgot-password");
   return (
@@ -88,19 +79,11 @@ export default function ForgotStepMethod({
             onKeyDown={(e) => e.key === "Enter" && onSend()}
           />
         </div>
-        <div className="flex justify-center py-2">
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            sitekey={siteKey}
-            onChange={onRecaptchaChange}
-            theme="light"
-          />
-        </div>
         <Button
           type="button"
           variant="outline"
           onClick={onSend}
-          disabled={loading || !email.trim() || !recaptchaReady}
+          disabled={loading || !email.trim()}
           className="w-full h-auto flex items-center gap-4 p-4 rounded-xl border-2 border-brand-primary/20 dark:border-brand-primary/30 bg-brand-primary/5 dark:bg-brand-primary/10 hover:border-brand-primary/50 hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 transition-all duration-200 group shadow-none"
         >
           <div className="w-12 h-12 rounded-xl bg-linear-to-br from-brand-primary to-brand-primary-dark flex items-center justify-center shadow-md shadow-brand-primary/20 group-hover:shadow-lg group-hover:shadow-brand-primary/30 transition-all">

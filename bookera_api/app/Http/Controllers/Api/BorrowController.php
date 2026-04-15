@@ -109,4 +109,15 @@ class BorrowController extends Controller
 
         return ApiResponse::successResponse('Buku salinan berhasil di-assign ke peminjaman', $borrow);
     }
+
+    public function complete(Borrow $borrow): JsonResponse
+    {
+        try {
+            $borrow = $this->borrowService->complete($borrow);
+
+            return ApiResponse::successResponse('Peminjaman berhasil diselesaikan dan ditutup', $borrow);
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse($e->getMessage(), null, 400);
+        }
+    }
 }

@@ -10,7 +10,7 @@ class PrivacyPolicyService
 {
     public function getAll(): Collection
     {
-        return PrivacyPolicy::orderBy('created_at', 'desc')->get();
+        return PrivacyPolicy::query()->latest()->orderByDesc('id')->get();
     }
 
     public function create(array $data): PrivacyPolicy

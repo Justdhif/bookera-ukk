@@ -9,17 +9,33 @@ import {
   ActivityLogFilters,
 } from "@/types/activity-log";
 import { toast } from "sonner";
-import ActivityStatistics from "./statistics/ActivityStatistics";
-import ActivityCharts from "./charts/ActivityCharts";
-import ActivityTable from "./table/ActivityTable";
-import ActivityDetailDialog from "./dialog/ActivityDetailDialog";
+import ActivityStatistics from "./ActivityStatistics";
+import ActivityCharts from "./ActivityCharts";
+import ActivityTable from "./ActivityTable";
+import ActivityDetailDialog from "./ActivityDetailDialog";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import { useAuthStore } from "@/store/auth.store";
+import { useRouter } from "next/navigation";
 
 export default function ActivityLogClient() {
   const t = useTranslations("activity-log");
+  const { user } = useAuthStore();
+  const router = useRouter();
   const [data, setData] = useState<ActivityLogIndexResponse | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user && user.role !== "admin") {
+      if (user.role === "officer:catalog") {
+        router.replace("/admin/categories");
+      } else if (user.role === "officer:management") {
+        router.replace("/admin/users");
+      } else {
+        router.replace("/");
+      }
+    }
+  }, [user, router]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [filters, setFilters] = useState<ActivityLogFilters>({

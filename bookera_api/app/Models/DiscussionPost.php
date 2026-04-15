@@ -27,6 +27,8 @@ class DiscussionPost extends Model
         'taken_down_at' => 'datetime',
     ];
 
+    protected $withCount = ['likes', 'comments'];
+
     protected static function boot(): void
     {
         parent::boot();

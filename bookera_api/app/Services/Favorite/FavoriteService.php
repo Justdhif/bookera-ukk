@@ -9,7 +9,11 @@ class FavoriteService
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
-        $query = BookFavorite::with(['book.authors', 'book.publishers', 'book.categories', 'book.reviews.user.profile'])
+        $query = BookFavorite::with([
+            'book' => function ($q) {
+                $q->with(['authors', 'publishers', 'categories', 'reviews.user.profile', 'copies']);
+            }
+        ])
             ->where('user_id', auth()->id());
 
         if (!empty($filters['search'])) {
@@ -30,10 +34,30 @@ class FavoriteService
             });
         }
 
-        // Apply sorting (newest favorites first)
-        $query->latest('id');
+        if (isset($filters['rating']) && $filters['rating'] !== '') {
+            $rating = (float) $filters['rating'];
+            $query->whereHas('book', function ($q) use ($rating) {
+                $q->whereIn('id', function ($sub) use ($rating) {
+                    $sub->select('book_id')
+                        ->from('book_reviews')
+                        ->groupBy('book_id');
 
-        return $query->paginate($filters['per_page'] ?? 10);
+                    if ($rating == 5) {
+                        $sub->havingRaw("AVG(rating) = 5");
+                    } else {
+                        $sub->havingRaw("AVG(rating) >= ? AND AVG(rating) < ?", [$rating, $rating + 1]);
+                    }
+                });
+            });
+        }
+
+        if (isset($filters['min_reviews']) && $filters['min_reviews'] !== '') {
+            $query->whereHas('book', function ($q) use ($filters) {
+                $q->has('reviews', '>=', (int) $filters['min_reviews']);
+            });
+        }
+
+        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
     public function create(array $data): BookFavorite

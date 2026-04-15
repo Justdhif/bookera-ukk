@@ -8,7 +8,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class FineTypeService
 {
-    public function getAll(array $filters = []): LengthAwarePaginator
+    public function getAll(array $filters): LengthAwarePaginator
     {
         $query = FineType::query();
 

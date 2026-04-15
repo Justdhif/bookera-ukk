@@ -3,18 +3,29 @@
 namespace App\Services\BookReturn;
 
 use App\Helpers\ActivityLogger;
-use App\Services\Borrow\BorrowNotificationService;
 use App\Models\BookCopy;
 use App\Models\BookReturn;
+use App\Models\BookReturnDetail;
 use App\Models\Borrow;
 use App\Models\BorrowDetail;
 use App\Models\Fine;
 use App\Models\FineType;
+use App\Models\LostBookDetail;
+use App\Services\BookReturn\BookReturnNotificationService;
+use App\Services\LostBook\LostBookService;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class BookReturnService
 {
+    private LostBookService $lostBookService;
+
+    public function __construct(LostBookService $lostBookService)
+    {
+        $this->lostBookService = $lostBookService;
+    }
+
     public function getByBorrow(Borrow $borrow): Collection
     {
         return BookReturn::with(['details.bookCopy.book'])
@@ -24,139 +35,104 @@ class BookReturnService
             ->get();
     }
 
-    public function create(Borrow $borrow, array $data): BookReturn
+    public function create(Borrow $borrow, array $data): array
     {
         return DB::transaction(function () use ($borrow, $data) {
-            $return = BookReturn::create([
-                'borrow_id'   => $borrow->id,
-                'return_date' => now(),
-            ]);
+            $bookReturn = null;
+            $results = [
+                'returned' => [],
+                'lost' => [],
+            ];
+            $lostItems = [];
 
-            $returnedCopies = [];
-
-            foreach ($data['borrow_detail_ids'] as $detailId) {
-                $borrowDetail = BorrowDetail::where('id', $detailId)
+            foreach ($data['items'] as $item) {
+                $borrowDetail = BorrowDetail::where('id', $item['borrow_detail_id'])
                     ->where('borrow_id', $borrow->id)
-                    ->where('status', 'borrowed')
-                    ->firstOrFail();
-
-                $bookCopy = $borrowDetail->bookCopy;
-
-                $return->details()->create([
-                    'book_copy_id' => $bookCopy->id,
-                    'condition'    => 'good',
-                ]);
-
-                $returnedCopies[] = [
-                    'copy_id'          => $bookCopy->id,
-                    'book_title'       => $bookCopy->book->title ?? 'Unknown',
-                    'borrow_detail_id' => $detailId,
-                ];
-
-                ActivityLogger::log(
-                    'create',
-                    'book_return_detail',
-                    "Return requested for book copy #{$bookCopy->id} ({$bookCopy->book->title})",
-                    ['copy_id' => $bookCopy->id, 'borrow_detail_id' => $detailId],
-                    null,
-                    $bookCopy
-                );
-            }
-
-            $return->load(['details.bookCopy.book', 'borrow.user.profile']);
-
-            ActivityLogger::log(
-                'create',
-                'book_return',
-                "Return requested for borrow #{$borrow->id} with " . count($returnedCopies) . " book(s)",
-                [
-                    'return_id'       => $return->id,
-                    'borrow_id'       => $borrow->id,
-                    'return_date'     => $return->return_date,
-                    'returned_copies' => $returnedCopies,
-                ],
-                null,
-                $return
-            );
-
-            (new BorrowNotificationService())->notifyReturnRequested($return);
-
-            return $return;
-        });
-    }
-
-    public function approve(BookReturn $bookReturn): BookReturn
-    {
-        $borrow = $bookReturn->borrow;
-
-        // Prevent approving if there are unpaid fines
-        $unpaidFines = $borrow->fines()->where('status', 'unpaid')->count();
-        if ($unpaidFines > 0) {
-            throw new \Exception('Tidak dapat menyelesaikan pengembalian. Masih ada ' . $unpaidFines . ' denda yang belum dibayar.');
-        }
-
-        DB::transaction(function () use ($borrow, $bookReturn) {
-            foreach ($bookReturn->details as $detail) {
-                $bookCopy = $detail->bookCopy;
-                $oldStatus = $bookCopy->status;
-
-                $newStatus = match ($detail->condition) {
-                    'good'    => 'available',
-                    'damaged' => 'damaged',
-                    'lost'    => 'lost',
-                    default   => 'available'
-                };
-
-                $bookCopy->update(['status' => $newStatus]);
-
-                // Update corresponding borrow_detail status
-                $borrowDetail = BorrowDetail::where('borrow_id', $borrow->id)
-                    ->where('book_copy_id', $bookCopy->id)
-                    ->where('status', 'borrowed')
                     ->first();
 
-                if ($borrowDetail) {
-                    $borrowDetail->update(['status' => 'returned']);
+                if (! $borrowDetail) {
+                    continue;
                 }
 
-                ActivityLogger::log(
-                    'update',
-                    'book_copy',
-                    "Book copy #{$bookCopy->id} status changed to '{$newStatus}' (condition: {$detail->condition})",
-                    ['copy_id' => $bookCopy->id, 'new_status' => $newStatus, 'condition' => $detail->condition],
-                    ['copy_id' => $bookCopy->id, 'old_status' => $oldStatus],
-                    $bookCopy
-                );
+                $bookCopy = $borrowDetail->bookCopy;
+                $requestedStatus = $item['status'];
+                $alreadyReturned = $this->hasFinalizedReturnForCopy($borrow, $bookCopy->id);
+                $alreadyLost = $this->hasFinalizedLostForCopy($borrow, $bookCopy->id);
+
+                if ($requestedStatus === 'returned') {
+                    if ($alreadyReturned || $alreadyLost) {
+                        continue;
+                    }
+
+                    if (! $bookReturn) {
+                        $bookReturn = BookReturn::firstOrCreate([
+                            'borrow_id'   => $borrow->id,
+                            'return_date' => now(),
+                        ]);
+                    }
+
+                    $condition = $item['condition'] ?? 'good';
+
+                    $bookReturn->details()->create([
+                        'book_copy_id' => $bookCopy->id,
+                        'condition'    => $condition,
+                    ]);
+
+                    $borrowDetail->update(['status' => 'returned']);
+                    $bookCopy->update(['status' => 'available']);
+
+                    $results['returned'][] = [
+                        'copy_id'    => $bookCopy->id,
+                        'book_title' => $bookCopy->book->title,
+                        'condition'  => $condition,
+                    ];
+
+                    if ($condition === 'damaged') {
+                        $this->autoCreateDamagedFine($borrow, $bookCopy);
+                    }
+
+                    ActivityLogger::log(
+                        'update',
+                        'book_return_detail',
+                        "Book copy #{$bookCopy->id} ({$bookCopy->book->title}) processed as returned (condition: {$condition})",
+                        ['copy_id' => $bookCopy->id, 'condition' => $condition],
+                        null,
+                        $bookCopy
+                    );
+                } elseif ($requestedStatus === 'lost') {
+                    if ($alreadyLost || $alreadyReturned) {
+                        continue;
+                    }
+
+                    $lostItems[] = [
+                        'book_copy_id' => $bookCopy->id,
+                        'lost_date'    => $item['lost_date'] ?? now()->toDateString(),
+                        'notes'        => $item['notes'] ?? null,
+                    ];
+
+                    $results['lost'][] = [
+                        'copy_id'    => $bookCopy->id,
+                        'book_title' => $bookCopy->book->title,
+                    ];
+                }
             }
 
-            // Close borrow if all borrow_details are returned or lost
-            $allDone = BorrowDetail::where('borrow_id', $borrow->id)
-                ->where('status', 'borrowed')
-                ->doesntExist();
-
-            if ($allDone) {
-                $oldBorrowStatus = $borrow->status;
-                $borrow->update(['status' => 'close']);
-
-                ActivityLogger::log(
-                    'update',
-                    'borrow',
-                    "Borrow #{$borrow->id} closed - all books returned/lost",
-                    ['borrow_id' => $borrow->id, 'new_status' => 'close'],
-                    ['borrow_id' => $borrow->id, 'old_status' => $oldBorrowStatus],
-                    $borrow
-                );
+            if (! empty($lostItems)) {
+                $this->lostBookService->createMany($borrow, $lostItems);
             }
 
-            (new BorrowNotificationService())->notifyReturnApproved($bookReturn);
+            if (! empty($results['returned']) || ! empty($results['lost'])) {
+                $borrow->load(['user.profile', 'fines.fineType']);
+                (new BookReturnNotificationService())->notifyReturnProcessed($borrow, $results);
+            }
+
+            return [
+                'book_return' => $bookReturn,
+                'summary'     => $results,
+            ];
         });
-
-        return $bookReturn->load('details.bookCopy.book', 'borrow');
     }
 
-    /**
-     * Update conditions for book return details and auto-create fines for damaged books.
-     */
     public function updateConditions(BookReturn $bookReturn, array $conditions): BookReturn
     {
         return DB::transaction(function () use ($bookReturn, $conditions) {
@@ -164,14 +140,13 @@ class BookReturnService
 
             foreach ($conditions as $detailId => $condition) {
                 $detail = $bookReturn->details()->find($detailId);
-                if (!$detail) {
+                if (! $detail) {
                     continue;
                 }
 
                 $oldCondition = $detail->condition;
                 $detail->update(['condition' => $condition]);
 
-                // Auto-create fine for damaged books
                 if ($condition === 'damaged' && $oldCondition !== 'damaged') {
                     $this->autoCreateDamagedFine($borrow, $detail->bookCopy);
                 }
@@ -193,7 +168,7 @@ class BookReturnService
     private function autoCreateDamagedFine(Borrow $borrow, BookCopy $bookCopy): void
     {
         $damagedFineType = FineType::where('type', 'damaged')->first();
-        if (!$damagedFineType) {
+        if (! $damagedFineType) {
             return;
         }
 
@@ -225,12 +200,8 @@ class BookReturnService
         );
 
         $fine->load('fineType', 'borrow.user', 'borrow.borrowDetails.bookCopy.book');
-        (new BorrowNotificationService())->notifyFineCreated($fine);
     }
 
-    /**
-     * Mark all unpaid fines for this return's borrow as paid.
-     */
     public function finishFines(BookReturn $bookReturn): array
     {
         $borrow = $bookReturn->borrow;
@@ -238,7 +209,7 @@ class BookReturnService
         $unpaidFines = $borrow->fines()->where('status', 'unpaid')->get();
 
         if ($unpaidFines->isEmpty()) {
-            throw new \Exception('Tidak ada denda yang belum dibayar untuk peminjaman ini.');
+            throw new Exception('Tidak ada denda yang belum dibayar untuk peminjaman ini.');
         }
 
         DB::transaction(function () use ($unpaidFines, $borrow) {
@@ -262,9 +233,6 @@ class BookReturnService
         return $borrow->fines()->with('fineType')->get()->toArray();
     }
 
-    /**
-     * Get detailed return info including borrow details and fines.
-     */
     public function getDetail(BookReturn $bookReturn): BookReturn
     {
         return $bookReturn->load([
@@ -280,65 +248,17 @@ class BookReturnService
         return $borrow->status === 'open';
     }
 
-    public function canApprove(BookReturn $bookReturn): bool
+    private function hasFinalizedReturnForCopy(Borrow $borrow, int $bookCopyId): bool
     {
-        $borrow = $bookReturn->borrow;
-
-        if ($borrow->status !== 'open') {
-            return false;
-        }
-
-        return true;
+        return BookReturnDetail::whereHas('bookReturn', function ($query) use ($borrow) {
+            $query->where('borrow_id', $borrow->id);
+        })->where('book_copy_id', $bookCopyId)->exists();
     }
 
-    public function processFine(BookReturn $bookReturn): Fine
+    private function hasFinalizedLostForCopy(Borrow $borrow, int $bookCopyId): bool
     {
-        return DB::transaction(function () use ($bookReturn) {
-            $borrow = $bookReturn->borrow;
-
-            $hasDamagedBooks = $bookReturn->details()
-                ->where('condition', 'damaged')
-                ->exists();
-
-            if (!$hasDamagedBooks) {
-                throw new \Exception('Tidak ada buku yang rusak pada peminjaman ini');
-            }
-
-            $existingFine = $borrow->fines()
-                ->where('status', 'unpaid')
-                ->first();
-
-            if ($existingFine) {
-                throw new \Exception('Sudah ada denda yang belum dibayar untuk peminjaman ini');
-            }
-
-            $damagedFineType = FineType::where('type', 'damaged')->first();
-
-            if (!$damagedFineType) {
-                throw new \Exception('Tipe denda untuk buku rusak tidak ditemukan');
-            }
-
-            $fine = Fine::create([
-                'borrow_id'    => $borrow->id,
-                'fine_type_id' => $damagedFineType->id,
-                'amount'       => $damagedFineType->amount,
-                'status'       => 'unpaid',
-            ]);
-
-            ActivityLogger::log(
-                'create',
-                'fine',
-                "Fine created for damaged book(s) in borrow #{$borrow->id}",
-                ['fine_id' => $fine->id, 'amount' => $fine->amount],
-                null,
-                $fine
-            );
-
-            $fine->load('fineType', 'borrow.user', 'borrow.borrowDetails.bookCopy.book');
-
-            (new BorrowNotificationService())->notifyFineCreated($fine);
-
-            return $fine;
-        });
+        return LostBookDetail::whereHas('lostBook', function ($query) use ($borrow) {
+            $query->where('borrow_id', $borrow->id);
+        })->where('book_copy_id', $bookCopyId)->exists();
     }
 }

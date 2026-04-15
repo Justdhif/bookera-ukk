@@ -10,12 +10,13 @@ import {
 import { buildAuthorFormData } from "./form-data/author.form-data";
 
 export const authorService = {
-  getAll: (filters?: AuthorFilterParams | any, isAdmin = false) =>
-    api.get<ApiResponse<any>>(isAdmin ? "/admin/authors" : "/authors", {
+  getAll: (filters?: AuthorFilterParams) =>
+    api.get<ApiResponse<AuthorListResponse>>("/admin/authors", {
       params: filters,
     }),
 
-  getById: (id: number) => api.get<ApiResponse<Author>>(`/authors/${id}`),
+  getById: (id: number) =>
+    api.get<ApiResponse<Author>>(`/admin/authors/${id}`),
 
   create: (data: CreateAuthorData) =>
     api.post<ApiResponse<Author>>("/admin/authors", buildAuthorFormData(data), {

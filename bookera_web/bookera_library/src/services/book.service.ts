@@ -14,13 +14,13 @@ export const bookService = {
     const { category_ids, ...params } = filters ?? {};
     if (category_ids?.length)
       Object.assign(params, { category_ids: category_ids.join(",") });
-    return api.get<ApiResponse<BookListResponse>>("/books", { params });
+    return api.get<ApiResponse<BookListResponse>>("/admin/books", { params });
   },
 
-  getById: (id: number) => api.get<ApiResponse<Book>>(`/books/${id}`),
+  getById: (id: number) => api.get<ApiResponse<Book>>(`/admin/books/${id}`),
 
   getBySlug: (slug: string) =>
-    api.get<ApiResponse<Book>>(`/books/slug/${slug}`),
+    api.get<ApiResponse<Book>>(`/admin/books/slug/${slug}`),
 
   create: (data: CreateBookData) =>
     api.post<ApiResponse<Book>>("/admin/books", buildBookFormData(data), {

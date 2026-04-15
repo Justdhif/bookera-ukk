@@ -19,13 +19,14 @@ import { BorrowRequestCard } from "./BorrowRequestCard";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 
 export default function BorrowClient() {
   const t = useTranslations("borrow");
   const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
   const [loadingBorrows, setLoadingBorrows] = useState(false);
   const [borrowFilters, setBorrowFilters] = useState<BorrowFilterParams>({
-    per_page: 10,
+    per_page: ITEMS_PER_PAGE_OPTIONS[1],
   });
   const [borrowSearch, setBorrowSearch] = useState("");
   const [borrowPagination, setBorrowPagination] = useState({
@@ -41,7 +42,7 @@ export default function BorrowClient() {
     search?: string;
     per_page?: number;
     page?: number;
-  }>({ per_page: 10 });
+  }>({ per_page: ITEMS_PER_PAGE_OPTIONS[1] });
   const [requestSearch, setRequestSearch] = useState("");
   const [requestPagination, setRequestPagination] = useState({
     current_page: 1,

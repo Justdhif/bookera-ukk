@@ -5,8 +5,8 @@ import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DollarSign, Settings } from "lucide-react";
-import FineTypeManagement from "./fine-type/FineTypeManagement";
-import FineManagement from "./fine/FineManagement";
+import FineTypeManagement from "./FineTypeManagement";
+import FineManagement from "./FineManagement";
 
 export default function FinesClient() {
   const t = useTranslations("fines");

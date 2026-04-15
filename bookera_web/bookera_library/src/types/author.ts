@@ -31,6 +31,6 @@ export interface UpdateAuthorData {
 export interface AuthorFilterParams {
   search?: string;
   is_active?: boolean;
-  per_page?: number;
+  per_page?: number | "all";
   page?: number;
 }

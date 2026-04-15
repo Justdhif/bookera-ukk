@@ -16,8 +16,10 @@ use App\Services\NotificationService as DatabaseNotificationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Services\BaseNotificationService;
+use Throwable;
 
-class BorrowNotificationService
+class BorrowNotificationService extends BaseNotificationService
 {
     public function notifyBorrowRequested(Borrow $borrow): void
     {
@@ -47,7 +49,18 @@ class BorrowNotificationService
                 $message,
                 'borrow_request',
                 'borrow',
-                ['borrow_id' => $borrow->id],
+                [
+                    'borrow_id' => $borrow->id,
+                    'user' => [
+                        'name' => $userName,
+                        'avatar' => $borrow->user?->profile?->avatar,
+                    ],
+                    'books' => $borrow->borrowDetails->map(fn($d) => [
+                        'title' => $d->bookCopy?->book?->title,
+                        'cover' => $d->bookCopy?->book?->cover_image,
+                        'author' => $d->bookCopy?->book?->author
+                    ])->toArray()
+                ],
                 fn () => new BorrowNotificationMail(
                     subjectLine: 'New Direct Borrow - Bookera',
                     title: 'New Direct Borrow',
@@ -91,7 +104,15 @@ class BorrowNotificationService
             $message,
             'borrow_created',
             'borrow',
-            ['borrow_id' => $borrow->id, 'borrow_code' => $borrow->borrow_code]
+            [
+                'borrow_id' => $borrow->id, 
+                'borrow_code' => $borrow->borrow_code,
+                'books' => $borrow->borrowDetails->map(fn($d) => [
+                    'title' => $d->bookCopy?->book?->title,
+                    'cover' => $d->bookCopy?->book?->cover_image,
+                    'author' => $d->bookCopy?->book?->author
+                ])->toArray()
+            ]
         );
 
         if (! $profile || ! $profile->notification_enabled) {
@@ -99,7 +120,7 @@ class BorrowNotificationService
         }
 
         if ($profile->notification_email && ! empty($user->email)) {
-            $this->sendMailAfterResponse(
+            $this->runAfterResponse(
                 function () use ($user, $message, $details, $books): void {
                     Mail::to($user->email)->send(new BorrowNotificationMail(
                         subjectLine: 'Borrow Created - Bookera',
@@ -139,7 +160,7 @@ class BorrowNotificationService
 
             try {
                 (new FonnteService)->send($profile->phone_number, $whatsappMessage);
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 Log::error('Failed to send borrow issued WhatsApp: '.$exception->getMessage());
             }
         }
@@ -173,7 +194,18 @@ class BorrowNotificationService
                 $message,
                 'borrow_request',
                 'borrow',
-                ['request_id' => $borrowRequest->id],
+                [
+                    'request_id' => $borrowRequest->id,
+                    'user' => [
+                        'name' => $userName,
+                        'avatar' => $borrowRequest->user?->profile?->avatar,
+                    ],
+                    'books' => $borrowRequest->borrowRequestDetails->map(fn($d) => [
+                        'title' => $d->book?->title,
+                        'cover' => $d->book?->cover_image,
+                        'author' => $d->book?->author
+                    ])->toArray()
+                ],
                 fn () => new BorrowNotificationMail(
                     subjectLine: 'New Borrow Request - Bookera',
                     title: 'New Borrow Request',
@@ -203,7 +235,15 @@ class BorrowNotificationService
             'Your borrow request #'.$borrowRequest->id.' has been approved. Borrow code: '.$borrow->borrow_code.'. Please come to the library on '.Carbon::parse($borrowRequest->borrow_date)->format('d M Y').'.',
             'borrow_request_approved',
             'borrow',
-            ['request_id' => $borrowRequest->id, 'borrow_code' => $borrow->borrow_code]
+            [
+                'request_id' => $borrowRequest->id, 
+                'borrow_code' => $borrow->borrow_code,
+                'books' => $borrowRequest->borrowRequestDetails->map(fn($d) => [
+                    'title' => $d->book?->title,
+                    'cover' => $d->book?->cover_image,
+                    'author' => $d->book?->author
+                ])->toArray()
+            ]
         );
 
         if (! $profile || ! $profile->notification_enabled) {
@@ -211,7 +251,7 @@ class BorrowNotificationService
         }
 
         if ($profile->notification_email && ! empty($user->email)) {
-            $this->sendMailAfterResponse(
+            $this->runAfterResponse(
                 function () use ($user, $borrowRequest, $borrow): void {
                     Mail::to($user->email)->send(new BorrowRequestApprovedMail($borrowRequest, $borrow));
                 },
@@ -242,7 +282,7 @@ class BorrowNotificationService
 
             try {
                 (new FonnteService)->send($profile->phone_number, $message);
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 Log::error('Failed to send borrow approval WhatsApp: '.$exception->getMessage());
             }
         }
@@ -262,7 +302,15 @@ class BorrowNotificationService
             'Your borrow request #'.$borrowRequest->id.' has been rejected.'.$reason,
             'borrow_request_rejected',
             'borrow',
-            ['request_id' => $borrowRequest->id, 'reject_reason' => $borrowRequest->reject_reason]
+            [
+                'request_id' => $borrowRequest->id, 
+                'reject_reason' => $borrowRequest->reject_reason,
+                'books' => $borrowRequest->borrowRequestDetails->map(fn($d) => [
+                    'title' => $d->book?->title,
+                    'cover' => $d->book?->cover_image,
+                    'author' => $d->book?->author
+                ])->toArray()
+            ]
         );
 
         if (! $profile || ! $profile->notification_enabled) {
@@ -270,7 +318,7 @@ class BorrowNotificationService
         }
 
         if ($profile->notification_email && ! empty($user->email)) {
-            $this->sendMailAfterResponse(
+            $this->runAfterResponse(
                 function () use ($user, $borrowRequest): void {
                     Mail::to($user->email)->send(new BorrowRequestRejectedMail($borrowRequest));
                 },
@@ -301,7 +349,7 @@ class BorrowNotificationService
 
             try {
                 (new FonnteService)->send($profile->phone_number, $message);
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 Log::error('Failed to send borrow rejection WhatsApp: '.$exception->getMessage());
             }
         }
@@ -334,7 +382,18 @@ class BorrowNotificationService
                 $message,
                 'borrow_request_cancelled',
                 'borrow',
-                ['request_id' => $borrowRequest->id],
+                [
+                    'request_id' => $borrowRequest->id,
+                    'user' => [
+                        'name' => $userName,
+                        'avatar' => $borrowRequest->user?->profile?->avatar,
+                    ],
+                    'books' => $borrowRequest->borrowRequestDetails->map(fn($d) => [
+                        'title' => $d->book?->title,
+                        'cover' => $d->book?->cover_image,
+                        'author' => $d->book?->author
+                    ])->toArray()
+                ],
                 fn () => new BorrowNotificationMail(
                     subjectLine: 'Borrow Request Cancelled - Bookera',
                     title: 'Borrow Request Cancelled',
@@ -348,376 +407,5 @@ class BorrowNotificationService
                 false
             );
         }
-    }
-
-    public function notifyReturnRequested(BookReturn $bookReturn): void
-    {
-        $bookReturn->loadMissing(['borrow.user.profile', 'details.bookCopy.book']);
-
-        $borrow = $bookReturn->borrow;
-        $user = $borrow?->user;
-        $profile = $user?->profile;
-        $userName = $profile?->full_name ?? $user?->email ?? 'Unknown User';
-
-        [$bookTitles, $moreText, $books] = $this->summarizeBooks(
-            $bookReturn->details,
-            fn ($detail) => $detail->bookCopy->book->title ?? 'Unknown'
-        );
-
-        $details = [
-            'Return ID' => '#'.$bookReturn->id,
-            'Borrow ID' => '#'.$borrow->id,
-            'Borrow Code' => $borrow->borrow_code,
-            'Borrower' => $userName,
-            'Return Date' => Carbon::parse($bookReturn->return_date)->format('d M Y'),
-        ];
-
-        $admins = User::with('profile')->where('role', 'admin')->get();
-
-        foreach ($admins as $admin) {
-            $adminName = $admin?->profile?->full_name ?? $admin?->email ?? 'Admin';
-
-            $whatsappMessage = "📥 *BOOKERA — Pengajuan Pengembalian*\n"
-                ."━━━━━━━━━━━━━━━━━━━━\n\n"
-                ."Halo, *{$adminName}*! 👋\n\n"
-                ."{$userName} mengajukan pengembalian buku.\n\n"
-                ."📋 *Detail Pengajuan:*\n"
-                .'  🔖 Kode Pinjam : *'.$borrow->borrow_code."*\n"
-                .'  👤 Peminjam    : '.$userName."\n"
-                .'  📅 Tanggal Ajukan : '.Carbon::parse($bookReturn->return_date)->format('d M Y')."\n\n"
-                ."📚 *Buku yang Dikembalikan:*\n"
-                .collect($books)->take(2)->map(fn ($book) => '  • '.$book)->implode("\n").($moreText ? "\n  {$moreText}" : '')
-                ."\n\n"
-                ."━━━━━━━━━━━━━━━━━━━━\n"
-                ."Silakan tinjau pengajuan di dashboard Bookera.\n\n"
-                .'_Bookera — Perpustakaan Digital_';
-
-            $this->dispatchNotification(
-                $admin,
-                'Pengajuan Pengembalian Baru',
-                "{$userName} mengajukan pengembalian untuk {$bookTitles}{$moreText} (Peminjaman #{$borrow->id}).",
-                'return_request',
-                'return',
-                ['return_id' => $bookReturn->id, 'borrow_id' => $borrow->id],
-                fn () => new BorrowNotificationMail(
-                    subjectLine: 'Return Request - Bookera',
-                    title: 'Pengajuan Pengembalian Baru',
-                    bodyMessage: "{$userName} mengajukan pengembalian untuk {$bookTitles}{$moreText} (Peminjaman #{$borrow->id}).",
-                    details: $details,
-                    books: $books,
-                    footerNote: 'Silakan review pengajuan pengembalian ini di dashboard Bookera.',
-                ),
-                $whatsappMessage,
-                true,
-                true
-            );
-        }
-    }
-
-    public function notifyReturnApproved(BookReturn $bookReturn): void
-    {
-        $bookReturn->loadMissing(['borrow.user.profile', 'details.bookCopy.book']);
-
-        $borrow = $bookReturn->borrow;
-        $user = $borrow?->user;
-        $profile = $user?->profile;
-        $userName = $profile?->full_name ?? $user?->email ?? 'Unknown User';
-
-        [$bookTitles, $moreText, $books] = $this->summarizeBooks(
-            $bookReturn->details,
-            fn ($detail) => $detail->bookCopy->book->title ?? 'Unknown'
-        );
-
-        $message = "Pengembalian Anda untuk {$bookTitles}{$moreText} telah berhasil diproses.";
-        $details = [
-            'Return ID' => '#'.$bookReturn->id,
-            'Borrow ID' => '#'.$borrow->id,
-            'Borrow Code' => $borrow->borrow_code,
-            'Processed At' => Carbon::parse($bookReturn->return_date)->format('d M Y'),
-            'Status' => 'Selesai',
-        ];
-
-        DatabaseNotificationService::send(
-            $borrow->user_id,
-            'Pengembalian Diproses',
-            $message,
-            'return_approved',
-            'return',
-            ['return_id' => $bookReturn->id, 'borrow_id' => $borrow->id]
-        );
-
-        if (! $profile || ! $profile->notification_enabled) {
-            return;
-        }
-
-        if ($profile->notification_email && ! empty($user->email)) {
-            $this->sendMailAfterResponse(
-                function () use ($user, $message, $details, $books): void {
-                    Mail::to($user->email)->send(new BorrowNotificationMail(
-                        subjectLine: 'Return Completed - Bookera',
-                        title: 'Pengembalian Diproses',
-                        bodyMessage: $message,
-                        details: $details,
-                        books: $books,
-                        footerNote: 'Terima kasih, pengembalian buku Anda sudah selesai diproses.',
-                    ));
-                },
-                'Failed to send return approved email',
-                ['recipient_id' => $user->id, 'return_id' => $bookReturn->id]
-            );
-        }
-
-        if ($profile->notification_whatsapp && $profile->phone_number) {
-            $returnBookList = $bookReturn->details
-                ->map(function ($detail) {
-                    return '  • '.($detail->bookCopy->book->title ?? 'Unknown');
-                })
-                ->implode("\n");
-
-            $whatsappMessage = "✅ *BOOKERA — Pengembalian Diproses*\n"
-                ."━━━━━━━━━━━━━━━━━━━━\n\n"
-                ."Halo, *{$userName}*! 👋\n\n"
-                ."Pengembalian buku Anda telah berhasil diproses.\n\n"
-                ."📋 *Detail Pengembalian:*\n"
-                .'  🔖 Kode Pinjam : *'.$borrow->borrow_code."*\n"
-                .'  📅 Tanggal Diproses : '.Carbon::parse($bookReturn->return_date)->format('d M Y')."\n\n"
-                ."📚 *Buku yang Dikembalikan:*\n"
-                .$returnBookList."\n\n"
-                ."━━━━━━━━━━━━━━━━━━━━\n"
-                ."Terima kasih telah mengembalikan buku.\n\n"
-                .'_Bookera — Perpustakaan Digital_';
-
-            try {
-                (new FonnteService)->send($profile->phone_number, $whatsappMessage);
-            } catch (\Throwable $exception) {
-                Log::error('Failed to send return approved WhatsApp: '.$exception->getMessage());
-            }
-        }
-    }
-
-    public function notifyFineCreated(Fine $fine): void
-    {
-        $fine->loadMissing(['fineType', 'borrow.user.profile', 'borrow.borrowDetails.bookCopy.book']);
-
-        $borrow = $fine->borrow;
-        $user = $borrow?->user;
-        $profile = $user?->profile;
-        $userName = $profile?->full_name ?? $user?->email ?? 'Unknown User';
-
-        [$bookTitles, $moreText, $books] = $this->summarizeBooks(
-            $borrow->borrowDetails,
-            fn ($detail) => $detail->bookCopy->book->title ?? 'Unknown'
-        );
-
-        $fineTypeName = $fine->fineType->name ?? 'Denda';
-        $amount = number_format((float) $fine->amount, 0, ',', '.');
-        $message = "Denda sebesar Rp {$amount} telah dikenakan untuk buku {$bookTitles}{$moreText} ({$fineTypeName}).";
-        $details = [
-            'Fine ID' => '#'.$fine->id,
-            'Borrow ID' => '#'.$borrow->id,
-            'Borrow Code' => $borrow->borrow_code,
-            'Fine Type' => $fineTypeName,
-            'Amount' => 'Rp '.$amount,
-            'Status' => ucfirst($fine->status),
-        ];
-
-        DatabaseNotificationService::send(
-            $borrow->user_id,
-            'Denda Baru Dikenakan',
-            $message,
-            'fine_created',
-            'fine',
-            ['fine_id' => $fine->id, 'borrow_id' => $borrow->id]
-        );
-
-        if (! $profile || ! $profile->notification_enabled) {
-            return;
-        }
-
-        if ($profile->notification_email && ! empty($user->email)) {
-            $this->sendMailAfterResponse(
-                function () use ($user, $message, $details, $books): void {
-                    Mail::to($user->email)->send(new BorrowNotificationMail(
-                        subjectLine: 'Fine Created - Bookera',
-                        title: 'Denda Baru Dikenakan',
-                        bodyMessage: $message,
-                        details: $details,
-                        books: $books,
-                        footerNote: 'Silakan cek detail denda Anda di aplikasi Bookera.',
-                    ));
-                },
-                'Failed to send fine email',
-                ['recipient_id' => $user->id, 'fine_id' => $fine->id]
-            );
-        }
-
-        if ($profile->notification_whatsapp && $profile->phone_number) {
-            $fineBookList = $borrow->borrowDetails
-                ->map(function ($detail) {
-                    return '  • '.($detail->bookCopy->book->title ?? 'Unknown');
-                })
-                ->take(2)
-                ->implode("\n").($moreText ? "\n  {$moreText}" : '');
-
-            $whatsappMessage = "💰 *BOOKERA — Notifikasi Denda*\n"
-                ."━━━━━━━━━━━━━━━━━━━━\n\n"
-                ."Halo, *{$userName}*! 👋\n\n"
-                ."Denda baru telah dikenakan pada akun Anda.\n\n"
-                ."📋 *Detail Denda:*\n"
-                .'  🔖 Kode Pinjam : *'.$borrow->borrow_code."*\n"
-                .'  ⚠️ Jenis Denda  : '.$fineTypeName."\n"
-                .'  💵 Jumlah Denda : *Rp '.$amount."*\n\n"
-                ."📚 *Buku Terkait:*\n"
-                .$fineBookList."\n\n"
-                ."━━━━━━━━━━━━━━━━━━━━\n"
-                ."Silakan cek detail denda di aplikasi Bookera.\n\n"
-                .'_Bookera — Perpustakaan Digital_';
-
-            try {
-                (new FonnteService)->send($profile->phone_number, $whatsappMessage);
-            } catch (\Throwable $exception) {
-                Log::error('Failed to send fine WhatsApp: '.$exception->getMessage());
-            }
-        }
-    }
-
-    public function notifyLostBookReported(LostBook $lostBook): void
-    {
-        $lostBook->loadMissing(['borrow.user.profile', 'bookCopy.book']);
-
-        $borrow = $lostBook->borrow;
-        $bookCopy = $lostBook->bookCopy;
-        $user = $borrow?->user;
-        $profile = $user?->profile;
-        $borrowId = $borrow?->id;
-        $borrowCode = $borrow?->borrow_code ?? 'N/A';
-
-        $userName = $profile?->full_name ?? $user?->email ?? 'Unknown User';
-        $bookTitle = $bookCopy?->book?->title ?? 'Unknown';
-        $copyCode = $bookCopy?->copy_code ?? 'N/A';
-
-        $admins = User::with('profile')->where('role', 'admin')->get();
-
-        foreach ($admins as $admin) {
-            $adminName = $admin?->profile?->full_name ?? $admin?->email ?? 'Admin';
-
-            $whatsappMessage = "⚠️ *BOOKERA — Buku Hilang Dilaporkan*\n"
-                ."━━━━━━━━━━━━━━━━━━━━\n\n"
-                ."Halo, *{$adminName}*! 👋\n\n"
-                ."{$userName} melaporkan buku hilang.\n\n"
-                ."📋 *Detail Laporan:*\n"
-                .'  🔖 Kode Pinjam : *'.$borrowCode."*\n"
-                .'  📘 Judul Buku  : '.$bookTitle."\n"
-                .'  🏷️ Kode Copy   : '.$copyCode."\n\n"
-                ."━━━━━━━━━━━━━━━━━━━━\n"
-                ."Silakan verifikasi laporan ini di dashboard Bookera.\n\n"
-                .'_Bookera — Perpustakaan Digital_';
-
-            $this->dispatchNotification(
-                $admin,
-                'Buku Hilang Dilaporkan',
-                "User {$userName} reported lost book: {$bookTitle} (Copy: {$copyCode}) - Borrow #{$borrowId}",
-                'lost_book_report',
-                'lost_book',
-                ['lost_book_id' => $lostBook->id, 'borrow_id' => $borrowId],
-                fn () => new BorrowNotificationMail(
-                    subjectLine: 'Lost Book Reported - Bookera',
-                    title: 'Buku Hilang Dilaporkan',
-                    bodyMessage: "User {$userName} reported lost book: {$bookTitle} (Copy: {$copyCode}) - Borrow #{$borrowId}",
-                    details: [
-                        'Lost Book ID' => '#'.$lostBook->id,
-                        'Borrow ID' => '#'.$borrowId,
-                        'Borrower' => $userName,
-                        'Book Title' => $bookTitle,
-                        'Copy Code' => $copyCode,
-                    ],
-                    books: [$bookTitle],
-                    footerNote: 'Silakan cek dan verifikasi laporan buku hilang ini.',
-                ),
-                $whatsappMessage,
-                true,
-                true
-            );
-        }
-    }
-
-    private function dispatchNotification(
-        object $recipient,
-        string $title,
-        string $message,
-        string $type,
-        string $module,
-        array $data,
-        ?callable $mailFactory = null,
-        ?string $whatsappMessage = null,
-        bool $sendMail = true,
-        bool $sendWhatsApp = true
-    ): void {
-        DatabaseNotificationService::send(
-            $recipient->id,
-            $title,
-            $message,
-            $type,
-            $module,
-            $data
-        );
-
-        $profile = $recipient?->profile;
-
-        if (! $profile || ! $profile->notification_enabled) {
-            return;
-        }
-
-        if ($sendMail && $profile->notification_email && $mailFactory && ! empty($recipient->email)) {
-            $this->sendMailAfterResponse(
-                function () use ($recipient, $mailFactory): void {
-                    Mail::to($recipient->email)->send($mailFactory());
-                },
-                'Failed to send borrow email notification',
-                [
-                    'recipient_id' => $recipient->id,
-                    'title' => $title,
-                ]
-            );
-        }
-
-        if ($sendWhatsApp && $profile->notification_whatsapp && $profile->phone_number && $whatsappMessage) {
-            try {
-                (new FonnteService)->send($profile->phone_number, $whatsappMessage);
-            } catch (\Throwable $exception) {
-                Log::error('Failed to send borrow WhatsApp notification: '.$exception->getMessage(), [
-                    'recipient_id' => $recipient->id,
-                    'title' => $title,
-                ]);
-            }
-        }
-    }
-
-    private function sendMailAfterResponse(callable $callback, string $logMessage, array $context = []): void
-    {
-        app()->terminating(function () use ($callback, $logMessage, $context): void {
-            try {
-                $callback();
-            } catch (\Throwable $exception) {
-                Log::error($logMessage.': '.$exception->getMessage(), $context + [
-                    'exception' => $exception,
-                ]);
-            }
-        });
-    }
-
-    /**
-     * @return array{0:string,1:string,2:array<int, string>}
-     */
-    private function summarizeBooks($details, callable $titleResolver): array
-    {
-        $details = collect($details);
-
-        $bookTitles = $details->take(2)->map($titleResolver)->implode(', ');
-        $totalBooks = $details->count();
-        $moreText = $totalBooks > 2 ? ' and '.($totalBooks - 2).' more' : '';
-        $books = $details->map($titleResolver)->values()->all();
-
-        return [$bookTitles, $moreText, $books];
     }
 }

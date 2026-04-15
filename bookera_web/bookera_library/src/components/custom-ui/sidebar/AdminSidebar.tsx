@@ -47,14 +47,19 @@ type MenuGroup = {
   roles: string[];
   items: MenuItem[];
 };
-const getMenuGroups = (t: any): MenuGroup[] => [
+const getMenuGroups = (t: any, role: string | undefined): MenuGroup[] => [
   {
     title: t("mainMenu"),
     roles: ["admin", "officer:catalog", "officer:management"],
     items: [
       {
         title: t("dashboard"),
-        href: "/admin",
+        href:
+          role === "officer:catalog"
+            ? "/admin/categories"
+            : role === "officer:management"
+            ? "/admin/users"
+            : "/admin",
         icon: LayoutDashboard,
       },
     ],
@@ -114,17 +119,17 @@ const getMenuGroups = (t: any): MenuGroup[] => [
         href: "/admin/lost-books",
         icon: AlertCircle,
       },
-      {
-        title: t("activityLogs"),
-        href: "/admin/activity-logs",
-        icon: Activity,
-      },
     ],
   },
   {
     title: t("systemSettings"),
     roles: ["admin"],
     items: [
+      {
+        title: t("activityLogs"),
+        href: "/admin/activity-logs",
+        icon: Activity,
+      },
       {
         title: t("termsOfService"),
         href: "/admin/terms-of-service",
@@ -138,12 +143,13 @@ const getMenuGroups = (t: any): MenuGroup[] => [
     ],
   },
 ];
+
 export function AdminSidebar() {
   const t = useTranslations("sidebar");
   const pathname = usePathname();
   const { user } = useAuthStore();
   const { open } = useSidebar();
-  const allMenuGroups = getMenuGroups(t);
+  const allMenuGroups = getMenuGroups(t, user?.role);
   const menuGroups = React.useMemo(() => {
     if (!user?.role) return [];
     return allMenuGroups.filter((group) => group.roles.includes(user.role));

@@ -6,7 +6,6 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import Providers from "./providers";
 import { AudioProvider } from "@/contexts/AudioContext";
-import RecaptchaProvider from "@/components/providers/RecaptchaProvider";
 import "./globals.css";
 import TopLoader from "@/components/custom-ui/TopLoader";
 
@@ -38,20 +37,18 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <TopLoader />
-        <RecaptchaProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <NextIntlClientProvider messages={messages}>
-              <AudioProvider>
-                <Providers>{children}</Providers>
-              </AudioProvider>
-            </NextIntlClientProvider>
-           </ThemeProvider>
-        </RecaptchaProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <NextIntlClientProvider messages={messages}>
+            <AudioProvider>
+              <Providers>{children}</Providers>
+            </AudioProvider>
+          </NextIntlClientProvider>
+        </ThemeProvider>
         <Toaster richColors position="bottom-right" />
       </body>
     </html>

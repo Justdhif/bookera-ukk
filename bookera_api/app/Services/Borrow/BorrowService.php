@@ -7,6 +7,7 @@ use App\Helpers\ActivityLogger;
 use App\Models\BookCopy;
 use App\Models\Borrow;
 use App\Models\User;
+use App\Services\LostBook\LostBookService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -16,14 +17,17 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class BorrowService
 {
-    public function getAll(array $filters = []): LengthAwarePaginator
+    public function getAll(array $filters): LengthAwarePaginator
     {
         $query = Borrow::with([
-            'borrowDetails.bookCopy.book',
+            'borrowDetails.bookCopy.book.authors',
+            'borrowDetails.bookCopy.book.publishers',
+            'borrowDetails.bookCopy.book.categories',
+            'borrowRequest.borrowRequestDetails.book.authors',
             'user.profile',
-            'bookReturns.details.bookCopy.book',
+            'bookReturns.details.bookCopy.book.authors',
             'fines.fineType',
-            'lostBooks.bookCopy.book',
+            'lostBooks.details.bookCopy.book.authors',
         ]);
 
         if (!empty($filters['search'])) {
@@ -189,24 +193,28 @@ class BorrowService
     public function getById(Borrow $borrow): Borrow
     {
         return $borrow->load([
-            'borrowDetails.bookCopy.book',
+            'borrowDetails.bookCopy.book.authors',
+            'borrowDetails.bookCopy.book.publishers',
+            'borrowDetails.bookCopy.book.categories',
             'borrowRequest.borrowRequestDetails.book',
             'user.profile',
-            'bookReturns',
+            'bookReturns.details.bookCopy.book.authors',
             'fines.fineType',
-            'lostBooks.bookCopy.book',
+            'lostBooks.details.bookCopy.book.authors',
         ]);
     }
 
     public function getByCode(string $code): Borrow
     {
         return Borrow::with([
-            'borrowDetails.bookCopy.book',
+            'borrowDetails.bookCopy.book.authors',
+            'borrowDetails.bookCopy.book.publishers',
+            'borrowDetails.bookCopy.book.categories',
             'borrowRequest.borrowRequestDetails.book',
             'user.profile',
-            'bookReturns.details.bookCopy.book',
+            'bookReturns.details.bookCopy.book.authors',
             'fines.fineType',
-            'lostBooks.bookCopy.book',
+            'lostBooks.details.bookCopy.book.authors',
         ])->where('borrow_code', $code)->firstOrFail();
     }
 
@@ -275,13 +283,76 @@ class BorrowService
         });
     }
 
+    public function complete(Borrow $borrow): Borrow
+    {
+        return DB::transaction(function () use ($borrow) {
+            $borrow->load([
+                'borrowDetails',
+                'fines',
+                'lostBooks.details.bookCopy.book',
+                'bookReturns.details.bookCopy.book',
+            ]);
+
+            $processedCopyIds = collect($borrow->bookReturns)
+                ->flatMap(fn ($bookReturn) => $bookReturn->details->pluck('book_copy_id'))
+                ->merge(
+                    collect($borrow->lostBooks)
+                        ->flatMap(fn ($lostBook) => $lostBook->details->pluck('book_copy_id')),
+                )
+                ->unique();
+
+            $hasUnprocessedBooks = $borrow->borrowDetails->contains(
+                fn ($detail) => ! $processedCopyIds->contains($detail->book_copy_id)
+            );
+
+            if ($hasUnprocessedBooks) {
+                throw new \Exception('Masih ada buku yang belum diproses status pengembalian atau ilangnya');
+            }
+
+            $hasUnpaidFines = $borrow->fines()->where('status', 'unpaid')->exists();
+            if ($hasUnpaidFines) {
+                throw new \Exception('Masih ada denda yang belum dibayar');
+            }
+
+            // Clean up lost book records if the admin eventually marked them as returned
+            foreach ($borrow->borrowDetails as $detail) {
+                if ($detail->status === 'returned') {
+                    app(LostBookService::class)->removeByBorrowAndCopy($borrow, $detail->book_copy_id);
+                    BookCopy::where('id', $detail->book_copy_id)->update(['status' => 'available']);
+                }
+            }
+
+            $borrow->update(['status' => 'close']);
+
+            ActivityLogger::log(
+                'update',
+                'borrow',
+                "Direct borrow #{$borrow->id} completed/closed",
+                ['borrow_id' => $borrow->id, 'new_status' => 'close'],
+                ['borrow_id' => $borrow->id, 'old_status' => 'open'],
+                $borrow
+            );
+
+            return $borrow->fresh([
+                'borrowDetails.bookCopy.book.authors',
+                'borrowDetails.bookCopy.book.publishers',
+                'borrowDetails.bookCopy.book.categories',
+                'bookReturns.details',
+                'fines.fineType',
+                'lostBooks.details.bookCopy.book.authors',
+            ]);
+        });
+    }
+
     public function getByUser(User $user): Collection
     {
         return Borrow::with([
-            'borrowDetails.bookCopy.book',
+            'borrowDetails.bookCopy.book.authors',
+            'borrowDetails.bookCopy.book.publishers',
+            'borrowDetails.bookCopy.book.categories',
             'bookReturns.details',
             'fines.fineType',
-            'lostBooks.bookCopy.book',
+            'lostBooks.details.bookCopy.book.authors',
         ])
             ->where('user_id', $user->id)
             ->latest()

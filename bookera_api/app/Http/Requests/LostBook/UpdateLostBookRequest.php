@@ -11,10 +11,19 @@ class UpdateLostBookRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (! $this->filled('lost_date') && $this->filled('estimated_lost_date')) {
+            $this->merge([
+                'lost_date' => $this->input('estimated_lost_date'),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [
-            'estimated_lost_date' => 'nullable|date',
+            'lost_date' => 'nullable|date',
             'notes' => 'nullable|string',
         ];
     }

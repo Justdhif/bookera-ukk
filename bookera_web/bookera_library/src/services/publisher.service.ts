@@ -10,12 +10,13 @@ import {
 import { buildPublisherFormData } from "./form-data/publisher.form-data";
 
 export const publisherService = {
-  getAll: (filters?: PublisherFilterParams | any, isAdmin = false) =>
-    api.get<ApiResponse<any>>(isAdmin ? "/admin/publishers" : "/publishers", {
+  getAll: (filters?: PublisherFilterParams) =>
+    api.get<ApiResponse<PublisherListResponse>>("/admin/publishers", {
       params: filters,
     }),
 
-  getById: (id: number) => api.get<ApiResponse<Publisher>>(`/publishers/${id}`),
+  getById: (id: number) =>
+    api.get<ApiResponse<Publisher>>(`/admin/publishers/${id}`),
 
   create: (data: CreatePublisherData) =>
     api.post<ApiResponse<Publisher>>(

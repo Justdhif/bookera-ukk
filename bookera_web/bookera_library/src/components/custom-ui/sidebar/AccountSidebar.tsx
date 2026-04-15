@@ -22,6 +22,7 @@ import {
   BookOpen,
   DollarSign,
   Heart,
+  Home as HomeIcon,
 } from "lucide-react";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import { useTranslations } from "next-intl";
@@ -101,6 +102,25 @@ export default function AccountSidebar() {
         <SidebarGroup className="p-2">
           <TooltipProvider delayDuration={0}>
             <SidebarMenu className={cn(!open && "flex flex-col items-center")}>
+              {/* Home Navigation */}
+              <SidebarMenuItem className={cn(!open && "w-full flex justify-center")}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={{ content: tNavbar("goToHome") }}
+                  className={cn(
+                    "rounded-xl transition-all text-muted-foreground hover:text-foreground hover:bg-accent",
+                    !open && "justify-center px-0 mx-auto",
+                  )}
+                >
+                  <Link href="/">
+                    <HomeIcon className="h-5 w-5 shrink-0" />
+                    {open && <span className="font-medium">{tNavbar("goToHome")}</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <div className="my-2 h-px bg-border/40 mx-2" />
+
               {NAV_ITEMS.map(({ path, icon: Icon, labelKey }) => {
                 const href = userSlug ? `/${userSlug}${path}` : path;
                 const isActive =

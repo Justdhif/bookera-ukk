@@ -10,7 +10,7 @@ class TermsOfServiceService
 {
     public function getAll(): Collection
     {
-        return TermsOfService::orderBy('created_at', 'desc')->get();
+        return TermsOfService::query()->latest()->orderByDesc('id')->get();
     }
 
     public function create(array $data): TermsOfService

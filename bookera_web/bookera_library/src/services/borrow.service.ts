@@ -2,6 +2,14 @@ import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
 import { Borrow, BorrowListResponse, BorrowFilterParams } from "@/types/borrow";
 
+interface BorrowReturnItemPayload {
+  borrow_detail_id: number;
+  status: "returned" | "lost";
+  condition: "good" | "damaged" | null;
+  lost_date?: string;
+  notes?: string | null;
+}
+
 export const borrowService = {
   getAll: (filters?: BorrowFilterParams) =>
     api.get<ApiResponse<BorrowListResponse>>("/admin/borrows", {
@@ -27,4 +35,13 @@ export const borrowService = {
     }),
 
   getByUser: () => api.get<ApiResponse<Borrow[]>>("/my-borrows"),
+
+  requestReturn: (id: number, data: { items: BorrowReturnItemPayload[] }) =>
+    api.post<ApiResponse<any>>(`/borrows/${id}/return`, data),
+
+  reportLost: (id: number, data: { borrow_detail_ids: number[] }) =>
+    api.post<ApiResponse<any>>(`/borrows/${id}/report-lost`, data),
+
+  complete: (id: number) =>
+    api.post<ApiResponse<Borrow>>(`/admin/borrows/${id}/complete`),
 };

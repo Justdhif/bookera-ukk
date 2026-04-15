@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
-use App\Services\RecaptchaService;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\ValidationException;
 
 class SetupProfile extends FormRequest
 {
@@ -26,7 +24,6 @@ class SetupProfile extends FormRequest
             'occupation' => 'nullable|string|max:100',
             'institution' => 'nullable|string|max:255',
             'avatar'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'recaptcha_token' => 'nullable|string',
         ];
     }
 
@@ -47,16 +44,5 @@ class SetupProfile extends FormRequest
             'avatar.mimes' => 'Avatar harus berformat jpeg, png, atau jpg',
             'avatar.max'   => 'Ukuran avatar maksimal 2MB',
         ];
-    }
-
-    protected function passedValidation(): void
-    {
-        $token = $this->input('recaptcha_token');
-
-        if ($token && !app(RecaptchaService::class)->verify($token)) {
-            throw ValidationException::withMessages([
-                'recaptcha_token' => 'Verifikasi reCAPTCHA gagal. Silakan coba lagi.',
-            ]);
-        }
     }
 }

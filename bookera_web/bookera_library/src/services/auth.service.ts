@@ -21,24 +21,21 @@ interface MeResponse {
 }
 
 export const authService = {
-  login: (email: string, password: string, recaptcha_token?: string | null) =>
+  login: (email: string, password: string) =>
     api.post<ApiResponse<LoginResponse>>("/auth/login", {
       email,
       password,
-      ...(recaptcha_token ? { recaptcha_token } : {}),
     }),
 
   register: (
     email: string,
     password: string,
     password_confirmation: string,
-    recaptcha_token?: string | null,
   ) =>
     api.post<ApiResponse<RegisterResponse>>("/auth/register", {
       email,
       password,
       password_confirmation,
-      ...(recaptcha_token ? { recaptcha_token } : {}),
     }),
 
   setupProfile: (data: FormData) =>
@@ -52,10 +49,9 @@ export const authService = {
 
   logout: () => api.post<ApiResponse<null>>("/auth/logout"),
 
-  forgotPassword: (email: string, recaptcha_token?: string | null) =>
+  forgotPassword: (email: string) =>
     api.post<ApiResponse<{ email: string }>>("/auth/forgot-password", {
       email,
-      ...(recaptcha_token ? { recaptcha_token } : {}),
     }),
 
   resetPassword: (

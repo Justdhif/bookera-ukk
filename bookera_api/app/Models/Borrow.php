@@ -3,6 +3,11 @@
 namespace App\Models;
 
 use App\Models\BorrowRequest;
+use App\Models\BookReturn;
+use App\Models\BorrowDetail;
+use App\Models\Fine;
+use App\Models\LostBook;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -56,7 +61,7 @@ class Borrow extends Model
 
     public function lostBook()
     {
-        return $this->hasOne(LostBook::class);
+        return $this->lostBooks();
     }
 
     public function lostBooks()

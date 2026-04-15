@@ -6,35 +6,42 @@ use App\Helpers\ActivityLogger;
 use App\Helpers\SlugGenerator;
 use App\Models\Publisher;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class PublisherService
 {
-    public function getAll(array $filters): LengthAwarePaginator|Collection
+    public function getAll(array $filters): LengthAwarePaginator
     {
         $query = Publisher::query()
-            ->withCount('books')
-            ->when($filters['search'] ?? null, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%");
-            })
-            ->when(isset($filters['is_active']), function ($query) use ($filters) {
-                $query->where('is_active', $filters['is_active']);
-            })
             ->latest()
             ->orderByDesc('id');
 
-        if (isset($filters['per_page']) && $filters['per_page'] === 'all') {
-            return $query->get();
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where('name', 'like', "%{$search}%");
         }
 
-        return $query->paginate($filters['per_page'] ?? 10);
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', filter_var($filters['is_active'], FILTER_VALIDATE_BOOLEAN));
+        }
+
+        $perPage = $filters['per_page'] ?? 15;
+        if ($perPage === 'all') {
+            $perPage = max(1, (clone $query)->count());
+        }
+
+        return $query->paginate((int) $perPage);
     }
 
     public function getById(int $id): ?Publisher
     {
         return Publisher::find($id);
+    }
+
+    public function getBySlug(string $slug): ?Publisher
+    {
+        return Publisher::where('slug', $slug)->first();
     }
 
     public function create(array $data, UploadedFile $photo): Publisher

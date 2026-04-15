@@ -31,6 +31,6 @@ export interface UpdatePublisherData {
 export interface PublisherFilterParams {
   search?: string;
   is_active?: boolean;
-  per_page?: number;
+  per_page?: number | "all";
   page?: number;
 }

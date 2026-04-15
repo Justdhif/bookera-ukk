@@ -40,9 +40,4 @@ return [
         'url' => env('FONNTE_URL', 'https://api.fonnte.com/send'),
     ],
 
-    'recaptcha' => [
-        'secret_key' => env('RECAPTCHA_SECRET_KEY'),
-        'min_score'  => env('RECAPTCHA_MIN_SCORE', 0.5),
-    ],
-
 ];

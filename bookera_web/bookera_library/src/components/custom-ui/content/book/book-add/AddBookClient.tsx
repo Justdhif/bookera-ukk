@@ -62,7 +62,7 @@ export default function AddBookClient() {
         is_active: true,
         per_page: "all",
       });
-      setAuthors(res.data.data || []);
+      setAuthors(res.data.data.data || []);
     } catch {
       toast.error("Failed to load authors");
     }
@@ -73,7 +73,7 @@ export default function AddBookClient() {
         is_active: true,
         per_page: "all",
       });
-      setPublishers(res.data.data || []);
+      setPublishers(res.data.data.data || []);
     } catch {
       toast.error("Failed to load publishers");
     }

@@ -8,20 +8,19 @@ use App\Models\DiscussionPostImage;
 use App\Models\DiscussionLike;
 use App\Models\Follow;
 use App\Models\User;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class DiscussionPostService
 {
     public function getAll(?User $authUser, int $perPage = 15): LengthAwarePaginator
     {
-        $posts = DiscussionPost::with(['user.profile', 'images'])
-            ->withCount(['likes', 'comments'])
-            ->notTakenDown()
-            ->latest()
-            ->paginate($perPage);
+        $query = DiscussionPost::with(['user.profile', 'images'])
+            ->notTakenDown();
+
+        $posts = $query->latest()->orderByDesc('id')->paginate($perPage);
 
         return $this->attachAuthDataToPosts($posts, $authUser);
     }
@@ -31,7 +30,6 @@ class DiscussionPostService
         $targetUser = User::where('slug', $userSlug)->firstOrFail();
 
         $posts = DiscussionPost::with(['user.profile', 'images'])
-            ->withCount(['likes', 'comments'])
             ->where('user_id', $targetUser->id)
             ->notTakenDown()
             ->latest()
@@ -47,7 +45,6 @@ class DiscussionPostService
             ->pluck('followable_id');
 
         $posts = DiscussionPost::with(['user.profile', 'images'])
-            ->withCount(['likes', 'comments'])
             ->whereIn('user_id', $followingIds)
             ->notTakenDown()
             ->latest()
@@ -59,7 +56,6 @@ class DiscussionPostService
     public function getBySlug(string $slug, ?User $authUser): DiscussionPost
     {
         $post = DiscussionPost::with(['user.profile', 'images'])
-            ->withCount(['likes', 'comments'])
             ->where('slug', $slug)
             ->firstOrFail();
 
@@ -182,7 +178,7 @@ class DiscussionPostService
             foreach ($post->images as $img) {
                 Storage::disk('public')->delete($img->image_path);
             }
-            
+
             $oldData = $post->toArray();
             $post->delete();
 
@@ -199,9 +195,11 @@ class DiscussionPostService
 
     private function attachAuthDataToPosts(LengthAwarePaginator $posts, ?User $authUser): LengthAwarePaginator
     {
-        if ($authUser && $posts->count() > 0) {
+        $postCollection = $posts->getCollection();
+
+        if ($authUser && $postCollection->isNotEmpty()) {
             $likedIds = DiscussionLike::where('user_id', $authUser->id)
-                ->whereIn('post_id', $posts->pluck('id'))
+                ->whereIn('post_id', $postCollection->pluck('id'))
                 ->pluck('post_id')
                 ->flip();
 
@@ -209,37 +207,39 @@ class DiscussionPostService
                 ->where('followable_type', User::class)
                 ->pluck('followable_id')
                 ->toArray();
-                
+
             $followingUserIds = collect($followingUserIdsArray)->flip();
 
             // Load likes from followed users
-            $posts->load(['likes' => function ($query) use ($followingUserIdsArray) {
+            $postCollection->load(['likes' => function ($query) use ($followingUserIdsArray) {
                 $query->whereIn('user_id', $followingUserIdsArray)
                     ->with('user.profile')
                     ->latest();
             }]);
 
-            $posts->through(function (DiscussionPost $post) use ($likedIds, $followingUserIds) {
+            $postCollection->transform(function (DiscussionPost $post) use ($likedIds, $followingUserIds) {
                 $post->setAttribute('is_liked', $likedIds->has($post->id));
                 $post->user->setAttribute('is_following', $followingUserIds->has($post->user_id));
-                
+
                 // Get up to 3 followed likers
                 $followedLikers = $post->likes->take(3)->map(fn ($like) => $like->user);
                 $post->setAttribute('followed_likers', $followedLikers);
-                
+
                 // Unset the full likes relation to avoid sending too much data
                 $post->unsetRelation('likes');
-                
+
                 return $post;
             });
         } else {
-            $posts->through(function (DiscussionPost $post) {
+            $postCollection->transform(function (DiscussionPost $post) {
                 $post->setAttribute('is_liked', false);
                 $post->user->setAttribute('is_following', false);
                 $post->setAttribute('followed_likers', collect());
                 return $post;
             });
         }
+
+        $posts->setCollection($postCollection);
 
         return $posts;
     }

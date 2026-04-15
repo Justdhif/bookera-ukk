@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Bell, Mail, MessageCircle, Loader2 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import DataLoading from "@/components/custom-ui/DataLoading";
 import { toast } from "sonner";
 import { userService } from "@/services/user.service";
 import { NotificationSettings } from "@/types/user";
@@ -92,10 +92,8 @@ export default function SettingsNotificationCard() {
       </CardHeader>
       <CardContent className="pt-6 space-y-6">
         {loading ? (
-          <div className="space-y-3">
-            <Skeleton className="h-5 w-56" />
-            <Skeleton className="h-12 w-full rounded-xl" />
-            <Skeleton className="h-12 w-full rounded-xl" />
+          <div className="flex justify-center py-8">
+            <DataLoading variant="inline" size="md" />
           </div>
         ) : (
           <>

@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import FineStatusBadge from "@/components/custom-ui/badge/FineStatusBadge";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { DollarSign, BookOpen, Calendar, AlertCircle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import DataLoading from "@/components/custom-ui/DataLoading";
 import { format } from "date-fns";
 
 export default function MyFinesPageClient() {
@@ -45,22 +45,12 @@ export default function MyFinesPageClient() {
   if (loading) {
     return (
       <div className="space-y-6">
-      <ContentHeader
-        title={t("myFines")}
-        description={t("viewAllFinesDesc")}
-      />
-        <div className="grid gap-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i}>
-              <CardHeader className="space-y-2">
-                <Skeleton className="h-6 w-32" />
-                <Skeleton className="h-4 w-64" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-24 w-full" />
-              </CardContent>
-            </Card>
-          ))}
+        <ContentHeader
+          title={t("myFines")}
+          description={t("viewAllFinesDesc")}
+        />
+        <div className="flex justify-center py-12">
+          <DataLoading variant="inline" size="lg" />
         </div>
       </div>
     );

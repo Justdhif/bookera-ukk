@@ -13,11 +13,11 @@ class DiscussionCommentService
 {
     public function getAll(DiscussionPost $post, int $perPage = 20): LengthAwarePaginator
     {
-        return DiscussionComment::with(['user.profile', 'replies.user.profile'])
+        $query = DiscussionComment::with(['user.profile', 'replies.user.profile'])
             ->where('post_id', $post->id)
-            ->whereNull('parent_id')
-            ->latest()
-            ->paginate($perPage);
+            ->whereNull('parent_id');
+
+        return $query->latest()->orderByDesc('id')->paginate($perPage);
     }
 
     public function getReplies(DiscussionComment $comment, int $perPage = 20): LengthAwarePaginator

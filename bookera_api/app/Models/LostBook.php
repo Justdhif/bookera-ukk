@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Borrow;
+use App\Models\LostBookDetail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class LostBook extends Model
 {
@@ -12,13 +15,6 @@ class LostBook extends Model
 
     protected $fillable = [
         'borrow_id',
-        'book_copy_id',
-        'estimated_lost_date',
-        'notes',
-    ];
-
-    protected $casts = [
-        'estimated_lost_date' => 'date',
     ];
 
     public function borrow(): BelongsTo
@@ -26,8 +22,13 @@ class LostBook extends Model
         return $this->belongsTo(Borrow::class);
     }
 
-    public function bookCopy(): BelongsTo
+    public function lostBookDetails(): HasMany
     {
-        return $this->belongsTo(BookCopy::class);
+        return $this->hasMany(LostBookDetail::class);
+    }
+
+    public function details(): HasMany
+    {
+        return $this->lostBookDetails();
     }
 }

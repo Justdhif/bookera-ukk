@@ -14,7 +14,6 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, LogIn } from "lucide-react";
-import ReCAPTCHA from "react-google-recaptcha";
 
 interface LoginFormProps {
   loading: boolean;
@@ -22,11 +21,6 @@ interface LoginFormProps {
   onSwitchToRegister: () => void;
   onOpenTos: () => void;
   onOpenPrivacy: () => void;
-  recaptchaRef: React.RefObject<ReCAPTCHA | null>;
-  siteKey: string;
-  onRecaptchaChange: (token: string | null) => void;
-  resetRecaptcha?: () => void;
-  recaptchaReady?: boolean;
 }
 
 const inputClassName =
@@ -38,10 +32,6 @@ export default function LoginForm({
   onSwitchToRegister,
   onOpenTos,
   onOpenPrivacy,
-  recaptchaRef,
-  siteKey,
-  onRecaptchaChange,
-  recaptchaReady = true,
 }: LoginFormProps) {
   const t = useTranslations("login");
   const [formData, setFormData] = useState({
@@ -141,21 +131,12 @@ export default function LoginForm({
               </Button>
             </div>
           </div>
-          <div className="flex justify-center py-2">
-            <ReCAPTCHA
-              ref={recaptchaRef}
-              sitekey={siteKey}
-              onChange={onRecaptchaChange}
-              theme="light" // or use a theme from context/props
-            />
-          </div>
-          {/* Old forgot password link removed from here */}
           <Button
             type="button"
             variant="submit"
             loading={loading}
             onClick={handleSubmit}
-            disabled={loading || !recaptchaReady}
+            disabled={loading}
             className="w-full h-12 text-base font-semibold rounded-lg bg-linear-to-r from-brand-primary to-brand-primary-dark hover:from-brand-primary-dark hover:to-brand-primary-darker transition-all duration-300 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:shadow-brand-primary/30"
             spinnerClassName="text-white"
           >

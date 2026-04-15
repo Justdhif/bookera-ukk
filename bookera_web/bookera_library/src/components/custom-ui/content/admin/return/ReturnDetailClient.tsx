@@ -9,11 +9,11 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { ReturnDetailSkeleton } from "./return-detail/ReturnDetailSkeleton";
-import { ReturnInfoCard } from "./return-detail/ReturnInfoCard";
-import { ReturnBooksCard } from "./return-detail/ReturnBooksCard";
-import { ReturnFinesCard } from "./return-detail/ReturnFinesCard";
-import { ReturnActionsCard } from "./return-detail/ReturnActionsCard";
+import DataLoading from "@/components/custom-ui/DataLoading";
+import { ReturnInfoCard } from "./ReturnInfoCard";
+import { ReturnBooksCard } from "./ReturnBooksCard";
+import { ReturnFinesCard } from "./ReturnFinesCard";
+import { ReturnActionsCard } from "./ReturnActionsCard";
 
 export default function ReturnDetailClient() {
   const t = useTranslations("return");
@@ -27,7 +27,6 @@ export default function ReturnDetailClient() {
   >({});
   const [savingConditions, setSavingConditions] = useState(false);
   const [finishingFines, setFinishingFines] = useState(false);
-  const [finishingBorrow, setFinishingBorrow] = useState(false);
 
   useEffect(() => {
     fetchDetail();
@@ -93,21 +92,7 @@ export default function ReturnDetailClient() {
     }
   };
 
-  const handleFinishBorrow = async () => {
-    if (!bookReturn) return;
-    setFinishingBorrow(true);
-    try {
-      await bookReturnService.approve(bookReturn.id);
-      toast.success(t("closeBorrowSuccess"));
-      router.push("/admin/returns");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || t("closeBorrowError"));
-    } finally {
-      setFinishingBorrow(false);
-    }
-  };
-
-  if (loading) return <ReturnDetailSkeleton />;
+  if (loading) return <DataLoading size="lg" />;
   if (!bookReturn) return null;
 
   const fines: Fine[] = bookReturn.borrow?.fines ?? [];
@@ -137,8 +122,6 @@ export default function ReturnDetailClient() {
           hasUnpaidFines={hasUnpaidFines}
           onFinishFines={handleFinishFines}
           finishingFines={finishingFines}
-          onFinishBorrow={handleFinishBorrow}
-          finishingBorrow={finishingBorrow}
         />
       )}
     </div>

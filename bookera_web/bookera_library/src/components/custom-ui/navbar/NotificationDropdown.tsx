@@ -7,7 +7,7 @@ import { useEffect, useState, useRef } from "react";
 import { Bell, ChevronRight, LogIn, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { motion, AnimatePresence } from "framer-motion";
 import { notificationService } from "@/services/notification.service";
@@ -156,16 +156,8 @@ export default function NotificationDropdown({
                   linkHref="/login"
                 />
               ) : isLoading ? (
-                <div className="p-4 space-y-3">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="flex gap-3">
-                      <Skeleton className="h-8 w-8 rounded-lg shrink-0" />
-                      <div className="flex-1 space-y-2">
-                        <Skeleton className="h-4 w-3/5" />
-                        <Skeleton className="h-3 w-4/5" />
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex justify-center p-4">
+                  <DataLoading variant="inline" size="md" />
                 </div>
               ) : notifications.length === 0 ? (
                 <EmptyState

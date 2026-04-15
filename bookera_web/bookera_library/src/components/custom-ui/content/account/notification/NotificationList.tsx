@@ -1,18 +1,19 @@
 "use client";
-import { useTranslations } from "next-intl";
+
+import { useTranslations, useFormatter } from "next-intl";
 import { useState } from "react";
 import { Notification } from "@/types/notification";
 import { Input } from "@/components/ui/input";
 import { Loader2, Bell, Search, CheckCheck, Filter } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import DataLoading from "@/components/custom-ui/DataLoading";
 import { cn } from "@/lib/utils";
-import { formatDistanceToNow } from "date-fns";
 import {
   NotificationIconBadge,
   getModuleBadgeStyle,
 } from "./notification-utils";
 import { Button } from "@/components/ui/button";
 import EmptyState from "@/components/custom-ui/EmptyState";
+
 interface NotificationListProps {
   notifications: Notification[];
   loading: boolean;
@@ -24,6 +25,7 @@ interface NotificationListProps {
   onMarkAllAsRead: () => void;
   isMarkingAll?: boolean;
 }
+
 export default function NotificationList({
   notifications,
   loading,
@@ -36,23 +38,28 @@ export default function NotificationList({
   isMarkingAll = false,
 }: NotificationListProps) {
   const t = useTranslations("notification");
+  const format = useFormatter();
   const [searchValue, setSearchValue] = useState("");
   const [statusValue, setStatusValue] = useState("all");
+
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
     onSearchChange(value);
   };
+
   const handleStatusClick = (status: string) => {
     setStatusValue(status);
     onStatusChange(status);
   };
+
   const statusOptions = [
     { value: "all", label: t("allStatus") },
     { value: "unread", label: t("unread") },
     { value: "read", label: t("read") },
   ];
+
   return (
-    <div className="flex flex-col h-[calc(100vh-7rem)] rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-8rem)] rounded-xl border border-border bg-card shadow-sm overflow-hidden">
       <div className="px-4 pt-4 pb-3 border-b border-border bg-card/80 backdrop-blur-sm">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -136,22 +143,8 @@ export default function NotificationList({
       </div>
       <div className="flex-1 overflow-y-auto">
         {loading ? (
-          <div className="p-3">
-            <div className="space-y-2">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="flex gap-3 p-3.5">
-                  <Skeleton className="h-10 w-10 rounded-xl shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-3/5" />
-                    <Skeleton className="h-3 w-4/5" />
-                    <div className="flex items-center gap-2">
-                      <Skeleton className="h-4 w-14 rounded" />
-                      <Skeleton className="h-3 w-20" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="flex h-full items-center justify-center p-3">
+            <DataLoading variant="inline" size="lg" />
           </div>
         ) : notifications.length === 0 ? (
           <EmptyState
@@ -211,13 +204,11 @@ export default function NotificationList({
                             getModuleBadgeStyle(notif.module),
                           )}
                         >
-                          {notif.module}
+                          {t(`modules.${notif.module}`, { defaultValue: notif.module })}
                         </span>
                       )}
                       <span className="text-[11px] text-muted-foreground/70">
-                        {formatDistanceToNow(new Date(notif.created_at), {
-                          addSuffix: true,
-                        })}
+                        {format.relativeTime(new Date(notif.created_at))}
                       </span>
                     </div>
                   </div>

@@ -5,8 +5,8 @@ import { Author, AuthorFilterParams } from "@/types/author";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { authorService } from "@/services/author.service";
 import AuthorTable from "./AuthorTable";
-import AuthorFormDialog from "./author-add/AuthorFormDialog";
-import AuthorDetailDialog from "./author-detail/AuthorDetailDialog";
+import AuthorFormDialog from "./AuthorFormDialog";
+import AuthorDetailDialog from "./AuthorDetailDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -22,12 +22,13 @@ import {
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import { useTranslations } from "next-intl";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 
 export default function AuthorClient() {
   const t = useTranslations("author");
   const [authors, setAuthors] = useState<Author[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState<AuthorFilterParams>({ per_page: 10 });
+  const [filters, setFilters] = useState<AuthorFilterParams>({ per_page: ITEMS_PER_PAGE_OPTIONS[1] });
   const [searchInput, setSearchInput] = useState("");
   const [pagination, setPagination] = useState({
     current_page: 1,
@@ -73,9 +74,9 @@ export default function AuthorClient() {
   const fetchAuthors = async (activeFilters: AuthorFilterParams) => {
     setLoading(true);
     try {
-      const res = await authorService.getAll(activeFilters, true);
+      const res = await authorService.getAll(activeFilters);
       const paginatedData = res.data.data;
-      setAuthors(paginatedData.data ?? paginatedData);
+      setAuthors(paginatedData.data ?? []);
       setPagination({
         current_page: paginatedData.current_page ?? 1,
         last_page: paginatedData.last_page ?? 1,

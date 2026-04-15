@@ -1,7 +1,7 @@
 "use client";
+
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { useEffect, useState } from "react";
 import {
   notificationService,
@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import NotificationList from "./NotificationList";
 import NotificationDetail from "./NotificationDetail";
+
 export default function NotificationPageClient() {
   const t = useTranslations("notification");
   const router = useRouter();
@@ -23,10 +24,12 @@ export default function NotificationPageClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [deleteId, setDeleteId] = useState<number | null>(null);
+
   useEffect(() => {
     fetchNotifications();
     fetchUnreadCount();
   }, []);
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -43,12 +46,13 @@ export default function NotificationPageClient() {
       const response = await notificationService.getAll(filters);
       setNotifications(response.data.data.data);
     } catch (error) {
-      toast.error("failedToLoadNotifications");
+      toast.error(t("failedLoadNotifications"));
       console.error("Failed to fetch notifications:", error);
     } finally {
       setLoading(false);
     }
   };
+
   const fetchUnreadCount = async () => {
     try {
       const response = await notificationService.getUnreadCount();
@@ -57,6 +61,7 @@ export default function NotificationPageClient() {
       console.error("Failed to fetch unread count:", error);
     }
   };
+
   const handleNotificationClick = async (notif: Notification) => {
     if (!notif.read_at) {
       try {
@@ -75,6 +80,7 @@ export default function NotificationPageClient() {
       setSelectedNotif(notif);
     }
   };
+
   const handleNavigateToDetail = (notif: Notification) => {
     if (notif.module === "loan" && notif.data?.loan_id) {
       router.push(`/admin/loans`);
@@ -82,36 +88,39 @@ export default function NotificationPageClient() {
       router.push(`/admin/returns`);
     }
   };
+
   const handleMarkAllAsRead = async () => {
     setIsMarkingAll(true);
     try {
       await notificationService.markAllAsRead();
       fetchNotifications();
       fetchUnreadCount();
-      toast.success("All notifications marked as read");
+      toast.success(t("allMarkedReadSuccess"));
     } catch (error) {
-      toast.error("Failed to mark all notifications as read");
+      toast.error(t("allMarkedReadError"));
       console.error("Failed to mark all as read:", error);
     } finally {
       setIsMarkingAll(false);
     }
   };
+
   const confirmDelete = async () => {
     if (!deleteId) return;
     try {
       await notificationService.delete(deleteId);
       setNotifications(notifications.filter((n) => n.id !== deleteId));
-      toast.success("Notification deleted");
+      toast.success(t("notifDeletedSuccess"));
       fetchUnreadCount();
       setDeleteId(null);
       if (selectedNotif?.id === deleteId) {
         setSelectedNotif(null);
       }
     } catch (error) {
-      toast.error("failedToDeleteNotification");
+      toast.error(t("failedDeleteNotification"));
       console.error("Failed to delete notification:", error);
     }
   };
+
   const filteredNotifications = notifications.filter((notif) => {
     const matchesSearch =
       searchQuery === "" ||
@@ -123,12 +132,9 @@ export default function NotificationPageClient() {
       (statusFilter === "unread" && !notif.read_at);
     return matchesSearch && matchesStatus;
   });
+
   return (
-    <div className="space-y-6 flex flex-col h-[calc(100vh-7rem)]">
-      <ContentHeader
-        title={t("title")}
-        description={t("description")}
-      />
+    <div className="flex flex-col h-[calc(100vh-8rem)] overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0">
         <div className="lg:col-span-5">
           <NotificationList
@@ -156,7 +162,7 @@ export default function NotificationPageClient() {
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
         title={t("deleteNotification")}
-        description="Are you sure you want to delete this notification? This action cannot be undone."
+        description={t("confirmDeleteDesc")}
         onConfirm={confirmDelete}
       />
     </div>

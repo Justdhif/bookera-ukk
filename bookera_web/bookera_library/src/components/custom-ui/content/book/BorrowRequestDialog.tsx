@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -17,12 +18,13 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { borrowRequestService } from "@/services/borrow-request.service";
-import ReCAPTCHA from "react-google-recaptcha";
-import { useRecaptcha } from "@/hooks/useRecaptcha";
-import { bookService } from "@/services/book.service";
+import { publicService } from "@/services/public.service";
 import { Book } from "@/types/book";
 import Image from "next/image";
-import { BookOpen, Building2, Star } from "lucide-react";
+import { BookOpen, Building2, Star, AlertCircle } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface BorrowRequestDialogProps {
   bookIds: number[];
@@ -50,36 +52,24 @@ export default function BorrowRequestDialog({
   const [loadingBooks, setLoadingBooks] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const {
-    siteKey,
-    recaptchaRef,
-    token,
-    handleRecaptchaChange,
-    reset: resetRecaptcha,
-  } = useRecaptcha();
+  const uniqueBookIds = Array.from(new Set(bookIds));
 
   const handleClose = () => {
     onClose();
     setBorrowDate(undefined);
     setReturnDate(undefined);
     setSelectedBooks([]);
-    resetRecaptcha();
-  };
-
-  const handleDialogOutsideInteraction = (event: {
-    preventDefault: () => void;
-  }) => {
-    event.preventDefault();
   };
 
   const isSubmitDisabled =
     loading ||
-    bookIds.length === 0 ||
-    (loadingBooks && selectedBooks.length === 0) ||
+    loadingBooks ||
+    uniqueBookIds.length === 0 ||
+    selectedBooks.length < uniqueBookIds.length ||
     !borrowDate ||
     !returnDate ||
     returnDate <= borrowDate ||
-    !token;
+    selectedBooks.some((book) => (book.available_copies ?? 0) === 0);
 
   useEffect(() => {
     if (!isOpen) {
@@ -95,17 +85,17 @@ export default function BorrowRequestDialog({
         return;
       }
 
-      const uniqueBookIds = Array.from(new Set(bookIds));
       const cachedBooks = uniqueBookIds
         .map((bookId) => initialBooks.find((book) => book.id === bookId))
         .filter((book): book is Book => Boolean(book));
-      const missingBookIds = uniqueBookIds.filter(
-        (bookId) => !cachedBooks.some((book) => book.id === bookId),
-      );
 
       if (cachedBooks.length > 0) {
         setSelectedBooks(cachedBooks);
       }
+
+      const missingBookIds = uniqueBookIds.filter(
+        (bookId) => !cachedBooks.some((book) => book.id === bookId),
+      );
 
       if (missingBookIds.length === 0) {
         setLoadingBooks(false);
@@ -115,7 +105,7 @@ export default function BorrowRequestDialog({
       setLoadingBooks(true);
       try {
         const responses = await Promise.all(
-          missingBookIds.map((bookId) => bookService.getById(bookId)),
+          missingBookIds.map((bookId) => publicService.getBookById(bookId)),
         );
 
         if (!cancelled) {
@@ -172,24 +162,17 @@ export default function BorrowRequestDialog({
       return;
     }
 
-    if (!token) {
-      toast.error(t("pleaseVerifyRecaptcha") || "Please verify reCAPTCHA");
-      return;
-    }
-
     try {
       setLoading(true);
       await borrowRequestService.create({
         book_ids: bookIds,
         borrow_date: format(borrowDate, "yyyy-MM-dd"),
         return_date: format(returnDate, "yyyy-MM-dd"),
-        recaptcha_token: token,
       });
       toast.success(t("common.borrowRequestSubmitted") || "Borrow request created successfully!");
       if (onSuccess) onSuccess();
       handleClose();
     } catch (error: any) {
-      resetRecaptcha();
       toast.error(
         error.response?.data?.message || t("common.failedToBorrow") || "Failed to create borrow request",
       );
@@ -199,24 +182,21 @@ export default function BorrowRequestDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose} modal={false}>
-      <DialogContent
-        className="max-w-2xl! sm:max-w-2xl! lg:max-w-3xl! p-0 overflow-visible"
-        onPointerDownOutside={handleDialogOutsideInteraction}
-        onInteractOutside={handleDialogOutsideInteraction}
-      >
-        <div className="max-h-[90vh] overflow-y-auto scrollbar-hide p-6">
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-2xl sm:max-w-2xl lg:max-w-3xl">
           <DialogHeader>
             <DialogTitle>{t("borrowRequestTitle")}</DialogTitle>
             <DialogDescription>
-              {bookIds.length > 1
-                ? `${t("borrowRequestDesc")} (${bookIds.length} ${t("books")})`
+              {uniqueBookIds.length > 1
+                ? `${t("borrowRequestDesc")} (${uniqueBookIds.length} ${t("books")})`
                 : t("borrowRequestDesc")}
             </DialogDescription>
           </DialogHeader>
 
+          <Separator />
+
           <div className="space-y-5">
-          <section className="space-y-3 rounded-2xl border border-border/70 bg-muted/20 p-4 shadow-sm">
+          <section className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div className="space-y-1">
                 <Label className="text-sm font-semibold text-foreground">
@@ -228,7 +208,7 @@ export default function BorrowRequestDialog({
               </div>
 
               <div className="inline-flex min-w-10 items-center justify-center rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                {selectedBooks.length || bookIds.length}
+                {uniqueBookIds.length}
               </div>
             </div>
 
@@ -274,6 +254,33 @@ export default function BorrowRequestDialog({
                           <span className="truncate">{book.publisher}</span>
                         </div>
                       )}
+                      
+                      <div className="flex items-center gap-2 pt-1">
+                        <Badge 
+                          variant="outline"
+                          className={cn(
+                            "h-6 px-2.5 text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border-none",
+                            (book.available_copies ?? 0) > 0 
+                              ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.1)]" 
+                              : "bg-rose-500/15 text-rose-500 hover:bg-rose-500/25 shadow-[0_0_12px_rgba(244,63,94,0.15)] animate-pulse"
+                          )}
+                        >
+                          {(book.available_copies ?? 0) > 0 ? (
+                            <div className="flex items-center gap-1.5">
+                              <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                              </span>
+                              {t("stockAvailable", { count: book.available_copies ?? 0 })}
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5">
+                              <AlertCircle className="h-3 w-3 shrink-0" />
+                              {t("outOfStock")}
+                            </div>
+                          )}
+                        </Badge>
+                      </div>
                     </div>
 
                     <div className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-600">
@@ -315,38 +322,31 @@ export default function BorrowRequestDialog({
             </div>
           </div>
 
-          <div>
-            <div className="flex justify-center overflow-visible">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={siteKey}
-                onChange={handleRecaptchaChange}
-                theme="light"
-              />
-            </div>
           </div>
 
-          <div className="flex flex-col-reverse gap-3 sm:flex-row">
+          <DialogFooter className="gap-2 mt-2">
             <Button
               variant="outline"
               onClick={handleClose}
-              className="flex-1"
               disabled={loading}
             >
               {t("detail.editDialog.cancel")}
             </Button>
             <Button
               onClick={handleSubmit}
-              className="flex-1"
               disabled={isSubmitDisabled}
-              loading={loading}
+              loading={loading || loadingBooks}
               variant="submit"
             >
-              {loading ? t("processingBtn") : t("submitRequest")}
+              {loading 
+                ? t("processingBtn") 
+                : loadingBooks
+                  ? tCommon("loading")
+                  : selectedBooks.length > 0 && selectedBooks.some(book => (book.available_copies ?? 0) === 0)
+                    ? t("outOfStock")
+                    : t("submitRequest")}
             </Button>
-          </div>
-        </div>
-        </div>
+          </DialogFooter>
       </DialogContent>
     </Dialog>
   );

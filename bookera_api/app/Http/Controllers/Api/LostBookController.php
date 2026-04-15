@@ -36,20 +36,18 @@ class LostBookController extends Controller
     public function store(StoreLostBookRequest $request, Borrow $borrow): JsonResponse
     {
         $validated = $request->validated();
-        [$canReport, $errorMessage] = $this->lostBookService->canReportLost($borrow, $validated['book_copy_id']);
+        try {
+            $borrow = $this->lostBookService->markBorrowDetailsLost($borrow, $validated['borrow_detail_ids']);
 
-        if (!$canReport) {
-            return ApiResponse::errorResponse($errorMessage, null, 400);
+            return ApiResponse::successResponse('Status buku hilang berhasil diperbarui', $borrow);
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }
-
-        $lostBook = $this->lostBookService->create($borrow, $validated);
-
-        return ApiResponse::successResponse('Buku hilang berhasil dilaporkan', $lostBook, 201);
     }
 
     public function show(LostBook $lostBook): JsonResponse
     {
-        $lostBook->load(['borrow.user.profile', 'bookCopy.book']);
+        $lostBook->load(['borrow.user.profile', 'details.bookCopy.book']);
 
         return ApiResponse::successResponse('Detail buku hilang', $lostBook);
     }
@@ -78,16 +76,7 @@ class LostBookController extends Controller
 
         $lostBook = $this->lostBookService->finishLostBookProcess($lostBook);
 
-        return ApiResponse::successResponse('Proses buku hilang telah selesai. Status peminjaman diubah menjadi lost.', $lostBook);
+        return ApiResponse::successResponse('Proses buku hilang telah selesai. Status peminjaman ditutup.', $lostBook);
     }
 
-    public function processFine(LostBook $lostBook): JsonResponse
-    {
-        try {
-            $fine = $this->lostBookService->processFine($lostBook);
-            return ApiResponse::successResponse('Denda berhasil diproses', $fine, 201);
-        } catch (\Exception $e) {
-            return ApiResponse::errorResponse($e->getMessage(), null, 400);
-        }
-    }
 }

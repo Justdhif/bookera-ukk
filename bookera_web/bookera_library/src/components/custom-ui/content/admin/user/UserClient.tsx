@@ -1,13 +1,13 @@
 "use client";
 
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { useTranslations } from "next-intl";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { User, UserFilterParams } from "@/types/user";
 import { userService } from "@/services/user.service";
-import UserTable from "./UserTable";
-import UserFilter from "./UserFilter";
+import UserTable from "./UserFilter";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
@@ -26,7 +26,7 @@ export default function UserClient() {
     from: 0,
     to: 0,
   });
-  const [filters, setFilters] = useState<UserFilterParams>({ per_page: 10 });
+  const [filters, setFilters] = useState<UserFilterParams>({ per_page: ITEMS_PER_PAGE_OPTIONS[1] });
   const confirmDelete = async () => {
     if (!deleteId) return;
     await userService.delete(deleteId);

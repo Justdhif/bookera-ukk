@@ -21,6 +21,7 @@ export interface Book {
   is_active: boolean;
   average_rating?: number;
   reviews_count?: number;
+  favorites_count?: number;
 
   categories: Category[];
   authors?: Author[];
@@ -58,6 +59,10 @@ export interface BookFilterParams {
   search?: string;
   category_ids?: number[];
   status?: "active" | "inactive";
+  author_ids?: number[];
+  publisher_ids?: number[];
   per_page?: number;
   page?: number;
+  rating?: number;
+  min_reviews?: number;
 }

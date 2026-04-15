@@ -24,6 +24,8 @@ class FavoriteController extends Controller
             'search'      => $request->search,
             'category_id' => $request->category_id,
             'per_page'    => $request->per_page,
+            'rating'      => $request->rating,
+            'min_reviews' => $request->min_reviews,
         ];
 
         $favorites = $this->favoriteService->getAll($filters);

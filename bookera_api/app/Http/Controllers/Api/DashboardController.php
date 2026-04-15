@@ -23,24 +23,57 @@ class DashboardController extends Controller
         return ApiResponse::successResponse('Data total dashboard berhasil diambil', $data);
     }
 
-    public function loanMonthlyChart(): JsonResponse
+    public function loanMonthlyChart(\Illuminate\Http\Request $request): JsonResponse
     {
-        $data = $this->dashboardService->getLoanMonthlyChart();
+        $year = $request->query('year', now()->year);
+        $data = $this->dashboardService->getLoanMonthlyChart((int)$year);
 
         return ApiResponse::successResponse('Data grafik peminjaman bulanan', $data);
     }
 
-    public function loanStatusChart(): JsonResponse
+    public function loanStatusChart(\Illuminate\Http\Request $request): JsonResponse
     {
-        $data = $this->dashboardService->getLoanStatusChart();
+        $year = $request->query('year', now()->year);
+        $month = $request->query('month', now()->month);
+        $data = $this->dashboardService->getLoanStatusChart((int)$year, (int)$month);
 
         return ApiResponse::successResponse('Data grafik status peminjaman', $data);
     }
 
-    public function latest(): JsonResponse
+    public function calendar(\Illuminate\Http\Request $request): JsonResponse
     {
-        $data = $this->dashboardService->getLatestLoans();
+        $year = $request->query('year', now()->year);
+        $month = $request->query('month', now()->month);
+        
+        $data = $this->dashboardService->getCalendar((int)$year, (int)$month);
 
-        return ApiResponse::successResponse('Data peminjaman terbaru', $data);
+        return ApiResponse::successResponse('Data kalender peminjaman', $data);
+    }
+
+    public function dayDetail(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $year  = $request->query('year', now()->year);
+        $month = $request->query('month', now()->month);
+        $day   = $request->query('day', now()->day);
+
+        $data = $this->dashboardService->getDayDetail((int)$year, (int)$month, (int)$day);
+
+        return ApiResponse::successResponse('Data detail tanggal', $data);
+    }
+
+    public function borrowComparisonChart(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $year = $request->query('year', now()->year);
+        $data = $this->dashboardService->getBorrowComparisonChart((int)$year);
+
+        return ApiResponse::successResponse('Data grafik perbandingan peminjaman', $data);
+    }
+
+    public function loginRegisterTrendChart(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $year = $request->query('year', now()->year);
+        $data = $this->dashboardService->getLoginRegisterTrendChart((int)$year);
+
+        return ApiResponse::successResponse('Data grafik tren login & registrasi', $data);
     }
 }

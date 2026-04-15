@@ -1,5 +1,6 @@
 "use client";
-import { useTranslations } from "next-intl";
+
+import { useTranslations, useFormatter } from "next-intl";
 import { Notification } from "@/types/notification";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,19 +12,23 @@ import {
   Clock,
   Eye,
 } from "lucide-react";
-import { format, formatDistanceToNow } from "date-fns";
 import {
   NotificationIconBadge,
   getModuleBadgeStyle,
   getNotificationIconConfig,
 } from "./notification-utils";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User, Book as BookIcon, Receipt, History, MessageSquare, Info as InfoIcon, AlertCircle } from "lucide-react";
+
 interface NotificationDetailProps {
   notification: Notification | null;
   onClose: () => void;
   onNavigate: (notif: Notification) => void;
   onDelete: (id: number) => void;
 }
+
 export default function NotificationDetail({
   notification,
   onClose,
@@ -31,6 +36,8 @@ export default function NotificationDetail({
   onDelete,
 }: NotificationDetailProps) {
   const t = useTranslations("notification");
+  const format = useFormatter();
+
   if (!notification) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-7rem)] rounded-xl border border-dashed border-border/70 bg-muted/20">
@@ -53,12 +60,14 @@ export default function NotificationDetail({
       </div>
     );
   }
+
   const config = getNotificationIconConfig(
     notification.type,
     notification.module,
   );
+
   return (
-    <div className="flex flex-col h-[calc(100vh-7rem)] rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-8rem)] rounded-xl border border-border bg-card shadow-sm overflow-hidden">
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-border bg-card/80 backdrop-blur-sm">
         <div className="flex items-center gap-2">
           <h3 className="font-semibold text-sm">{t("notificationDetail")}</h3>
@@ -77,13 +86,12 @@ export default function NotificationDetail({
               onClick={() => onNavigate(notification)}
               className="h-7 text-xs gap-1.5 border-border/60"
             >
-              <Eye className="w-4 h-4 mr-2" />{" "}
               <ExternalLink className="h-3 w-3" />
               {t("viewFullDetail")}
             </Button>
           )}
           <Button
-            variant="brand"
+            variant="ghost"
             size="icon"
             onClick={onClose}
             className="h-7 w-7 text-muted-foreground hover:text-foreground"
@@ -107,16 +115,17 @@ export default function NotificationDetail({
               <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  {format(
-                    new Date(notification.created_at),
-                    "MMM dd, yyyy · HH:mm",
-                  )}
+                  {format.dateTime(new Date(notification.created_at), {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                  })}
                 </span>
                 <span className="text-muted-foreground/40">·</span>
                 <span className="text-muted-foreground/70">
-                  {formatDistanceToNow(new Date(notification.created_at), {
-                    addSuffix: true,
-                  })}
+                  {format.relativeTime(new Date(notification.created_at))}
                 </span>
               </div>
             </div>
@@ -143,7 +152,7 @@ export default function NotificationDetail({
                       getModuleBadgeStyle(notification.module),
                     )}
                   >
-                    {notification.module}
+                    {t(`modules.${notification.module}`, { defaultValue: notification.module })}
                   </span>
                 </div>
               )}
@@ -153,37 +162,131 @@ export default function NotificationDetail({
                     {t("type")}
                   </p>
                   <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border border-border bg-background text-foreground/80">
-                    {notification.type.replace(/_/g, " ")}
+                    {t(`types.${notification.type}`, { defaultValue: notification.type.replace(/_/g, " ") })}
                   </span>
                 </div>
               )}
             </div>
           )}
           {notification.data && Object.keys(notification.data).length > 0 && (
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-                {t("additionalInfo")}
-              </p>
-              <div className="rounded-lg border border-border/60 bg-muted/20 overflow-hidden">
-                {Object.entries(notification.data).map(([key, value], idx) => (
-                  <div
-                    key={key}
-                    className={cn(
-                      "flex items-start gap-4 px-4 py-2.5 text-sm",
-                      idx !== 0 && "border-t border-border/40",
-                    )}
-                  >
-                    <span className="text-muted-foreground capitalize min-w-28 text-xs pt-0.5">
-                      {key.replace(/_/g, " ")}
-                    </span>
-                    <span className="font-medium text-foreground/90 flex-1 break-all">
-                      {typeof value === "object"
-                        ? JSON.stringify(value, null, 2)
-                        : String(value)}
-                    </span>
+            <div className="space-y-4">
+              {/* User Snapshot if available (typically for admin notifications) */}
+              {notification.data.user && (
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                  <Avatar className="h-10 w-10 border-2 border-background shadow-sm">
+                    <AvatarImage src={notification.data.user.avatar} />
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      <User className="h-5 w-5" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] uppercase font-bold tracking-wider text-primary/70 mb-0.5">{t("user")}</p>
+                    <p className="text-sm font-bold text-foreground truncate">{notification.data.user.name}</p>
                   </div>
-                ))}
+                </div>
+              )}
+
+              {/* Books Section */}
+              {(notification.data.books || notification.data.returned || notification.data.lost) && (
+                <div className="space-y-3">
+                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <BookIcon className="h-3 w-3" />
+                    {t("relatedBooks")}
+                  </p>
+                  <div className="grid gap-2">
+                    {/* Standard books array */}
+                    {notification.data.books?.map((book: any, idx: number) => (
+                      <div key={idx} className="flex items-center gap-3 p-2.5 rounded-xl border border-border/50 bg-background/50 hover:bg-background transition-colors shadow-sm">
+                        <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-lg bg-muted border border-border/40">
+                          <Image
+                            src={book.cover || "/placeholder-book.png"}
+                            alt={book.title}
+                            fill
+                            className="object-cover"
+                            sizes="40px"
+                            unoptimized
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-foreground line-clamp-1">{book.title}</p>
+                          <p className="text-[11px] text-muted-foreground truncate">{book.author || t("noAuthor")}</p>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Returned books array */}
+                    {notification.data.returned?.map((item: any, idx: number) => (
+                      <div key={`ret-${idx}`} className="flex items-center gap-3 p-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 transition-colors shadow-sm">
+                        <div className="min-w-10 h-10 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
+                          <History className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-foreground line-clamp-1">{item.book_title}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-emerald-500 text-white leading-none">
+                              {item.condition === 'good' ? t("conditionGood") : t("conditionDamaged")}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Lost books array */}
+                    {notification.data.lost?.map((item: any, idx: number) => (
+                      <div key={`lost-${idx}`} className="flex items-center gap-3 p-2.5 rounded-xl border border-rose-500/20 bg-rose-500/5 transition-colors shadow-sm text-rose-600">
+                        <div className="min-w-10 h-10 flex items-center justify-center rounded-lg bg-rose-500/10 text-rose-600">
+                          <AlertCircle className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-foreground line-clamp-1">{item.book_title}</p>
+                          <p className="text-[10px] uppercase font-bold mt-0.5">{t("statusLost")}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* General Technical Data Table (Filtering out handled keys) */}
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2 flex items-center gap-2">
+                  <InfoIcon className="h-3 w-3" />
+                  {t("additionalInfo")}
+                </p>
+                <div className="rounded-xl border border-border/40 bg-muted/20 overflow-hidden divide-y divide-border/20">
+                  {Object.entries(notification.data)
+                    .filter(([key]) => !['user', 'books', 'returned', 'lost'].includes(key))
+                    .map(([key, value]) => (
+                      <div key={key} className="flex items-start gap-4 px-4 py-2.5 text-sm hover:bg-muted/30 transition-colors">
+                        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider min-w-28 pt-0.5">
+                          {key.replace(/_/g, " ")}
+                        </span>
+                        <span className="font-bold text-foreground/90 flex-1 break-all">
+                          {typeof value === "object"
+                            ? JSON.stringify(value, null, 2)
+                            : String(value)}
+                        </span>
+                      </div>
+                    ))}
+                </div>
               </div>
+
+              {/* Fine Info Shortcut */}
+              {notification.data.total_fine > 0 && (
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 shadow-sm animate-pulse">
+                  <Receipt className="h-6 w-6 shrink-0" />
+                  <div>
+                    <p className="text-[10px] uppercase font-black tracking-widest leading-none mb-1 opacity-70">{t("totalFine")}</p>
+                    <p className="text-2xl font-black">
+                      {format.number(notification.data.total_fine, {
+                        style: "currency",
+                        currency: "IDR",
+                        minimumFractionDigits: 0,
+                      })}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -14,8 +14,13 @@ class StoreBookReturnRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'borrow_detail_ids' => 'required|array|min:1',
-            'borrow_detail_ids.*' => 'required|integer|exists:borrow_details,id',
+            'items' => 'required|array|min:1',
+            'items.*.borrow_detail_id' => 'required|integer|exists:borrow_details,id',
+            'items.*.status' => 'required|string|in:returned,lost',
+            'items.*.condition' => 'nullable|string|in:good,damaged',
+            'items.*.lost_date' => 'nullable|date',
+            'items.*.notes' => 'nullable|string',
+            'notes' => 'nullable|string',
         ];
     }
 }

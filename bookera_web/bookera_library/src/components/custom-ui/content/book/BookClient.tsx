@@ -1,5 +1,6 @@
 "use client";
 
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { useTranslations } from "next-intl";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import Link from "next/link";
@@ -31,7 +32,7 @@ export default function BookClient() {
     from: 0,
     to: 0,
   });
-  const [filters, setFilters] = useState<BookFilterParams>({ per_page: 10 });
+  const [filters, setFilters] = useState<BookFilterParams>({ per_page: ITEMS_PER_PAGE_OPTIONS[1] });
 
   const fetchCategories = async () => {
     setCategoriesLoading(true);

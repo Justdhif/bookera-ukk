@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             DiscussionSeeder::class,
             ActivityLogSeeder::class,
             BookReviewSeeder::class,
+            FineTypeSeeder::class,
         ]);
 
         Schema::enableForeignKeyConstraints();

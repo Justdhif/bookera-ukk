@@ -23,59 +23,59 @@ class Book extends Model
         'is_active',
     ];
 
-    protected $appends = ['author', 'publisher', 'average_rating', 'reviews_count'];
+    protected $withCount = ['favorites', 'total_copies', 'available_copies'];
 
-    protected function coverImage(): Attribute
+    protected $appends = ['author', 'publisher', 'average_rating', 'reviews_count', 'total_copies', 'available_copies'];
+
+    public function getCoverImageAttribute($value)
     {
-        return Attribute::make(
-            get: function ($value) {
-                if ($value) {
-                    return storage_image($value);
-                }
+        if ($value) {
+            return storage_image($value);
+        }
 
-                return 'https://picsum.photos/seed/'.rawurlencode($this->slug).'/400/600';
-            },
-            set: fn ($value) => $value,
-        );
+        return 'https://picsum.photos/seed/'.rawurlencode($this->slug).'/400/600';
     }
 
-    protected function author(): Attribute
+    public function setCoverImageAttribute($value)
     {
-        return Attribute::make(
-            get: fn () => $this->authors->pluck('name')->join(', '),
-        );
+        $this->attributes['cover_image'] = $value;
     }
 
-    protected function publisher(): Attribute
+    public function getAuthorAttribute()
     {
-        return Attribute::make(
-            get: fn () => $this->publishers->pluck('name')->join(', '),
-        );
+        return $this->authors->pluck('name')->join(', ');
     }
 
-    protected function averageRating(): Attribute
+    public function getPublisherAttribute()
     {
-        return Attribute::make(
-            get: function () {
-                if ($this->relationLoaded('reviews')) {
-                    $avg = $this->reviews->avg('rating');
-                    return $avg !== null ? round($avg, 1) : 0;
-                }
-                return 0;
-            }
-        );
+        return $this->publishers->pluck('name')->join(', ');
     }
 
-    protected function reviewsCount(): Attribute
+    public function getAverageRatingAttribute()
     {
-        return Attribute::make(
-            get: function () {
-                if ($this->relationLoaded('reviews')) {
-                    return $this->reviews->count();
-                }
-                return 0;
-            }
-        );
+        if ($this->relationLoaded('reviews')) {
+            $avg = $this->reviews->avg('rating');
+            return $avg !== null ? round($avg, 1) : 0;
+        }
+        return 0;
+    }
+
+    public function getReviewsCountAttribute()
+    {
+        if ($this->relationLoaded('reviews')) {
+            return $this->reviews->count();
+        }
+        return 0;
+    }
+
+    public function getTotalCopiesAttribute()
+    {
+        return $this->total_copies_count ?? 0;
+    }
+
+    public function getAvailableCopiesAttribute()
+    {
+        return $this->available_copies_count ?? 0;
     }
 
     public function reviews()
@@ -96,6 +96,16 @@ class Book extends Model
     public function favorites()
     {
         return $this->hasMany(BookFavorite::class);
+    }
+
+    public function total_copies()
+    {
+        return $this->hasMany(BookCopy::class);
+    }
+
+    public function available_copies()
+    {
+        return $this->hasMany(BookCopy::class)->where('status', 'available');
     }
 
     public function authors()

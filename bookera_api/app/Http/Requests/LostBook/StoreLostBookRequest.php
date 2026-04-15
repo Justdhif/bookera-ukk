@@ -14,9 +14,8 @@ class StoreLostBookRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'book_copy_id' => 'required|integer|exists:book_copies,id',
-            'estimated_lost_date' => 'nullable|date',
-            'notes' => 'nullable|string',
+            'borrow_detail_ids' => 'required|array|min:1',
+            'borrow_detail_ids.*' => 'required|integer|distinct|exists:borrow_details,id',
         ];
     }
 }

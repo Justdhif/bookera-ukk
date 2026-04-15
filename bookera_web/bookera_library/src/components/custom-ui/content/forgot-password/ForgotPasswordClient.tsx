@@ -11,7 +11,6 @@ import ForgotStepMethod from "./steps/ForgotStepMethod";
 import ForgotStepOtp from "./steps/ForgotStepOtp";
 import ForgotStepReset from "./steps/ForgotStepReset";
 import ForgotStepSuccess from "./steps/ForgotStepSuccess";
-import { useRecaptcha } from "@/hooks/useRecaptcha";
 
 export type ForgotStep = "method" | "otp" | "reset" | "success";
 
@@ -74,35 +73,20 @@ export default function ForgotPasswordClient() {
     };
   }, []);
 
-  const {
-    siteKey,
-    recaptchaRef,
-    token,
-    handleRecaptchaChange,
-    reset: resetRecaptcha,
-    ready: recaptchaReady,
-  } = useRecaptcha();
-
   const handleSendOtp = async () => {
     if (!email.trim()) {
       toast.error(t("emailRequired"));
       return;
     }
 
-    if (!token) {
-      toast.error(t("pleaseVerifyRecaptcha") || "Please verify reCAPTCHA");
-      return;
-    }
-
     setSubmitting(true);
     try {
-      const res = await authService.forgotPassword(email, token);
+      const res = await authService.forgotPassword(email);
       toast.success(res.data.message || "Verification code sent to your email");
       setStep("otp");
       startCooldown();
       setTimeout(() => otpRefs.current[0]?.focus(), 400);
     } catch (err: any) {
-      resetRecaptcha();
       toast.error(
         err.response?.data?.message || "Failed to send verification code",
       );
@@ -250,10 +234,6 @@ export default function ForgotPasswordClient() {
                 onSend={handleSendOtp}
                 onBack={() => router.push(backPath)}
                 isAuthenticated={isAuthenticated}
-                siteKey={siteKey}
-                recaptchaRef={recaptchaRef}
-                onRecaptchaChange={handleRecaptchaChange}
-                recaptchaReady={recaptchaReady && !!token}
               />
             </motion.div>
           )}

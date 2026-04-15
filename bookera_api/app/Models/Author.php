@@ -20,18 +20,20 @@ class Author extends Model
         'is_active',
     ];
 
-    protected function photo(): Attribute
-    {
-        return Attribute::make(
-            get: function ($value) {
-                if ($value) {
-                    return storage_image($value);
-                }
+    protected $withCount = ['books'];
 
-                return 'https://api.dicebear.com/7.x/initials/png?seed='.rawurlencode($this->name);
-            },
-            set: fn ($value) => $value,
-        );
+    public function getPhotoAttribute($value)
+    {
+        if ($value) {
+            return storage_image($value);
+        }
+
+        return 'https://picsum.photos/seed/'.rawurlencode($this->slug).'/400/400';
+    }
+
+    public function setPhotoAttribute($value)
+    {
+        $this->attributes['photo'] = $value;
     }
 
     public function books()

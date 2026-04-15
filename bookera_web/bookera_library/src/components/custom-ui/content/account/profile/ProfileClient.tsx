@@ -7,7 +7,7 @@ import { authService } from "@/services/auth.service";
 import { userService } from "@/services/user.service";
 import { User, UpdateUserData } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import DataLoading from "@/components/custom-ui/DataLoading";
 import { X, Edit, CircleUser } from "lucide-react";
 import { toast } from "sonner";
 import AvatarUploadModal from "@/components/custom-ui/content/admin/user/AvatarUploadModal";
@@ -114,7 +114,7 @@ export default function ProfileClient() {
         title={t("myProfile")}
         description={
           loading ? (
-            <Skeleton className="h-4 w-48 mt-1" />
+            <DataLoading variant="inline" size="sm" className="justify-start mt-1" />
           ) : isEditMode ? (
             t("editProfileDescription", {
               name: user?.profile.full_name ?? "",
@@ -164,9 +164,8 @@ export default function ProfileClient() {
         }
       />
       {loading ? (
-        <div className="grid gap-6 lg:grid-cols-3">
-          <Skeleton className="h-96" />
-          <Skeleton className="lg:col-span-2 h-96" />
+        <div className="flex justify-center py-16">
+          <DataLoading variant="inline" size="lg" />
         </div>
       ) : (
         user && (

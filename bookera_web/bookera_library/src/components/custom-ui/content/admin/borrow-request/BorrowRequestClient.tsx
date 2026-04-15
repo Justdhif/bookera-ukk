@@ -1,5 +1,6 @@
 "use client";
 
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
@@ -24,7 +25,7 @@ export default function BorrowRequestClient() {
     search?: string;
     per_page?: number;
     page?: number;
-  }>({ per_page: 10 });
+  }>({ per_page: ITEMS_PER_PAGE_OPTIONS[1] });
   const [searchInput, setSearchInput] = useState("");
   const [pagination, setPagination] = useState({
     current_page: 1,

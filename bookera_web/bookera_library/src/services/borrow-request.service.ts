@@ -11,7 +11,6 @@ export const borrowRequestService = {
     book_ids: number[];
     borrow_date: string;
     return_date: string;
-    recaptcha_token?: string | null;
   }) => api.post<ApiResponse<BorrowRequest>>("/borrow-requests", data),
 
   getById: (id: number, isAdmin = false) =>
@@ -38,8 +37,10 @@ export const borrowRequestService = {
       copy_ids: copyIds,
     }),
 
-  approve: (id: number) =>
-    api.patch<ApiResponse<Borrow>>(`/admin/borrow-requests/${id}/approve`),
+  approve: (id: number, copyIds: number[]) =>
+    api.patch<ApiResponse<Borrow>>(`/admin/borrow-requests/${id}/approve`, {
+      copy_ids: copyIds,
+    }),
 
   reject: (id: number, rejectReason?: string) =>
     api.patch<ApiResponse<BorrowRequest>>(

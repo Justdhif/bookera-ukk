@@ -10,7 +10,7 @@ export interface CategoryFilterParams {
 
 export const categoryService = {
   getAll: (filters?: CategoryFilterParams) =>
-    api.get<ApiResponse<CategoryListResponse>>("/categories", {
+    api.get<ApiResponse<CategoryListResponse>>("/admin/categories", {
       params: filters,
     }),
 

@@ -9,6 +9,7 @@ use App\Http\Requests\BookReturn\UpdateBookReturnConditionsRequest;
 use App\Models\BookReturn;
 use App\Models\Borrow;
 use App\Services\BookReturn\BookReturnService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class BookReturnController extends Controller
@@ -50,7 +51,7 @@ class BookReturnController extends Controller
         try {
             $result = $this->bookReturnService->updateConditions($bookReturn, $request->validated()['conditions']);
             return ApiResponse::successResponse('Kondisi buku berhasil diperbarui', $result);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }
     }
@@ -60,38 +61,9 @@ class BookReturnController extends Controller
         try {
             $fines = $this->bookReturnService->finishFines($bookReturn);
             return ApiResponse::successResponse('Semua denda berhasil ditandai sebagai lunas', $fines);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }
     }
 
-    public function approveReturn(BookReturn $bookReturn): JsonResponse
-    {
-        try {
-            if (!$this->bookReturnService->canApprove($bookReturn)) {
-                $borrow = $bookReturn->borrow;
-
-                if ($borrow->status !== 'open') {
-                    return ApiResponse::errorResponse('Peminjaman ini tidak dalam status open', null, 400);
-                }
-
-                return ApiResponse::errorResponse('Tidak dapat menyelesaikan return', null, 400);
-            }
-
-            $result = $this->bookReturnService->approve($bookReturn);
-            return ApiResponse::successResponse('Pengembalian berhasil diselesaikan', $result);
-        } catch (\Exception $e) {
-            return ApiResponse::errorResponse($e->getMessage(), null, 400);
-        }
-    }
-
-    public function processFine(BookReturn $bookReturn): JsonResponse
-    {
-        try {
-            $fine = $this->bookReturnService->processFine($bookReturn);
-            return ApiResponse::successResponse('Denda berhasil diproses', $fine, 201);
-        } catch (\Exception $e) {
-            return ApiResponse::errorResponse($e->getMessage(), null, 400);
-        }
-    }
 }

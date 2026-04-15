@@ -1,5 +1,6 @@
 "use client";
 import { useState, Dispatch, SetStateAction } from "react";
+import { setUserLocale } from "@/services/locale";
 import { Locale } from "@/i18n/config";
 import {
   DropdownMenu,
@@ -9,11 +10,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
+
 type Props = {
   defaultValue: string;
   items: Array<{ value: string; label: string }>;
   label: string;
-  setLocale: Dispatch<SetStateAction<Locale | undefined>>;
+  setLocale?: Dispatch<SetStateAction<Locale | undefined>>;
   iconOnly?: boolean;
 };
 export default function LocaleSwitcherSelect({
@@ -24,10 +26,11 @@ export default function LocaleSwitcherSelect({
   iconOnly = false,
 }: Props) {
   const [selectedValue, setSelectedValue] = useState(defaultValue);
-  function onChange(value: string) {
+  async function onChange(value: string) {
     const locale = value as Locale;
     setSelectedValue(value);
-    setLocale(locale);
+    if (setLocale) setLocale(locale);
+    await setUserLocale(locale);
   }
   const selectedItem = items.find((item) => item.value === selectedValue);
   return (

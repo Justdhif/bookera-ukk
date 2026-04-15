@@ -18,16 +18,15 @@ export const lostBookService = {
   create: (
     borrowId: number,
     data: {
-      book_copy_id: number;
-      notes?: string;
-      estimated_lost_date?: string;
+      borrow_detail_ids: number[];
     },
   ) =>
-    api.post<ApiResponse<LostBook>>(`/borrows/${borrowId}/report-lost`, data),
+    api.post<ApiResponse<any>>(`/borrows/${borrowId}/report-lost`, data),
 
   update: (
     id: number,
     data: {
+      lost_date?: string;
       estimated_lost_date?: string;
       notes?: string;
     },
@@ -35,9 +34,6 @@ export const lostBookService = {
 
   finish: (id: number) =>
     api.post<ApiResponse<LostBook>>(`/admin/lost-books/${id}/finish`),
-
-  processFine: (id: number) =>
-    api.post<ApiResponse<any>>(`/admin/lost-books/${id}/process-fine`),
 
   delete: (id: number) =>
     api.delete<ApiResponse<null>>(`/admin/lost-books/${id}`),

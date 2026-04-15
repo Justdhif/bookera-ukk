@@ -41,33 +41,30 @@ class UserProfile extends Model
         return $this->belongsTo(User::class);
     }
 
-    protected function avatar(): Attribute
+    public function getAvatarAttribute($value)
     {
-        return Attribute::make(
-            get: function ($value) {
-                if ($value) {
-                    return storage_image($value);
-                }
-                return AvatarHelper::generateDefaultAvatar($this->user_id);
-            },
-            set: fn ($value) => $value
-        );
+        if ($value) {
+            return storage_image($value);
+        }
+        return AvatarHelper::generateDefaultAvatar($this->user_id);
     }
 
-    protected function phoneNumber(): Attribute
+    public function setAvatarAttribute($value)
     {
-        return Attribute::make(
-            set: function ($value) {
-                if ($value === null || $value === '') {
-                    return null;
-                }
-                $digits = preg_replace('/\D/', '', $value);
-                if (str_starts_with($digits, '0')) {
-                    $digits = '62'.substr($digits, 1);
-                }
+        $this->attributes['avatar'] = $value;
+    }
 
-                return $digits;
-            }
-        );
+    public function setPhoneNumberAttribute($value)
+    {
+        if ($value === null || $value === '') {
+            $this->attributes['phone_number'] = null;
+            return;
+        }
+        $digits = preg_replace('/\D/', '', $value);
+        if (str_starts_with($digits, '0')) {
+            $digits = '62'.substr($digits, 1);
+        }
+
+        $this->attributes['phone_number'] = $digits;
     }
 }

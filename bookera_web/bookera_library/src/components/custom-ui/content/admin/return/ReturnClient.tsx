@@ -1,4 +1,5 @@
 "use client";
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
@@ -16,7 +17,7 @@ export default function ReturnClient() {
   const t = useTranslations("return");
   const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState<BorrowFilterParams>({ per_page: 10 });
+  const [filters, setFilters] = useState<BorrowFilterParams>({ per_page: ITEMS_PER_PAGE_OPTIONS[1] });
   const [searchInput, setSearchInput] = useState("");
   const [pagination, setPagination] = useState({
     current_page: 1,

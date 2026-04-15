@@ -8,6 +8,7 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 
 interface Props {
   books: Book[];
@@ -24,10 +25,10 @@ export default function BookList({ books, loading }: Props) {
   const t = useTranslations("public");
   const [page, setPage] = useState(0);
   const direction = useRef(0);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(ITEMS_PER_PAGE_OPTIONS[0]);
 
   useEffect(() => {
-    const update = () => setItemsPerPage(window.innerWidth < 640 ? 2 : 5);
+    const update = () => setItemsPerPage(window.innerWidth < 640 ? 2 : ITEMS_PER_PAGE_OPTIONS[0]);
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);

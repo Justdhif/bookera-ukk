@@ -1,11 +1,12 @@
 "use client";
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { useEffect, useState } from "react";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { Publisher, PublisherFilterParams } from "@/types/publisher";
 import { publisherService } from "@/services/publisher.service";
 import PublisherTable from "./PublisherTable";
-import PublisherFormDialog from "./publisher-add/PublisherFormDialog";
-import PublisherDetailDialog from "./publisher-detail/PublisherDetailDialog";
+import PublisherFormDialog from "./PublisherFormDialog";
+import PublisherDetailDialog from "./PublisherDetailDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -26,7 +27,7 @@ export default function PublisherClient() {
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<PublisherFilterParams>({
-    per_page: 10,
+    per_page: ITEMS_PER_PAGE_OPTIONS[1],
   });
   const [searchInput, setSearchInput] = useState("");
   const [pagination, setPagination] = useState({
@@ -69,9 +70,9 @@ export default function PublisherClient() {
   const fetchPublishers = async (activeFilters: PublisherFilterParams) => {
     setLoading(true);
     try {
-      const res = await publisherService.getAll(activeFilters, true);
+      const res = await publisherService.getAll(activeFilters);
       const paginatedData = res.data.data;
-      setPublishers(paginatedData.data ?? paginatedData);
+      setPublishers(paginatedData.data ?? []);
       setPagination({
         current_page: paginatedData.current_page ?? 1,
         last_page: paginatedData.last_page ?? 1,

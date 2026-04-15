@@ -1,4 +1,3 @@
-import { useTranslations } from "next-intl";
 import { Borrow } from "@/types/borrow";
 import {
   Card,
@@ -9,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { QrCode } from "lucide-react";
 import { QrCodeImage } from "@/components/custom-ui/QrCodeImage";
+import { useTranslations } from "next-intl";
 import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
 
 interface BorrowQrCardProps {
@@ -16,26 +16,32 @@ interface BorrowQrCardProps {
 }
 
 export function BorrowQrCard({ borrow }: BorrowQrCardProps) {
-  const t = useTranslations("public");
+  const t = useTranslations("borrow");
+
   return (
     <Card className="flex flex-col">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <QrCode className="h-5 w-5" />
-          Your Borrow
+          {t("borrowQrCode")}
         </CardTitle>
-        <CardDescription>Borrow code & status</CardDescription>
+        <CardDescription>{t("borrowQrDesc")}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4 flex-1 justify-center">
         <QrCodeImage
           url={borrow.qr_code_url}
           code={borrow.borrow_code}
-          label="Borrow Code"
-          size="md"
+          label={t("borrowCode")}
+          size="lg"
         />
-        <div className="flex flex-col gap-2 w-full">
-          <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
-            <p className="text-sm font-medium">{t("status")}</p>
+        <div className="flex flex-col gap-2 items-center w-full">
+          <div className="flex items-center justify-between w-full rounded-lg border p-3 bg-muted/30">
+            <div>
+              <p className="text-sm font-medium">{t("borrowStatus")}</p>
+              <p className="text-xs text-muted-foreground">
+                {t("currentProcessingState")}
+              </p>
+            </div>
             <BorrowStatusBadge status={borrow.status} />
           </div>
         </div>

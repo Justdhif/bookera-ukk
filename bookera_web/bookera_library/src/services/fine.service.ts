@@ -59,4 +59,7 @@ export const fineService = {
     api.post<ApiResponse<Fine>>(`/admin/fines/${id}/waive`, payload),
 
   delete: (id: number) => api.delete<ApiResponse<null>>(`/admin/fines/${id}`),
+
+  getAllFineTypes: (params?: { type?: string; search?: string }) =>
+    api.get<ApiResponse<FineTypeListResponse>>("/fine-types", { params }),
 };

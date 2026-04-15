@@ -14,13 +14,11 @@ interface AuthState {
   login: (
     email: string,
     password: string,
-    recaptchaToken?: string | null,
   ) => Promise<string>;
   register: (
     email: string,
     password: string,
     password_confirmation: string,
-    recaptchaToken?: string | null,
   ) => Promise<string>;
   fetchUser: () => Promise<void>;
   logout: () => Promise<void>;
@@ -34,11 +32,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   initialLoading: true,
 
-  login: async (email, password, recaptchaToken) => {
+  login: async (email, password) => {
     try {
       set({ loading: true });
 
-      const res = await authService.login(email, password, recaptchaToken);
+      const res = await authService.login(email, password);
 
       const { token, user } = res.data.data;
 
@@ -58,7 +56,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  register: async (email, password, password_confirmation, recaptchaToken) => {
+  register: async (email, password, password_confirmation) => {
     try {
       set({ loading: true });
 
@@ -66,7 +64,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         email,
         password,
         password_confirmation,
-        recaptchaToken,
       );
 
       const { token, user } = res.data.data;

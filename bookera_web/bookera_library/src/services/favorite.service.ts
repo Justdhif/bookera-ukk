@@ -12,6 +12,8 @@ export const favoriteService = {
     page?: number;
     search?: string;
     category_id?: number;
+    rating?: number;
+    min_reviews?: number;
   }) =>
     api.get<ApiResponse<PaginatedFavoriteResponse>>("/favorites", { params }),
 

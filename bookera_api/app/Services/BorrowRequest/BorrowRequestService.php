@@ -18,7 +18,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class BorrowRequestService
 {
-    public function getAll(array $filters = []): LengthAwarePaginator
+    public function getAll(array $filters): LengthAwarePaginator
     {
         $query = BorrowRequest::with([
             'borrowRequestDetails.book',
@@ -134,7 +134,7 @@ class BorrowRequestService
         return $request;
     }
 
-    public function approve(BorrowRequest $borrowRequest): Borrow
+    public function approve(BorrowRequest $borrowRequest, array $copyIds = []): Borrow
     {
         abort_if(
             $borrowRequest->approval_status !== 'processing',
@@ -142,7 +142,12 @@ class BorrowRequestService
             'Only processing requests can be approved'
         );
 
-        $borrow = DB::transaction(function () use ($borrowRequest) {
+        $details = $borrowRequest->borrowRequestDetails;
+        if (empty($copyIds) || count($copyIds) !== $details->count()) {
+            abort(422, 'Sila berikan ID salinan buku untuk setiap buku yang diminta');
+        }
+
+        $borrow = DB::transaction(function () use ($borrowRequest, $copyIds, $details) {
             $borrowCode = $this->generateBorrowCode();
 
             $borrow = Borrow::create([
@@ -156,6 +161,31 @@ class BorrowRequestService
 
             $borrow->update(['qr_code_path' => $this->generateBorrowQrCode($borrowCode, $borrow->id)]);
 
+            foreach ($details as $index => $detail) {
+                $copy = BookCopy::where('id', $copyIds[$index])
+                    ->where('book_id', $detail->book_id)
+                    ->where('status', 'available')
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                BorrowDetail::create([
+                    'borrow_id'    => $borrow->id,
+                    'book_copy_id' => $copy->id,
+                    'status'       => 'borrowed',
+                ]);
+
+                $copy->update(['status' => 'borrowed']);
+
+                ActivityLogger::log(
+                    'update',
+                    'book_copy',
+                    "Salinan buku #{$copy->id} ({$copy->book->title}) ditetapkan dari permintaan #{$borrowRequest->id}",
+                    ['copy_id' => $copy->id, 'new_status' => 'borrowed', 'borrow_id' => $borrow->id],
+                    ['copy_id' => $copy->id, 'old_status' => 'available'],
+                    $copy
+                );
+            }
+
             $borrowRequest->update(['approval_status' => 'approved']);
 
             $borrowRequest->load(['borrowRequestDetails.book', 'user.profile']);
@@ -165,7 +195,7 @@ class BorrowRequestService
             ActivityLogger::log(
                 'update',
                 'borrow_request',
-                "Borrow request #{$borrowRequest->id} approved — borrow #{$borrow->id} created",
+                "Permintaan peminjaman #{$borrowRequest->id} disetujui — peminjaman #{$borrow->id} dibuat dengan salinan buku yang ditetapkan",
                 ['request_id' => $borrowRequest->id, 'borrow_id' => $borrow->id, 'status' => 'approved'],
                 ['request_id' => $borrowRequest->id, 'status' => 'processing'],
                 $borrowRequest
