@@ -5,12 +5,11 @@ import { borrowService } from "@/services/borrow.service";
 import { Borrow } from "@/types/borrow";
 import { useAuthStore } from "@/store/auth.store";
 import {
-  BookOpen,
-  LogIn,
   CalendarDays,
   ArrowLeft,
   ArrowRight,
   Clock,
+  LogIn,
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
@@ -104,8 +103,6 @@ export function getDayState(date: Date, borrows: Borrow[]): DayState {
   return "future";
 }
 
-
-
 function getMonday(date: Date): Date {
   const d = startOfDay(date);
   const day = d.getDay();
@@ -155,11 +152,6 @@ export default function DailyTimeline() {
   };
 
   const activeBorrows = borrows.filter((b) => b.status === "open");
-  const totalEvents = days.reduce(
-    (acc, d) => acc + getDayEvents(d, activeBorrows).length,
-    0
-  );
-
   const sunday = days[6];
   const weekLabel = (() => {
     const code = locale === "id" ? "id-ID" : "en-US";
@@ -180,13 +172,13 @@ export default function DailyTimeline() {
           </svg>
         </div>
 
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between px-5 pt-4 pb-3 border-b border-gray-100 dark:border-white/5 gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 shadow-xs">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between px-4 sm:px-5 pt-4 pb-3 border-b border-gray-100 dark:border-white/5 gap-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 shadow-xs shrink-0">
               <CalendarDays size={16} className="text-emerald-600 dark:text-emerald-400" />
             </div>
-            <div>
-              <div className="flex items-center gap-2 mb-0.5">
+            <div className="flex flex-col">
+              <div className="flex flex-wrap items-center gap-2 mb-0.5">
                 <p className="text-[11px] font-black tracking-widest text-emerald-600 dark:text-emerald-400 uppercase">
                   {t("title")}
                 </p>
@@ -201,27 +193,19 @@ export default function DailyTimeline() {
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 self-end sm:self-auto">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {!isAuthenticated && !initialLoading && (
               <Link
                 href="/login"
-                className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400/80 hover:text-emerald-500 dark:hover:text-emerald-400 border border-emerald-500/20 px-3 py-1.5 rounded-xl bg-emerald-500/5 transition-all duration-200 mr-1"
+                className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400/80 hover:text-emerald-500 dark:hover:text-emerald-400 border border-emerald-500/20 px-3 py-2 rounded-xl bg-emerald-500/5 transition-all duration-200"
               >
                 <LogIn size={11} /> Login
               </Link>
             )}
-            {isAuthenticated && (
-              <Link
-                href="/my-borrows"
-                className="flex items-center gap-1.5 text-[10px] font-semibold text-gray-500 dark:text-white/40 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors duration-200 mr-2 bg-gray-100 dark:bg-white/5 px-2.5 py-1 rounded-lg"
-              >
-                <BookOpen size={11} /> {t("active_count", { count: activeBorrows.length })}
-              </Link>
-            )}
-            <div className="flex items-center gap-1 bg-gray-100 dark:bg-white/5 p-1 rounded-xl border border-gray-200 dark:border-white/10">
+            <div className="flex items-center gap-1 bg-gray-100 dark:bg-white/5 p-1 rounded-xl border border-gray-200 dark:border-white/10 ml-auto sm:ml-0">
               <button
                 onClick={() => setWeekOffset((p) => p - 1)}
-                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-white/10 text-gray-400 dark:text-white/50 hover:text-emerald-600 dark:hover:text-white transition-all duration-200"
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-white/10 text-gray-400 dark:text-white/50 hover:text-emerald-600 dark:hover:text-white transition-all duration-200"
               >
                 <ArrowLeft size={14} />
               </button>
@@ -241,7 +225,7 @@ export default function DailyTimeline() {
               </button>
               <button
                 onClick={() => setWeekOffset((p) => p + 1)}
-                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-white/10 text-gray-400 dark:text-white/50 hover:text-emerald-600 dark:hover:text-white transition-all duration-200"
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-white/10 text-gray-400 dark:text-white/50 hover:text-emerald-600 dark:hover:text-white transition-all duration-200"
               >
                 <ArrowRight size={14} />
               </button>
@@ -249,38 +233,41 @@ export default function DailyTimeline() {
           </div>
         </div>
 
-        <div className="relative z-10 px-4 py-4">
-          <div className="grid grid-cols-7 gap-3 sm:gap-4">
-            {days.map((day, i) => (
-              <DayBubble
-                key={i}
-                date={day}
-                borrows={activeBorrows}
-                onClick={() => handleDayClick(day)}
-                isSelected={selectedDate ? isSameDay(day, selectedDate) : false}
-                locale={locale}
-                todayLabel={t("today_label")}
-              />
-            ))}
+        <div className="relative z-10 overflow-x-auto scrollbar-hide">
+          <div className="px-4 py-6 min-w-[500px]">
+            <div className="grid grid-cols-7 gap-3 sm:gap-4">
+              {days.map((day, i) => (
+                <DayBubble
+                  key={i}
+                  date={day}
+                  borrows={activeBorrows}
+                  onClick={() => handleDayClick(day)}
+                  isSelected={selectedDate ? isSameDay(day, selectedDate) : false}
+                  locale={locale}
+                  todayLabel={t("today_label")}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="relative z-10 px-5 pb-4">
-          <div className="flex flex-wrap items-center gap-5 text-[10px] text-gray-400 dark:text-white/40 font-bold uppercase tracking-wider">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 shadow-sm" />
+        <div className="relative z-10 px-5 pb-5 mt-[-8px]">
+          <div className="flex flex-wrap items-center gap-y-3 gap-x-6 text-[10px] text-gray-400 dark:text-white/40 font-bold uppercase tracking-wider">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
               <span>{t("start_borrow")}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 shadow-sm" />
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
               <span>{t("deadline")}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-500/80 shadow-sm" />
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-500/80 shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
               <span>{t("in_progress")}</span>
             </div>
           </div>
         </div>
+
       </div>
 
       <TimelineDayDialog

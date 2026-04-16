@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Carbon\Carbon;
 
 class BorrowRequestService
 {
@@ -49,11 +50,32 @@ class BorrowRequestService
 
     public function create(array $data, User $user): BorrowRequest
     {
+        // Check for active borrows
+        $hasActiveBorrow = Borrow::where('user_id', $user->id)
+            ->where('status', 'open')
+            ->exists();
+
+        if ($hasActiveBorrow) {
+            abort(422, 'Anda masih memiliki peminjaman aktif yang belum dikembalikan.');
+        }
+
+        // Check for pending/approved requests
+        $hasPendingRequest = BorrowRequest::where('user_id', $user->id)
+            ->whereIn('approval_status', ['processing', 'approved'])
+            ->exists();
+
+        if ($hasPendingRequest) {
+            abort(422, 'Anda memiliki permintaan peminjaman yang sedang diproses atau sudah disetujui.');
+        }
+
         $request = DB::transaction(function () use ($data, $user) {
+            $borrowDate = Carbon::parse($data['borrow_date']);
+            $returnDate = $borrowDate->copy()->addDays(5);
+
             $request = BorrowRequest::create([
                 'user_id'         => $user->id,
-                'borrow_date'     => $data['borrow_date'],
-                'return_date'     => $data['return_date'],
+                'borrow_date'     => $borrowDate->toDateString(),
+                'return_date'     => $returnDate->toDateString(),
                 'approval_status' => 'processing',
             ]);
 

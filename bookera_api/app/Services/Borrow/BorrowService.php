@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Carbon\Carbon;
 
 class BorrowService
 {
@@ -55,14 +56,25 @@ class BorrowService
 
     public function create(array $data, User $user): Borrow
     {
+        // Check for active borrows
+        $hasActiveBorrow = Borrow::where('user_id', $user->id)
+            ->where('status', 'open')
+            ->exists();
+
+        if ($hasActiveBorrow) {
+            abort(422, 'User masih memiliki peminjaman aktif yang belum dikembalikan.');
+        }
+
         $borrow = DB::transaction(function () use ($data, $user) {
             $borrowCode = $this->generateBorrowCode();
+            $borrowDate = now();
+            $returnDate = $borrowDate->copy()->addDays(5);
 
             $borrow = Borrow::create([
                 'user_id'     => $user->id,
                 'borrow_code' => $borrowCode,
-                'borrow_date' => now(),
-                'return_date' => $data['return_date'],
+                'borrow_date' => $borrowDate->toDateString(),
+                'return_date' => $returnDate->toDateString(),
                 'status'      => 'open',
             ]);
 
@@ -117,14 +129,25 @@ class BorrowService
 
     public function createAdmin(array $data, User $admin): Borrow
     {
+        // Check for active borrows for the target user
+        $hasActiveBorrow = Borrow::where('user_id', $data['user_id'])
+            ->where('status', 'open')
+            ->exists();
+
+        if ($hasActiveBorrow) {
+            abort(422, 'User tersebut masih memiliki peminjaman aktif yang belum dikembalikan.');
+        }
+
         $borrow = DB::transaction(function () use ($data, $admin) {
             $borrowCode = $this->generateBorrowCode();
+            $borrowDate = isset($data['borrow_date']) ? Carbon::parse($data['borrow_date']) : now();
+            $returnDate = $borrowDate->copy()->addDays(5);
 
             $borrow = Borrow::create([
                 'user_id'     => $data['user_id'],
                 'borrow_code' => $borrowCode,
-                'borrow_date' => $data['borrow_date'] ?? now()->toDateString(),
-                'return_date' => $data['return_date'],
+                'borrow_date' => $borrowDate->toDateString(),
+                'return_date' => $returnDate->toDateString(),
                 'status'      => 'open',
             ]);
 

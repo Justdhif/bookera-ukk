@@ -15,7 +15,9 @@ use App\Services\BookReturn\BookReturnNotificationService;
 use App\Services\LostBook\LostBookService;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+
 
 class BookReturnService
 {
@@ -91,6 +93,8 @@ class BookReturnService
                         $this->autoCreateDamagedFine($borrow, $bookCopy);
                     }
 
+                    $this->autoCreateLateFine($borrow, $bookCopy);
+
                     ActivityLogger::log(
                         'update',
                         'book_return_detail',
@@ -147,7 +151,7 @@ class BookReturnService
                 $oldCondition = $detail->condition;
                 $detail->update(['condition' => $condition]);
 
-                if ($condition === 'damaged' && $oldCondition !== 'damaged') {
+                if ($condition === 'damaged') {
                     $this->autoCreateDamagedFine($borrow, $detail->bookCopy);
                 }
 
@@ -201,6 +205,56 @@ class BookReturnService
 
         $fine->load('fineType', 'borrow.user', 'borrow.borrowDetails.bookCopy.book');
     }
+
+    private function autoCreateLateFine(Borrow $borrow, BookCopy $bookCopy): void
+    {
+        if (! $borrow->return_date) {
+            return;
+        }
+
+        $expectedReturnDate = Carbon::parse($borrow->return_date)->startOfDay();
+        $actualReturnDate = now()->startOfDay();
+
+        if (! $actualReturnDate->greaterThan($expectedReturnDate)) {
+            return;
+        }
+
+        $daysLate = (int) $actualReturnDate->diffInDays($expectedReturnDate);
+
+        $lateFineType = FineType::where('type', 'late')->first();
+        if (! $lateFineType || $daysLate <= 0) {
+            return;
+        }
+
+        $totalAmount = $lateFineType->amount * $daysLate;
+        $fineNotes = 'Denda keterlambatan (' . $daysLate . ' hari): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
+
+        $existingFine = $borrow->fines()
+            ->where('notes', $fineNotes)
+            ->first();
+
+        if ($existingFine) {
+            return;
+        }
+
+        $fine = Fine::create([
+            'borrow_id'    => $borrow->id,
+            'fine_type_id' => $lateFineType->id,
+            'amount'       => $totalAmount,
+            'status'       => 'unpaid',
+            'notes'        => $fineNotes,
+        ]);
+
+        ActivityLogger::log(
+            'create',
+            'fine',
+            "Fine auto-created for late return in borrow #{$borrow->id}",
+            ['fine_id' => $fine->id, 'amount' => $fine->amount, 'days_late' => $daysLate, 'book_copy_id' => $bookCopy->id],
+            null,
+            $fine
+        );
+    }
+
 
     public function finishFines(BookReturn $bookReturn): array
     {

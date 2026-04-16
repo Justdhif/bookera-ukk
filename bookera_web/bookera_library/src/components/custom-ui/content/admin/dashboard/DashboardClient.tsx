@@ -8,9 +8,6 @@ import {
 } from "@/types/dashboard";
 import DashboardCards from "./DashboardCards";
 import BorrowMonthlyChart from "./BorrowMonthlyChart";
-import LoginRegisterTrendChart from "./LoginRegisterTrendChart";
-import BorrowStatusChart from "./BorrowStatusChart";
-import BorrowComparisonChart from "./BorrowComparisonChart";
 import BorrowCalendar from "./BorrowCalendar";
 import { toast } from "sonner";
 import DataLoading from "@/components/custom-ui/DataLoading";
@@ -56,17 +53,14 @@ export default function DashboardClient() {
         isAdmin
       />
 
-      {loading ? <DataLoading size="lg" className="border-none bg-transparent shadow-none" /> : <DashboardCards data={totals!} />}
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <BorrowStatusChart />
-        <BorrowComparisonChart />
-      </div>
+      {loading ? (
+        <DataLoading size="lg" className="border-none bg-transparent shadow-none" />
+      ) : (
+        <DashboardCards data={totals!} />
+      )}
 
       <BorrowMonthlyChart />
       <BorrowCalendar />
-
-      <LoginRegisterTrendChart />
     </div>
   );
 }

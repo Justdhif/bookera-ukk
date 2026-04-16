@@ -15,17 +15,6 @@ export interface BorrowMonthly {
   close_borrows: number;
 }
 
-export interface LoginRegisterTrend {
-  month: number;
-  login_count: number;
-  register_count: number;
-}
-
-export interface BorrowStatus {
-  status: string;
-  total: number;
-}
-
 export interface CalendarDay {
   date: number;
   open_borrows: number;
@@ -52,12 +41,6 @@ export interface DayDetail {
   borrows: DayDetailBorrow[];
 }
 
-export interface BorrowComparison {
-  month: number;
-  total_borrows: number;
-  total_requests: number;
-}
-
 export interface LatestBorrow {
   id: number;
   user?: {
@@ -76,3 +59,4 @@ export interface LatestBorrow {
     };
   }>;
 }
+

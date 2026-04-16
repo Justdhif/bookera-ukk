@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { toast } from "sonner";
 import { borrowRequestService } from "@/services/borrow-request.service";
 import { publicService } from "@/services/public.service";
@@ -70,8 +70,6 @@ export default function BorrowRequestDialog({
     uniqueBookIds.length === 0 ||
     selectedBooks.length < uniqueBookIds.length ||
     !borrowDate ||
-    !returnDate ||
-    returnDate <= borrowDate ||
     selectedBooks.some((book) => (book.available_copies ?? 0) === 0);
 
   useEffect(() => {
@@ -135,6 +133,14 @@ export default function BorrowRequestDialog({
       cancelled = true;
     };
   }, [uniqueBookIds, initialBooks, isOpen]);
+
+  useEffect(() => {
+    if (borrowDate) {
+      setReturnDate(addDays(borrowDate, 5));
+    } else {
+      setReturnDate(undefined);
+    }
+  }, [borrowDate]);
 
   const handleSubmit = async () => {
     if (!isAuthenticated) {
@@ -304,15 +310,12 @@ export default function BorrowRequestDialog({
             </div>
 
             <div className="space-y-2">
-              <Label variant="required">{t("returnDateLabel")}</Label>
-              <DatePicker
-                value={returnDate}
-                onChange={setReturnDate}
-                placeholder={t("selectReturnDate")}
-                dateMode="future"
-              />
-              <p className="text-xs text-muted-foreground">
-                {t("returnDateMustBeAfter")}
+              <Label>{t("returnDateLabel")}</Label>
+              <div className="flex h-10 w-full rounded-2xl border border-border bg-muted/30 px-3 py-2 text-sm items-center text-muted-foreground cursor-not-allowed">
+                {returnDate ? format(returnDate, "PPP") : t("selectBorrowDateFirst")}
+              </div>
+              <p className="text-[10px] text-primary/80 font-medium px-1">
+                {t("autoReturnDateInfo") || "* Otomatis diset 5 hari dari tanggal pinjam"}
               </p>
             </div>
           </div>

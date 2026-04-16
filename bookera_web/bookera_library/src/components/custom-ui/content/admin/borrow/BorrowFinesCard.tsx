@@ -85,6 +85,11 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
                   <p className="text-2xl font-black tracking-tight text-foreground">
                     {formatCurrency(fine.amount)}
                   </p>
+                  {fine.notes && (
+                    <p className="text-sm font-medium text-muted-foreground/80 mt-1 max-w-md">
+                      {fine.notes}
+                    </p>
+                  )}
                 </div>
               </div>
 

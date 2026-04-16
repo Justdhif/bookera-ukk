@@ -82,29 +82,29 @@ export function DayBubble({ date, borrows, onClick, isSelected, locale, todayLab
   return (
     <button
       onClick={onClick}
-      className={`relative flex flex-col justify-between items-center w-full aspect-square py-2.5 px-1 rounded-xl cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-md dark:hover:shadow-none active:scale-95 overflow-hidden ${outerClass} ${ringClass}`}
+      className={`relative flex flex-col justify-between items-center w-full aspect-square py-2.5 px-1 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-md dark:hover:shadow-none active:scale-95 overflow-hidden ${outerClass} ${ringClass}`}
     >
       {isToday && (
-        <div className="absolute left-[8px] inset-y-0 w-0 flex items-center justify-center pointer-events-none">
-          <span className="rotate-90 text-[10px] font-black uppercase text-gray-400/10 dark:text-white/15 whitespace-nowrap tracking-[1em] select-none leading-none">
+        <div className="absolute left-[6px] sm:left-[8px] inset-y-0 w-0 flex items-center justify-center pointer-events-none">
+          <span className="rotate-90 text-[8px] sm:text-[9px] font-black uppercase text-gray-400/20 dark:text-emerald-400/20 whitespace-nowrap tracking-[1em] select-none leading-none">
             {todayLabel}
           </span>
         </div>
       )}
       
-      <span className={`text-[10px] font-bold uppercase tracking-wider leading-none relative z-10 ${dayTextColor}`}>
+      <span className={`text-[8px] sm:text-[10px] font-bold uppercase tracking-wider leading-none relative z-10 ${dayTextColor}`}>
         {dayName(date, locale)}
       </span>
 
-      <div className="relative flex items-center justify-center">
+      <div className="flex items-center justify-center absolute top-1.5 left-1.5 sm:relative sm:top-0 sm:left-0">
         {isToday && (
-          <span className="absolute w-6 h-6 rounded-full bg-gray-200 dark:bg-white/10 animate-pulse" />
+          <span className="absolute w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-gray-200 dark:bg-white/10 animate-pulse" />
         )}
-        <div className={`w-3.5 h-3.5 rounded-full ${dotColor} ${state === "deadline" ? "animate-pulse" : ""}`} />
+        <div className={`w-2 h-2 sm:w-3.5 sm:h-3.5 rounded-full ${dotColor} ${state === "deadline" ? "animate-pulse" : ""}`} />
       </div>
 
       <div className="flex flex-col items-center gap-px">
-        <span className={`text-[13px] tabular-nums leading-none ${dateTextColor}`}>
+        <span className={`text-[12px] sm:text-[13px] tabular-nums leading-none ${dateTextColor}`}>
           {date.getDate()}
         </span>
         {events.length > 0 && (

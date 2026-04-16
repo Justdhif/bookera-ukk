@@ -42,27 +42,11 @@ class BorrowSeeder extends Seeder
                     break;
                 }
 
-                if ($i === 0) {
-                    $status = 'open';
-                } elseif ($i === 1 && $count > 1) {
-                    $status = 'close';
-                } elseif ($i === 2 && $count > 2) {
-                    $status = 'open';
-                } else {
-                    $status = rand(0, 1) ? 'close' : 'open';
-                }
+                $status = ($i === 0) ? 'open' : 'close';
 
                 if ($status === 'open') {
-                    if ($i === 0) {
-                        $returnDate = Carbon::create(date('Y'), 4, 15);
-                        $borrowDate = Carbon::create(date('Y'), 4, rand(1, 14));
-                    } elseif ($i === 2 && $count > 2) {
-                        $borrowDate = Carbon::create(date('Y'), 4, 15);
-                        $returnDate = (clone $borrowDate)->addDays(7); 
-                    } else {
-                        $borrowDate = Carbon::create(date('Y'), 4, rand(1, 20));
-                        $returnDate = (clone $borrowDate)->addDays(7); 
-                    }
+                    $returnDate = Carbon::create(date('Y'), 4, 15);
+                    $borrowDate = Carbon::create(date('Y'), 4, rand(1, 14));
                 } else {
                     $borrowDate = Carbon::now()->subDays(rand(5, 40));
                     $returnDate = (clone $borrowDate)->addDays(7); 

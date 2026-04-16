@@ -135,81 +135,104 @@ export function BorrowBooksCard({
               const isProcessed = Boolean(returnDetail || lostDetail);
               const canEditStatus = borrow.status === "open" && !isProcessed;
               
-              const state = returnStates[detail.id];
-              const damagedFine = getFineAmount("damaged");
-              const lostFine = getFineAmount("lost");
+                const state = returnStates[detail.id];
+                const damagedFine = getFineAmount("damaged");
+                const lostFine = getFineAmount("lost");
+                const lateFineAmount = fineTypes.find((ft) => ft.type === "late")?.amount || 0;
 
-              return (
-                <div
-                  key={detail.id}
-                    className={`p-6 transition-colors ${
-                    !isProcessed ? "hover:bg-muted/5" : "bg-muted/10 opacity-75"
-                  }`}
-                >
-                  <div className="flex flex-col md:flex-row md:items-start gap-6">
-                    <div className="flex-1 flex gap-5">
-                      <div className="relative group shrink-0">
-                        <div className="w-24 h-36 rounded-xl overflow-hidden shadow-lg border border-primary/20 bg-muted">
-                          <img
-                            src={detail.book_copy?.book?.cover_image || "/placeholder-book.png"}
-                            alt={detail.book_copy?.book?.title}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                            onError={(e) => (e.currentTarget.src = "https://picsum.photos/seed/book/200/300")}
-                          />
-                        </div>
-                        <Badge className="absolute -top-2 -right-2 shadow-md px-2 py-0.5 bg-background text-foreground border-2">
-                          #{detail.book_copy?.copy_code}
-                        </Badge>
-                      </div>
+                const getDaysLate = () => {
+                  if (!borrow.return_date) return 0;
+                  const expected = new Date(borrow.return_date);
+                  expected.setHours(0, 0, 0, 0);
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  if (today <= expected) return 0;
+                  return Math.ceil((today.getTime() - expected.getTime()) / (1000 * 60 * 60 * 24));
+                };
+                const daysLate = getDaysLate();
+                const totalLateFine = daysLate * lateFineAmount;
 
-                      <div className="flex-1 space-y-3">
-                        <div className="space-y-1">
-                          <h4 className="font-black text-xl leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                            {detail.book_copy?.book?.title || "Unknown"}
-                          </h4>
-                          <div className="flex flex-wrap items-center gap-2 text-sm">
-                            <span className="text-muted-foreground font-medium">{tCommon("from")}</span>
-                            <span className="text-foreground font-bold underline decoration-primary/30 decoration-2 underline-offset-4">
-                              {detail.book_copy?.book?.author || tCommon("noAuthors")}
-                            </span>
-                            <span className="text-muted-foreground">•</span>
-                            <span className="text-muted-foreground italic">
-                              {detail.book_copy?.book?.publisher || "Standard Edition"}
-                            </span>
+                return (
+                  <div
+                    key={detail.id}
+                      className={`p-6 transition-colors ${
+                      !isProcessed ? "hover:bg-muted/5" : "bg-muted/10 opacity-75"
+                    }`}
+                  >
+                    <div className="flex flex-col md:flex-row md:items-start gap-6">
+                      <div className="flex-1 flex gap-5">
+                        <div className="relative group shrink-0">
+                          <div className="w-24 h-36 rounded-xl overflow-hidden shadow-lg border border-primary/20 bg-muted">
+                            <img
+                              src={detail.book_copy?.book?.cover_image || "/placeholder-book.png"}
+                              alt={detail.book_copy?.book?.title}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                              onError={(e) => (e.currentTarget.src = "https://picsum.photos/seed/book/200/300")}
+                            />
                           </div>
+                          <Badge className="absolute -top-2 -right-2 shadow-md px-2 py-0.5 bg-background text-foreground border-2">
+                            #{detail.book_copy?.copy_code}
+                          </Badge>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                          <BorrowDetailStatusBadge status={detail.status} />
-                          {detail.book_copy?.book?.categories && detail.book_copy.book.categories.length > 0 && (
-                            <div className="flex gap-1.5 overflow-hidden">
-                              {detail.book_copy.book.categories.slice(0, 2).map((cat: any) => (
-                                <Badge key={cat.id} variant="secondary" className="text-[10px] uppercase font-bold tracking-tight py-0">
-                                  {cat.name}
-                                </Badge>
-                              ))}
+                        <div className="flex-1 space-y-3">
+                          <div className="space-y-1">
+                            <h4 className="font-black text-xl leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                              {detail.book_copy?.book?.title || "Unknown"}
+                            </h4>
+                            <div className="flex flex-wrap items-center gap-2 text-sm">
+                              <span className="text-muted-foreground font-medium">{tCommon("from")}</span>
+                              <span className="text-foreground font-bold underline decoration-primary/30 decoration-2 underline-offset-4">
+                                {detail.book_copy?.book?.author || tCommon("noAuthors")}
+                              </span>
+                              <span className="text-muted-foreground">•</span>
+                              <span className="text-muted-foreground italic">
+                                {detail.book_copy?.book?.publisher || "Standard Edition"}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <BorrowDetailStatusBadge status={detail.status} />
+                            {detail.book_copy?.book?.categories && detail.book_copy.book.categories.length > 0 && (
+                              <div className="flex gap-1.5 overflow-hidden">
+                                {detail.book_copy.book.categories.slice(0, 2).map((cat: any) => (
+                                  <Badge key={cat.id} variant="secondary" className="text-[10px] uppercase font-bold tracking-tight py-0">
+                                    {cat.name}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          {detail.note && (
+                            <div className="flex items-start gap-2.5 text-xs text-destructive bg-destructive/5 p-3 rounded-xl border border-destructive/20 max-w-sm">
+                              <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                              <p className="font-semibold italic leading-relaxed">
+                                {tCommon("note")}: {detail.note}
+                              </p>
                             </div>
                           )}
-                        </div>
 
-                        {detail.note && (
-                          <div className="flex items-start gap-2.5 text-xs text-destructive bg-destructive/5 p-3 rounded-xl border border-destructive/20 max-w-sm">
-                            <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                            <p className="font-semibold italic leading-relaxed">
-                              {tCommon("note")}: {detail.note}
-                            </p>
-                          </div>
-                        )}
-
-                        {canEditStatus && state?.status === "returned" && state?.condition === "damaged" && (
-                          <div className="flex items-center gap-2 p-3 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-lg border border-amber-500/20 max-w-sm animate-in fade-in slide-in-from-top-1">
-                            <AlertCircle className="h-4 w-4 shrink-0" />
-                            <div className="text-sm">
-                              <span className="font-semibold uppercase text-[10px] tracking-wider block mb-0.5">{t("fineInfo")}</span>
-                              <span className="font-black text-lg">{formatCurrency(damagedFine || 0)}</span>
+                          {canEditStatus && state?.status === "returned" && state?.condition === "damaged" && (
+                            <div className="flex items-center gap-2 p-3 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-lg border border-amber-500/20 max-w-sm animate-in fade-in slide-in-from-top-1">
+                              <AlertCircle className="h-4 w-4 shrink-0" />
+                              <div className="text-sm">
+                                <span className="font-semibold uppercase text-[10px] tracking-wider block mb-0.5">{t("fineInfo")}</span>
+                                <span className="font-black text-lg">{formatCurrency(damagedFine || 0)}</span>
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
+
+                          {canEditStatus && state?.status === "returned" && daysLate > 0 && (
+                            <div className="flex items-center gap-2 p-3 bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-lg border border-rose-500/20 max-w-sm animate-in fade-in slide-in-from-top-1">
+                              <Clock className="h-4 w-4 shrink-0" />
+                              <div className="text-sm">
+                                <span className="font-semibold uppercase text-[10px] tracking-wider block mb-0.5">{t("lateFineInfo", { days: daysLate })}</span>
+                                <span className="font-black text-lg">{formatCurrency(totalLateFine)}</span>
+                              </div>
+                            </div>
+                          )}
 
                         {canEditStatus && state?.status === "lost" && (
                           <div className="flex items-center gap-2 p-3 bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-lg border border-rose-500/20 max-w-sm animate-in fade-in slide-in-from-top-1">
