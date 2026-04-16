@@ -306,12 +306,12 @@ class BorrowService
             );
 
             if ($hasUnprocessedBooks) {
-                throw new \Exception('Masih ada buku yang belum diproses status pengembalian atau ilangnya');
+                throw new \Exception('There are still books whose return or lost status has not been processed');
             }
 
             $hasUnpaidFines = $borrow->fines()->where('status', 'unpaid')->exists();
             if ($hasUnpaidFines) {
-                throw new \Exception('Masih ada denda yang belum dibayar');
+                throw new \Exception('There are still unpaid fines');
             }
 
             // Clean up lost book records if the admin eventually marked them as returned

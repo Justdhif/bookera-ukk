@@ -2,6 +2,7 @@
 
 import BannerCarousel from "./BannerCarousel";
 import SpeakerMarquee from "./SpeakerMarquee";
+import DailyTimeline from "./DailyTimeline";
 import PublicBookGrid from "@/components/custom-ui/content/book/PublicBookGrid";
 
 export default function PublicPageClient() {
@@ -15,6 +16,7 @@ export default function PublicPageClient() {
       </div>
 
       <div className="container mx-auto px-4 space-y-6">
+        <DailyTimeline />
         <div className="space-y-10">
           <PublicBookGrid showBorrowActions={false} />
         </div>

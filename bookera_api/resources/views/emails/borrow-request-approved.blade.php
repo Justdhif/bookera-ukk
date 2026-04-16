@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="{{ app()->getLocale() }}" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Borrow Request Approved – Bookera</title>
+  <title>{{ __('Borrow Request Approved') }} – Bookera</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f0fdf4;font-family:'Segoe UI',Arial,sans-serif;">
 
@@ -35,8 +35,8 @@
               </tr>
               <tr>
                 <td align="center">
-                  <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:700;letter-spacing:-0.3px;">Request Approved!</h1>
-                  <p style="color:rgba(255,255,255,0.88);margin:8px 0 0;font-size:14px;">Your borrow request has been approved by the library</p>
+                  <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:700;letter-spacing:-0.3px;">{{ __('Request Approved!') }}</h1>
+                  <p style="color:rgba(255,255,255,0.88);margin:8px 0 0;font-size:14px;">{{ __('Your borrow request has been approved by the library') }}</p>
                 </td>
               </tr>
             </table>
@@ -47,20 +47,20 @@
         <tr>
           <td style="padding:36px 40px 0;">
             <p style="color:#374151;font-size:15px;line-height:1.7;margin:0 0 8px;">
-              Hello, <strong style="color:#111827;">{{ $borrowRequest->user->profile->full_name ?? $borrowRequest->user->email }}</strong>
+              {{ __('Hello,') }} <strong style="color:#111827;">{{ $borrowRequest->user->profile->full_name ?? $borrowRequest->user->email }}</strong>
             </p>
             <p style="color:#6b7280;font-size:14px;line-height:1.7;margin:0 0 28px;">
-              Great news! Your borrow request <strong style="color:#111827;">#{{ $borrowRequest->id }}</strong> has been approved.
-              Please pick up your books at the library on your selected borrow date.
+              {{ __('Great news! Your borrow request :id has been approved.', ['id' => '#'.$borrowRequest->id]) }}
+              {{ __('Please pick up your books at the library on your selected borrow date.') }}
             </p>
 
             <!-- Borrow Code Box -->
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:2px dashed #10b981;border-radius:12px;background:#f0fdf4;margin-bottom:28px;">
               <tr>
                 <td style="padding:20px 24px;text-align:center;">
-                  <p style="color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin:0 0 8px;">Borrow Code</p>
+                  <p style="color:#6b7280;font-size:11px;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin:0 0 8px;">{{ __('Borrow Code') }}</p>
                   <p style="color:#047857;font-size:28px;font-weight:800;letter-spacing:6px;margin:0;font-family:'Courier New',Courier,monospace;">{{ $borrow->borrow_code }}</p>
-                  <p style="color:#6b7280;font-size:12px;margin:8px 0 0;">Show this code to library staff when picking up your books</p>
+                  <p style="color:#6b7280;font-size:12px;margin:8px 0 0;">{{ __('Show this code to library staff when picking up your books') }}</p>
                 </td>
               </tr>
             </table>
@@ -71,7 +71,7 @@
                 <td style="padding:14px 20px;border-bottom:1px solid #e5e7eb;">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                      <td style="color:#6b7280;font-size:13px;">Borrow Date</td>
+                      <td style="color:#6b7280;font-size:13px;">{{ __('Borrow Date') }}</td>
                       <td style="color:#111827;font-size:13px;font-weight:600;text-align:right;">{{ \Carbon\Carbon::parse($borrowRequest->borrow_date)->format('d M Y') }}</td>
                     </tr>
                   </table>
@@ -81,7 +81,7 @@
                 <td style="padding:14px 20px;">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                      <td style="color:#6b7280;font-size:13px;">Return Date</td>
+                      <td style="color:#6b7280;font-size:13px;">{{ __('Return Date') }}</td>
                       <td style="color:#111827;font-size:13px;font-weight:600;text-align:right;">{{ \Carbon\Carbon::parse($borrowRequest->return_date)->format('d M Y') }}</td>
                     </tr>
                   </table>
@@ -90,7 +90,7 @@
             </table>
 
             <!-- Book List -->
-            <p style="color:#111827;font-size:14px;font-weight:600;margin:0 0 12px;">Requested Books</p>
+            <p style="color:#111827;font-size:14px;font-weight:600;margin:0 0 12px;">{{ __('Requested Books') }}</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
               @foreach($borrowRequest->borrowRequestDetails as $detail)
               <tr>
@@ -98,7 +98,7 @@
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f0fdf4;border-left:3px solid #10b981;border-radius:0 6px 6px 0;">
                     <tr>
                       <td style="padding:10px 14px;">
-                        <span style="color:#065f46;font-size:13px;font-weight:500;">{{ $detail->book->title ?? 'Unknown' }}</span>
+                        <span style="color:#065f46;font-size:13px;font-weight:500;">{{ $detail->book->title ?? __('Unknown') }}</span>
                         @if($detail->book->author ?? null)
                         <br><span style="color:#6b7280;font-size:12px;">{{ $detail->book->author }}</span>
                         @endif
@@ -120,9 +120,8 @@
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:10px;border:1px solid #a7f3d0;">
               <tr>
                 <td style="padding:16px 20px;">
-                  <p style="color:#065f46;font-size:13px;line-height:1.6;margin:0;">
-                    <strong>Reminder:</strong> Please arrive at the library on <strong>{{ \Carbon\Carbon::parse($borrowRequest->borrow_date)->format('d M Y') }}</strong>
-                    to collect your books. Late pick-up may result in automatic cancellation.
+                    <p style="color:#065f46;font-size:13px;line-height:1.6;margin:0;">
+                    <strong>{{ __('Reminder:') }}</strong> {{ __('Please arrive at the library on :date to collect your books. Late pick-up may result in automatic cancellation.', ['date' => \Carbon\Carbon::parse($borrowRequest->borrow_date)->format('d M Y')]) }}
                   </p>
                 </td>
               </tr>
@@ -141,10 +140,10 @@
         <tr>
           <td style="padding:24px 40px;text-align:center;background:#f9fafb;">
             <p style="color:#9ca3af;font-size:12px;margin:0 0 4px;">
-              &copy; {{ date('Y') }} Bookera Library Management System. All rights reserved.
+              &copy; {{ date('Y') }} Bookera Library Management System. {{ __('All rights reserved.') }}
             </p>
             <p style="color:#d1d5db;font-size:11px;margin:0;">
-              This is an automated message — please do not reply to this email.
+              {{ __('This is an automated message — please do not reply to this email.') }}
             </p>
           </td>
         </tr>

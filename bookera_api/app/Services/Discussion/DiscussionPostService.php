@@ -116,7 +116,7 @@ class DiscussionPostService
             ActivityLogger::log(
                 'create',
                 'Discussion',
-                'Berhasil membuat postingan diskusi',
+                'Post created successfully',
                 null,
                 null,
                 $post
@@ -158,7 +158,7 @@ class DiscussionPostService
             ActivityLogger::log(
                 'update',
                 'Discussion',
-                "Berhasil memperbarui postingan diskusi dengan id {$post->id}",
+                "Post #{$post->id} updated successfully",
                 null,
                 null,
                 $post
@@ -185,7 +185,7 @@ class DiscussionPostService
             ActivityLogger::log(
                 'delete',
                 'Discussion',
-                "Berhasil menghapus postingan diskusi dengan id {$oldData['id']}",
+                "Post #{$oldData['id']} deleted successfully",
                 null,
                 $oldData,
                 null

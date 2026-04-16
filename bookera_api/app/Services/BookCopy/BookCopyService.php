@@ -28,7 +28,7 @@ class BookCopyService
     public function delete(BookCopy $bookCopy): array
     {
         if ($bookCopy->status !== 'available') {
-            throw new \Exception('Salinan buku sedang dipinjam dan tidak dapat dihapus');
+            throw new \Exception('This book copy is currently borrowed and cannot be deleted');
         }
 
         $deletedCopyId = $bookCopy->id;

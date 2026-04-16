@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prependToGroup('api', \App\Http\Middleware\SetLocale::class);
+        $middleware->prependToGroup('web', \App\Http\Middleware\SetLocale::class);
+
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'auth' => \Illuminate\Auth\Middleware\Authenticate::class,

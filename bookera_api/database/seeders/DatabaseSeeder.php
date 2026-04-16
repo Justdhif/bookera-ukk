@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             ActivityLogSeeder::class,
             BookReviewSeeder::class,
             FineTypeSeeder::class,
+            BorrowSeeder::class,
         ]);
 
         Schema::enableForeignKeyConstraints();

@@ -35,7 +35,7 @@ class FollowService
         $model = User::findOrFail($id);
 
         if ($model->id === Auth::id()) {
-            throw new \Exception('Kamu tidak bisa mengikuti dirimu sendiri.', 422);
+            throw new \Exception(__('You cannot follow yourself.'), 422);
         }
 
         $follow = Follow::firstOrCreate([
@@ -50,8 +50,8 @@ class FollowService
 
             Notification::create([
                 'user_id' => $model->id,
-                'title'   => 'Pengikut baru',
-                'message' => "{$actorName} mulai mengikutimu.",
+                'title'   => __('New follower'),
+                'message' => __(':name started following you.', ['name' => $actorName]),
                 'type'    => 'new_follower',
                 'module'  => 'discussion',
                 'data'    => ['actor_id' => Auth::id()],

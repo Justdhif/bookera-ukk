@@ -31,14 +31,14 @@ class BorrowRequestController extends Controller
 
         $requests = $this->borrowRequestService->getAll($filters);
 
-        return ApiResponse::successResponse('Data permintaan peminjaman berhasil diambil', $requests);
+        return ApiResponse::successResponse('Borrow request data retrieved successfully', $requests);
     }
 
     public function show(BorrowRequest $borrowRequest): JsonResponse
     {
         $borrowRequest = $this->borrowRequestService->getById($borrowRequest);
 
-        return ApiResponse::successResponse('Detail permintaan peminjaman', $borrowRequest);
+        return ApiResponse::successResponse('Borrow request details', $borrowRequest);
     }
 
     public function assignBorrow(Request $request, BorrowRequest $borrowRequest): JsonResponse
@@ -46,8 +46,7 @@ class BorrowRequestController extends Controller
         $copyIds = $request->input('copy_ids', []);
         $borrow  = $this->borrowRequestService->assignBorrow($borrowRequest, $copyIds);
 
-        return ApiResponse::successResponse(
-            'Peminjaman berhasil dibuat dari permintaan',
+        return ApiResponse::successResponse('Borrow created from request successfully',
             $borrow,
             201
         );
@@ -58,7 +57,7 @@ class BorrowRequestController extends Controller
         $copyIds = $request->input('copy_ids', []);
         $borrow  = $this->borrowRequestService->approve($borrowRequest, $copyIds);
 
-        return ApiResponse::successResponse('Permintaan peminjaman berhasil disetujui', $borrow, 201);
+        return ApiResponse::successResponse('Borrow request approved successfully', $borrow, 201);
     }
 
     public function reject(Request $request, BorrowRequest $borrowRequest): JsonResponse
@@ -66,14 +65,14 @@ class BorrowRequestController extends Controller
         $rejectReason  = $request->input('reject_reason');
         $borrowRequest = $this->borrowRequestService->reject($borrowRequest, $rejectReason);
 
-        return ApiResponse::successResponse('Permintaan peminjaman berhasil ditolak', $borrowRequest);
+        return ApiResponse::successResponse('Borrow request rejected successfully', $borrowRequest);
     }
 
     public function destroy(BorrowRequest $borrowRequest): JsonResponse
     {
         $this->borrowRequestService->delete($borrowRequest);
 
-        return ApiResponse::successResponse('Permintaan peminjaman berhasil dihapus');
+        return ApiResponse::successResponse('Borrow request deleted successfully');
     }
 
     // ─── User ─────────────────────────────────────────────────────────────────
@@ -85,8 +84,7 @@ class BorrowRequestController extends Controller
             $request->user()
         );
 
-        return ApiResponse::successResponse(
-            'Permintaan peminjaman berhasil dibuat',
+        return ApiResponse::successResponse('Borrow request created successfully',
             $borrowRequest,
             201
         );
@@ -96,17 +94,17 @@ class BorrowRequestController extends Controller
     {
         $requests = $this->borrowRequestService->getByUser($request->user());
 
-        return ApiResponse::successResponse('Data permintaan peminjaman user', $requests);
+        return ApiResponse::successResponse('User borrow request data', $requests);
     }
 
     public function cancel(Request $request, BorrowRequest $borrowRequest): JsonResponse
     {
         if ($borrowRequest->user_id !== $request->user()->id) {
-            return ApiResponse::errorResponse('Kamu tidak berhak membatalkan permintaan ini', null, 403);
+            return ApiResponse::errorResponse('You are not authorized to cancel this request', null, 403);
         }
 
         $borrowRequest = $this->borrowRequestService->cancel($borrowRequest, $request->user());
 
-        return ApiResponse::successResponse('Permintaan peminjaman berhasil dibatalkan', $borrowRequest);
+        return ApiResponse::successResponse('Borrow request cancelled successfully', $borrowRequest);
     }
 }

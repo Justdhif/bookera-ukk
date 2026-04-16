@@ -4,12 +4,13 @@ import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { FineType } from "@/types/fine";
 import { fineTypeService } from "@/services/fine.service";
-import FineTypeTable from "./FineTypeFormDialog";
+import FineTypeTable from "./FineTypeTable";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import { Plus } from "lucide-react";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import FineTypeFormDialog from "./FineTypeFormDialog";
 
 export default function FineTypeManagement() {
   const t = useTranslations("fines");
@@ -77,11 +78,11 @@ export default function FineTypeManagement() {
       ) : (
         <FineTypeTable
           data={fineTypes}
-          onEdit={(fineType) => {
+          onEdit={(fineType: FineType) => {
             setEditing(fineType);
             setOpen(true);
           }}
-          onDelete={(id) => setDeleteId(id)}
+          onDelete={(id: number) => setDeleteId(id)}
         />
       )}
 

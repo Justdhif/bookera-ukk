@@ -13,7 +13,7 @@ class ApiResponse
     ): JsonResponse {
         return response()->json([
             'success' => true,
-            'message' => $message,
+            'message' => __($message),
             'data' => $data,
         ], $statusCode);
     }
@@ -25,7 +25,7 @@ class ApiResponse
     ): JsonResponse {
         return response()->json([
             'success' => false,
-            'message' => $message,
+            'message' => __($message),
             'data' => $data,
         ], $statusCode);
     }
@@ -37,7 +37,7 @@ class ApiResponse
     ): JsonResponse {
         return response()->json([
             'success' => false,
-            'message' => $message,
+            'message' => __($message),
             'data' => $data,
         ], $statusCode);
     }
@@ -49,7 +49,7 @@ class ApiResponse
     ): JsonResponse {
         return response()->json([
             'success' => false,
-            'message' => $message,
+            'message' => __($message),
             'data' => $data,
         ], $statusCode);
     }
@@ -61,7 +61,7 @@ class ApiResponse
     ): JsonResponse {
         return response()->json([
             'success' => false,
-            'message' => $message,
+            'message' => __($message),
             'data' => $data,
         ], $statusCode);
     }
@@ -73,7 +73,7 @@ class ApiResponse
     ): JsonResponse {
         return response()->json([
             'success' => false,
-            'message' => $message,
+            'message' => __($message),
             'data' => $data,
         ], $statusCode);
     }

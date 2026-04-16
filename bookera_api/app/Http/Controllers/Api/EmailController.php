@@ -30,12 +30,12 @@ class EmailController extends Controller
         $newEmail = $request->new_email;
 
         if ($user->email === $newEmail) {
-            return ApiResponse::errorResponse('Email baru tidak boleh sama dengan email saat ini.', null, 422);
+            return ApiResponse::errorResponse('The new email must be different from the current email.', null, 422);
         }
 
         // Generate 6-digit OTP
         $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        
+
         // Cache it for 5 minutes
         $cacheKey = "email_otp_{$user->id}";
 
@@ -49,10 +49,12 @@ class EmailController extends Controller
             Mail::to($newEmail)->send(new VerifyEmailChangeMail($otp, $newEmail));
         } catch (\Exception $e) {
             Cache::forget($cacheKey);
-            return ApiResponse::errorResponse('Gagal mengirim OTP ke email baru. Pastikan email valid: ' . $e->getMessage(), null, 500);
+            return ApiResponse::errorResponse('Failed to send OTP to the new email. Make sure the email is valid: :message', [
+                'message' => $e->getMessage(),
+            ], 500);
         }
 
-        return ApiResponse::successResponse('OTP berhasil dikirim ke alamat email baru Anda.', [
+        return ApiResponse::successResponse('OTP has been sent to your new email address.', [
             'email_hint' => $this->maskEmail($newEmail),
         ]);
     }
@@ -72,18 +74,18 @@ class EmailController extends Controller
         $cached = Cache::get($cacheKey);
 
         if (!$cached) {
-            return ApiResponse::errorResponse('OTP sudah kadaluarsa atau tidak ditemukan. Silakan minta OTP baru.', null, 422);
+            return ApiResponse::errorResponse('The OTP has expired or was not found. Please request a new OTP.', null, 422);
         }
 
         if ($cached['otp'] !== $request->otp) {
-            return ApiResponse::errorResponse('Kode OTP tidak valid.', null, 422);
+            return ApiResponse::errorResponse('The OTP code is invalid.', null, 422);
         }
 
         $newEmail = $cached['new_email'];
 
         // Ensure email is still unique
         if (User::where('email', $newEmail)->exists()) {
-            return ApiResponse::errorResponse('Email ini sudah terdaftar di akun lain.', null, 422);
+            return ApiResponse::errorResponse('This email is already registered to another account.', null, 422);
         }
 
         // Update email
@@ -96,7 +98,7 @@ class EmailController extends Controller
 
         $user->load('profile');
 
-        return ApiResponse::successResponse('Alamat email berhasil diperbarui.', $user);
+        return ApiResponse::successResponse('Email address updated successfully.', $user);
     }
 
     /**

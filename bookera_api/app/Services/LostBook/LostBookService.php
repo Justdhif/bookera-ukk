@@ -19,7 +19,7 @@ class LostBookService
     {
         return DB::transaction(function () use ($borrow, $borrowDetailIds) {
             if ($borrow->status !== 'open') {
-                throw new \Exception('Peminjaman ini tidak dalam status open');
+                throw new \Exception('This borrow is not in open status');
             }
 
             $uniqueIds = array_values(array_unique($borrowDetailIds));
@@ -30,12 +30,12 @@ class LostBookService
                 ->get();
 
             if ($borrowDetails->count() !== count($uniqueIds)) {
-                throw new \Exception('Ada detail peminjaman yang tidak valid');
+                throw new \Exception('There are invalid borrow details');
             }
 
             foreach ($borrowDetails as $borrowDetail) {
                 if ($borrowDetail->status !== 'borrowed') {
-                    throw new \Exception('Salah satu buku sudah diproses statusnya');
+                    throw new \Exception('One of the books has already been processed');
                 }
 
                 $bookCopy = $borrowDetail->bookCopy;
@@ -249,7 +249,7 @@ class LostBookService
             $detail = $this->getPrimaryDetail($lostBook);
 
             if (!$detail) {
-                throw new \Exception('Detail buku hilang tidak ditemukan');
+                throw new \Exception('Lost book detail not found');
             }
 
             $oldValues = [

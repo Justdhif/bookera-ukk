@@ -95,7 +95,7 @@ class AuthorService
     public function delete(Author $author): array
     {
         if ($author->books()->count() > 0) {
-            throw new \Exception('Tidak dapat menghapus penulis yang masih memiliki buku. Hapus atau pindahkan buku terlebih dahulu.', 422);
+            throw new \Exception('Cannot delete an author who still has books. Remove or reassign the books first.', 422);
         }
 
         $deletedAuthorId = $author->id;

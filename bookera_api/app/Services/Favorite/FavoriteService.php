@@ -67,7 +67,7 @@ class FavoriteService
             ->exists();
 
         if ($already) {
-            throw new \Exception('Buku sudah ada di favorit');
+            throw new \Exception('Book is already in favorites');
         }
 
         return BookFavorite::create([
@@ -83,7 +83,7 @@ class FavoriteService
             ->delete();
 
         if (!$deleted) {
-            throw new \Exception('Buku tidak ditemukan di favorit');
+            throw new \Exception('Book not found in favorites');
         }
     }
 

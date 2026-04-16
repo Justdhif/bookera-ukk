@@ -309,7 +309,7 @@ export default function BookDetailClient() {
             book && (
               <div className="flex flex-wrap items-center gap-3">
                 <FavoriteButton bookId={book.id} />
-                <AddToRequestButton bookId={book.id} />
+                <AddToRequestButton book={book} />
               </div>
             )
           )

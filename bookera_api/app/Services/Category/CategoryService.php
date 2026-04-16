@@ -62,7 +62,7 @@ class CategoryService
     public function delete(Category $category): array
     {
         if ($category->books()->count() > 0) {
-            throw new \Exception('Tidak dapat menghapus kategori yang masih memiliki buku. Hapus atau pindahkan buku terlebih dahulu.', 422);
+            throw new \Exception('Cannot delete a category that still has books. Remove or reassign the books first.', 422);
         }
 
         $deletedCategoryId = $category->id;

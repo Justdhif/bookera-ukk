@@ -28,7 +28,7 @@ class PublicController extends Controller
 
         $books = $this->publicService->getAllBooks($filters);
 
-        return ApiResponse::successResponse('Data buku berhasil diambil', $books);
+        return ApiResponse::successResponse('Book data retrieved successfully', $books);
     }
 
     /**
@@ -39,10 +39,10 @@ class PublicController extends Controller
         $book = $this->publicService->getBookById($id);
 
         if (!$book) {
-            return ApiResponse::errorResponse('Buku tidak ditemukan', null, 404);
+            return ApiResponse::errorResponse('Book not found', null, 404);
         }
 
-        return ApiResponse::successResponse('Detail buku', $book);
+        return ApiResponse::successResponse('Book details', $book);
     }
 
     /**
@@ -53,10 +53,10 @@ class PublicController extends Controller
         $book = $this->publicService->getBookBySlug($slug);
 
         if (!$book) {
-            return ApiResponse::errorResponse('Buku tidak ditemukan', null, 404);
+            return ApiResponse::errorResponse('Book not found', null, 404);
         }
 
-        return ApiResponse::successResponse('Detail buku', $book);
+        return ApiResponse::successResponse('Book details', $book);
     }
 
     /**

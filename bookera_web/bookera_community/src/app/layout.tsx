@@ -8,6 +8,7 @@ import Providers from "./providers";
 import { AudioProvider } from "@/contexts/AudioContext";
 import "./globals.css";
 import TopLoader from "@/components/custom-ui/TopLoader";
+import { getUserLocale } from "@/services/locale";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,10 +30,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getUserLocale();
   const messages = await getMessages();
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

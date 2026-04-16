@@ -27,7 +27,7 @@ class BorrowRequestApprovedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Borrow Request Approved - Bookera',
+            subject: __('Borrow Request Approved - Bookera'),
         );
     }
 

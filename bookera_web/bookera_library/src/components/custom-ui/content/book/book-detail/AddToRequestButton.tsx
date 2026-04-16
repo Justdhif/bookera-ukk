@@ -6,14 +6,15 @@ import { useAuthStore } from "@/store/auth.store";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { BookPlus } from "lucide-react";
+import { Book } from "@/types/book";
 import BorrowRequestDialog from "@/components/custom-ui/content/book/BorrowRequestDialog";
 
 interface AddToRequestButtonProps {
-  bookId: number;
+  book: Book;
 }
 
 export default function AddToRequestButton({
-  bookId,
+  book,
 }: AddToRequestButtonProps) {
   const t = useTranslations("public");
   const { isAuthenticated } = useAuthStore();
@@ -37,7 +38,8 @@ export default function AddToRequestButton({
       </Button>
 
       <BorrowRequestDialog
-        bookIds={[bookId]}
+        bookIds={[book.id]}
+        initialBooks={[book]}
         isOpen={showDialog}
         onClose={() => setShowDialog(false)}
         onSuccess={() => setShowDialog(false)}

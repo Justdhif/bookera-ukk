@@ -4,7 +4,6 @@ namespace App\Services\BookReturn;
 
 use App\Mail\BorrowNotificationMail;
 use App\Models\Borrow;
-use App\Models\User;
 use App\Services\BaseNotificationService;
 use App\Services\FonnteService;
 use App\Services\NotificationService as DatabaseNotificationService;
@@ -21,7 +20,7 @@ class BookReturnNotificationService extends BaseNotificationService
 
         $user = $borrow->user;
         $profile = $user?->profile;
-        $userName = $profile?->full_name ?? $user->email ?? 'Unknown User';
+        $userName = $profile?->full_name ?? $user->email ?? $this->t('Unknown User');
 
         $returned = $summary['returned'] ?? [];
         $lost = $summary['lost'] ?? [];
@@ -30,30 +29,33 @@ class BookReturnNotificationService extends BaseNotificationService
         $booksForMail = [];
 
         foreach ($returned as $item) {
-            $conditionText = $item['condition'] === 'good' ? 'Baik' : 'Rusak';
+            $conditionText = $item['condition'] === 'good' ? $this->t('Good') : $this->t('Damaged');
             $bookSummaryList[] = "  • {$item['book_title']} ({$conditionText})";
             $booksForMail[] = "{$item['book_title']} ({$conditionText})";
         }
 
         foreach ($lost as $item) {
-            $bookSummaryList[] = "  • {$item['book_title']} (Hilang)";
-            $booksForMail[] = "{$item['book_title']} (Hilang)";
+            $bookSummaryList[] = '  • '.$item['book_title'].' ('.$this->t('Lost').')';
+            $booksForMail[] = $item['book_title'].' ('.$this->t('Lost').')';
         }
 
         // Summary for brief message
         $titles = collect($booksForMail)->take(2)->implode(', ');
         $moreCount = count($booksForMail) - 2;
-        $moreText = $moreCount > 0 ? " and {$moreCount} more" : "";
-        
+        $moreText = $moreCount > 0 ? $this->t(' and :count more', ['count' => $moreCount]) : '';
+
         $unpaidFines = $borrow->fines->where('status', 'unpaid');
         $totalFineAmount = $unpaidFines->sum('amount');
         $fineAmountFormatted = number_format($totalFineAmount, 0, ',', '.');
 
-        $message = "Pengembalian buku Anda ({$titles}{$moreText}) telah diproses. Total denda: Rp {$fineAmountFormatted}.";
+        $message = $this->t('Your book return (:books) has been processed. Total fines: Rp :amount.', [
+            'books' => $titles.$moreText,
+            'amount' => $fineAmountFormatted,
+        ]);
 
         DatabaseNotificationService::send(
             $borrow->user_id,
-            'Pengembalian Buku Diproses',
+            $this->t('Book Return Processed'),
             $message,
             'return_processed',
             'borrow',
@@ -70,22 +72,22 @@ class BookReturnNotificationService extends BaseNotificationService
         }
 
         $details = [
-            'Borrow Code' => $borrow->borrow_code,
-            'Process Date' => now()->format('d M Y'),
-            'Total Fines' => 'Rp '.$fineAmountFormatted,
-            'Status' => 'Diterima',
+            $this->t('Borrow Code') => $borrow->borrow_code,
+            $this->t('Process Date') => now()->format('d M Y'),
+            $this->t('Total Fines') => 'Rp '.$fineAmountFormatted,
+            $this->t('Status') => $this->t('Accepted'),
         ];
 
         if ($profile->notification_email && ! empty($user->email)) {
             $this->runAfterResponse(
                 function () use ($user, $message, $details, $booksForMail): void {
                     Mail::to($user->email)->send(new BorrowNotificationMail(
-                        subjectLine: 'Return Processed - Bookera',
-                        title: 'Pengembalian Buku Diproses',
+                        subjectLine: $this->t('Return Processed - Bookera'),
+                        title: $this->t('Book Return Processed'),
                         bodyMessage: $message,
                         details: $details,
                         books: $booksForMail,
-                        footerNote: 'Silakan cek detail pengembalian dan denda di aplikasi Bookera.',
+                        footerNote: $this->t('Please check the return and fine details in the Bookera app.'),
                     ));
                 },
                 'Failed to send consolidated return email',
@@ -95,26 +97,26 @@ class BookReturnNotificationService extends BaseNotificationService
 
         if ($profile->notification_whatsapp && $profile->phone_number) {
             $fineList = $unpaidFines->map(function ($f) {
-                return '  • '.($f->fineType->name ?? 'Denda').': *Rp '.number_format($f->amount, 0, ',', '.').'*';
+                return '  • '.($f->fineType->name ?? $this->t('Fine')).': *Rp '.number_format($f->amount, 0, ',', '.').'*';
             })->implode("\n");
 
-            $fineSection = $totalFineAmount > 0 
-                ? "\n💰 *Informasi Denda:*\n" . $fineList . "\n  ━━━━━━━━━━━━━━\n  *Total Tagihan: Rp {$fineAmountFormatted}*\n"
-                : "\n✅ *Tidak ada denda tambahan.*\n";
+            $fineSection = $totalFineAmount > 0
+                ? "\n".$this->t('💰 *Fine Information:*')."\n" . $fineList . "\n  ━━━━━━━━━━━━━━\n  *".$this->t('Total Amount').": Rp {$fineAmountFormatted}*\n"
+                : "\n".$this->t('✅ *No additional fines.*')."\n";
 
-            $whatsappMessage = "✅ *BOOKERA — Notifikasi Pengembalian*\n"
+            $whatsappMessage = $this->t("✅ *BOOKERA — Return Notification*\n")
                 ."━━━━━━━━━━━━━━━━━━━━\n\n"
-                ."Halo, *{$userName}*! 👋\n\n"
-                ."Proses pengembalian buku Anda telah berhasil diproses.\n\n"
-                ."📋 *Detail Pengembalian:*\n"
-                .'  🔖 Kode Pinjam : *'.$borrow->borrow_code."*\n"
-                .'  📅 Tanggal     : '.now()->format('d M Y')."\n\n"
-                ."📚 *Status Buku:*\n"
+                .$this->t('Hello, *:name*! 👋', ['name' => $userName])."\n\n"
+                .$this->t('Your book return has been processed successfully.')."\n\n"
+                .$this->t('📋 *Return Details:*')."\n"
+                .$this->t('  🔖 Borrow Code : *:code*', ['code' => $borrow->borrow_code])."\n"
+                .$this->t('  📅 Date     : :date', ['date' => now()->format('d M Y')])."\n\n"
+                .$this->t('📚 *Book Status:*')."\n"
                 .implode("\n", $bookSummaryList)."\n"
                 .$fineSection."\n"
                 ."━━━━━━━━━━━━━━━━━━━━\n"
-                ."Silakan lakukan pembayaran denda di perpustakaan jika ada.\n\n"
-                .'_Bookera — Perpustakaan Digital_';
+                .$this->t('Please make any fine payment at the library if applicable.')."\n\n"
+                .$this->t('_Bookera — Perpustakaan Digital_');
 
             try {
                 (new FonnteService)->send($profile->phone_number, $whatsappMessage);

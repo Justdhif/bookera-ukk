@@ -31,14 +31,14 @@ class UserController extends Controller
 
         $users = $this->userService->getAll($filters);
 
-        return ApiResponse::successResponse('Data user berhasil diambil', $users);
+        return ApiResponse::successResponse('User data retrieved successfully', $users);
     }
 
     public function show(User $user): JsonResponse
     {
         $user = $this->userService->getById($user);
 
-        return ApiResponse::successResponse('Detail user', $user);
+        return ApiResponse::successResponse('User details', $user);
     }
 
     public function showBySlug(string $slug): JsonResponse
@@ -46,9 +46,9 @@ class UserController extends Controller
         try {
             $user = $this->userService->getBySlug($slug);
 
-            return ApiResponse::successResponse('Detail user', $user);
+            return ApiResponse::successResponse('User details', $user);
         } catch (\Exception $e) {
-            return ApiResponse::errorResponse('User tidak ditemukan', 404);
+            return ApiResponse::errorResponse('User not found', 404);
         }
     }
 
@@ -57,9 +57,9 @@ class UserController extends Controller
         try {
             $user = $this->userService->getByIdentificationNumber($identificationNumber);
 
-            return ApiResponse::successResponse('Detail user', $user);
+            return ApiResponse::successResponse('User details', $user);
         } catch (\Exception $e) {
-            return ApiResponse::errorResponse('User tidak ditemukan', 404);
+            return ApiResponse::errorResponse('User not found', 404);
         }
     }
 
@@ -76,9 +76,11 @@ class UserController extends Controller
 
             $user = $this->userService->create($data);
 
-            return ApiResponse::successResponse('User berhasil dibuat', $user, 201);
+            return ApiResponse::successResponse('User created successfully', $user, 201);
         } catch (\Exception $e) {
-            return ApiResponse::errorResponse('Gagal membuat user: ' . $e->getMessage(), null, 500);
+            return ApiResponse::errorResponse('Failed to create user: :message', [
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -95,9 +97,11 @@ class UserController extends Controller
 
             $user = $this->userService->update($user, $data);
 
-            return ApiResponse::successResponse('User berhasil diupdate', $user);
+            return ApiResponse::successResponse('User updated successfully', $user);
         } catch (\Exception $e) {
-            return ApiResponse::errorResponse('Gagal mengupdate user: ' . $e->getMessage(), null, 500);
+            return ApiResponse::errorResponse('Failed to update user: :message', [
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -106,9 +110,11 @@ class UserController extends Controller
         try {
             $this->userService->delete($user);
 
-            return ApiResponse::successResponse('User berhasil dihapus', null);
+            return ApiResponse::successResponse('User deleted successfully', null);
         } catch (\Exception $e) {
-            return ApiResponse::errorResponse('Gagal menghapus user: ' . $e->getMessage(), null, 500);
+            return ApiResponse::errorResponse('Failed to delete user: :message', [
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 }

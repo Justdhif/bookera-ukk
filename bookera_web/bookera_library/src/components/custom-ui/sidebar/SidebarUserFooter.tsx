@@ -40,10 +40,10 @@ export function SidebarUserFooter() {
   const backHref = isAdmin
     ? "/"
     : user?.role === "officer:catalog"
-    ? "/admin/categories"
-    : user?.role === "officer:management"
-    ? "/admin/users"
-    : "/admin";
+      ? "/admin/categories"
+      : user?.role === "officer:management"
+        ? "/admin/users"
+        : "/admin";
   const backLabelKey = isAdmin ? "publicPage" : "dashboard";
   const profileHref = user?.slug ? `/${user.slug}/profile` : "/profile";
 
@@ -103,7 +103,13 @@ export function SidebarUserFooter() {
                 !open && "justify-center px-0 mx-auto",
               )}
             >
-              <a href={typeof window !== "undefined" ? `${window.location.protocol}//${window.location.hostname}:4000` : "http://localhost:4000"}>
+              <a
+                href={
+                  typeof window !== "undefined"
+                    ? `${window.location.protocol}//${window.location.hostname}:4000`
+                    : "http://localhost:4000"
+                }
+              >
                 <div
                   className={cn(
                     open ? "p-1.5" : "p-2",

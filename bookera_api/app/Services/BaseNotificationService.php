@@ -10,6 +10,11 @@ use Throwable;
 
 abstract class BaseNotificationService
 {
+    protected function t(string $message, array $replace = []): string
+    {
+        return __($message, $replace);
+    }
+
     protected function dispatchNotification(
         object $recipient,
         string $title,
@@ -90,7 +95,7 @@ abstract class BaseNotificationService
 
         $bookTitles = $details->take(2)->map($titleResolver)->implode(', ');
         $totalBooks = $details->count();
-        $moreText = $totalBooks > 2 ? ' and '.($totalBooks - 2).' more' : '';
+        $moreText = $totalBooks > 2 ? $this->t(' and :count more', ['count' => $totalBooks - 2]) : '';
         $books = $details->map($titleResolver)->values()->all();
 
         return [$bookTitles, $moreText, $books];

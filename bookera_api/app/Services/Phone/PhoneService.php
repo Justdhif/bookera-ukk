@@ -28,7 +28,9 @@ class PhoneService
             return false;
         }
 
-        $message = "Kode verifikasi Bookera Anda adalah: *{$otp}*\n\nKode ini berlaku selama 5 menit. Jangan bagikan kode ini kepada siapapun.";
+        $message = __('Your Bookera verification code is: *:otp*', ['otp' => $otp])
+            ."\n\n"
+            .__('This code is valid for 5 minutes. Do not share it with anyone.');
 
         try {
             $response = Http::withHeaders([

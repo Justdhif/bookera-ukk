@@ -32,7 +32,7 @@ class BookController extends Controller
 
         $books = $this->bookService->getAll($filters);
 
-        return ApiResponse::successResponse('Data buku berhasil diambil', $books);
+        return ApiResponse::successResponse('Book data retrieved successfully', $books);
     }
 
     public function store(StoreBookRequest $request): JsonResponse
@@ -42,7 +42,7 @@ class BookController extends Controller
             $request->file('cover_image')
         );
 
-        return ApiResponse::successResponse('Buku berhasil ditambahkan', $book, 201);
+        return ApiResponse::successResponse('Book added successfully', $book, 201);
     }
 
     public function show(int $id): JsonResponse
@@ -50,10 +50,10 @@ class BookController extends Controller
         $book = $this->bookService->getById($id);
 
         if (!$book) {
-            return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
+            return ApiResponse::errorResponse('Book not found', 404);
         }
 
-        return ApiResponse::successResponse('Detail buku', $book);
+        return ApiResponse::successResponse('Book details', $book);
     }
 
     public function showBySlug(string $slug): JsonResponse
@@ -61,10 +61,10 @@ class BookController extends Controller
         $book = $this->bookService->getBySlug($slug);
 
         if (!$book) {
-            return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
+            return ApiResponse::errorResponse('Book not found', 404);
         }
 
-        return ApiResponse::successResponse('Detail buku', $book);
+        return ApiResponse::successResponse('Book details', $book);
     }
 
     public function update(UpdateBookRequest $request, Book $book): JsonResponse
@@ -75,7 +75,7 @@ class BookController extends Controller
             $request->file('cover_image')
         );
 
-        return ApiResponse::successResponse('Buku berhasil diperbarui', $book);
+        return ApiResponse::successResponse('Book updated successfully', $book);
     }
 
     public function destroy(int $id): JsonResponse
@@ -83,9 +83,9 @@ class BookController extends Controller
         $deleted = $this->bookService->delete($id);
 
         if (!$deleted) {
-            return ApiResponse::errorResponse('Buku tidak ditemukan', 404);
+            return ApiResponse::errorResponse('Book not found', 404);
         }
 
-        return ApiResponse::successResponse('Buku berhasil dihapus', null);
+        return ApiResponse::successResponse('Book deleted successfully', null);
     }
 }

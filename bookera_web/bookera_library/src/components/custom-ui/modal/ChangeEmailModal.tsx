@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -15,20 +16,24 @@ import { Mail, ShieldCheck, RefreshCw, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/axios";
 import { cn } from "@/lib/utils";
+
 interface ChangeEmailModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   currentEmail?: string;
   onSuccess?: (newEmail: string) => void;
 }
+
 type Step = "change" | "otp";
 const RESEND_COOLDOWN = 60;
+
 export default function ChangeEmailModal({
   open,
   onOpenChange,
   currentEmail,
   onSuccess,
 }: ChangeEmailModalProps) {
+  const t = useTranslations("profile");
   const [step, setStep] = useState<Step>("change");
   const [newEmail, setNewEmail] = useState("");
   const [emailHint, setEmailHint] = useState("");
@@ -37,6 +42,7 @@ export default function ChangeEmailModal({
   const [resendCooldown, setResendCooldown] = useState(0);
   const otpRef = useRef<HTMLInputElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   useEffect(() => {
     if (open) {
       setStep("change");
@@ -48,11 +54,13 @@ export default function ChangeEmailModal({
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
   }, [open]);
+
   useEffect(() => {
     if (step === "otp") {
       setTimeout(() => otpRef.current?.focus(), 100);
     }
   }, [step]);
+
   const startResendCooldown = () => {
     setResendCooldown(RESEND_COOLDOWN);
     intervalRef.current = setInterval(() => {
@@ -65,11 +73,13 @@ export default function ChangeEmailModal({
       });
     }, 1000);
   };
+
   const handleSendOtp = async () => {
     if (!newEmail || !/\S+@\S+\.\S+/.test(newEmail)) {
-      toast.error("Masukkan alamat email yang valid");
+      toast.error(t("enterValidEmailError"));
       return;
     }
+
     try {
       setSubmitting(true);
       const res = await api.post("/email/request-change", {
@@ -79,49 +89,56 @@ export default function ChangeEmailModal({
       setEmailHint(hint);
       setStep("otp");
       startResendCooldown();
-      toast.success("OTP berhasil dikirim ke alamat email baru Anda");
+      toast.success(t("otpSentEmailSuccess"));
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal mengirim OTP. Coba lagi.",
+        error.response?.data?.message || t("failedUpdate"),
       );
     } finally {
       setSubmitting(false);
     }
   };
+
   const handleResendOtp = async () => {
     if (resendCooldown > 0) return;
     await handleSendOtp();
   };
+
   const handleVerifyOtp = async () => {
     if (otp.length !== 6) {
-      toast.error("Masukkan 6 digit kode OTP");
+      toast.error(t("enterOtpError"));
       return;
     }
+
     try {
       setSubmitting(true);
       await api.post("/email/verify-otp", { otp });
-      toast.success("Alamat email berhasil diperbarui");
+      toast.success(t("updateEmailSuccess"));
       onSuccess?.(newEmail);
       onOpenChange(false);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Kode OTP tidak valid atau kadaluarsa",
+        error.response?.data?.message || t("invalidOtp"),
       );
     } finally {
       setSubmitting(false);
     }
   };
+
   const handleOtpInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/\D/g, "").slice(0, 6);
     setOtp(val);
   };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       if (step === "change") handleSendOtp();
       else handleVerifyOtp();
     }
   };
+
   const isEmailValid = newEmail && /\S+@\S+\.\S+/.test(newEmail);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -132,37 +149,36 @@ export default function ChangeEmailModal({
                 <div className="p-1.5 rounded-lg bg-brand-primary/10">
                   <Mail className="h-4 w-4 text-brand-primary" />
                 </div>
-                Ganti Email
+                {t("changeEmailTitle")}
               </DialogTitle>
               <DialogDescription>
-                Masukkan alamat email baru. Kami akan mengirim kode verifikasi
-                ke email tersebut.
+                {t("changeEmailDescription")}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-5 py-1">
               {currentEmail && (
                 <div className="rounded-lg border bg-muted/40 px-4 py-3 space-y-0.5">
                   <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                    Email saat ini
+                    {t("currentEmailLabel")}
                   </p>
                   <p className="text-sm font-semibold">{currentEmail}</p>
                 </div>
               )}
               <div className="space-y-2">
                 <Label htmlFor="new-email" variant="required">
-                  Email Baru
+                  {t("newEmailLabel")}
                 </Label>
                 <Input
                   id="new-email"
                   type="email"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  placeholder="email@example.com"
+                  placeholder={t("newEmailPlaceholder")}
                   disabled={submitting}
                   onKeyDown={handleKeyDown}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Pastikan alamat email ini aktif dan belum digunakan
+                  {t("emailValidationHint")}
                 </p>
               </div>
             </div>
@@ -173,7 +189,7 @@ export default function ChangeEmailModal({
                 onClick={() => onOpenChange(false)}
                 disabled={submitting}
               >
-                Batal
+                {t("batal")}
               </Button>
               <Button
                 type="button"
@@ -182,7 +198,7 @@ export default function ChangeEmailModal({
                 disabled={submitting || !isEmailValid}
                 loading={submitting}
               >
-                {submitting ? "Mengirim..." : "Kirim OTP"}
+                {submitting ? t("sending") : t("submit")}
               </Button>
             </DialogFooter>
           </>
@@ -193,10 +209,10 @@ export default function ChangeEmailModal({
                 <div className="p-1.5 rounded-lg bg-brand-primary/10">
                   <ShieldCheck className="h-4 w-4 text-brand-primary" />
                 </div>
-                Verifikasi OTP
+                {t("verifyOtpTitle")}
               </DialogTitle>
               <DialogDescription>
-                Masukkan 6 digit kode yang dikirim ke{" "}
+                {t("verifyOtpDescription")}{" "}
                 <span className="font-semibold text-foreground">
                   {emailHint}
                 </span>
@@ -205,7 +221,7 @@ export default function ChangeEmailModal({
             <div className="space-y-5 py-1">
               <div className="space-y-2">
                 <Label htmlFor="otp-input" variant="required">
-                  Kode OTP
+                  {t("otpLabel")}
                 </Label>
                 <Input
                   id="otp-input"
@@ -215,7 +231,7 @@ export default function ChangeEmailModal({
                   value={otp}
                   onChange={handleOtpInput}
                   onKeyDown={handleKeyDown}
-                  placeholder="123456"
+                  placeholder={t("otpPlaceholder")}
                   maxLength={6}
                   disabled={submitting}
                   className="text-center text-xl tracking-[0.5em] font-semibold"
@@ -228,7 +244,7 @@ export default function ChangeEmailModal({
                   className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <ArrowLeft className="h-3 w-3" />
-                  Ganti email
+                  {t("changeEmail").toLowerCase()}
                 </Button>
                 <Button
                   type="button"
@@ -245,12 +261,12 @@ export default function ChangeEmailModal({
                     className={cn("h-3 w-3", submitting && "animate-spin")}
                   />
                   {resendCooldown > 0
-                    ? `Kirim ulang (${resendCooldown}s)`
-                    : "Kirim ulang OTP"}
+                    ? t("resendOtpIn", { seconds: resendCooldown })
+                    : t("resendOtp")}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground text-center">
-                Kode berlaku selama 5 menit
+                {t("otpValidityHint")}
               </p>
             </div>
             <DialogFooter className="gap-2">
@@ -260,7 +276,7 @@ export default function ChangeEmailModal({
                 onClick={() => onOpenChange(false)}
                 disabled={submitting}
               >
-                Batal
+                {t("batal")}
               </Button>
               <Button
                 type="button"
@@ -269,7 +285,7 @@ export default function ChangeEmailModal({
                 disabled={submitting || otp.length !== 6}
                 loading={submitting}
               >
-                {submitting ? "Memverifikasi..." : "Verifikasi"}
+                {submitting ? t("verifying") : t("verifikasi")}
               </Button>
             </DialogFooter>
           </>
@@ -278,3 +294,4 @@ export default function ChangeEmailModal({
     </Dialog>
   );
 }
+

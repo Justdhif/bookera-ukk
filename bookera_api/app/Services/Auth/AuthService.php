@@ -23,11 +23,11 @@ class AuthService
         $user = User::where('email', $email)->first();
 
         if (! $user || ! Hash::check($password, $user->password)) {
-            throw new \Exception('Email atau password salah');
+            throw new \Exception('Incorrect email or password');
         }
 
         if (! $user->is_active) {
-            throw new \Exception('Akun tidak aktif', 403);
+            throw new \Exception('The account is inactive', 403);
         }
 
         Auth::login($user);
@@ -40,7 +40,7 @@ class AuthService
         ActivityLogger::log(
             'login',
             'Auth',
-            'User berhasil melakukan login',
+            'User logged in successfully',
             null,
             null,
             $user
@@ -78,7 +78,7 @@ class AuthService
             ActivityLogger::log(
                 'register',
                 'Auth',
-                'User baru berhasil mendaftar akun',
+                'New user registered successfully',
                 ['email' => $user->email],
                 null,
                 $user
@@ -158,7 +158,7 @@ class AuthService
         $user = User::where('email', $email)->first();
 
         if (! $user) {
-            throw new \Exception('Email tidak terdaftar');
+            throw new \Exception('Email is not registered');
         }
 
         // Generate 6-digit OTP token
@@ -190,7 +190,7 @@ class AuthService
             ->first();
 
         if (! $record) {
-            throw new \Exception('Token reset password tidak ditemukan');
+            throw new \Exception('Password reset token not found');
         }
 
         // Check if token is expired (60 minutes)
@@ -201,19 +201,19 @@ class AuthService
                 ->where('email', $email)
                 ->delete();
 
-            throw new \Exception('Token reset password sudah kadaluarsa');
+            throw new \Exception('Password reset token has expired');
         }
 
         // Verify the token
         if (! Hash::check($token, $record->token)) {
-            throw new \Exception('Token reset password tidak valid');
+            throw new \Exception('Password reset token is invalid');
         }
 
         // Update the user's password
         $user = User::where('email', $email)->first();
 
         if (! $user) {
-            throw new \Exception('User tidak ditemukan');
+            throw new \Exception('User not found');
         }
 
         $user->update([
@@ -230,7 +230,7 @@ class AuthService
         ActivityLogger::log(
             'reset_password',
             'Auth',
-            "User berhasil mengubah kata sandi",
+            "User successfully reset password",
             null,
             null,
             $user
@@ -248,7 +248,7 @@ class AuthService
             ActivityLogger::log(
                 'logout',
                 'Auth',
-                'User berhasil melakukan logout',
+                'User logged out successfully',
                 null,
                 null,
                 $user
@@ -270,7 +270,7 @@ class AuthService
     public function changePassword(User $user, string $currentPassword, string $newPassword): void
     {
         if (! Hash::check($currentPassword, $user->password)) {
-            throw new \Exception('Password saat ini tidak sesuai', 400);
+            throw new \Exception('Current password does not match', 400);
         }
 
         $user->update([

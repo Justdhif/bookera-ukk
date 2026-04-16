@@ -23,7 +23,7 @@ class BorrowRequestRejectedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Borrow Request Rejected - Bookera',
+            subject: __('Borrow Request Rejected - Bookera'),
         );
     }
 

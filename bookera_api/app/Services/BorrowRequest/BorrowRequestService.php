@@ -179,7 +179,7 @@ class BorrowRequestService
                 ActivityLogger::log(
                     'update',
                     'book_copy',
-                    "Salinan buku #{$copy->id} ({$copy->book->title}) ditetapkan dari permintaan #{$borrowRequest->id}",
+                    "Book copy #{$copy->id} ({$copy->book->title}) assigned from request #{$borrowRequest->id}",
                     ['copy_id' => $copy->id, 'new_status' => 'borrowed', 'borrow_id' => $borrow->id],
                     ['copy_id' => $copy->id, 'old_status' => 'available'],
                     $copy
@@ -195,7 +195,7 @@ class BorrowRequestService
             ActivityLogger::log(
                 'update',
                 'borrow_request',
-                "Permintaan peminjaman #{$borrowRequest->id} disetujui — peminjaman #{$borrow->id} dibuat dengan salinan buku yang ditetapkan",
+                "Borrow request #{$borrowRequest->id} approved — borrow #{$borrow->id} created with assigned book copies",
                 ['request_id' => $borrowRequest->id, 'borrow_id' => $borrow->id, 'status' => 'approved'],
                 ['request_id' => $borrowRequest->id, 'status' => 'processing'],
                 $borrowRequest

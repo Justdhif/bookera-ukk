@@ -112,10 +112,12 @@ export default function ProfileLeftCard({
                 {isEditMode && (
                   <Button
                     type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => setChangeEmailOpen(true)}
-                    className="text-xs text-brand-primary hover:text-brand-primary/80 font-medium transition-colors"
+                    className="h-8 border-brand-primary/20 hover:border-brand-primary/50 text-brand-primary hover:bg-brand-primary/5 font-semibold text-xs rounded-lg transition-all"
                   >
-                    Ganti Email
+                    {t("changeEmail")}
                   </Button>
                 )}
               </div>
@@ -135,10 +137,12 @@ export default function ProfileLeftCard({
                 {isEditMode && (
                   <Button
                     type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => setChangePhoneOpen(true)}
-                    className="text-xs text-brand-primary hover:text-brand-primary/80 font-medium transition-colors"
+                    className="h-8 border-brand-primary/20 hover:border-brand-primary/50 text-brand-primary hover:bg-brand-primary/5 font-semibold text-xs rounded-lg transition-all"
                   >
-                    Ganti Nomor
+                    {t("changePhone")}
                   </Button>
                 )}
               </div>

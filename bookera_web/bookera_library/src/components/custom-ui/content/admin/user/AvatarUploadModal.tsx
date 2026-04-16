@@ -12,10 +12,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Upload, X, Check, FileWarning, Trash, Eye } from "lucide-react";
+import { Upload, X, Check, FileWarning, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Image from "next/image";
+
 interface AvatarUploadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -24,9 +25,11 @@ interface AvatarUploadModalProps {
   userName: string;
   isRequired?: boolean;
 }
+
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
 const ALLOWED_FILE_EXTENSIONS = [".jpg", ".jpeg", ".png"];
+
 const DEFAULT_AVATARS = [
   "https://api.dicebear.com/7.x/bottts/png?seed=1&backgroundColor=b6e3f4,c7d2fe,ddd6fe",
   "https://api.dicebear.com/7.x/bottts/png?seed=2&backgroundColor=fde68a,fcd34d,fbbf24",
@@ -34,6 +37,7 @@ const DEFAULT_AVATARS = [
   "https://api.dicebear.com/7.x/bottts/png?seed=4&backgroundColor=a7f3d0,6ee7b7,34d399",
   "https://api.dicebear.com/7.x/bottts/png?seed=5&backgroundColor=fca5a5,f87171,ef4444",
 ];
+
 export default function AvatarUploadModal({
   open,
   onOpenChange,
@@ -42,7 +46,8 @@ export default function AvatarUploadModal({
   userName,
   isRequired = false,
 }: AvatarUploadModalProps) {
-  const t = useTranslations("user");
+  const t = useTranslations("setup-profile");
+  const commonT = useTranslations("common");
   const [selectedAvatar, setSelectedAvatar] = useState<string | File>(
     currentAvatar,
   );
@@ -50,6 +55,7 @@ export default function AvatarUploadModal({
   const [localError, setLocalError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (open) {
       setSelectedAvatar(currentAvatar);
@@ -57,17 +63,16 @@ export default function AvatarUploadModal({
       setLocalError(null);
     }
   }, [open, currentAvatar]);
+
   const validateFile = (file: File): boolean => {
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      const errorMsg =
-        "Invalid file type. Please upload JPG, JPEG, or PNG images only.";
+      const errorMsg = t("invalidFileType");
       setLocalError(errorMsg);
       toast.error(errorMsg);
       return false;
     }
     if (file.size > MAX_FILE_SIZE) {
-      const errorMsg =
-        "File size exceeds 2MB limit. Please choose a smaller image.";
+      const errorMsg = t("fileSizeExceed");
       setLocalError(errorMsg);
       toast.error(errorMsg);
       return false;
@@ -75,6 +80,7 @@ export default function AvatarUploadModal({
     setLocalError(null);
     return true;
   };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && validateFile(file)) {
@@ -86,11 +92,13 @@ export default function AvatarUploadModal({
       reader.readAsDataURL(file);
     }
   };
+
   const handleDefaultAvatarClick = (avatarUrl: string) => {
     setSelectedAvatar(avatarUrl);
     setPreviewUrl(avatarUrl);
     setLocalError(null);
   };
+
   const handleRemoveAvatar = () => {
     setSelectedAvatar("");
     setPreviewUrl("");
@@ -99,9 +107,10 @@ export default function AvatarUploadModal({
       fileInputRef.current.value = "";
     }
   };
+
   const handleSave = () => {
     if (isRequired && !selectedAvatar) {
-      const errorMsg = "Avatar is required";
+      const errorMsg = t("noAvatarSelected");
       setLocalError(errorMsg);
       toast.error(errorMsg);
       return;
@@ -109,20 +118,24 @@ export default function AvatarUploadModal({
     onSave(selectedAvatar);
     onOpenChange(false);
   };
+
   const handleCancel = () => {
     setSelectedAvatar(currentAvatar);
     setPreviewUrl(currentAvatar);
     setLocalError(null);
     onOpenChange(false);
   };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   };
+
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
   };
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
@@ -136,27 +149,29 @@ export default function AvatarUploadModal({
       reader.readAsDataURL(file);
     }
   };
+
   const hasError = !!localError;
   const errorMessage =
-    localError || (isRequired && !selectedAvatar && "Avatar is required");
+    localError || (isRequired && !selectedAvatar && t("noAvatarSelected"));
   const isDisabled = !selectedAvatar || hasError;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-125">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {t("uploadAvatar")}
+            {commonT("uploadAvatar")}
             {isRequired && (
               <Badge
                 variant="destructive"
                 className="text-xs font-normal px-2 py-0 h-5"
               >
-                {t("requiredField")}
+                {commonT("required")}
               </Badge>
             )}
           </DialogTitle>
           <DialogDescription>
-            Choose from default avatars or upload your own image
+            {t("chooseAvatarDesc")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-6">
@@ -167,7 +182,7 @@ export default function AvatarUploadModal({
               isDragging && "border-primary bg-primary/5 dark:bg-primary/10",
               hasError
                 ? "border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/30 animate-shake"
-                : "border-gray-300 dark:border-gray-700",
+                : "border-gray-300 dark:border-gray-700 hover:border-brand-primary/50",
             )}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -181,10 +196,10 @@ export default function AvatarUploadModal({
             {previewUrl ? (
               <>
                 <div className="relative h-32 w-32">
-                  <div className="relative h-full w-full rounded-full overflow-hidden ring-4 ring-gray-100 dark:ring-gray-800">
+                  <div className="relative h-full w-full rounded-full overflow-hidden ring-4 ring-gray-100 dark:ring-gray-800 transition-shadow duration-300">
                     <Image
                       src={previewUrl}
-                      alt="Avatar preview"
+                      alt={userName}
                       fill
                       sizes="128px"
                       className="object-cover"
@@ -198,21 +213,21 @@ export default function AvatarUploadModal({
                       e.stopPropagation();
                       handleRemoveAvatar();
                     }}
-                    className="absolute -top-2 -right-2 h-8 w-8 rounded-full shadow-lg"
+                    className="absolute -top-1 -right-1 h-7 w-7 rounded-full shadow-lg border-2 border-background hover:scale-110 transition-transform"
                   >
-                    <Trash className="w-4 h-4 mr-2" /> <X className="h-4 w-4" />
-                    <span className="sr-only">Remove avatar</span>
+                    <X className="h-3.5 w-3.5" />
+                    <span className="sr-only">{t("removeAvatar")}</span>
                   </Button>
                 </div>
-                <p className="text-sm text-muted-foreground">Avatar Preview</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("avatarPreview")}</p>
               </>
             ) : (
               <>
                 <div
                   className={cn(
-                    "p-4 rounded-full",
+                    "p-4 rounded-full transition-colors duration-200",
                     isDragging
-                      ? "bg-primary/10 dark:bg-primary/20"
+                      ? "bg-brand-primary/10 dark:bg-brand-primary/20"
                       : hasError
                         ? "bg-red-100 dark:bg-red-900/50"
                         : "bg-gray-100 dark:bg-gray-800",
@@ -225,7 +240,7 @@ export default function AvatarUploadModal({
                       className={cn(
                         "h-10 w-10",
                         isDragging
-                          ? "text-primary"
+                          ? "text-brand-primary"
                           : "text-gray-400 dark:text-gray-500",
                       )}
                     />
@@ -235,7 +250,7 @@ export default function AvatarUploadModal({
                   {hasError ? (
                     <>
                       <p className="text-sm font-semibold text-red-700 dark:text-red-400">
-                        Upload failed
+                        {t("uploadFailed")}
                       </p>
                       <p className="text-xs text-red-600 dark:text-red-400/80 max-w-50">
                         {errorMessage}
@@ -245,11 +260,11 @@ export default function AvatarUploadModal({
                     <>
                       <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         {isDragging
-                          ? "Drop your image here"
-                          : "No avatar selected"}
+                          ? t("dropImageHere")
+                          : t("noAvatarSelected")}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Drag and drop or click to upload
+                        {t("dragDropHint")}
                       </p>
                     </>
                   )}
@@ -257,43 +272,43 @@ export default function AvatarUploadModal({
               </>
             )}
           </div>
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold">Default Avatars</h4>
-            <div className="grid grid-cols-5 gap-2">
-              {DEFAULT_AVATARS.map((avatarUrl) => {
+          <div className="space-y-4">
+            <h4 className="text-sm font-semibold flex items-center gap-2">
+              <span className="h-1 w-1 rounded-full bg-brand-primary"></span>
+              {t("defaultAvatars")}
+            </h4>
+            <div className="flex flex-wrap justify-center gap-4">
+              {DEFAULT_AVATARS.map((avatarUrl, idx) => {
                 const isSelected = previewUrl === avatarUrl;
                 return (
                   <Button
-                    key={avatarUrl}
+                    key={avatarUrl + idx}
                     type="button"
-                    variant="brand"
+                    variant="ghost"
                     size="icon"
                     onClick={() => handleDefaultAvatarClick(avatarUrl)}
-                    className="relative h-auto w-auto p-0 hover:bg-transparent group"
+                    className="relative h-16 w-16 p-0 rounded-full hover:bg-transparent group transition-all"
                   >
                     <div
                       className={cn(
-                        "relative rounded-full transition-all duration-200",
+                        "relative h-full w-full rounded-full transition-all duration-300",
                         isSelected
-                          ? "ring-2 ring-offset-2 ring-brand-primary ring-offset-background scale-105"
-                          : "group-hover:scale-105 group-hover:ring-1 group-hover:ring-gray-300",
+                          ? "ring-4 ring-brand-primary ring-offset-2 ring-offset-background scale-110"
+                          : "ring-1 ring-gray-200 dark:ring-gray-800 group-hover:scale-105 group-hover:ring-brand-primary/50",
                       )}
                     >
-                      <div className="relative h-14 w-14 rounded-full overflow-hidden border-2 border-white">
+                      <div className="relative h-full w-full rounded-full overflow-hidden border-2 border-white dark:border-gray-900">
                         <Image
                           src={avatarUrl}
                           alt="Default avatar"
                           fill
-                          sizes="56px"
+                          sizes="64px"
                           className="object-cover"
                         />
                       </div>
-                      {isSelected && (
-                        <div className="absolute inset-0 bg-primary/20 rounded-full animate-in zoom-in duration-200" />
-                      )}
                     </div>
                     {isSelected && (
-                      <div className="absolute -top-1 -right-1 h-5 w-5 bg-brand-primary rounded-full flex items-center justify-center shadow-md border border-white z-10">
+                      <div className="absolute -top-1 -right-1 h-5 w-5 bg-brand-primary rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-gray-900 z-10 animate-in zoom-in duration-300">
                         <Check className="h-3 w-3 text-white" />
                       </div>
                     )}
@@ -302,9 +317,12 @@ export default function AvatarUploadModal({
               })}
             </div>
           </div>
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Upload Your Own</h4>
-            <div className="flex flex-col gap-2">
+          <div className="space-y-3 pt-2">
+            <h4 className="text-sm font-semibold flex items-center gap-2">
+              <span className="h-1 w-1 rounded-full bg-brand-primary"></span>
+              {t("uploadYourOwn")}
+            </h4>
+            <div className="flex flex-col gap-3">
               <Input
                 ref={fileInputRef}
                 type="file"
@@ -317,34 +335,41 @@ export default function AvatarUploadModal({
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
                 className={cn(
-                  "w-full gap-2",
+                  "w-full gap-2 border-dashed h-12 hover:border-brand-primary hover:text-brand-primary transition-all",
                   hasError &&
                     "bg-red-50 hover:bg-red-100 text-red-700 border-red-300 dark:bg-red-950/30 dark:hover:bg-red-900/50 dark:text-red-400 dark:border-red-800",
                 )}
               >
-                <Eye className="w-4 h-4 mr-2" /> <Upload className="h-4 w-4" />
-                {previewUrl ? "Change Avatar" : "Browse Files"}
+                <Upload className="h-4 w-4" />
+                {previewUrl ? t("changePhoto") : t("browseFiles")}
               </Button>
-              <p className="text-xs text-muted-foreground text-center">
-                Format: JPG, PNG. Max 2MB
+              <p className="text-xs text-muted-foreground text-center italic">
+                {t("formatHint")}
               </p>
             </div>
           </div>
         </div>
-        <DialogFooter>
-          <Button type="button" variant="brand" onClick={handleCancel}>
-            Cancel
+        <DialogFooter className="flex-row gap-3 pt-4 border-t">
+          <Button 
+            type="button" 
+            variant="ghost" 
+            onClick={handleCancel} 
+            className="flex-1 rounded-xl h-11"
+          >
+            {commonT("cancel")}
           </Button>
           <Button
             type="button"
             variant="submit"
             onClick={handleSave}
             disabled={isDisabled}
+            className="flex-1 rounded-xl h-11 shadow-lg shadow-brand-primary/20"
           >
-            {t("saveAvatar")}
+            {commonT("save")}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
+

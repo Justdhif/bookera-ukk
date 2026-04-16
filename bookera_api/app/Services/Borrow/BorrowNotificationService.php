@@ -5,11 +5,8 @@ namespace App\Services\Borrow;
 use App\Mail\BorrowNotificationMail;
 use App\Mail\BorrowRequestApprovedMail;
 use App\Mail\BorrowRequestRejectedMail;
-use App\Models\BookReturn;
 use App\Models\Borrow;
 use App\Models\BorrowRequest;
-use App\Models\Fine;
-use App\Models\LostBook;
 use App\Models\User;
 use App\Services\FonnteService;
 use App\Services\NotificationService as DatabaseNotificationService;
@@ -27,17 +24,21 @@ class BorrowNotificationService extends BaseNotificationService
 
         [$bookTitles, $moreText, $books] = $this->summarizeBooks(
             $borrow->borrowDetails,
-            fn ($detail) => $detail->bookCopy->book->title ?? 'Unknown'
+            fn ($detail) => $detail->bookCopy->book->title ?? $this->t('Unknown')
         );
 
-        $userName = $borrow->user?->profile?->full_name ?? $borrow->user?->email ?? 'User';
-        $message = "{$userName} has a new borrow {$bookTitles}{$moreText} (Borrow #{$borrow->id})";
+        $userName = $borrow->user?->profile?->full_name ?? $borrow->user?->email ?? $this->t('User');
+        $message = $this->t(':name has a new borrow :books (Borrow #:id)', [
+            'name' => $userName,
+            'books' => $bookTitles.$moreText,
+            'id' => $borrow->id,
+        ]);
         $details = [
-            'Borrow ID' => '#'.$borrow->id,
-            'Borrow Code' => $borrow->borrow_code,
-            'Borrower' => $userName,
-            'Borrow Date' => Carbon::parse($borrow->borrow_date)->format('d M Y'),
-            'Return Date' => Carbon::parse($borrow->return_date)->format('d M Y'),
+            $this->t('Borrow ID') => '#'.$borrow->id,
+            $this->t('Borrow Code') => $borrow->borrow_code,
+            $this->t('Borrower') => $userName,
+            $this->t('Borrow Date') => Carbon::parse($borrow->borrow_date)->format('d M Y'),
+            $this->t('Return Date') => Carbon::parse($borrow->return_date)->format('d M Y'),
         ];
 
         $admins = User::with('profile')->where('role', 'admin')->get();
@@ -45,7 +46,7 @@ class BorrowNotificationService extends BaseNotificationService
         foreach ($admins as $admin) {
             $this->dispatchNotification(
                 $admin,
-                'New Direct Borrow',
+                $this->t('New Direct Borrow'),
                 $message,
                 'borrow_request',
                 'borrow',
@@ -62,14 +63,18 @@ class BorrowNotificationService extends BaseNotificationService
                     ])->toArray()
                 ],
                 fn () => new BorrowNotificationMail(
-                    subjectLine: 'New Direct Borrow - Bookera',
-                    title: 'New Direct Borrow',
+                    subjectLine: $this->t('New Direct Borrow - Bookera'),
+                    title: $this->t('New Direct Borrow'),
                     bodyMessage: $message,
                     details: $details,
                     books: $books,
-                    footerNote: 'This borrow was created directly in the system.',
+                    footerNote: $this->t('This borrow was created directly in the system.'),
                 ),
-                "New borrow received from {$userName}. Borrow #{$borrow->id}. Books: {$bookTitles}{$moreText}",
+                $this->t('New borrow received from :name. Borrow #:id. Books: :books', [
+                    'name' => $userName,
+                    'id' => $borrow->id,
+                    'books' => $bookTitles.$moreText,
+                ]),
                 true,
                 false
             );
@@ -82,30 +87,33 @@ class BorrowNotificationService extends BaseNotificationService
 
         [$bookTitles, $moreText, $books] = $this->summarizeBooks(
             $borrow->borrowDetails,
-            fn ($detail) => $detail->bookCopy->book->title ?? 'Unknown'
+            fn ($detail) => $detail->bookCopy->book->title ?? $this->t('Unknown')
         );
 
         $user = $borrow->user;
         $profile = $user?->profile;
-        $userName = $profile?->full_name ?? $user?->email ?? 'User';
+        $userName = $profile?->full_name ?? $user?->email ?? $this->t('User');
 
-        $message = "Peminjaman Anda untuk {$bookTitles}{$moreText} telah berhasil dibuat. Kode pinjam: {$borrow->borrow_code}.";
+        $message = $this->t('Your borrow request for :books has been created successfully. Borrow code: :code.', [
+            'books' => $bookTitles.$moreText,
+            'code' => $borrow->borrow_code,
+        ]);
         $details = [
-            'Borrow ID' => '#'.$borrow->id,
-            'Borrow Code' => $borrow->borrow_code,
-            'Borrow Date' => Carbon::parse($borrow->borrow_date)->format('d M Y'),
-            'Return Date' => Carbon::parse($borrow->return_date)->format('d M Y'),
-            'Status' => ucfirst($borrow->status),
+            $this->t('Borrow ID') => '#'.$borrow->id,
+            $this->t('Borrow Code') => $borrow->borrow_code,
+            $this->t('Borrow Date') => Carbon::parse($borrow->borrow_date)->format('d M Y'),
+            $this->t('Return Date') => Carbon::parse($borrow->return_date)->format('d M Y'),
+            $this->t('Status') => ucfirst($borrow->status),
         ];
 
         DatabaseNotificationService::send(
             $user->id,
-            'Peminjaman Baru',
+            $this->t('New Borrow'),
             $message,
             'borrow_created',
             'borrow',
             [
-                'borrow_id' => $borrow->id, 
+                'borrow_id' => $borrow->id,
                 'borrow_code' => $borrow->borrow_code,
                 'books' => $borrow->borrowDetails->map(fn($d) => [
                     'title' => $d->bookCopy?->book?->title,
@@ -123,12 +131,12 @@ class BorrowNotificationService extends BaseNotificationService
             $this->runAfterResponse(
                 function () use ($user, $message, $details, $books): void {
                     Mail::to($user->email)->send(new BorrowNotificationMail(
-                        subjectLine: 'Borrow Created - Bookera',
-                        title: 'Peminjaman Baru',
+                        subjectLine: $this->t('Borrow Created - Bookera'),
+                        title: $this->t('New Borrow'),
                         bodyMessage: $message,
                         details: $details,
                         books: $books,
-                        footerNote: 'Simpan kode pinjam untuk proses peminjaman di perpustakaan.',
+                        footerNote: $this->t('Keep the borrow code for the library pickup process.'),
                     ));
                 },
                 'Failed to send borrow issued email',
@@ -139,24 +147,24 @@ class BorrowNotificationService extends BaseNotificationService
         if ($profile->notification_whatsapp && $profile->phone_number) {
             $bookList = $borrow->borrowDetails
                 ->map(function ($detail) {
-                    return '  • '.($detail->bookCopy->book->title ?? 'Unknown');
+                    return '  • '.($detail->bookCopy->book->title ?? $this->t('Unknown'));
                 })
                 ->take(2)
                 ->implode("\n").($moreText ? "\n  {$moreText}" : '');
 
-            $whatsappMessage = "📚 *BOOKERA — Peminjaman Baru*\n"
+            $whatsappMessage = $this->t("📚 *BOOKERA — New Borrow*\n")
                 ."━━━━━━━━━━━━━━━━━━━━\n\n"
-                ."Halo, *{$userName}*! 👋\n\n"
-                ."Peminjaman buku Anda telah berhasil dibuat.\n\n"
-                ."📋 *Detail Peminjaman:*\n"
-                .'  🔖 Kode Pinjam  : *'.$borrow->borrow_code."*\n"
-                .'  📅 Tanggal Pinjam : '.Carbon::parse($borrow->borrow_date)->format('d M Y')."\n"
-                .'  🔄 Batas Kembali : '.Carbon::parse($borrow->return_date)->format('d M Y')."\n\n"
-                ."📚 *Buku yang Dipinjam:*\n"
+                .$this->t('Hello, *:name*! 👋', ['name' => $userName])."\n\n"
+                .$this->t('Your borrow request has been created successfully.')."\n\n"
+                .$this->t('📋 *Borrow Details:*')."\n"
+                .$this->t('  🔖 Borrow Code : *:code*', ['code' => $borrow->borrow_code])."\n"
+                .$this->t('  📅 Borrow Date : :date', ['date' => Carbon::parse($borrow->borrow_date)->format('d M Y')])."\n"
+                .$this->t('  🔄 Return Date : :date', ['date' => Carbon::parse($borrow->return_date)->format('d M Y')])."\n\n"
+                .$this->t('📚 *Borrowed Books:*')."\n"
                 .$bookList."\n\n"
                 ."━━━━━━━━━━━━━━━━━━━━\n"
-                ."Simpan kode pinjam ini untuk proses peminjaman di perpustakaan.\n\n"
-                .'_Bookera — Perpustakaan Digital_';
+                .$this->t('Keep the borrow code for the library pickup process.')."\n\n"
+                .$this->t('_Bookera — Digital Library_');
 
             try {
                 (new FonnteService)->send($profile->phone_number, $whatsappMessage);
@@ -172,17 +180,21 @@ class BorrowNotificationService extends BaseNotificationService
 
         [$bookTitles, $moreText, $books] = $this->summarizeBooks(
             $borrowRequest->borrowRequestDetails,
-            fn ($detail) => $detail->book->title ?? 'Unknown'
+            fn ($detail) => $detail->book->title ?? $this->t('Unknown')
         );
 
-        $userName = $borrowRequest->user?->profile?->full_name ?? $borrowRequest->user?->email ?? 'User';
-        $message = "{$userName} wants to borrow {$bookTitles}{$moreText} (Request #{$borrowRequest->id})";
+        $userName = $borrowRequest->user?->profile?->full_name ?? $borrowRequest->user?->email ?? $this->t('User');
+        $message = $this->t(':name wants to borrow :books (Request #:id)', [
+            'name' => $userName,
+            'books' => $bookTitles.$moreText,
+            'id' => $borrowRequest->id,
+        ]);
         $details = [
-            'Request ID' => '#'.$borrowRequest->id,
-            'Borrower' => $userName,
-            'Borrow Date' => Carbon::parse($borrowRequest->borrow_date)->format('d M Y'),
-            'Return Date' => Carbon::parse($borrowRequest->return_date)->format('d M Y'),
-            'Status' => 'Processing',
+            $this->t('Request ID') => '#'.$borrowRequest->id,
+            $this->t('Borrower') => $userName,
+            $this->t('Borrow Date') => Carbon::parse($borrowRequest->borrow_date)->format('d M Y'),
+            $this->t('Return Date') => Carbon::parse($borrowRequest->return_date)->format('d M Y'),
+            $this->t('Status') => $this->t('Processing'),
         ];
 
         $admins = User::with('profile')->where('role', 'admin')->get();
@@ -190,7 +202,7 @@ class BorrowNotificationService extends BaseNotificationService
         foreach ($admins as $admin) {
             $this->dispatchNotification(
                 $admin,
-                'New Borrow Request',
+                $this->t('New Borrow Request'),
                 $message,
                 'borrow_request',
                 'borrow',
@@ -207,14 +219,17 @@ class BorrowNotificationService extends BaseNotificationService
                     ])->toArray()
                 ],
                 fn () => new BorrowNotificationMail(
-                    subjectLine: 'New Borrow Request - Bookera',
-                    title: 'New Borrow Request',
+                    subjectLine: $this->t('New Borrow Request - Bookera'),
+                    title: $this->t('New Borrow Request'),
                     bodyMessage: $message,
                     details: $details,
                     books: $books,
-                    footerNote: 'Review the request from the admin dashboard.',
+                    footerNote: $this->t('Review the request from the admin dashboard.'),
                 ),
-                "Borrow request from {$userName}: {$bookTitles}{$moreText}",
+                $this->t('Borrow request from :name: :books', [
+                    'name' => $userName,
+                    'books' => $bookTitles.$moreText,
+                ]),
                 true,
                 false
             );
@@ -231,12 +246,16 @@ class BorrowNotificationService extends BaseNotificationService
 
         DatabaseNotificationService::send(
             $borrowRequest->user_id,
-            'Borrow Request Approved',
-            'Your borrow request #'.$borrowRequest->id.' has been approved. Borrow code: '.$borrow->borrow_code.'. Please come to the library on '.Carbon::parse($borrowRequest->borrow_date)->format('d M Y').'.',
+            $this->t('Borrow Request Approved'),
+            $this->t('Your borrow request #:id has been approved. Borrow code: :code. Please come to the library on :date.', [
+                'id' => $borrowRequest->id,
+                'code' => $borrow->borrow_code,
+                'date' => Carbon::parse($borrowRequest->borrow_date)->format('d M Y'),
+            ]),
             'borrow_request_approved',
             'borrow',
             [
-                'request_id' => $borrowRequest->id, 
+                'request_id' => $borrowRequest->id,
                 'borrow_code' => $borrow->borrow_code,
                 'books' => $borrowRequest->borrowRequestDetails->map(fn($d) => [
                     'title' => $d->book?->title,
@@ -262,23 +281,23 @@ class BorrowNotificationService extends BaseNotificationService
 
         if ($profile->notification_whatsapp && $profile->phone_number) {
             $bookList = $borrowRequest->borrowRequestDetails->map(function ($detail) {
-                return '  • '.($detail->book->title ?? 'Unknown');
+                return '  • '.($detail->book->title ?? $this->t('Unknown'));
             })->implode("\n");
 
-            $message = "🎉 *BOOKERA — Peminjaman Disetujui!*\n"
+            $message = $this->t("🎉 *BOOKERA — Borrow Approved!*\n")
                 ."━━━━━━━━━━━━━━━━━━━━\n\n"
-                ."Halo, *{$profile->full_name}*! 👋\n\n"
-                ."Permintaan peminjaman Anda telah *disetujui* oleh petugas perpustakaan.\n\n"
-                ."📋 *Detail Peminjaman:*\n"
-                .'  🔖 No. Request   : #'.$borrowRequest->id."\n"
-                .'  🎫 Kode Pinjam   : *'.$borrow->borrow_code."*\n"
-                .'  📅 Tanggal Ambil : '.Carbon::parse($borrowRequest->borrow_date)->format('d M Y')."\n"
-                .'  🔄 Batas Kembali : '.Carbon::parse($borrowRequest->return_date)->format('d M Y')."\n\n"
-                ."📚 *Buku yang Dipinjam:*\n"
+                .$this->t('Hello, *:name*! 👋', ['name' => $profile->full_name])."\n\n"
+                .$this->t('Your borrow request has been *approved* by the library staff.')."\n\n"
+                .$this->t('📋 *Borrow Details:*')."\n"
+                .$this->t('  🔖 Request No.   : #:id', ['id' => $borrowRequest->id])."\n"
+                .$this->t('  🎫 Borrow Code   : *:code*', ['code' => $borrow->borrow_code])."\n"
+                .$this->t('  📅 Pickup Date : :date', ['date' => Carbon::parse($borrowRequest->borrow_date)->format('d M Y')])."\n"
+                .$this->t('  🔄 Return Date : :date', ['date' => Carbon::parse($borrowRequest->return_date)->format('d M Y')])."\n\n"
+                .$this->t('📚 *Borrowed Books:*')."\n"
                 .$bookList."\n\n"
                 ."━━━━━━━━━━━━━━━━━━━━\n"
-                ."⚠️ Tunjukkan *kode pinjam* kepada petugas saat mengambil buku.\n\n"
-                .'_Bookera — Perpustakaan Digital_';
+                .$this->t('⚠️ Show the *borrow code* to the staff when picking up the books.')."\n\n"
+                .$this->t('_Bookera — Digital Library_');
 
             try {
                 (new FonnteService)->send($profile->phone_number, $message);
@@ -298,12 +317,15 @@ class BorrowNotificationService extends BaseNotificationService
 
         DatabaseNotificationService::send(
             $borrowRequest->user_id,
-            'Borrow Request Rejected',
-            'Your borrow request #'.$borrowRequest->id.' has been rejected.'.$reason,
+            $this->t('Borrow Request Rejected'),
+            $this->t('Your borrow request #:id has been rejected.:reason', [
+                'id' => $borrowRequest->id,
+                'reason' => $reason,
+            ]),
             'borrow_request_rejected',
             'borrow',
             [
-                'request_id' => $borrowRequest->id, 
+                'request_id' => $borrowRequest->id,
                 'reject_reason' => $borrowRequest->reject_reason,
                 'books' => $borrowRequest->borrowRequestDetails->map(fn($d) => [
                     'title' => $d->book?->title,
@@ -329,23 +351,23 @@ class BorrowNotificationService extends BaseNotificationService
 
         if ($profile->notification_whatsapp && $profile->phone_number) {
             $bookList = $borrowRequest->borrowRequestDetails->map(function ($detail) {
-                return '  • '.($detail->book->title ?? 'Unknown');
+                return '  • '.($detail->book->title ?? $this->t('Unknown'));
             })->implode("\n");
 
             $reasonText = $borrowRequest->reject_reason
-                ? "📝 *Alasan Penolakan:*\n  ".$borrowRequest->reject_reason."\n\n"
+                ? $this->t("📝 *Reason for Rejection:*\n  :reason\n\n", ['reason' => $borrowRequest->reject_reason])
                 : '';
 
-            $message = "❌ *BOOKERA — Peminjaman Ditolak*\n"
+            $message = $this->t("❌ *BOOKERA — Borrow Rejected*\n")
                 ."━━━━━━━━━━━━━━━━━━━━\n\n"
-                ."Halo, *{$profile->full_name}*! 👋\n\n"
-                .'Mohon maaf, permintaan peminjaman *#'.$borrowRequest->id."* tidak dapat diproses.\n\n"
-                ."📚 *Buku yang Diminta:*\n"
+                .$this->t('Hello, *:name*! 👋', ['name' => $profile->full_name])."\n\n"
+                .$this->t('Sorry, borrow request *#:id* could not be processed.', ['id' => $borrowRequest->id])."\n\n"
+                .$this->t('📚 *Requested Books:*')."\n"
                 .$bookList."\n\n"
                 .$reasonText
-                ."💡 Anda dapat mengajukan permintaan baru dengan memilih buku yang tersedia.\n\n"
+                .$this->t('💡 You can submit a new request by selecting available books.')."\n\n"
                 ."━━━━━━━━━━━━━━━━━━━━\n"
-                .'_Bookera — Perpustakaan Digital_';
+                .$this->t('_Bookera — Digital Library_');
 
             try {
                 (new FonnteService)->send($profile->phone_number, $message);
@@ -361,16 +383,19 @@ class BorrowNotificationService extends BaseNotificationService
 
         [$bookTitles, $moreText, $books] = $this->summarizeBooks(
             $borrowRequest->borrowRequestDetails,
-            fn ($detail) => $detail->book->title ?? 'Unknown'
+            fn ($detail) => $detail->book->title ?? $this->t('Unknown')
         );
 
-        $userName = $borrowRequest->user?->profile?->full_name ?? $borrowRequest->user?->email ?? 'User';
-        $message = "{$userName} cancelled borrow request #{$borrowRequest->id}";
+        $userName = $borrowRequest->user?->profile?->full_name ?? $borrowRequest->user?->email ?? $this->t('User');
+        $message = $this->t(':name cancelled borrow request #:id', [
+            'name' => $userName,
+            'id' => $borrowRequest->id,
+        ]);
         $details = [
-            'Request ID' => '#'.$borrowRequest->id,
-            'Borrower' => $userName,
-            'Status' => 'Cancelled',
-            'Books' => $bookTitles.$moreText,
+            $this->t('Request ID') => '#'.$borrowRequest->id,
+            $this->t('Borrower') => $userName,
+            $this->t('Status') => $this->t('Cancelled'),
+            $this->t('Books') => $bookTitles.$moreText,
         ];
 
         $admins = User::with('profile')->where('role', 'admin')->get();
@@ -378,7 +403,7 @@ class BorrowNotificationService extends BaseNotificationService
         foreach ($admins as $admin) {
             $this->dispatchNotification(
                 $admin,
-                'Borrow Request Cancelled',
+                $this->t('Borrow Request Cancelled'),
                 $message,
                 'borrow_request_cancelled',
                 'borrow',
@@ -395,14 +420,18 @@ class BorrowNotificationService extends BaseNotificationService
                     ])->toArray()
                 ],
                 fn () => new BorrowNotificationMail(
-                    subjectLine: 'Borrow Request Cancelled - Bookera',
-                    title: 'Borrow Request Cancelled',
+                    subjectLine: $this->t('Borrow Request Cancelled - Bookera'),
+                    title: $this->t('Borrow Request Cancelled'),
                     bodyMessage: $message,
                     details: $details,
                     books: $books,
-                    footerNote: 'The request was cancelled by the user.',
+                    footerNote: $this->t('The request was cancelled by the user.'),
                 ),
-                "{$userName} cancelled borrow request #{$borrowRequest->id}. Books: {$bookTitles}{$moreText}",
+                $this->t(':name cancelled borrow request #:id. Books: :books', [
+                    'name' => $userName,
+                    'id' => $borrowRequest->id,
+                    'books' => $bookTitles.$moreText,
+                ]),
                 true,
                 false
             );

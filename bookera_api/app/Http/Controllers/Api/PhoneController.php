@@ -48,10 +48,10 @@ class PhoneController extends Controller
 
         if (!$sent) {
             Cache::forget($cacheKey);
-            return ApiResponse::errorResponse('Gagal mengirim OTP. Pastikan nomor WhatsApp valid dan coba lagi.', null, 500);
+            return ApiResponse::errorResponse('Failed to send OTP. Make sure the WhatsApp number is valid and try again.', null, 500);
         }
 
-        return ApiResponse::successResponse('OTP berhasil dikirim ke nomor WhatsApp baru Anda.', [
+        return ApiResponse::successResponse('OTP has been sent to your new WhatsApp number.', [
             'phone_hint' => '***' . substr($newPhone, -4),
         ]);
     }
@@ -71,11 +71,11 @@ class PhoneController extends Controller
         $cached = Cache::get($cacheKey);
 
         if (!$cached) {
-            return ApiResponse::errorResponse('OTP sudah kadaluarsa atau tidak ditemukan. Silakan minta OTP baru.', null, 422);
+            return ApiResponse::errorResponse('The OTP has expired or was not found. Please request a new OTP.', null, 422);
         }
 
         if ($cached['otp'] !== $request->otp) {
-            return ApiResponse::errorResponse('Kode OTP tidak valid.', null, 422);
+            return ApiResponse::errorResponse('The OTP code is invalid.', null, 422);
         }
 
         // Update phone number
@@ -88,6 +88,6 @@ class PhoneController extends Controller
 
         $user->load('profile');
 
-        return ApiResponse::successResponse('Nomor telepon berhasil diperbarui.', $user);
+        return ApiResponse::successResponse('Phone number updated successfully.', $user);
     }
 }

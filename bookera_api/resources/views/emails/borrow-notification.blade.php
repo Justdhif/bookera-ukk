@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="{{ app()->getLocale() }}" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,7 +26,7 @@
               <tr>
                 <td align="center">
                   <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:700;letter-spacing:-0.3px;">{{ $title }}</h1>
-                  <p style="color:rgba(255,255,255,0.88);margin:8px 0 0;font-size:14px;">Borrow notification from the library system</p>
+                  <p style="color:rgba(255,255,255,0.88);margin:8px 0 0;font-size:14px;">{{ __('Borrow notification from the library system') }}</p>
                 </td>
               </tr>
             </table>
@@ -55,7 +55,7 @@
             @endif
 
             @if(!empty($books))
-            <p style="color:#111827;font-size:14px;font-weight:600;margin:0 0 12px;">Books</p>
+            <p style="color:#111827;font-size:14px;font-weight:600;margin:0 0 12px;">{{ __('Books') }}</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
               @foreach($books as $book)
               <tr>
@@ -98,10 +98,10 @@
         <tr>
           <td style="padding:24px 40px;text-align:center;background:#f9fafb;">
             <p style="color:#9ca3af;font-size:12px;margin:0 0 4px;">
-              &copy; {{ date('Y') }} Bookera Library Management System. All rights reserved.
+              &copy; {{ date('Y') }} Bookera Library Management System. {{ __('All rights reserved.') }}
             </p>
             <p style="color:#d1d5db;font-size:11px;margin:0;">
-              This is an automated message — please do not reply to this email.
+              {{ __('This is an automated message — please do not reply to this email.') }}
             </p>
           </td>
         </tr>

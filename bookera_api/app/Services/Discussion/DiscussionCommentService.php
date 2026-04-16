@@ -51,8 +51,8 @@ class DiscussionCommentService
         if ($parent === null && $post->user_id !== $user->id) {
             Notification::create([
                 'user_id' => $post->user_id,
-                'title'   => 'Komentar baru di postinganmu',
-                'message' => "{$actorName} mengomentari postinganmu.",
+                'title'   => __('New comment on your post'),
+                'message' => __(':name commented on your post.', ['name' => $actorName]),
                 'type'    => 'discussion_comment',
                 'module'  => 'discussion',
                 'data'    => [
@@ -67,8 +67,8 @@ class DiscussionCommentService
         if ($parent !== null && $parent->user_id !== $user->id) {
             Notification::create([
                 'user_id' => $parent->user_id,
-                'title'   => 'Balasan komentar baru',
-                'message' => "{$actorName} membalas komentarmu.",
+                'title'   => __('New comment reply'),
+                'message' => __(':name replied to your comment.', ['name' => $actorName]),
                 'type'    => 'discussion_reply',
                 'module'  => 'discussion',
                 'data'    => [

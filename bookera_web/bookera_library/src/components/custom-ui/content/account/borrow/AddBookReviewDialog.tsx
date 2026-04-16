@@ -51,14 +51,14 @@ export function AddBookReviewDialog({
         rating,
         review,
       });
-      toast.success(t("review.submitSuccess") || "Review submitted successfully!");
+      toast.success(t("review.submitSuccess"));
       setOpen(false);
       setReview("");
       setRating(5);
       onSuccess?.();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || t("review.submitError") || "Failed to submit review"
+        error.response?.data?.message || t("review.submitError")
       );
     } finally {
       setLoading(false);
@@ -71,7 +71,7 @@ export function AddBookReviewDialog({
         {trigger || (
           <Button variant="outline" size="sm" className="flex items-center gap-2">
             <MessageSquarePlus className="h-4 w-4" />
-            {t("addReview") || "Add Review"}
+            {t("addReview")}
           </Button>
         )}
       </DialogTrigger>
@@ -79,10 +79,10 @@ export function AddBookReviewDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MessageSquarePlus className="h-5 w-5 text-primary" />
-            {t("review.writeReview") || "Write a Review"}
+            {t("review.writeReview")}
           </DialogTitle>
           <DialogDescription>
-            {t("review.reviewingBook", { title: bookTitle }) || `You are reviewing: ${bookTitle}`}
+            {t("review.reviewingBook", { title: bookTitle })}
           </DialogDescription>
         </DialogHeader>
 
@@ -137,13 +137,8 @@ export function AddBookReviewDialog({
           <Button variant="ghost" onClick={() => setOpen(false)} disabled={loading}>
             {tCommon("cancel")}
           </Button>
-          <Button onClick={handleSubmit} disabled={loading} className="gap-2">
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <MessageSquarePlus className="h-4 w-4" />
-            )}
-            {t("review.submitBtn") || "Submit Review"}
+          <Button variant="submit" onClick={handleSubmit} disabled={loading} loading={loading} className="gap-2">
+            {t("review.submitBtn")}
           </Button>
         </DialogFooter>
       </DialogContent>

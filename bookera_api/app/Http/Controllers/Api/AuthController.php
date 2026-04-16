@@ -34,7 +34,7 @@ class AuthController extends Controller
                 $request->password
             );
 
-            return ApiResponse::successResponse('Login berhasil', $data);
+            return ApiResponse::successResponse('Login successful', $data);
         } catch (\Exception $e) {
             $statusCode = $e->getCode() === 403 ? 403 : 401;
 
@@ -59,9 +59,18 @@ class AuthController extends Controller
 
             $data = $this->authService->register($userData);
 
-            return ApiResponse::successResponse('Registrasi berhasil', $data, 201);
+            return ApiResponse::successResponse('Registration successful', $data, 201);
         } catch (\Exception $e) {
-            return ApiResponse::errorResponse($e->getMessage(), 500);
+            $message = $e->getMessage();
+            $prefix = 'Gagal melakukan registrasi: ';
+
+            if (str_starts_with($message, $prefix)) {
+                $message = substr($message, strlen($prefix));
+            }
+
+            return ApiResponse::errorResponse('Registration failed: :message', [
+                'message' => $message,
+            ], 500);
         }
     }
 
@@ -77,11 +86,20 @@ class AuthController extends Controller
                 $request->file('avatar')
             );
 
-            return ApiResponse::successResponse('Profile berhasil diperbarui', [
+            return ApiResponse::successResponse('Profile updated successfully', [
                 'user' => $user,
             ]);
         } catch (\Exception $e) {
-            return ApiResponse::errorResponse('Gagal memperbarui profile: '.$e->getMessage(), 500);
+            $message = $e->getMessage();
+            $prefix = 'Gagal mengupdate profile: ';
+
+            if (str_starts_with($message, $prefix)) {
+                $message = substr($message, strlen($prefix));
+            }
+
+            return ApiResponse::errorResponse('Failed to update profile: :message', [
+                'message' => $message,
+            ], 500);
         }
     }
 
@@ -93,8 +111,7 @@ class AuthController extends Controller
         try {
             $this->authService->forgotPassword($request->email);
 
-            return ApiResponse::successResponse(
-                'Kode verifikasi telah dikirim ke email Anda',
+            return ApiResponse::successResponse('Verification code has been sent to your email',
                 ['email' => $request->email]
             );
         } catch (\Exception $e) {
@@ -114,7 +131,7 @@ class AuthController extends Controller
                 $request->password
             );
 
-            return ApiResponse::successResponse('Password berhasil direset. Silakan login dengan password baru.');
+            return ApiResponse::successResponse('Password has been reset. Please log in with your new password.');
         } catch (\Exception $e) {
             $statusCode = 400;
 
@@ -135,7 +152,7 @@ class AuthController extends Controller
     {
         $this->authService->logout($request->user());
 
-        return ApiResponse::successResponse('Logout berhasil', null);
+        return ApiResponse::successResponse('Logout successful', null);
     }
 
     /**
@@ -145,7 +162,7 @@ class AuthController extends Controller
     {
         $user = $this->authService->getCurrentUser($request->user());
 
-        return ApiResponse::successResponse('Data user', ['user' => $user]);
+        return ApiResponse::successResponse('User data', ['user' => $user]);
     }
 
     /**
@@ -160,7 +177,7 @@ class AuthController extends Controller
                 $request->password
             );
 
-            return ApiResponse::successResponse('Password berhasil diubah');
+            return ApiResponse::successResponse('Password changed successfully');
         } catch (\Exception $e) {
             $statusCode = $e->getCode() ?: 400;
             return ApiResponse::errorResponse($e->getMessage(), $statusCode);

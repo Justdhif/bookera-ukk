@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
@@ -55,9 +56,11 @@ export default function ProfileClient() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchUser();
   }, []);
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!user) return;
@@ -77,6 +80,7 @@ export default function ProfileClient() {
       setSubmitting(false);
     }
   };
+
   const handleCancelEdit = () => {
     if (user) {
       setFormData({
@@ -97,6 +101,7 @@ export default function ProfileClient() {
     }
     setIsEditMode(false);
   };
+
   const handleAvatarChange = (avatar: string | File) => {
     if (typeof avatar === "string") {
       setAvatarPreview(avatar);
@@ -108,6 +113,7 @@ export default function ProfileClient() {
       reader.readAsDataURL(avatar);
     }
   };
+
   return (
     <div className="space-y-6">
       <ContentHeader
@@ -130,7 +136,7 @@ export default function ProfileClient() {
             <div className="flex gap-2">
               <Button
                 type="button"
-                variant="submit"
+                variant="outline"
                 onClick={handleCancelEdit}
                 disabled={submitting}
                 className="h-8"

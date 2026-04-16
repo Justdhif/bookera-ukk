@@ -25,32 +25,32 @@ class BookReturnController extends Controller
     {
         $returns = $this->bookReturnService->getByBorrow($borrow);
 
-        return ApiResponse::successResponse('Data pengembalian buku berhasil diambil', $returns);
+        return ApiResponse::successResponse('Book return data retrieved successfully', $returns);
     }
 
     public function store(StoreBookReturnRequest $request, Borrow $borrow): JsonResponse
     {
         if (!$this->bookReturnService->canCreate($borrow)) {
-            return ApiResponse::errorResponse('Peminjaman ini tidak dalam status open', null, 400);
+            return ApiResponse::errorResponse('This borrow is not in open status', null, 400);
         }
 
         $bookReturn = $this->bookReturnService->create($borrow, $request->validated());
 
-        return ApiResponse::successResponse('Request pengembalian berhasil dibuat. Menunggu persetujuan admin.', $bookReturn, 201);
+        return ApiResponse::successResponse('Return request created successfully. Waiting for admin approval.', $bookReturn, 201);
     }
 
     public function show(BookReturn $bookReturn): JsonResponse
     {
         $detail = $this->bookReturnService->getDetail($bookReturn);
 
-        return ApiResponse::successResponse('Detail pengembalian buku', $detail);
+        return ApiResponse::successResponse('Book return details', $detail);
     }
 
     public function updateConditions(UpdateBookReturnConditionsRequest $request, BookReturn $bookReturn): JsonResponse
     {
         try {
             $result = $this->bookReturnService->updateConditions($bookReturn, $request->validated()['conditions']);
-            return ApiResponse::successResponse('Kondisi buku berhasil diperbarui', $result);
+            return ApiResponse::successResponse('Book condition updated successfully', $result);
         } catch (Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }
@@ -60,7 +60,7 @@ class BookReturnController extends Controller
     {
         try {
             $fines = $this->bookReturnService->finishFines($bookReturn);
-            return ApiResponse::successResponse('Semua denda berhasil ditandai sebagai lunas', $fines);
+            return ApiResponse::successResponse('All fines have been marked as paid', $fines);
         } catch (Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }

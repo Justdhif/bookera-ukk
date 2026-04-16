@@ -34,7 +34,7 @@ class BorrowController extends Controller
 
         $borrows = $this->borrowService->getAll($filters);
 
-        return ApiResponse::successResponse('Data peminjaman berhasil diambil', $borrows);
+        return ApiResponse::successResponse('Borrow data retrieved successfully', $borrows);
     }
 
     public function store(StoreBorrowRequest $request): JsonResponse
@@ -44,8 +44,7 @@ class BorrowController extends Controller
             $request->user()
         );
 
-        return ApiResponse::successResponse(
-            'Permintaan peminjaman berhasil dibuat dan menunggu persetujuan admin',
+        return ApiResponse::successResponse('Borrow request created and waiting for admin approval',
             $borrow,
             201
         );
@@ -58,8 +57,7 @@ class BorrowController extends Controller
             $request->user()
         );
 
-        return ApiResponse::successResponse(
-            'Peminjaman langsung berhasil dibuat dengan status open',
+        return ApiResponse::successResponse('Direct borrow created successfully with open status',
             $borrow,
             201
         );
@@ -69,45 +67,45 @@ class BorrowController extends Controller
     {
         $borrow = $this->borrowService->getById($borrow);
 
-        return ApiResponse::successResponse('Detail peminjaman', $borrow);
+        return ApiResponse::successResponse('Borrow details', $borrow);
     }
 
     public function showByCode(string $code): JsonResponse
     {
         $borrow = $this->borrowService->getByCode($code);
 
-        return ApiResponse::successResponse('Detail peminjaman', $borrow);
+        return ApiResponse::successResponse('Borrow details', $borrow);
     }
 
     public function update(UpdateBorrowRequest $request, Borrow $borrow): JsonResponse
     {
         $borrow = $this->borrowService->update($borrow, $request->validated());
 
-        return ApiResponse::successResponse('Peminjaman berhasil diupdate', $borrow);
+        return ApiResponse::successResponse('Borrow updated successfully', $borrow);
     }
 
     public function getBorrowByUser(Request $request): JsonResponse
     {
         $borrows = $this->borrowService->getByUser($request->user());
 
-        return ApiResponse::successResponse('Data peminjaman user', $borrows);
+        return ApiResponse::successResponse('User borrow data', $borrows);
     }
 
     public function assignCopies(Request $request, Borrow $borrow): JsonResponse
     {
         if (! $borrow->borrow_request_id) {
-            return ApiResponse::errorResponse('Borrow ini tidak berasal dari request', null, 422);
+            return ApiResponse::errorResponse('This borrow was not created from a request', null, 422);
         }
 
         if ($borrow->borrowDetails()->count() > 0) {
-            return ApiResponse::errorResponse('Buku salinan sudah pernah di-assign ke peminjaman ini', null, 422);
+            return ApiResponse::errorResponse('Book copies have already been assigned to this borrow', null, 422);
         }
 
         $copyIds = $request->input('copy_ids', []);
 
         $borrow = $this->borrowRequestService->addCopiesToBorrow($borrow, $copyIds);
 
-        return ApiResponse::successResponse('Buku salinan berhasil di-assign ke peminjaman', $borrow);
+        return ApiResponse::successResponse('Book copies assigned to borrow successfully', $borrow);
     }
 
     public function complete(Borrow $borrow): JsonResponse
@@ -115,7 +113,7 @@ class BorrowController extends Controller
         try {
             $borrow = $this->borrowService->complete($borrow);
 
-            return ApiResponse::successResponse('Peminjaman berhasil diselesaikan dan ditutup', $borrow);
+            return ApiResponse::successResponse('Borrow completed and closed successfully', $borrow);
         } catch (\Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }

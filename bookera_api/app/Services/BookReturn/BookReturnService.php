@@ -209,7 +209,7 @@ class BookReturnService
         $unpaidFines = $borrow->fines()->where('status', 'unpaid')->get();
 
         if ($unpaidFines->isEmpty()) {
-            throw new Exception('Tidak ada denda yang belum dibayar untuk peminjaman ini.');
+            throw new Exception('There are no unpaid fines for this borrow.');
         }
 
         DB::transaction(function () use ($unpaidFines, $borrow) {

@@ -20,10 +20,10 @@ class NotificationSettingsController extends Controller
         $profile = $user->profile;
 
         if (! $profile) {
-            return ApiResponse::errorResponse('Profil pengguna tidak ditemukan', 404);
+            return ApiResponse::errorResponse('User profile not found', 404);
         }
 
-        return ApiResponse::successResponse('Pengaturan notifikasi berhasil diambil', [
+        return ApiResponse::successResponse('Notification settings retrieved successfully', [
             'notification_enabled' => (bool) $profile->notification_enabled,
             'notification_email' => (bool) $profile->notification_email,
             'notification_whatsapp' => (bool) $profile->notification_whatsapp,
@@ -45,7 +45,7 @@ class NotificationSettingsController extends Controller
         $profile = $user->profile;
 
         if (! $profile) {
-            return ApiResponse::errorResponse('Profil pengguna tidak ditemukan', 404);
+            return ApiResponse::errorResponse('User profile not found', 404);
         }
 
         $profile->update([
@@ -54,7 +54,7 @@ class NotificationSettingsController extends Controller
             'notification_whatsapp' => $validated['notification_whatsapp'],
         ]);
 
-        return ApiResponse::successResponse('Pengaturan notifikasi berhasil diperbarui', [
+        return ApiResponse::successResponse('Notification settings updated successfully', [
             'notification_enabled' => (bool) $profile->notification_enabled,
             'notification_email' => (bool) $profile->notification_email,
             'notification_whatsapp' => (bool) $profile->notification_whatsapp,

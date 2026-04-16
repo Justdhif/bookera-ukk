@@ -30,7 +30,7 @@ class VerifyEmailChangeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Kode Verifikasi Perubahan Email',
+            subject: __('Email Change Verification Code'),
         );
     }
 

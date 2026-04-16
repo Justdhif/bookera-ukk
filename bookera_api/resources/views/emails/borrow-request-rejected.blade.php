@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="{{ app()->getLocale() }}" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Borrow Request Rejected – Bookera</title>
+  <title>{{ __('Borrow Request Rejected') }} – Bookera</title>
 </head>
 <body style="margin:0;padding:0;background-color:#fef2f2;font-family:'Segoe UI',Arial,sans-serif;">
 
@@ -36,8 +36,8 @@
               </tr>
               <tr>
                 <td align="center">
-                  <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:700;letter-spacing:-0.3px;">Request Rejected</h1>
-                  <p style="color:rgba(255,255,255,0.88);margin:8px 0 0;font-size:14px;">Your borrow request could not be approved</p>
+                  <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:700;letter-spacing:-0.3px;">{{ __('Request Rejected') }}</h1>
+                  <p style="color:rgba(255,255,255,0.88);margin:8px 0 0;font-size:14px;">{{ __('Your borrow request could not be approved') }}</p>
                 </td>
               </tr>
             </table>
@@ -48,11 +48,10 @@
         <tr>
           <td style="padding:36px 40px 0;">
             <p style="color:#374151;font-size:15px;line-height:1.7;margin:0 0 8px;">
-              Hello, <strong style="color:#111827;">{{ $borrowRequest->user->profile->full_name ?? $borrowRequest->user->email }}</strong>
+              {{ __('Hello,') }} <strong style="color:#111827;">{{ $borrowRequest->user->profile->full_name ?? $borrowRequest->user->email }}</strong>
             </p>
             <p style="color:#6b7280;font-size:14px;line-height:1.7;margin:0 0 28px;">
-              We regret to inform you that your borrow request <strong style="color:#111827;">#{{ $borrowRequest->id }}</strong>
-              has been <strong style="color:#dc2626;">rejected</strong> by the library.
+              {{ __('We regret to inform you that your borrow request :id has been rejected by the library.', ['id' => '#'.$borrowRequest->id]) }}
             </p>
 
             <!-- Request Summary -->
@@ -61,7 +60,7 @@
                 <td style="padding:14px 20px;border-bottom:1px solid #e5e7eb;">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                      <td style="color:#6b7280;font-size:13px;">Request ID</td>
+                      <td style="color:#6b7280;font-size:13px;">{{ __('Request ID') }}</td>
                       <td style="color:#111827;font-size:13px;font-weight:600;text-align:right;">#{{ $borrowRequest->id }}</td>
                     </tr>
                   </table>
@@ -71,7 +70,7 @@
                 <td style="padding:14px 20px;border-bottom:1px solid #e5e7eb;">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                      <td style="color:#6b7280;font-size:13px;">Requested Borrow Date</td>
+                      <td style="color:#6b7280;font-size:13px;">{{ __('Requested Borrow Date') }}</td>
                       <td style="color:#111827;font-size:13px;font-weight:600;text-align:right;">{{ \Carbon\Carbon::parse($borrowRequest->borrow_date)->format('d M Y') }}</td>
                     </tr>
                   </table>
@@ -81,9 +80,9 @@
                 <td style="padding:14px 20px;">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                      <td style="color:#6b7280;font-size:13px;">Status</td>
+                      <td style="color:#6b7280;font-size:13px;">{{ __('Status') }}</td>
                       <td style="text-align:right;">
-                        <span style="background:#fee2e2;color:#b91c1c;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;">Rejected</span>
+                        <span style="background:#fee2e2;color:#b91c1c;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;">{{ __('Rejected') }}</span>
                       </td>
                     </tr>
                   </table>
@@ -96,7 +95,7 @@
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
               <tr>
                 <td style="background:#fef2f2;border-left:3px solid #dc2626;border-radius:0 8px 8px 0;padding:14px 18px;">
-                  <p style="color:#991b1b;font-size:13px;font-weight:600;margin:0 0 6px;text-transform:uppercase;letter-spacing:0.5px;">Reason for Rejection</p>
+                  <p style="color:#991b1b;font-size:13px;font-weight:600;margin:0 0 6px;text-transform:uppercase;letter-spacing:0.5px;">{{ __('Reason for Rejection') }}</p>
                   <p style="color:#7f1d1d;font-size:14px;line-height:1.6;margin:0;">{{ $borrowRequest->reject_reason }}</p>
                 </td>
               </tr>
@@ -105,15 +104,15 @@
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
               <tr>
                 <td style="background:#fef2f2;border-left:3px solid #dc2626;border-radius:0 8px 8px 0;padding:14px 18px;">
-                  <p style="color:#991b1b;font-size:13px;font-weight:600;margin:0 0 6px;text-transform:uppercase;letter-spacing:0.5px;">Reason for Rejection</p>
-                  <p style="color:#9ca3af;font-size:14px;font-style:italic;margin:0;">No specific reason provided.</p>
+                  <p style="color:#991b1b;font-size:13px;font-weight:600;margin:0 0 6px;text-transform:uppercase;letter-spacing:0.5px;">{{ __('Reason for Rejection') }}</p>
+                  <p style="color:#9ca3af;font-size:14px;font-style:italic;margin:0;">{{ __('No specific reason provided.') }}</p>
                 </td>
               </tr>
             </table>
             @endif
 
             <!-- Requested Books -->
-            <p style="color:#111827;font-size:14px;font-weight:600;margin:0 0 12px;">Requested Books</p>
+            <p style="color:#111827;font-size:14px;font-weight:600;margin:0 0 12px;">{{ __('Requested Books') }}</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
               @foreach($borrowRequest->borrowRequestDetails as $detail)
               <tr>
@@ -121,7 +120,7 @@
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border-left:3px solid #d1d5db;border-radius:0 6px 6px 0;">
                     <tr>
                       <td style="padding:10px 14px;">
-                        <span style="color:#374151;font-size:13px;font-weight:500;">{{ $detail->book->title ?? 'Unknown' }}</span>
+                        <span style="color:#374151;font-size:13px;font-weight:500;">{{ $detail->book->title ?? __('Unknown') }}</span>
                         @if($detail->book->author ?? null)
                         <br><span style="color:#9ca3af;font-size:12px;">{{ $detail->book->author }}</span>
                         @endif
@@ -141,9 +140,9 @@
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:10px;border:1px solid #a7f3d0;">
               <tr>
                 <td style="padding:16px 20px;">
-                  <p style="color:#065f46;font-size:13px;font-weight:600;margin:0 0 4px;">What can you do next?</p>
+                  <p style="color:#065f46;font-size:13px;font-weight:600;margin:0 0 4px;">{{ __('What can you do next?') }}</p>
                   <p style="color:#047857;font-size:13px;line-height:1.6;margin:0;">
-                    You may submit a new borrow request with different dates or contact the library directly for more information about this rejection.
+                    {{ __('You may submit a new borrow request with different dates or contact the library directly for more information about this rejection.') }}
                   </p>
                 </td>
               </tr>
@@ -162,10 +161,10 @@
         <tr>
           <td style="padding:24px 40px;text-align:center;background:#f9fafb;">
             <p style="color:#9ca3af;font-size:12px;margin:0 0 4px;">
-              &copy; {{ date('Y') }} Bookera Library Management System. All rights reserved.
+              &copy; {{ date('Y') }} Bookera Library Management System. {{ __('All rights reserved.') }}
             </p>
             <p style="color:#d1d5db;font-size:11px;margin:0;">
-              This is an automated message — please do not reply to this email.
+              {{ __('This is an automated message — please do not reply to this email.') }}
             </p>
           </td>
         </tr>

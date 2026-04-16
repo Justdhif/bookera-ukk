@@ -26,14 +26,14 @@ class ReviewController extends Controller
 
         $reviews = $this->reviewService->getByBookId($bookId, $filters);
 
-        return ApiResponse::successResponse('Data ulasan berhasil diambil', $reviews);
+        return ApiResponse::successResponse('Review data retrieved successfully', $reviews);
     }
 
     public function store(StoreReviewRequest $request): JsonResponse
     {
         try {
             $review = $this->reviewService->createOrUpdate($request->validated());
-            return ApiResponse::successResponse('Ulasan berhasil disimpan', $review, 201);
+            return ApiResponse::successResponse('Review saved successfully', $review, 201);
         } catch (\Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }
@@ -43,7 +43,7 @@ class ReviewController extends Controller
     {
         try {
             $this->reviewService->delete($bookId);
-            return ApiResponse::successResponse('Ulasan berhasil dihapus', null);
+            return ApiResponse::successResponse('Review deleted successfully', null);
         } catch (\Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 404);
         }
@@ -53,6 +53,6 @@ class ReviewController extends Controller
     {
         $review = $this->reviewService->check($bookId);
 
-        return ApiResponse::successResponse('Status ulasan', ['review' => $review]);
+        return ApiResponse::successResponse('Review status', ['review' => $review]);
     }
 }

@@ -12,6 +12,7 @@ import { formatDistanceToNow } from "date-fns";
 import { id, enUS } from "date-fns/locale";
 import { useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
+import DataLoading from "@/components/custom-ui/DataLoading";
 
 interface BookReviewSectionProps {
   book: Book;
@@ -97,18 +98,7 @@ export default function BookReviewSection({
         <h3 className="font-semibold text-xl">{t("latestReviews")}</h3>
 
         {loading ? (
-          <div className="space-y-4 animate-pulse">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex gap-4 p-4 border rounded-xl">
-                <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800" />
-                <div className="flex-1 space-y-2">
-                  <div className="w-32 h-4 bg-gray-200 dark:bg-gray-800 rounded" />
-                  <div className="w-24 h-3 bg-gray-200 dark:bg-gray-800 rounded" />
-                  <div className="w-full h-10 bg-gray-200 dark:bg-gray-800 rounded" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <DataLoading size="md" className="py-12" />
         ) : !reviews?.data.length ? (
           <div className="text-center py-12 px-4 border rounded-xl bg-gray-50/50 dark:bg-gray-800/20">
             <Star className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />

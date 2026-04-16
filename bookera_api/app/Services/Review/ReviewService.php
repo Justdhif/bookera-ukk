@@ -8,6 +8,9 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ReviewService
 {
+    public function __construct()
+    {
+    }
     public function getByBookId(int $bookId, array $filters): LengthAwarePaginator
     {
         $query = BookReview::with(['user.profile'])
@@ -33,7 +36,7 @@ class ReviewService
         ActivityLogger::log(
             $review->wasRecentlyCreated ? 'create' : 'update',
             'Review',
-            $review->wasRecentlyCreated ? "Memberikan ulasan buku dengan id {$data['book_id']}" : "Membaharui ulasan buku dengan id {$data['book_id']}",
+            $review->wasRecentlyCreated ? "Posted a book review for book ID {$data['book_id']}" : "Updated a book review for book ID {$data['book_id']}",
             ['rating' => $data['rating']],
             null,
             $review
@@ -49,7 +52,7 @@ class ReviewService
             ->first();
 
         if (!$review) {
-            throw new \Exception('Ulasan tidak ditemukan');
+            throw new \Exception('Review not found');
         }
 
         $oldData = $review->toArray();
@@ -58,7 +61,7 @@ class ReviewService
         ActivityLogger::log(
             'delete',
             'Review',
-            "Menghapus ulasan buku dengan id {$bookId}",
+            "Deleted book review for book ID {$bookId}",
             null,
             $oldData,
         );

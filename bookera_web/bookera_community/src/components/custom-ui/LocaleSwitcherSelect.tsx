@@ -10,6 +10,15 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Globe } from 'lucide-react';
+import { setCookie } from 'cookies-next';
+import { useRouter } from 'next/navigation';
+
+const COOKIE_NAME = 'NEXT_LOCALE';
+const COOKIE_OPTIONS = {
+  path: '/',
+  sameSite: 'lax' as const,
+  maxAge: 60 * 60 * 24 * 365,
+};
 
 type Props = {
   defaultValue: string;
@@ -27,11 +36,14 @@ export default function LocaleSwitcherSelect({
   iconOnly = false
 }: Props) {
   const [selectedValue, setSelectedValue] = useState(defaultValue);
+  const router = useRouter();
 
   function onChange(value: string) {
     const locale = value as Locale;
     setSelectedValue(value);
     setLocale(locale);
+    setCookie(COOKIE_NAME, locale, COOKIE_OPTIONS);
+    router.refresh();
   }
 
   const selectedItem = items.find(item => item.value === selectedValue);

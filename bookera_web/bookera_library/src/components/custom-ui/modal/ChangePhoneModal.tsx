@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -19,20 +20,24 @@ import { Smartphone, ShieldCheck, RefreshCw, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/axios";
 import { cn } from "@/lib/utils";
+
 interface ChangePhoneModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   currentPhone?: string;
   onSuccess: (newPhone: string) => void;
 }
+
 type Step = "change" | "otp";
 const RESEND_COOLDOWN = 60;
+
 export default function ChangePhoneModal({
   open,
   onOpenChange,
   currentPhone,
   onSuccess,
 }: ChangePhoneModalProps) {
+  const t = useTranslations("profile");
   const [step, setStep] = useState<Step>("change");
   const [newPhone, setNewPhone] = useState("");
   const [phoneHint, setPhoneHint] = useState("");
@@ -41,6 +46,7 @@ export default function ChangePhoneModal({
   const [resendCooldown, setResendCooldown] = useState(0);
   const otpRef = useRef<HTMLInputElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   useEffect(() => {
     if (open) {
       setStep("change");
@@ -52,11 +58,13 @@ export default function ChangePhoneModal({
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
   }, [open]);
+
   useEffect(() => {
     if (step === "otp") {
       setTimeout(() => otpRef.current?.focus(), 100);
     }
   }, [step]);
+
   const startResendCooldown = () => {
     setResendCooldown(RESEND_COOLDOWN);
     intervalRef.current = setInterval(() => {
@@ -69,11 +77,13 @@ export default function ChangePhoneModal({
       });
     }, 1000);
   };
+
   const handleSendOtp = async () => {
     if (!newPhone || newPhone.length < 8) {
-      toast.error("Masukkan nomor telepon yang valid");
+      toast.error(t("enterValidPhoneError"));
       return;
     }
+
     try {
       setSubmitting(true);
       const res = await api.post("/phone/request-change", {
@@ -83,48 +93,54 @@ export default function ChangePhoneModal({
       setPhoneHint(hint);
       setStep("otp");
       startResendCooldown();
-      toast.success("OTP berhasil dikirim ke WhatsApp Anda");
+      toast.success(t("otpSentPhoneSuccess"));
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Gagal mengirim OTP. Coba lagi.",
+        error.response?.data?.message || t("failedUpdate"),
       );
     } finally {
       setSubmitting(false);
     }
   };
+
   const handleResendOtp = async () => {
     if (resendCooldown > 0) return;
     await handleSendOtp();
   };
+
   const handleVerifyOtp = async () => {
     if (otp.length !== 6) {
-      toast.error("Masukkan 6 digit kode OTP");
+      toast.error(t("enterOtpError"));
       return;
     }
+
     try {
       setSubmitting(true);
       await api.post("/phone/verify-otp", { otp });
-      toast.success("Nomor telepon berhasil diperbarui");
+      toast.success(t("updatePhoneSuccess"));
       onSuccess(newPhone);
       onOpenChange(false);
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Kode OTP tidak valid atau kadaluarsa",
+        error.response?.data?.message || t("invalidOtp"),
       );
     } finally {
       setSubmitting(false);
     }
   };
+
   const handleOtpInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/\D/g, "").slice(0, 6);
     setOtp(val);
   };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       if (step === "change") handleSendOtp();
       else handleVerifyOtp();
     }
   };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -135,18 +151,17 @@ export default function ChangePhoneModal({
                 <div className="p-1.5 rounded-lg bg-brand-primary/10">
                   <Smartphone className="h-4 w-4 text-brand-primary" />
                 </div>
-                Ganti Nomor Telepon
+                {t("changePhoneTitle")}
               </DialogTitle>
               <DialogDescription>
-                Masukkan nomor baru Anda. Kami akan mengirim kode verifikasi via
-                WhatsApp.
+                {t("changePhoneDescription")}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-5 py-1">
               {currentPhone && (
                 <div className="rounded-lg border bg-muted/40 px-4 py-3 space-y-0.5">
                   <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                    Nomor saat ini
+                    {t("currentPhoneLabel")}
                   </p>
                   <p className="text-sm font-semibold tabular-nums">
                     {formatPhoneDisplay(currentPhone)}
@@ -155,17 +170,17 @@ export default function ChangePhoneModal({
               )}
               <div className="space-y-2">
                 <Label htmlFor="new-phone" variant="required">
-                  Nomor Baru
+                  {t("newPhoneLabel")}
                 </Label>
                 <PhoneInput
                   id="new-phone"
                   value={newPhone}
                   onChange={setNewPhone}
-                  placeholder="812 3456 7890"
+                  placeholder={t("newPhonePlaceholder")}
                   disabled={submitting}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Pastikan nomor ini aktif di WhatsApp
+                  {t("phoneValidationHint")}
                 </p>
               </div>
             </div>
@@ -176,7 +191,7 @@ export default function ChangePhoneModal({
                 onClick={() => onOpenChange(false)}
                 disabled={submitting}
               >
-                Batal
+                {t("batal")}
               </Button>
               <Button
                 type="button"
@@ -185,7 +200,7 @@ export default function ChangePhoneModal({
                 disabled={submitting || !newPhone || newPhone.length < 8}
                 loading={submitting}
               >
-                {submitting ? "Mengirim..." : "Kirim OTP"}
+                {submitting ? t("sending") : t("submit")}
               </Button>
             </DialogFooter>
           </>
@@ -196,19 +211,19 @@ export default function ChangePhoneModal({
                 <div className="p-1.5 rounded-lg bg-brand-primary/10">
                   <ShieldCheck className="h-4 w-4 text-brand-primary" />
                 </div>
-                Verifikasi OTP
+                {t("verifyOtpTitle")}
               </DialogTitle>
               <DialogDescription>
-                Masukkan 6 digit kode yang dikirim ke{" "}
+                {t("verifyOtpDescription")}{" "}
                 <span className="font-semibold text-foreground">
-                  {phoneHint || "WhatsApp Anda"}
+                  {phoneHint || "WhatsApp"}
                 </span>
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-5 py-1">
               <div className="space-y-2">
                 <Label htmlFor="otp-input" variant="required">
-                  Kode OTP
+                  {t("otpLabel")}
                 </Label>
                 <Input
                   id="otp-input"
@@ -218,7 +233,7 @@ export default function ChangePhoneModal({
                   value={otp}
                   onChange={handleOtpInput}
                   onKeyDown={handleKeyDown}
-                  placeholder="123456"
+                  placeholder={t("otpPlaceholder")}
                   maxLength={6}
                   disabled={submitting}
                   className="text-center text-xl tracking-[0.5em] font-semibold"
@@ -231,7 +246,7 @@ export default function ChangePhoneModal({
                   className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <ArrowLeft className="h-3 w-3" />
-                  Ganti nomor
+                  {t("changePhone").toLowerCase()}
                 </Button>
                 <Button
                   type="button"
@@ -248,12 +263,12 @@ export default function ChangePhoneModal({
                     className={cn("h-3 w-3", submitting && "animate-spin")}
                   />
                   {resendCooldown > 0
-                    ? `Kirim ulang (${resendCooldown}s)`
-                    : "Kirim ulang OTP"}
+                    ? t("resendOtpIn", { seconds: resendCooldown })
+                    : t("resendOtp")}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground text-center">
-                Kode berlaku selama 5 menit
+                {t("otpValidityHint")}
               </p>
             </div>
             <DialogFooter className="gap-2">
@@ -263,7 +278,7 @@ export default function ChangePhoneModal({
                 onClick={() => onOpenChange(false)}
                 disabled={submitting}
               >
-                Batal
+                {t("batal")}
               </Button>
               <Button
                 type="button"
@@ -272,7 +287,7 @@ export default function ChangePhoneModal({
                 disabled={submitting || otp.length !== 6}
                 loading={submitting}
               >
-                {submitting ? "Memverifikasi..." : "Verifikasi"}
+                {submitting ? t("verifying") : t("verifikasi")}
               </Button>
             </DialogFooter>
           </>
@@ -281,3 +296,4 @@ export default function ChangePhoneModal({
     </Dialog>
   );
 }
+

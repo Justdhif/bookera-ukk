@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -18,16 +19,19 @@ import { authService } from "@/services/auth.service";
 import PasswordRequirements, {
   isPasswordValid,
 } from "@/components/custom-ui/content/admin/auth/PasswordRequirements";
+
 interface ChangePasswordModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }
+
 export default function ChangePasswordModal({
   open,
   onOpenChange,
   onSuccess,
 }: ChangePasswordModalProps) {
+  const t = useTranslations("profile");
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
@@ -36,6 +40,7 @@ export default function ChangePasswordModal({
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirmation, setShowPasswordConfirmation] =
     useState(false);
+
   useEffect(() => {
     if (open) {
       setCurrentPassword("");
@@ -46,23 +51,25 @@ export default function ChangePasswordModal({
       setShowPasswordConfirmation(false);
     }
   }, [open]);
+
   const handleSubmit = async () => {
     if (!currentPassword) {
-      toast.error("Password saat ini wajib diisi");
+      toast.error(t("currentPasswordRequired"));
       return;
     }
     if (!password) {
-      toast.error("Password baru wajib diisi");
+      toast.error(t("newPasswordRequired"));
       return;
     }
     if (!isPasswordValid(password)) {
-      toast.error("Password baru tidak memenuhi syarat");
+      toast.error(t("passwordRequirementsError"));
       return;
     }
     if (password !== passwordConfirmation) {
-      toast.error("Konfirmasi password tidak cocok");
+      toast.error(t("passwordMismatchError"));
       return;
     }
+
     try {
       setSubmitting(true);
       await authService.changePassword({
@@ -70,24 +77,27 @@ export default function ChangePasswordModal({
         password,
         password_confirmation: passwordConfirmation,
       });
-      toast.success("Password berhasil diubah");
+      toast.success(t("updatePasswordSuccess"));
       onSuccess?.();
       onOpenChange(false);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal mengubah password");
+      toast.error(error.response?.data?.message || t("failedUpdate"));
     } finally {
       setSubmitting(false);
     }
   };
+
   const isFormValid =
     currentPassword &&
     isPasswordValid(password) &&
     passwordConfirmation === password;
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && isFormValid) {
       handleSubmit();
     }
   };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -96,24 +106,24 @@ export default function ChangePasswordModal({
             <div className="p-1.5 rounded-lg bg-brand-primary/10">
               <Lock className="h-4 w-4 text-brand-primary" />
             </div>
-            Ganti Password
+            {t("changePasswordTitle")}
           </DialogTitle>
           <DialogDescription>
-            Masukkan password saat ini dan password baru Anda.
+            {t("changePasswordDescription")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-1">
           <div className="space-y-2 relative">
             <div className="flex items-center justify-between">
               <Label htmlFor="current-password" variant="required">
-                Password Saat Ini
+                {t("currentPasswordLabel")}
               </Label>
               <Link
                 href="/forgot-password"
                 className="text-xs text-brand-primary hover:text-brand-primary/80 font-medium transition-colors"
                 onClick={() => onOpenChange(false)}
               >
-                Lupa password?
+                {t("forgotPasswordLink")}
               </Link>
             </div>
             <div className="relative">
@@ -124,12 +134,14 @@ export default function ChangePasswordModal({
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 disabled={submitting}
                 onKeyDown={handleKeyDown}
-                placeholder="Masukkan password saat ini"
+                placeholder={t("currentPasswordPlaceholder")}
                 className="pr-10"
               />
               <Button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-transparent"
                 onClick={() => setShowCurrentPassword(!showCurrentPassword)}
               >
                 {showCurrentPassword ? (
@@ -142,7 +154,7 @@ export default function ChangePasswordModal({
           </div>
           <div className="space-y-2 relative">
             <Label htmlFor="new-password" variant="required">
-              Password Baru
+              {t("newPasswordLabel")}
             </Label>
             <div className="relative">
               <Input
@@ -152,12 +164,14 @@ export default function ChangePasswordModal({
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={submitting}
                 onKeyDown={handleKeyDown}
-                placeholder="Masukkan password baru"
+                placeholder={t("newPasswordPlaceholder")}
                 className="pr-10"
               />
               <Button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-transparent"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -174,7 +188,7 @@ export default function ChangePasswordModal({
           </div>
           <div className="space-y-2 relative">
             <Label htmlFor="password-confirmation" variant="required">
-              Konfirmasi Password
+              {t("confirmPasswordLabel")}
             </Label>
             <div className="relative">
               <Input
@@ -184,12 +198,14 @@ export default function ChangePasswordModal({
                 onChange={(e) => setPasswordConfirmation(e.target.value)}
                 disabled={submitting}
                 onKeyDown={handleKeyDown}
-                placeholder="Ketik ulang password baru"
+                placeholder={t("confirmPasswordPlaceholder")}
                 className="pr-10"
               />
               <Button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground hover:bg-transparent"
                 onClick={() =>
                   setShowPasswordConfirmation(!showPasswordConfirmation)
                 }
@@ -210,7 +226,7 @@ export default function ChangePasswordModal({
             onClick={() => onOpenChange(false)}
             disabled={submitting}
           >
-            Batal
+            {t("batal")}
           </Button>
           <Button
             type="button"
@@ -219,10 +235,11 @@ export default function ChangePasswordModal({
             disabled={submitting || !isFormValid}
             loading={submitting}
           >
-            {submitting ? "Menyimpan..." : "Simpan Password"}
+            {submitting ? t("saving") : t("savePasswordBtn")}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
+
