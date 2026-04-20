@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\BorrowRequest;
 use App\Models\BookReturn;
 use App\Models\BorrowDetail;
-use App\Models\Fine;
+use App\Models\FineBorrow;
 use App\Models\LostBook;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -41,7 +41,7 @@ class Borrow extends Model
 
     public function borrowDetails()
     {
-        return $this->hasMany(BorrowDetail::class);
+        return $this->hasMany(BorrowDetail::class)->orderBy('id');
     }
 
     public function details()
@@ -56,7 +56,7 @@ class Borrow extends Model
 
     public function fines()
     {
-        return $this->hasMany(Fine::class);
+        return $this->hasMany(FineBorrow::class, 'borrow_id')->orderBy('id');
     }
 
     public function lostBook()
@@ -66,7 +66,7 @@ class Borrow extends Model
 
     public function lostBooks()
     {
-        return $this->hasMany(LostBook::class);
+        return $this->hasMany(LostBook::class)->orderBy('id');
     }
 
     public function getQrCodeUrlAttribute(): ?string

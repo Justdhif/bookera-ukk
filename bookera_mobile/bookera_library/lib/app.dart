@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'core/router/app_router.dart';
+import 'core/theme/app_theme.dart';
+import 'core/utils/snackbar_service.dart';
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Library App",
+  Widget build(BuildContext context, WidgetRef ref) {
+    return MaterialApp.router(
+      title: "Bookera Library",
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.blue,
-      ),
-      // home: Teks welcome
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text("Library App"),
-        ),
-        body: const Center(
-          child: Text("Welcome to the Library App!"),
-        ),
-      ),
+      scaffoldMessengerKey: SnackBarService.scaffoldMessengerKey,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      routerConfig: AppRouter.router,
     );
   }
 }

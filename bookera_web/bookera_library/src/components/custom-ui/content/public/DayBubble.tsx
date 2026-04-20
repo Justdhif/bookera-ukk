@@ -10,35 +10,14 @@ import {
 export interface DayBubbleProps {
   date: Date;
   borrows: Borrow[];
-  onClick: () => void;
-  isSelected: boolean;
   locale: string;
-  todayLabel: string;
 }
 
-export function DayBubble({ date, borrows, onClick, isSelected, locale, todayLabel }: DayBubbleProps) {
+export function DayBubble({ date, borrows, locale }: DayBubbleProps) {
   const today = startOfDay(new Date());
   const d = startOfDay(date);
   const isToday = isSameDay(d, today);
   const state = getDayState(d, borrows);
-  const events = getDayEvents(d, borrows);
-
-  const ringClass = isSelected
-    ? "ring-2 ring-gray-400 dark:ring-white/60"
-    : "";
-
-  const outerClass =
-    state === "deadline"
-      ? "bg-red-50 dark:bg-red-500/15 border border-red-200 dark:border-red-500/40"
-      : state === "start"
-      ? "bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/40"
-      : state === "has-event"
-      ? "bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20"
-      : isToday
-      ? "bg-gray-100 dark:bg-white/10 border border-gray-300 dark:border-white/20"
-      : state === "past"
-      ? "bg-gray-50 dark:bg-white/3 border border-gray-100 dark:border-white/8"
-      : "bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-xs";
 
   const dotColor =
     state === "deadline"
@@ -80,50 +59,25 @@ export function DayBubble({ date, borrows, onClick, isSelected, locale, todayLab
       : "text-gray-600 dark:text-white/60 font-bold";
 
   return (
-    <button
-      onClick={onClick}
-      className={`relative flex flex-col justify-between items-center w-full aspect-square py-2.5 px-1 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-md dark:hover:shadow-none active:scale-95 overflow-hidden ${outerClass} ${ringClass}`}
-    >
-      {isToday && (
-        <div className="absolute left-[6px] sm:left-[8px] inset-y-0 w-0 flex items-center justify-center pointer-events-none">
-          <span className="rotate-90 text-[8px] sm:text-[9px] font-black uppercase text-gray-400/20 dark:text-emerald-400/20 whitespace-nowrap tracking-[1em] select-none leading-none">
-            {todayLabel}
-          </span>
-        </div>
-      )}
-      
-      <span className={`text-[8px] sm:text-[10px] font-bold uppercase tracking-wider leading-none relative z-10 ${dayTextColor}`}>
+    <div className="flex w-full flex-col items-center justify-center gap-2 py-2 text-center sm:gap-2.5 sm:py-2.5">
+      <span className={`text-[9px] font-bold uppercase tracking-[0.12em] leading-none sm:text-[10px] ${dayTextColor}`}>
         {dayName(date, locale)}
       </span>
 
-      <div className="flex items-center justify-center absolute top-1.5 left-1.5 sm:relative sm:top-0 sm:left-0">
+      <div className="relative flex items-center justify-center">
         {isToday && (
-          <span className="absolute w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-gray-200 dark:bg-white/10 animate-pulse" />
+          <span className="absolute h-4 w-4 animate-pulse rounded-full bg-gray-200 dark:bg-white/10 sm:h-5 sm:w-5" />
         )}
-        <div className={`w-2 h-2 sm:w-3.5 sm:h-3.5 rounded-full ${dotColor} ${state === "deadline" ? "animate-pulse" : ""}`} />
+        <div
+          className={`h-2 w-2 rounded-full sm:h-3 sm:w-3 ${dotColor} ${
+            state === "deadline" ? "animate-pulse" : ""
+          }`}
+        />
       </div>
 
-      <div className="flex flex-col items-center gap-px">
-        <span className={`text-[12px] sm:text-[13px] tabular-nums leading-none ${dateTextColor}`}>
-          {date.getDate()}
-        </span>
-        {events.length > 0 && (
-          <div className="flex gap-0.5 mt-0.5">
-            {events.slice(0, 3).map((_, i) => (
-              <span
-                key={i}
-                className={`w-1 h-1 rounded-full ${
-                  state === "deadline"
-                    ? "bg-red-500 dark:bg-red-400"
-                    : state === "start"
-                    ? "bg-emerald-500 dark:bg-emerald-400"
-                    : "bg-blue-500 dark:bg-blue-400"
-                }`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </button>
+      <span className={`text-[13px] tabular-nums leading-none sm:text-[14px] ${dateTextColor}`}>
+        {date.getDate()}
+      </span>
+    </div>
   );
 }

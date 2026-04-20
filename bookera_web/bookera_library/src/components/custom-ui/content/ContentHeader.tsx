@@ -38,8 +38,7 @@ export default function ContentHeader({
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 md:flex-row md:items-center justify-between transition-all duration-300",
-        !isAdmin && "border-b pb-6",
+        "flex flex-col gap-4 md:flex-row md:items-center justify-between border-b pb-6 transition-all duration-300",
         className
       )}
     >

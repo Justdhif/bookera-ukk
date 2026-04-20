@@ -14,6 +14,7 @@ export interface Book {
   publication_year?: number;
   isbn?: string;
   description?: string;
+  price?: number;
 
   language?: string;
   cover_image: string;

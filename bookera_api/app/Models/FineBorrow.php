@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Fine extends Model
+class FineBorrow extends Model
 {
     use HasFactory;
+
+    protected $table = 'fine_borrows';
 
     protected $fillable = [
         'borrow_id',

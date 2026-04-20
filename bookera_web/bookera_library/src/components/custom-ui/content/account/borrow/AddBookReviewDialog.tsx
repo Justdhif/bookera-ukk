@@ -40,7 +40,7 @@ export function AddBookReviewDialog({
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      toast.error(t("review.ratingRequired") || "Rating is required");
+      toast.error(t("review.ratingRequired"));
       return;
     }
 
@@ -75,7 +75,7 @@ export function AddBookReviewDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MessageSquarePlus className="h-5 w-5 text-primary" />
@@ -89,17 +89,20 @@ export function AddBookReviewDialog({
         <div className="grid gap-6 py-4">
           <div className="flex flex-col items-center justify-center gap-3">
             <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-              {t("review.yourRating") || "Your Rating"}
+              {t("review.yourRating")}
             </span>
             <div className="flex items-center gap-1.5">
               {[1, 2, 3, 4, 5].map((star) => (
-                <button
+                <Button
                   key={star}
                   type="button"
-                  className="transition-all duration-200 hover:scale-110 active:scale-95"
+                  variant="ghost"
+                  size="icon-sm"
+                  className="rounded-full transition-all duration-200 hover:scale-110 active:scale-95"
                   onMouseEnter={() => setHoveredRating(star)}
                   onMouseLeave={() => setHoveredRating(0)}
                   onClick={() => setRating(star)}
+                  aria-label={t("review.starRatingAriaLabel", { count: star })}
                 >
                   <Star
                     className={`h-8 w-8 ${
@@ -108,25 +111,25 @@ export function AddBookReviewDialog({
                         : "text-muted-foreground"
                     }`}
                   />
-                </button>
+                </Button>
               ))}
             </div>
             <span className="text-sm font-bold text-primary italic">
-              {rating === 5 && (t("review.rating5") || "Excellent!")}
-              {rating === 4 && (t("review.rating4") || "Very Good")}
-              {rating === 3 && (t("review.rating3") || "Good")}
-              {rating === 2 && (t("review.rating2") || "Fair")}
-              {rating === 1 && (t("review.rating1") || "Poor")}
+              {rating === 5 && t("review.rating5")}
+              {rating === 4 && t("review.rating4")}
+              {rating === 3 && t("review.rating3")}
+              {rating === 2 && t("review.rating2")}
+              {rating === 1 && t("review.rating1")}
             </span>
           </div>
 
           <div className="space-y-2">
             <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider pl-1">
-              {t("review.yourReview") || "Your Review"}
+              {t("review.yourReview")}
             </span>
             <Textarea
-              placeholder={t("review.placeholder") || "Share your thoughts about this book..."}
-              className="min-h-[120px] resize-none focus:ring-primary/20"
+              placeholder={t("review.placeholder")}
+              className="min-h-30 resize-none focus:ring-primary/20"
               value={review}
               onChange={(e) => setReview(e.target.value)}
             />

@@ -5,11 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BookReturn\StoreBookReturnRequest;
-use App\Http\Requests\BookReturn\UpdateBookReturnConditionsRequest;
 use App\Models\BookReturn;
 use App\Models\Borrow;
 use App\Services\BookReturn\BookReturnService;
-use Exception;
 use Illuminate\Http\JsonResponse;
 
 class BookReturnController extends Controller
@@ -44,26 +42,6 @@ class BookReturnController extends Controller
         $detail = $this->bookReturnService->getDetail($bookReturn);
 
         return ApiResponse::successResponse('Book return details', $detail);
-    }
-
-    public function updateConditions(UpdateBookReturnConditionsRequest $request, BookReturn $bookReturn): JsonResponse
-    {
-        try {
-            $result = $this->bookReturnService->updateConditions($bookReturn, $request->validated()['conditions']);
-            return ApiResponse::successResponse('Book condition updated successfully', $result);
-        } catch (Exception $e) {
-            return ApiResponse::errorResponse($e->getMessage(), null, 400);
-        }
-    }
-
-    public function finishFines(BookReturn $bookReturn): JsonResponse
-    {
-        try {
-            $fines = $this->bookReturnService->finishFines($bookReturn);
-            return ApiResponse::successResponse('All fines have been marked as paid', $fines);
-        } catch (Exception $e) {
-            return ApiResponse::errorResponse($e->getMessage(), null, 400);
-        }
     }
 
 }

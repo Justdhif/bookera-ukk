@@ -23,6 +23,6 @@ class FineType extends Model
 
     public function fines(): HasMany
     {
-        return $this->hasMany(Fine::class);
+        return $this->hasMany(FineBorrow::class);
     }
 }

@@ -23,15 +23,4 @@ export const bookReturnService = {
   getById: (id: number) =>
     api.get<ApiResponse<BookReturn>>(`/book-returns/${id}`),
 
-  updateConditions: (
-    id: number,
-    conditions: Record<number, "good" | "damaged" | "lost">,
-  ) =>
-    api.patch<ApiResponse<BookReturn>>(`/admin/book-returns/${id}/conditions`, {
-      conditions,
-    }),
-
-  finishFines: (id: number) =>
-    api.post<ApiResponse<any>>(`/admin/book-returns/${id}/finish-fines`),
-
 };

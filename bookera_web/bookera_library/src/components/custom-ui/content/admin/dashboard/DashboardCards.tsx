@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DashboardTotals } from "@/types/dashboard";
 import { Button } from "@/components/ui/button";
@@ -202,18 +203,14 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
               ? item.value.toLocaleString()
               : item.value}
           </p>
-          <Button
-            onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              handleDetailsClick(item.detailsHref);
-            }}
-            className="opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-linear-to-r from-white/80 to-white/60 dark:from-slate-800/80 dark:to-slate-900/60 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 hover:scale-105 hover:shadow-md active:scale-95 group/btn"
-          >
-            <span className="text-xs font-medium bg-linear-to-br from-slate-700 to-slate-900 dark:from-slate-300 dark:to-slate-100 bg-clip-text text-transparent group-hover/btn:from-emerald-600 group-hover/btn:to-teal-600 dark:group-hover/btn:from-emerald-400 dark:group-hover/btn:to-teal-400 transition-all duration-200">
-              {item.detailsText}
-            </span>
-            <ChevronRight className="h-3 w-3 text-slate-600 dark:text-slate-400 group-hover/btn:text-emerald-600 dark:group-hover/btn:text-emerald-400 group-hover/btn:translate-x-1 transition-all duration-200" />
-          </Button>
+          <Link href={item.detailsHref} onClick={(e) => e.stopPropagation()}>
+            <Button className="opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-linear-to-r from-white/80 to-white/60 dark:from-slate-800/80 dark:to-slate-900/60 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 hover:scale-105 hover:shadow-md active:scale-95 group/btn">
+              <span className="text-xs font-medium bg-linear-to-br from-slate-700 to-slate-900 dark:from-slate-300 dark:to-slate-100 bg-clip-text text-transparent group-hover/btn:from-emerald-600 group-hover/btn:to-teal-600 dark:group-hover/btn:from-emerald-400 dark:group-hover/btn:to-teal-400 transition-all duration-200">
+                {item.detailsText}
+              </span>
+              <ChevronRight className="h-3 w-3 text-slate-600 dark:text-slate-400 group-hover/btn:text-emerald-600 dark:group-hover/btn:text-emerald-400 group-hover/btn:translate-x-1 transition-all duration-200" />
+            </Button>
+          </Link>
         </div>
         <div className="mt-4 relative">
           <div className="absolute left-0 right-0 h-px bg-linear-to-r from-transparent via-slate-300/30 dark:via-slate-600/30 to-transparent" />

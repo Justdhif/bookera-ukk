@@ -6,6 +6,7 @@ interface BorrowReturnItemPayload {
   borrow_detail_id: number;
   status: "returned" | "lost";
   condition: "good" | "damaged" | null;
+  fine_type_id?: number;
   lost_date?: string;
   notes?: string | null;
 }

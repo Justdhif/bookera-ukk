@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   notificationService,
@@ -15,7 +14,6 @@ import NotificationDetail from "./NotificationDetail";
 
 export default function NotificationPageClient() {
   const t = useTranslations("notification");
-  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [selectedNotif, setSelectedNotif] = useState<Notification | null>(null);
   const [loading, setLoading] = useState(true);
@@ -78,14 +76,6 @@ export default function NotificationPageClient() {
       }
     } else {
       setSelectedNotif(notif);
-    }
-  };
-
-  const handleNavigateToDetail = (notif: Notification) => {
-    if (notif.module === "loan" && notif.data?.loan_id) {
-      router.push(`/admin/loans`);
-    } else if (notif.module === "return" && notif.data?.return_id) {
-      router.push(`/admin/returns`);
     }
   };
 
@@ -153,7 +143,6 @@ export default function NotificationPageClient() {
           <NotificationDetail
             notification={selectedNotif}
             onClose={() => setSelectedNotif(null)}
-            onNavigate={handleNavigateToDetail}
             onDelete={setDeleteId}
           />
         </div>

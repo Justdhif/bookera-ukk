@@ -78,15 +78,17 @@ export default function EmptyState({
       {(actionLabel && onAction) || (linkLabel && linkHref) ? (
         <div className={cn("flex gap-2", isCompact ? "mt-3" : "mt-5")}>
           {linkLabel && linkHref && (
-            <Link
-              href={linkHref}
-              className={cn(
-                "inline-flex items-center justify-center gap-2 rounded-xl font-semibold shadow-sm transition-colors",
-                "bg-brand-primary hover:bg-brand-primary-dark text-white shadow-brand-primary/20",
-                isCompact ? "h-8 px-5 text-xs" : "h-10 px-6 text-sm",
-              )}
-            >
-              {linkLabel}
+            <Link href={linkHref}>
+              <Button
+                variant="brand"
+                size={isCompact ? "sm" : "default"}
+                className={cn(
+                  "rounded-xl font-semibold shadow-sm transition-colors shadow-brand-primary/20",
+                  isCompact ? "h-8 px-5 text-xs" : "h-10 px-6 text-sm",
+                )}
+              >
+                {linkLabel}
+              </Button>
             </Link>
           )}
           {actionLabel && onAction && (

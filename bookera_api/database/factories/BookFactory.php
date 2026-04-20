@@ -28,6 +28,7 @@ class BookFactory extends Factory
             'publication_year' => fake()->optional(0.9)->year(),
             'language' => fake()->randomElement(self::$languages),
             'cover_image' => 'https://picsum.photos/seed/'.$slugBase.'-'.$slugSuffix.'/400/600',
+            'price' => fake()->randomFloat(2, 50000, 250000),
             'is_active' => fake()->boolean(90),
         ];
     }

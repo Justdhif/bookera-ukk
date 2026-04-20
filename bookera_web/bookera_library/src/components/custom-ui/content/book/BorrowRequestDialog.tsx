@@ -196,7 +196,7 @@ export default function BorrowRequestDialog({
         <Separator />
 
         <div className="space-y-5">
-          <section className="space-y-3">
+          <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div className="space-y-1">
                 <Label className="text-sm font-semibold text-foreground">
@@ -296,7 +296,7 @@ export default function BorrowRequestDialog({
                 {tCommon("noBooksSelected")}
               </div>
             )}
-          </section>
+          </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">

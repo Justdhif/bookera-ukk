@@ -38,7 +38,7 @@ export default function FavoritesPageClient() {
         />
       </div>
       
-      <section className="space-y-3">
+      <div className="space-y-3">
           <PublicBookGrid 
             fetchMode="favorites"
             onSelectAll={handleSelectAll}
@@ -47,7 +47,7 @@ export default function FavoritesPageClient() {
             onSelectionChange={handleSelectBook}
             onVisibleBooksChange={setVisibleBooks}
           />
-      </section>
+      </div>
 
       <BorrowRequestDialog
         bookIds={selectedBookIds}

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { QrCode } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,9 +12,9 @@ interface QrCodeImageProps {
 }
 
 const sizeMap = {
-  sm: { img: "w-36 h-36", icon: "h-8 w-8" },
-  md: { img: "w-44 h-44", icon: "h-10 w-10" },
-  lg: { img: "w-52 h-52", icon: "h-12 w-12" },
+  sm: { img: "w-36 h-36", icon: "h-8 w-8", width: 144, height: 144 },
+  md: { img: "w-44 h-44", icon: "h-10 w-10", width: 176, height: 176 },
+  lg: { img: "w-52 h-52", icon: "h-12 w-12", width: 208, height: 208 },
 };
 
 export function QrCodeImage({
@@ -31,10 +32,13 @@ export function QrCodeImage({
     <div className={cn("flex flex-col items-center gap-3", className)}>
       {url ? (
         <div className="rounded-lg border p-3 bg-white shadow-sm">
-          <img
+          <Image
             src={url}
             alt={`QR ${code}`}
+            width={sz.width}
+            height={sz.height}
             className={cn(sz.img, "object-contain")}
+            unoptimized
           />
         </div>
       ) : (

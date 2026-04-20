@@ -18,7 +18,7 @@ class DashboardService
             'total_categories' => \App\Models\Category::count(),
             'total_authors' => \App\Models\Author::count(),
             'total_publishers' => \App\Models\Publisher::count(),
-            'total_fines' => \App\Models\Fine::sum('amount'),
+            'total_fines' => \App\Models\FineBorrow::sum('amount'),
             'loans_today' => Borrow::whereDate('borrow_date', today())->count(),
             'returns_today' => BookReturn::whereDate('return_date', today())->count(),
         ];

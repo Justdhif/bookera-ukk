@@ -21,6 +21,7 @@ interface BorrowFinesCardProps {
 
 export function BorrowFinesCard({ fines }: BorrowFinesCardProps) {
   const t = useTranslations("borrow");
+  const tPublic = useTranslations("public");
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -75,7 +76,7 @@ export function BorrowFinesCard({ fines }: BorrowFinesCardProps) {
                   }
                   variant="outline"
                 >
-                  {fine.status.toUpperCase()}
+                  {tPublic(`fineStatus.${fine.status}`)}
                 </Badge>
               </div>
             </div>

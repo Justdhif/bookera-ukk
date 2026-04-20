@@ -186,12 +186,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{borrowRequest}', [BorrowRequestController::class, 'destroy']);
         });
 
-        Route::prefix('book-returns')->group(function () {
-            Route::post('/{bookReturn}/approve', [BookReturnController::class, 'approveReturn']);
-            Route::patch('/{bookReturn}/conditions', [BookReturnController::class, 'updateConditions']);
-            Route::post('/{bookReturn}/finish-fines', [BookReturnController::class, 'finishFines']);
-        });
-
         Route::apiResource('fine-types', FineTypeController::class);
 
         Route::prefix('fines')->group(function () {

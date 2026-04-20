@@ -1,5 +1,5 @@
 "use client";
-import * as React from "react";
+
 import Image from "next/image";
 import {
   Sidebar,
@@ -11,24 +11,12 @@ import {
 import { useTranslations } from "next-intl";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import { SidebarUserFooter } from "@/components/custom-ui/sidebar/SidebarUserFooter";
-import { useAuthStore } from "@/store/auth.store";
-import { Home } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
 import AuthorPublisherSidebarSearch from "./AuthorPublisherSidebarSearch";
+
 export default function PublicSidebar() {
   const { open } = useSidebar();
   const t = useTranslations("navbar");
-  const { user } = useAuthStore();
-  const pathname = usePathname();
-  const isActive = pathname === "/";
-  const isAdmin = user?.role === "admin" || user?.role?.startsWith("officer:");
+
   return (
     <Sidebar
       collapsible="icon"
@@ -65,43 +53,6 @@ export default function PublicSidebar() {
         </div>
       </SidebarHeader>
       <SidebarContent className="overflow-hidden flex flex-col">
-        <div className="p-4 py-2 border-b border-border/40 shrink-0">
-          <SidebarMenu>
-            <SidebarMenuItem
-              className={!open ? "w-full flex justify-center" : ""}
-            >
-              <SidebarMenuButton
-                asChild
-                tooltip={t("goToHome")}
-                isActive={isActive}
-                className={cn(
-                  "rounded-xl transition-all",
-                  isActive
-                    ? "bg-brand-primary/10 dark:bg-brand-primary/15 text-brand-primary border border-brand-primary/20 dark:border-brand-primary/30"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent",
-                  !open && "justify-center px-0 mx-auto",
-                )}
-              >
-                <Link href="/">
-                  <Home
-                    className={cn(
-                      "h-5 w-5 shrink-0",
-                      isActive && "text-brand-primary",
-                    )}
-                  />
-                  {open && (
-                    <span className="font-medium">
-                      {t("goToHome") || "Home"}
-                    </span>
-                  )}
-                  {isActive && open && (
-                    <div className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-primary animate-pulse" />
-                  )}
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </div>
         <AuthorPublisherSidebarSearch />
       </SidebarContent>
       <SidebarFooter className="p-0 border-t border-border/60 dark:border-white/10">

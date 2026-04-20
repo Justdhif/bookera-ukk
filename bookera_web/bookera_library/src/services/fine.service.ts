@@ -14,7 +14,7 @@ import {
 } from "@/types/fine";
 
 export const fineTypeService = {
-  getAll: (params?: { type?: string; search?: string }) =>
+  getAll: (params?: { type?: string; search?: string; per_page?: number; page?: number }) =>
     api.get<ApiResponse<FineTypeListResponse>>("/admin/fine-types", { params }),
 
   getById: (id: number) =>
@@ -60,6 +60,6 @@ export const fineService = {
 
   delete: (id: number) => api.delete<ApiResponse<null>>(`/admin/fines/${id}`),
 
-  getAllFineTypes: (params?: { type?: string; search?: string }) =>
+  getAllFineTypes: (params?: { type?: string; search?: string; per_page?: number; page?: number }) =>
     api.get<ApiResponse<FineTypeListResponse>>("/fine-types", { params }),
 };

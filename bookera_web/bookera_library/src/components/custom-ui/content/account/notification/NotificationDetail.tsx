@@ -3,6 +3,7 @@
 import { useTranslations, useFormatter } from "next-intl";
 import { Notification } from "@/types/notification";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   Bell,
   CheckCheck,
@@ -25,14 +26,12 @@ import { User, Book as BookIcon, Receipt, History, MessageSquare, Info as InfoIc
 interface NotificationDetailProps {
   notification: Notification | null;
   onClose: () => void;
-  onNavigate: (notif: Notification) => void;
   onDelete: (id: number) => void;
 }
 
 export default function NotificationDetail({
   notification,
   onClose,
-  onNavigate,
   onDelete,
 }: NotificationDetailProps) {
   const t = useTranslations("notification");
@@ -65,6 +64,12 @@ export default function NotificationDetail({
     notification.type,
     notification.module,
   );
+  const detailHref =
+    notification.module === "loan" && notification.data?.loan_id
+      ? "/admin/loans"
+      : notification.module === "return" && notification.data?.return_id
+        ? "/admin/returns"
+        : null;
 
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] rounded-xl border border-border bg-card shadow-sm overflow-hidden">
@@ -79,16 +84,17 @@ export default function NotificationDetail({
           )}
         </div>
         <div className="flex items-center gap-1.5">
-          {notification.module && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onNavigate(notification)}
-              className="h-7 text-xs gap-1.5 border-border/60"
-            >
-              <ExternalLink className="h-3 w-3" />
-              {t("viewFullDetail")}
-            </Button>
+          {detailHref && (
+            <Link href={detailHref}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs gap-1.5 border-border/60"
+              >
+                <ExternalLink className="h-3 w-3" />
+                {t("viewFullDetail")}
+              </Button>
+            </Link>
           )}
           <Button
             variant="ghost"

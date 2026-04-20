@@ -4,17 +4,12 @@ import { useEffect, useState } from "react";
 import { borrowService } from "@/services/borrow.service";
 import { Borrow } from "@/types/borrow";
 import { useAuthStore } from "@/store/auth.store";
-import {
-  CalendarDays,
-  ArrowLeft,
-  ArrowRight,
-  Clock,
-  LogIn,
-} from "lucide-react";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { CalendarDays, ArrowLeft, ArrowRight, Clock } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
-import { TimelineDayDialog } from "./DailyTimelineDialog";
 import { DayBubble } from "./DayBubble";
+import { ActiveBorrowPanel } from "./ActiveBorrowPanel";
+import { DailyTimelineReminderAlert } from "./DailyTimelineReminderAlert";
 
 export function startOfDay(d: Date) {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -22,7 +17,7 @@ export function startOfDay(d: Date) {
 
 export function diffDays(a: Date, b: Date) {
   return Math.round(
-    (startOfDay(b).getTime() - startOfDay(a).getTime()) / (1000 * 60 * 60 * 24)
+    (startOfDay(b).getTime() - startOfDay(a).getTime()) / (1000 * 60 * 60 * 24),
   );
 }
 
@@ -62,7 +57,8 @@ export function getBookTitle(borrow: Borrow): string {
       .filter(Boolean);
     if (titles.length > 0) return titles.join(", ");
   }
-  const reqDetails = (borrow.borrow_request?.borrow_request_details as any[]) ?? [];
+  const reqDetails =
+    (borrow.borrow_request?.borrow_request_details as any[]) ?? [];
   const titles = reqDetails.map((d: any) => d.book?.title).filter(Boolean);
   return titles.length > 0 ? titles.join(", ") : `Kode ${borrow.borrow_code}`;
 }
@@ -84,7 +80,13 @@ export function getDayEvents(date: Date, borrows: Borrow[]): BorrowEvent[] {
   return events;
 }
 
-export type DayState = "today" | "past" | "future" | "has-event" | "deadline" | "start";
+export type DayState =
+  | "today"
+  | "past"
+  | "future"
+  | "has-event"
+  | "deadline"
+  | "start";
 
 export function getDayState(date: Date, borrows: Borrow[]): DayState {
   const today = startOfDay(new Date());
@@ -111,16 +113,15 @@ function getMonday(date: Date): Date {
 }
 
 export default function DailyTimeline() {
-  const { isAuthenticated, initialLoading } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const [borrows, setBorrows] = useState<Borrow[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [weekOffset, setWeekOffset] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [mounted, setMounted] = useState(false);
 
   const t = useTranslations("daily_timeline");
   const locale = useLocale();
+  const userSlug = useAuthStore((state) => state.user?.slug);
 
   useEffect(() => {
     setMounted(true);
@@ -129,10 +130,12 @@ export default function DailyTimeline() {
   }, []);
 
   const today = startOfDay(new Date());
-  const monday = new Date(getMonday(today).getTime() + weekOffset * 7 * 86400000);
+  const monday = new Date(
+    getMonday(today).getTime() + weekOffset * 7 * 86400000,
+  );
 
   const days: Date[] = Array.from({ length: 7 }, (_, i) =>
-    startOfDay(new Date(monday.getTime() + i * 86400000))
+    startOfDay(new Date(monday.getTime() + i * 86400000)),
   );
 
   useEffect(() => {
@@ -140,143 +143,180 @@ export default function DailyTimeline() {
       setBorrows([]);
       return;
     }
+
     borrowService
       .getByUser()
       .then((res) => setBorrows(res.data.data ?? []))
       .catch(() => setBorrows([]));
   }, [isAuthenticated]);
 
-  const handleDayClick = (date: Date) => {
-    setSelectedDate(date);
-    setDialogOpen(true);
-  };
-
   const activeBorrows = borrows.filter((b) => b.status === "open");
+  const activeBorrowsHref = userSlug
+    ? `/${userSlug}/my-borrows`
+    : "/my-borrows";
   const sunday = days[6];
   const weekLabel = (() => {
     const code = locale === "id" ? "id-ID" : "en-US";
-    const monStr = monday.toLocaleDateString(code, { day: "numeric", month: "short" });
-    const sunStr = sunday.toLocaleDateString(code, { day: "numeric", month: "short", year: "numeric" });
+    const monStr = monday.toLocaleDateString(code, {
+      day: "numeric",
+      month: "short",
+    });
+    const sunStr = sunday.toLocaleDateString(code, {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
     return `${monStr} – ${sunStr}`;
   })();
 
   return (
-    <>
-      <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-linear-to-br dark:from-[#0f0f1a] dark:via-[#1a1a2e] dark:to-[#16213e] border border-gray-200 dark:border-white/6 shadow-sm dark:shadow-none transition-colors duration-300">
+    <div className="grid items-stretch gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.95fr)]">
+      <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-colors duration-300 dark:border-white/6 dark:bg-linear-to-br dark:from-[#0f0f1a] dark:via-[#1a1a2e] dark:to-[#16213e] dark:shadow-none">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.06)_0%,transparent_70%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.10)_0%,transparent_70%)]" />
-          <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(52,211,153,0.04)_0%,transparent_70%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(52,211,153,0.06)_0%,transparent_70%)]" />
-          <svg className="absolute top-0 right-0 w-24 h-12 opacity-20 dark:opacity-40" viewBox="0 0 96 48" fill="none">
-            <line x1="20" y1="0" x2="96" y2="48" stroke="currentColor" className="text-emerald-500/10 dark:text-emerald-500/8" strokeWidth="16" />
-            <line x1="50" y1="0" x2="96" y2="36" stroke="currentColor" className="text-emerald-500/10 dark:text-emerald-500/5" strokeWidth="8" />
+          <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.06)_0%,transparent_70%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.10)_0%,transparent_70%)]" />
+          <div className="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(52,211,153,0.04)_0%,transparent_70%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(52,211,153,0.06)_0%,transparent_70%)]" />
+          <svg
+            className="absolute right-0 top-0 h-12 w-24 opacity-20 dark:opacity-40"
+            viewBox="0 0 96 48"
+            fill="none"
+          >
+            <line
+              x1="20"
+              y1="0"
+              x2="96"
+              y2="48"
+              stroke="currentColor"
+              className="text-emerald-500/10 dark:text-emerald-500/8"
+              strokeWidth="16"
+            />
+            <line
+              x1="50"
+              y1="0"
+              x2="96"
+              y2="36"
+              stroke="currentColor"
+              className="text-emerald-500/10 dark:text-emerald-500/5"
+              strokeWidth="8"
+            />
           </svg>
         </div>
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between px-4 sm:px-5 pt-4 pb-3 border-b border-gray-100 dark:border-white/5 gap-4">
+        <div className="relative z-10 flex flex-col gap-4 border-b border-gray-100 px-4 pb-3 pt-4 dark:border-white/5 sm:px-5 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 shadow-xs shrink-0">
-              <CalendarDays size={16} className="text-emerald-600 dark:text-emerald-400" />
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 shadow-xs dark:bg-emerald-500/15">
+              <CalendarDays
+                size={16}
+                className="text-emerald-600 dark:text-emerald-400"
+              />
             </div>
             <div className="flex flex-col">
-              <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                <p className="text-[11px] font-black tracking-widest text-emerald-600 dark:text-emerald-400 uppercase">
+              <div className="mb-0.5 flex flex-wrap items-center gap-2">
+                <p className="text-[11px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
                   {t("title")}
                 </p>
                 {mounted && (
-                  <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400/80 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <span className="flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400/80">
                     <Clock size={10} />
-                    {currentTime.toLocaleTimeString(locale === "id" ? "id-ID" : "en-US", { hour: '2-digit', minute: '2-digit' })}
+                    {currentTime.toLocaleTimeString(
+                      locale === "id" ? "id-ID" : "en-US",
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      },
+                    )}
                   </span>
                 )}
               </div>
-              <p className="text-[10px] font-medium text-gray-400 dark:text-white/40">{weekLabel}</p>
+              <p className="text-[10px] font-medium text-gray-400 dark:text-white/40">
+                {weekLabel}
+              </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            {!isAuthenticated && !initialLoading && (
-              <Link
-                href="/login"
-                className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400/80 hover:text-emerald-500 dark:hover:text-emerald-400 border border-emerald-500/20 px-3 py-2 rounded-xl bg-emerald-500/5 transition-all duration-200"
-              >
-                <LogIn size={11} /> Login
-              </Link>
-            )}
-            <div className="flex items-center gap-1 bg-gray-100 dark:bg-white/5 p-1 rounded-xl border border-gray-200 dark:border-white/10 ml-auto sm:ml-0">
-              <button
+          <div className="flex w-full flex-wrap items-center justify-start gap-2 self-start sm:gap-3 md:ml-auto md:w-auto md:justify-end md:self-auto">
+            <div className="flex items-center gap-1 rounded-xl border border-gray-200 bg-gray-100 p-1 dark:border-white/10 dark:bg-white/5 md:ml-auto">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
                 onClick={() => setWeekOffset((p) => p - 1)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-white/10 text-gray-400 dark:text-white/50 hover:text-emerald-600 dark:hover:text-white transition-all duration-200"
+                className="text-gray-400 hover:bg-white hover:text-emerald-600 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white"
               >
                 <ArrowLeft size={14} />
-              </button>
-              <button
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => setWeekOffset(0)}
-                className="text-[10px] font-bold px-3 py-1 rounded-lg text-gray-500 dark:text-white/50 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-200 whitespace-nowrap"
+                className="rounded-lg px-3 py-1 text-[10px] font-bold whitespace-nowrap text-gray-500 transition-all duration-200 hover:text-emerald-600 dark:text-white/50 dark:hover:text-emerald-400"
               >
                 {weekOffset === 0
                   ? t("this_week")
                   : weekOffset === 1
-                  ? t("next_week")
-                  : weekOffset === -1
-                  ? t("last_week")
-                  : weekOffset > 1
-                  ? t("weeks_ahead", { count: weekOffset })
-                  : t("weeks_ago", { count: Math.abs(weekOffset) })}
-              </button>
-              <button
+                    ? t("next_week")
+                    : weekOffset === -1
+                      ? t("last_week")
+                      : weekOffset > 1
+                        ? t("weeks_ahead", { count: weekOffset })
+                        : t("weeks_ago", { count: Math.abs(weekOffset) })}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
                 onClick={() => setWeekOffset((p) => p + 1)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-white/10 text-gray-400 dark:text-white/50 hover:text-emerald-600 dark:hover:text-white transition-all duration-200"
+                className="text-gray-400 hover:bg-white hover:text-emerald-600 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white"
               >
                 <ArrowRight size={14} />
-              </button>
+              </Button>
             </div>
           </div>
         </div>
 
-        <div className="relative z-10 overflow-x-auto scrollbar-hide">
-          <div className="px-4 py-6 min-w-[500px]">
-            <div className="grid grid-cols-7 gap-3 sm:gap-4">
+        <div className="relative z-10 overflow-x-hidden sm:overflow-x-auto scrollbar-hide">
+          <div className="px-4 py-6 sm:min-w-125 sm:p-0">
+            <div className="grid grid-cols-7 gap-1 sm:gap-4">
               {days.map((day, i) => (
                 <DayBubble
                   key={i}
                   date={day}
                   borrows={activeBorrows}
-                  onClick={() => handleDayClick(day)}
-                  isSelected={selectedDate ? isSameDay(day, selectedDate) : false}
                   locale={locale}
-                  todayLabel={t("today_label")}
                 />
               ))}
             </div>
           </div>
         </div>
 
-        <div className="relative z-10 px-5 pb-5 mt-[-8px]">
-          <div className="flex flex-wrap items-center gap-y-3 gap-x-6 text-[10px] text-gray-400 dark:text-white/40 font-bold uppercase tracking-wider">
+        <div className="relative z-10 px-5 pb-4 mt-5">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-white/40">
             <div className="flex items-center gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
               <span>{t("start_borrow")}</span>
             </div>
             <div className="flex items-center gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
               <span>{t("deadline")}</span>
             </div>
             <div className="flex items-center gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-500/80 shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-blue-500/80 shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
               <span>{t("in_progress")}</span>
             </div>
           </div>
         </div>
 
+        <DailyTimelineReminderAlert
+          activeBorrows={activeBorrows}
+          isAuthenticated={isAuthenticated}
+        />
       </div>
 
-      <TimelineDayDialog
-        date={selectedDate}
+      <ActiveBorrowPanel
         borrows={activeBorrows}
         isAuthenticated={isAuthenticated}
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
+        activeBorrowsHref={activeBorrowsHref}
       />
-    </>
+    </div>
   );
 }

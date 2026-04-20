@@ -5,11 +5,13 @@ namespace App\Services\LostBook;
 use App\Helpers\ActivityLogger;
 use App\Models\BookCopy;
 use App\Models\Borrow;
-use App\Models\Fine;
+use App\Models\FineBorrow;
 use App\Models\FineType;
 use App\Models\LostBook;
 use App\Models\LostBookDetail;
+use App\Models\User;
 use App\Services\BookReturn\BookReturnNotificationService;
+use App\Services\NotificationService as DatabaseNotificationService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -50,25 +52,62 @@ class LostBookService
                     "Borrow detail #{$borrowDetail->id} ({$bookCopy->book->title}) marked as lost",
                     [
                         'borrow_detail_id' => $borrowDetail->id,
-                        'book_copy_id'     => $bookCopy->id,
-                        'borrow_id'        => $borrow->id,
-                        'new_status'       => 'lost',
+                        'book_copy_id' => $bookCopy->id,
+                        'borrow_id' => $borrow->id,
+                        'new_status' => 'lost',
                     ],
                     [
                         'borrow_detail_id' => $borrowDetail->id,
-                        'book_copy_id'     => $bookCopy->id,
-                        'old_status'       => $oldStatus,
+                        'book_copy_id' => $bookCopy->id,
+                        'old_status' => $oldStatus,
                     ],
                     $borrowDetail
                 );
             }
 
-            $lostSummary = $borrowDetails->map(fn($detail) => [
+            $lostSummary = $borrowDetails->map(fn ($detail) => [
                 'copy_id' => $detail->book_copy_id,
-                'book_title' => $detail->bookCopy->book->title
+                'book_title' => $detail->bookCopy->book->title,
+                'cover' => $detail->bookCopy->book->cover_image,
+                'author' => $detail->bookCopy->book->author,
             ])->toArray();
 
             (new BookReturnNotificationService())->notifyReturnProcessed($borrow, ['lost' => $lostSummary]);
+
+            $borrow->loadMissing(['user.profile']);
+            $borrowerName = $borrow->user?->profile?->full_name ?? $borrow->user?->email ?? __('Unknown User');
+            $bookTitles = collect($lostSummary)->take(2)->pluck('book_title')->implode(', ');
+            $moreCount = max(0, count($lostSummary) - 2);
+            $moreText = $moreCount > 0 ? __(' and :count more', ['count' => $moreCount]) : '';
+            $message = __(':name reported lost books :books (Borrow #:id)', [
+                'name' => $borrowerName,
+                'books' => $bookTitles.$moreText,
+                'id' => $borrow->id,
+            ]);
+
+            $admins = User::with('profile')->where('role', 'admin')->get();
+
+            foreach ($admins as $admin) {
+                DatabaseNotificationService::send(
+                    $admin->id,
+                    __('Lost Book Reported'),
+                    $message,
+                    'lost_book_reported',
+                    'borrow',
+                    [
+                        'borrow_id' => $borrow->id,
+                        'user' => [
+                            'name' => $borrowerName,
+                            'avatar' => $borrow->user?->profile?->avatar,
+                        ],
+                        'books' => collect($lostSummary)->map(fn ($item) => [
+                            'title' => $item['book_title'],
+                            'cover' => $item['cover'],
+                            'author' => $item['author'],
+                        ])->toArray(),
+                    ]
+                );
+            }
 
             return $borrow->load([
                 'borrowDetails.bookCopy.book.authors',
@@ -140,8 +179,8 @@ class LostBookService
 
                 $lostBookDetail = $lostBook->details()->create([
                     'book_copy_id' => $bookCopy->id,
-                    'lost_date'    => $lostDate,
-                    'notes'        => $item['notes'] ?? null,
+                    'lost_date' => $lostDate,
+                    'notes' => $item['notes'] ?? null,
                 ]);
 
                 $bookCopy->update(['status' => 'lost']);
@@ -158,12 +197,12 @@ class LostBookService
                     'book_copy',
                     "Book copy #{$bookCopy->id} ({$bookCopy->book->title}) reported as lost",
                     [
-                        'copy_id'    => $bookCopy->id,
+                        'copy_id' => $bookCopy->id,
                         'new_status' => 'lost',
-                        'borrow_id'  => $borrow->id,
+                        'borrow_id' => $borrow->id,
                     ],
                     [
-                        'copy_id'    => $bookCopy->id,
+                        'copy_id' => $bookCopy->id,
                         'old_status' => $oldStatus,
                     ],
                     $bookCopy
@@ -175,9 +214,9 @@ class LostBookService
                     "Lost book detail created for copy #{$bookCopy->id} ({$bookCopy->book->title})",
                     [
                         'lost_book_detail_id' => $lostBookDetail->id,
-                        'lost_book_id'        => $lostBook->id,
-                        'lost_date'           => $lostDate,
-                        'notes'               => $lostBookDetail->notes,
+                        'lost_book_id' => $lostBook->id,
+                        'lost_date' => $lostDate,
+                        'notes' => $lostBookDetail->notes,
                     ],
                     null,
                     $lostBookDetail
@@ -192,8 +231,8 @@ class LostBookService
                 "Lost book reported for borrow #{$borrow->id}",
                 [
                     'lost_book_id' => $lostBook->id,
-                    'detail_count'  => $lostBook->details()->count(),
-                    'borrow_id'     => $borrow->id,
+                    'detail_count' => $lostBook->details()->count(),
+                    'borrow_id' => $borrow->id,
                 ],
                 null,
                 $lostBook
@@ -207,34 +246,35 @@ class LostBookService
 
     private function autoCreateLostFine(Borrow $borrow, BookCopy $bookCopy): void
     {
-        $lostFineType = FineType::where('type', 'lost')->first();
+        $lostFineType = FineType::where('type', 'lost')->orderBy('amount')->orderBy('id')->first();
 
         if (!$lostFineType) {
             return;
         }
 
-        $fineNotes = 'Denda buku hilang: ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
+        $fineNotes = 'Denda buku hilang (' . $lostFineType->name . '): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
 
         $existingFine = $borrow->fines()
-            ->where('notes', $fineNotes)
+            ->where('fine_type_id', $lostFineType->id)
+            ->where('notes', 'like', '%' . $bookCopy->copy_code . '%')
             ->first();
 
         if ($existingFine) {
             return;
         }
 
-        $fine = Fine::create([
-            'borrow_id'    => $borrow->id,
+        $fine = FineBorrow::create([
+            'borrow_id' => $borrow->id,
             'fine_type_id' => $lostFineType->id,
-            'amount'       => $lostFineType->amount,
-            'status'       => 'unpaid',
-            'notes'        => $fineNotes,
+            'amount' => $bookCopy->book->price,
+            'status' => 'unpaid',
+            'notes' => $fineNotes,
         ]);
 
         ActivityLogger::log(
             'create',
             'fine',
-            "Fine auto-created for lost book in borrow #{$borrow->id}",
+            "Fine auto-created for lost book in borrow #{$borrow->id} ({$lostFineType->name})",
             ['fine_id' => $fine->id, 'amount' => $fine->amount, 'book_copy_id' => $bookCopy->id],
             null,
             $fine
@@ -254,7 +294,7 @@ class LostBookService
 
             $oldValues = [
                 'lost_date' => $detail->lost_date ? (string) $detail->lost_date : null,
-                'notes'     => $detail->notes,
+                'notes' => $detail->notes,
             ];
 
             $updateData = [];
@@ -277,10 +317,10 @@ class LostBookService
                 "Lost book detail #{$detail->id} information updated",
                 [
                     'lost_book_detail_id' => $detail->id,
-                    'lost_book_id'        => $lostBook->id,
-                    'book_copy_id'        => $detail->book_copy_id,
-                    'lost_date'           => $detail->lost_date ? (string) $detail->lost_date : null,
-                    'notes'               => $detail->notes,
+                    'lost_book_id' => $lostBook->id,
+                    'book_copy_id' => $detail->book_copy_id,
+                    'lost_date' => $detail->lost_date ? (string) $detail->lost_date : null,
+                    'notes' => $detail->notes,
                 ],
                 $oldValues,
                 $detail
@@ -300,8 +340,8 @@ class LostBookService
             "Lost book record #{$lostBook->id} deleted",
             [
                 'lost_book_id' => $lostBook->id,
-                'borrow_id'    => $lostBook->borrow_id,
-                'detail_ids'   => $lostBook->details->pluck('id')->values()->all(),
+                'borrow_id' => $lostBook->borrow_id,
+                'detail_ids' => $lostBook->details->pluck('id')->values()->all(),
             ],
             null,
             $lostBook
@@ -325,10 +365,10 @@ class LostBookService
                 "Lost book detail #{$detail->id} deleted",
                 [
                     'lost_book_detail_id' => $detail->id,
-                    'lost_book_id'        => $lostBook->id,
-                    'book_copy_id'        => $detail->book_copy_id,
-                    'lost_date'           => $detail->lost_date ? (string) $detail->lost_date : null,
-                    'notes'               => $detail->notes,
+                    'lost_book_id' => $lostBook->id,
+                    'book_copy_id' => $detail->book_copy_id,
+                    'lost_date' => $detail->lost_date ? (string) $detail->lost_date : null,
+                    'notes' => $detail->notes,
                 ],
                 null,
                 $detail

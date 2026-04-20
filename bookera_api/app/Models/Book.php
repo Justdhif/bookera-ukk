@@ -20,7 +20,13 @@ class Book extends Model
         'publication_year',
         'language',
         'cover_image',
+        'price',
         'is_active',
+    ];
+
+    protected $casts = [
+        'price' => 'float',
+        'is_active' => 'boolean',
     ];
 
     protected $withCount = ['favorites', 'total_copies', 'available_copies'];

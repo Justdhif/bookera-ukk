@@ -75,7 +75,7 @@ class BorrowNotificationService extends BaseNotificationService
                     'id' => $borrow->id,
                     'books' => $bookTitles.$moreText,
                 ]),
-                true,
+                false,
                 false
             );
         }
@@ -94,7 +94,7 @@ class BorrowNotificationService extends BaseNotificationService
         $profile = $user?->profile;
         $userName = $profile?->full_name ?? $user?->email ?? $this->t('User');
 
-        $message = $this->t('Your borrow request for :books has been created successfully. Borrow code: :code.', [
+        $message = $this->t('Your borrow for :books has been created successfully. Borrow code: :code.', [
             'books' => $bookTitles.$moreText,
             'code' => $borrow->borrow_code,
         ]);
@@ -184,10 +184,9 @@ class BorrowNotificationService extends BaseNotificationService
         );
 
         $userName = $borrowRequest->user?->profile?->full_name ?? $borrowRequest->user?->email ?? $this->t('User');
-        $message = $this->t(':name wants to borrow :books (Request #:id)', [
+        $message = $this->t('Borrow request from :name: :books', [
             'name' => $userName,
             'books' => $bookTitles.$moreText,
-            'id' => $borrowRequest->id,
         ]);
         $details = [
             $this->t('Request ID') => '#'.$borrowRequest->id,
@@ -230,7 +229,7 @@ class BorrowNotificationService extends BaseNotificationService
                     'name' => $userName,
                     'books' => $bookTitles.$moreText,
                 ]),
-                true,
+                false,
                 false
             );
         }
@@ -313,7 +312,9 @@ class BorrowNotificationService extends BaseNotificationService
 
         $user = $borrowRequest->user;
         $profile = $user?->profile;
-        $reason = $borrowRequest->reject_reason ? (' Reason: '.$borrowRequest->reject_reason) : '';
+        $reason = $borrowRequest->reject_reason
+            ? ' '.$this->t('Reason: :reason', ['reason' => $borrowRequest->reject_reason])
+            : '';
 
         DatabaseNotificationService::send(
             $borrowRequest->user_id,
@@ -432,7 +433,7 @@ class BorrowNotificationService extends BaseNotificationService
                     'id' => $borrowRequest->id,
                     'books' => $bookTitles.$moreText,
                 ]),
-                true,
+                false,
                 false
             );
         }

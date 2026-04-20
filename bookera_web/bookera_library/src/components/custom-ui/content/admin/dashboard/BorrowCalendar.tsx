@@ -8,13 +8,13 @@ import {
   CalendarDays,
   ExternalLink,
 } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDay, DayDetail } from "@/types/dashboard";
 import { dashboardService } from "@/services/dashboard.service";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -29,7 +29,6 @@ type DayCell = {
 
 export default function BorrowCalendar() {
   const t = useTranslations("dashboard");
-  const router = useRouter();
   const today = new Date();
 
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
@@ -129,7 +128,7 @@ export default function BorrowCalendar() {
             <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg" onClick={goToPrevMonth}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="text-sm font-semibold min-w-[140px] text-center">
+            <span className="text-sm font-semibold min-w-35 text-center">
               {fullMonthName} {currentYear}
             </span>
             <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg" onClick={goToNextMonth}>
@@ -139,7 +138,7 @@ export default function BorrowCalendar() {
         </div>
       </CardHeader>
 
-      <CardContent className="pt-5 flex items-stretch gap-6 min-h-[460px]">
+      <CardContent className="pt-5 flex items-stretch gap-6 min-h-115">
         <div className="flex-1 min-w-0">
           {loadingCalendar ? (
             <div className="h-full flex items-center justify-center">
@@ -168,7 +167,10 @@ export default function BorrowCalendar() {
                   const isSelected = selectedDay === cell.day && cell.isCurrentMonth;
 
                   return (
-                    <button
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
                       key={idx}
                       disabled={!cell.isCurrentMonth}
                       onClick={() => {
@@ -209,7 +211,7 @@ export default function BorrowCalendar() {
                           {total}
                         </span>
                       )}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -232,7 +234,7 @@ export default function BorrowCalendar() {
           )}
         </div>
 
-        <div className="w-[300px] shrink-0 border-l pl-6 pb-2 flex flex-col">
+        <div className="w-75 shrink-0 border-l pl-6 pb-2 flex flex-col">
           {selectedDay === null ? (
             <div className="flex-1 flex items-center justify-center">
               <EmptyState
@@ -322,15 +324,16 @@ export default function BorrowCalendar() {
 
               {dayDetail.total > 0 && (
                 <div className="pt-2 mt-auto">
-                  <Button
-                    variant="outline"
-                    className="w-full gap-2 text-sm h-10 border-[#10b981]/40 text-[#059669] dark:text-[#34d399] hover:bg-[#10b981]/10 hover:border-[#10b981]/60"
-                    onClick={() => router.push('/admin/borrows')}
-                  >
-                    <BookOpen className="h-4 w-4" />
-                    {t("viewAll")} ({dayDetail.total})
-                    <ExternalLink className="h-3.5 w-3.5 ml-auto" />
-                  </Button>
+                  <Link href="/admin/borrows">
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2 text-sm h-10 border-[#10b981]/40 text-[#059669] dark:text-[#34d399] hover:bg-[#10b981]/10 hover:border-[#10b981]/60"
+                    >
+                      <BookOpen className="h-4 w-4" />
+                      {t("viewAll")} ({dayDetail.total})
+                      <ExternalLink className="h-3.5 w-3.5 ml-auto" />
+                    </Button>
+                  </Link>
                 </div>
               )}
             </div>

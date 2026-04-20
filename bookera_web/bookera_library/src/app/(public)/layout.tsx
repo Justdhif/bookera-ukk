@@ -1,10 +1,11 @@
-"use client";
-
+import type { Metadata } from "next";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import PublicHeader from "@/components/custom-ui/navbar/PublicHeader";
 import PublicSidebar from "@/components/custom-ui/sidebar/PublicSidebar";
-import { useAuthStore } from "@/store/auth.store";
-import "@/app/globals.css";
+
+export const metadata: Metadata = {
+  title: "Bookera | Library",
+};
 
 export default function PublicLayout({
   children,

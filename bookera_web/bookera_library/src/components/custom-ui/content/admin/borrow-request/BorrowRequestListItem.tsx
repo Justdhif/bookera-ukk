@@ -6,18 +6,17 @@ import { BookOpen, Calendar, Eye, Trash, User } from "lucide-react";
 import { BorrowRequest } from "@/types/borrow-request";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
 
 interface BorrowRequestListItemProps {
   request: BorrowRequest;
   onDelete: (id: number) => void;
-  onOpenDetail: (id: number) => void;
 }
 
 export default function BorrowRequestListItem({
   request,
   onDelete,
-  onOpenDetail,
 }: BorrowRequestListItemProps) {
   const t = useTranslations("borrow-request");
 
@@ -76,15 +75,12 @@ export default function BorrowRequestListItem({
             >
               <Trash className="h-4 w-4" />
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 gap-1.5 px-3"
-              onClick={() => onOpenDetail(request.id)}
-            >
-              <Eye className="h-3.5 w-3.5" />
-              {t("detail")}
-            </Button>
+            <Link href={`/admin/borrow-requests/${request.id}`}>
+              <Button size="sm" variant="outline" className="h-8 gap-1.5 px-3">
+                <Eye className="h-3.5 w-3.5" />
+                {t("detail")}
+              </Button>
+            </Link>
           </div>
         </div>
       </CardContent>

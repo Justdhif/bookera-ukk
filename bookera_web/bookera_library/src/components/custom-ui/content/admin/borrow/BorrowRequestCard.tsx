@@ -124,18 +124,18 @@ export function BorrowRequestCard({ req, onDelete }: BorrowRequestCardProps) {
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[10px] font-bold uppercase text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <User className="h-3 w-3" />
-                            <span className="truncate max-w-[120px]">{authors}</span>
+                            <span className="truncate max-w-30">{authors}</span>
                           </div>
                           {book?.publishers && book.publishers.length > 0 && (
                             <div className="flex items-center gap-1">
                               <Building2 className="h-3 w-3" />
-                              <span className="truncate max-w-[120px]">{book.publishers[0].name}</span>
+                              <span className="truncate max-w-30">{book.publishers[0].name}</span>
                             </div>
                           )}
                           {book?.isbn && (
                             <div className="flex items-center gap-1">
                               <Hash className="h-3 w-3" />
-                              <span className="truncate max-w-[100px]">{book.isbn}</span>
+                              <span className="truncate max-w-25">{book.isbn}</span>
                             </div>
                           )}
                           {book?.publication_year && (

@@ -123,7 +123,7 @@ export function BorrowRequestCard({
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground/70 flex items-center gap-2">
               <BookOpen className="h-4 w-4 text-primary" />
-              {t("requestedBooks")} <span className="text-primary truncate max-w-[150px]">
+              {t("requestedBooks")} <span className="text-primary truncate max-w-37.5">
                 ({request.borrow_request_details?.length || 0})
               </span>
             </h4>
@@ -144,7 +144,7 @@ export function BorrowRequestCard({
                   <div className="relative w-24 h-32 sm:w-20 sm:h-28 shrink-0 shadow-lg group-hover/item:scale-105 transition-transform duration-300 z-10">
                     <Image
                       src={book?.cover_image || "/placeholder.png"}
-                      alt={book?.title || "Book"}
+                      alt={book?.title || tCommon("bookCover")}
                       fill
                       className="object-cover rounded-lg"
                       unoptimized
@@ -160,18 +160,18 @@ export function BorrowRequestCard({
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[10px] font-bold uppercase text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <User className="h-3 w-3" />
-                            <span className="truncate max-w-[120px]">{authors}</span>
+                            <span className="truncate max-w-30">{authors}</span>
                           </div>
                           {book?.publishers && book.publishers.length > 0 && (
                             <div className="flex items-center gap-1">
                               <Building2 className="h-3 w-3" />
-                              <span className="truncate max-w-[120px]">{book.publishers[0].name}</span>
+                              <span className="truncate max-w-30">{book.publishers[0].name}</span>
                             </div>
                           )}
                           {book?.isbn && (
                             <div className="flex items-center gap-1">
                               <Hash className="h-3 w-3" />
-                              <span className="truncate max-w-[100px]">{book.isbn}</span>
+                              <span className="truncate max-w-25">{book.isbn}</span>
                             </div>
                           )}
                         </div>

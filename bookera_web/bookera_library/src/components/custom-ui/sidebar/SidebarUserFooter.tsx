@@ -16,7 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, ChevronRight, LogIn, LogOut, Users } from "lucide-react";
+import { ChevronRight, Home, LogIn, LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
 import LogoutConfirmDialog from "@/components/custom-ui/modal/LogoutConfirmDialog";
@@ -26,6 +26,7 @@ import { usePathnameCondition } from "@/hooks/usePathnameCondition";
 
 export function SidebarUserFooter() {
   const t = useTranslations("sidebar");
+  const tNavbar = useTranslations("navbar");
   const { pathname, isAdmin } = usePathnameCondition();
   const router = useRouter();
 
@@ -36,18 +37,15 @@ export function SidebarUserFooter() {
   const hasAdminRole =
     user?.role === "admin" || user?.role?.startsWith("officer:");
 
-  const showBackButton = isAdmin || hasAdminRole;
-  const backHref = isAdmin
-    ? "/"
-    : user?.role === "officer:catalog"
-      ? "/admin/categories"
-      : user?.role === "officer:management"
-        ? "/admin/users"
-        : "/admin";
-  const backLabelKey = isAdmin ? "publicPage" : "dashboard";
+  const isAccountPage = Boolean(
+    user?.slug &&
+      (pathname === `/${user.slug}` || pathname.startsWith(`/${user.slug}/`)),
+  );
+
+  const showHomeButton = isAdmin || hasAdminRole || isAccountPage;
   const profileHref = user?.slug ? `/${user.slug}/profile` : "/profile";
 
-  const backLabel = t(backLabelKey);
+  const homeLabel = tNavbar("goToHome");
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -63,28 +61,28 @@ export function SidebarUserFooter() {
     <>
       <TooltipProvider delayDuration={0}>
         <SidebarMenu className="gap-2 p-2">
-          {showBackButton && (
+          {showHomeButton && (
             <SidebarMenuItem
               className={cn(!open && "w-full flex justify-center")}
             >
               <SidebarMenuButton
                 asChild
-                tooltip={{ content: backLabel }}
+                tooltip={{ content: homeLabel }}
                 className={cn(
                   "rounded-xl hover:bg-brand-primary/8 dark:hover:bg-brand-primary/15 transition-all group/back",
                   !open && "justify-center px-0 mx-auto",
                 )}
               >
-                <Link href={backHref}>
+                <Link href="/">
                   <div
                     className={cn(
                       open ? "p-1.5" : "p-2",
                       "rounded-lg bg-linear-to-br from-brand-primary to-brand-primary-dark text-white shadow-sm group-hover/back:shadow-md transition-shadow shrink-0",
                     )}
                   >
-                    <BookOpen className="h-3.5 w-3.5" />
+                    <Home className="h-3.5 w-3.5" />
                   </div>
-                  {open && <span className="font-medium">{backLabel}</span>}
+                  {open && <span className="font-medium">{homeLabel}</span>}
                   {open && (
                     <ChevronRight className="h-3 w-3 text-muted-foreground/50 group-hover/back:text-brand-primary group-hover/back:translate-x-0.5 transition-all ml-auto" />
                   )}
@@ -92,39 +90,6 @@ export function SidebarUserFooter() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           )}
-          <SidebarMenuItem
-            className={cn(!open && "w-full flex justify-center")}
-          >
-            <SidebarMenuButton
-              asChild
-              tooltip={{ content: t("community") }}
-              className={cn(
-                "rounded-xl hover:bg-brand-primary/8 dark:hover:bg-brand-primary/15 transition-all group/community",
-                !open && "justify-center px-0 mx-auto",
-              )}
-            >
-              <a
-                href={
-                  typeof window !== "undefined"
-                    ? `${window.location.protocol}//${window.location.hostname}:4000`
-                    : "http://localhost:4000"
-                }
-              >
-                <div
-                  className={cn(
-                    open ? "p-1.5" : "p-2",
-                    "rounded-lg bg-linear-to-br from-brand-primary/10 to-brand-primary/20 text-brand-primary shadow-sm group-hover/community:shadow-md transition-shadow shrink-0",
-                  )}
-                >
-                  <Users className="h-3.5 w-3.5" />
-                </div>
-                {open && <span className="font-medium">{t("community")}</span>}
-                {open && (
-                  <ChevronRight className="h-3 w-3 text-muted-foreground/50 group-hover/community:text-brand-primary group-hover/community:translate-x-0.5 transition-all ml-auto" />
-                )}
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
           {isAuthenticated && (
             <SidebarMenuItem
               className={cn(!open && "w-full flex justify-center")}

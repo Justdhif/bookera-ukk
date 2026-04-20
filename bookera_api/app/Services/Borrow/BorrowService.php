@@ -27,6 +27,8 @@ class BorrowService
             'borrowRequest.borrowRequestDetails.book.authors',
             'user.profile',
             'bookReturns.details.bookCopy.book.authors',
+            'bookReturns.details.bookCopy.book.publishers',
+            'bookReturns.details.bookCopy.book.categories',
             'fines.fineType',
             'lostBooks.details.bookCopy.book.authors',
         ]);
@@ -51,7 +53,7 @@ class BorrowService
             $query->where('status', $filters['status']);
         }
 
-        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
+        return $query->orderBy('id')->paginate($filters['per_page'] ?? 15);
     }
 
     public function create(array $data, User $user): Borrow
@@ -222,6 +224,8 @@ class BorrowService
             'borrowRequest.borrowRequestDetails.book',
             'user.profile',
             'bookReturns.details.bookCopy.book.authors',
+            'bookReturns.details.bookCopy.book.publishers',
+            'bookReturns.details.bookCopy.book.categories',
             'fines.fineType',
             'lostBooks.details.bookCopy.book.authors',
         ]);
@@ -236,6 +240,8 @@ class BorrowService
             'borrowRequest.borrowRequestDetails.book',
             'user.profile',
             'bookReturns.details.bookCopy.book.authors',
+            'bookReturns.details.bookCopy.book.publishers',
+            'bookReturns.details.bookCopy.book.categories',
             'fines.fineType',
             'lostBooks.details.bookCopy.book.authors',
         ])->where('borrow_code', $code)->firstOrFail();
@@ -360,7 +366,9 @@ class BorrowService
                 'borrowDetails.bookCopy.book.authors',
                 'borrowDetails.bookCopy.book.publishers',
                 'borrowDetails.bookCopy.book.categories',
-                'bookReturns.details',
+                'bookReturns.details.bookCopy.book.authors',
+                'bookReturns.details.bookCopy.book.publishers',
+                'bookReturns.details.bookCopy.book.categories',
                 'fines.fineType',
                 'lostBooks.details.bookCopy.book.authors',
             ]);
@@ -373,12 +381,14 @@ class BorrowService
             'borrowDetails.bookCopy.book.authors',
             'borrowDetails.bookCopy.book.publishers',
             'borrowDetails.bookCopy.book.categories',
-            'bookReturns.details',
+            'bookReturns.details.bookCopy.book.authors',
+            'bookReturns.details.bookCopy.book.publishers',
+            'bookReturns.details.bookCopy.book.categories',
             'fines.fineType',
             'lostBooks.details.bookCopy.book.authors',
         ])
             ->where('user_id', $user->id)
-            ->latest()
+            ->orderBy('id')
             ->get();
     }
 

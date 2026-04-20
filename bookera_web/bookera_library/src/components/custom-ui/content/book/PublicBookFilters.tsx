@@ -118,7 +118,7 @@ export default function PublicBookFilters({
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)] xl:items-stretch">
-        <section className="relative h-full overflow-hidden rounded-3xl border border-border/70 bg-linear-to-br from-background via-background/95 to-brand-primary/5 p-4 pb-0 shadow-sm backdrop-blur-sm">
+        <div className="relative h-full overflow-hidden rounded-3xl border border-border/70 bg-linear-to-br from-background via-background/95 to-brand-primary/5 p-4 pb-0 shadow-sm backdrop-blur-sm">
           <div className="relative flex flex-col">
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-2">
@@ -188,9 +188,9 @@ export default function PublicBookFilters({
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
-        <section className="relative h-full overflow-hidden rounded-3xl border border-border/70 bg-background/80 p-4 shadow-sm backdrop-blur-sm">
+        <div className="relative h-full overflow-hidden rounded-3xl border border-border/70 bg-background/80 p-4 shadow-sm backdrop-blur-sm">
           <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-brand-primary/5 via-transparent to-transparent" />
           <div className="relative flex flex-col">
             <div className="space-y-2">
@@ -260,7 +260,7 @@ export default function PublicBookFilters({
               </div>
             </div>
           </div>
-        </section>
+        </div>
       </div>
     </div>
   );

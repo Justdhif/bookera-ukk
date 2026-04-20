@@ -130,9 +130,6 @@ export default function BorrowRequestClient() {
                 key={req.id}
                 request={req}
                 onDelete={handleDelete}
-                onOpenDetail={(requestId) =>
-                  router.push(`/admin/borrow-requests/${requestId}`)
-                }
               />
             ))}
           </div>

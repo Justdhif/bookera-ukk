@@ -1,10 +1,11 @@
-"use client";
-
+import type { Metadata } from "next";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/custom-ui/sidebar/AdminSidebar";
 import AdminHeader from "@/components/custom-ui/navbar/AdminHeader";
-import { useAuthStore } from "@/store/auth.store";
-import "@/app/globals.css";
+
+export const metadata: Metadata = {
+  title: "Bookera | Admin",
+};
 
 export default function AdminLayout({
   children,

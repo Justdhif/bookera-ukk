@@ -42,7 +42,6 @@ export default function PublicBookGrid({
   onBorrowRequest,
   showBorrowActions = true,
 }: PublicBookGridProps) {
-  const t = useTranslations("navbar");
   const tPublic = useTranslations("public");
   const tFavorites = useTranslations("public.favorites");
   const userSlug = useAuthStore((state) => state.user?.slug);
@@ -220,7 +219,7 @@ export default function PublicBookGrid({
 
   return (
     <div>
-      <section className="space-y-4">
+      <div className="space-y-4">
         <PublicBookFilters
           categories={categories}
           categoriesLoading={categoriesLoading}
@@ -269,7 +268,6 @@ export default function PublicBookGrid({
             <div
               className={cn(
                 "grid grid-cols-2 gap-3 transition-opacity duration-300 sm:grid-cols-3 md:grid-cols-4",
-                loadingMore && "opacity-70",
               )}
             >
               {books.map((book) => (
@@ -297,7 +295,7 @@ export default function PublicBookGrid({
             )}
           </div>
         )}
-      </section>
+    </div>
     </div>
   );
 }

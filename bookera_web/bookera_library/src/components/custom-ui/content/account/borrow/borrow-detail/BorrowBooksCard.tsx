@@ -1,6 +1,7 @@
 "use client";
 
 import { Borrow } from "@/types/borrow";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import BorrowDetailStatusBadge from "@/components/custom-ui/badge/BorrowDetailStatusBadge";
 import {
@@ -81,11 +82,14 @@ export function BorrowBooksCard({
                   <div className="flex flex-col md:flex-row md:items-start gap-6">
                     <div className="flex-1 flex gap-5">
                       <div className="relative group shrink-0">
-                        <div className="w-24 h-36 rounded-xl overflow-hidden shadow-lg border border-primary/20 bg-muted">
-                          <img
+                        <div className="relative w-24 h-36 rounded-xl overflow-hidden shadow-lg border border-primary/20 bg-muted">
+                          <Image
                             src={book?.cover_image || "/placeholder.png"}
-                            alt={book?.title}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                            alt={book?.title || tCommon("bookCover")}
+                            fill
+                            sizes="96px"
+                            className="object-cover transition-transform duration-300 group-hover:scale-110"
+                            unoptimized
                           />
                         </div>
                         <Badge className="absolute -top-2 -right-2 shadow-md px-2 py-0.5 bg-background text-foreground border-2">
@@ -96,7 +100,7 @@ export function BorrowBooksCard({
                       <div className="flex-1 space-y-3">
                         <div className="space-y-1">
                           <h4 className="font-black text-xl leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                            {book?.title || "Unknown"}
+                            {book?.title || tCommon("noData")}
                           </h4>
                           <div className="flex flex-wrap items-center gap-2 text-sm">
                             <span className="text-muted-foreground font-medium">{tCommon("from")}</span>
@@ -147,7 +151,7 @@ export function BorrowBooksCard({
                           trigger={
                             <Button variant="brand" size="sm" className="w-full sm:w-auto gap-2 font-bold shadow-sm">
                               <MessageCircle className="h-4 w-4" />
-                              {tPublic("addReview") || "Add Review"}
+                              {tPublic("addReview")}
                             </Button>
                           }
                         />
@@ -174,7 +178,7 @@ export function BorrowBooksCard({
                 <BookOpen className="h-5 w-5 text-primary mt-0.5 shrink-0" />
                 <div className="flex-1 min-w-0 space-y-1">
                   <p className="font-medium text-sm truncate">
-                    {detail.book?.title || "Unknown"}
+                    {detail.book?.title || tCommon("noData")}
                   </p>
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Clock className="h-3 w-3" />

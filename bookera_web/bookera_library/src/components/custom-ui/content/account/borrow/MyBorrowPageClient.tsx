@@ -7,34 +7,18 @@ import { borrowService } from "@/services/borrow.service";
 import { borrowRequestService } from "@/services/borrow-request.service";
 import { Borrow } from "@/types/borrow";
 import { BorrowRequest } from "@/types/borrow-request";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
-import BorrowDetailStatusBadge from "@/components/custom-ui/badge/BorrowDetailStatusBadge";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Link from "next/link";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import {
-  BookOpen,
-  Calendar,
-  Eye,
-  ClipboardList,
-  Trash,
-  XCircle,
-  Loader2,
-} from "lucide-react";
+import { ClipboardList, Package } from "lucide-react";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { toast } from "sonner";
-import { format } from "date-fns";
-import { useAuthStore } from "@/store/auth.store";
 
 import { BorrowCard } from "./BorrowCard";
 import { BorrowRequestCard } from "./BorrowRequestCard";
 
 export default function MyBorrowPageClient() {
   const t = useTranslations("public");
-  const userSlug = useAuthStore((state) => state.user?.slug);
+  const tBorrow = useTranslations("borrow");
   const [borrows, setBorrows] = useState<Borrow[]>([]);
   const [loadingBorrows, setLoadingBorrows] = useState(true);
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
@@ -92,61 +76,116 @@ export default function MyBorrowPageClient() {
     </div>
   );
 
+  const sortedBorrows = [...borrows].sort((left, right) => left.id - right.id);
+  const sortedRequests = [...requests].sort((left, right) => left.id - right.id);
+  const openBorrows = sortedBorrows.filter((borrow) => borrow.status === "open");
+  const closedBorrows = sortedBorrows.filter((borrow) => borrow.status === "close");
+
+  const borrowTabs = [
+    {
+      value: "all",
+      label: tBorrow("allBorrows"),
+      desc: tBorrow("allBorrowsDesc"),
+      data: sortedBorrows,
+      emptyTitle: tBorrow("noBorrowsFound"),
+      emptyDesc: tBorrow("noBorrowsFoundDesc"),
+    },
+    {
+      value: "open",
+      label: tBorrow("openBorrows"),
+      desc: tBorrow("openBorrowsDesc"),
+      data: openBorrows,
+      emptyTitle: tBorrow("noBorrowsFound"),
+      emptyDesc: tBorrow("noBorrowsFoundDesc"),
+    },
+    {
+      value: "closed",
+      label: tBorrow("closedBorrows"),
+      desc: tBorrow("closedBorrowsDesc"),
+      data: closedBorrows,
+      emptyTitle: tBorrow("noBorrowsFound"),
+      emptyDesc: tBorrow("noBorrowsFoundDesc"),
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      <ContentHeader title={t("myLibrary")} description={t("myLibraryDesc")} />
+      <ContentHeader
+        title={t("myBorrows")}
+        description={t("myBorrowsDesc")}
+        isAdmin
+      />
 
-      <Tabs defaultValue="borrows">
-        <TabsList className="mb-4">
-          <TabsTrigger value="borrows" className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            {t("myBorrows")}
+      <Tabs defaultValue="all" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="all">
+            {tBorrow("all")} ({sortedBorrows.length})
           </TabsTrigger>
-          <TabsTrigger value="requests" className="flex items-center gap-2">
-            <ClipboardList className="h-4 w-4" />
-            {t("myRequests")}
+          <TabsTrigger value="open">
+            {tBorrow("open")} ({openBorrows.length})
+          </TabsTrigger>
+          <TabsTrigger value="closed">
+            {tBorrow("closed")} ({closedBorrows.length})
+          </TabsTrigger>
+          <TabsTrigger value="requests" className="flex items-center gap-1">
+            <ClipboardList className="h-3.5 w-3.5" />
+            {tBorrow("requests")} ({sortedRequests.length})
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="borrows" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          {loadingBorrows ? (
-            loadingState
-          ) : borrows.length === 0 ? (
-            <EmptyState
-              icon={<BookOpen className="h-12 w-12 text-muted-foreground/50" />}
-              title={t("noBorrowsYet")}
-              description={t("noBorrowsYetDesc")}
-            />
-          ) : (
-            <div className="grid gap-6">
-              {borrows.map((borrow) => (
-                <BorrowCard key={borrow.id} borrow={borrow} />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="requests" className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          {loadingRequests ? (
-            loadingState
-          ) : requests.length === 0 ? (
-            <EmptyState
-              icon={<ClipboardList className="h-12 w-12 text-muted-foreground/50" />}
-              title={t("noRequestsYet")}
-              description={t("noRequestsYetDesc")}
-            />
-          ) : (
-            <div className="grid gap-6">
-              {requests.map((req) => (
-                <BorrowRequestCard
-                  key={req.id}
-                  request={req}
-                  onDelete={handleDeleteRequest}
-                  isDeleting={deleteId === req.id}
+        {borrowTabs.map(({ value, label, desc, data, emptyTitle, emptyDesc }) => (
+          <TabsContent key={value} value={value} className="space-y-4">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold">{label}</h3>
+                <p className="text-sm text-muted-foreground">{desc}</p>
+              </div>
+              {loadingBorrows ? (
+                loadingState
+              ) : data.length === 0 ? (
+                <EmptyState
+                  icon={<Package />}
+                  title={emptyTitle}
+                  description={emptyDesc}
                 />
-              ))}
+              ) : (
+                <div className="grid gap-4">
+                  {data.map((borrow) => (
+                    <BorrowCard key={borrow.id} borrow={borrow} />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </TabsContent>
+        ))}
+
+        <TabsContent value="requests" className="space-y-4">
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-semibold">{t("myRequests")}</h3>
+              <p className="text-sm text-muted-foreground">{t("myRequestsDesc")}</p>
+            </div>
+            {loadingRequests ? (
+              loadingState
+            ) : sortedRequests.length === 0 ? (
+              <EmptyState
+                icon={<ClipboardList />}
+                title={t("noRequestsYet")}
+                description={t("noRequestsYetDesc")}
+              />
+            ) : (
+              <div className="space-y-4">
+                {sortedRequests.map((req) => (
+                  <BorrowRequestCard
+                    key={req.id}
+                    request={req}
+                    onDelete={handleDeleteRequest}
+                    isDeleting={deleteId === req.id}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Fine\StoreFineRequest;
 use App\Http\Requests\Fine\UpdateFineRequest;
 use App\Http\Requests\Fine\WaiveFineRequest;
-use App\Models\Fine;
+use App\Models\FineBorrow;
 use App\Models\Borrow;
 use App\Services\Fine\FineService;
 use Illuminate\Http\JsonResponse;
@@ -56,21 +56,21 @@ class FineController extends Controller
         return ApiResponse::successResponse('Denda berhasil dibuat', $fine, 201);
     }
 
-    public function show(Fine $fine): JsonResponse
+    public function show(FineBorrow $fine): JsonResponse
     {
         $fine->load(['borrow.user.profile', 'fineType']);
 
         return ApiResponse::successResponse('Detail denda', $fine);
     }
 
-    public function update(UpdateFineRequest $request, Fine $fine): JsonResponse
+    public function update(UpdateFineRequest $request, FineBorrow $fine): JsonResponse
     {
         $fine = $this->fineService->update($fine, $request->validated());
 
         return ApiResponse::successResponse('Denda berhasil diupdate', $fine);
     }
 
-    public function markAsPaid(Request $request, Fine $fine): JsonResponse
+    public function markAsPaid(Request $request, FineBorrow $fine): JsonResponse
     {
         if (!$this->fineService->canMarkAsPaid($fine)) {
             return ApiResponse::errorResponse('Denda ini sudah dibayar', null, 400);
@@ -81,7 +81,7 @@ class FineController extends Controller
         return ApiResponse::successResponse('Denda berhasil ditandai sebagai sudah dibayar', $fine);
     }
 
-    public function waive(WaiveFineRequest $request, Fine $fine): JsonResponse
+    public function waive(WaiveFineRequest $request, FineBorrow $fine): JsonResponse
     {
         if (!$this->fineService->canWaive($fine)) {
             return ApiResponse::errorResponse('Denda ini sudah dibatalkan', null, 400);
@@ -93,7 +93,7 @@ class FineController extends Controller
         return ApiResponse::successResponse('Denda berhasil dibatalkan', $fine);
     }
 
-    public function destroy(Fine $fine): JsonResponse
+    public function destroy(FineBorrow $fine): JsonResponse
     {
         $this->fineService->delete($fine);
 

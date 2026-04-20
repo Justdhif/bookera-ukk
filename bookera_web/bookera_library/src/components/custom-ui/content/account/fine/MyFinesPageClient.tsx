@@ -13,6 +13,39 @@ import { DollarSign, BookOpen, Calendar, AlertCircle } from "lucide-react";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { format } from "date-fns";
 
+type FineBorrowGroup = {
+  borrowId: number;
+  borrow?: Fine["borrow"];
+  fines: Fine[];
+};
+
+const groupFinesByBorrow = (fines: Fine[]): FineBorrowGroup[] => {
+  return [...fines]
+    .sort((left, right) => {
+      if (left.borrow_id !== right.borrow_id) {
+        return left.borrow_id - right.borrow_id;
+      }
+
+      return left.id - right.id;
+    })
+    .reduce<FineBorrowGroup[]>((groups, fine) => {
+      const lastGroup = groups[groups.length - 1];
+
+      if (lastGroup && lastGroup.borrowId === fine.borrow_id) {
+        lastGroup.fines.push(fine);
+        return groups;
+      }
+
+      groups.push({
+        borrowId: fine.borrow_id,
+        borrow: fine.borrow,
+        fines: [fine],
+      });
+
+      return groups;
+    }, []);
+};
+
 export default function MyFinesPageClient() {
   const t = useTranslations("public");
   const [fines, setFines] = useState<Fine[]>([]);
@@ -41,6 +74,8 @@ export default function MyFinesPageClient() {
       minimumFractionDigits: 0,
     }).format(amount);
   };
+
+  const groupedFines = groupFinesByBorrow(fines);
 
   if (loading) {
     return (
@@ -80,106 +115,112 @@ export default function MyFinesPageClient() {
       />
 
       <div className="grid gap-4">
-        {fines.map((fine) => (
-          <Card key={fine.id} className="overflow-hidden">
-            <CardHeader className="bg-muted/30 pb-4">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <CardTitle className="text-lg">Fine #{fine.id}</CardTitle>
-                    <FineStatusBadge status={fine.status} />
-                    {fine.borrow_id && (
-                      <Badge variant="outline">
-                        {t("loanNumber")}
-                        {fine.borrow_id}
-                      </Badge>
+        {groupedFines.map((group) => {
+          const borrow = group.borrow;
+
+          return (
+            <Card key={group.borrowId} className="overflow-hidden">
+              <CardHeader>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <CardTitle className="text-lg">
+                        {t("borrowHash")}
+                        {group.borrowId}
+                      </CardTitle>
+                      {borrow?.borrow_code && (
+                        <Badge variant="outline">{borrow.borrow_code}</Badge>
+                      )}
+                    </div>
+                    {borrow?.borrow_date && (
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Calendar className="h-3 w-3" />
+                        <span>
+                          {format(new Date(borrow.borrow_date), "dd MMM yyyy")}
+                        </span>
+                      </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    <span>
-                      {format(new Date(fine.created_at), "dd MMM yyyy")}
-                    </span>
-                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">
-                    {t("fineAmountLabel")}
-                  </p>
-                  <p className="text-2xl font-bold text-red-600">
-                    {formatCurrency(fine.amount)}
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">
-                    {t("fineTypeLabel")}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-orange-600" />
-                    <p className="font-medium">{fine.fine_type?.name}</p>
-                  </div>
-                  {fine.fine_type?.description && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {fine.fine_type.description}
-                    </p>
-                  )}
-                </div>
-
-                {fine.borrow?.borrow_details &&
-                  fine.borrow.borrow_details.length > 0 && (
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-2">
-                        {t("relatedBooksLabel")}
-                      </p>
-                      <div className="grid gap-2">
-                        {fine.borrow.borrow_details.map((detail) => (
-                          <div
-                            key={detail.id}
-                            className="flex items-start gap-3 rounded-lg border bg-muted/20 p-3"
-                          >
-                            <BookOpen className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-sm truncate">
-                                {detail.book_copy?.book?.title || "Unknown"}
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-5">
+                  <div className="grid gap-3">
+                    {group.fines.map((fine) => (
+                      <div
+                        key={fine.id}
+                        className="rounded-lg border bg-background p-4"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-semibold">
+                                {t("fineNumber")}
+                                {fine.id}
                               </p>
-                              <p className="text-xs text-muted-foreground">
-                                {t("copyCodeLabel")}:
-                                {detail.book_copy?.copy_code}
-                              </p>
+                              <FineStatusBadge status={fine.status} />
+                            </div>
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                              <Calendar className="h-3 w-3" />
+                              <span>
+                                {format(new Date(fine.created_at), "dd MMM yyyy")}
+                              </span>
                             </div>
                           </div>
-                        ))}
+                          <div className="text-right">
+                            <p className="text-sm text-muted-foreground">
+                              {t("fineAmountLabel")}
+                            </p>
+                            <p className="text-xl font-bold text-red-600">
+                              {formatCurrency(fine.amount)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 space-y-4">
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">
+                              {t("fineTypeLabel")}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <AlertCircle className="h-4 w-4 text-orange-600" />
+                              <p className="font-medium">{fine.fine_type?.name}</p>
+                            </div>
+                            {fine.fine_type?.description && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {fine.fine_type.description}
+                              </p>
+                            )}
+                          </div>
+
+                          {fine.notes && (
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground mb-1">
+                                {t("notesLabel")}
+                              </p>
+                              <p className="text-sm">{fine.notes}</p>
+                            </div>
+                          )}
+
+                          {fine.waive_reason && (
+                            <div className="rounded-lg border border-green-200 bg-green-50 p-3">
+                              <p className="text-sm font-medium text-green-800 mb-1">
+                                {t("waivedLabel")}
+                              </p>
+                              <p className="text-sm text-green-700">
+                                {fine.waive_reason}
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
-
-                {fine.notes && (
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-1">
-                      {t("notesLabel")}
-                    </p>
-                    <p className="text-sm">{fine.notes}</p>
+                    ))}
                   </div>
-                )}
-
-                {fine.waive_reason && (
-                  <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-                    <p className="text-sm font-medium text-green-800 mb-1">
-                      {t("waivedLabel")}
-                    </p>
-                    <p className="text-sm text-green-700">
-                      {fine.waive_reason}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import { Search, History, X, BookOpen } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/hooks/useDebounce";
 import { publicService } from "@/services/public.service";
 import { Book } from "@/types/book";
@@ -203,12 +205,15 @@ export default function PublicHeaderSearch() {
                   <span className="text-sm font-semibold text-foreground/80">
                     {t("recentSearches")}
                   </span>
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={clearAllHistory}
-                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    className="h-auto px-0 py-0 text-xs text-muted-foreground hover:bg-transparent hover:text-foreground"
                   >
                     {t("clearAll")}
-                  </button>
+                  </Button>
                 </div>
                 {searchHistory.map((item, index) => (
                   <div
@@ -224,9 +229,16 @@ export default function PublicHeaderSearch() {
                   >
                     <div className="flex items-center gap-3 overflow-hidden">
                       {item.type === "book" ? (
-                        <div className="h-10 w-7 rounded bg-muted shrink-0 overflow-hidden">
+                        <div className="relative h-10 w-7 rounded bg-muted shrink-0 overflow-hidden">
                           {item.coverImage ? (
-                            <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover" />
+                            <Image
+                              src={item.coverImage}
+                              alt={item.title}
+                              fill
+                              sizes="28px"
+                              className="object-cover"
+                              unoptimized
+                            />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-secondary">
                               <BookOpen className="h-3 w-3 text-muted-foreground" />
@@ -246,12 +258,16 @@ export default function PublicHeaderSearch() {
                         )}
                       </div>
                     </div>
-                    <button
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
                       onClick={(e) => removeHistoryItem(item.id, e)}
-                      className="opacity-0 group-hover:opacity-100 p-1 text-muted-foreground hover:text-foreground transition-all rounded-full hover:bg-muted"
+                      className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      aria-label="Remove history item"
                     >
                       <X className="h-4 w-4" />
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -290,7 +306,7 @@ export default function PublicHeaderSearch() {
                   ))}
 
                 {isLoading && previewBooks.length === 0 ? (
-                  <div className="p-4 flex items-center justify-center min-h-[100px]">
+                  <div className="p-4 flex items-center justify-center min-h-25">
                     <DataLoading variant="inline" size="md" />
                   </div>
                 ) : previewBooks.length > 0 ? (
@@ -308,10 +324,13 @@ export default function PublicHeaderSearch() {
                       >
                         <div className="h-12 w-9 md:h-14 md:w-10 bg-muted shrink-0 rounded overflow-hidden relative">
                           {book.cover_image ? (
-                            <img
+                            <Image
                               src={book.cover_image}
                               alt={book.title}
-                              className="w-full h-full object-cover"
+                              fill
+                              sizes="40px"
+                              className="object-cover"
+                              unoptimized
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-secondary">

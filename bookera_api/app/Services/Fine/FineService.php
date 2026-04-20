@@ -4,7 +4,7 @@ namespace App\Services\Fine;
 
 use App\Helpers\ActivityLogger;
 use App\Models\Borrow;
-use App\Models\Fine;
+use App\Models\FineBorrow;
 use App\Models\FineType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -14,7 +14,7 @@ class FineService
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
-        $query = Fine::with(['borrow.user.profile', 'fineType']);
+        $query = FineBorrow::with(['borrow.user.profile', 'fineType']);
 
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -37,37 +37,36 @@ class FineService
             });
         }
 
-        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
+        return $query->orderBy('borrow_id')->orderBy('id')->paginate($filters['per_page'] ?? 15);
     }
 
     public function getBorrowFines(Borrow $borrow): Collection
     {
-        return Fine::with(['fineType'])
+        return FineBorrow::with(['fineType'])
             ->where('borrow_id', $borrow->id)
-            ->latest()
-            ->orderByDesc('id')
+            ->orderBy('id')
             ->get();
     }
 
     public function getMyFines(int $userId): Collection
     {
-        return Fine::with(['fineType', 'borrow.borrowDetails.bookCopy.book'])
+        return FineBorrow::with(['fineType', 'borrow.borrowDetails.bookCopy.book'])
             ->whereHas('borrow', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
-            ->latest()
-            ->orderByDesc('id')
+            ->orderBy('borrow_id')
+            ->orderBy('id')
             ->get();
     }
 
-    public function create(Borrow $borrow, array $data): Fine
+    public function create(Borrow $borrow, array $data): FineBorrow
     {
         $fineType = FineType::findOrFail($data['fine_type_id']);
 
         return DB::transaction(function () use ($borrow, $fineType, $data) {
             $amount = $data['amount'] ?? $fineType->amount;
 
-            $fine = Fine::create([
+            $fine = FineBorrow::create([
                 'borrow_id'    => $borrow->id,
                 'fine_type_id' => $fineType->id,
                 'amount'       => $amount,
@@ -96,7 +95,7 @@ class FineService
         });
     }
 
-    public function update(Fine $fine, array $data): Fine
+    public function update(FineBorrow $fine, array $data): FineBorrow
     {
         $oldData = $fine->toArray();
         $fine->update($data);
@@ -117,7 +116,7 @@ class FineService
         return $fine->load(['borrow.user.profile', 'fineType']);
     }
 
-    public function markAsPaid(Fine $fine): Fine
+    public function markAsPaid(FineBorrow $fine): FineBorrow
     {
         $fine->update([
             'status' => 'paid',
@@ -140,7 +139,7 @@ class FineService
         return $fine->load(['borrow.user.profile', 'fineType']);
     }
 
-    public function waiveFine(Fine $fine, ?string $notes = null): Fine
+    public function waiveFine(FineBorrow $fine, ?string $notes = null): FineBorrow
     {
         $oldStatus = $fine->status;
 
@@ -165,7 +164,7 @@ class FineService
         return $fine->load(['borrow.user.profile', 'fineType']);
     }
 
-    public function delete(Fine $fine): void
+    public function delete(FineBorrow $fine): void
     {
         ActivityLogger::log(
             'delete',
@@ -184,12 +183,12 @@ class FineService
         $fine->delete();
     }
 
-    public function canMarkAsPaid(Fine $fine): bool
+    public function canMarkAsPaid(FineBorrow $fine): bool
     {
         return $fine->status !== 'paid';
     }
 
-    public function canWaive(Fine $fine): bool
+    public function canWaive(FineBorrow $fine): bool
     {
         return $fine->status !== 'waived';
     }

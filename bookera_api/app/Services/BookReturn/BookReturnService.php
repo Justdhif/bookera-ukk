@@ -8,12 +8,11 @@ use App\Models\BookReturn;
 use App\Models\BookReturnDetail;
 use App\Models\Borrow;
 use App\Models\BorrowDetail;
-use App\Models\Fine;
+use App\Models\FineBorrow;
 use App\Models\FineType;
 use App\Models\LostBookDetail;
 use App\Services\BookReturn\BookReturnNotificationService;
 use App\Services\LostBook\LostBookService;
-use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +29,13 @@ class BookReturnService
 
     public function getByBorrow(Borrow $borrow): Collection
     {
-        return BookReturn::with(['details.bookCopy.book'])
+        return BookReturn::with([
+            'details.bookCopy.book.authors',
+            'details.bookCopy.book.publishers',
+            'details.bookCopy.book.categories',
+            'borrow.user.profile',
+            'borrow.fines.fineType',
+        ])
             ->where('borrow_id', $borrow->id)
             ->latest()
             ->orderByDesc('id')
@@ -74,6 +79,8 @@ class BookReturnService
                     }
 
                     $condition = $item['condition'] ?? 'good';
+                    $selectedFineTypeId = isset($item['fine_type_id']) ? (int) $item['fine_type_id'] : null;
+                    $selectedDamagedFineType = $this->resolveFineTypeByType('damaged', $selectedFineTypeId);
 
                     $bookReturn->details()->create([
                         'book_copy_id' => $bookCopy->id,
@@ -90,7 +97,7 @@ class BookReturnService
                     ];
 
                     if ($condition === 'damaged') {
-                        $this->autoCreateDamagedFine($borrow, $bookCopy);
+                        $this->autoCreateDamagedFine($borrow, $bookCopy, $selectedDamagedFineType);
                     }
 
                     $this->autoCreateLateFine($borrow, $bookCopy);
@@ -137,56 +144,25 @@ class BookReturnService
         });
     }
 
-    public function updateConditions(BookReturn $bookReturn, array $conditions): BookReturn
+    private function autoCreateDamagedFine(Borrow $borrow, BookCopy $bookCopy, ?FineType $preferredFineType = null): void
     {
-        return DB::transaction(function () use ($bookReturn, $conditions) {
-            $borrow = $bookReturn->borrow;
-
-            foreach ($conditions as $detailId => $condition) {
-                $detail = $bookReturn->details()->find($detailId);
-                if (! $detail) {
-                    continue;
-                }
-
-                $oldCondition = $detail->condition;
-                $detail->update(['condition' => $condition]);
-
-                if ($condition === 'damaged') {
-                    $this->autoCreateDamagedFine($borrow, $detail->bookCopy);
-                }
-
-                ActivityLogger::log(
-                    'update',
-                    'book_return_detail',
-                    "Return detail #{$detail->id} condition updated to '{$condition}'",
-                    ['detail_id' => $detail->id, 'new_condition' => $condition],
-                    ['detail_id' => $detail->id, 'old_condition' => $oldCondition],
-                    $detail
-                );
-            }
-
-            return $bookReturn->fresh(['details.bookCopy.book', 'borrow.fines.fineType']);
-        });
-    }
-
-    private function autoCreateDamagedFine(Borrow $borrow, BookCopy $bookCopy): void
-    {
-        $damagedFineType = FineType::where('type', 'damaged')->first();
+        $damagedFineType = $preferredFineType ?? $this->resolveFineTypeByType('damaged');
         if (! $damagedFineType) {
             return;
         }
 
-        $fineNotes = 'Denda buku rusak: ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
+        $fineNotes = 'Denda buku rusak (' . $damagedFineType->name . '): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
 
         $existingFine = $borrow->fines()
-            ->where('notes', $fineNotes)
+            ->where('fine_type_id', $damagedFineType->id)
+            ->where('notes', 'like', '%' . $bookCopy->copy_code . '%')
             ->first();
 
         if ($existingFine) {
             return;
         }
 
-        $fine = Fine::create([
+        $fine = FineBorrow::create([
             'borrow_id'    => $borrow->id,
             'fine_type_id' => $damagedFineType->id,
             'amount'       => $damagedFineType->amount,
@@ -197,7 +173,7 @@ class BookReturnService
         ActivityLogger::log(
             'create',
             'fine',
-            "Fine auto-created for damaged book in borrow #{$borrow->id}",
+            "Fine auto-created for damaged book in borrow #{$borrow->id} ({$damagedFineType->name})",
             ['fine_id' => $fine->id, 'amount' => $fine->amount, 'book_copy_id' => $bookCopy->id],
             null,
             $fine
@@ -219,25 +195,26 @@ class BookReturnService
             return;
         }
 
-        $daysLate = (int) $actualReturnDate->diffInDays($expectedReturnDate);
+        $daysLate = (int) $expectedReturnDate->diffInDays($actualReturnDate);
 
-        $lateFineType = FineType::where('type', 'late')->first();
+        $lateFineType = $this->resolveFineTypeByType('late');
         if (! $lateFineType || $daysLate <= 0) {
             return;
         }
 
         $totalAmount = $lateFineType->amount * $daysLate;
-        $fineNotes = 'Denda keterlambatan (' . $daysLate . ' hari): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
+        $fineNotes = 'Denda keterlambatan (' . $lateFineType->name . ', ' . $daysLate . ' hari): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
 
         $existingFine = $borrow->fines()
-            ->where('notes', $fineNotes)
+            ->where('fine_type_id', $lateFineType->id)
+            ->where('notes', 'like', '%' . $bookCopy->copy_code . '%')
             ->first();
 
         if ($existingFine) {
             return;
         }
 
-        $fine = Fine::create([
+        $fine = FineBorrow::create([
             'borrow_id'    => $borrow->id,
             'fine_type_id' => $lateFineType->id,
             'amount'       => $totalAmount,
@@ -248,52 +225,36 @@ class BookReturnService
         ActivityLogger::log(
             'create',
             'fine',
-            "Fine auto-created for late return in borrow #{$borrow->id}",
+            "Fine auto-created for late return in borrow #{$borrow->id} ({$lateFineType->name})",
             ['fine_id' => $fine->id, 'amount' => $fine->amount, 'days_late' => $daysLate, 'book_copy_id' => $bookCopy->id],
             null,
             $fine
         );
     }
 
-
-    public function finishFines(BookReturn $bookReturn): array
+    private function resolveFineTypeByType(string $type, ?int $preferredFineTypeId = null): ?FineType
     {
-        $borrow = $bookReturn->borrow;
+        $query = FineType::where('type', $type)->orderBy('amount')->orderBy('id');
 
-        $unpaidFines = $borrow->fines()->where('status', 'unpaid')->get();
+        if ($preferredFineTypeId) {
+            $preferredFineType = (clone $query)->whereKey($preferredFineTypeId)->first();
 
-        if ($unpaidFines->isEmpty()) {
-            throw new Exception('There are no unpaid fines for this borrow.');
+            if ($preferredFineType) {
+                return $preferredFineType;
+            }
         }
 
-        DB::transaction(function () use ($unpaidFines, $borrow) {
-            foreach ($unpaidFines as $fine) {
-                $fine->update([
-                    'status'  => 'paid',
-                    'paid_at' => now(),
-                ]);
-
-                ActivityLogger::log(
-                    'update',
-                    'fine',
-                    "Fine #{$fine->id} marked as paid via return finish-fines",
-                    ['fine_id' => $fine->id, 'status' => 'paid', 'paid_at' => $fine->paid_at],
-                    ['status' => 'unpaid'],
-                    $fine
-                );
-            }
-        });
-
-        return $borrow->fines()->with('fineType')->get()->toArray();
+        return $query->first();
     }
 
     public function getDetail(BookReturn $bookReturn): BookReturn
     {
         return $bookReturn->load([
-            'details.bookCopy.book',
+            'details.bookCopy.book.authors',
+            'details.bookCopy.book.publishers',
+            'details.bookCopy.book.categories',
             'borrow.user.profile',
             'borrow.fines.fineType',
-            'borrow.borrowDetails.bookCopy.book',
         ]);
     }
 

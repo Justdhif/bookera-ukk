@@ -238,11 +238,7 @@ export default function BookCard({
             </div>
           </div>
         </div>
-        <Link
-          href={`/books/${book.slug}`}
-          className="block"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <Link href={`/books/${book.slug}`} onClick={(e) => e.stopPropagation()}>
           <Button size="sm" variant="outline" className="w-full gap-1">
             <Eye className="h-3.5 w-3.5" />
             {t("detail.detail")}

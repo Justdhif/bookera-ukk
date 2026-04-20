@@ -85,6 +85,16 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
                   <p className="text-2xl font-black tracking-tight text-foreground">
                     {formatCurrency(fine.amount)}
                   </p>
+                  {fine.fine_type?.description && (
+                    <p className="text-sm font-medium text-muted-foreground/80 mt-1 max-w-md">
+                      {fine.fine_type.description}
+                    </p>
+                  )}
+                  {fine.fine_type?.type === "lost" && (
+                    <p className="text-xs font-medium text-muted-foreground/70 mt-1 max-w-md">
+                      {t("lostFineValueNote")}
+                    </p>
+                  )}
                   {fine.notes && (
                     <p className="text-sm font-medium text-muted-foreground/80 mt-1 max-w-md">
                       {fine.notes}
