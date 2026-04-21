@@ -5,11 +5,22 @@ import {
   BorrowMonthly,
   CalendarDay,
   DayDetail,
+  TopBorrowedStat,
 } from "@/types/dashboard";
 
 export const dashboardService = {
   getTotals: () =>
     api.get<ApiResponse<DashboardTotals>>("/admin/dashboard/totals"),
+
+  getTopBorrowedCategories: (limit = 5) =>
+    api.get<ApiResponse<TopBorrowedStat[]>>(
+      `/admin/dashboard/top-borrowed-categories?limit=${limit}`,
+    ),
+
+  getTopBorrowedBooks: (limit = 5) =>
+    api.get<ApiResponse<TopBorrowedStat[]>>(
+      `/admin/dashboard/top-borrowed-books?limit=${limit}`,
+    ),
 
   getLoanMonthlyChart: (year: number) =>
     api.get<ApiResponse<BorrowMonthly[]>>(

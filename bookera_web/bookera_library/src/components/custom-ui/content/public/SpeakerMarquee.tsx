@@ -16,7 +16,7 @@ export default function SpeakerMarquee() {
 
   return (
     <div className="relative pt-2">
-      <div className="relative flex items-center h-12.5 overflow-visible rounded-2xl bg-linear-to-r from-[#0f0f1a] via-[#1a1a2e] to-[#16213e]">
+      <div className="relative flex items-center h-12.5 overflow-visible rounded-2xl bg-linear-to-r from-emerald-50 via-teal-50/50 to-emerald-50 dark:from-[#0f0f1a] dark:via-[#1a1a2e] dark:to-[#16213e] border border-emerald-100/40 dark:border-white/5 shadow-xs dark:shadow-none">
         <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
           <svg
             className="absolute top-0 right-0 w-20 h-10.5"
@@ -95,8 +95,8 @@ export default function SpeakerMarquee() {
           </div>
           <div style={{ width: 52, height: "100%" }} />
         </div>
-        <div className="absolute left-18 top-0 bottom-0 w-8 z-10 pointer-events-none bg-linear-to-r from-[#0f0f1a] to-transparent" />
-        <div className="absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none bg-linear-to-l from-[#16213e] to-transparent rounded-r-full" />
+        <div className="absolute left-18 top-0 bottom-0 w-8 z-10 pointer-events-none bg-linear-to-r from-emerald-50 dark:from-[#0f0f1a] to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none bg-linear-to-l from-emerald-50 dark:from-[#16213e] to-transparent rounded-r-full" />
         <div className="flex-1 overflow-hidden z-1">
           <Marquee
             speed={38}
@@ -114,7 +114,7 @@ export default function SpeakerMarquee() {
                     boxShadow: `0 0 5px ${msg.accent}`,
                   }}
                 />
-                <span className="text-[11px] font-medium text-white/70 whitespace-nowrap tracking-[0.01em]">
+                <span className="text-[11px] font-medium text-slate-600 dark:text-white/70 whitespace-nowrap tracking-[0.01em]">
                   {msg.text}
                 </span>
                 <Sparkles

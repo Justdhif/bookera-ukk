@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BookOpen, Building2, Calendar, DollarSign, Eye, Hash, Receipt, Tag, User } from "lucide-react";
+import { BookOpen, Building2, Calendar, DollarSign, Eye, Hash, Receipt, Tag, User, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
@@ -140,10 +140,10 @@ export function ReturnCard({ borrow }: ReturnCardProps) {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-9 rounded-full bg-background/50 px-4 shadow-sm backdrop-blur transition-all hover:bg-primary hover:text-white"
+                  className="h-8 gap-1"
                 >
-                  <Eye className="mr-2 h-4 w-4" />
-                  {t("detailsBtn")}
+                  <Eye className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{t("detailsBtn")}</span>
                 </Button>
               </Link>
             )}

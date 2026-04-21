@@ -44,7 +44,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   const t = useTranslations("dashboard");
   if (active && payload && payload.length) {
     return (
-      <div className="p-4 rounded-xl shadow-xl border-2 bg-popover text-popover-foreground min-w-[150px]">
+      <div className="p-4 rounded-xl shadow-xl border-2 bg-popover text-popover-foreground min-w-37.5">
         <p className="font-semibold mb-2">{label}</p>
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center gap-2 mt-1">
@@ -145,7 +145,7 @@ export default function BorrowMonthlyChart() {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-6 min-h-[400px] flex items-center justify-center">
+      <CardContent className="pt-6 min-h-100 flex items-center justify-center">
         {loading ? (
           <DataLoading className="border-none bg-transparent shadow-none min-h-0 py-0" />
         ) : hasData ? (

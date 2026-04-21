@@ -1,13 +1,20 @@
 export interface DashboardTotals {
   total_users: number;
   total_books: number;
-  total_categories: number;
-  total_authors: number;
-  total_publishers: number;
-  total_fines: number;
-  loans_today: number;
-  returns_today: number;
+  total_borrows: number;
+  total_returns: number;
 }
+
+export interface TopBorrowedStat {
+  id: number;
+  name: string;
+  slug: string;
+  total_borrows: number;
+}
+
+export interface TopBorrowedCategory extends TopBorrowedStat {}
+
+export interface TopBorrowedBook extends TopBorrowedStat {}
 
 export interface BorrowMonthly {
   month: number;

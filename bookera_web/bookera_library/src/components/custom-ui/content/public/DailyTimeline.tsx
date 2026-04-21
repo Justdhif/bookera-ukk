@@ -275,21 +275,34 @@ export default function DailyTimeline() {
         </div>
 
         <div className="relative z-10 overflow-x-hidden sm:overflow-x-auto scrollbar-hide">
-          <div className="px-4 py-6 sm:min-w-125 sm:p-0">
-            <div className="grid grid-cols-7 gap-1 sm:gap-4">
-              {days.map((day, i) => (
-                <DayBubble
-                  key={i}
-                  date={day}
-                  borrows={activeBorrows}
-                  locale={locale}
-                />
-              ))}
+          <div className="px-6 py-8 sm:min-w-125">
+            <div className="space-y-2">
+              <div className="grid grid-cols-7 gap-4 md:gap-5">
+                {days.map((day, i) => (
+                  <div
+                    key={i}
+                    className="py-1 text-center text-[10px] font-semibold tracking-[0.22em] text-muted-foreground uppercase"
+                  >
+                    {dayName(day, locale)}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-4">
+                {days.map((day, i) => (
+                  <DayBubble
+                    key={i}
+                    date={day}
+                    borrows={activeBorrows}
+                    locale={locale}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="relative z-10 px-5 pb-4 mt-5">
+        <div className="relative z-10 px-5 pb-4">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-white/40">
             <div className="flex items-center gap-2.5">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />

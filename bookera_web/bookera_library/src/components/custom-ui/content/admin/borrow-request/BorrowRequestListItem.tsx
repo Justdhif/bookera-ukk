@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
-import { BookOpen, Calendar, Eye, Trash, User } from "lucide-react";
+import { BookOpen, Calendar, Eye, Trash, User, ArrowRight } from "lucide-react";
 import { BorrowRequest } from "@/types/borrow-request";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -76,9 +76,9 @@ export default function BorrowRequestListItem({
               <Trash className="h-4 w-4" />
             </Button>
             <Link href={`/admin/borrow-requests/${request.id}`}>
-              <Button size="sm" variant="outline" className="h-8 gap-1.5 px-3">
+              <Button size="sm" variant="outline" className="h-8 gap-1">
                 <Eye className="h-3.5 w-3.5" />
-                {t("detail")}
+                <span className="hidden sm:inline">{t("detail")}</span>
               </Button>
             </Link>
           </div>

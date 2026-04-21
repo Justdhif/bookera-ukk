@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Calendar, User, Eye, Building2, Tag, Hash, MessageCircle } from "lucide-react";
+import { BookOpen, Calendar, User, Eye, Building2, Tag, Hash, MessageCircle, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/store/auth.store";
@@ -61,9 +61,9 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
           <div className="flex gap-2 items-center self-end md:self-center">
             {borrow.borrow_code && (
               <Link href={detailLink}>
-                <Button size="sm" variant="outline" className="rounded-full px-4 h-9 bg-background/50 backdrop-blur hover:bg-primary hover:text-white transition-all shadow-sm">
-                  <Eye className="h-4 w-4 mr-2" />
-                  {t("detailsBtn")}
+                <Button size="sm" variant="outline" className="h-8 gap-1">
+                  <Eye className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{tCommon("view")}</span>
                 </Button>
               </Link>
             )}

@@ -107,14 +107,17 @@ export default function BorrowCalendar() {
     cells.push({ day: d, isCurrentMonth: false });
   }
 
-  const getBorrowIntensityBg = (data?: CalendarDay) => {
-    if (!data) return "";
-    const total = data.open_borrows + data.close_borrows;
-    if (total === 0) return "";
-    if (total <= 2) return "bg-[#10b981]/15 dark:bg-[#10b981]/20";
-    if (total <= 5) return "bg-[#10b981]/30 dark:bg-[#10b981]/35";
-    if (total <= 10) return "bg-[#10b981]/50 dark:bg-[#10b981]/55";
-    return "bg-[#10b981]/70 dark:bg-[#10b981]/75";
+  const getBorrowDayTone = (data?: CalendarDay, isCurrentMonth = true) => {
+    if (!isCurrentMonth) return "bg-slate-100/80 text-slate-400/80 dark:bg-slate-800/40 dark:text-slate-500";
+    if (!data) return "bg-brand-primary/5 text-brand-primary-dark/40";
+
+    const total = Number(data.open_borrows) + Number(data.close_borrows);
+
+    if (total === 0) return "bg-brand-primary/5 text-brand-primary-dark/40";
+    if (total <= 2) return "bg-brand-primary/15 text-brand-primary-dark";
+    if (total <= 5) return "bg-brand-primary/30 text-brand-primary-darker";
+    if (total <= 10) return "bg-brand-primary/50 text-white";
+    return "bg-brand-primary/75 text-white";
   };
 
   return (
@@ -138,39 +141,33 @@ export default function BorrowCalendar() {
         </div>
       </CardHeader>
 
-      <CardContent className="pt-5 flex items-stretch gap-6 min-h-115">
+      <CardContent className="pt-5 flex flex-col lg:items-stretch lg:flex-row gap-6 min-h-fit lg:min-h-115">
         <div className="flex-1 min-w-0">
           {loadingCalendar ? (
             <div className="h-full flex items-center justify-center">
               <DataLoading variant="inline" size="lg" />
             </div>
           ) : (
-            <div className="space-y-1.5">
-              <div className="grid grid-cols-7 gap-1.5">
+            <div className="space-y-1">
+              <div className="grid grid-cols-7 gap-1.5 md:gap-3">
                 {DAYS_OF_WEEK_KEYS.map((key) => (
                   <div
                     key={key}
-                    className="text-center text-xs font-semibold text-muted-foreground py-1 tracking-wide uppercase"
+                    className="py-1 text-center text-[11px] font-semibold tracking-[0.22em] text-muted-foreground uppercase"
                   >
                     {t(key)}
                   </div>
                 ))}
               </div>
 
-              <div className="grid grid-cols-7 gap-1.5">
+              <div className="grid grid-cols-7 gap-1.5 md:gap-3">
                 {cells.map((cell, idx) => {
                   const todayCell = isToday(cell.day, cell.isCurrentMonth);
-                  const total =
-                    cell.isCurrentMonth && cell.data
-                      ? cell.data.open_borrows + cell.data.close_borrows
-                      : 0;
                   const isSelected = selectedDay === cell.day && cell.isCurrentMonth;
 
                   return (
-                    <Button
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="sm"
                       key={idx}
                       disabled={!cell.isCurrentMonth}
                       onClick={() => {
@@ -178,40 +175,40 @@ export default function BorrowCalendar() {
                         setSelectedDay(cell.day);
                       }}
                       className={cn(
-                        "relative flex flex-col justify-start items-end rounded-xl p-2 aspect-square",
-                        "transition-all duration-150 outline-none focus-visible:ring-2 focus-visible:ring-[#10b981]",
-                        !cell.isCurrentMonth && "opacity-30 cursor-default",
-                        cell.isCurrentMonth && "cursor-pointer",
-                        todayCell
-                          ? "bg-linear-to-br from-[#10b981] to-[#059669] shadow-lg shadow-[#10b981]/30"
-                          : isSelected
-                          ? "bg-[#10b981]/15 ring-2 ring-[#10b981]/60 dark:bg-[#10b981]/25"
-                          : cell.isCurrentMonth
-                          ? cn("bg-muted/60 dark:bg-muted/40 hover:bg-[#10b981]/10 dark:hover:bg-[#10b981]/15", getBorrowIntensityBg(cell.data))
-                          : "bg-muted/30 dark:bg-muted/20"
+                        "relative flex aspect-square min-h-12 md:min-h-32 flex-col items-end justify-start overflow-hidden rounded-lg md:rounded-[1.15rem] p-1.5 md:p-3 pt-1 md:pt-2.5 text-right outline-none transition-all",
+                        "border border-transparent shadow-sm focus-visible:ring-2 focus-visible:ring-brand-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                        "cursor-pointer disabled:cursor-default",
+                        
+                        // Default intensity color
+                        getBorrowDayTone(cell.data, cell.isCurrentMonth),
+                        
+                        // Distinct Today styling
+                        todayCell && "ring-2 ring-indigo-500/50 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-200 shadow-md",
+                        
+                        // Distinct Selected styling
+                        isSelected && "ring-2 ring-brand-primary shadow-lg bg-brand-primary text-white z-10 ring-offset-2 ring-offset-background",
+                        
+                        // Not current month treatment
+                        !cell.isCurrentMonth && "cursor-default"
                       )}
                     >
-                      <span
-                        className={cn(
-                          "text-xs font-bold leading-none",
-                          todayCell ? "text-white" : cell.isCurrentMonth ? "text-foreground" : "text-muted-foreground"
-                        )}
-                      >
+                      <span className="relative z-10 text-xs md:text-[15px] font-semibold leading-none drop-shadow-sm">
                         {cell.day}
                       </span>
-                      {cell.isCurrentMonth && total > 0 && (
-                        <span
-                          className={cn(
-                            "absolute bottom-2 left-2 text-[10px] font-bold leading-none px-1.5 py-0.5 rounded-md",
-                            todayCell
-                              ? "bg-white/25 text-white"
-                              : "bg-[#10b981]/20 text-[#059669] dark:text-[#34d399]"
-                          )}
-                        >
-                          {total}
-                        </span>
+                      
+                      {cell.data && (Number(cell.data.open_borrows) + Number(cell.data.close_borrows)) > 0 && (
+                        <div className="mt-auto self-start">
+                          <span className={cn(
+                            "inline-flex items-center justify-center rounded-lg px-2 py-0.5 text-[10px] font-bold shadow-xs border transition-colors",
+                            todayCell || isSelected || (Number(cell.data.open_borrows) + Number(cell.data.close_borrows)) > 5
+                              ? "bg-white/20 text-white border-white/30 backdrop-blur-xs"
+                              : "bg-brand-primary/10 text-brand-primary-dark border-brand-primary/20 shadow-brand-primary/5"
+                          )}>
+                            {(Number(cell.data.open_borrows) + Number(cell.data.close_borrows))} <span className="hidden md:inline ml-0.5">{t("total").toLowerCase()}</span>
+                          </span>
+                        </div>
                       )}
-                    </Button>
+                    </button>
                   );
                 })}
               </div>
@@ -219,13 +216,13 @@ export default function BorrowCalendar() {
               <div className="flex items-center gap-3 pt-3 flex-wrap">
                 <span className="text-[11px] text-muted-foreground font-medium">{t("intensity")}</span>
                 {[
-                  { label: "1–2", cls: "bg-[#10b981]/15" },
-                  { label: "3–5", cls: "bg-[#10b981]/30" },
-                  { label: "6–10", cls: "bg-[#10b981]/50" },
-                  { label: "10+", cls: "bg-[#10b981]/70" },
+                  { label: "1–2", cls: "bg-brand-primary/15" },
+                  { label: "3–5", cls: "bg-brand-primary/30" },
+                  { label: "6–10", cls: "bg-brand-primary/50" },
+                  { label: "10+", cls: "bg-brand-primary/75" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-1.5">
-                    <div className={cn("w-3.5 h-3.5 rounded", item.cls)} />
+                    <div className={cn("w-3.5 h-3.5 rounded-md border border-brand-primary/20 shadow-sm", item.cls)} />
                     <span className="text-[11px] text-muted-foreground">{item.label}</span>
                   </div>
                 ))}
@@ -234,7 +231,7 @@ export default function BorrowCalendar() {
           )}
         </div>
 
-        <div className="w-75 shrink-0 border-l pl-6 pb-2 flex flex-col">
+        <div className="w-full lg:w-75 shrink-0 border-t lg:border-t-0 lg:border-l pt-6 lg:pt-0 lg:pl-6 pb-2 flex flex-col">
           {selectedDay === null ? (
             <div className="flex-1 flex items-center justify-center">
               <EmptyState
@@ -259,31 +256,37 @@ export default function BorrowCalendar() {
               </div>
 
               <div className="grid grid-cols-3 gap-2 shrink-0">
-                <div className="flex flex-col items-center p-3 rounded-xl bg-muted/60 text-center">
-                  <span className="text-2xl font-bold text-foreground">{dayDetail.total}</span>
+                <div className="flex flex-col items-center rounded-xl bg-brand-primary/8 p-3 text-center">
+                  <span className="text-2xl font-bold text-brand-primary-dark">{dayDetail.total}</span>
                   <span className="text-[11px] text-muted-foreground mt-0.5">{t("total")}</span>
                 </div>
-                <div className="flex flex-col items-center p-3 rounded-xl bg-blue-500/10 dark:bg-blue-500/15 text-center">
-                  <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">{dayDetail.open_borrows}</span>
+                <div className="flex flex-col items-center rounded-xl bg-brand-primary/12 p-3 text-center">
+                  <span className="text-2xl font-bold text-brand-primary">{dayDetail.open_borrows}</span>
                   <span className="text-[11px] text-muted-foreground mt-0.5">{t("open")}</span>
                 </div>
-                <div className="flex flex-col items-center p-3 rounded-xl bg-[#10b981]/10 dark:bg-[#10b981]/15 text-center">
-                  <span className="text-2xl font-bold text-[#059669] dark:text-[#34d399]">{dayDetail.close_borrows}</span>
+                <div className="flex flex-col items-center rounded-xl bg-brand-primary-dark/12 p-3 text-center">
+                  <span className="text-2xl font-bold text-brand-primary-darker">{dayDetail.close_borrows}</span>
                   <span className="text-[11px] text-muted-foreground mt-0.5">{t("closed")}</span>
                 </div>
               </div>
 
               <div className="flex-1 flex flex-col h-full">
                 {dayDetail.borrows.length === 0 ? (
-                  <div className="flex-1 flex items-center justify-center">
-                    <p className="text-sm text-muted-foreground">{t("noBorrowsOnDay")}</p>
+                  <div className="flex-1 flex items-center justify-center p-4">
+                    <EmptyState
+                      variant="compact"
+                      icon={<BookOpen />}
+                      title={t("noBorrowsOnDay")}
+                      description={t("clickDateDesc")}
+                      className="border-none"
+                    />
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3">
                     {dayDetail.borrows.map((borrow) => (
                       <div
                         key={borrow.id}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/60 hover:border-border transition-all"
+                        className="flex items-center gap-3 rounded-xl border border-border/50 bg-muted/30 p-3 transition-colors"
                       >
                         <Avatar className="h-9 w-9 bg-muted">
                           <AvatarImage
@@ -291,7 +294,7 @@ export default function BorrowCalendar() {
                             alt={borrow.user.full_name}
                             className="object-cover"
                           />
-                          <AvatarFallback className="text-xs font-medium bg-[#10b981]/10 text-[#059669] dark:text-[#34d399]">
+                          <AvatarFallback className="text-xs font-medium bg-brand-primary/10 text-brand-primary-dark">
                             {borrow.user.full_name.substring(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
@@ -310,8 +313,8 @@ export default function BorrowCalendar() {
                           className={cn(
                             "text-[10px] px-2 py-0.5 whitespace-nowrap",
                             borrow.status === "open"
-                              ? "border-blue-400/50 text-blue-600 dark:text-blue-400 bg-blue-500/10"
-                              : "border-[#10b981]/50 text-[#059669] dark:text-[#34d399] bg-[#10b981]/10"
+                              ? "border-brand-primary/40 text-brand-primary-dark bg-brand-primary/10"
+                              : "border-brand-primary-dark/40 text-brand-primary-darker bg-brand-primary-dark/10"
                           )}
                         >
                           {borrow.status === "open" ? t("open") : t("closed")}
@@ -327,7 +330,7 @@ export default function BorrowCalendar() {
                   <Link href="/admin/borrows">
                     <Button
                       variant="outline"
-                      className="w-full gap-2 text-sm h-10 border-[#10b981]/40 text-[#059669] dark:text-[#34d399] hover:bg-[#10b981]/10 hover:border-[#10b981]/60"
+                      className="w-full gap-2 h-10 text-sm border-brand-primary/40 text-brand-primary-dark hover:bg-transparent hover:text-brand-primary-dark hover:border-brand-primary/40"
                     >
                       <BookOpen className="h-4 w-4" />
                       {t("viewAll")} ({dayDetail.total})

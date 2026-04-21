@@ -201,10 +201,10 @@ export default function FineTable({
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="h-8"
+                                className="h-8 gap-1"
                               >
-                                <Eye className="h-3.5 w-3.5 mr-1" />
-                                Details
+                                <Eye className="h-3.5 w-3.5" />
+                                <span className="hidden sm:inline">Details</span>
                               </Button>
                             </Link>
                             <Button

@@ -23,6 +23,22 @@ class DashboardController extends Controller
         return ApiResponse::successResponse('Data total dashboard berhasil diambil', $data);
     }
 
+    public function topBorrowedCategories(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $limit = (int) $request->query('limit', 5);
+        $data = $this->dashboardService->getTopBorrowedCategories($limit > 0 ? $limit : 5);
+
+        return ApiResponse::successResponse('Data kategori teratas peminjaman berhasil diambil', $data);
+    }
+
+    public function topBorrowedBooks(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $limit = (int) $request->query('limit', 5);
+        $data = $this->dashboardService->getTopBorrowedBooks($limit > 0 ? $limit : 5);
+
+        return ApiResponse::successResponse('Data buku teratas peminjaman berhasil diambil', $data);
+    }
+
     public function loanMonthlyChart(\Illuminate\Http\Request $request): JsonResponse
     {
         $year = $request->query('year', now()->year);
@@ -44,7 +60,7 @@ class DashboardController extends Controller
     {
         $year = $request->query('year', now()->year);
         $month = $request->query('month', now()->month);
-        
+
         $data = $this->dashboardService->getCalendar((int)$year, (int)$month);
 
         return ApiResponse::successResponse('Data kalender peminjaman', $data);
