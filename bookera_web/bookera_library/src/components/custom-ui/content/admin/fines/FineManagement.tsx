@@ -63,11 +63,11 @@ export default function FineManagement() {
     if (!deleteId) return;
     try {
       await fineService.delete(deleteId);
-      toast.success("Fine deleted successfully");
+      toast.success(t("deleteSuccess"));
       setDeleteId(null);
       fetchFines(filters);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to load fines");
+      toast.error(err.response?.data?.message || t("loadError"));
     }
   };
 
@@ -85,7 +85,7 @@ export default function FineManagement() {
         to: paginatedData.to ?? 0,
       });
     } catch (err) {
-      toast.error("Failed to load fines");
+      toast.error(t("loadError"));
     } finally {
       setLoading(false);
     }
@@ -111,10 +111,10 @@ export default function FineManagement() {
   const handleWaive = async (id: number) => {
     try {
       await fineService.waive(id);
-      toast.success("Fine cancelled successfully");
+      toast.success(t("waiveSuccess"));
       fetchFines(filters);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to waive fine");
+      toast.error(err.response?.data?.message || t("waiveError"));
     }
   };
 
@@ -127,18 +127,18 @@ export default function FineManagement() {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+        <div className="relative flex-2 w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t("searchFines")}
             value={searchInput}
             onChange={handleSearchChange}
-            className="pl-9"
+            className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
           />
         </div>
         <Select value={statusValue} onValueChange={handleStatusChange}>
-          <SelectTrigger className="w-full sm:w-48">
+          <SelectTrigger className="flex-1 w-full sm:w-auto h-11! shadow-sm transition-all duration-300">
             <SelectValue placeholder={t("filterStatus")} />
           </SelectTrigger>{" "}
           <SelectContent>

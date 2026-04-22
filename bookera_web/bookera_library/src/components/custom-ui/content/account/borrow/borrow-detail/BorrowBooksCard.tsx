@@ -11,7 +11,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BookOpen, Clock, Info, MessageCircle, Eye, AlertCircle } from "lucide-react";
+import {
+  BookOpen,
+  Clock,
+  Info,
+  MessageCircle,
+  Eye,
+  AlertCircle,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { AddBookReviewDialog } from "../AddBookReviewDialog";
@@ -24,10 +31,7 @@ interface BorrowBooksCardProps {
   onUpdate?: () => void;
 }
 
-export function BorrowBooksCard({
-  borrow,
-  onUpdate,
-}: BorrowBooksCardProps) {
+export function BorrowBooksCard({ borrow, onUpdate }: BorrowBooksCardProps) {
   const t = useTranslations("borrow");
   const tCommon = useTranslations("common");
   const tPublic = useTranslations("public");
@@ -47,7 +51,8 @@ export function BorrowBooksCard({
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2 text-xl">
               <BookOpen className="h-6 w-6 text-primary" />
-              {showRequested ? t("requestedBooks") : t("borrowedBooks")} ({bookCount})
+              {showRequested ? t("requestedBooks") : t("borrowedBooks")} (
+              {bookCount})
             </CardTitle>
             <CardDescription>
               {showRequested
@@ -55,16 +60,17 @@ export function BorrowBooksCard({
                 : t("manageReturnStatus")}
             </CardDescription>
           </div>
-          {borrow.status === "open" && borrow.borrow_details?.some(d => d.status === "borrowed") && (
-            <Button
-              variant="destructive"
-              onClick={() => setReportDialogOpen(true)}
-              className="rounded-full px-6 font-bold gap-2 shadow-sm hover:scale-105 transition-all"
-            >
-              <AlertCircle className="h-4 w-4" />
-              {tPublic("reportLostBook")}
-            </Button>
-          )}
+          {borrow.status === "open" &&
+            borrow.borrow_details?.some((d) => d.status === "borrowed") && (
+              <Button
+                variant="destructive"
+                onClick={() => setReportDialogOpen(true)}
+                className="rounded-full px-6 font-bold gap-2 shadow-sm hover:scale-105 transition-all"
+              >
+                <AlertCircle className="h-4 w-4" />
+                {tPublic("reportLostBook")}
+              </Button>
+            )}
         </div>
       </CardHeader>
       <CardContent className="p-0">
@@ -72,7 +78,10 @@ export function BorrowBooksCard({
           {hasAssignedCopies &&
             borrow.borrow_details.map((detail) => {
               const book = detail.book_copy?.book;
-              const authors = book?.authors?.map(a => a.name).join(", ") || book?.author || tCommon("noAuthors");
+              const authors =
+                book?.authors?.map((a) => a.name).join(", ") ||
+                book?.author ||
+                tCommon("noAuthors");
 
               return (
                 <div
@@ -103,7 +112,9 @@ export function BorrowBooksCard({
                             {book?.title || tCommon("noData")}
                           </h4>
                           <div className="flex flex-wrap items-center gap-2 text-sm">
-                            <span className="text-muted-foreground font-medium">{tCommon("from")}</span>
+                            <span className="text-muted-foreground font-medium">
+                              {tCommon("from")}
+                            </span>
                             <span className="text-foreground font-bold underline decoration-primary/30 decoration-2 underline-offset-4">
                               {authors}
                             </span>
@@ -123,7 +134,11 @@ export function BorrowBooksCard({
                           {book?.categories && book.categories.length > 0 && (
                             <div className="flex gap-1.5 overflow-hidden">
                               {book.categories.slice(0, 2).map((cat: any) => (
-                                <Badge key={cat.id} variant="secondary" className="text-[10px] uppercase font-bold tracking-tight py-0">
+                                <Badge
+                                  key={cat.id}
+                                  variant="secondary"
+                                  className="text-[10px] uppercase font-bold tracking-tight py-0"
+                                >
                                   {cat.name}
                                 </Badge>
                               ))}
@@ -143,22 +158,30 @@ export function BorrowBooksCard({
                     </div>
 
                     <div className="flex flex-col gap-2 shrink-0 md:pt-2">
-                       {borrow.status === "close" && book && (
-                        <AddBookReviewDialog 
-                          bookId={book.id} 
+                      {borrow.status === "close" && book && (
+                        <AddBookReviewDialog
+                          bookId={book.id}
                           bookTitle={book.title}
                           onSuccess={onUpdate}
                           trigger={
-                            <Button variant="brand" size="sm" className="w-full sm:w-auto gap-2 font-bold shadow-sm">
+                            <Button
+                              variant="brand"
+                              size="sm"
+                              className="w-full sm:w-auto gap-2 font-bold shadow-sm"
+                            >
                               <MessageCircle className="h-4 w-4" />
                               {tPublic("addReview")}
                             </Button>
                           }
                         />
                       )}
-                      
+
                       <Link href={`/books/${book?.slug}`} target="_blank">
-                        <Button variant="outline" size="sm" className="w-full sm:w-auto gap-2 font-bold">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full sm:w-auto gap-2 font-bold"
+                        >
                           <Eye className="h-4 w-4" />
                           {tPublic("detailsBtn")}
                         </Button>

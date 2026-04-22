@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             BookFavoriteSeeder::class,
             BookCopySeeder::class,
             DiscussionSeeder::class,
+            ComplaintSeeder::class,
             ActivityLogSeeder::class,
             BookReviewSeeder::class,
             FineTypeSeeder::class,

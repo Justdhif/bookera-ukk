@@ -18,6 +18,12 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
+import {
+  MAX_FILE_SIZE,
+  ALLOWED_FILE_TYPES,
+  ALLOWED_FILE_EXTENSIONS,
+} from "@/constants/file";
 
 interface BookSideCardProps {
   coverPreview: string;
@@ -33,10 +39,6 @@ interface BookSideCardProps {
   onCoverValidationChange?: (isValid: boolean) => void;
 }
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
-const ALLOWED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
-const ALLOWED_FILE_EXTENSIONS = [".jpg", ".jpeg", ".png"];
-
 export default function BookSideCard({
   coverPreview,
   isEditMode = true,
@@ -48,6 +50,7 @@ export default function BookSideCard({
   coverError = false,
   onCoverValidationChange,
 }: BookSideCardProps) {
+  const t = useTranslations("book");
   const [localError, setLocalError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -61,16 +64,15 @@ export default function BookSideCard({
 
   const validateFile = (file: File): boolean => {
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      const errorMsg =
-        "Invalid file type. Please upload JPG, JPEG, or PNG images only.";
+      const errorMsg = t("invalidFileType");
       setLocalError(errorMsg);
       toast.error(errorMsg);
       if (onCoverValidationChange) onCoverValidationChange(false);
       return false;
     }
+
     if (file.size > MAX_FILE_SIZE) {
-      const errorMsg =
-        "File size exceeds 5MB limit. Please choose a smaller image.";
+      const errorMsg = t("fileSizeExceed");
       setLocalError(errorMsg);
       toast.error(errorMsg);
       if (onCoverValidationChange) onCoverValidationChange(false);
@@ -131,33 +133,37 @@ export default function BookSideCard({
   };
 
   const hasError = localError || coverError;
-  const errorMessage = localError || (coverError && "Cover image is required");
+  const errorMessage = localError || (coverError && t("coverRequired"));
 
   return (
     <Card className="flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg flex items-center gap-2 dark:text-white">
-              Book Cover
-              {isCoverRequired && isEditMode && (
-                <Badge
-                  variant="destructive"
-                  className="text-xs font-normal px-2 py-0 h-5"
-                >
-                  Required
-                </Badge>
-              )}
+            <CardTitle className="text-xl flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-brand-primary" />
+              {t("bookCover")}
             </CardTitle>
-            <CardDescription className="dark:text-gray-400">
-              {isEditMode
-                ? "Upload a cover image for your book"
-                : "Current book cover"}
+            <CardDescription>
+              {isEditMode ? t("uploadCover") : t("bookDetailsComplete")}
             </CardDescription>
           </div>
+          {isCoverRequired && isEditMode && (
+            <Badge
+              variant="destructive"
+              className="text-xs font-normal px-2 py-0 h-5"
+            >
+              {t("required")}
+            </Badge>
+          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4 pt-0">
+        <Label
+          className={cn("text-sm font-medium", coverError && "text-red-500")}
+        >
+          {t("cover")}
+        </Label>
         <div className="flex flex-col gap-4">
           <div
             className={cn(
@@ -216,56 +222,37 @@ export default function BookSideCard({
                   !isEditMode && "cursor-default",
                 )}
               >
-                {hasError ? (
-                  <>
-                    <div className="bg-red-100 dark:bg-red-900/50 p-3 rounded-full">
-                      <FileWarning className="h-8 w-8 text-red-600 dark:text-red-400" />
-                    </div>
-                    <div className="text-center space-y-1">
-                      <p className="text-sm font-semibold text-red-700 dark:text-red-400">
-                        Upload failed
-                      </p>
-                      <p className="text-xs text-red-600 dark:text-red-400/80 max-w-50">
-                        {errorMessage}
-                      </p>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div
+                <div className="flex flex-col items-center gap-3 py-4 text-center">
+                  <div
+                    className={cn(
+                      "p-4 rounded-2xl transition-all duration-300 shadow-sm",
+                      hasError
+                        ? "bg-red-50 dark:bg-red-950/30 text-red-500"
+                        : "bg-brand-primary/10 text-brand-primary group-hover:scale-110",
+                    )}
+                  >
+                    {hasError ? (
+                      <FileWarning className="h-8 w-8" />
+                    ) : (
+                      <Upload className="h-8 w-8" />
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <p
                       className={cn(
-                        "p-3 rounded-full",
-                        isDragging
-                          ? "bg-primary/10 dark:bg-primary/20"
-                          : "bg-gray-100 dark:bg-gray-800",
+                        "text-sm font-semibold",
+                        hasError
+                          ? "text-red-600 dark:text-red-400"
+                          : "text-foreground",
                       )}
                     >
-                      <BookOpen
-                        className={cn(
-                          "h-8 w-8",
-                          isDragging
-                            ? "text-primary"
-                            : "text-gray-400 dark:text-gray-500",
-                        )}
-                      />
-                    </div>
-                    <div className="text-center space-y-1">
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {isDragging ? "Drop your image here" : "No cover image"}
-                      </p>
-                      {isEditMode && (
-                        <>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            Drag and drop or click to upload
-                          </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500">
-                            JPG, JPEG, or PNG (max. 5MB)
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </>
-                )}
+                      {hasError ? errorMessage : t("dragDropUpload")}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                      {t("formatHint")}
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -283,14 +270,10 @@ export default function BookSideCard({
                 type="button"
                 variant="outline"
                 onClick={() => document.getElementById("cover_image")?.click()}
-                className={cn(
-                  "w-full gap-2 transition-colors",
-                  hasError &&
-                    "bg-red-50 hover:bg-red-100 text-red-700 border-red-300 dark:bg-red-950/30 dark:hover:bg-red-900/50 dark:text-red-400 dark:border-red-800",
-                )}
+                className="w-full h-10 gap-2 font-medium border-2 hover:bg-brand-primary/5 hover:border-brand-primary transition-all duration-300"
               >
                 <Upload className="h-4 w-4" />
-                {coverPreview ? "Change Cover" : "Browse Files"}
+                {coverPreview ? t("changeCover") : t("browseFiles")}
               </Button>
             </>
           )}
@@ -298,29 +281,22 @@ export default function BookSideCard({
 
         <div className="rounded-lg border p-4 bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700">
           <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label className="text-sm font-medium dark:text-gray-300">
-                Book Status
-              </Label>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {formData.is_active
-                  ? "Book is available and visible to users"
-                  : "Book is hidden from users"}
-              </p>
-            </div>
+            <Label htmlFor="is_active" className="text-sm font-semibold">
+              {t("statusLabel")}
+            </Label>
             {isEditMode ? (
               <Switch
+                id="is_active"
                 checked={formData.is_active}
                 onCheckedChange={handleSwitchChange}
-                className="data-[state=checked]:bg-primary dark:data-[state=checked]:bg-primary"
               />
             ) : (
-              <ActiveStatusBadge
-                isActive={formData.is_active}
-                className="bg-primary/10 text-primary border-primary/20 dark:bg-primary/15 dark:text-primary dark:border-primary/30"
-              />
+              <ActiveStatusBadge isActive={formData.is_active} />
             )}
           </div>
+          <p className="text-xs text-muted-foreground leading-relaxed mt-2">
+            {t("activeDesc")}
+          </p>
         </div>
       </CardContent>
     </Card>

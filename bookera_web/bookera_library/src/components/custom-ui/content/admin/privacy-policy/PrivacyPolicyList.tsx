@@ -44,7 +44,7 @@ export default function PrivacyPolicyList({
                 <div className="flex items-center gap-1.5">
                   <Calendar className="h-3.5 w-3.5" />
                   <span>
-                    Dibuat:
+                    {t("createdAt")}:{" "}
                     {new Date(item.created_at).toLocaleDateString("id-ID", {
                       day: "numeric",
                       month: "short",
@@ -55,7 +55,7 @@ export default function PrivacyPolicyList({
                 <div className="flex items-center gap-1.5">
                   <Clock className="h-3.5 w-3.5" />
                   <span>
-                    Diperbarui:
+                    {t("updatedAt")}:{" "}
                     {new Date(item.updated_at).toLocaleDateString("id-ID", {
                       day: "numeric",
                       month: "short",
@@ -73,7 +73,7 @@ export default function PrivacyPolicyList({
                 className="h-8 gap-1"
               >
                 <Edit className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Edit</span>
+                <span className="hidden sm:inline">{t("edit")}</span>
               </Button>
               <Button
                 variant="destructive"
@@ -82,7 +82,7 @@ export default function PrivacyPolicyList({
                 className="h-8 gap-1"
               >
                 <Trash className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Delete</span>
+                <span className="hidden sm:inline">{t("delete")}</span>
               </Button>
             </div>
           </div>

@@ -15,13 +15,67 @@ class DashboardService
         return [
             'total_users' => User::count(),
             'total_books' => Book::count(),
-            'total_categories' => \App\Models\Category::count(),
-            'total_authors' => \App\Models\Author::count(),
-            'total_publishers' => \App\Models\Publisher::count(),
-            'total_fines' => \App\Models\FineBorrow::sum('amount'),
-            'loans_today' => Borrow::whereDate('borrow_date', today())->count(),
-            'returns_today' => BookReturn::whereDate('return_date', today())->count(),
+            'total_borrows' => Borrow::count(),
+            'total_returns' => BookReturn::count(),
         ];
+    }
+
+    public function getTopBorrowedCategories(int $limit = 5): array
+    {
+        $limit = max(1, $limit);
+
+        return DB::table('borrow_details')
+            ->join('book_copies', 'borrow_details.book_copy_id', '=', 'book_copies.id')
+            ->join('books', 'book_copies.book_id', '=', 'books.id')
+            ->join('book_categories', 'books.id', '=', 'book_categories.book_id')
+            ->join('categories', 'book_categories.category_id', '=', 'categories.id')
+            ->select(
+                'categories.id',
+                'categories.name',
+                'categories.slug',
+                DB::raw('COUNT(*) as total_borrows')
+            )
+            ->groupBy('categories.id', 'categories.name', 'categories.slug')
+            ->orderByDesc('total_borrows')
+            ->limit($limit)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => (int) $item->id,
+                    'name' => $item->name,
+                    'slug' => $item->slug,
+                    'total_borrows' => (int) $item->total_borrows,
+                ];
+            })
+            ->all();
+    }
+
+    public function getTopBorrowedBooks(int $limit = 5): array
+    {
+        $limit = max(1, $limit);
+
+        return DB::table('borrow_details')
+            ->join('book_copies', 'borrow_details.book_copy_id', '=', 'book_copies.id')
+            ->join('books', 'book_copies.book_id', '=', 'books.id')
+            ->select(
+                'books.id',
+                'books.title as name',
+                'books.slug',
+                DB::raw('COUNT(*) as total_borrows')
+            )
+            ->groupBy('books.id', 'books.title', 'books.slug')
+            ->orderByDesc('total_borrows')
+            ->limit($limit)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => (int) $item->id,
+                    'name' => $item->name,
+                    'slug' => $item->slug,
+                    'total_borrows' => (int) $item->total_borrows,
+                ];
+            })
+            ->all();
     }
 
     public function getLoanMonthlyChart(int $year): mixed

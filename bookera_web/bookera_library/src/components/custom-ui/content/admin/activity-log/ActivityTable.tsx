@@ -26,7 +26,8 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import { ActivityLog, ActivityLogFilters } from "@/types/activity-log";
 import { formatDistanceToNow } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
-import { Search, RotateCcw, Filter } from "lucide-react";
+import { Search, RotateCcw, Filter, Activity } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ActivityTableProps {
   logs: ActivityLog[];
@@ -96,177 +97,101 @@ export default function ActivityTable({
   };
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="border-b pb-4 space-y-4">
-        <CardTitle className="text-xl font-bold flex items-center gap-2">
-          {t("title")}
-        </CardTitle>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3">
-          <div className="relative md:col-span-2 lg:col-span-3">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={t("searchDescription")}
-              value={localFilters.search || ""}
-              onChange={(e) =>
-                setLocalFilters({ ...localFilters, search: e.target.value })
-              }
-              onKeyPress={handleKeyPress}
-              className="pl-10"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3 md:col-span-1 lg:col-span-2">
-            <Select
-              value={localFilters.action || "all"}
-              onValueChange={(value) =>
-                setLocalFilters({
-                  ...localFilters,
-                  action: value === "all" ? undefined : value,
-                })
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={t("filterByAction")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("allActions")}</SelectItem>
-                <SelectItem value="login">{t("login")}</SelectItem>
-                <SelectItem value="logout">{t("logout")}</SelectItem>
-                <SelectItem value="create">{t("create")}</SelectItem>
-                <SelectItem value="update">{t("update")}</SelectItem>
-                <SelectItem value="delete">{t("delete")}</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={localFilters.module || "all"}
-              onValueChange={(value) =>
-                setLocalFilters({
-                  ...localFilters,
-                  module: value === "all" ? undefined : value,
-                })
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={t("filterByModule")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("allModules")}</SelectItem>
-                <SelectItem value="auth">{t("auth")}</SelectItem>
-                <SelectItem value="user">{t("user")}</SelectItem>
-                <SelectItem value="book">{t("book")}</SelectItem>
-                <SelectItem value="loan">{t("loan")}</SelectItem>
-                <SelectItem value="return">Return</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex gap-2 md:col-span-1 lg:col-span-2">
-            <Button
-              onClick={handleApplyFilters}
-              variant="brand"
-              size="sm"
-              className="flex-1"
-            >
-              <Filter className="h-3.5 w-3.5 mr-1.5" />
-              Apply
-            </Button>
-            <Button
-              onClick={handleReset}
-              variant="brand"
-              size="sm"
-              className="px-3"
-              title={t("resetFilters")}
-            >
-              <RotateCcw className="h-3.5 w-3.5" />
-              {t("resetFilters")}
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("noCol")}</TableHead>
-                <TableHead>{t("user")}</TableHead>
-                <TableHead>{t("actionCol")}</TableHead>
-                <TableHead>{t("moduleCol")}</TableHead>
-                <TableHead>{t("descriptionCol")}</TableHead>
-                <TableHead>{t("ipAddress")}</TableHead>
-                <TableHead>{t("timeCol")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {logs.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="p-0">
-                    <EmptyState
-                      title={t("noActivityLogs")}
-                      description="There are no activity logs to display at the moment."
-                      icon={
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={1.5}
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                          />
-                        </svg>
-                      }
-                      className="h-[50vh]"
-                    />
-                  </TableCell>
-                </TableRow>
-              ) : (
-                logs.map((log, index) => (
-                  <TableRow
-                    key={log.id}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => onRowClick(log.id)}
+    <div className="rounded-md border shadow-xs bg-white dark:bg-gray-900/50 overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-muted/50 hover:bg-muted/50 border-b">
+            <TableHead className="w-16 text-center font-semibold">
+              #
+            </TableHead>
+            <TableHead className="font-semibold">{t("user")}</TableHead>
+            <TableHead className="font-semibold">{t("actionCol")}</TableHead>
+            <TableHead className="font-semibold">{t("moduleCol")}</TableHead>
+            <TableHead className="font-semibold">{t("descriptionCol")}</TableHead>
+            <TableHead className="font-semibold">{t("ipAddress")}</TableHead>
+            <TableHead className="font-semibold">{t("timeCol")}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {logs.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={7} className="p-0">
+                <EmptyState
+                  title={t("noActivityLogs")}
+                  description="There are no activity logs to display at the moment."
+                  icon={<Activity />}
+                  className="h-[50vh]"
+                />
+              </TableCell>
+            </TableRow>
+          ) : (
+            logs.map((log, index) => (
+              <TableRow
+                key={log.id}
+                className="group cursor-pointer hover:bg-primary/5 transition-colors border-b last:border-b-0"
+                onClick={() => onRowClick(log.id)}
+              >
+                <TableCell className="font-medium text-center text-muted-foreground py-4">
+                  {index + 1}
+                </TableCell>
+                <TableCell className="py-4">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10 border shadow-xs">
+                      <AvatarImage
+                        src={log.user?.profile?.avatar}
+                        alt={log.user?.profile?.full_name}
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {log.user?.profile?.full_name?.charAt(0) || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium text-foreground leading-none mb-1">
+                        {log.user?.profile?.full_name || "Unknown"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {log.user?.email}
+                      </p>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className="py-4">
+                  <Badge
+                    variant={getActionBadge(log.action)}
+                    className={cn(
+                      "font-medium capitalize px-2.5 py-0.5 rounded-full text-[11px]",
+                      getActionColor(log.action)
+                    )}
                   >
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">
-                          {log.user?.profile?.full_name || "Unknown"}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {log.user?.email}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={getActionBadge(log.action)}
-                        className={getActionColor(log.action)}
-                      >
-                        {log.action}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{log.module}</Badge>
-                    </TableCell>
-                    <TableCell className="max-w-xs truncate">
-                      {log.description}
-                    </TableCell>
-                    <TableCell className="text-sm">{log.ip_address}</TableCell>
-                    <TableCell className="text-sm">
-                      {formatDistanceToNow(new Date(log.created_at), {
-                        addSuffix: true,
-                        locale: idLocale,
-                      })}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+                    {log.action}
+                  </Badge>
+                </TableCell>
+                <TableCell className="py-4">
+                  <Badge
+                    variant="outline"
+                    className="capitalize font-normal text-[11px] bg-muted/30"
+                  >
+                    {log.module}
+                  </Badge>
+                </TableCell>
+                <TableCell className="max-w-xs truncate text-foreground text-sm py-4">
+                  {log.description}
+                </TableCell>
+                <TableCell className="font-mono text-xs text-muted-foreground py-4">
+                  {log.ip_address}
+                </TableCell>
+                <TableCell className="text-xs text-muted-foreground whitespace-nowrap py-4">
+                  {formatDistanceToNow(new Date(log.created_at), {
+                    addSuffix: true,
+                    locale: idLocale,
+                  })}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

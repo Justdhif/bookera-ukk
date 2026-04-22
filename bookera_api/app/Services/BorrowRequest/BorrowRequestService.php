@@ -346,10 +346,7 @@ class BorrowRequestService
         return $borrow;
     }
 
-    public function delete(BorrowRequest $request): void
-    {
-        $request->delete();
-    }
+
 
     /**
      * Assign book copies to an already-created borrow (from an approved request).

@@ -73,7 +73,7 @@ export default function DeleteConfirmDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isDeleting}
-            className="w-full sm:w-auto sm:flex-1 h-11 font-medium border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 transition-all duration-200"
+            
           >
             {cancelText || t("cancel")}
           </Button>

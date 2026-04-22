@@ -9,6 +9,7 @@ import {
 } from "@/types/dashboard";
 import DashboardCards from "./DashboardCards";
 import TopBorrowedCategoriesChart from "./TopBorrowedCategoriesChart";
+import TopBorrowedBooksChart from "./TopBorrowedBooksChart";
 import BorrowMonthlyChart from "./BorrowMonthlyChart";
 import BorrowCalendar from "./BorrowCalendar";
 import { toast } from "sonner";
@@ -55,18 +56,17 @@ export default function DashboardClient() {
         isAdmin
       />
 
-      <div className="flex flex-col gap-6 xl:flex-row xl:items-stretch">
-        <div className="w-full h-full min-h-0 xl:flex-[1_1_0%]">
-          {loading ? (
-            <DataLoading size="lg" className="h-full min-h-105" />
-          ) : totals ? (
-            <DashboardCards data={totals} />
-          ) : null}
-        </div>
+      <div className="w-full">
+        {loading ? (
+          <DataLoading size="lg" className="min-h-40" />
+        ) : totals ? (
+          <DashboardCards data={totals} />
+        ) : null}
+      </div>
 
-        <div className="w-full h-full min-h-0 xl:flex-[2_1_0%]">
-          <TopBorrowedCategoriesChart />
-        </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <TopBorrowedCategoriesChart />
+        <TopBorrowedBooksChart />
       </div>
 
       <BorrowMonthlyChart />
@@ -74,3 +74,5 @@ export default function DashboardClient() {
     </div>
   );
 }
+
+

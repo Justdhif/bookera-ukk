@@ -23,6 +23,7 @@ interface DatePickerProps {
   dateMode?: DateMode;
   minDate?: Date;
   maxDate?: Date;
+  className?: string;
 }
 
 export function DatePicker({
@@ -33,6 +34,7 @@ export function DatePicker({
   dateMode = "all",
   minDate,
   maxDate,
+  className,
 }: DatePickerProps) {
   const t = useTranslations("common");
   const [open, setOpen] = React.useState(false);
@@ -64,12 +66,13 @@ export function DatePicker({
         <Button
           variant="outline"
           className={cn(
-            "h-11 w-full justify-start gap-3 rounded-2xl border-border/70 bg-background px-4 text-left font-medium shadow-sm transition-all hover:border-primary/40 hover:bg-accent/20 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary/20",
+            "h-9 w-full justify-start gap-2 rounded-md border border-input bg-transparent px-3 py-2 text-sm font-normal shadow-xs transition-[color,box-shadow] outline-none hover:bg-accent/50 hover:text-accent-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30 disabled:cursor-not-allowed disabled:opacity-50",
+            className,
             !value && "text-muted-foreground",
           )}
           disabled={disabled}
         >
-          <CalendarIcon className="h-4 w-4 shrink-0 text-primary/70" />
+          <CalendarIcon className="size-4 shrink-0 opacity-50" />
           {value ? format(value, "PPP") : <span>{effectivePlaceholder}</span>}
         </Button>
       </PopoverTrigger>
@@ -87,6 +90,9 @@ export function DatePicker({
             if (effectiveMaxDate && date > effectiveMaxDate) return true;
             return false;
           }}
+          captionLayout="dropdown"
+          fromYear={1900}
+          toYear={new Date().getFullYear() + 10}
           initialFocus
         />
       </PopoverContent>

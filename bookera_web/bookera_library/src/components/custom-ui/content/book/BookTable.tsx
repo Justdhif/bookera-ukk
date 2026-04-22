@@ -17,6 +17,7 @@ import { Book } from "@/types/book";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import { BookOpen, Eye, Trash } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Props {
   data: Book[];
@@ -47,9 +48,7 @@ export function BookTable({ data, onDelete }: Props) {
             <TableHead className="w-24 font-semibold">{t("cover")}</TableHead>
             <TableHead className="font-semibold">{t("title_col")}</TableHead>
             <TableHead className="font-semibold">{t("author")}</TableHead>
-            <TableHead className="font-semibold">{t("isbn")}</TableHead>
             <TableHead className="font-semibold">{t("publisher")}</TableHead>
-            <TableHead className="font-semibold">{t("year")}</TableHead>
             <TableHead className="font-semibold">{t("status")}</TableHead>
             <TableHead className="font-semibold text-right pr-6">
               {t("actions")}
@@ -82,25 +81,31 @@ export function BookTable({ data, onDelete }: Props) {
                 )}
               </TableCell>
               <TableCell>
-                <div className="flex flex-col gap-2">
-                  <span className="font-medium text-foreground">
+                <div className="flex flex-col gap-1.5">
+                  <span className="font-semibold text-foreground leading-none">
                     {book.title}
                   </span>
-                  <Badge
-                    variant={
-                      book.available_copies && book.available_copies > 0
-                        ? "default"
-                        : "secondary"
-                    }
-                    className={
-                      book.available_copies && book.available_copies > 0
-                        ? "bg-brand-primary hover:bg-brand-primary-dark text-white text-xs"
-                        : "text-xs"
-                    }
-                  >
-                    {book.available_copies || 0}/{book.total_copies || 0}
-                    {t("available")}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={cn(
+                        "flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border transition-all duration-300",
+                        book.available_copies && book.available_copies > 0
+                          ? "bg-emerald-50 text-emerald-600 border-emerald-200/50 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
+                          : "bg-rose-50 text-rose-600 border-rose-200/50 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "w-1.5 h-1.5 rounded-full animate-pulse",
+                          book.available_copies && book.available_copies > 0
+                            ? "bg-emerald-500"
+                            : "bg-rose-500"
+                        )}
+                      />
+                      {book.available_copies || 0}/{book.total_copies || 0}{" "}
+                      {t("available")}
+                    </div>
+                  </div>
                 </div>
               </TableCell>
               <TableCell>
@@ -111,20 +116,10 @@ export function BookTable({ data, onDelete }: Props) {
                 </span>
               </TableCell>
               <TableCell>
-                <span className="text-muted-foreground font-mono text-sm">
-                  {book.isbn || "-"}
-                </span>
-              </TableCell>
-              <TableCell>
                 <span className="text-muted-foreground">
                   {book.publishers && book.publishers.length > 0
                     ? book.publishers.map((p) => p.name).join(", ")
                     : book.publisher || "-"}
-                </span>
-              </TableCell>
-              <TableCell>
-                <span className="text-muted-foreground">
-                  {book.publication_year || "-"}
                 </span>
               </TableCell>
               <TableCell>

@@ -49,16 +49,7 @@ class AuthorController extends Controller
         return ApiResponse::successResponse('Penulis berhasil ditambahkan', $author, 201);
     }
 
-    public function show(Author $author): JsonResponse
-    {
-        $author = $this->authorService->getById($author->id);
 
-        if (!$author) {
-            return ApiResponse::errorResponse('Penulis tidak ditemukan', null, 404);
-        }
-
-        return ApiResponse::successResponse('Data penulis berhasil diambil', $author);
-    }
 
     public function update(UpdateAuthorRequest $request, Author $author): JsonResponse
     {

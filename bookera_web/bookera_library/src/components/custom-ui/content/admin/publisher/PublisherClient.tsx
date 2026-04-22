@@ -6,7 +6,6 @@ import { Publisher, PublisherFilterParams } from "@/types/publisher";
 import { publisherService } from "@/services/publisher.service";
 import PublisherTable from "./PublisherTable";
 import PublisherFormDialog from "./PublisherFormDialog";
-import PublisherDetailDialog from "./PublisherDetailDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -47,8 +46,10 @@ export default function PublisherClient() {
     }, 500);
     return () => clearTimeout(timeout);
   }, [searchInput]);
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSearchInput(e.target.value);
+
   const statusValue =
     filters.is_active === undefined
       ? "all"
@@ -61,12 +62,11 @@ export default function PublisherClient() {
       is_active: value === "all" ? undefined : value === "active",
       page: 1,
     }));
+
   const [addOpen, setAddOpen] = useState(false);
-  const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(
-    null,
-  );
-  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+
   const fetchPublishers = async (activeFilters: PublisherFilterParams) => {
     setLoading(true);
     try {
@@ -86,13 +86,16 @@ export default function PublisherClient() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchPublishers(filters);
   }, [filters]);
-  const handleView = (publisher: Publisher) => {
+
+  const handleEdit = (publisher: Publisher) => {
     setSelectedPublisher(publisher);
-    setDetailOpen(true);
+    setAddOpen(true);
   };
+
   const confirmDelete = async () => {
     if (!deleteId) return;
     try {
@@ -101,9 +104,10 @@ export default function PublisherClient() {
       setDeleteId(null);
       fetchPublishers(filters);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to delete publisher");
+      toast.error(err.response?.data?.message || t("deleteError"));
     }
   };
+
   return (
     <div className="space-y-6">
       <ContentHeader
@@ -112,7 +116,10 @@ export default function PublisherClient() {
         isAdmin
         rightActions={
           <Button
-            onClick={() => setAddOpen(true)}
+            onClick={() => {
+              setSelectedPublisher(null);
+              setAddOpen(true);
+            }}
             variant="submit"
             className="h-8 gap-1"
           >
@@ -121,18 +128,18 @@ export default function PublisherClient() {
           </Button>
         }
       />
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+        <div className="relative flex-2 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t("searchPublishers")}
             value={searchInput}
             onChange={handleSearchChange}
-            className="pl-9"
+            className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
           />
         </div>
         <Select value={statusValue} onValueChange={handleStatusChange}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="flex-1 w-full sm:w-auto h-11! shadow-sm transition-all duration-300">
             <SelectValue placeholder={t("allStatus")} />
           </SelectTrigger>
           <SelectContent>
@@ -155,7 +162,7 @@ export default function PublisherClient() {
         ) : (
           <PublisherTable
             data={publishers}
-            onView={handleView}
+            onEdit={handleEdit}
             onDelete={(id) => setDeleteId(id)}
           />
         )}
@@ -163,19 +170,15 @@ export default function PublisherClient() {
       <PublisherFormDialog
         open={addOpen}
         setOpen={setAddOpen}
-        onSuccess={() => fetchPublishers(filters)}
-      />
-      <PublisherDetailDialog
-        open={detailOpen}
-        setOpen={setDetailOpen}
         publisher={selectedPublisher}
         onSuccess={() => fetchPublishers(filters)}
       />
+
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={() => setDeleteId(null)}
         title={t("deletePublisher")}
-        description="Are you sure you want to delete this publisher? This action cannot be undone."
+        description={t("deletePublisherConfirm")}
         onConfirm={confirmDelete}
       />
     </div>

@@ -51,9 +51,10 @@ export default function CategoryClient() {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSearchInput(e.target.value);
+
   const confirmDelete = async () => {
     if (!deleteId) {
-      toast.error("An error occurred");
+      toast.error(t("errorOccurred"));
       return;
     }
     await categoryService.delete(deleteId);
@@ -106,14 +107,14 @@ export default function CategoryClient() {
           </Button>
         }
       />
-      <div className="flex gap-3">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+        <div className="relative flex-1 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t("searchCategoriesPlaceholder")}
             value={searchInput}
             onChange={handleSearchChange}
-            className="pl-9"
+            className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
           />
         </div>
       </div>

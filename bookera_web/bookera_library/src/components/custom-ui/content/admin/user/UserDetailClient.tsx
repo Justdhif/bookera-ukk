@@ -1,4 +1,5 @@
 "use client";
+
 import { useTranslations } from "next-intl";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { useState, useEffect } from "react";
@@ -9,8 +10,9 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, X, Edit } from "lucide-react";
 import { toast } from "sonner";
 import DataLoading from "@/components/custom-ui/DataLoading";
-import UserSideCard from "../UserSideCard";
-import UserProfileForm from "../UserProfileForm";
+import UserSideCard from "./UserSideCard";
+import UserProfileForm from "./UserProfileForm";
+
 export default function UserDetailClient() {
   const t = useTranslations("user");
   const router = useRouter();
@@ -27,10 +29,12 @@ export default function UserDetailClient() {
   const [avatarPreview, setAvatarPreview] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [isFullNameValid, setIsFullNameValid] = useState(true);
+
   useEffect(() => {
     if (!slug) return;
     fetchUser();
   }, [slug]);
+
   const fetchUser = async () => {
     try {
       setLoading(true);
@@ -53,12 +57,13 @@ export default function UserDetailClient() {
       });
       setAvatarPreview(res.data.data.profile.avatar);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to load user data");
+      toast.error(error.response?.data?.message || t("loadError"));
       router.push("/admin/users");
     } finally {
       setLoading(false);
     }
   };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!user) return;
@@ -67,9 +72,10 @@ export default function UserDetailClient() {
       !formData.full_name?.trim() ||
       !formData.role
     ) {
-      toast.error("Please complete all required fields");
+      toast.error(t("requiredFields"));
       return;
     }
+
     try {
       setSubmitting(true);
       await userService.update(user.id, formData);
@@ -82,6 +88,7 @@ export default function UserDetailClient() {
       setSubmitting(false);
     }
   };
+
   const handleCancelEdit = () => {
     if (user) {
       setFormData({
@@ -102,6 +109,7 @@ export default function UserDetailClient() {
     }
     setIsEditMode(false);
   };
+
   return (
     <div className="space-y-6">
       <ContentHeader
@@ -114,12 +122,12 @@ export default function UserDetailClient() {
             <div className="flex gap-2">
               <Button
                 type="button"
-                variant="submit"
+                variant="outline"
                 onClick={handleCancelEdit}
                 disabled={submitting}
                 className="h-8"
               >
-                <X className="h-3.5 w-3.5 mr-1.5" />
+                <X className="h-3.5 w-3.5" />
                 {t("cancel")}
               </Button>
               <Button
@@ -175,7 +183,6 @@ export default function UserDetailClient() {
               formData={formData}
               setFormData={setFormData}
               onFullNameValidChange={setIsFullNameValid}
-              hideAccount={true}
             />
           </div>
         )

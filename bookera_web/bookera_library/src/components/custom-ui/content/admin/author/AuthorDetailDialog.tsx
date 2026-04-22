@@ -90,13 +90,13 @@ export default function AuthorDetailDialog({
   const handleFileSelect = (file: File) => {
     const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     if (!allowed.includes(file.type)) {
-      const msg = "Only JPG, PNG or WEBP images are allowed";
+      const msg = t("invalidFileType");
       setPhotoError(msg);
       toast.error(msg);
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      const msg = "Image must be less than 2MB";
+      const msg = t("fileSizeExceed");
       setPhotoError(msg);
       toast.error(msg);
       return;
@@ -133,7 +133,7 @@ export default function AuthorDetailDialog({
       setIsEditMode(false);
       onSuccess();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to update author");
+      toast.error(err.response?.data?.message || t("updateError"));
     } finally {
       setIsLoading(false);
     }
@@ -164,10 +164,9 @@ export default function AuthorDetailDialog({
                 onClick={() => setIsEditMode(true)}
                 className="h-7 gap-1"
               >
-                {" "}
-                <Edit className="h-3.5 w-3.5" /> Edit{" "}
+                <Edit className="h-3.5 w-3.5" /> {t("edit")}
               </Button>
-            )}{" "}
+            )}
           </div>{" "}
         </DialogHeader>{" "}
         <div className="space-y-5">
@@ -254,10 +253,9 @@ export default function AuthorDetailDialog({
                   </div>{" "}
                   {isEditMode && (
                     <p className="text-xs text-muted-foreground">
-                      {" "}
-                      Click X to revert or drag a new photo{" "}
+                      {t("revertPhotoHint")}
                     </p>
-                  )}{" "}
+                  )}
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-2 py-2 text-center">
@@ -359,16 +357,14 @@ export default function AuthorDetailDialog({
           </div>{" "}
           {isEditMode && (
             <div className="flex gap-2 pt-1">
-              {" "}
               <Button
                 variant="brand"
                 onClick={handleCancelEdit}
                 disabled={isLoading}
                 className="flex-1 h-9"
               >
-                {" "}
-                <X className="h-3.5 w-3.5 mr-1.5" /> Cancel{" "}
-              </Button>{" "}
+                <X className="h-3.5 w-3.5 mr-1.5" /> {t("cancel")}
+              </Button>
               <Button
                 variant="submit"
                 onClick={handleSave}
@@ -376,10 +372,9 @@ export default function AuthorDetailDialog({
                 loading={isLoading}
                 className="flex-1 h-9"
               >
-                {" "}
-                <Save className="h-3.5 w-3.5 mr-1.5" />{" "}
-                {isLoading ? "Saving..." : "Save Changes"}{" "}
-              </Button>{" "}
+                <Save className="h-3.5 w-3.5 mr-1.5" />
+                {isLoading ? t("saving") : t("saveChanges")}
+              </Button>
             </div>
           )}{" "}
         </div>{" "}

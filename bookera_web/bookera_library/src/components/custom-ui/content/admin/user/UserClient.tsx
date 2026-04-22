@@ -7,13 +7,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { User, UserFilterParams } from "@/types/user";
 import { userService } from "@/services/user.service";
-import UserTable from "./UserFilter";
+import UserTable from "./UserTable";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import { Plus, User as UserIcon } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import UserFilter from "./UserFilter";
 export default function UserClient() {
   const t = useTranslations("user");
   const [users, setUsers] = useState<User[]>([]);

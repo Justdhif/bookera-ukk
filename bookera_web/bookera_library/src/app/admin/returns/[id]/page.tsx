@@ -1,5 +1,5 @@
-import ReturnDetailClient from "@/components/custom-ui/content/admin/return/ReturnDetailClient";
+import { redirect } from "next/navigation";
 
 export default function ReturnDetailPage() {
-  return <ReturnDetailClient />;
+  redirect("/admin/returns");
 }

@@ -1,4 +1,5 @@
 "use client";
+
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
@@ -9,8 +10,9 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { isPasswordValid } from "@/components/custom-ui/content/admin/auth/PasswordRequirements";
-import UserSideCard from "../UserSideCard";
-import UserProfileForm from "../UserProfileForm";
+import UserSideCard from "./UserSideCard";
+import UserProfileForm from "./UserProfileForm";
+
 export default function AddUserClient() {
   const t = useTranslations("user");
   const router = useRouter();
@@ -90,7 +92,6 @@ export default function AddUserClient() {
             formData={formData}
             setFormData={setFormData}
             onFullNameValidChange={setIsFullNameValid}
-            hideAccount={true}
           />
         </div>
       </div>

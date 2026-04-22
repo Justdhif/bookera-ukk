@@ -32,6 +32,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Plus, UserSquare, Building2, X, Trash } from "lucide-react";
+import { cn } from "@/lib/utils";
 import YearPicker from "@/components/custom-ui/YearPicker";
 
 interface FormData {
@@ -318,11 +319,17 @@ export default function BookForm({
                         onSelect={() =>
                           isEditMode && handleAuthorSelect(author.id)
                         }
-                        className="cursor-pointer"
+                        className={cn(
+                          "cursor-pointer transition-colors duration-200",
+                          formData.author_ids.includes(author.id)
+                            ? "bg-brand-primary/10 text-brand-primary font-medium"
+                            : "hover:bg-accent"
+                        )}
                       >
                         <Checkbox
                           checked={formData.author_ids.includes(author.id)}
-                          className="mr-2"
+                          variant="circle"
+                          className="mr-2 border-brand-primary/40"
                           disabled={!isEditMode}
                         />
                         {author.name}
@@ -337,7 +344,7 @@ export default function BookForm({
                 {formData.author_ids.map((id) => {
                   const author = authors.find((a) => a.id === id);
                   return author ? (
-                    <Badge key={id} variant="secondary" className="gap-1">
+                    <Badge key={id} variant="default" className="gap-1 bg-brand-primary/10 text-brand-primary border-brand-primary/20 hover:bg-brand-primary/20 transition-all duration-300">
                       {author.name}
                       {isEditMode && (
                         <Button
@@ -408,13 +415,19 @@ export default function BookForm({
                         onSelect={() =>
                           isEditMode && handlePublisherSelect(publisher.id)
                         }
-                        className="cursor-pointer"
+                        className={cn(
+                          "cursor-pointer transition-colors duration-200",
+                          formData.publisher_ids.includes(publisher.id)
+                            ? "bg-brand-primary/10 text-brand-primary font-medium"
+                            : "hover:bg-accent"
+                        )}
                       >
                         <Checkbox
                           checked={formData.publisher_ids.includes(
                             publisher.id,
                           )}
-                          className="mr-2"
+                          variant="circle"
+                          className="mr-2 border-brand-primary/40"
                           disabled={!isEditMode}
                         />
                         {publisher.name}
@@ -429,7 +442,7 @@ export default function BookForm({
                 {formData.publisher_ids.map((id) => {
                   const publisher = publishers.find((p) => p.id === id);
                   return publisher ? (
-                    <Badge key={id} variant="secondary" className="gap-1">
+                    <Badge key={id} variant="default" className="gap-1 bg-brand-primary/10 text-brand-primary border-brand-primary/20 hover:bg-brand-primary/20 transition-all duration-300">
                       {publisher.name}
                       {isEditMode && (
                         <Button
@@ -488,11 +501,17 @@ export default function BookForm({
                         onSelect={() =>
                           isEditMode && handleCategorySelect(cat.id)
                         }
-                        className="cursor-pointer"
+                        className={cn(
+                          "cursor-pointer transition-colors duration-200",
+                          formData.category_ids.includes(cat.id)
+                            ? "bg-brand-primary/10 text-brand-primary font-medium"
+                            : "hover:bg-accent"
+                        )}
                       >
                         <Checkbox
                           checked={formData.category_ids.includes(cat.id)}
-                          className="mr-2"
+                          variant="circle"
+                          className="mr-2 border-brand-primary/40"
                           disabled={!isEditMode}
                         />
                         {cat.name}
@@ -507,7 +526,7 @@ export default function BookForm({
                 {formData.category_ids.map((id: number) => {
                   const category = categories.find((c) => c.id === id);
                   return category ? (
-                    <Badge key={id} variant="secondary" className="gap-1">
+                    <Badge key={id} variant="default" className="gap-1 bg-brand-primary/10 text-brand-primary border-brand-primary/20 hover:bg-brand-primary/20 transition-all duration-300">
                       {category.name}
                       {isEditMode && (
                         <Button

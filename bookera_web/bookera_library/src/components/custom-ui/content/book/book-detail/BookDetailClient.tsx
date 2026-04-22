@@ -106,7 +106,6 @@ export default function BookDetailClient() {
   const fetchAuthors = async () => {
     try {
       const res = await authorService.getAll({
-        is_active: true,
         per_page: "all",
       });
       setAuthors(res.data.data.data || []);
@@ -118,7 +117,6 @@ export default function BookDetailClient() {
   const fetchPublishers = async () => {
     try {
       const res = await publisherService.getAll({
-        is_active: true,
         per_page: "all",
       });
       setPublishers(res.data.data.data || []);
@@ -282,7 +280,7 @@ export default function BookDetailClient() {
                   disabled={submitting}
                   className="h-8"
                 >
-                  <X className="h-3.5 w-3.5 mr-1.5" />
+                  <X className="h-3.5 w-3.5" />
                   {tAdmin("cancel")}
                 </Button>
                 <Button

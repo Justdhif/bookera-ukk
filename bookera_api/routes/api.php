@@ -26,6 +26,11 @@ use App\Http\Controllers\Api\PublisherController;
 use App\Http\Controllers\Api\TermsOfServiceController;
 use App\Http\Controllers\Api\PhoneController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ComplaintController;
+use App\Http\Controllers\Api\ComplaintCommentController;
+use App\Http\Controllers\Api\ComplaintVoteController;
+use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\NotificationSettingsController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -55,18 +60,22 @@ Route::get('/test-smtp', function () {
 
 Route::get('books', [PublicController::class, 'books']);
 Route::get('books/slug/{slug}', [PublicController::class, 'bookBySlug']);
-Route::get('books/{id}', [PublicController::class, 'bookShow']);
-Route::get('books/{id}/reviews', [\App\Http\Controllers\Api\ReviewController::class, 'index']);
+Route::get('books/{id}', [PublicController::class, 'bookById'])->whereNumber('id');
+
+Route::get('books/{id}/reviews', [ReviewController::class, 'index']);
+Route::get('complaints', [ComplaintController::class, 'index']);
+Route::get('complaints/{slug}', [ComplaintController::class, 'show']);
+Route::get('complaints/{slug}/comments', [ComplaintCommentController::class, 'index']);
 
 Route::get('categories', [PublicController::class, 'categories']);
 
 Route::get('authors', [PublicController::class, 'authors']);
 Route::get('authors/slug/{slug}', [PublicController::class, 'authorBySlug']);
-Route::get('authors/{id}', [PublicController::class, 'authorShow']);
+
 
 Route::get('publishers', [PublicController::class, 'publishers']);
 Route::get('publishers/slug/{slug}', [PublicController::class, 'publisherBySlug']);
-Route::get('publishers/{id}', [PublicController::class, 'publisherShow']);
+
 
 Route::get('terms-of-services/active', [TermsOfServiceController::class, 'getActive']);
 Route::get('terms-of-services', [TermsOfServiceController::class, 'index']);
@@ -110,6 +119,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('dashboard')->group(function () {
             Route::get('/totals', [DashboardController::class, 'totals']);
+            Route::get('/top-borrowed-categories', [DashboardController::class, 'topBorrowedCategories']);
+            Route::get('/top-borrowed-books', [DashboardController::class, 'topBorrowedBooks']);
             Route::get('/loan-monthly-chart', [DashboardController::class, 'loanMonthlyChart']);
             Route::get('/loan-status-chart', [DashboardController::class, 'loanStatusChart']);
             Route::get('/calendar', [DashboardController::class, 'calendar']);
@@ -128,8 +139,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('books')->group(function () {
             Route::get('/', [BookController::class, 'index']);
             Route::get('/slug/{slug}', [BookController::class, 'showBySlug']);
-            Route::get('/{id}', [BookController::class, 'show']);
+
             Route::post('/', [BookController::class, 'store']);
+            Route::get('/{id}', [BookController::class, 'show'])->whereNumber('id');
             Route::put('/{book}', [BookController::class, 'update']);
             Route::delete('/{book}', [BookController::class, 'destroy']);
             Route::post('/{book}/copies', [BookCopyController::class, 'store']);
@@ -141,7 +153,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('authors')->group(function () {
             Route::get('/', [AuthorController::class, 'index']);
-            Route::get('/{author}', [AuthorController::class, 'show']);
+
             Route::post('/', [AuthorController::class, 'store']);
             Route::put('/{author}', [AuthorController::class, 'update']);
             Route::patch('/{author}', [AuthorController::class, 'update']);
@@ -150,7 +162,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('publishers')->group(function () {
             Route::get('/', [PublisherController::class, 'index']);
-            Route::get('/{publisher}', [PublisherController::class, 'show']);
+
             Route::post('/', [PublisherController::class, 'store']);
             Route::put('/{publisher}', [PublisherController::class, 'update']);
             Route::patch('/{publisher}', [PublisherController::class, 'update']);
@@ -165,7 +177,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/', [UserController::class, 'store']);
             Route::get('/slug/{slug}', [UserController::class, 'showBySlug']);
             Route::get('/identification/{identificationNumber}', [UserController::class, 'showByIdentification']);
-            Route::get('/{user}', [UserController::class, 'show']);
+
             Route::delete('/{user}', [UserController::class, 'destroy']);
         });
 
@@ -183,16 +195,15 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{borrowRequest}/assign', [BorrowRequestController::class, 'assignBorrow']);
             Route::patch('/{borrowRequest}/approve', [BorrowRequestController::class, 'approve']);
             Route::patch('/{borrowRequest}/reject', [BorrowRequestController::class, 'reject']);
-            Route::delete('/{borrowRequest}', [BorrowRequestController::class, 'destroy']);
+
         });
 
-        Route::apiResource('fine-types', FineTypeController::class);
+        Route::apiResource('fine-types', FineTypeController::class)->except(['show']);
 
         Route::prefix('fines')->group(function () {
             Route::get('/', [FineController::class, 'index']);
             Route::post('/borrows/{borrow}', [FineController::class, 'store']);
-            Route::get('/{fine}', [FineController::class, 'show']);
-            Route::put('/{fine}', [FineController::class, 'update']);
+
             Route::post('/{fine}/mark-paid', [FineController::class, 'markAsPaid']);
             Route::post('/{fine}/waive', [FineController::class, 'waive']);
             Route::delete('/{fine}', [FineController::class, 'destroy']);
@@ -200,9 +211,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('lost-books')->group(function () {
             Route::get('/', [LostBookController::class, 'index']);
-            Route::get('/{lostBook}', [LostBookController::class, 'show']);
-            Route::put('/{lostBook}', [LostBookController::class, 'update']);
-            Route::post('/{lostBook}/finish', [LostBookController::class, 'finish']);
             Route::delete('/{lostBook}', [LostBookController::class, 'destroy']);
         });
 
@@ -217,6 +225,11 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::patch('/reports/{report}', [DiscussionPostReportController::class, 'update']);
             Route::patch('/{slug}/takedown', [DiscussionPostReportController::class, 'takedown']);
             Route::patch('/{slug}/restore', [DiscussionPostReportController::class, 'restore']);
+        });
+
+        // Complaint management
+        Route::prefix('complaints')->group(function () {
+            Route::patch('/{slug}/status', [ComplaintController::class, 'updateStatus']);
         });
     });
 
@@ -240,7 +253,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('borrows')->group(function () {
         Route::post('/', [BorrowController::class, 'store']);
         Route::get('/code/{code}', [BorrowController::class, 'showByCode']);
-        Route::get('/{borrow}', [BorrowController::class, 'show']);
+
         Route::post('/{borrow}/return', [BookReturnController::class, 'store']);
         Route::get('/{borrow}/returns', [BookReturnController::class, 'index']);
         Route::post('/{borrow}/report-lost', [LostBookController::class, 'store']);
@@ -272,8 +285,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('settings')->group(function () {
-        Route::get('/notifications', [\App\Http\Controllers\Api\NotificationSettingsController::class, 'show']);
-        Route::patch('/notifications', [\App\Http\Controllers\Api\NotificationSettingsController::class, 'update']);
+        Route::get('/notifications', [NotificationSettingsController::class, 'show']);
+        Route::patch('/notifications', [NotificationSettingsController::class, 'update']);
     });
 
     Route::prefix('favorites')->group(function () {
@@ -284,9 +297,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('reviews')->group(function () {
-        Route::post('/', [\App\Http\Controllers\Api\ReviewController::class, 'store']);
-        Route::delete('/{bookId}', [\App\Http\Controllers\Api\ReviewController::class, 'destroy']);
-        Route::get('/check/{bookId}', [\App\Http\Controllers\Api\ReviewController::class, 'check']);
+        Route::post('/', [ReviewController::class, 'store']);
+        Route::delete('/{bookId}', [ReviewController::class, 'destroy']);
+        Route::get('/check/{bookId}', [ReviewController::class, 'check']);
     });
 
     Route::prefix('follows')->group(function () {
@@ -315,6 +328,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{comment}', [DiscussionCommentController::class, 'update']);
         Route::delete('/{comment}', [DiscussionCommentController::class, 'destroy']);
         Route::get('/{comment}/replies', [DiscussionCommentController::class, 'replies']);
+    });
+
+    Route::prefix('complaints')->group(function () {
+        Route::post('/', [ComplaintController::class, 'store']);
+        Route::delete('/{slug}', [ComplaintController::class, 'destroy']);
+        Route::post('/{slug}/vote', [ComplaintVoteController::class, 'toggle']);
+        Route::post('/{slug}/comments', [ComplaintCommentController::class, 'store']);
+    });
+
+    Route::prefix('complaint-comments')->group(function () {
+        Route::delete('/{id}', [ComplaintCommentController::class, 'destroy']);
     });
 
     Route::prefix('users')->group(function () {

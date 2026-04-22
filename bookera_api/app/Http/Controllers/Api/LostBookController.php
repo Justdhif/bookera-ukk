@@ -45,19 +45,7 @@ class LostBookController extends Controller
         }
     }
 
-    public function show(LostBook $lostBook): JsonResponse
-    {
-        $lostBook->load(['borrow.user.profile', 'details.bookCopy.book']);
 
-        return ApiResponse::successResponse('Detail buku hilang', $lostBook);
-    }
-
-    public function update(UpdateLostBookRequest $request, LostBook $lostBook): JsonResponse
-    {
-        $lostBook = $this->lostBookService->update($lostBook, $request->validated());
-
-        return ApiResponse::successResponse('Informasi buku hilang berhasil diupdate', $lostBook);
-    }
 
     public function destroy(LostBook $lostBook): JsonResponse
     {
@@ -65,18 +53,4 @@ class LostBookController extends Controller
 
         return ApiResponse::successResponse('Record buku hilang berhasil dihapus');
     }
-
-    public function finish(LostBook $lostBook): JsonResponse
-    {
-        [$canFinish, $errorMessage] = $this->lostBookService->canFinish($lostBook);
-
-        if (!$canFinish) {
-            return ApiResponse::errorResponse($errorMessage, null, 400);
-        }
-
-        $lostBook = $this->lostBookService->finishLostBookProcess($lostBook);
-
-        return ApiResponse::successResponse('Proses buku hilang telah selesai. Status peminjaman ditutup.', $lostBook);
-    }
-
 }

@@ -63,12 +63,7 @@ class BorrowController extends Controller
         );
     }
 
-    public function show(Borrow $borrow): JsonResponse
-    {
-        $borrow = $this->borrowService->getById($borrow);
 
-        return ApiResponse::successResponse('Borrow details', $borrow);
-    }
 
     public function showByCode(string $code): JsonResponse
     {

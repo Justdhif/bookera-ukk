@@ -142,14 +142,7 @@ export default function BorrowDetailClient() {
   const handleSubmit = async () => {
     if (!borrow) return;
 
-    const lostItemWithoutDate = Object.values(returnStates).some(
-      (state) => state.status === "lost" && !state.lostDate,
-    );
 
-    if (lostItemWithoutDate) {
-      toast.error(t("lostDateRequired"));
-      return;
-    }
 
     const defaultDamagedFineTypeId =
       fineTypes
@@ -237,18 +230,6 @@ export default function BorrowDetailClient() {
       })
     : "";
 
-  if (loading) {
-    return <DataLoading size="lg" />;
-  }
-
-  if (!borrow) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-100 text-muted-foreground italic">
-        {t("noBorrowFound")}
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <ContentHeader
@@ -258,7 +239,14 @@ export default function BorrowDetailClient() {
         isAdmin
       />
 
-      <div className="space-y-6 animate-in fade-in duration-500">
+      {loading ? (
+        <DataLoading size="lg" />
+      ) : !borrow ? (
+        <div className="flex flex-col items-center justify-center min-h-[400px] text-muted-foreground italic bg-muted/30 rounded-3xl border-2 border-dashed">
+          {t("noBorrowFound")}
+        </div>
+      ) : (
+        <div className="space-y-6 animate-in fade-in duration-500">
         <div className="grid gap-6 lg:grid-cols-3">
           <BorrowQrCard borrow={borrow} />
           <BorrowInfoCard borrow={borrow} />
@@ -336,7 +324,8 @@ export default function BorrowDetailClient() {
             </CardContent>
           </Card>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

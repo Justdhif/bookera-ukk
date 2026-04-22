@@ -48,5 +48,4 @@ export const borrowRequestService = {
       { reject_reason: rejectReason },
     ),
 
-  delete: (id: number) => api.delete(`/admin/borrow-requests/${id}`),
 };

@@ -17,8 +17,7 @@ export const fineTypeService = {
   getAll: (params?: { type?: string; search?: string; per_page?: number; page?: number }) =>
     api.get<ApiResponse<FineTypeListResponse>>("/admin/fine-types", { params }),
 
-  getById: (id: number) =>
-    api.get<ApiResponse<FineType>>(`/admin/fine-types/${id}`),
+
 
   create: (payload: CreateFineTypePayload) =>
     api.post<ApiResponse<FineType>>("/admin/fine-types", payload),
@@ -36,10 +35,9 @@ export const fineService = {
       params: filters,
     }),
 
-  getById: (id: number) => api.get<ApiResponse<Fine>>(`/admin/fines/${id}`),
 
-  getByLoan: (loanId: number) =>
-    api.get<ApiResponse<Fine[]>>(`/loans/${loanId}/fines`),
+
+
 
   getByBorrow: (borrowId: number) =>
     api.get<ApiResponse<Fine[]>>(`/borrows/${borrowId}/fines`),
@@ -49,8 +47,7 @@ export const fineService = {
   create: (loanId: number, payload: CreateFinePayload) =>
     api.post<ApiResponse<Fine>>(`/admin/fines/loans/${loanId}`, payload),
 
-  update: (id: number, payload: UpdateFinePayload) =>
-    api.put<ApiResponse<Fine>>(`/admin/fines/${id}`, payload),
+
 
   markAsPaid: (id: number) =>
     api.post<ApiResponse<Fine>>(`/admin/fines/${id}/mark-paid`),

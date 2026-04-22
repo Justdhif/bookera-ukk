@@ -36,14 +36,14 @@ export default function UserTable({ data, onDelete }: Props) {
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
-            <TableHead className="w-16 text-center font-semibold">#</TableHead>
+            <TableHead className="w-16 text-center font-semibold">{t("noCol")}</TableHead>
             <TableHead className="font-semibold">{t("user")}</TableHead>
             <TableHead className="font-semibold">{t("email")}</TableHead>
             <TableHead className="font-semibold">{t("role")}</TableHead>
             <TableHead className="font-semibold">{t("occupation")}</TableHead>
             <TableHead className="font-semibold">{t("status")}</TableHead>
             <TableHead className="font-semibold text-right pr-6">
-              Actions
+              {t("actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -119,7 +119,7 @@ export default function UserTable({ data, onDelete }: Props) {
                     className="h-8 gap-1"
                   >
                     <Trash className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{t("deleteUser")}</span>
+                    <span className="hidden sm:inline">{t("delete")}</span>
                   </Button>
                 </div>
               </TableCell>

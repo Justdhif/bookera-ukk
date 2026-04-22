@@ -68,12 +68,7 @@ class BorrowRequestController extends Controller
         return ApiResponse::successResponse('Borrow request rejected successfully', $borrowRequest);
     }
 
-    public function destroy(BorrowRequest $borrowRequest): JsonResponse
-    {
-        $this->borrowRequestService->delete($borrowRequest);
 
-        return ApiResponse::successResponse('Borrow request deleted successfully');
-    }
 
     // ─── User ─────────────────────────────────────────────────────────────────
 

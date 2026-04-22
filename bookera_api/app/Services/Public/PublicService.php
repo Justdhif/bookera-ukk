@@ -89,9 +89,11 @@ class PublicService
         return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
-    public function getBookById(int $id): ?Book
+
+
+    public function getBookBySlug(string $slug): ?Book
     {
-        $book = Book::where('id', $id)->where('is_active', true)->first();
+        $book = Book::where('slug', $slug)->where('is_active', true)->first();
 
         if (!$book) {
             return null;
@@ -100,9 +102,9 @@ class PublicService
         return $this->loadBookDetails($book);
     }
 
-    public function getBookBySlug(string $slug): ?Book
+    public function getBookById(int $id): ?Book
     {
-        $book = Book::where('slug', $slug)->where('is_active', true)->first();
+        $book = Book::where('id', $id)->where('is_active', true)->first();
 
         if (!$book) {
             return null;
@@ -149,17 +151,7 @@ class PublicService
         return $query->paginate((int) ($filters['per_page'] ?? 15));
     }
 
-    public function getAuthorById(int $id): ?Author
-    {
-        $author = Author::query()
-            ->find($id);
 
-        if (!$author || !$author->is_active) {
-            return null;
-        }
-
-        return $author;
-    }
 
     public function getAuthorBySlug(string $slug): ?Author
     {
@@ -189,17 +181,7 @@ class PublicService
         return $query->paginate((int) ($filters['per_page'] ?? 15));
     }
 
-    public function getPublisherById(int $id): ?Publisher
-    {
-        $publisher = Publisher::query()
-            ->find($id);
 
-        if (!$publisher || !$publisher->is_active) {
-            return null;
-        }
-
-        return $publisher;
-    }
 
     public function getPublisherBySlug(string $slug): ?Publisher
     {

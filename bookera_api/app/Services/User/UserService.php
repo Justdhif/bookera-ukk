@@ -40,10 +40,7 @@ class UserService
         return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
-    public function getById(User $user): User
-    {
-        return $user->load('profile');
-    }
+
 
     public function getBySlug(string $slug): User
     {

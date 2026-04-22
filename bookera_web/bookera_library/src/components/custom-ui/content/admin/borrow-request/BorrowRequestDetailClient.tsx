@@ -8,8 +8,7 @@ import { BorrowRequest } from "@/types/borrow-request";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Trash, XCircle } from "lucide-react";
-import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
+import { CheckCircle2, XCircle } from "lucide-react";
 import BorrowRequestSummaryCard from "./BorrowRequestSummaryCard";
 import BorrowRequestBooksCard from "./BorrowRequestBooksCard";
 import BorrowRequestInfoCard from "./BorrowRequestInfoCard";
@@ -28,8 +27,6 @@ export default function AdminBorrowRequestDetailClient() {
   const [loading, setLoading] = useState(true);
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [selectedCopyIds, setSelectedCopyIds] = useState<number[]>([]);
 
@@ -53,7 +50,10 @@ export default function AdminBorrowRequestDetailClient() {
   const handleApprove = async () => {
     if (!request) return;
     if (selectedCopyIds.length !== request.borrow_request_details.length) {
-      toast.error(t("selectCopiesError") || "Please select all book copies before approving");
+      toast.error(
+        t("selectCopiesError") ||
+          "Please select all book copies before approving",
+      );
       return;
     }
 
@@ -85,22 +85,6 @@ export default function AdminBorrowRequestDetailClient() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!request) return;
-
-    setDeleting(true);
-    try {
-      await borrowRequestService.delete(request.id);
-      toast.success(t("deleteSuccess"));
-      router.push("/admin/borrows");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || t("deleteError"));
-    } finally {
-      setDeleting(false);
-      setDeleteDialogOpen(false);
-    }
-  };
-
   return (
     <div className="space-y-6">
       <ContentHeader
@@ -111,17 +95,6 @@ export default function AdminBorrowRequestDetailClient() {
         rightActions={
           !loading && request && request.approval_status === "processing" ? (
             <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm">
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setDeleteDialogOpen(true)}
-                disabled={deleting || approving || rejecting}
-                className="h-8 gap-1.5 px-3"
-              >
-                <Trash className="h-4 w-4" />
-                {t("delete")}
-              </Button>
-
               <Button
                 variant="outline"
                 size="sm"
@@ -137,24 +110,16 @@ export default function AdminBorrowRequestDetailClient() {
                 size="sm"
                 className="h-8 gap-1.5 px-3 bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:ring-emerald-600/20 dark:bg-emerald-600 dark:hover:bg-emerald-700"
                 onClick={handleApprove}
-                disabled={approving || rejecting || selectedCopyIds.length !== (request?.borrow_request_details?.length ?? 0)}
+                disabled={
+                  approving ||
+                  rejecting ||
+                  selectedCopyIds.length !==
+                    (request?.borrow_request_details?.length ?? 0)
+                }
                 loading={approving}
               >
                 {!approving && <CheckCircle2 className="h-4 w-4" />}
                 {t("approve")}
-              </Button>
-            </div>
-          ) : !loading && request ? (
-            <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm">
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setDeleteDialogOpen(true)}
-                disabled={deleting || approving || rejecting}
-                className="h-8 gap-1.5 px-3"
-              >
-                <Trash className="h-4 w-4" />
-                {t("delete")}
               </Button>
             </div>
           ) : null
@@ -169,8 +134,6 @@ export default function AdminBorrowRequestDetailClient() {
         </div>
       ) : (
         <div className="space-y-6 animate-in fade-in duration-500">
-          <BorrowRequestRejectReasonCard request={request} />
-
           <div className="grid gap-6 lg:grid-cols-2">
             <BorrowRequestSummaryCard request={request} />
             <BorrowRequestInfoCard request={request} />
@@ -178,11 +141,15 @@ export default function AdminBorrowRequestDetailClient() {
 
           <div className="grid gap-6 lg:grid-cols-2">
             <BorrowRequestBooksCard request={request} />
-            <BorrowRequestAssignCopiesCard
-              request={request}
-              onSelectionChange={setSelectedCopyIds}
-              disabled={approving || rejecting}
-            />
+            {request.approval_status === "rejected" ? (
+              <BorrowRequestRejectReasonCard request={request} />
+            ) : (
+              <BorrowRequestAssignCopiesCard
+                request={request}
+                onSelectionChange={setSelectedCopyIds}
+                disabled={approving || rejecting}
+              />
+            )}
           </div>
 
           <BorrowRequestRejectDialog
@@ -190,16 +157,6 @@ export default function AdminBorrowRequestDetailClient() {
             loading={rejecting}
             onOpenChange={setRejectDialogOpen}
             onReject={handleReject}
-          />
-
-          <DeleteConfirmDialog
-            open={deleteDialogOpen}
-            onOpenChange={(open) => {
-              if (!deleting) setDeleteDialogOpen(open);
-            }}
-            title={t("deleteRequest")}
-            description={t("deleteDetailDesc")}
-            onConfirm={handleDelete}
           />
         </div>
       )}

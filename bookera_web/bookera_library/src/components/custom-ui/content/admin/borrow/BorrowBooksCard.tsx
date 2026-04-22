@@ -518,7 +518,7 @@ export function BorrowBooksCard({
                             </div>
                           ) : null}
 
-                          {daysLate > 0 && (
+                          {daysLate > 0 && state?.status !== "lost" && (
                             <div className="space-y-2 border-t border-border/50 pt-3">
                               <div className="flex items-start justify-between gap-4">
                                 <div className="space-y-1">

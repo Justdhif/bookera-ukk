@@ -1,17 +1,19 @@
 "use client";
+
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { LostBook, LostBookFilterParams } from "@/types/lost-book";
 import { lostBookService } from "@/services/lost-book.service";
-import LostBooksTable from "./LostBooksTable";
+import { LostBookCard } from "./LostBookCard";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import { Search, AlertCircle } from "lucide-react";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
+import EmptyState from "@/components/custom-ui/EmptyState";
 
 export default function LostBooksClient() {
   const t = useTranslations("lost-books");
@@ -81,17 +83,31 @@ export default function LostBooksClient() {
     }
   };
 
-  const handleFinish = async (id: number) => {
-    setActionLoading(id);
-    try {
-      await lostBookService.finish(id);
-      toast.success(t("completeSuccess"));
-      fetchLostBooks(filters);
-    } catch (error: any) {
-      toast.error(t("completeError"));
-    } finally {
-      setActionLoading(null);
+
+
+  const renderCards = (books: LostBook[]) => {
+    if (books.length === 0) {
+      return (
+        <EmptyState
+          icon={<AlertCircle />}
+          title={t("noLostBooks")}
+          description={t("noLostBooksDesc")}
+        />
+      );
     }
+    return (
+      <div className="grid gap-4">
+        {books.map((lostBook) => (
+          <LostBookCard
+            key={lostBook.borrow_id}
+            borrow={lostBook.borrow}
+            items={[lostBook]}
+            onDelete={(id) => setDeleteId(id)}
+            actionLoading={actionLoading}
+          />
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -102,39 +118,38 @@ export default function LostBooksClient() {
         isAdmin
       />
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={t("searchPlaceholder")}
-            value={searchInput}
-            onChange={handleSearchChange}
-            className="pl-9"
-          />
-        </div>
-      </div>
-
-      <PaginatedContent
-        currentPage={pagination.current_page}
-        lastPage={pagination.last_page}
-        total={pagination.total}
-        from={pagination.from}
-        to={pagination.to}
-        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
-      >
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <DataLoading variant="inline" size="lg" />
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={t("searchPlaceholder")}
+              value={searchInput}
+              onChange={handleSearchChange}
+              className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
+            />
           </div>
-        ) : (
-          <LostBooksTable
-            data={lostBooks}
-            onDelete={(id) => setDeleteId(id)}
-            onFinish={handleFinish}
-            actionLoading={actionLoading}
-          />
-        )}
-      </PaginatedContent>
+        </div>
+
+        <PaginatedContent
+          currentPage={pagination.current_page}
+          lastPage={pagination.last_page}
+          total={pagination.total}
+          from={pagination.from}
+          to={pagination.to}
+          onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+        >
+          {loading ? (
+            <div className="grid gap-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <DataLoading key={i} size="lg" />
+              ))}
+            </div>
+          ) : (
+            renderCards(lostBooks)
+          )}
+        </PaginatedContent>
+      </div>
 
       <DeleteConfirmDialog
         open={deleteId !== null}

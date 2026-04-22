@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import ActivityStatistics from "./ActivityStatistics";
 import ActivityCharts from "./ActivityCharts";
 import ActivityTable from "./ActivityTable";
+import ActivityFilters from "./ActivityFilters";
 import ActivityDetailDialog from "./ActivityDetailDialog";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
@@ -36,6 +37,7 @@ export default function ActivityLogClient() {
       }
     }
   }, [user, router]);
+
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [filters, setFilters] = useState<ActivityLogFilters>({
@@ -44,21 +46,21 @@ export default function ActivityLogClient() {
     year: new Date().getFullYear(),
   });
 
-  useEffect(() => {
-    fetchActivityLogs();
-  }, [filters]);
-
   const fetchActivityLogs = async () => {
     setLoading(true);
     try {
       const response = await activityLogService.getAll(filters, true);
       setData(response.data.data);
     } catch (error) {
-      toast.error("loadError");
+      toast.error(t("loadError"));
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchActivityLogs();
+  }, [filters]);
 
   const handleRowClick = (id: number) => {
     setSelectedId(id);
@@ -85,27 +87,36 @@ export default function ActivityLogClient() {
 
       {loading ? <DataLoading size="lg" /> : data && <ActivityCharts charts={data.charts} onYearChange={handleYearChange} />}
 
+      <ActivityFilters
+        filters={filters}
+        onFilterChange={setFilters}
+      />
+
       {loading ? (
-        <DataLoading size="lg" />
+        <div className="flex justify-center py-12">
+          <DataLoading variant="inline" size="lg" />
+        </div>
       ) : (
         data && (
-          <PaginatedContent
-            currentPage={data.logs.current_page}
-            lastPage={data.logs.last_page}
-            total={data.logs.total}
-            from={data.logs.from}
-            to={data.logs.to}
-            onPageChange={handlePageChange}
-          >
-            <ActivityTable
-              logs={data.logs.data}
-              pagination={data.logs}
-              onRowClick={handleRowClick}
+          <div className="space-y-4">
+            <PaginatedContent
+              currentPage={data.logs.current_page}
+              lastPage={data.logs.last_page}
+              total={data.logs.total}
+              from={data.logs.from}
+              to={data.logs.to}
               onPageChange={handlePageChange}
-              filters={filters}
-              onFilterChange={setFilters}
-            />
-          </PaginatedContent>
+            >
+              <ActivityTable
+                logs={data.logs.data}
+                pagination={data.logs}
+                onRowClick={handleRowClick}
+                onPageChange={handlePageChange}
+                filters={filters}
+                onFilterChange={setFilters}
+              />
+            </PaginatedContent>
+          </div>
         )
       )}
 

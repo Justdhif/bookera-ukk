@@ -13,10 +13,12 @@ import { Label } from "@/components/ui/label";
 import { Category } from "@/types/category";
 import { categoryService } from "@/services/category.service";
 import { toast } from "sonner";
+
 interface FormData {
   name: string;
   description: string;
 }
+
 export default function CategoryFormDialog({
   open,
   setOpen,
@@ -35,12 +37,14 @@ export default function CategoryFormDialog({
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
+
   useEffect(() => {
     setFormData({
       name: category?.name ?? "",
       description: category?.description ?? "",
     });
   }, [category, open]);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -50,6 +54,7 @@ export default function CategoryFormDialog({
       [name]: value,
     }));
   };
+
   const isFormValid = (): boolean => {
     const requiredFieldsFilled = formData.name.trim() !== "";
     if (!requiredFieldsFilled) return false;
@@ -59,9 +64,11 @@ export default function CategoryFormDialog({
     if (hasValidationErrors) return false;
     return true;
   };
+
   const isSubmitDisabled = (): boolean => {
     return isLoading || !isFormValid();
   };
+
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
@@ -85,11 +92,12 @@ export default function CategoryFormDialog({
       setOpen(false);
       onSuccess();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "An error occurred");
+      toast.error(err.response?.data?.message || t("errorOccurred"));
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -99,7 +107,7 @@ export default function CategoryFormDialog({
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name" variant="required">
                 {t("categoryName")}

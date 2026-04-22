@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
-import { BookOpen, Calendar, Eye, Trash, User, ArrowRight } from "lucide-react";
+import { BookOpen, Calendar, Eye, User, ArrowRight } from "lucide-react";
 import { BorrowRequest } from "@/types/borrow-request";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,12 +11,10 @@ import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
 
 interface BorrowRequestListItemProps {
   request: BorrowRequest;
-  onDelete: (id: number) => void;
 }
 
 export default function BorrowRequestListItem({
   request,
-  onDelete,
 }: BorrowRequestListItemProps) {
   const t = useTranslations("borrow-request");
 
@@ -33,7 +31,9 @@ export default function BorrowRequestListItem({
               <div className="flex min-w-0 items-center gap-1 text-sm text-muted-foreground">
                 <User className="h-3.5 w-3.5 shrink-0" />
                 <span className="truncate">
-                  {request.user?.profile?.full_name || request.user?.email || "-"}
+                  {request.user?.profile?.full_name ||
+                    request.user?.email ||
+                    "-"}
                 </span>
               </div>
             </div>
@@ -67,14 +67,6 @@ export default function BorrowRequestListItem({
           </div>
 
           <div className="flex shrink-0 gap-2">
-            <Button
-              size="icon-sm"
-              variant="destructive"
-              onClick={() => onDelete(request.id)}
-              aria-label={t("delete")}
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
             <Link href={`/admin/borrow-requests/${request.id}`}>
               <Button size="sm" variant="outline" className="h-8 gap-1">
                 <Eye className="h-3.5 w-3.5" />

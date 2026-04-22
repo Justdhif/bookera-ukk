@@ -1,63 +1,50 @@
 "use client";
 
-import Image from "next/image";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useTranslations } from "next-intl";
-import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
-import { SidebarUserFooter } from "@/components/custom-ui/sidebar/SidebarUserFooter";
 import AuthorPublisherSidebarSearch from "./AuthorPublisherSidebarSearch";
+import Link from "next/link";
+import { MessageSquareText } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+import AppSidebar from "./AppSidebar";
 
 export default function PublicSidebar() {
   const { open } = useSidebar();
   const t = useTranslations("navbar");
 
   return (
-    <Sidebar
-      collapsible="icon"
-      className="bg-linear-to-b from-background to-muted/20"
-    >
-      <SidebarHeader className="p-0 overflow-hidden border-b-0">
-        <div className="relative bg-linear-to-135deg from-brand-primary-dark via-brand-primary to-brand-primary-light overflow-hidden">
-          <div className="absolute -top-6 -right-6 h-20 w-20 rounded-full bg-primary/8" />
-          <div className="absolute -bottom-4 -left-4 h-14 w-14 rounded-full bg-primary/8" />
-          <div
-            className={`relative z-10 flex items-center gap-3 px-4 py-4 ${
-              !open ? "justify-center px-0" : ""
-            }`}
-          >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-primary shadow-md backdrop-blur-sm ring-1 ring-brand-primary/20">
-              <Image
-                src={BookeraLogo}
-                alt="Bookera"
-                className="h-6 w-6 object-contain brightness-0 invert"
-              />
-            </div>
-            {open && (
-              <div className="flex flex-col leading-tight">
-                <span className="text-[15px] font-bold tracking-wide text-brand-primary drop-shadow-sm">
-                  Bookera
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                  {t("myLibrary")}
-                </span>
-              </div>
-            )}
-          </div>
-          <div className="mt-2 h-px bg-linear-to-r from-white/0 via-white/30 to-white/0" />
-        </div>
-      </SidebarHeader>
-      <SidebarContent className="overflow-hidden flex flex-col">
-        <AuthorPublisherSidebarSearch />
-      </SidebarContent>
-      <SidebarFooter className="p-0 border-t border-border/60 dark:border-white/10">
-        <SidebarUserFooter />
-      </SidebarFooter>
-    </Sidebar>
+    <AppSidebar subtitle={t("myLibrary")}>
+      <div className="px-2 py-4 border-b border-border/40">
+        <SidebarMenu>
+          <SidebarMenuItem className={cn(!open && "w-full flex justify-center")}>
+            <SidebarMenuButton
+              asChild
+              tooltip={t("complaint")}
+              className={cn(
+                "rounded-xl transition-all h-10 px-3",
+                !open && "justify-center px-0 mx-auto",
+              )}
+            >
+              <Link href="/complaints">
+                <div className={cn(
+                  "p-1.5 rounded-lg bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400 shrink-0",
+                  !open && "p-2"
+                )}>
+                  <MessageSquareText className="h-4 w-4" />
+                </div>
+                {open && <span className="font-semibold text-sm ml-1">{t("complaint")}</span>}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </div>
+      <AuthorPublisherSidebarSearch />
+    </AppSidebar>
   );
 }

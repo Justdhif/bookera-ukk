@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { authorService } from "@/services/author.service";
-import { CreateAuthorData } from "@/types/author";
+import { Author, CreateAuthorData } from "@/types/author";
 import { toast } from "sonner";
 import { FileWarning, Upload, X, Trash, Eye } from "lucide-react";
 import Image from "next/image";
@@ -23,10 +23,12 @@ import { useTranslations } from "next-intl";
 export default function AuthorFormDialog({
   open,
   setOpen,
+  author = null,
   onSuccess,
 }: {
   open: boolean;
   setOpen: (v: boolean) => void;
+  author?: Author | null;
   onSuccess: () => void;
 }) {
   const t = useTranslations("author");
@@ -43,13 +45,23 @@ export default function AuthorFormDialog({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!open) {
-      setFormData({ name: "", bio: "", is_active: true, photo: null });
-      setPhotoPreview("");
+    if (open) {
+      if (author) {
+        setFormData({
+          name: author.name,
+          bio: author.bio || "",
+          is_active: author.is_active,
+          photo: null, // Photo remains null unless changed
+        });
+        setPhotoPreview(author.photo);
+      } else {
+        setFormData({ name: "", bio: "", is_active: true, photo: null });
+        setPhotoPreview("");
+      }
       setPhotoError(null);
       setIsDragging(false);
     }
-  }, [open]);
+  }, [open, author]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -65,13 +77,13 @@ export default function AuthorFormDialog({
   const handleFileSelect = (file: File) => {
     const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     if (!allowed.includes(file.type)) {
-      const msg = "Only JPG, PNG or WEBP images are allowed";
+      const msg = t("invalidFileType");
       setPhotoError(msg);
       toast.error(msg);
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      const msg = "Image must be less than 2MB";
+      const msg = t("fileSizeExceed");
       setPhotoError(msg);
       toast.error(msg);
       return;
@@ -96,21 +108,26 @@ export default function AuthorFormDialog({
   };
 
   const isSubmitDisabled = () =>
-    isLoading || !formData.name.trim() || !formData.photo;
+    isLoading || !formData.name.trim() || (!author && !formData.photo);
 
   const handleSubmit = async () => {
-    if (!formData.photo) {
+    if (!author && !formData.photo) {
       toast.error(t("photoRequired"));
       return;
     }
     setIsLoading(true);
     try {
-      await authorService.create(formData);
-      toast.success(t("addSuccess"));
+      if (author) {
+        await authorService.update(author.id, formData);
+        toast.success(t("updateSuccess"));
+      } else {
+        await authorService.create(formData);
+        toast.success(t("addSuccess"));
+      }
       setOpen(false);
       onSuccess();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to add author");
+      toast.error(err.response?.data?.message || (author ? t("updateError") : t("addError")));
     } finally {
       setIsLoading(false);
     }
@@ -120,7 +137,7 @@ export default function AuthorFormDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{t("addAuthor")}</DialogTitle>
+          <DialogTitle>{author ? t("editAuthor") : t("addAuthor")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-5">
           <div className="space-y-2">
@@ -187,7 +204,7 @@ export default function AuthorFormDialog({
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Click X to remove or drag a new photo
+                    {t("removePhotoHint")}
                   </p>
                 </div>
               ) : (
@@ -273,7 +290,7 @@ export default function AuthorFormDialog({
             loading={isLoading}
             className="w-full"
           >
-            {t("addAuthor")}
+            {author ? t("saveChanges") : t("addAuthor")}
           </Button>
         </div>
       </DialogContent>

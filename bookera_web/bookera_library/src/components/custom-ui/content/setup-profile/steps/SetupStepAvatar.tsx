@@ -27,11 +27,11 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
-  MAX_FILE_SIZE,
+  MAX_AVATAR_SIZE as MAX_FILE_SIZE,
   ALLOWED_FILE_TYPES,
   ALLOWED_FILE_EXTENSIONS,
-  DEFAULT_AVATARS,
-} from "@/constants/avatar";
+} from "@/constants/file";
+import { DEFAULT_AVATARS } from "@/constants/avatar";
 
 const iconPopTransition = {
   type: "spring" as const,

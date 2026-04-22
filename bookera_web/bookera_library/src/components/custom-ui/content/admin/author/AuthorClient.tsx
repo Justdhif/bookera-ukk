@@ -6,7 +6,6 @@ import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { authorService } from "@/services/author.service";
 import AuthorTable from "./AuthorTable";
 import AuthorFormDialog from "./AuthorFormDialog";
-import AuthorDetailDialog from "./AuthorDetailDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -68,7 +67,6 @@ export default function AuthorClient() {
 
   const [addOpen, setAddOpen] = useState(false);
   const [selectedAuthor, setSelectedAuthor] = useState<Author | null>(null);
-  const [detailOpen, setDetailOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const fetchAuthors = async (activeFilters: AuthorFilterParams) => {
@@ -95,9 +93,9 @@ export default function AuthorClient() {
     fetchAuthors(filters);
   }, [filters]);
 
-  const handleView = (author: Author) => {
+  const handleEdit = (author: Author) => {
     setSelectedAuthor(author);
-    setDetailOpen(true);
+    setAddOpen(true);
   };
 
   const confirmDelete = async () => {
@@ -108,7 +106,7 @@ export default function AuthorClient() {
       setDeleteId(null);
       fetchAuthors(filters);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to delete author");
+      toast.error(err.response?.data?.message || t("deleteError"));
     }
   };
 
@@ -120,7 +118,10 @@ export default function AuthorClient() {
         isAdmin
         rightActions={
           <Button
-            onClick={() => setAddOpen(true)}
+            onClick={() => {
+              setSelectedAuthor(null);
+              setAddOpen(true);
+            }}
             variant="submit"
             className="h-8 gap-1"
           >
@@ -129,18 +130,18 @@ export default function AuthorClient() {
           </Button>
         }
       />
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+        <div className="relative flex-2 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t("searchAuthors")}
             value={searchInput}
             onChange={handleSearchChange}
-            className="pl-9"
+            className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
           />
         </div>
         <Select value={statusValue} onValueChange={handleStatusChange}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="flex-1 w-full sm:w-auto h-11! shadow-sm transition-all duration-300">
             <SelectValue placeholder={t("allStatus")} />
           </SelectTrigger>
           <SelectContent>
@@ -163,7 +164,7 @@ export default function AuthorClient() {
         ) : (
           <AuthorTable
             data={authors}
-            onView={handleView}
+            onEdit={handleEdit}
             onDelete={(id) => setDeleteId(id)}
           />
         )}
@@ -171,14 +172,10 @@ export default function AuthorClient() {
       <AuthorFormDialog
         open={addOpen}
         setOpen={setAddOpen}
-        onSuccess={() => fetchAuthors(filters)}
-      />
-      <AuthorDetailDialog
-        open={detailOpen}
-        setOpen={setDetailOpen}
         author={selectedAuthor}
         onSuccess={() => fetchAuthors(filters)}
       />
+
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={() => setDeleteId(null)}

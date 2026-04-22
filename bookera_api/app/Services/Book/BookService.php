@@ -149,27 +149,9 @@ class BookService
         return $book;
     }
 
-    public function getById(int $id): ?Book
-    {
-        $book = Book::find($id);
 
-        if (!$book) {
-            return null;
-        }
 
-        return $this->loadBookDetails($book);
-    }
 
-    public function getBySlug(string $slug): ?Book
-    {
-        $book = Book::where('slug', $slug)->first();
-
-        if (!$book) {
-            return null;
-        }
-
-        return $this->loadBookDetails($book);
-    }
 
     public function update(Book $book, array $data, ?UploadedFile $coverImage = null): Book
     {
@@ -265,5 +247,26 @@ class BookService
         });
 
         return $book;
+    }
+    public function getById(int $id): ?Book
+    {
+        $book = Book::find($id);
+
+        if (!$book) {
+            return null;
+        }
+
+        return $this->loadBookDetails($book);
+    }
+
+    public function getBySlug(string $slug): ?Book
+    {
+        $book = Book::where('slug', $slug)->first();
+
+        if (!$book) {
+            return null;
+        }
+
+        return $this->loadBookDetails($book);
     }
 }

@@ -17,8 +17,9 @@ import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import BookSideCard from "../BookSideCard";
 import BookForm from "../BookForm";
-import AuthorFormDialog from "@/components/custom-ui/content/admin/author/author-add/AuthorFormDialog";
-import PublisherFormDialog from "@/components/custom-ui/content/admin/publisher/publisher-add/PublisherFormDialog";
+import AuthorFormDialog from "@/components/custom-ui/content/admin/author/AuthorFormDialog";
+import PublisherFormDialog from "@/components/custom-ui/content/admin/publisher/PublisherFormDialog";
+
 export default function AddBookClient() {
   const t = useTranslations("book");
   const router = useRouter();
@@ -43,11 +44,13 @@ export default function AddBookClient() {
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [authorDialogOpen, setAuthorDialogOpen] = useState(false);
   const [publisherDialogOpen, setPublisherDialogOpen] = useState(false);
+
   useEffect(() => {
     fetchCategories();
     fetchAuthors();
     fetchPublishers();
   }, []);
+
   const fetchCategories = async () => {
     try {
       const res = await categoryService.getAll();
@@ -56,10 +59,10 @@ export default function AddBookClient() {
       toast.error("Failed to load categories");
     }
   };
+
   const fetchAuthors = async () => {
     try {
       const res = await authorService.getAll({
-        is_active: true,
         per_page: "all",
       });
       setAuthors(res.data.data.data || []);
@@ -67,10 +70,10 @@ export default function AddBookClient() {
       toast.error("Failed to load authors");
     }
   };
+
   const fetchPublishers = async () => {
     try {
       const res = await publisherService.getAll({
-        is_active: true,
         per_page: "all",
       });
       setPublishers(res.data.data.data || []);
@@ -78,9 +81,11 @@ export default function AddBookClient() {
       toast.error("Failed to load publishers");
     }
   };
+
   const handleSwitchChange = (checked: boolean) => {
     setFormData((prev) => ({ ...prev, is_active: checked }));
   };
+
   const handleCoverImageChange = (file: File | null, preview: string) => {
     setFormData((prev) => ({ ...prev, cover_image: file }));
     setCoverPreview(preview);
@@ -88,15 +93,18 @@ export default function AddBookClient() {
       setCoverError(false);
     }
   };
+
   const handleCoverValidationChange = (isValid: boolean) => {
     setCoverError(!isValid);
   };
+
   const isFormValid = (): boolean => {
     if (!formData.title.trim()) return false;
     if (!formData.cover_image && !coverPreview) return false;
     if (coverError || formHasErrors) return false;
     return true;
   };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!formData.cover_image && !coverPreview) {
@@ -119,6 +127,7 @@ export default function AddBookClient() {
       setSubmitting(false);
     }
   };
+
   return (
     <div className="space-y-6">
       <ContentHeader

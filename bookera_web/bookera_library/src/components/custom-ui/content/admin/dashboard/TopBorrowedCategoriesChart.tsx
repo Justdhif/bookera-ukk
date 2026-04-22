@@ -3,42 +3,38 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
   Tooltip,
   ResponsiveContainer,
-  Cell,
+  Legend,
 } from "recharts";
-import { BarChart3, BookOpen, LayoutGrid } from "lucide-react";
+import { LayoutGrid } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { dashboardService } from "@/services/dashboard.service";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TopBorrowedStat } from "@/types/dashboard";
 import { toast } from "sonner";
 
-const BAR_COLORS = ["#059669", "#0ea5e9", "#f97316", "#8b5cf6", "#ef4444"];
-type ChartMode = "categories" | "books";
+const COLORS = ["#10b981", "#0ea5e9", "#f59e0b", "#8b5cf6", "#f43f5e"];
 
 const CustomTooltip = ({ active, payload }: any) => {
   const t = useTranslations("dashboard");
 
-  if (active && payload && payload.length) {
+  if (active && payload && payload.length && payload[0]) {
     const item = payload[0];
 
     return (
-      <div className="rounded-xl border bg-popover px-4 py-3 shadow-xl">
+      <div className="rounded-xl border bg-popover/90 px-4 py-3 shadow-xl backdrop-blur-md">
         <p className="mb-2 font-semibold text-popover-foreground">
-          {item.payload?.name}
+          {item.name}
         </p>
         <div className="flex items-center gap-2">
           <span
             className="h-3 w-3 rounded-full"
-            style={{ backgroundColor: item.color ?? item.fill }}
+            style={{ backgroundColor: item.payload?.payload?.fill ?? item.payload?.fill ?? "#ccc" }}
           />
           <span className="text-sm text-muted-foreground">{t("borrowCount")}:</span>
           <span className="text-sm font-bold text-popover-foreground">{item.value}</span>
@@ -50,13 +46,38 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+}: any) => {
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  if (percent < 0.05) return null;
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor={x > cx ? "start" : "end"}
+      dominantBaseline="central"
+      className="text-[10px] font-bold"
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
 export default function TopBorrowedCategoriesChart() {
   const t = useTranslations("dashboard");
-  const [activeMode, setActiveMode] = useState<ChartMode>("categories");
-  const [dataByMode, setDataByMode] = useState<Record<ChartMode, TopBorrowedStat[]>>({
-    categories: [],
-    books: [],
-  });
+  const [data, setData] = useState<TopBorrowedStat[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -64,39 +85,19 @@ export default function TopBorrowedCategoriesChart() {
 
     const loadData = async () => {
       setLoading(true);
-
-      const [categoriesResult, booksResult] = await Promise.allSettled([
-        dashboardService.getTopBorrowedCategories(5),
-        dashboardService.getTopBorrowedBooks(5),
-      ]);
-
-      if (!isMounted) {
-        return;
-      }
-
-      const nextData: Record<ChartMode, TopBorrowedStat[]> = {
-        categories: [],
-        books: [],
-      };
-      let hasError = false;
-
-      if (categoriesResult.status === "fulfilled") {
-        nextData.categories = categoriesResult.value.data.data ?? [];
-      } else {
-        hasError = true;
-      }
-
-      if (booksResult.status === "fulfilled") {
-        nextData.books = booksResult.value.data.data ?? [];
-      } else {
-        hasError = true;
-      }
-
-      setDataByMode(nextData);
-      setLoading(false);
-
-      if (hasError) {
-        toast.error(t("loadError"));
+      try {
+        const result = await dashboardService.getTopBorrowedCategories(5);
+        if (isMounted) {
+          setData(result.data.data ?? []);
+        }
+      } catch (error) {
+        if (isMounted) {
+          toast.error(t("loadError"));
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -107,117 +108,104 @@ export default function TopBorrowedCategoriesChart() {
     };
   }, [t]);
 
-  const activeData = dataByMode[activeMode];
-
-  const chartData = activeData.map((item) => ({
-    name: item.name,
-    total_borrows: item.total_borrows,
+  const chartData = data.map((item, index) => ({
+    ...item,
+    fill: COLORS[index % COLORS.length],
+    gradId: `grad-cat-${index % COLORS.length}`,
   }));
 
   const hasData = chartData.length > 0;
-  const titleKey =
-    activeMode === "categories"
-      ? "topBorrowedCategoriesTitle"
-      : "topBorrowedBooksTitle";
-  const descriptionKey =
-    activeMode === "categories"
-      ? "topBorrowedCategoriesDescription"
-      : "topBorrowedBooksDescription";
-  const yAxisWidth = activeMode === "books" ? 200 : 140;
 
   return (
-    <Tabs
-      value={activeMode}
-      onValueChange={(value) => setActiveMode(value as ChartMode)}
-      className="w-full gap-0"
-    >
-      <Card className="h-full w-full overflow-hidden border-none shadow-premium bg-card/50 backdrop-blur-sm">
-        <CardHeader className="border-b border-border/50 bg-muted/20 pb-4">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="space-y-1.5">
-              <CardTitle className="flex items-center gap-2 text-lg font-bold">
-                <div className="rounded-lg bg-emerald-500/10 p-1.5 text-emerald-500">
-                  <BarChart3 className="h-5 w-5" />
-                </div>
-                {t(titleKey)}
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">{t(descriptionKey)}</p>
+    <Card className="h-full w-full overflow-hidden border-none shadow-premium bg-card/50 backdrop-blur-sm">
+      <CardHeader className="border-b border-border/50 bg-muted/20 pb-4">
+        <div className="space-y-1.5">
+          <CardTitle className="flex items-center gap-2 text-lg font-bold">
+            <div className="rounded-lg bg-emerald-500/10 p-1.5 text-emerald-500">
+              <LayoutGrid className="h-5 w-5" />
             </div>
+            {t("topBorrowedCategoriesTitle")}
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            {t("topBorrowedCategoriesDescription")}
+          </p>
+        </div>
+      </CardHeader>
 
-            <TabsList className="grid w-full grid-cols-2 lg:w-65">
-              <TabsTrigger value="categories" className="gap-2">
-                <LayoutGrid className="size-4" />
-                <span>{t("topCategories")}</span>
-              </TabsTrigger>
-              <TabsTrigger value="books" className="gap-2">
-                <BookOpen className="size-4" />
-                <span>{t("topBooks")}</span>
-              </TabsTrigger>
-            </TabsList>
-          </div>
-        </CardHeader>
-
-        <CardContent className="flex min-h-105 items-center justify-center pt-6">
-          {loading ? (
-            <DataLoading
-              variant="card"
-              size="lg"
-              className="w-full border-none bg-transparent shadow-none"
-            />
-          ) : hasData ? (
-            <ResponsiveContainer width="100%" height={360}>
-              <BarChart
-                data={chartData}
-                layout="vertical"
-                margin={{ top: 8, right: 24, left: 8, bottom: 8 }}
-                barCategoryGap="28%"
-              >
-                <defs>
-                  <linearGradient id="borrowCategoryGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#059669" stopOpacity={1} />
-                    <stop offset="100%" stopColor="#0ea5e9" stopOpacity={0.95} />
+      <CardContent className="flex min-h-105 items-center justify-center">
+        {loading ? (
+          <DataLoading
+            variant="card"
+            size="lg"
+            className="w-full border-none bg-transparent shadow-none"
+          />
+        ) : hasData ? (
+          <ResponsiveContainer width="100%" height={360}>
+            <PieChart>
+              <defs>
+                {COLORS.map((color, index) => (
+                  <linearGradient key={`grad-cat-${index}`} id={`grad-cat-${index}`} x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor={color} stopOpacity={0.8} />
+                    <stop offset="100%" stopColor={color} stopOpacity={1} />
                   </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#e5e7eb"
-                  className="dark:stroke-gray-800"
-                />
-                <XAxis
-                  type="number"
-                  allowDecimals={false}
-                  tick={{ fill: "#6b7280", fontSize: 12 }}
-                  axisLine={{ stroke: "#d1d5db" }}
-                  tickLine={false}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  tick={{ fill: "#6b7280", fontSize: 12 }}
-                  axisLine={{ stroke: "#d1d5db" }}
-                  tickLine={false}
-                  width={yAxisWidth}
-                />
-                <Tooltip content={(props) => <CustomTooltip {...props} />} />
-                <Bar
-                  dataKey="total_borrows"
-                  radius={[0, 999, 999, 0]}
-                  fill="url(#borrowCategoryGradient)"
-                >
-                  {chartData.map((entry, index) => (
-                    <Cell key={entry.name} fill={BAR_COLORS[index % BAR_COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
-              <BarChart3 className="h-12 w-12 opacity-10" />
-              <p className="text-sm font-medium">{t("noData")}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </Tabs>
+                ))}
+              </defs>
+              <Pie
+                data={chartData}
+                dataKey="total_borrows"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius={80}
+                outerRadius={120}
+                paddingAngle={5}
+                labelLine={false}
+                label={renderCustomizedLabel}
+                animationBegin={0}
+                animationDuration={1500}
+              >
+                {chartData.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={`url(#${entry.gradId})`}
+                    stroke="transparent"
+                    className="hover:opacity-80 transition-opacity cursor-pointer outline-none"
+                  />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36}
+                content={({ payload }) => (
+                  <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4">
+                    {payload?.map((entry: any, index: number) => {
+                      const color = entry.payload?.fill || COLORS[index % COLORS.length];
+                      return (
+                        <div key={`legend-${index}`} className="flex items-center gap-2">
+                          <div 
+                            className="size-2.5 rounded-full" 
+                            style={{ backgroundColor: color }}
+                          />
+                          <span className="text-xs font-medium text-muted-foreground">
+                            {entry.value}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+            <LayoutGrid className="h-12 w-12 opacity-10" />
+            <p className="text-sm font-medium">{t("noData")}</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
+

@@ -48,19 +48,20 @@ export default function UserFilter({ onChange }: Props) {
     }
   };
   return (
-    <div className="flex flex-col sm:flex-row gap-3">
-      <div className="relative flex-1">
+    <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+      <div className="relative flex-2 w-full">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder={t("searchUsers")}
           value={searchInput}
           onChange={handleSearchChange}
-          className="pl-9 h-11 transition-all"
+          className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
         />
       </div>
-      <div className="flex flex-row gap-3 sm:w-auto">
+
+      <div className="flex flex-row items-center gap-3 w-full sm:flex-1">
         <Select value={roleValue ?? "all"} onValueChange={handleRoleChange}>
-          <SelectTrigger className="flex-1 sm:w-48 h-11">
+          <SelectTrigger className="flex-1 sm:w-48 h-11! shadow-sm transition-all duration-300">
             <SelectValue placeholder={t("allRoles")} />
           </SelectTrigger>
           <SelectContent>
@@ -72,8 +73,9 @@ export default function UserFilter({ onChange }: Props) {
             ))}
           </SelectContent>
         </Select>
+
         <Select value={statusValue} onValueChange={handleStatusChange}>
-          <SelectTrigger className="flex-1 sm:w-40 h-11">
+          <SelectTrigger className="flex-1 sm:w-40 h-11! shadow-sm transition-all duration-300">
             <SelectValue placeholder={t("allStatus")} />
           </SelectTrigger>
           <SelectContent>

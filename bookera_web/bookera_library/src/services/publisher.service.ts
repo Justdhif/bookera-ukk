@@ -15,8 +15,7 @@ export const publisherService = {
       params: filters,
     }),
 
-  getById: (id: number) =>
-    api.get<ApiResponse<Publisher>>(`/admin/publishers/${id}`),
+
 
   create: (data: CreatePublisherData) =>
     api.post<ApiResponse<Publisher>>(

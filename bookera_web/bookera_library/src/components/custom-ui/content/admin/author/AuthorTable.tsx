@@ -12,17 +12,17 @@ import { Button } from "@/components/ui/button";
 import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import { Author } from "@/types/author";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { Eye, Trash, UserSquare } from "lucide-react";
+import { Edit, Trash, UserSquare } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 export default function AuthorTable({
   data,
-  onView,
+  onEdit,
   onDelete,
 }: {
   data: Author[];
-  onView: (author: Author) => void;
+  onEdit: (author: Author) => void;
   onDelete: (id: number) => void;
 }) {
   const t = useTranslations("author");
@@ -90,12 +90,12 @@ export default function AuthorTable({
               <div className="flex justify-end items-center gap-2">
                 <Button
                   size="sm"
-                  variant="outline"
-                  onClick={() => onView(item)}
+                  variant="brand"
+                  onClick={() => onEdit(item)}
                   className="h-8 gap-1"
                 >
-                  <Eye className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t("view")}</span>
+                  <Edit className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{t("edit")}</span>
                 </Button>
                 <Button
                   size="sm"

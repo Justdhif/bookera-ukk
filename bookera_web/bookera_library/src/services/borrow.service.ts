@@ -23,7 +23,7 @@ export const borrowService = {
       data,
     ),
 
-  getById: (id: number) => api.get<ApiResponse<Borrow>>(`/borrows/${id}`),
+
 
   getByCode: (code: string, isAdmin = false) =>
     api.get<ApiResponse<Borrow>>(

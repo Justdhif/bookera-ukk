@@ -37,7 +37,7 @@ export default function TermsOfServiceFormDialog({
   }, [item, open]);
   const handleSubmit = async () => {
     if (!title.trim() || !content.trim()) {
-      toast.error("pleaseCompleteRequiredFields");
+      toast.error(t("pleaseCompleteRequiredFields"));
       return;
     }
     setIsLoading(true);
@@ -48,17 +48,17 @@ export default function TermsOfServiceFormDialog({
       };
       if (item) {
         await termsOfServiceService.update(item.id, payload);
-        toast.success("termsOfServiceUpdated");
+        toast.success(t("termsOfServiceUpdated"));
       } else {
         await termsOfServiceService.create(payload);
-        toast.success("termsOfServiceAdded");
+        toast.success(t("termsOfServiceAdded"));
       }
       setTitle("");
       setContent("");
       setOpen(false);
       onSuccess();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "An error occurred");
+      toast.error(error.response?.data?.message || t("errorOccurred"));
     } finally {
       setIsLoading(false);
     }
@@ -68,34 +68,34 @@ export default function TermsOfServiceFormDialog({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {item ? "editTermsOfService" : "addTermsOfService"}
+            {item ? t("editTerms") : t("addTerms")}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title" variant="required">
-              {"Title"}
+              {t("titleLabel")}
             </Label>
             <Input
               id="title"
-              placeholder="example: Terms of Service - Bookera Library System"
+              placeholder={t("titlePlaceholder")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="content" variant="required">
-              {"contentHTML"}
+              {t("contentHTML")}
             </Label>
             <Textarea
               id="content"
-              placeholder={`<h2>1. Acceptance of Terms</h2>\n<p>By accessing and using Bookera...</p>`}
+              placeholder={t.raw("contentPlaceholder")}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={16}
               className="font-mono text-sm"
             />
-            <p className="text-xs text-muted-foreground">useHTMLTags</p>
+            <p className="text-xs text-muted-foreground">{t("useHTMLTags")}</p>
           </div>
           <Button
             onClick={handleSubmit}
@@ -106,11 +106,11 @@ export default function TermsOfServiceFormDialog({
           >
             {isLoading
               ? item
-                ? "Saving..."
-                : "Adding..."
+                ? t("saving")
+                : t("adding")
               : item
                 ? t("saveChanges")
-                : "Add"}
+                : t("add")}
           </Button>
         </div>
       </DialogContent>

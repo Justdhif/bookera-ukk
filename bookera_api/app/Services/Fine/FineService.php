@@ -95,26 +95,7 @@ class FineService
         });
     }
 
-    public function update(FineBorrow $fine, array $data): FineBorrow
-    {
-        $oldData = $fine->toArray();
-        $fine->update($data);
 
-        ActivityLogger::log(
-            'update',
-            'fine',
-            "Fine #{$fine->id} updated",
-            [
-                'fine_id' => $fine->id,
-                'amount' => $fine->amount,
-                'notes' => $fine->notes,
-            ],
-            $oldData,
-            $fine
-        );
-
-        return $fine->load(['borrow.user.profile', 'fineType']);
-    }
 
     public function markAsPaid(FineBorrow $fine): FineBorrow
     {

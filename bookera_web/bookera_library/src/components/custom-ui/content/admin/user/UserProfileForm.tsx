@@ -1,9 +1,11 @@
 "use client";
+
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { User } from "@/types/user";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { PhoneInput } from "@/components/custom-ui/PhoneInput";
 import {
@@ -22,6 +24,7 @@ import {
 } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
 import { format } from "date-fns";
+
 interface UserProfileFormProps {
   user?: User;
   isEditMode: boolean;
@@ -29,8 +32,8 @@ interface UserProfileFormProps {
   setFormData: (data: any) => void;
   onFullNameValidChange?: (valid: boolean) => void;
   isProfileView?: boolean;
-  hideAccount?: boolean;
 }
+
 export default function UserProfileForm({
   user,
   isEditMode,
@@ -38,20 +41,22 @@ export default function UserProfileForm({
   setFormData,
   onFullNameValidChange,
   isProfileView,
-  hideAccount = false,
 }: UserProfileFormProps) {
   const t = useTranslations("user");
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const handleBirthDateChange = (date: Date | undefined) => {
     setFormData({
       ...formData,
       birth_date: date ? format(date, "yyyy-MM-dd") : undefined,
     });
   };
+
   useEffect(() => {
     if (isEditMode && onFullNameValidChange) {
       const val = formData.full_name || "";
@@ -59,6 +64,7 @@ export default function UserProfileForm({
       onFullNameValidChange(valid);
     }
   }, [isEditMode, formData.full_name, onFullNameValidChange]);
+  
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
@@ -68,44 +74,6 @@ export default function UserProfileForm({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {!hideAccount && (
-          <div className="space-y-4">
-            <h3 className="font-semibold text-lg">{t("accountSection")}</h3>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="email"
-                  variant={isEditMode ? "required" : "default"}
-                >
-                  {t("email")}
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required={isEditMode}
-                  value={formData.email || ""}
-                  onChange={handleInputChange}
-                  placeholder={t("enterEmail")}
-                  disabled={!isEditMode || isProfileView}
-                />
-              </div>
-              {isEditMode && !isProfileView && (
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    value={formData.password || ""}
-                    onChange={handleInputChange}
-                    placeholder={t("enterPassword")}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        )}
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">{t("profileSection")}</h3>
           <div className="grid gap-4 sm:grid-cols-2">

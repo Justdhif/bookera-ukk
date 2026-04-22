@@ -40,10 +40,7 @@ class FineTypeController extends Controller
         return ApiResponse::successResponse('Tipe denda berhasil dibuat', $fineType, 201);
     }
 
-    public function show(FineType $fineType): JsonResponse
-    {
-        return ApiResponse::successResponse('Detail tipe denda', $fineType);
-    }
+
 
     public function update(UpdateFineTypeRequest $request, FineType $fineType): JsonResponse
     {

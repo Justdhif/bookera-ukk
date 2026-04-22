@@ -15,8 +15,7 @@ export const authorService = {
       params: filters,
     }),
 
-  getById: (id: number) =>
-    api.get<ApiResponse<Author>>(`/admin/authors/${id}`),
+
 
   create: (data: CreateAuthorData) =>
     api.post<ApiResponse<Author>>("/admin/authors", buildAuthorFormData(data), {

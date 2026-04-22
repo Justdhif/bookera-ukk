@@ -34,12 +34,7 @@ class UserController extends Controller
         return ApiResponse::successResponse('User data retrieved successfully', $users);
     }
 
-    public function show(User $user): JsonResponse
-    {
-        $user = $this->userService->getById($user);
 
-        return ApiResponse::successResponse('User details', $user);
-    }
 
     public function showBySlug(string $slug): JsonResponse
     {

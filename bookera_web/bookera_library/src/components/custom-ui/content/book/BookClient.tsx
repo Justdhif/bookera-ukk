@@ -40,7 +40,7 @@ export default function BookClient() {
       const res = await categoryService.getAll();
       setCategories(res.data.data.data || []);
     } catch (error) {
-      toast.error("Failed to load categories");
+      toast.error(t("loadCategoriesError"));
       console.error("Error fetching categories:", error);
     } finally {
       setCategoriesLoading(false);
@@ -78,7 +78,7 @@ export default function BookClient() {
 
   const confirmDelete = async () => {
     if (!deleteId) {
-      toast.error("An error occurred");
+      toast.error(t("genericError"));
       return;
     }
     await bookService.delete(deleteId);

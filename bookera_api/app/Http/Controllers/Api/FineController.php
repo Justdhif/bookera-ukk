@@ -56,19 +56,9 @@ class FineController extends Controller
         return ApiResponse::successResponse('Denda berhasil dibuat', $fine, 201);
     }
 
-    public function show(FineBorrow $fine): JsonResponse
-    {
-        $fine->load(['borrow.user.profile', 'fineType']);
 
-        return ApiResponse::successResponse('Detail denda', $fine);
-    }
 
-    public function update(UpdateFineRequest $request, FineBorrow $fine): JsonResponse
-    {
-        $fine = $this->fineService->update($fine, $request->validated());
 
-        return ApiResponse::successResponse('Denda berhasil diupdate', $fine);
-    }
 
     public function markAsPaid(Request $request, FineBorrow $fine): JsonResponse
     {

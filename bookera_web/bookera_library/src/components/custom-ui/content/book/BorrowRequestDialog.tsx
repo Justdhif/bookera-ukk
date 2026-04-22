@@ -21,7 +21,7 @@ import { borrowRequestService } from "@/services/borrow-request.service";
 import { publicService } from "@/services/public.service";
 import { Book } from "@/types/book";
 import Image from "next/image";
-import { BookOpen, Building2, Star, AlertCircle } from "lucide-react";
+import { BookOpen, Building2, Star, AlertCircle, Calendar } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -105,12 +105,12 @@ export default function BorrowRequestDialog({
         );
 
         if (!cancelled) {
-          const fetchedBooks = responses.map((response) => response.data.data);
+          const fetchedBooks = responses.map((response: any) => response.data.data);
           const mergedBooks = uniqueBookIds
             .map(
               (bookId) =>
-                cachedBooks.find((book) => book.id === bookId) ??
-                fetchedBooks.find((book) => book.id === bookId),
+                cachedBooks.find((book: Book) => book.id === bookId) ??
+                fetchedBooks.find((book: Book) => book.id === bookId),
             )
             .filter((book): book is Book => Boolean(book));
           setSelectedBooks(mergedBooks);
@@ -311,11 +311,12 @@ export default function BorrowRequestDialog({
 
             <div className="space-y-2">
               <Label>{t("returnDateLabel")}</Label>
-              <div className="flex h-10 w-full rounded-2xl border border-border bg-muted/30 px-3 py-2 text-sm items-center text-muted-foreground cursor-not-allowed">
+              <div className="flex h-9 w-full items-center gap-2 rounded-md border border-input bg-muted/30 px-3 py-2 text-sm font-normal text-muted-foreground cursor-not-allowed">
+                <Calendar className="h-4 w-4 shrink-0 opacity-50" />
                 {returnDate ? format(returnDate, "PPP") : t("selectBorrowDateFirst")}
               </div>
               <p className="text-[10px] text-primary/80 font-medium px-1">
-                {t("autoReturnDateInfo") || "* Otomatis diset 5 hari dari tanggal pinjam"}
+                {t("autoReturnDateInfo")}
               </p>
             </div>
           </div>

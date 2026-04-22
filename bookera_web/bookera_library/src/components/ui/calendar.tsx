@@ -11,6 +11,13 @@ import {
   getDefaultClassNames,
   type DayButton,
 } from "react-day-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -52,17 +59,17 @@ function Calendar({
         ),
         month: cn("flex w-full flex-col gap-3", defaultClassNames.month),
         nav: cn(
-          "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-2 px-1",
+          "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-2 px-1 pointer-events-none",
           defaultClassNames.nav,
         ),
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
-          "size-(--cell-size) rounded-full border border-border/70 bg-background/80 p-0 shadow-sm backdrop-blur-sm aria-disabled:opacity-40",
+          "size-(--cell-size) rounded-full border border-border/70 bg-background/80 p-0 shadow-sm backdrop-blur-sm aria-disabled:opacity-40 pointer-events-auto",
           defaultClassNames.button_previous,
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
-          "size-(--cell-size) rounded-full border border-border/70 bg-background/80 p-0 shadow-sm backdrop-blur-sm aria-disabled:opacity-40",
+          "size-(--cell-size) rounded-full border border-border/70 bg-background/80 p-0 shadow-sm backdrop-blur-sm aria-disabled:opacity-40 pointer-events-auto",
           defaultClassNames.button_next,
         ),
         month_caption: cn(
@@ -111,17 +118,17 @@ function Calendar({
           defaultClassNames.day,
         ),
         range_start: cn(
-          "rounded-l-xl bg-primary",
+          "rounded-l-xl bg-brand-primary",
           defaultClassNames.range_start,
         ),
-        range_middle: cn("rounded-none bg-primary/10", defaultClassNames.range_middle),
-        range_end: cn("rounded-r-xl bg-primary", defaultClassNames.range_end),
+        range_middle: cn("rounded-none bg-brand-primary/10", defaultClassNames.range_middle),
+        range_end: cn("rounded-r-xl bg-brand-primary", defaultClassNames.range_end),
         today: cn(
-          "rounded-xl border border-primary/30 bg-primary/10 text-primary data-[selected=true]:rounded-none",
+          "rounded-xl border border-brand-primary/30 bg-brand-primary/10 text-brand-primary data-[selected=true]:rounded-none",
           defaultClassNames.today,
         ),
         outside: cn(
-          "text-muted-foreground/50 aria-selected:text-muted-foreground/60",
+          "text-muted-foreground/30 opacity-50",
           defaultClassNames.outside,
         ),
         disabled: cn(
@@ -172,6 +179,43 @@ function Calendar({
             </td>
           );
         },
+        Dropdown: ({ value, options, onChange, "aria-label": ariaLabel }) => {
+          const selected = options?.find((option) => option.value === value);
+          const handleChange = (value: string) => {
+            const changeEvent = {
+              target: { value },
+            } as React.ChangeEvent<HTMLSelectElement>;
+            onChange?.(changeEvent);
+          };
+
+          return (
+            <div className="relative inline-flex items-center" onClick={(e) => e.stopPropagation()}>
+              <Select
+                value={value?.toString()}
+                onValueChange={handleChange}
+              >
+                <SelectTrigger
+                  aria-label={ariaLabel}
+                  className="h-8 w-fit gap-1.5 border-none bg-transparent px-2 py-1 text-sm font-bold shadow-none transition-colors hover:bg-accent focus:ring-0 [&>svg]:opacity-50"
+                >
+                  <SelectValue>{selected?.label}</SelectValue>
+                </SelectTrigger>
+                <SelectContent align="center" className="max-h-60 overflow-y-auto z-60">
+                  {options?.map((option) => (
+                    <SelectItem
+                      key={option.value}
+                      value={option.value.toString()}
+                      disabled={option.disabled}
+                      className="text-xs"
+                    >
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         ...components,
       }}
       {...props}
@@ -207,8 +251,9 @@ function CalendarDayButton({
       data-range-start={modifiers.range_start}
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
+      data-outside={modifiers.outside}
       className={cn(
-        "flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 rounded-xl border border-transparent leading-none font-medium text-foreground/90 transition-all hover:border-primary/20 hover:bg-primary/10 hover:text-primary group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-2 group-data-[focused=true]/day:ring-primary/30 data-[selected-single=true]:border-primary data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[selected-single=true]:shadow-sm data-[range-start=true]:rounded-l-xl data-[range-start=true]:border-primary data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:rounded-r-xl data-[range-end=true]:border-primary data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-primary/10 data-[range-middle=true]:text-primary [&>span]:text-xs [&>span]:opacity-80",
+        "flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 rounded-xl border border-transparent leading-none font-medium text-foreground/90 transition-all hover:border-brand-primary/20 hover:bg-brand-primary/10 hover:text-brand-primary group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-2 group-data-[focused=true]/day:ring-brand-primary/30 data-[selected-single=true]:border-brand-primary data-[selected-single=true]:bg-brand-primary data-[selected-single=true]:text-white data-[selected-single=true]:shadow-sm data-[range-start=true]:rounded-l-xl data-[range-start=true]:border-brand-primary data-[range-start=true]:bg-brand-primary data-[range-start=true]:text-white data-[range-end=true]:rounded-r-xl data-[range-end=true]:border-brand-primary data-[range-end=true]:bg-brand-primary data-[range-end=true]:text-white data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-brand-primary/10 data-[range-middle=true]:text-brand-primary data-[outside=true]:text-muted-foreground/30 data-[outside=true]:font-normal [&>span]:text-xs [&>span]:opacity-80",
         defaultClassNames.day,
         className,
       )}

@@ -74,7 +74,7 @@ export default function UserSideCard({
   const getRoleDisplay = (role: string) => {
     switch (role) {
       case "admin":
-        return "Admin";
+        return t("admin");
       case "officer:catalog":
         return t("officerCatalog");
       case "officer:management":
@@ -82,7 +82,7 @@ export default function UserSideCard({
       case "user":
         return t("user");
       default:
-        return "Select Role";
+        return t("selectRole");
     }
   };
 
@@ -93,10 +93,10 @@ export default function UserSideCard({
           <CardTitle>{t("avatarTitle")}</CardTitle>
           <CardDescription>
             {isAddMode
-              ? "Upload a profile photo for the user"
+              ? t("addUserDesc")
               : isEditMode
-                ? "Upload user profile picture"
-                : "User photo"}
+                ? t("uploadAvatar")
+                : t("avatarTitle")}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
@@ -155,17 +155,30 @@ export default function UserSideCard({
               />
             </div>
             <div className="space-y-1.5">
-              <Label
-                htmlFor="sc-password"
-                variant={isAddMode ? "required" : "default"}
-              >
-                Password
-                {!isAddMode && (
-                  <span className="text-xs font-normal text-muted-foreground">
-                    (leave empty to keep)
-                  </span>
-                )}
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label
+                  htmlFor="sc-password"
+                  variant={isAddMode ? "required" : "default"}
+                >
+                  {t("passwordLabel")}
+                  {!isAddMode && (
+                    <span className="text-xs font-normal text-muted-foreground ml-1">
+                      ({t("leaveEmptyToKeep")})
+                    </span>
+                  )}
+                </Label>
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  onClick={() =>
+                    setFormData({ ...formData, password: "Bookera09#" })
+                  }
+                  className="h-auto p-0 text-[10px] font-medium"
+                >
+                  {t("defaultPassword")}
+                </Button>
+              </div>
               <Input
                 id="sc-password"
                 type="password"
@@ -175,8 +188,8 @@ export default function UserSideCard({
                 }
                 placeholder={
                   isAddMode
-                    ? "Create a strong password"
-                    : "New password (optional)"
+                    ? t("createStrongPassword")
+                    : t("newPasswordOptional")
                 }
                 required={isAddMode}
                 disabled={!canEdit}
@@ -190,7 +203,7 @@ export default function UserSideCard({
           <div className="space-y-2 w-full">
             <div className="flex items-center gap-2">
               <Label className="text-muted-foreground text-xs w-16">
-                Role:
+                {t("role")}:
               </Label>
               <Select
                 value={formData.role}
@@ -216,7 +229,7 @@ export default function UserSideCard({
             </div>
             <div className="flex items-center gap-2">
               <Label className="text-muted-foreground text-xs w-16">
-                Status:
+                {t("status")}:
               </Label>
               <Select
                 value={formData.is_active ? "active" : "inactive"}
@@ -245,7 +258,7 @@ export default function UserSideCard({
                   href="/admin/borrows"
                   className="text-xs text-primary hover:underline"
                 >
-                  View All
+                  {t("viewAllBorrows")}
                 </Link>
               </div>
               {recentBorrows.length > 0 ? (
@@ -258,8 +271,7 @@ export default function UserSideCard({
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium truncate">
-                          {borrow.borrow_details.length} book
-                          {borrow.borrow_details.length !== 1 ? "s" : ""}
+                          {t("bookCount", { count: borrow.borrow_details.length })}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {new Date(borrow.borrow_date).toLocaleDateString(

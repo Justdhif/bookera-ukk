@@ -49,16 +49,7 @@ class PublisherController extends Controller
         return ApiResponse::successResponse('Penerbit berhasil ditambahkan', $publisher, 201);
     }
 
-    public function show(Publisher $publisher): JsonResponse
-    {
-        $publisher = $this->publisherService->getById($publisher->id);
 
-        if (!$publisher) {
-            return ApiResponse::errorResponse('Penerbit tidak ditemukan', null, 404);
-        }
-
-        return ApiResponse::successResponse('Data penerbit berhasil diambil', $publisher);
-    }
 
     public function update(UpdatePublisherRequest $request, Publisher $publisher): JsonResponse
     {

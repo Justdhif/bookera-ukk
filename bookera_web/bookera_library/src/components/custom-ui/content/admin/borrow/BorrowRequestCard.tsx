@@ -15,7 +15,6 @@ import {
   Calendar,
   User,
   Eye,
-  Trash2,
   ArrowRight,
   Hash,
   Tag,
@@ -27,10 +26,9 @@ import { useTranslations } from "next-intl";
 
 interface BorrowRequestCardProps {
   req: BorrowRequest;
-  onDelete: (id: number) => void;
 }
 
-export function BorrowRequestCard({ req, onDelete }: BorrowRequestCardProps) {
+export function BorrowRequestCard({ req }: BorrowRequestCardProps) {
   const t = useTranslations("public");
   const tCommon = useTranslations("common");
   
@@ -61,14 +59,7 @@ export function BorrowRequestCard({ req, onDelete }: BorrowRequestCardProps) {
           </div>
 
           <div className="flex gap-2 items-center self-end md:self-center">
-            <Button
-              size="sm"
-              variant="destructive"
-              className="h-9 w-9 p-0 rounded-full shadow-sm hover:shadow-destructive/20"
-              onClick={() => onDelete(req.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+
             <Link href={`/admin/borrow-requests/${req.id}`}>
               <Button
                 size="sm"

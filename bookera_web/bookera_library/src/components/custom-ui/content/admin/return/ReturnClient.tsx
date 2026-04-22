@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { PackageCheck, Search } from "lucide-react";
-
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
@@ -13,7 +12,6 @@ import { borrowService } from "@/services/borrow.service";
 import { Borrow, BorrowFilterParams } from "@/types/borrow";
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { toast } from "sonner";
-
 import { ReturnCard } from "./ReturnCard";
 
 export default function ReturnClient() {
@@ -112,14 +110,14 @@ export default function ReturnClient() {
           <p className="text-sm text-muted-foreground">{t("returnedDesc")}</p>
         </div>
 
-        <div className="flex gap-2">
-          <div className="relative flex-1">
+        <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+          <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={t("searchByUserOrTitle")}
               value={searchInput}
               onChange={handleSearchChange}
-              className="pl-10"
+              className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
             />
           </div>
         </div>

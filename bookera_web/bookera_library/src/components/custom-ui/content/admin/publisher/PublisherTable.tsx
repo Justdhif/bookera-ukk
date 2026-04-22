@@ -11,19 +11,21 @@ import { Button } from "@/components/ui/button";
 import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import { Publisher } from "@/types/publisher";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { Building2, Eye, Trash } from "lucide-react";
+import { Building2, Edit, Trash } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+
 export default function PublisherTable({
   data,
-  onView,
+  onEdit,
   onDelete,
 }: {
   data: Publisher[];
-  onView: (publisher: Publisher) => void;
+  onEdit: (publisher: Publisher) => void;
   onDelete: (id: number) => void;
 }) {
   const t = useTranslations("publisher");
+
   if (data.length === 0) {
     return (
       <EmptyState
@@ -33,6 +35,7 @@ export default function PublisherTable({
       />
     );
   }
+
   return (
     <Table>
       <TableHeader>
@@ -88,12 +91,12 @@ export default function PublisherTable({
               <div className="flex justify-end items-center gap-2">
                 <Button
                   size="sm"
-                  variant="outline"
-                  onClick={() => onView(item)}
+                  variant="brand"
+                  onClick={() => onEdit(item)}
                   className="h-8 gap-1"
                 >
-                  <Eye className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t("view")}</span>
+                  <Edit className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{t("edit")}</span>
                 </Button>
                 <Button
                   size="sm"

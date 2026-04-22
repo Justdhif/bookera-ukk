@@ -31,12 +31,14 @@ class PublicController extends Controller
         return ApiResponse::successResponse('Book data retrieved successfully', $books);
     }
 
+
+
     /**
-     * Display the specified book by ID.
+     * Display the specified book by slug.
      */
-    public function bookShow(int $id): JsonResponse
+    public function bookBySlug(string $slug): JsonResponse
     {
-        $book = $this->publicService->getBookById($id);
+        $book = $this->publicService->getBookBySlug($slug);
 
         if (!$book) {
             return ApiResponse::errorResponse('Book not found', null, 404);
@@ -46,11 +48,11 @@ class PublicController extends Controller
     }
 
     /**
-     * Display the specified book by slug.
+     * Display the specified book by ID.
      */
-    public function bookBySlug(string $slug): JsonResponse
+    public function bookById(int $id): JsonResponse
     {
-        $book = $this->publicService->getBookBySlug($slug);
+        $book = $this->publicService->getBookById($id);
 
         if (!$book) {
             return ApiResponse::errorResponse('Book not found', null, 404);
@@ -69,19 +71,7 @@ class PublicController extends Controller
         return ApiResponse::successResponse('Data penulis berhasil diambil', $authors);
     }
 
-    /**
-     * Display the specified author by ID.
-     */
-    public function authorShow(int $id): JsonResponse
-    {
-        $author = $this->publicService->getAuthorById($id);
 
-        if (!$author) {
-            return ApiResponse::errorResponse('Penulis tidak ditemukan', null, 404);
-        }
-
-        return ApiResponse::successResponse('Data penulis berhasil diambil', $author);
-    }
 
     /**
      * Display the specified author by slug.
@@ -107,19 +97,7 @@ class PublicController extends Controller
         return ApiResponse::successResponse('Data penerbit berhasil diambil', $publishers);
     }
 
-    /**
-     * Display the specified publisher by ID.
-     */
-    public function publisherShow(int $id): JsonResponse
-    {
-        $publisher = $this->publicService->getPublisherById($id);
 
-        if (!$publisher) {
-            return ApiResponse::errorResponse('Penerbit tidak ditemukan', null, 404);
-        }
-
-        return ApiResponse::successResponse('Data penerbit berhasil diambil', $publisher);
-    }
 
     /**
      * Display the specified publisher by slug.

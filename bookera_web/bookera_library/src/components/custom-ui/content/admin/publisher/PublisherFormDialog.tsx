@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
@@ -12,19 +13,22 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { publisherService } from "@/services/publisher.service";
-import { CreatePublisherData } from "@/types/publisher";
+import { CreatePublisherData, Publisher } from "@/types/publisher";
 import { toast } from "sonner";
 import { Building2, FileWarning, Upload, X, Trash, Eye } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+
 export default function PublisherFormDialog({
   open,
   setOpen,
+  publisher = null,
   onSuccess,
 }: {
   open: boolean;
   setOpen: (v: boolean) => void;
+  publisher?: Publisher | null;
   onSuccess: () => void;
 }) {
   const t = useTranslations("publisher");
@@ -39,33 +43,47 @@ export default function PublisherFormDialog({
   const [isDragging, setIsDragging] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
-    if (!open) {
-      setFormData({ name: "", description: "", is_active: true, photo: null });
-      setPhotoPreview("");
+    if (open) {
+      if (publisher) {
+        setFormData({
+          name: publisher.name,
+          description: publisher.description || "",
+          is_active: publisher.is_active,
+          photo: null,
+        });
+        setPhotoPreview(publisher.photo);
+      } else {
+        setFormData({ name: "", description: "", is_active: true, photo: null });
+        setPhotoPreview("");
+      }
       setPhotoError(null);
       setIsDragging(false);
     }
-  }, [open]);
+  }, [open, publisher]);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
   const handleSwitchChange = (checked: boolean) => {
     setFormData((prev) => ({ ...prev, is_active: checked }));
   };
+
   const handleFileSelect = (file: File) => {
     const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     if (!allowed.includes(file.type)) {
-      const msg = "Only JPG, PNG or WEBP images are allowed";
+      const msg = t("invalidFileType");
       setPhotoError(msg);
       toast.error(msg);
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      const msg = "Image must be less than 2MB";
+      const msg = t("fileSizeExceed");
       setPhotoError(msg);
       toast.error(msg);
       return;
@@ -76,40 +94,50 @@ export default function PublisherFormDialog({
     reader.onloadend = () => setPhotoPreview(reader.result as string);
     reader.readAsDataURL(file);
   };
+
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) handleFileSelect(file);
   };
+
   const handleRemovePhoto = () => {
     setFormData((prev) => ({ ...prev, photo: null }));
     setPhotoPreview("");
     setPhotoError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
+
   const isSubmitDisabled = () =>
-    isLoading || !formData.name.trim() || !formData.photo;
+    isLoading || !formData.name.trim() || (!publisher && !formData.photo);
+
   const handleSubmit = async () => {
-    if (!formData.photo) {
+    if (!publisher && !formData.photo) {
       toast.error(t("photoRequired"));
       return;
     }
     setIsLoading(true);
     try {
-      await publisherService.create(formData);
-      toast.success(t("addSuccess"));
+      if (publisher) {
+        await publisherService.update(publisher.id, formData);
+        toast.success(t("updateSuccess"));
+      } else {
+        await publisherService.create(formData);
+        toast.success(t("addSuccess"));
+      }
       setOpen(false);
       onSuccess();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to add publisher");
+      toast.error(err.response?.data?.message || (publisher ? t("updateError") : t("addError")));
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{t("addPublisher")}</DialogTitle>
+          <DialogTitle>{publisher ? t("editPublisher") : t("addPublisher")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-5">
           <div className="space-y-2">
@@ -172,12 +200,11 @@ export default function PublisherFormDialog({
                         handleRemovePhoto();
                       }}
                     >
-                      <Trash className="w-4 h-4 mr-2" />{" "}
                       <X className="h-3 w-3" />
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Click X to remove or drag a new photo
+                    {t("removePhotoHint")}
                   </p>
                 </div>
               ) : (
@@ -212,7 +239,7 @@ export default function PublisherFormDialog({
                 onClick={() => fileInputRef.current?.click()}
                 className="w-full gap-2"
               >
-                <Eye className="w-4 h-4 mr-2" /> <Upload className="h-4 w-4" />
+                <Upload className="h-4 w-4" />
                 {photoPreview ? t("changePhoto") : t("browseFiles")}
               </Button>
               <p className="text-xs text-muted-foreground text-center">
@@ -263,7 +290,7 @@ export default function PublisherFormDialog({
             loading={isLoading}
             className="w-full"
           >
-            {t("addPublisher")}
+            {publisher ? t("saveChanges") : t("addPublisher")}
           </Button>
         </div>
       </DialogContent>

@@ -65,7 +65,7 @@ export default function DeleteConfirmDialog({
         <DialogFooter className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-2 mt-6">
           <Button
             type="button"
-            variant="brand"
+            variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isDeleting}
             className="w-full sm:w-auto sm:flex-1 h-11 font-medium border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 transition-all duration-200"
@@ -77,17 +77,10 @@ export default function DeleteConfirmDialog({
             variant="destructive"
             onClick={handleConfirm}
             disabled={isDeleting}
+            loading={isDeleting}
             className="w-full sm:w-auto sm:flex-1 h-11 font-medium bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 shadow-sm transition-all duration-200"
           >
-            <Trash className="w-4 h-4 mr-2" />{" "}
-            {isDeleting ? (
-              <span className="flex items-center justify-center">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t("loading")}...
-              </span>
-            ) : (
-              confirmText || t("delete")
-            )}
+            {isDeleting ? t("loading") : t("delete")}
           </Button>
         </DialogFooter>
       </DialogContent>

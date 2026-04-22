@@ -34,10 +34,13 @@ export const publicService = {
     return api.get<ApiResponse<BookListResponse>>("/books", { params });
   },
 
-  getBookById: (id: number) => api.get<ApiResponse<Book>>(`/books/${id}`),
+
 
   getBookBySlug: (slug: string) =>
     api.get<ApiResponse<Book>>(`/books/slug/${slug}`),
+
+  getBookById: (id: number) =>
+    api.get<ApiResponse<Book>>(`/books/${id}`),
 
   // Authors
   getAuthors: (filters?: AuthorFilterParams) =>
@@ -45,7 +48,7 @@ export const publicService = {
       params: { ...filters, is_active: true },
     }),
 
-  getAuthorById: (id: number) => api.get<ApiResponse<Author>>(`/authors/${id}`),
+
   
   getAuthorBySlug: (slug: string) => 
     api.get<ApiResponse<Author>>(`/authors/slug/${slug}`),
@@ -56,8 +59,7 @@ export const publicService = {
       params: { ...filters, is_active: true },
     }),
 
-  getPublisherById: (id: number) =>
-    api.get<ApiResponse<Publisher>>(`/publishers/${id}`),
+
     
   getPublisherBySlug: (slug: string) => 
     api.get<ApiResponse<Publisher>>(`/publishers/slug/${slug}`),

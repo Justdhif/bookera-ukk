@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { ClipboardList, Search } from "lucide-react";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import { Input } from "@/components/ui/input";
 import BorrowRequestListItem from "./BorrowRequestListItem";
@@ -34,7 +33,7 @@ export default function BorrowRequestClient() {
     from: 0,
     to: 0,
   });
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setFilters((prev) => ({
@@ -45,8 +44,10 @@ export default function BorrowRequestClient() {
     }, 500);
     return () => clearTimeout(timer);
   }, [searchInput]);
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSearchInput(e.target.value);
+
   const fetchRequests = async (activeFilters: {
     search?: string;
     per_page?: number;
@@ -70,25 +71,12 @@ export default function BorrowRequestClient() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchRequests(filters);
   }, [filters]);
 
-  const handleDelete = (id: number) => {
-    setDeleteId(id);
-  };
 
-  const confirmDelete = async () => {
-    if (!deleteId) return;
-    try {
-      await borrowRequestService.delete(deleteId);
-      toast.success(t("deleteSuccess"));
-      setDeleteId(null);
-      fetchRequests(filters);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || t("deleteError"));
-    }
-  };
   return (
     <div className="space-y-6">
       <ContentHeader
@@ -129,19 +117,12 @@ export default function BorrowRequestClient() {
               <BorrowRequestListItem
                 key={req.id}
                 request={req}
-                onDelete={handleDelete}
               />
             ))}
           </div>
         )}
       </PaginatedContent>
-      <DeleteConfirmDialog
-        open={deleteId !== null}
-        onOpenChange={(open) => !open && setDeleteId(null)}
-        title={t("deleteRequest")}
-        description={t("deleteDesc")}
-        onConfirm={confirmDelete}
-      />
+
     </div>
   );
 }

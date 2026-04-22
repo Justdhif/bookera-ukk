@@ -215,21 +215,7 @@ class BorrowService
         return $borrow;
     }
 
-    public function getById(Borrow $borrow): Borrow
-    {
-        return $borrow->load([
-            'borrowDetails.bookCopy.book.authors',
-            'borrowDetails.bookCopy.book.publishers',
-            'borrowDetails.bookCopy.book.categories',
-            'borrowRequest.borrowRequestDetails.book',
-            'user.profile',
-            'bookReturns.details.bookCopy.book.authors',
-            'bookReturns.details.bookCopy.book.publishers',
-            'bookReturns.details.bookCopy.book.categories',
-            'fines.fineType',
-            'lostBooks.details.bookCopy.book.authors',
-        ]);
-    }
+
 
     public function getByCode(string $code): Borrow
     {

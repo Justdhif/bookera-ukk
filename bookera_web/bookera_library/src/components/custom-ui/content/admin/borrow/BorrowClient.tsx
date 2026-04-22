@@ -51,7 +51,7 @@ export default function BorrowClient() {
     from: 0,
     to: 0,
   });
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+
 
   const fetchBorrows = async (activeFilters: BorrowFilterParams) => {
     setLoadingBorrows(true);
@@ -132,19 +132,7 @@ export default function BorrowClient() {
     fetchRequests(requestFilters);
   }, [requestFilters]);
 
-  const handleDeleteRequest = (id: number) => setDeleteId(id);
 
-  const confirmDeleteRequest = async () => {
-    if (!deleteId) return;
-    try {
-      await borrowRequestService.delete(deleteId);
-      toast.success(t("deleteRequestSuccess"));
-      setDeleteId(null);
-      fetchRequests(requestFilters);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || t("deleteRequestError"));
-    }
-  };
 
   const renderBorrowCards = (borrows: Borrow[]) => {
     if (borrows.length === 0) {
@@ -227,14 +215,14 @@ export default function BorrowClient() {
                 <h3 className="text-lg font-semibold">{label}</h3>
                 <p className="text-sm text-muted-foreground">{desc}</p>
               </div>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
+              <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+                <div className="relative flex-1 w-full">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder={t("searchByUserOrTitle")}
                     value={borrowSearch}
                     onChange={handleBorrowSearchChange}
-                    className="pl-10"
+                    className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
                   />
                 </div>
               </div>
@@ -270,14 +258,14 @@ export default function BorrowClient() {
                 {t("borrowRequestsDesc")}
               </p>
             </div>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
+            <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+              <div className="relative flex-1 w-full">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder={t("searchByNameOrTitle")}
                   value={requestSearch}
                   onChange={handleRequestSearchChange}
-                  className="pl-9"
+                  className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
                 />
               </div>
             </div>
@@ -309,7 +297,6 @@ export default function BorrowClient() {
                     <BorrowRequestCard
                       key={req.id}
                       req={req}
-                      onDelete={handleDeleteRequest}
                     />
                   ))}
                 </div>
@@ -318,14 +305,6 @@ export default function BorrowClient() {
           </div>
         </TabsContent>
       </Tabs>
-
-      <DeleteConfirmDialog
-        open={deleteId !== null}
-        onOpenChange={(open) => !open && setDeleteId(null)}
-        title={t("deleteBorrowRequest")}
-        description={t("deleteBorrowRequestDesc")}
-        onConfirm={confirmDeleteRequest}
-      />
     </div>
   );
 }

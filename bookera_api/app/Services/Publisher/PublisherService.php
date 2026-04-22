@@ -34,15 +34,9 @@ class PublisherService
         return $query->paginate((int) $perPage);
     }
 
-    public function getById(int $id): ?Publisher
-    {
-        return Publisher::find($id);
-    }
 
-    public function getBySlug(string $slug): ?Publisher
-    {
-        return Publisher::where('slug', $slug)->first();
-    }
+
+
 
     public function create(array $data, UploadedFile $photo): Publisher
     {

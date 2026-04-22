@@ -33,7 +33,7 @@ class StoreUserRequest extends FormRequest
         return [
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'role' => ['required', Rule::in(['admin', 'officer', 'user'])],
+            'role' => ['required', Rule::in(['admin', 'officer:catalog', 'officer:management', 'user'])],
             'is_active' => 'nullable|in:true,false,1,0',
             'full_name' => 'required|string|max:255',
             'gender' => ['nullable', Rule::in(['male', 'female', 'prefer_not_to_say'])],

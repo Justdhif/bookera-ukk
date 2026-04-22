@@ -26,9 +26,11 @@ interface AvatarUploadModalProps {
   isRequired?: boolean;
 }
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024;
-const ALLOWED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
-const ALLOWED_FILE_EXTENSIONS = [".jpg", ".jpeg", ".png"];
+import {
+  MAX_AVATAR_SIZE as MAX_FILE_SIZE,
+  ALLOWED_FILE_TYPES,
+  ALLOWED_FILE_EXTENSIONS,
+} from "@/constants/file";
 
 const DEFAULT_AVATARS = [
   "https://api.dicebear.com/7.x/bottts/png?seed=1&backgroundColor=b6e3f4,c7d2fe,ddd6fe",

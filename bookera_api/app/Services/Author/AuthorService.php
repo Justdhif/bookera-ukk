@@ -34,15 +34,9 @@ class AuthorService
         return $query->paginate((int) $perPage);
     }
 
-    public function getById(int $id): ?Author
-    {
-        return Author::find($id);
-    }
 
-    public function getBySlug(string $slug): ?Author
-    {
-        return Author::where('slug', $slug)->first();
-    }
+
+
 
     public function create(array $data, UploadedFile $photo): Author
     {

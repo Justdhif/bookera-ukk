@@ -45,27 +45,9 @@ class BookController extends Controller
         return ApiResponse::successResponse('Book added successfully', $book, 201);
     }
 
-    public function show(int $id): JsonResponse
-    {
-        $book = $this->bookService->getById($id);
 
-        if (!$book) {
-            return ApiResponse::errorResponse('Book not found', 404);
-        }
 
-        return ApiResponse::successResponse('Book details', $book);
-    }
 
-    public function showBySlug(string $slug): JsonResponse
-    {
-        $book = $this->bookService->getBySlug($slug);
-
-        if (!$book) {
-            return ApiResponse::errorResponse('Book not found', 404);
-        }
-
-        return ApiResponse::successResponse('Book details', $book);
-    }
 
     public function update(UpdateBookRequest $request, Book $book): JsonResponse
     {
@@ -76,6 +58,28 @@ class BookController extends Controller
         );
 
         return ApiResponse::successResponse('Book updated successfully', $book);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        $book = $this->bookService->getById($id);
+
+        if (!$book) {
+            return ApiResponse::errorResponse('Book not found', 404);
+        }
+
+        return ApiResponse::successResponse('Book details retrieved successfully', $book);
+    }
+
+    public function showBySlug(string $slug): JsonResponse
+    {
+        $book = $this->bookService->getBySlug($slug);
+
+        if (!$book) {
+            return ApiResponse::errorResponse('Book not found', 404);
+        }
+
+        return ApiResponse::successResponse('Book details retrieved successfully', $book);
     }
 
     public function destroy(int $id): JsonResponse

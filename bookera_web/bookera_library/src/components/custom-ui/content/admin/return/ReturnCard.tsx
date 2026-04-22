@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BookOpen, Building2, Calendar, DollarSign, Eye, Hash, Receipt, Tag, User, ArrowRight } from "lucide-react";
+import { BookOpen, Building2, Calendar, DollarSign, Eye, Hash, Receipt, Tag, User } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
@@ -82,7 +82,11 @@ export function ReturnCard({ borrow }: ReturnCardProps) {
     .filter((fine) => fine.status === "unpaid")
     .reduce((sum, fine) => sum + Number(fine.amount), 0);
 
-  const detailLink = latestReturn ? `/admin/returns/${latestReturn.id}` : null;
+  const detailLink = borrow.borrow_code
+    ? `/admin/borrows/${borrow.borrow_code}`
+    : borrow.id
+      ? `/admin/borrows/${borrow.id}`
+      : null;
 
   return (
     <Card className="group relative overflow-hidden border-2 transition-all duration-300 hover:shadow-premium">
@@ -143,7 +147,7 @@ export function ReturnCard({ borrow }: ReturnCardProps) {
                   className="h-8 gap-1"
                 >
                   <Eye className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t("detailsBtn")}</span>
+                  <span className="hidden sm:inline">{t("viewBtn")}</span>
                 </Button>
               </Link>
             )}

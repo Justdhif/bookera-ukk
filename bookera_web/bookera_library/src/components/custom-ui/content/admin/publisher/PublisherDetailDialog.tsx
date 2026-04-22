@@ -82,13 +82,13 @@ export default function PublisherDetailDialog({
   const handleFileSelect = (file: File) => {
     const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     if (!allowed.includes(file.type)) {
-      const msg = "Only JPG, PNG or WEBP images are allowed";
+      const msg = t("invalidFileType");
       setPhotoError(msg);
       toast.error(msg);
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      const msg = "Image must be less than 2MB";
+      const msg = t("fileSizeExceed");
       setPhotoError(msg);
       toast.error(msg);
       return;
@@ -122,7 +122,7 @@ export default function PublisherDetailDialog({
       setIsEditMode(false);
       onSuccess();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to update publisher");
+      toast.error(err.response?.data?.message || t("updateError"));
     } finally {
       setIsLoading(false);
     }
@@ -152,7 +152,7 @@ export default function PublisherDetailDialog({
                 className="h-7 gap-1"
               >
                 <Edit className="h-3.5 w-3.5" />
-                Edit
+                {t("edit")}
               </Button>
             )}
           </div>
@@ -217,7 +217,7 @@ export default function PublisherDetailDialog({
                       />
                     </div>
                     {isEditMode && (
-                      <Button
+                    <Button
                         type="button"
                         variant="destructive"
                         size="icon"
@@ -227,14 +227,13 @@ export default function PublisherDetailDialog({
                           handleRemovePhoto();
                         }}
                       >
-                        <Trash className="w-4 h-4 mr-2" />{" "}
                         <X className="h-3 w-3" />
                       </Button>
                     )}
                   </div>
                   {isEditMode && (
                     <p className="text-xs text-muted-foreground">
-                      Click X to revert or drag a new photo
+                      {t("revertPhotoHint")}
                     </p>
                   )}
                 </div>
@@ -271,7 +270,7 @@ export default function PublisherDetailDialog({
                 className="w-full gap-2"
                 disabled={!isEditMode}
               >
-                <Eye className="w-4 h-4 mr-2" /> <Upload className="h-4 w-4" />
+                <Upload className="h-4 w-4" />
                 {photoPreview ? t("changePhoto") : t("browseFiles")}
               </Button>
               <p className="text-xs text-muted-foreground text-center">
@@ -330,7 +329,7 @@ export default function PublisherDetailDialog({
                 className="flex-1 h-9"
               >
                 <X className="h-3.5 w-3.5 mr-1.5" />
-                Cancel
+                {t("cancel")}
               </Button>
               <Button
                 variant="submit"
@@ -340,7 +339,7 @@ export default function PublisherDetailDialog({
                 className="flex-1 h-9"
               >
                 <Save className="h-3.5 w-3.5 mr-1.5" />
-                {isLoading ? "Saving..." : "Save Changes"}
+                {isLoading ? t("saving") : t("saveChanges")}
               </Button>
             </div>
           )}

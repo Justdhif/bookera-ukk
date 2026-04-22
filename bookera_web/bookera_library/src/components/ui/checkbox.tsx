@@ -44,7 +44,10 @@ function Checkbox({
         className="grid place-content-center text-current transition-none"
       >
         <CheckIcon
-          className={cn(variant === "circle" ? "size-3.5" : "size-3")}
+          className={cn(
+            variant === "circle" ? "size-3.5 text-white" : "size-3",
+          )}
+          strokeWidth={3}
         />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
