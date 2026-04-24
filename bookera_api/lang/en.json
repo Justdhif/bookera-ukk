@@ -267,5 +267,6 @@
   "📋 *Return Details:*": "📋 *Return Details:*",
   "📚 *Book Status:*": "📚 *Book Status:*",
   "📚 *Borrowed Books:*": "📚 *Borrowed Books:*",
-  "📚 *Requested Books:*": "📚 *Requested Books:*"
+  "📚 *Requested Books:*": "📚 *Requested Books:*",
+  "The user still has an active borrow that has not been returned.": "The user still has an active borrow that has not been returned."
 }

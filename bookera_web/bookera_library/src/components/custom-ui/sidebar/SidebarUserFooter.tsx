@@ -42,7 +42,7 @@ export function SidebarUserFooter() {
       (pathname === `/${user.slug}` || pathname.startsWith(`/${user.slug}/`)),
   );
 
-  const isHomePage = pathname === "/";
+  const isHomePage = pathname === "/home";
   const showHomeButton = (isAdmin || hasAdminRole || isAccountPage) && !isHomePage;
   const profileHref = user?.slug ? `/${user.slug}/profile` : "/profile";
 
@@ -55,7 +55,7 @@ export function SidebarUserFooter() {
 
   const handleLogoutConfirm = async () => {
     await logout();
-    router.push("/");
+    router.push("/home");
   };
 
   return (
@@ -74,7 +74,7 @@ export function SidebarUserFooter() {
                   !open && "justify-center px-0 mx-auto",
                 )}
               >
-                <Link href="/">
+                <Link href="/home">
                   <div
                     className={cn(
                       open ? "p-1.5" : "p-2",

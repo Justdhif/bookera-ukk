@@ -1,4 +1,5 @@
 import { Category } from "./category";
+import { Genre } from "./genre";
 import { BookCopy } from "./book-copy";
 import { Author } from "./author";
 import { Publisher } from "./publisher";
@@ -29,6 +30,7 @@ export interface Book {
   publishers?: Publisher[];
   copies: BookCopy[];
   reviews?: BookReview[];
+  genres?: Genre[];
 
   total_copies?: number;
   available_copies?: number;
@@ -47,8 +49,10 @@ export interface CreateBookData {
   isbn: string;
   language: string;
   description: string;
+  price?: number | string;
   is_active: boolean;
   category_ids: number[];
+  genre_ids: number[];
   cover_image?: File | null;
 }
 
@@ -59,6 +63,7 @@ export interface UpdateBookData extends Partial<CreateBookData> {
 export interface BookFilterParams {
   search?: string;
   category_ids?: number[];
+  genre_ids?: number[];
   status?: "active" | "inactive";
   author_ids?: number[];
   publisher_ids?: number[];

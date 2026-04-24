@@ -32,7 +32,7 @@ export interface User {
   updated_at: string;
   is_following?: boolean;
 
-  profile: UserProfile;
+  profile: UserProfile | null;
 }
 
 export type UserListResponse = PaginatedResponse<User>;

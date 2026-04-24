@@ -11,12 +11,13 @@ import { BookCopy } from "@/types/book-copy";
 import { User } from "@/types/user";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import BookSelectorCard from "./BookCopySelectorCard";
+import BookSelectorCard from "./BookSelectorCard";
 import DueDateCard from "./DueDateCard";
-import BorrowDateCard from "./UserSelectorCard";
+import UserSelectorCard from "./UserSelectorCard";
 import { useTranslations } from "next-intl";
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
+import BorrowDateCard from "./BorrowDateCard";
+import BookCopySelectorCard from "./BookCopySelectorCard";
 
 export default function CreateBorrowClient() {
   const router = useRouter();
@@ -44,10 +45,17 @@ export default function CreateBorrowClient() {
     fetchUsers();
     const today = new Date();
     setBorrowDate(today);
-    const defaultReturn = new Date();
-    defaultReturn.setDate(defaultReturn.getDate() + 7);
-    setReturnDate(defaultReturn);
   }, []);
+
+  useEffect(() => {
+    if (borrowDate) {
+      const returnD = new Date(borrowDate);
+      returnD.setDate(returnD.getDate() + 5);
+      setReturnDate(returnD);
+    } else {
+      setReturnDate(undefined);
+    }
+  }, [borrowDate]);
 
   const fetchBooks = async (page = 1) => {
     try {
@@ -191,23 +199,6 @@ export default function CreateBorrowClient() {
         description={t("createBorrowDesc")}
         showBackButton
         isAdmin
-        rightActions={
-          <Button
-            onClick={handleSubmit}
-            variant="submit"
-            disabled={
-              loading ||
-              !selectedUserId ||
-              selectedCopyIds.length === 0 ||
-              !borrowDate ||
-              !returnDate
-            }
-            loading={loading}
-            className="h-8"
-          >
-            {t("createBorrow")}
-          </Button>
-        }
       />
 
       <div className="grid gap-6 lg:grid-cols-3 flex-1 overflow-hidden min-h-0">
@@ -236,12 +227,29 @@ export default function CreateBorrowClient() {
           />
           <DueDateCard value={returnDate} onChange={handleReturnDateChange} />
         </div>
-        <div className="lg:col-span-2 min-h-0">
+        <div className="lg:col-span-2 min-h-0 flex flex-col gap-6">
           <BookCopySelectorCard
             selectedBooks={selectedBooks}
             selectedCopyIds={selectedCopyIds}
             onCopyToggle={handleCopyToggle}
           />
+          <div className="flex justify-end pt-2">
+            <Button
+              onClick={handleSubmit}
+              variant="submit"
+              disabled={
+                loading ||
+                !selectedUserId ||
+                selectedCopyIds.length === 0 ||
+                !borrowDate ||
+                !returnDate
+              }
+              loading={loading}
+              className="h-8"
+            >
+              {t("createBorrow")}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

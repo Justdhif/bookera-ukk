@@ -98,7 +98,7 @@ export default function SetupProfileClient() {
       const res = await authService.setupProfile(submitData);
       setUser(res.data.data.user);
       toast.success(t("profileCreated"));
-      router.push("/");
+      router.push("/home");
     } catch (error: any) {
       const errorData = error.response?.data;
       if (errorData?.data && typeof errorData.data === "object") {

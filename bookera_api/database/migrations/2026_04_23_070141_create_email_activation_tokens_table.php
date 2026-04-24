@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('books', function (Blueprint $table) {
-            $table->decimal('price', 15, 2)->after('cover_image')->default(0);
+        Schema::create('email_activation_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
         });
-
-        Schema::rename('fines', 'fine_borrows');
     }
 
     /**
@@ -23,10 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::rename('fine_borrows', 'fines');
-
-        Schema::table('books', function (Blueprint $table) {
-            $table->dropColumn('price');
-        });
+        Schema::dropIfExists('email_activation_tokens');
     }
 };

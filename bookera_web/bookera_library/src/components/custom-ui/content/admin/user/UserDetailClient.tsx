@@ -117,47 +117,6 @@ export default function UserDetailClient() {
         description={isEditMode ? t("editUserInfo") : t("viewUserDetail")}
         showBackButton
         isAdmin
-        rightActions={
-          isEditMode ? (
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCancelEdit}
-                disabled={submitting}
-                className="h-8"
-              >
-                <X className="h-3.5 w-3.5" />
-                {t("cancel")}
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                variant="submit"
-                disabled={
-                  submitting ||
-                  !formData.email?.trim() ||
-                  !formData.full_name?.trim() ||
-                  !formData.role ||
-                  !isFullNameValid
-                }
-                loading={submitting}
-                className="h-8"
-              >
-                {submitting ? t("saving") : t("saveChanges")}
-              </Button>
-            </div>
-          ) : (
-            <Button
-              onClick={() => setIsEditMode(true)}
-              variant="brand"
-              className="h-8 gap-1"
-              disabled={loading}
-            >
-              <Edit className="h-3.5 w-3.5" />
-              {t("editUser")}
-            </Button>
-          )
-        }
       />
       {loading ? (
         <div className="flex justify-center py-16">
@@ -183,6 +142,17 @@ export default function UserDetailClient() {
               formData={formData}
               setFormData={setFormData}
               onFullNameValidChange={setIsFullNameValid}
+              onSubmit={handleSubmit}
+              onCancel={handleCancelEdit}
+              onEdit={() => setIsEditMode(true)}
+              submitting={submitting}
+              isSubmitDisabled={
+                submitting ||
+                !formData.email?.trim() ||
+                !formData.full_name?.trim() ||
+                !formData.role ||
+                !isFullNameValid
+              }
             />
           </div>
         )

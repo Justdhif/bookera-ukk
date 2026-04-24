@@ -60,15 +60,15 @@ export default function UserTable({ data, onDelete }: Props) {
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
                     <AvatarImage
-                      src={item.profile.avatar}
-                      alt={item.profile.full_name}
+                      src={item.profile?.avatar || undefined}
+                      alt={item.profile?.full_name || "User"}
                       className="object-cover"
                     />
-                    <AvatarFallback>{item.profile.full_name[0]}</AvatarFallback>
+                    <AvatarFallback>{item.profile?.full_name?.[0] || "U"}</AvatarFallback>
                   </Avatar>
                   <div>
                     <div className="font-medium text-foreground">
-                      {item.profile.full_name}
+                      {item.profile?.full_name || "Unknown User"}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       {item.slug || "N/A"}
@@ -86,7 +86,7 @@ export default function UserTable({ data, onDelete }: Props) {
               </TableCell>
               <TableCell>
                 <span className="text-muted-foreground">
-                  {item.profile.occupation || "N/A"}
+                  {item.profile?.occupation || "N/A"}
                 </span>
               </TableCell>
               <TableCell>

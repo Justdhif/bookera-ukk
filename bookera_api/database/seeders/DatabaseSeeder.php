@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
+use Database\Seeders\BookSeeder;
+use Database\Seeders\GenreSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,6 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             CategorySeeder::class,
+            GenreSeeder::class,
             AuthorSeeder::class,
             PublisherSeeder::class,
             PrivacyPolicySeeder::class,

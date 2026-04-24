@@ -8,7 +8,6 @@ use App\Models\Borrow;
 use App\Models\FineBorrow;
 use App\Models\FineType;
 use App\Models\LostBook;
-use App\Models\LostBookDetail;
 use App\Models\User;
 use App\Services\BookReturn\BookReturnNotificationService;
 use App\Services\NotificationService as DatabaseNotificationService;
@@ -26,20 +25,20 @@ class LostBookService
     {
         abort_if($borrow->status !== 'open', 400, 'This borrow is not in open status');
 
-        $details = $borrow->borrowDetails()->with('bookCopy.book')->whereIn('id', array_unique($ids))->get();
+        $details = $borrow->borrowDetails()->with('bookCopy.book.genres')->whereIn('id', array_unique($ids))->get();
         abort_if($details->count() !== count(array_unique($ids)), 400, 'Invalid borrow details');
 
         $details->each(function ($detail) use ($borrow) {
             abort_if($detail->status !== 'borrowed', 400, 'Book already processed');
-            
+
             $copy = $detail->bookCopy;
             $oldStatus = $copy->status;
             $detail->update(['status' => 'lost']);
             $copy->update(['status' => 'lost']);
 
-            ActivityLogger::log('update', 'borrow_detail', "Book {$copy->book->title} lost", 
+            ActivityLogger::log('update', 'borrow_detail', "Book {$copy->book->title} lost",
                 ['detail_id' => $detail->id, 'copy_id' => $copy->id, 'borrow_id' => $borrow->id, 'new_status' => 'lost'],
-                ['detail_id' => $detail->id, 'copy_id' => $copy->id, 'old_status' => $oldStatus], 
+                ['detail_id' => $detail->id, 'copy_id' => $copy->id, 'old_status' => $oldStatus],
                 $detail
             );
         });
@@ -48,7 +47,7 @@ class LostBookService
 
         return $borrow->load([
             'borrowDetails.bookCopy.book.authors', 'borrowDetails.bookCopy.book.publishers',
-            'borrowDetails.bookCopy.book.categories', 'borrowRequest.borrowRequestDetails.book',
+            'borrowDetails.bookCopy.book.categories', 'borrowDetails.bookCopy.book.genres', 'borrowRequest.borrowRequestDetails.book',
             'user.profile', 'bookReturns.details.bookCopy.book.authors', 'fines.fineType',
             'lostBooks.details.bookCopy.book.authors'
         ]);
@@ -68,7 +67,7 @@ class LostBookService
         $titles = collect($summary)->take(2)->pluck('book_title')->implode(', ') . (count($summary) > 2 ? '...' : '');
         $msg = "{$name} reported lost books: {$titles} (Borrow #{$borrow->id})";
 
-        User::where('role', 'admin')->get()->each(fn($admin) => 
+        User::where('role', 'admin')->get()->each(fn($admin) =>
             DatabaseNotificationService::send($admin->id, 'Lost Book Reported', $msg, 'lost_book_reported', 'borrow', [
                 'borrow_id' => $borrow->id,
                 'user' => ['name' => $name, 'avatar' => $borrow->user?->profile?->avatar],
@@ -121,7 +120,7 @@ class LostBookService
         $lostBook = LostBook::firstOrCreate(['borrow_id' => $borrow->id]);
 
         foreach ($items as $item) {
-            $copy = BookCopy::where('id', $item['book_copy_id'])->lockForUpdate()->firstOrFail()->loadMissing('book');
+            $copy = BookCopy::where('id', $item['book_copy_id'])->lockForUpdate()->firstOrFail()->loadMissing('book.genres');
             $oldStatus = $copy->status;
 
             $detail = $lostBook->details()->create([
@@ -133,23 +132,23 @@ class LostBookService
             $copy->update(['status' => 'lost']);
             $borrow->borrowDetails()->where('book_copy_id', $copy->id)->update(['status' => 'lost']);
 
-            ActivityLogger::log('update', 'book_copy', "Book {$copy->book->title} lost", 
+            ActivityLogger::log('update', 'book_copy', "Book {$copy->book->title} lost",
                 ['copy_id' => $copy->id, 'new_status' => 'lost', 'borrow_id' => $borrow->id],
                 ['copy_id' => $copy->id, 'old_status' => $oldStatus], $copy
             );
 
-            ActivityLogger::log('create', 'lost_book_detail', "Lost detail for {$copy->book->title}", 
+            ActivityLogger::log('create', 'lost_book_detail', "Lost detail for {$copy->book->title}",
                 ['id' => $detail->id, 'lost_id' => $lostBook->id, 'date' => $detail->lost_date], null, $detail
             );
 
             $this->autoCreateLostFine($borrow, $copy);
         }
 
-        ActivityLogger::log('create', 'lost_book', "Lost book reported for borrow #{$borrow->id}", 
+        ActivityLogger::log('create', 'lost_book', "Lost book reported for borrow #{$borrow->id}",
             ['id' => $lostBook->id, 'borrow_id' => $borrow->id], null, $lostBook
         );
 
-        return $lostBook->load(['borrow.user.profile', 'details.bookCopy.book', 'borrow.fines.fineType']);
+        return $lostBook->load(['borrow.user.profile', 'details.bookCopy.book.genres', 'borrow.fines.fineType']);
     }
 
     private function autoCreateLostFine(Borrow $borrow, BookCopy $bookCopy): void
@@ -159,6 +158,9 @@ class LostBookService
         if (!$lostFineType) {
             return;
         }
+
+        $percentage = (float) ($lostFineType->percentage ?? 100);
+        $amount = round(((float) ($bookCopy->book->price ?? 0) * $percentage) / 100, 2);
 
         $fineNotes = 'Denda buku hilang (' . $lostFineType->name . '): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
 
@@ -174,7 +176,7 @@ class LostBookService
         $fine = FineBorrow::create([
             'borrow_id' => $borrow->id,
             'fine_type_id' => $lostFineType->id,
-            'amount' => $bookCopy->book->price,
+            'amount' => $amount,
             'status' => 'unpaid',
             'notes' => $fineNotes,
         ]);
@@ -193,7 +195,7 @@ class LostBookService
 
     public function delete(LostBook $lostBook): void
     {
-        $lostBook->loadMissing(['borrow', 'details.bookCopy.book']);
+        $lostBook->loadMissing(['borrow', 'details.bookCopy.book.genres']);
 
         ActivityLogger::log(
             'delete',

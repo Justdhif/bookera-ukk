@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, Clock, LogIn, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Borrow } from "@/types/borrow";
 
 interface DailyTimelineReminderAlertProps {
@@ -70,16 +68,6 @@ export function DailyTimelineReminderAlert({
             <p className="mt-1 text-sm font-semibold leading-6 text-blue-900 dark:text-blue-100">
               {t("login_desc")}
             </p>
-            <Link href="/login" className="mt-3 inline-flex">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="rounded-full border-blue-200 bg-white px-3 py-1.5 text-xs font-semibold text-blue-700 shadow-sm transition hover:bg-blue-50 dark:border-blue-500/20 dark:bg-white/5 dark:text-blue-300 dark:hover:bg-white/10"
-              >
-                {t("login_btn")}
-              </Button>
-            </Link>
           </div>
         </div>
       </div>

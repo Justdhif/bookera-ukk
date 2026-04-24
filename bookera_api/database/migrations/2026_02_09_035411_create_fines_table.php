@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fines', function (Blueprint $table) {
+        Schema::create('fine_borrows', function (Blueprint $table) {
             $table->id();
             $table->foreignId('borrow_id')->constrained('borrows')->onDelete('cascade');
             $table->foreignId('fine_type_id')->constrained('fine_types')->onDelete('cascade');
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('fines');
+        Schema::dropIfExists('fine_borrows');
     }
 };

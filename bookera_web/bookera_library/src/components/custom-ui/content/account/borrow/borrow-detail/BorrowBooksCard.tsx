@@ -188,6 +188,37 @@ export function BorrowBooksCard({ borrow, onUpdate }: BorrowBooksCardProps) {
                       </Link>
                     </div>
                   </div>
+
+                  {/* Per-book Late Fine Info */}
+                  {borrow.status === "open" && detail.status === "borrowed" && borrow.estimated_late_fine?.is_late && (
+                    <div className="mt-6 rounded-3xl border border-border/60 bg-muted/20 p-4 sm:p-5 shadow-sm">
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="space-y-1">
+                            <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-rose-600">
+                              <Clock className="h-4 w-4" />
+                              {borrow.estimated_late_fine.fine_name ?? t("overdueAlertTitle")}
+                            </p>
+                            <p className="font-semibold text-foreground">
+                              {t("lateFineInfo", { days: borrow.estimated_late_fine.days_late })}
+                            </p>
+                          </div>
+                          <span className="text-lg font-black text-rose-600">
+                            {new Intl.NumberFormat("id-ID", {
+                              style: "currency",
+                              currency: "IDR",
+                              minimumFractionDigits: 0,
+                            }).format(borrow.estimated_late_fine.fine_per_book * borrow.estimated_late_fine.days_late)}
+                          </span>
+                        </div>
+                        {(borrow.estimated_late_fine.fine_description || t("overdueWarningNote")) && (
+                          <p className="text-sm leading-relaxed text-muted-foreground">
+                            {borrow.estimated_late_fine.fine_description || t("overdueWarningNote")}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}

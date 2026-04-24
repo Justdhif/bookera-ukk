@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\BookReturnController;
 use App\Http\Controllers\Api\BorrowController;
 use App\Http\Controllers\Api\BorrowRequestController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\GenreController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DiscussionCommentController;
 use App\Http\Controllers\Api\DiscussionLikeController;
@@ -90,6 +91,8 @@ Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('/activate', [AuthController::class, 'activate']);
+    Route::post('/resend-activation', [AuthController::class, 'resendActivation']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
@@ -136,9 +139,16 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [CategoryController::class, 'index']);
         });
 
+        Route::prefix('genres')->group(function () {
+            Route::get('/', [GenreController::class, 'index']);
+        });
+
         Route::prefix('books')->group(function () {
             Route::get('/', [BookController::class, 'index']);
             Route::get('/slug/{slug}', [BookController::class, 'showBySlug']);
+            Route::get('/template', [BookController::class, 'downloadTemplate']);
+            Route::get('/export', [BookController::class, 'export']);
+            Route::post('/import', [BookController::class, 'import']);
 
             Route::post('/', [BookController::class, 'store']);
             Route::get('/{id}', [BookController::class, 'show'])->whereNumber('id');
@@ -149,7 +159,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::delete('book-copies/{bookCopy}', [BookCopyController::class, 'destroy']);
 
-        Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
+    Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
+    Route::apiResource('genres', GenreController::class)->except(['index', 'show']);
 
         Route::prefix('authors')->group(function () {
             Route::get('/', [AuthorController::class, 'index']);

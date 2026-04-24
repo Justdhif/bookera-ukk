@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('email')->unique();
+            $table->string('slug')->nullable()->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', [
@@ -22,7 +23,7 @@ return new class extends Migration
                 'officer:management',
                 'user',
             ])->default('user');
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(false);
             $table->timestamp('last_login_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

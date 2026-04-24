@@ -9,10 +9,12 @@ import { usePathnameCondition } from "@/hooks/usePathnameCondition";
 import { bookService } from "@/services/book.service";
 import { publicService } from "@/services/public.service";
 import { categoryService } from "@/services/category.service";
+import { genreService } from "@/services/genre.service";
 import { authorService } from "@/services/author.service";
 import { publisherService } from "@/services/publisher.service";
 import { Book, CreateBookData } from "@/types/book";
 import { Category } from "@/types/category";
+import { Genre } from "@/types/genre";
 import { Author } from "@/types/author";
 import { Publisher } from "@/types/publisher";
 import BookCopyList from "./BookCopyList";
@@ -62,6 +64,7 @@ export default function BookDetailClient() {
   const [loading, setLoading] = useState(true);
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [genres, setGenres] = useState<Genre[]>([]);
   const [authors, setAuthors] = useState<Author[]>([]);
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -77,6 +80,7 @@ export default function BookDetailClient() {
     description: "",
     is_active: true,
     category_ids: [],
+    genre_ids: [],
     cover_image: null,
   });
   const [coverPreview, setCoverPreview] = useState<string>("");
@@ -89,6 +93,7 @@ export default function BookDetailClient() {
     fetchBook();
     if (isAdmin) {
       fetchCategories();
+      fetchGenres();
       fetchAuthors();
       fetchPublishers();
     }
@@ -100,6 +105,15 @@ export default function BookDetailClient() {
       setCategories(res.data.data.data || []);
     } catch (error) {
       console.error("Error fetching categories:", error);
+    }
+  };
+
+  const fetchGenres = async () => {
+    try {
+      const res = await genreService.getAll();
+      setGenres(res.data.data.data || []);
+    } catch (error) {
+      console.error("Error fetching genres:", error);
     }
   };
 
@@ -143,8 +157,10 @@ export default function BookDetailClient() {
           isbn: bookData.isbn || "",
           language: bookData.language || "",
           description: bookData.description || "",
+          price: bookData.price || "",
           is_active: bookData.is_active,
           category_ids: bookData.categories?.map((c: Category) => c.id) || [],
+          genre_ids: bookData.genres?.map((g: Genre) => g.id) || [],
           cover_image: null,
         });
         setCoverPreview(bookData.cover_image || "");
@@ -191,6 +207,10 @@ export default function BookDetailClient() {
 
   const handleCategoryChange = (categoryIds: number[]) => {
     setFormData((prev) => ({ ...prev, category_ids: categoryIds }));
+  };
+
+  const handleGenreChange = (genreIds: number[]) => {
+    setFormData((prev) => ({ ...prev, genre_ids: genreIds }));
   };
 
   const handleAuthorChange = (authorIds: number[]) => {
@@ -245,8 +265,10 @@ export default function BookDetailClient() {
         isbn: book.isbn || "",
         language: book.language || "",
         description: book.description || "",
+        price: book.price || "",
         is_active: book.is_active,
         category_ids: book.categories?.map((c: Category) => c.id) || [],
+        genre_ids: book.genres?.map((g: Genre) => g.id) || [],
         cover_image: null,
       });
       setCoverPreview(book.cover_image || "");
@@ -270,40 +292,7 @@ export default function BookDetailClient() {
         showBackButton
         isAdmin={isAdmin}
         rightActions={
-          isAdmin ? (
-            isEditMode ? (
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancelEdit}
-                  disabled={submitting}
-                  className="h-8"
-                >
-                  <X className="h-3.5 w-3.5" />
-                  {tAdmin("cancel")}
-                </Button>
-                <Button
-                  onClick={handleSubmit}
-                  variant="submit"
-                  disabled={isSubmitDisabled()}
-                  loading={submitting}
-                >
-                  {submitting ? tAdmin("saving") : tAdmin("saveChanges")}
-                </Button>
-              </div>
-            ) : (
-              <Button
-                onClick={() => setIsEditMode(true)}
-                variant="brand"
-                className="h-8 gap-1"
-                disabled={loading}
-              >
-                <Edit className="h-3.5 w-3.5" />
-                {tAdmin("editBook")}
-              </Button>
-            )
-          ) : (
+          isAdmin ? null : (
             book && (
               <div className="flex flex-wrap items-center gap-3">
                 <FavoriteButton bookId={book.id} />
@@ -346,14 +335,21 @@ export default function BookDetailClient() {
                 onInputChange={handleInputChange}
                 onYearChange={handleYearChange}
                 onCategoryChange={handleCategoryChange}
+                onGenreChange={handleGenreChange}
                 onAuthorChange={handleAuthorChange}
                 onPublisherChange={handlePublisherChange}
                 onAddAuthor={() => setAuthorDialogOpen(true)}
                 onAddPublisher={() => setPublisherDialogOpen(true)}
+                genres={genres}
                 categories={categories}
                 authors={authors}
                 publishers={publishers}
                 onValidationChange={handleFormValidationChange}
+                onSubmit={handleSubmit}
+                onCancel={handleCancelEdit}
+                onEdit={() => setIsEditMode(true)}
+                submitting={submitting}
+                isSubmitDisabled={isSubmitDisabled()}
               />
             </div>
             {!isEditMode && (
@@ -492,7 +488,7 @@ export default function BookDetailClient() {
                         </div>
                         <div className="space-y-1">
                           <Label className="text-muted-foreground">
-                            {tPublic("totalCopies")}
+                            {tPublic("available")}
                           </Label>
                           <p className="font-medium">
                             {book.copies?.length || 0}

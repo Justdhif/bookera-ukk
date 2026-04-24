@@ -29,6 +29,9 @@ return new class extends Migration
             $table->string('identification_number')->nullable()->unique();
             $table->string('occupation')->nullable();
             $table->string('institution')->nullable();
+            $table->boolean('notification_enabled')->default(false);
+            $table->boolean('notification_email')->default(false);
+            $table->boolean('notification_whatsapp')->default(false);
 
             $table->timestamps();
         });

@@ -267,5 +267,6 @@
   "📋 *Return Details:*": "📋 *Detail Pengembalian:*",
   "📚 *Book Status:*": "📚 *Status Buku:*",
   "📚 *Borrowed Books:*": "📚 *Buku yang Dipinjam:*",
-  "📚 *Requested Books:*": "📚 *Buku yang Diminta:*"
+  "📚 *Requested Books:*": "📚 *Buku yang Diminta:*",
+  "The user still has an active borrow that has not been returned.": "User masih memiliki peminjaman aktif yang belum dikembalikan."
 }

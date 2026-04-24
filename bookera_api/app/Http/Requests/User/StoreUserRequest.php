@@ -30,7 +30,7 @@ class StoreUserRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
             'role' => ['required', Rule::in(['admin', 'officer:catalog', 'officer:management', 'user'])],
@@ -44,7 +44,14 @@ class StoreUserRequest extends FormRequest
             'identification_number' => 'nullable|string|unique:user_profiles,identification_number',
             'occupation' => 'nullable|string|max:100',
             'institution' => 'nullable|string|max:255',
-            'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
+
+        if ($this->hasFile('avatar')) {
+            $rules['avatar'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048';
+        } else {
+            $rules['avatar'] = 'nullable|string';
+        }
+
+        return $rules;
     }
 }

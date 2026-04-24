@@ -14,11 +14,13 @@ class FineType extends Model
         'name',
         'type',
         'amount',
+        'percentage',
         'description',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'percentage' => 'decimal:2',
     ];
 
     public function fines(): HasMany

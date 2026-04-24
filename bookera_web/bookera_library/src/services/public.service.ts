@@ -26,9 +26,12 @@ export interface PublicCategoryFilterParams {
 export const publicService = {
   // Books
   getBooks: (filters?: BookFilterParams) => {
-    const { category_ids, ...params } = filters ?? {};
+    const { category_ids, genre_ids, ...params } = filters ?? {};
     if (category_ids?.length) {
       Object.assign(params, { category_ids: category_ids.join(",") });
+    }
+    if (genre_ids?.length) {
+      Object.assign(params, { genre_ids: genre_ids.join(",") });
     }
 
     return api.get<ApiResponse<BookListResponse>>("/books", { params });

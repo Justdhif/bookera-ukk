@@ -13,7 +13,7 @@ class SetupProfile extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'full_name' => 'required|string|max:255',
             'gender' => 'nullable|in:male,female,prefer_not_to_say',
             'birth_date' => 'nullable|date',
@@ -23,8 +23,15 @@ class SetupProfile extends FormRequest
             'identification_number' => 'nullable|string|max:50',
             'occupation' => 'nullable|string|max:100',
             'institution' => 'nullable|string|max:255',
-            'avatar'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
+
+        if ($this->hasFile('avatar')) {
+            $rules['avatar'] = 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048';
+        } else {
+            $rules['avatar'] = 'nullable|string';
+        }
+
+        return $rules;
     }
 
     public function messages(): array

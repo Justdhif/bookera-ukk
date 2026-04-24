@@ -15,6 +15,8 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->unsignedBigInteger('likes_count')->default(0);
             $table->unsignedBigInteger('comments_count')->default(0);
+            $table->timestamp('taken_down_at')->nullable();
+            $table->string('taken_down_reason')->nullable();
             $table->timestamps();
 
             $table->index(['user_id', 'created_at']);

@@ -8,8 +8,13 @@ use App\Http\Requests\Book\StoreBookRequest;
 use App\Http\Requests\Book\UpdateBookRequest;
 use App\Models\Book;
 use App\Services\Book\BookService;
+use App\Exports\BookTemplateExport;
+use App\Exports\BookExport;
+use App\Imports\BookImport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class BookController extends Controller
 {
@@ -25,6 +30,7 @@ class BookController extends Controller
         $filters = [
             'search' => $request->search,
             'category_ids' => $request->category_ids,
+            'genre_ids' => $request->genre_ids,
             'status' => $request->status,
             'has_stock' => $request->has_stock,
             'per_page' => $request->per_page
@@ -91,5 +97,29 @@ class BookController extends Controller
         }
 
         return ApiResponse::successResponse('Book deleted successfully', null);
+    }
+
+    public function import(Request $request): JsonResponse
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        try {
+            Excel::import(new BookImport, $request->file('file'));
+            return ApiResponse::successResponse('Books imported successfully');
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse('Failed to import books: ' . $e->getMessage(), 500);
+        }
+    }
+
+    public function downloadTemplate(): BinaryFileResponse
+    {
+        return Excel::download(new BookTemplateExport, 'book_template.xlsx');
+    }
+
+    public function export(): BinaryFileResponse
+    {
+        return Excel::download(new BookExport, 'books_data_' . date('Y-m-d_H-i-s') . '.xlsx');
     }
 }

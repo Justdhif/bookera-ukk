@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { User as UserIcon, ChevronsUpDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface UserSelectorCardProps {
   users: User[];
@@ -73,9 +74,14 @@ export default function UserSelectorCard({
             >
               {selectedUser ? (
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <UserIcon className="h-4 w-4 text-primary" />
-                  </div>
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src={selectedUser.profile?.avatar || undefined}
+                      alt={selectedUser.profile?.full_name || "User"}
+                      className="object-cover"
+                    />
+                    <AvatarFallback>{selectedUser.profile?.full_name?.[0] || "U"}</AvatarFallback>
+                  </Avatar>
                   <div className="text-left">
                     <div className="font-medium">
                       {selectedUser.profile?.full_name}
@@ -114,9 +120,14 @@ export default function UserSelectorCard({
                           )}
                         />
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <UserIcon className="h-4 w-4 text-primary" />
-                          </div>
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage
+                              src={user.profile?.avatar || undefined}
+                              alt={user.profile?.full_name || "User"}
+                              className="object-cover"
+                            />
+                            <AvatarFallback>{user.profile?.full_name?.[0] || "U"}</AvatarFallback>
+                          </Avatar>
                           <div>
                             <div className="font-medium">
                               {user.profile?.full_name}

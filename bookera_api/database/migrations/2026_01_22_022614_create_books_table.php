@@ -20,6 +20,7 @@ return new class extends Migration
             $table->year('publication_year')->nullable();
             $table->string('language', 50)->nullable();
             $table->string('cover_image')->nullable();
+            $table->decimal('price', 15, 2)->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

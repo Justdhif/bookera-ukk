@@ -1,5 +1,5 @@
-import PublicPageClient from "@/components/custom-ui/content/public/PublicPageClient";
+import { redirect } from "next/navigation";
 
-export default function PublicPage() {
-  return <PublicPageClient />;
+export default function RootPage() {
+  redirect("/landing-page");
 }

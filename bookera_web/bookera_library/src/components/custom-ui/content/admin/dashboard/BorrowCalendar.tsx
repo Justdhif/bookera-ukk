@@ -19,7 +19,15 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const DAYS_OF_WEEK_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
+const DAYS_OF_WEEK_KEYS = [
+  "sun",
+  "mon",
+  "tue",
+  "wed",
+  "thu",
+  "fri",
+  "sat",
+] as const;
 
 type DayCell = {
   day: number;
@@ -62,17 +70,22 @@ export default function BorrowCalendar() {
   }, [selectedDay, currentYear, currentMonth]);
 
   const goToPrevMonth = () => {
-    if (currentMonth === 1) { setCurrentYear((y) => y - 1); setCurrentMonth(12); }
-    else setCurrentMonth((m) => m - 1);
+    if (currentMonth === 1) {
+      setCurrentYear((y) => y - 1);
+      setCurrentMonth(12);
+    } else setCurrentMonth((m) => m - 1);
   };
 
   const goToNextMonth = () => {
-    if (currentMonth === 12) { setCurrentYear((y) => y + 1); setCurrentMonth(1); }
-    else setCurrentMonth((m) => m + 1);
+    if (currentMonth === 12) {
+      setCurrentYear((y) => y + 1);
+      setCurrentMonth(1);
+    } else setCurrentMonth((m) => m + 1);
   };
 
   const getDaysInMonth = (y: number, m: number) => new Date(y, m, 0).getDate();
-  const getFirstDayOfMonth = (y: number, m: number) => new Date(y, m - 1, 1).getDay();
+  const getFirstDayOfMonth = (y: number, m: number) =>
+    new Date(y, m - 1, 1).getDay();
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
@@ -93,7 +106,7 @@ export default function BorrowCalendar() {
 
   const prevMonthDays = getDaysInMonth(
     currentMonth === 1 ? currentYear - 1 : currentYear,
-    currentMonth === 1 ? 12 : currentMonth - 1
+    currentMonth === 1 ? 12 : currentMonth - 1,
   );
   for (let i = firstDay - 1; i >= 0; i--) {
     cells.push({ day: prevMonthDays - i, isCurrentMonth: false });
@@ -108,7 +121,8 @@ export default function BorrowCalendar() {
   }
 
   const getBorrowDayTone = (data?: CalendarDay, isCurrentMonth = true) => {
-    if (!isCurrentMonth) return "bg-slate-100/80 text-slate-400/80 dark:bg-slate-800/40 dark:text-slate-500";
+    if (!isCurrentMonth)
+      return "bg-slate-100/80 text-slate-400/80 dark:bg-slate-800/40 dark:text-slate-500";
     if (!data) return "bg-brand-primary/5 text-brand-primary-dark/40";
 
     const total = Number(data.open_borrows) + Number(data.close_borrows);
@@ -128,13 +142,23 @@ export default function BorrowCalendar() {
             {t("borrowCalendarTitle")}
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg" onClick={goToPrevMonth}>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-lg"
+              onClick={goToPrevMonth}
+            >
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="text-sm font-semibold min-w-35 text-center">
               {fullMonthName} {currentYear}
             </span>
-            <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg" onClick={goToNextMonth}>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-lg"
+              onClick={goToNextMonth}
+            >
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -163,7 +187,8 @@ export default function BorrowCalendar() {
               <div className="grid grid-cols-7 gap-1.5 md:gap-3">
                 {cells.map((cell, idx) => {
                   const todayCell = isToday(cell.day, cell.isCurrentMonth);
-                  const isSelected = selectedDay === cell.day && cell.isCurrentMonth;
+                  const isSelected =
+                    selectedDay === cell.day && cell.isCurrentMonth;
 
                   return (
                     <button
@@ -175,46 +200,63 @@ export default function BorrowCalendar() {
                         setSelectedDay(cell.day);
                       }}
                       className={cn(
-                        "relative flex aspect-square min-h-12 md:min-h-32 flex-col items-end justify-start overflow-hidden rounded-lg md:rounded-[1.15rem] p-1.5 md:p-3 pt-1 md:pt-2.5 text-right outline-none transition-all",
+                        "relative flex min-h-[5rem] md:min-h-28 flex-col items-end justify-start overflow-hidden rounded-lg md:rounded-[1.15rem] p-1.5 md:p-3 pt-1 md:pt-2.5 text-right outline-none transition-all",
                         "border border-transparent shadow-sm focus-visible:ring-2 focus-visible:ring-brand-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                         "cursor-pointer disabled:cursor-default",
-                        
+
                         // Default intensity color
                         getBorrowDayTone(cell.data, cell.isCurrentMonth),
-                        
+
                         // Distinct Today styling
-                        todayCell && "ring-2 ring-indigo-500/50 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-200 shadow-md",
-                        
+                        todayCell &&
+                          "ring-2 ring-indigo-500/50 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-200 shadow-md",
+
                         // Distinct Selected styling
-                        isSelected && "ring-2 ring-brand-primary shadow-lg bg-brand-primary text-white z-10 ring-offset-2 ring-offset-background",
-                        
+                        isSelected &&
+                          "ring-2 ring-brand-primary shadow-lg bg-brand-primary text-white z-10 ring-offset-2 ring-offset-background",
+
                         // Not current month treatment
-                        !cell.isCurrentMonth && "cursor-default"
+                        !cell.isCurrentMonth && "cursor-default",
                       )}
                     >
                       <span className="relative z-10 text-xs md:text-[15px] font-semibold leading-none drop-shadow-sm">
                         {cell.day}
                       </span>
-                      
-                      {cell.data && (Number(cell.data.open_borrows) + Number(cell.data.close_borrows)) > 0 && (
-                        <div className="mt-auto self-start">
-                          <span className={cn(
-                            "inline-flex items-center justify-center rounded-lg px-2 py-0.5 text-[10px] font-bold shadow-xs border transition-colors",
-                            todayCell || isSelected || (Number(cell.data.open_borrows) + Number(cell.data.close_borrows)) > 5
-                              ? "bg-white/20 text-white border-white/30 backdrop-blur-xs"
-                              : "bg-brand-primary/10 text-brand-primary-dark border-brand-primary/20 shadow-brand-primary/5"
-                          )}>
-                            {(Number(cell.data.open_borrows) + Number(cell.data.close_borrows))} <span className="hidden md:inline ml-0.5">{t("total").toLowerCase()}</span>
-                          </span>
-                        </div>
-                      )}
+
+                      {cell.data &&
+                        Number(cell.data.open_borrows) +
+                          Number(cell.data.close_borrows) >
+                          0 && (
+                          <div className="mt-auto self-start">
+                            <span
+                              className={cn(
+                                "inline-flex items-center justify-center rounded-lg px-2 py-0.5 text-[10px] font-bold shadow-xs border transition-colors",
+                                todayCell ||
+                                  isSelected ||
+                                  Number(cell.data.open_borrows) +
+                                    Number(cell.data.close_borrows) >
+                                    5
+                                  ? "bg-white/20 text-white border-white/30 backdrop-blur-xs"
+                                  : "bg-brand-primary/10 text-brand-primary-dark border-brand-primary/20 shadow-brand-primary/5",
+                              )}
+                            >
+                              {Number(cell.data.open_borrows) +
+                                Number(cell.data.close_borrows)}{" "}
+                              <span className="hidden md:inline ml-0.5">
+                                {t("total").toLowerCase()}
+                              </span>
+                            </span>
+                          </div>
+                        )}
                     </button>
                   );
                 })}
               </div>
 
               <div className="flex items-center gap-3 pt-3 flex-wrap">
-                <span className="text-[11px] text-muted-foreground font-medium">{t("intensity")}</span>
+                <span className="text-[11px] text-muted-foreground font-medium">
+                  {t("intensity")}
+                </span>
                 {[
                   { label: "1–2", cls: "bg-brand-primary/15" },
                   { label: "3–5", cls: "bg-brand-primary/30" },
@@ -222,8 +264,15 @@ export default function BorrowCalendar() {
                   { label: "10+", cls: "bg-brand-primary/75" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-1.5">
-                    <div className={cn("w-3.5 h-3.5 rounded-md border border-brand-primary/20 shadow-sm", item.cls)} />
-                    <span className="text-[11px] text-muted-foreground">{item.label}</span>
+                    <div
+                      className={cn(
+                        "w-3.5 h-3.5 rounded-md border border-brand-primary/20 shadow-sm",
+                        item.cls,
+                      )}
+                    />
+                    <span className="text-[11px] text-muted-foreground">
+                      {item.label}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -252,21 +301,35 @@ export default function BorrowCalendar() {
                 <p className="text-xs text-muted-foreground font-medium mb-1">
                   {fullMonthName} {selectedDay}, {currentYear}
                 </p>
-                <p className="text-base font-bold text-foreground">{t("borrowDetail")}</p>
+                <p className="text-base font-bold text-foreground">
+                  {t("borrowDetail")}
+                </p>
               </div>
 
               <div className="grid grid-cols-3 gap-2 shrink-0">
                 <div className="flex flex-col items-center rounded-xl bg-brand-primary/8 p-3 text-center">
-                  <span className="text-2xl font-bold text-brand-primary-dark">{dayDetail.total}</span>
-                  <span className="text-[11px] text-muted-foreground mt-0.5">{t("total")}</span>
+                  <span className="text-2xl font-bold text-brand-primary-dark">
+                    {dayDetail.total}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground mt-0.5">
+                    {t("total")}
+                  </span>
                 </div>
                 <div className="flex flex-col items-center rounded-xl bg-brand-primary/12 p-3 text-center">
-                  <span className="text-2xl font-bold text-brand-primary">{dayDetail.open_borrows}</span>
-                  <span className="text-[11px] text-muted-foreground mt-0.5">{t("open")}</span>
+                  <span className="text-2xl font-bold text-brand-primary">
+                    {dayDetail.open_borrows}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground mt-0.5">
+                    {t("open")}
+                  </span>
                 </div>
                 <div className="flex flex-col items-center rounded-xl bg-brand-primary-dark/12 p-3 text-center">
-                  <span className="text-2xl font-bold text-brand-primary-darker">{dayDetail.close_borrows}</span>
-                  <span className="text-[11px] text-muted-foreground mt-0.5">{t("closed")}</span>
+                  <span className="text-2xl font-bold text-brand-primary-darker">
+                    {dayDetail.close_borrows}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground mt-0.5">
+                    {t("closed")}
+                  </span>
                 </div>
               </div>
 
@@ -295,10 +358,12 @@ export default function BorrowCalendar() {
                             className="object-cover"
                           />
                           <AvatarFallback className="text-xs font-medium bg-brand-primary/10 text-brand-primary-dark">
-                            {borrow.user.full_name.substring(0, 2).toUpperCase()}
+                            {borrow.user.full_name
+                              .substring(0, 2)
+                              .toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
-                        
+
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-semibold truncate text-foreground leading-tight mb-1">
                             {borrow.user.full_name}
@@ -314,7 +379,7 @@ export default function BorrowCalendar() {
                             "text-[10px] px-2 py-0.5 whitespace-nowrap",
                             borrow.status === "open"
                               ? "border-brand-primary/40 text-brand-primary-dark bg-brand-primary/10"
-                              : "border-brand-primary-dark/40 text-brand-primary-darker bg-brand-primary-dark/10"
+                              : "border-brand-primary-dark/40 text-brand-primary-darker bg-brand-primary-dark/10",
                           )}
                         >
                           {borrow.status === "open" ? t("open") : t("closed")}

@@ -65,33 +65,113 @@ class AuthService
                 'email' => $userData['email'],
                 'password' => Hash::make($userData['password']),
                 'role' => 'user',
-                'is_active' => true,
+                'is_active' => false,
             ]);
 
+            $this->sendActivationEmail($user->email);
+
             DB::commit();
-
-            Auth::login($user);
-
-            $token = $user->createToken('api-token')->plainTextToken;
-            $user->load('profile');
 
             ActivityLogger::log(
                 'register',
                 'Auth',
-                'New user registered successfully',
+                'New user registered successfully, pending activation',
                 ['email' => $user->email],
                 null,
                 $user
             );
 
             return [
-                'token' => $token,
                 'user' => $user,
             ];
 
         } catch (\Exception $e) {
             DB::rollBack();
             throw new \Exception('Gagal melakukan registrasi: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Send activation link to user's email
+     */
+    public function sendActivationEmail(string $email): void
+    {
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            throw new \Exception('Email is not registered');
+        }
+
+        if ($user->is_active) {
+            throw new \Exception('Account is already active');
+        }
+
+        // Generate a random token
+        $token = \Illuminate\Support\Str::random(64);
+
+        // Store the token
+        DB::table('email_activation_tokens')->updateOrInsert(
+            ['email' => $email],
+            [
+                'token' => $token,
+                'created_at' => Carbon::now(),
+            ]
+        );
+
+        // Send the email
+        Mail::to($email)->send(new \App\Mail\ActivationMail($token, $email));
+    }
+
+    /**
+     * Activate user account using token
+     */
+    public function activateAccount(string $email, string $token): User
+    {
+        $record = DB::table('email_activation_tokens')
+            ->where('email', $email)
+            ->where('token', $token)
+            ->first();
+
+        if (!$record) {
+            throw new \Exception('Invalid or expired activation link');
+        }
+
+        // Check if token is expired (e.g., 24 hours)
+        $createdAt = Carbon::parse($record->created_at);
+        if (Carbon::now()->diffInHours($createdAt) > 24) {
+            DB::table('email_activation_tokens')->where('email', $email)->delete();
+            throw new \Exception('Activation link has expired. Please register again or request a new link.');
+        }
+
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            throw new \Exception('User not found');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $user->update(['is_active' => true]);
+
+            // Delete the token
+            DB::table('email_activation_tokens')->where('email', $email)->delete();
+
+            ActivityLogger::log(
+                'activate_account',
+                'Auth',
+                'User account activated successfully',
+                null,
+                null,
+                $user
+            );
+
+            DB::commit();
+
+            return $user;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new \Exception('Failed to activate account: ' . $e->getMessage());
         }
     }
 

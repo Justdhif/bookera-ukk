@@ -7,6 +7,9 @@ export const buildBookFormData = (
   formData.append("title", (data.title ?? "").trim());
   formData.append("language", (data.language ?? "").trim());
   formData.append("description", (data.description ?? "").trim());
+  if (data.price !== undefined && data.price !== null) {
+    formData.append("price", String(data.price));
+  }
   formData.append("is_active", (data.is_active ?? true) ? "1" : "0");
   if (data.isbn) formData.append("isbn", data.isbn.trim());
   if (data.publication_year)
@@ -14,6 +17,7 @@ export const buildBookFormData = (
   data.category_ids?.forEach((id) =>
     formData.append("category_ids[]", String(id)),
   );
+  data.genre_ids?.forEach((id) => formData.append("genre_ids[]", String(id)));
   data.author_ids?.forEach((id) => formData.append("author_ids[]", String(id)));
   data.publisher_ids?.forEach((id) =>
     formData.append("publisher_ids[]", String(id)),

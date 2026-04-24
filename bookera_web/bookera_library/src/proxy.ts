@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const CATALOG_ROUTES = ["/admin/categories", "/admin/books"];
+const CATALOG_ROUTES = ["/admin/categories", "/admin/genres", "/admin/books"];
 
 const MANAGEMENT_ROUTES = [
   "/admin/users",

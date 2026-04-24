@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
@@ -21,7 +22,6 @@ import {
   FileWarning,
   User as UserIcon,
   Trash,
-  Eye,
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -191,9 +191,9 @@ export default function SetupStepAvatar({
                     e.stopPropagation();
                     handleRemoveAvatar();
                   }}
-                  className="absolute -top-2 -right-2 h-7 w-7 rounded-full shadow-lg"
+                  className="absolute -top-2 -right-2 h-8 w-8 rounded-full shadow-lg hover:scale-110 transition-transform border-2 border-white dark:border-gray-900 z-10"
                 >
-                  <Trash className="w-4 h-4 mr-2" />
+                  <Trash className="w-4 h-4" />
                   <span className="sr-only">{t("removeAvatar")}</span>
                 </Button>
               </div>
@@ -322,7 +322,6 @@ export default function SetupStepAvatar({
             )}
             disabled={loading}
           >
-            <Eye className="w-4 h-4 mr-2" /> <Upload className="h-4 w-4" />
             {previewUrl ? t("changePhoto") : t("browseFiles")}
           </Button>
           <p className="text-xs text-gray-500 dark:text-gray-400 text-center">

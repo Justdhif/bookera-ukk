@@ -50,7 +50,7 @@ export default function ProfileClient() {
       return userData;
     } catch (error: any) {
       toast.error(error.response?.data?.message || t("failedLoad"));
-      router.push("/");
+      router.push("/home");
       return null;
     } finally {
       setLoading(false);
@@ -131,43 +131,6 @@ export default function ProfileClient() {
             })
           )
         }
-        rightActions={
-          isEditMode ? (
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCancelEdit}
-                disabled={submitting}
-                className="h-8"
-              >
-                <X className="h-3.5 w-3.5 mr-1.5" />
-                {t("cancelEdit")}
-              </Button>
-              <Button
-                onClick={handleSubmit}
-                variant="submit"
-                disabled={
-                  submitting || !formData.full_name?.trim() || !isFullNameValid
-                }
-                loading={submitting}
-                className="h-8"
-              >
-                {submitting ? t("saving") : t("saveChanges")}
-              </Button>
-            </div>
-          ) : (
-            <Button
-              onClick={() => setIsEditMode(true)}
-              variant="brand"
-              className="h-8 gap-1"
-              disabled={loading}
-            >
-              <Edit className="h-3.5 w-3.5" />
-              {t("editProfile")}
-            </Button>
-          )
-        }
       />
       {loading ? (
         <div className="flex justify-center py-16">
@@ -191,6 +154,13 @@ export default function ProfileClient() {
               formData={formData}
               setFormData={setFormData}
               setIsFullNameValid={setIsFullNameValid}
+              onSubmit={handleSubmit}
+              onCancel={handleCancelEdit}
+              onEdit={() => setIsEditMode(true)}
+              submitting={submitting}
+              isSubmitDisabled={
+                submitting || !formData.full_name?.trim() || !isFullNameValid
+              }
             />
           </div>
         )

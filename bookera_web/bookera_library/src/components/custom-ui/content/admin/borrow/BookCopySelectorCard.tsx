@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BookOpen } from "lucide-react";
 import EmptyState from "@/components/custom-ui/EmptyState";
+import { cn } from "@/lib/utils";
 
 interface BookCopySelectorCardProps {
   selectedBooks: Book[];
@@ -148,12 +149,18 @@ export default function BookCopySelectorCard({
                       return (
                         <div
                           key={copy.id}
-                          className="flex items-center gap-3 p-2.5 rounded-md border hover:bg-muted/50 transition cursor-pointer"
+                          className={cn(
+                            "flex items-center gap-3 p-2.5 rounded-md border transition cursor-pointer",
+                            isSelected
+                              ? "bg-brand-primary/10 border-brand-primary"
+                              : "hover:bg-muted/50"
+                          )}
                           onClick={() => onCopyToggle(copy.id)}
                         >
                           <Checkbox
                             checked={isSelected}
                             onCheckedChange={() => onCopyToggle(copy.id)}
+                            className="data-[state=checked]:bg-brand-primary data-[state=checked]:border-brand-primary"
                             onClick={(e) => e.stopPropagation()}
                           />
                           <span className="flex-1 text-sm font-medium select-none">

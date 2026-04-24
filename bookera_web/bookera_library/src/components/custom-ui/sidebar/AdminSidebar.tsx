@@ -22,6 +22,7 @@ import {
   DollarSign,
   AlertCircle,
   Tag,
+  Bookmark,
   LayoutDashboard,
   UserSquare,
   Building2,
@@ -68,6 +69,11 @@ const getMenuGroups = (t: any, role: string | undefined): MenuGroup[] => [
         title: t("categories"),
         href: "/admin/categories",
         icon: Tag,
+      },
+      {
+        title: t("genres"),
+        href: "/admin/genres",
+        icon: Bookmark,
       },
       {
         title: t("authors"),

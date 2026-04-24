@@ -75,7 +75,7 @@ export default function BookSelectorCard({
                   className={cn(
                     "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
                     isSelected
-                      ? "bg-primary/10 border-primary"
+                      ? "bg-brand-primary/10 border-brand-primary"
                       : "hover:bg-muted/50",
                   )}
                   onClick={() => onBookToggle(book)}
@@ -83,7 +83,7 @@ export default function BookSelectorCard({
                   <Checkbox
                     checked={isSelected}
                     onCheckedChange={() => onBookToggle(book)}
-                    className="mt-1 shrink-0"
+                    className="mt-1 shrink-0 data-[state=checked]:bg-brand-primary data-[state=checked]:border-brand-primary"
                     onClick={(e) => e.stopPropagation()}
                   />
                   {book.cover_image ? (

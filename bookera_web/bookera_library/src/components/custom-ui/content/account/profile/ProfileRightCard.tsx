@@ -13,6 +13,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Edit, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -26,12 +28,22 @@ interface ProfileRightCardProps {
   formData: Partial<UpdateUserData>;
   setFormData: (data: Partial<UpdateUserData>) => void;
   setIsFullNameValid: (valid: boolean) => void;
+  onSubmit?: (e: React.FormEvent) => void;
+  onCancel?: () => void;
+  onEdit?: () => void;
+  submitting?: boolean;
+  isSubmitDisabled?: boolean;
 }
 export default function ProfileRightCard({
   isEditMode,
   formData,
   setFormData,
   setIsFullNameValid,
+  onSubmit,
+  onCancel,
+  onEdit,
+  submitting = false,
+  isSubmitDisabled = false,
 }: ProfileRightCardProps) {
   const t = useTranslations("profile");
   const handleInputChange = (
@@ -174,6 +186,48 @@ export default function ProfileRightCard({
             </div>
           </div>
         </div>
+
+        {isEditMode ? (
+          onSubmit && (
+            <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
+              {onCancel && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onCancel}
+                  disabled={submitting}
+                  className="h-8"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  {t("cancelEdit")}
+                </Button>
+              )}
+              <Button 
+                onClick={onSubmit} 
+                variant="submit" 
+                className="h-8"
+                disabled={isSubmitDisabled || submitting}
+                loading={submitting}
+              >
+                {submitting ? t("saving") : t("saveChanges")}
+              </Button>
+            </div>
+          )
+        ) : (
+          onEdit && (
+            <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
+              <Button
+                type="button"
+                variant="brand"
+                onClick={onEdit}
+                className="h-8 gap-1"
+              >
+                <Edit className="h-3.5 w-3.5" />
+                {t("editProfile")}
+              </Button>
+            </div>
+          )
+        )}
       </CardContent>
     </Card>
   );

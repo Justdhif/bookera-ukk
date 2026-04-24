@@ -37,6 +37,15 @@ export interface Borrow {
 
   created_at: string;
   updated_at: string;
+  estimated_late_fine?: {
+    is_late: boolean;
+    days_late: number;
+    total_fine: number;
+    fine_per_book: number;
+    total_books: number;
+    fine_name?: string;
+    fine_description?: string;
+  };
 }
 
 export type BorrowListResponse = PaginatedResponse<Borrow>;
@@ -46,4 +55,6 @@ export interface BorrowFilterParams {
   status?: string;
   per_page?: number;
   page?: number;
+  start_date?: string;
+  end_date?: string;
 }

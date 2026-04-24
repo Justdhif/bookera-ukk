@@ -30,7 +30,7 @@ class UpdateUserRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($this->user->id)],
             'password' => 'nullable|min:6',
             'role' => ['required', Rule::in(['admin', 'officer:catalog', 'officer:management', 'user'])],
@@ -44,7 +44,14 @@ class UpdateUserRequest extends FormRequest
             'identification_number' => ['nullable', 'string', Rule::unique('user_profiles', 'identification_number')->ignore($this->user->profile->id ?? null)],
             'occupation' => 'nullable|string|max:100',
             'institution' => 'nullable|string|max:255',
-            'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
+
+        if ($this->hasFile('avatar')) {
+            $rules['avatar'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048';
+        } else {
+            $rules['avatar'] = 'nullable|string';
+        }
+
+        return $rules;
     }
 }

@@ -11,7 +11,7 @@ class FavoriteService
     {
         $query = BookFavorite::with([
             'book' => function ($q) {
-                $q->with(['authors', 'publishers', 'categories', 'reviews.user.profile', 'copies']);
+                $q->with(['authors', 'publishers', 'categories', 'genres', 'reviews.user.profile', 'copies']);
             }
         ])
             ->where('user_id', auth()->id());

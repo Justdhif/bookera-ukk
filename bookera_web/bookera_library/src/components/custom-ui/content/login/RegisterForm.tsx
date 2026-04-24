@@ -48,6 +48,7 @@ export default function RegisterForm({
   onOpenPrivacy,
 }: RegisterFormProps) {
   const t = useTranslations("login");
+  const tUser = useTranslations("user");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -113,10 +114,28 @@ export default function RegisterForm({
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="register-password">
-              <Lock className="w-4 h-4" />
-              {t("password")}
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="register-password">
+                <Lock className="w-4 h-4" />
+                {t("password")}
+              </Label>
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    password: "Bookera09#",
+                    passwordConfirm: "Bookera09#",
+                  }))
+                }
+                className="h-auto p-0 text-[10px] font-medium text-brand-primary hover:text-brand-primary-dark disabled:opacity-50"
+                disabled={loading}
+              >
+                {tUser("defaultPassword")}
+              </Button>
+            </div>
             <div className="relative">
               <Input
                 id="register-password"

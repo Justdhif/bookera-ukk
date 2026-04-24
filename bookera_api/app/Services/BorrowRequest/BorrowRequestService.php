@@ -50,22 +50,24 @@ class BorrowRequestService
 
     public function create(array $data, User $user): BorrowRequest
     {
-        // Check for active borrows
-        $hasActiveBorrow = Borrow::where('user_id', $user->id)
-            ->where('status', 'open')
+        // Check for unpaid fines
+        $hasUnpaidFines = Borrow::where('user_id', $user->id)
+            ->whereHas('fines', function ($query) {
+                $query->where('status', 'unpaid');
+            })
             ->exists();
 
-        if ($hasActiveBorrow) {
-            abort(422, 'Anda masih memiliki peminjaman aktif yang belum dikembalikan.');
+        if ($hasUnpaidFines) {
+            abort(422, 'Anda memiliki denda yang belum dibayar. Silakan lunasi denda Anda terlebih dahulu sebelum meminjam kembali.');
         }
 
-        // Check for pending/approved requests
+        // Check for pending requests
         $hasPendingRequest = BorrowRequest::where('user_id', $user->id)
-            ->whereIn('approval_status', ['processing', 'approved'])
+            ->where('approval_status', 'processing')
             ->exists();
 
         if ($hasPendingRequest) {
-            abort(422, 'Anda memiliki permintaan peminjaman yang sedang diproses atau sudah disetujui.');
+            abort(422, 'Anda memiliki permintaan peminjaman yang sedang diproses. Silakan tunggu hingga permintaan tersebut disetujui.');
         }
 
         $request = DB::transaction(function () use ($data, $user) {

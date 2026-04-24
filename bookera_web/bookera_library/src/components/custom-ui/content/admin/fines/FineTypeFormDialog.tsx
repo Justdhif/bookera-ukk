@@ -35,33 +35,59 @@ export default function FineTypeFormDialog({
   const t = useTranslations("fines");
   const [name, setName] = useState("");
   const [type, setType] = useState<"lost" | "damaged" | "late">("lost");
-  const [amount, setAmount] = useState("");
+  const [value, setValue] = useState("");
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const isDamaged = type === "damaged";
+  const valueLabel = isDamaged ? t("percentageLabel") : t("amountLabel");
+  const valuePlaceholder = isDamaged
+    ? t("percentagePlaceholder")
+    : t("fineAmountPlaceholder");
+
   useEffect(() => {
     if (!open) {
       setName("");
       setType("lost");
-      setAmount("");
+      setValue("");
       setDescription("");
     } else if (fineType) {
       setName(fineType.name);
       setType(fineType.type);
-      setAmount(fineType.amount.toString());
+      setValue(
+        String(
+          fineType.type === "damaged"
+            ? fineType.percentage ?? fineType.amount ?? 0
+            : fineType.amount ?? 0,
+        ),
+      );
       setDescription(fineType.description || "");
     }
   }, [fineType, open]);
   const handleSubmit = async () => {
-    if (!name || !amount) {
-      toast.error("Name and amount are required");
+    if (!name || !value) {
+      toast.error(
+        isDamaged ? t("nameAndPercentageRequired") : t("nameAndAmountRequired"),
+      );
       return;
     }
+
+    const numericValue = Number(value);
+
+    if (Number.isNaN(numericValue)) {
+      toast.error(
+        isDamaged ? t("nameAndPercentageRequired") : t("nameAndAmountRequired"),
+      );
+      return;
+    }
+
     setIsLoading(true);
     try {
       const payload = {
         name,
         type,
-        amount: parseFloat(amount),
+        amount: isDamaged ? 0 : numericValue,
+        percentage: isDamaged ? numericValue : undefined,
         description: description || undefined,
       };
       if (fineType) {
@@ -103,7 +129,13 @@ export default function FineTypeFormDialog({
             <Label htmlFor="type">
               {t("fineType")} <span className="text-red-500">*</span>
             </Label>
-            <Select value={type} onValueChange={(v: any) => setType(v)}>
+            <Select
+              value={type}
+              onValueChange={(v: any) => {
+                setType(v);
+                setValue("");
+              }}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -115,15 +147,18 @@ export default function FineTypeFormDialog({
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="amount">
-              {t("amountLabel")} <span className="text-red-500">*</span>
+            <Label htmlFor="value">
+              {valueLabel} <span className="text-red-500">*</span>
             </Label>
             <Input
-              id="amount"
+              id="value"
               type="number"
-              placeholder={t("fineAmountPlaceholder")}
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              placeholder={valuePlaceholder}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              min={0}
+              max={isDamaged ? 100 : undefined}
+              step="0.01"
             />
           </div>
           <div className="space-y-2">
@@ -140,7 +175,7 @@ export default function FineTypeFormDialog({
           <Button
             onClick={handleSubmit}
             variant="submit"
-            disabled={isLoading || !name || !amount}
+            disabled={isLoading || !name || !value}
             loading={isLoading}
             className="w-full"
           >

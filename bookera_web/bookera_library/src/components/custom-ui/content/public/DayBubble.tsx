@@ -1,11 +1,78 @@
 import { cn } from "@/lib/utils";
 import { Borrow } from "@/types/borrow";
-import {
-  startOfDay,
-  isSameDay,
-  getDayState,
-  getDayEvents,
-} from "./DailyTimeline";
+
+function startOfDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function diffDays(a: Date, b: Date) {
+  return Math.round(
+    (startOfDay(b).getTime() - startOfDay(a).getTime()) / (1000 * 60 * 60 * 24),
+  );
+}
+
+function isSameDay(a: Date, b: Date) {
+  return diffDays(a, b) === 0;
+}
+
+type BorrowEvent = {
+  borrow: Borrow;
+  type: "start" | "end" | "active";
+};
+
+type DayState =
+  | "today"
+  | "past"
+  | "future"
+  | "has-event"
+  | "deadline"
+  | "start";
+
+function getDayEvents(date: Date, borrows: Borrow[]): BorrowEvent[] {
+  const events: BorrowEvent[] = [];
+
+  for (const borrow of borrows) {
+    const start = startOfDay(new Date(borrow.borrow_date));
+    const end = startOfDay(new Date(borrow.return_date));
+    const current = startOfDay(date);
+
+    if (isSameDay(current, start)) {
+      events.push({ borrow, type: "start" });
+    } else if (isSameDay(current, end)) {
+      events.push({ borrow, type: "end" });
+    } else if (current > start && current < end) {
+      events.push({ borrow, type: "active" });
+    }
+  }
+
+  return events;
+}
+
+function getDayState(date: Date, borrows: Borrow[]): DayState {
+  const today = startOfDay(new Date());
+  const current = startOfDay(date);
+  const events = getDayEvents(current, borrows);
+
+  const hasDeadline = events.some((event) => event.type === "end");
+  const hasStart = events.some((event) => event.type === "start");
+  const hasActive = events.some((event) => event.type === "active");
+
+  if (isSameDay(current, today)) {
+    return "today";
+  }
+
+  if (current < today) {
+    if (hasDeadline) return "deadline";
+    if (hasStart) return "start";
+    if (hasActive) return "has-event";
+    return "past";
+  }
+
+  if (hasDeadline) return "deadline";
+  if (hasStart) return "start";
+  if (hasActive) return "has-event";
+  return "future";
+}
 
 export interface DayBubbleProps {
   date: Date;

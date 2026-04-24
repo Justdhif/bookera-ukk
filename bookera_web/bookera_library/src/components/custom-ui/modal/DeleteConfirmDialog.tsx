@@ -74,7 +74,7 @@ export default function DeleteConfirmDialog({
           </Button>
           <Button
             type="button"
-            variant="destructive"
+            variant="submit"
             onClick={handleConfirm}
             disabled={isDeleting}
             loading={isDeleting}

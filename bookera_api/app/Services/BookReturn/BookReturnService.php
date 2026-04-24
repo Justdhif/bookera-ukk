@@ -33,6 +33,7 @@ class BookReturnService
             'details.bookCopy.book.authors',
             'details.bookCopy.book.publishers',
             'details.bookCopy.book.categories',
+            'details.bookCopy.book.genres',
             'borrow.user.profile',
             'borrow.fines.fineType',
         ])
@@ -151,7 +152,10 @@ class BookReturnService
             return;
         }
 
-        $fineNotes = 'Denda buku rusak (' . $damagedFineType->name . '): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
+        $percentage = (float) ($damagedFineType->percentage ?? 0);
+        $bookPrice = (float) ($bookCopy->book->price ?? 0);
+        $amount = round(($bookPrice * $percentage) / 100, 2);
+        $fineNotes = 'Denda buku rusak (' . $damagedFineType->name . ', ' . $percentage . '%): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
 
         $existingFine = $borrow->fines()
             ->where('fine_type_id', $damagedFineType->id)
@@ -165,7 +169,7 @@ class BookReturnService
         $fine = FineBorrow::create([
             'borrow_id'    => $borrow->id,
             'fine_type_id' => $damagedFineType->id,
-            'amount'       => $damagedFineType->amount,
+            'amount'       => $amount,
             'status'       => 'unpaid',
             'notes'        => $fineNotes,
         ]);
@@ -234,7 +238,13 @@ class BookReturnService
 
     private function resolveFineTypeByType(string $type, ?int $preferredFineTypeId = null): ?FineType
     {
-        $query = FineType::where('type', $type)->orderBy('amount')->orderBy('id');
+        $query = FineType::where('type', $type);
+
+        if ($type === 'damaged') {
+            $query->orderBy('percentage')->orderBy('id');
+        } else {
+            $query->orderBy('amount')->orderBy('id');
+        }
 
         if ($preferredFineTypeId) {
             $preferredFineType = (clone $query)->whereKey($preferredFineTypeId)->first();
@@ -253,6 +263,7 @@ class BookReturnService
             'details.bookCopy.book.authors',
             'details.bookCopy.book.publishers',
             'details.bookCopy.book.categories',
+            'details.bookCopy.book.genres',
             'borrow.user.profile',
             'borrow.fines.fineType',
         ]);

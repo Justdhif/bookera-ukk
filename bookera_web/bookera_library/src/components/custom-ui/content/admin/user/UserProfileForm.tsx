@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { PhoneInput } from "@/components/custom-ui/PhoneInput";
+import { Edit, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -32,6 +33,11 @@ interface UserProfileFormProps {
   setFormData: (data: any) => void;
   onFullNameValidChange?: (valid: boolean) => void;
   isProfileView?: boolean;
+  onSubmit?: (e: React.FormEvent) => void;
+  onCancel?: () => void;
+  onEdit?: () => void;
+  submitting?: boolean;
+  isSubmitDisabled?: boolean;
 }
 
 export default function UserProfileForm({
@@ -41,6 +47,11 @@ export default function UserProfileForm({
   setFormData,
   onFullNameValidChange,
   isProfileView,
+  onSubmit,
+  onCancel,
+  onEdit,
+  submitting = false,
+  isSubmitDisabled = false,
 }: UserProfileFormProps) {
   const t = useTranslations("user");
 
@@ -211,6 +222,48 @@ export default function UserProfileForm({
             </div>
           </div>
         </div>
+
+        {isEditMode ? (
+          onSubmit && (
+            <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
+              {onCancel && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onCancel}
+                  disabled={submitting}
+                  className="h-8"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  {t("cancel")}
+                </Button>
+              )}
+              <Button 
+                onClick={onSubmit} 
+                variant="submit" 
+                className="h-8"
+                disabled={isSubmitDisabled || submitting}
+                loading={submitting}
+              >
+                {submitting ? t("saving") : (user ? t("saveChanges") : t("saveUser"))}
+              </Button>
+            </div>
+          )
+        ) : (
+          onEdit && (
+            <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
+              <Button
+                type="button"
+                variant="brand"
+                onClick={onEdit}
+                className="h-8 gap-1"
+              >
+                <Edit className="h-3.5 w-3.5" />
+                {t("editUser")}
+              </Button>
+            </div>
+          )
+        )}
       </CardContent>
     </Card>
   );

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->enum('type', ['lost', 'damaged', 'late']);
             $table->decimal('amount', 10, 2);
+            $table->decimal('percentage', 5, 2)->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
         });

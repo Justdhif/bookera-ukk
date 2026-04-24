@@ -12,6 +12,10 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import { ClipboardList, Package } from "lucide-react";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { toast } from "sonner";
+import DateRangeFilter from "@/components/custom-ui/DateRangeFilter";
+import { BorrowFilterParams } from "@/types/borrow";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 import { BorrowCard } from "./BorrowCard";
 import { BorrowRequestCard } from "./BorrowRequestCard";
@@ -24,22 +28,46 @@ export default function MyBorrowPageClient() {
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [filters, setFilters] = useState<BorrowFilterParams>({});
+  const [borrowSearch, setBorrowSearch] = useState("");
 
   useEffect(() => {
-    fetchBorrows();
+    fetchBorrows(filters);
+  }, [filters]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: borrowSearch }));
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [borrowSearch]);
+
+  useEffect(() => {
     fetchRequests();
   }, []);
 
-  const fetchBorrows = async () => {
+  const fetchBorrows = async (activeFilters?: BorrowFilterParams) => {
     setLoadingBorrows(true);
     try {
-      const response = await borrowService.getByUser();
+      const response = await borrowService.getByUser(activeFilters);
       setBorrows(response.data.data);
     } catch (error) {
       console.error("Failed to fetch borrows:", error);
     } finally {
       setLoadingBorrows(false);
     }
+  };
+
+  const handleBorrowSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBorrowSearch(e.target.value);
+  };
+
+  const handleDateFilter = (start_date?: string, end_date?: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      start_date,
+      end_date,
+    }));
   };
 
   const fetchRequests = async () => {
@@ -139,6 +167,18 @@ export default function MyBorrowPageClient() {
               <div>
                 <h3 className="text-lg font-semibold">{label}</h3>
                 <p className="text-sm text-muted-foreground">{desc}</p>
+              </div>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <div className="relative flex-1 w-full">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder={tBorrow("searchByNameOrTitle")}
+                    value={borrowSearch}
+                    onChange={handleBorrowSearchChange}
+                    className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
+                  />
+                </div>
+                <DateRangeFilter onFilter={handleDateFilter} />
               </div>
               {loadingBorrows ? (
                 loadingState

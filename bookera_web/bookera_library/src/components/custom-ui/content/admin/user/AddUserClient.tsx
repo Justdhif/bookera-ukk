@@ -63,17 +63,6 @@ export default function AddUserClient() {
         description={t("addUserDesc")}
         showBackButton
         isAdmin
-        rightActions={
-          <Button
-            onClick={handleSubmit}
-            variant="submit"
-            disabled={isSubmitDisabled()}
-            loading={submitting}
-            className="h-8"
-          >
-            {submitting ? t("saving") : t("addUser")}
-          </Button>
-        }
       />
       <div>
         <div className="grid gap-6 lg:grid-cols-3">
@@ -92,6 +81,9 @@ export default function AddUserClient() {
             formData={formData}
             setFormData={setFormData}
             onFullNameValidChange={setIsFullNameValid}
+            onSubmit={handleSubmit}
+            submitting={submitting}
+            isSubmitDisabled={isSubmitDisabled()}
           />
         </div>
       </div>

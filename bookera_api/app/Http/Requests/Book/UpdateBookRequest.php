@@ -25,10 +25,13 @@ class UpdateBookRequest extends FormRequest
             'cover_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'category_ids' => 'nullable|array',
             'category_ids.*' => 'integer|exists:categories,id',
+            'genre_ids' => 'nullable|array',
+            'genre_ids.*' => 'integer|exists:genres,id',
             'author_ids' => 'nullable|array',
             'author_ids.*' => 'integer|exists:authors,id',
             'publisher_ids' => 'nullable|array',
             'publisher_ids.*' => 'integer|exists:publishers,id',
+            'price' => 'required|numeric|min:0',
         ];
     }
 }

@@ -34,6 +34,17 @@ export default function FineTypeTable({
     damaged: t("damaged"),
     late: t("late"),
   };
+
+  const formatFineTypeValue = (fineType: FineType) => {
+    if (fineType.type === "damaged") {
+      return `${new Intl.NumberFormat("id-ID", {
+        maximumFractionDigits: 2,
+      }).format(Number(fineType.percentage ?? 0))}%`;
+    }
+
+    return `Rp ${Number(fineType.amount ?? 0).toLocaleString("id-ID")}`;
+  };
+
   if (data.length === 0) {
     return (
       <EmptyState
@@ -50,7 +61,7 @@ export default function FineTypeTable({
           <TableHead className="w-16 text-center">#</TableHead>
           <TableHead className="font-semibold">{t("name")}</TableHead>
           <TableHead className="font-semibold">{t("type")}</TableHead>
-          <TableHead className="font-semibold">{t("amount")}</TableHead>
+          <TableHead className="font-semibold">{t("fineValueLabel")}</TableHead>
           <TableHead className="font-semibold">{t("description")}</TableHead>
           <TableHead className="font-semibold text-right">
             {t("actions")}
@@ -76,7 +87,7 @@ export default function FineTypeTable({
             </TableCell>
             <TableCell>
               <span className="font-semibold text-foreground">
-                Rp {item.amount.toLocaleString("id-ID")}
+                {formatFineTypeValue(item)}
               </span>
             </TableCell>
             <TableCell>

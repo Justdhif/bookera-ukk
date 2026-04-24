@@ -13,9 +13,31 @@ class PublicService
     public function getAllBooks(array $filters): LengthAwarePaginator
     {
         $query = Book::query()
-            ->with(['categories', 'authors', 'publishers', 'reviews.user.profile', 'copies']);
+            ->with([
+                'categories',
+                'genres',
+                'authors',
+                'publishers',
+                'reviews.user.profile',
+                'copies' => function ($query) {
+                    $query->where('status', 'available');
+                }
+            ]);
+
+        // Override counts to only show available ones for public view
+        $query->withCount([
+            'favorites',
+            'available_copies as total_copies_count',
+            'available_copies as available_copies_count',
+            'reviews'
+        ]);
 
         $query->where('is_active', true);
+
+        // Always filter by available stock for public listing
+        $query->whereHas('copies', function ($copyQuery) {
+            $copyQuery->where('status', 'available');
+        });
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
@@ -38,6 +60,16 @@ class PublicService
 
             $query->whereHas('categories', function ($categoryQuery) use ($categoryIds) {
                 $categoryQuery->whereIn('categories.id', $categoryIds);
+            });
+        }
+
+        if (!empty($filters['genre_ids'])) {
+            $genreIds = is_array($filters['genre_ids'])
+                ? $filters['genre_ids']
+                : explode(',', $filters['genre_ids']);
+
+            $query->whereHas('genres', function ($genreQuery) use ($genreIds) {
+                $genreQuery->whereIn('genres.id', $genreIds);
             });
         }
 
@@ -80,12 +112,6 @@ class PublicService
             });
         }
 
-        if (isset($filters['has_stock']) && filter_var($filters['has_stock'], FILTER_VALIDATE_BOOLEAN)) {
-            $query->whereHas('copies', function ($copyQuery) {
-                $copyQuery->where('status', 'available');
-            });
-        }
-
         return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
     }
 
@@ -93,7 +119,15 @@ class PublicService
 
     public function getBookBySlug(string $slug): ?Book
     {
-        $book = Book::where('slug', $slug)->where('is_active', true)->first();
+        $book = Book::where('slug', $slug)
+            ->where('is_active', true)
+            ->withCount([
+                'favorites',
+                'available_copies as total_copies_count',
+                'available_copies as available_copies_count',
+                'reviews'
+            ])
+            ->first();
 
         if (!$book) {
             return null;
@@ -104,7 +138,15 @@ class PublicService
 
     public function getBookById(int $id): ?Book
     {
-        $book = Book::where('id', $id)->where('is_active', true)->first();
+        $book = Book::where('id', $id)
+            ->where('is_active', true)
+            ->withCount([
+                'favorites',
+                'available_copies as total_copies_count',
+                'available_copies as available_copies_count',
+                'reviews'
+            ])
+            ->first();
 
         if (!$book) {
             return null;
@@ -117,11 +159,12 @@ class PublicService
     {
         $book->load([
             'categories',
+            'genres',
             'authors',
             'publishers',
             'reviews.user.profile',
             'copies' => function ($query) {
-                $query->orderBy('status')->orderBy('created_at');
+                $query->where('status', 'available')->orderBy('created_at');
             }
         ]);
 
@@ -135,6 +178,7 @@ class PublicService
 
         return $book;
     }
+
 
     public function getAllAuthors(array $filters): LengthAwarePaginator
     {

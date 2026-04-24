@@ -35,7 +35,10 @@ export const borrowService = {
       copy_ids: copyIds,
     }),
 
-  getByUser: () => api.get<ApiResponse<Borrow[]>>("/my-borrows"),
+  getByUser: (filters?: BorrowFilterParams) =>
+    api.get<ApiResponse<Borrow[]>>("/my-borrows", {
+      params: filters,
+    }),
 
   requestReturn: (id: number, data: { items: BorrowReturnItemPayload[] }) =>
     api.post<ApiResponse<any>>(`/borrows/${id}/return`, data),

@@ -14,7 +14,7 @@ class BookService
     public function getAll(array $filters): LengthAwarePaginator
     {
         $query = Book::query()
-            ->with(['categories', 'authors', 'publishers', 'reviews.user.profile', 'copies']);
+            ->with(['categories', 'genres', 'authors', 'publishers', 'reviews.user.profile', 'copies']);
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
@@ -37,6 +37,16 @@ class BookService
 
             $query->whereHas('categories', function ($categoryQuery) use ($categoryIds) {
                 $categoryQuery->whereIn('categories.id', $categoryIds);
+            });
+        }
+
+        if (!empty($filters['genre_ids'])) {
+            $genreIds = is_array($filters['genre_ids'])
+                ? $filters['genre_ids']
+                : explode(',', $filters['genre_ids']);
+
+            $query->whereHas('genres', function ($genreQuery) use ($genreIds) {
+                $genreQuery->whereIn('genres.id', $genreIds);
             });
         }
 
@@ -127,6 +137,10 @@ class BookService
             $book->categories()->sync($data['category_ids']);
         }
 
+        if (!empty($data['genre_ids'])) {
+            $book->genres()->sync($data['genre_ids']);
+        }
+
         if (!empty($data['author_ids'])) {
             $book->authors()->sync($data['author_ids']);
         }
@@ -135,7 +149,7 @@ class BookService
             $book->publishers()->sync($data['publisher_ids']);
         }
 
-        $book->load(['categories', 'authors', 'publishers', 'copies', 'reviews']);
+        $book->load(['categories', 'genres', 'authors', 'publishers', 'copies', 'reviews']);
 
         ActivityLogger::log(
             'create',
@@ -174,6 +188,10 @@ class BookService
             $book->categories()->sync($data['category_ids']);
         }
 
+        if (array_key_exists('genre_ids', $data)) {
+            $book->genres()->sync($data['genre_ids'] ?? []);
+        }
+
         if (array_key_exists('author_ids', $data)) {
             $book->authors()->sync($data['author_ids'] ?? []);
         }
@@ -182,7 +200,7 @@ class BookService
             $book->publishers()->sync($data['publisher_ids'] ?? []);
         }
 
-        $book->load(['categories', 'authors', 'publishers', 'copies', 'reviews.user.profile']);
+        $book->load(['categories', 'genres', 'authors', 'publishers', 'copies', 'reviews.user.profile']);
 
         ActivityLogger::log(
             'update',
@@ -230,6 +248,7 @@ class BookService
     {
         $book->load([
             'categories',
+            'genres',
             'authors',
             'publishers',
             'reviews.user.profile',

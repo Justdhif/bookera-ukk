@@ -28,6 +28,7 @@ interface BorrowFinesCardProps {
 
 export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
   const t = useTranslations("borrow");
+  const tPublic = useTranslations("public");
   const [loadingId, setLoadingId] = useState<number | null>(null);
 
   const handleMarkAsPaid = async (fineId: number) => {
@@ -114,7 +115,7 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
                   }
                   variant="outline"
                 >
-                  {fine.status.toUpperCase()}
+                  {tPublic(`fineStatus.${fine.status}`)}
                 </Badge>
 
                 {fine.status === "unpaid" && (

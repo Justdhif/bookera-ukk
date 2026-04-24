@@ -27,7 +27,63 @@ class Borrow extends Model
         'status',
     ];
 
-    protected $appends = ['qr_code_url'];
+    protected $appends = ['qr_code_url', 'estimated_late_fine'];
+
+    public function getEstimatedLateFineAttribute(): array
+    {
+        if ($this->status === 'close') {
+            return [
+                'is_late' => false,
+                'days_late' => 0,
+                'total_fine' => 0,
+                'fine_per_book' => 0,
+                'total_books' => 0
+            ];
+        }
+
+        $expectedReturnDate = \Illuminate\Support\Carbon::parse($this->return_date)->startOfDay();
+        $today = now()->startOfDay();
+
+        if (!$today->greaterThan($expectedReturnDate)) {
+            return [
+                'is_late' => false,
+                'days_late' => 0,
+                'total_fine' => 0,
+                'fine_per_book' => 0,
+                'total_books' => 0
+            ];
+        }
+
+        $daysLate = (int) $expectedReturnDate->diffInDays($today);
+        $lateFineType = FineType::where('type', 'late')->orderBy('amount')->first();
+        
+        if (!$lateFineType) {
+            return [
+                'is_late' => true,
+                'days_late' => $daysLate,
+                'total_fine' => 0,
+                'fine_per_book' => 0,
+                'total_books' => 0
+            ];
+        }
+
+        // Count books that haven't been returned or marked lost yet
+        $unprocessedBooksCount = $this->borrowDetails()
+            ->where('status', 'borrowed')
+            ->count();
+
+        $totalFine = $lateFineType->amount * $daysLate * $unprocessedBooksCount;
+
+        return [
+            'is_late' => true,
+            'days_late' => $daysLate,
+            'total_fine' => (float) $totalFine,
+            'fine_per_book' => (float) $lateFineType->amount,
+            'total_books' => $unprocessedBooksCount,
+            'fine_name' => $lateFineType->name,
+            'fine_description' => $lateFineType->description
+        ];
+    }
 
     public function user()
     {

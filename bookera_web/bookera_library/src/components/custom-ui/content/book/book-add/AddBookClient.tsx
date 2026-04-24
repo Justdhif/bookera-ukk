@@ -7,9 +7,11 @@ import { useState, useEffect } from "react";
 import { bookService } from "@/services/book.service";
 import { CreateBookData } from "@/types/book";
 import { categoryService } from "@/services/category.service";
+import { genreService } from "@/services/genre.service";
 import { authorService } from "@/services/author.service";
 import { publisherService } from "@/services/publisher.service";
 import { Category } from "@/types/category";
+import { Genre } from "@/types/genre";
 import { Author } from "@/types/author";
 import { Publisher } from "@/types/publisher";
 import { Button } from "@/components/ui/button";
@@ -31,8 +33,10 @@ export default function AddBookClient() {
     isbn: "",
     language: "",
     description: "",
+    price: "",
     is_active: true,
     category_ids: [],
+    genre_ids: [],
     cover_image: null,
   });
   const [coverError, setCoverError] = useState(false);
@@ -40,6 +44,7 @@ export default function AddBookClient() {
   const [coverPreview, setCoverPreview] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [genres, setGenres] = useState<Genre[]>([]);
   const [authors, setAuthors] = useState<Author[]>([]);
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [authorDialogOpen, setAuthorDialogOpen] = useState(false);
@@ -47,6 +52,7 @@ export default function AddBookClient() {
 
   useEffect(() => {
     fetchCategories();
+    fetchGenres();
     fetchAuthors();
     fetchPublishers();
   }, []);
@@ -57,6 +63,15 @@ export default function AddBookClient() {
       setCategories(res.data.data.data || []);
     } catch {
       toast.error("Failed to load categories");
+    }
+  };
+
+  const fetchGenres = async () => {
+    try {
+      const res = await genreService.getAll();
+      setGenres(res.data.data.data || []);
+    } catch {
+      toast.error("Failed to load genres");
     }
   };
 
@@ -100,18 +115,12 @@ export default function AddBookClient() {
 
   const isFormValid = (): boolean => {
     if (!formData.title.trim()) return false;
-    if (!formData.cover_image && !coverPreview) return false;
     if (coverError || formHasErrors) return false;
     return true;
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!formData.cover_image && !coverPreview) {
-      setCoverError(true);
-      toast.error("Cover image is required");
-      return;
-    }
     if (coverError || formHasErrors) {
       toast.error("Please fix all validation errors before submitting");
       return;
@@ -135,17 +144,6 @@ export default function AddBookClient() {
         description={t("addBookDesc")}
         showBackButton
         isAdmin
-        rightActions={
-          <Button
-            onClick={handleSubmit}
-            variant="submit"
-            disabled={submitting || !isFormValid()}
-            loading={submitting}
-            className="h-8"
-          >
-            {submitting ? t("saving") : t("addBook")}
-          </Button>
-        }
       />
       <div>
         <div className="grid gap-6 lg:grid-cols-3">
@@ -156,7 +154,7 @@ export default function AddBookClient() {
               onCoverImageChange={handleCoverImageChange}
               setFormData={setFormData}
               onSwitchChange={handleSwitchChange}
-              isCoverRequired={true}
+              isCoverRequired={false}
               coverError={coverError}
               onCoverValidationChange={handleCoverValidationChange}
             />
@@ -165,12 +163,16 @@ export default function AddBookClient() {
             isEditMode={true}
             formData={formData}
             setFormData={setFormData}
+            genres={genres}
             categories={categories}
             authors={authors}
             publishers={publishers}
             onAddAuthor={() => setAuthorDialogOpen(true)}
             onAddPublisher={() => setPublisherDialogOpen(true)}
             onValidationChange={setFormHasErrors}
+            onSubmit={handleSubmit}
+            submitting={submitting}
+            isSubmitDisabled={!isFormValid()}
           />
         </div>
       </div>

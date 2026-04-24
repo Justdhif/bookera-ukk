@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Models\Genre;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -39,7 +39,7 @@ class Book extends Model
             return storage_image($value);
         }
 
-        return 'https://picsum.photos/seed/'.rawurlencode($this->slug).'/400/600';
+        return asset('images/default_cover.jpg');
     }
 
     public function setCoverImageAttribute($value)
@@ -92,6 +92,11 @@ class Book extends Model
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'book_categories', 'book_id', 'category_id');
+    }
+
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class, 'book_genres', 'book_id', 'genre_id');
     }
 
     public function copies()

@@ -6,7 +6,7 @@ import { AlertTriangle, ArrowRight, BookOpen, Clock, LogIn } from "lucide-react"
 import { useAuthStore } from "@/store/auth.store";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Borrow } from "@/types/borrow";
-import { diffDays, getBookTitle, startOfDay } from "./DailyTimeline";
+import { diffDays, formatBorrowDate, startOfDay } from "./DailyTimeline";
 
 interface ActiveBorrowPanelProps {
   borrows: Borrow[];
@@ -15,6 +15,25 @@ interface ActiveBorrowPanelProps {
 }
 
 const dueSoonThresholdDays = 3;
+
+function getBookTitle(borrow: Borrow): string {
+  if (borrow.borrow_details?.length > 0) {
+    const titles = borrow.borrow_details
+      .map((detail) => detail.book_copy?.book?.title)
+      .filter(Boolean);
+
+    if (titles.length > 0) {
+      return titles.join(", ");
+    }
+  }
+
+  const requestDetails = borrow.borrow_request?.borrow_request_details ?? [];
+  const titles = requestDetails
+    .map((detail) => detail.book?.title)
+    .filter(Boolean);
+
+  return titles.length > 0 ? titles.join(", ") : `Kode ${borrow.borrow_code}`;
+}
 
 export function ActiveBorrowPanel({
   borrows,
@@ -75,15 +94,13 @@ export function ActiveBorrowPanel({
 
       <div className="relative z-10 flex-1 min-h-0">
         {!isAuthenticated ? (
-          <div className="flex items-center justify-center px-4 py-6 sm:px-6">
+          <div className="flex h-full min-h-60 items-center justify-center px-4 py-6 sm:px-6">
             <EmptyState
               variant="compact"
               icon={<LogIn className="text-emerald-600 dark:text-emerald-400" />}
               title={t("login_prompt")}
               description={t("login_desc")}
-              linkLabel={t("login_btn")}
-              linkHref="/login"
-              className="w-full"
+              className="w-full max-w-sm"
             />
           </div>
         ) : activeBorrowItems.length === 0 ? (
@@ -163,6 +180,15 @@ export function ActiveBorrowPanel({
                               month: "short",
                               year: "numeric",
                             })}
+                          </span>
+                        </div>
+                        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-medium text-gray-400 dark:text-white/35">
+                          <span>
+                            {t("borrow_start")}: {formatBorrowDate(borrow.borrow_date, locale)}
+                          </span>
+                          <span className="hidden sm:inline">•</span>
+                          <span>
+                            {t("borrow_end")}: {formatBorrowDate(borrow.return_date, locale)}
                           </span>
                         </div>
                       </div>

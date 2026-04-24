@@ -11,9 +11,11 @@ import { buildBookFormData } from "./form-data/book.form-data";
 
 export const bookService = {
   getAll: (filters?: BookFilterParams) => {
-    const { category_ids, ...params } = filters ?? {};
+    const { category_ids, genre_ids, ...params } = filters ?? {};
     if (category_ids?.length)
       Object.assign(params, { category_ids: category_ids.join(",") });
+    if (genre_ids?.length)
+      Object.assign(params, { genre_ids: genre_ids.join(",") });
     return api.get<ApiResponse<BookListResponse>>("/admin/books", { params });
   },
   
@@ -40,4 +42,22 @@ export const bookService = {
     ),
 
   delete: (id: number) => api.delete<ApiResponse<null>>(`/admin/books/${id}`),
+
+  import: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return api.post<ApiResponse<null>>("/admin/books/import", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
+  downloadTemplate: () =>
+    api.get("/admin/books/template", {
+      responseType: "blob",
+    }),
+
+  exportData: () =>
+    api.get("/admin/books/export", {
+      responseType: "blob",
+    }),
 };

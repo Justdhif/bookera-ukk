@@ -20,6 +20,7 @@ import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialo
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
+import DateRangeFilter from "@/components/custom-ui/DateRangeFilter";
 
 export default function BorrowClient() {
   const t = useTranslations("borrow");
@@ -132,6 +133,15 @@ export default function BorrowClient() {
     fetchRequests(requestFilters);
   }, [requestFilters]);
 
+  const handleDateFilter = (start_date?: string, end_date?: string) => {
+    setBorrowFilters((prev) => ({
+      ...prev,
+      start_date,
+      end_date,
+      page: 1,
+    }));
+  };
+
 
 
   const renderBorrowCards = (borrows: Borrow[]) => {
@@ -225,6 +235,7 @@ export default function BorrowClient() {
                     className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
                   />
                 </div>
+                <DateRangeFilter onFilter={handleDateFilter} />
               </div>
               <PaginatedContent
                 currentPage={borrowPagination.current_page}

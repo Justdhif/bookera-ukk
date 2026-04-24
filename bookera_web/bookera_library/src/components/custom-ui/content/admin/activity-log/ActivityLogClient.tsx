@@ -33,7 +33,7 @@ export default function ActivityLogClient() {
       } else if (user.role === "officer:management") {
         router.replace("/admin/users");
       } else {
-        router.replace("/");
+        router.replace("/home");
       }
     }
   }, [user, router]);

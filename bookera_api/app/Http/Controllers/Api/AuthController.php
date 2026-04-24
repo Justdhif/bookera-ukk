@@ -146,6 +146,39 @@ class AuthController extends Controller
     }
 
     /**
+     * Activate user account
+     */
+    public function activate(Request $request): JsonResponse
+    {
+        try {
+            $user = $this->authService->activateAccount(
+                $request->email,
+                $request->token
+            );
+
+            return ApiResponse::successResponse('Account activated successfully', [
+                'user' => $user,
+            ]);
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse($e->getMessage(), 400);
+        }
+    }
+
+    /**
+     * Resend activation email
+     */
+    public function resendActivation(Request $request): JsonResponse
+    {
+        try {
+            $this->authService->sendActivationEmail($request->email);
+
+            return ApiResponse::successResponse('Activation link has been resent to your email');
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse($e->getMessage(), 400);
+        }
+    }
+
+    /**
      * Logout user
      */
     public function logout(Request $request): JsonResponse

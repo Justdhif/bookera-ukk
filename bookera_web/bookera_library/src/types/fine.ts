@@ -6,6 +6,7 @@ export interface FineType {
   name: string;
   type: "lost" | "damaged" | "late";
   amount: number;
+  percentage?: number | null;
   description?: string;
   created_at: string;
   updated_at: string;
@@ -30,6 +31,7 @@ export interface CreateFineTypePayload {
   name: string;
   type: "lost" | "damaged" | "late";
   amount: number;
+  percentage?: number;
   description?: string;
 }
 
@@ -37,6 +39,7 @@ export interface UpdateFineTypePayload {
   name?: string;
   type?: "lost" | "damaged" | "late";
   amount?: number;
+  percentage?: number;
   description?: string;
 }
 

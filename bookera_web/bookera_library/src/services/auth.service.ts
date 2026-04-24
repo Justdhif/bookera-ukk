@@ -69,4 +69,15 @@ export const authService = {
 
   changePassword: (data: Record<string, string>) =>
     api.post<ApiResponse<null>>("/auth/change-password", data),
+
+  activate: (email: string, token: string) =>
+    api.post<ApiResponse<{ user: User }>>("/auth/activate", {
+      email,
+      token,
+    }),
+
+  resendActivation: (email: string) =>
+    api.post<ApiResponse<null>>("/auth/resend-activation", {
+      email,
+    }),
 };

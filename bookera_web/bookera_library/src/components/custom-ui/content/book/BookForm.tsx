@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Book } from "@/types/book";
 import { Category } from "@/types/category";
+import { Genre } from "@/types/genre";
 import { Author } from "@/types/author";
 import { Publisher } from "@/types/publisher";
 import { Input } from "@/components/ui/input";
@@ -31,7 +32,7 @@ import {
 } from "@/components/ui/command";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Plus, UserSquare, Building2, X, Trash } from "lucide-react";
+import { Plus, UserSquare, Building2, Bookmark, X, Trash, Edit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import YearPicker from "@/components/custom-ui/YearPicker";
 
@@ -43,8 +44,10 @@ interface FormData {
   isbn: string;
   language: string;
   description: string;
+  price?: number | string;
   is_active: boolean;
   category_ids: number[];
+  genre_ids: number[];
 }
 
 interface FormErrors {
@@ -63,14 +66,21 @@ interface BookFormProps {
   ) => void;
   onYearChange?: (year: string) => void;
   onCategoryChange?: (categoryIds: number[]) => void;
+  onGenreChange?: (genreIds: number[]) => void;
   onAuthorChange?: (authorIds: number[]) => void;
   onPublisherChange?: (publisherIds: number[]) => void;
   onAddAuthor?: () => void;
   onAddPublisher?: () => void;
+  genres: Genre[];
   categories: Category[];
   authors: Author[];
   publishers: Publisher[];
   onValidationChange?: (hasErrors: boolean) => void;
+  onSubmit?: (e: React.FormEvent) => void;
+  onCancel?: () => void;
+  onEdit?: () => void;
+  submitting?: boolean;
+  isSubmitDisabled?: boolean;
 }
 export default function BookForm({
   book,
@@ -80,14 +90,21 @@ export default function BookForm({
   onInputChange,
   onYearChange,
   onCategoryChange,
+  onGenreChange,
   onAuthorChange,
   onPublisherChange,
   onAddAuthor,
   onAddPublisher,
+  genres,
   categories,
   authors,
   publishers,
   onValidationChange,
+  onSubmit,
+  onCancel,
+  onEdit,
+  submitting = false,
+  isSubmitDisabled = false,
 }: BookFormProps) {
   const t = useTranslations("book");
   const [errors, setErrors] = useState<FormErrors>({
@@ -166,6 +183,30 @@ export default function BookForm({
       setFormData({ ...formData, publisher_ids: newIds });
     }
   };
+  const handleGenreSelect = (genreId: number) => {
+    const newGenreIds = formData.genre_ids.includes(genreId)
+      ? formData.genre_ids.filter((id) => id !== genreId)
+      : [...formData.genre_ids, genreId];
+    if (onGenreChange) {
+      onGenreChange(newGenreIds);
+    } else {
+      setFormData({
+        ...formData,
+        genre_ids: newGenreIds,
+      });
+    }
+  };
+  const handleRemoveGenre = (genreId: number) => {
+    const newGenreIds = formData.genre_ids.filter((id) => id !== genreId);
+    if (onGenreChange) {
+      onGenreChange(newGenreIds);
+    } else {
+      setFormData({
+        ...formData,
+        genre_ids: newGenreIds,
+      });
+    }
+  };
   const handleRemoveCategory = (categoryId: number) => {
     const newCategoryIds = formData.category_ids.filter(
       (id) => id !== categoryId,
@@ -224,21 +265,6 @@ export default function BookForm({
         </div>
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">{t("publicationDetails")}</h3>
-          <div className="space-y-2">
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="publication_year">{t("publicationYear")}</Label>
-                <YearPicker
-                  value={formData.publication_year || ""}
-                  onChange={handleYearChange}
-                  placeholder={t("selectYear")}
-                  searchPlaceholder={t("searchYear")}
-                  emptyText={t("yearNotFound")}
-                  disabled={!isEditMode}
-                />
-              </div>
-            </div>
-          </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="isbn">{t("isbn")}</Label>
@@ -269,6 +295,48 @@ export default function BookForm({
                   isEditMode ? handleValidationChange("language") : undefined
                 }
               />
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="publication_year">{t("publicationYear")}</Label>
+              <YearPicker
+                value={formData.publication_year || ""}
+                onChange={handleYearChange}
+                placeholder={t("selectYear")}
+                searchPlaceholder={t("searchYear")}
+                emptyText={t("yearNotFound")}
+                disabled={!isEditMode}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label
+                htmlFor="price"
+                variant={isEditMode ? "required" : "default"}
+              >
+                {t("price")}
+              </Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
+                  Rp
+                </span>
+                <Input
+                  id="price"
+                  name="price"
+                  type={isEditMode ? "number" : "text"}
+                  min="0"
+                  required={isEditMode}
+                  value={
+                    !isEditMode && formData.price
+                      ? Number(formData.price).toLocaleString("id-ID")
+                      : formData.price || ""
+                  }
+                  onChange={handleInputChange}
+                  placeholder={t("enterPrice")}
+                  disabled={!isEditMode}
+                  className="pl-8"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -323,7 +391,7 @@ export default function BookForm({
                           "cursor-pointer transition-colors duration-200",
                           formData.author_ids.includes(author.id)
                             ? "bg-brand-primary/10 text-brand-primary font-medium"
-                            : "hover:bg-accent"
+                            : "hover:bg-accent",
                         )}
                       >
                         <Checkbox
@@ -344,7 +412,11 @@ export default function BookForm({
                 {formData.author_ids.map((id) => {
                   const author = authors.find((a) => a.id === id);
                   return author ? (
-                    <Badge key={id} variant="default" className="gap-1 bg-brand-primary/10 text-brand-primary border-brand-primary/20 hover:bg-brand-primary/20 transition-all duration-300">
+                    <Badge
+                      key={id}
+                      variant="default"
+                      className="gap-1 bg-brand-primary/10 text-brand-primary border-brand-primary/20 hover:bg-brand-primary/20 transition-all duration-300"
+                    >
                       {author.name}
                       {isEditMode && (
                         <Button
@@ -366,6 +438,97 @@ export default function BookForm({
                 })}
               </div>
             ) : null}
+          </div>
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              <Bookmark className="h-5 w-5" /> {t("genresSection")}
+            </h3>
+          </div>
+          <div className="space-y-2">
+            <Label>{t("selectGenresLabel")}</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal"
+                  disabled={!isEditMode}
+                >
+                  {formData.genre_ids && formData.genre_ids.length > 0
+                    ? t("genresSelected", {
+                        count: formData.genre_ids.length,
+                      })
+                    : t("selectGenresBtn")}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="p-0"
+                style={{ width: "var(--radix-popover-trigger-width)" }}
+              >
+                <Command>
+                  <CommandInput placeholder={t("searchGenresPlaceholder")} />
+                  <CommandEmpty>{t("noGenresFound")}</CommandEmpty>
+                  <CommandGroup>
+                    {genres.map((genre) => (
+                      <CommandItem
+                        key={genre.id}
+                        onSelect={() =>
+                          isEditMode && handleGenreSelect(genre.id)
+                        }
+                        className={cn(
+                          "cursor-pointer transition-colors duration-200",
+                          formData.genre_ids.includes(genre.id)
+                            ? "bg-brand-primary/10 text-brand-primary font-medium"
+                            : "hover:bg-accent",
+                        )}
+                      >
+                        <Checkbox
+                          checked={formData.genre_ids.includes(genre.id)}
+                          variant="circle"
+                          className="mr-2 border-brand-primary/40"
+                          disabled={!isEditMode}
+                        />
+                        {genre.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            {formData.genre_ids && formData.genre_ids.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.genre_ids.map((id: number) => {
+                  const genre = genres.find((g) => g.id === id);
+                  return genre ? (
+                    <Badge
+                      key={id}
+                      variant="default"
+                      className="gap-1 bg-brand-primary/10 text-brand-primary border-brand-primary/20 hover:bg-brand-primary/20 transition-all duration-300"
+                    >
+                      {genre.name}
+                      {isEditMode && (
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleRemoveGenre(id);
+                          }}
+                          className="h-4 w-4 p-0 ml-1 hover:bg-muted rounded-full"
+                        >
+                          <X className="h-3 w-3" />
+                          <span className="sr-only">Remove {genre.name}</span>
+                        </Button>
+                      )}
+                    </Badge>
+                  ) : null;
+                })}
+              </div>
+            )}
           </div>
         </div>
         <div className="space-y-4">
@@ -419,7 +582,7 @@ export default function BookForm({
                           "cursor-pointer transition-colors duration-200",
                           formData.publisher_ids.includes(publisher.id)
                             ? "bg-brand-primary/10 text-brand-primary font-medium"
-                            : "hover:bg-accent"
+                            : "hover:bg-accent",
                         )}
                       >
                         <Checkbox
@@ -442,7 +605,11 @@ export default function BookForm({
                 {formData.publisher_ids.map((id) => {
                   const publisher = publishers.find((p) => p.id === id);
                   return publisher ? (
-                    <Badge key={id} variant="default" className="gap-1 bg-brand-primary/10 text-brand-primary border-brand-primary/20 hover:bg-brand-primary/20 transition-all duration-300">
+                    <Badge
+                      key={id}
+                      variant="default"
+                      className="gap-1 bg-brand-primary/10 text-brand-primary border-brand-primary/20 hover:bg-brand-primary/20 transition-all duration-300"
+                    >
                       {publisher.name}
                       {isEditMode && (
                         <Button
@@ -505,7 +672,7 @@ export default function BookForm({
                           "cursor-pointer transition-colors duration-200",
                           formData.category_ids.includes(cat.id)
                             ? "bg-brand-primary/10 text-brand-primary font-medium"
-                            : "hover:bg-accent"
+                            : "hover:bg-accent",
                         )}
                       >
                         <Checkbox
@@ -526,7 +693,11 @@ export default function BookForm({
                 {formData.category_ids.map((id: number) => {
                   const category = categories.find((c) => c.id === id);
                   return category ? (
-                    <Badge key={id} variant="default" className="gap-1 bg-brand-primary/10 text-brand-primary border-brand-primary/20 hover:bg-brand-primary/20 transition-all duration-300">
+                    <Badge
+                      key={id}
+                      variant="default"
+                      className="gap-1 bg-brand-primary/10 text-brand-primary border-brand-primary/20 hover:bg-brand-primary/20 transition-all duration-300"
+                    >
                       {category.name}
                       {isEditMode && (
                         <Button
@@ -569,6 +740,48 @@ export default function BookForm({
             />
           </div>
         </div>
+
+        {isEditMode ? (
+          onSubmit && (
+            <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
+              {onCancel && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onCancel}
+                  disabled={submitting}
+                  className="h-8"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  {t("cancel")}
+                </Button>
+              )}
+              <Button 
+                onClick={onSubmit} 
+                variant="submit" 
+                className="h-8"
+                disabled={isSubmitDisabled || submitting}
+                loading={submitting}
+              >
+                {submitting ? t("saving") : (book ? t("saveChanges") : t("addBook"))}
+              </Button>
+            </div>
+          )
+        ) : (
+          onEdit && (
+            <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
+              <Button
+                type="button"
+                variant="brand"
+                onClick={onEdit}
+                className="h-8 gap-1"
+              >
+                <Edit className="h-3.5 w-3.5" />
+                {t("editBook")}
+              </Button>
+            </div>
+          )
+        )}
       </CardContent>
     </Card>
   );

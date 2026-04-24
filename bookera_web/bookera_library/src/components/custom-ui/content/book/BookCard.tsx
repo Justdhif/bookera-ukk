@@ -8,7 +8,7 @@ import { Book } from "@/types/book";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { BookOpen, CalendarDays, Building2, Eye, Star, Heart } from "lucide-react";
+import { BookOpen, Bookmark, CalendarDays, Building2, Eye, Star, Heart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
@@ -50,6 +50,10 @@ export default function BookCard({
       : book.publisher || null;
 
   const visibleCategories = book.categories?.slice(0, 2) ?? [];
+  const genreNames =
+    book.genres && book.genres.length > 0
+      ? book.genres.map((genre) => genre.name).join(", ")
+      : null;
 
   const handleCheckboxClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -97,47 +101,28 @@ export default function BookCard({
           height={400}
           unoptimized
         />
-        {book.total_copies !== undefined && (
-          <div className="absolute top-2 right-2">
-            <Badge
-              variant={
-                book.available_copies && book.available_copies > 0
-                  ? "default"
-                  : "secondary"
-              }
-              className={
-                book.available_copies && book.available_copies > 0
-                  ? "bg-brand-primary hover:bg-brand-primary-dark text-white text-xs"
-                  : "text-xs"
-              }
-            >
-              {book.available_copies || 0}/{book.total_copies}
-            </Badge>
+        {visibleCategories.length > 0 && (
+          <div className="absolute bottom-2 left-2 z-10 flex max-w-[calc(100%-1rem)] flex-wrap gap-1">
+            {visibleCategories.map((cat) => (
+              <Badge
+                key={`category-${cat.id}`}
+                variant="default"
+                className="text-[10px] px-1.5 py-0 h-4 font-normal shadow-sm backdrop-blur-sm"
+              >
+                {cat.name}
+              </Badge>
+            ))}
+            {(book.categories?.length ?? 0) > 2 && (
+              <Badge
+                variant="outline"
+                className="text-[10px] px-1.5 py-0 h-4 font-normal shadow-sm backdrop-blur-sm bg-background/85"
+              >
+                +{book.categories!.length - 2}
+              </Badge>
+            )}
           </div>
         )}
-
       </div>
-      {visibleCategories.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {visibleCategories.map((cat) => (
-            <Badge
-              key={cat.id}
-              variant="default"
-              className="text-[10px] px-1.5 py-0 h-4 font-normal"
-            >
-              {cat.name}
-            </Badge>
-          ))}
-          {(book.categories?.length ?? 0) > 2 && (
-            <Badge
-              variant="outline"
-              className="text-[10px] px-1.5 py-0 h-4 font-normal"
-            >
-              +{book.categories!.length - 2}
-            </Badge>
-          )}
-        </div>
-      )}
       <div ref={containerRef} className="overflow-hidden">
         <motion.span
           ref={textRef}
@@ -174,6 +159,12 @@ export default function BookCard({
           {book.title}
         </motion.span>
       </div>
+      {genreNames && (
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <Bookmark className="h-3 w-3 shrink-0" />
+          <span className="truncate">{genreNames}</span>
+        </div>
+      )}
       {authorNames && (
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <BookOpen className="h-3 w-3 shrink-0" />

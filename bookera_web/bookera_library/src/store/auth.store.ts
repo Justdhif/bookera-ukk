@@ -66,16 +66,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         password_confirmation,
       );
 
-      const { token, user } = res.data.data;
-
-      setCookie("token", token, { maxAge: 60 * 60 * 24 });
-      setCookie("role", user.role, { maxAge: 60 * 60 * 24 });
-
-      set({
-        user,
-        isAuthenticated: true,
-        loading: false,
-      });
+      set({ loading: false });
 
       return res.data.message;
     } catch (err) {

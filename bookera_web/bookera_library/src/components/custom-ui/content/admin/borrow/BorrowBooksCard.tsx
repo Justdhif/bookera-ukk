@@ -65,11 +65,30 @@ export function BorrowBooksCard({
   const t = useTranslations("borrow");
   const tCommon = useTranslations("common");
 
-  const sortFineTypesByAmount = (types: FineType[]) =>
-    [...types].sort((a, b) => a.amount - b.amount || a.id - b.id);
+  const sortFineTypesByValue = (types: FineType[]) =>
+    [...types].sort(
+      (a, b) => getFineTypeSortValue(a) - getFineTypeSortValue(b) || a.id - b.id,
+    );
+
+  const getFineTypeSortValue = (fineType: FineType) =>
+    Number(
+      fineType.type === "damaged"
+        ? fineType.percentage ?? 0
+        : fineType.amount ?? 0,
+    );
+
+  const formatFineTypeValue = (fineType: FineType) => {
+    if (fineType.type === "damaged") {
+      return `${new Intl.NumberFormat("id-ID", {
+        maximumFractionDigits: 2,
+      }).format(Number(fineType.percentage ?? 0))}%`;
+    }
+
+    return `Rp ${Number(fineType.amount ?? 0).toLocaleString("id-ID")}`;
+  };
 
   const getFineTypesByType = (type: FineType["type"]) =>
-    sortFineTypesByAmount(
+    sortFineTypesByValue(
       fineTypes.filter((fineType) => fineType.type === type),
     );
 
@@ -100,7 +119,7 @@ export function BorrowBooksCard({
     );
   })();
 
-  const lateFineAmount = lateFineType?.amount || 0;
+  const lateFineAmount = Number(lateFineType?.amount ?? 0);
   const totalLateFine = daysLate * lateFineAmount;
 
   const returnDetails =
@@ -190,7 +209,7 @@ export function BorrowBooksCard({
               const publisher =
                 book?.publishers?.[0]?.name ||
                 book?.publisher ||
-                "Standard Edition";
+                tCommon("noData");
               const categories = book?.categories ?? [];
 
               return (
@@ -206,7 +225,7 @@ export function BorrowBooksCard({
                         <div className="relative h-36 w-24 overflow-hidden rounded-2xl border border-primary/20 bg-muted shadow-md">
                           <Image
                             src={book?.cover_image || "/placeholder-book.png"}
-                            alt={book?.title || "Book cover"}
+                            alt={book?.title || tCommon("bookCover")}
                             fill
                             sizes="96px"
                             className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -220,7 +239,7 @@ export function BorrowBooksCard({
                       <div className="min-w-0 flex-1 space-y-3">
                         <div className="space-y-1">
                           <h4 className="line-clamp-2 text-xl font-black leading-tight text-foreground">
-                            {book?.title || "Unknown"}
+                            {book?.title || tCommon("noData")}
                           </h4>
                           <div className="flex flex-wrap items-center gap-2 text-sm">
                             <span className="font-medium text-muted-foreground">
@@ -412,9 +431,7 @@ export function BorrowBooksCard({
                                                 {fineType.name}
                                               </p>
                                               <span className="shrink-0 text-sm font-black text-amber-600">
-                                                {formatCurrency(
-                                                  fineType.amount,
-                                                )}
+                                                {formatFineTypeValue(fineType)}
                                               </span>
                                             </div>
                                             {fineType.description && (
@@ -444,8 +461,8 @@ export function BorrowBooksCard({
                                           </p>
                                         </div>
                                         <span className="text-lg font-black text-amber-600">
-                                          {formatCurrency(
-                                            selectedDamagedFineType.amount,
+                                          {formatFineTypeValue(
+                                            selectedDamagedFineType,
                                           )}
                                         </span>
                                       </div>
@@ -456,7 +473,6 @@ export function BorrowBooksCard({
                                       )}
                                     </div>
                                   )}
-
                                 </div>
                               )}
                             </div>
@@ -583,7 +599,7 @@ export function BorrowBooksCard({
                 <BookOpen className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                 <div className="min-w-0 flex-1 space-y-1">
                   <p className="truncate text-sm font-medium">
-                    {detail.book?.title || "Unknown"}
+                    {detail.book?.title || tCommon("noData")}
                   </p>
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Clock className="h-3 w-3" />

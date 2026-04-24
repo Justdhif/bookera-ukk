@@ -27,14 +27,16 @@ class BorrowController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
-            'search'   => $request->search,
-            'status'   => $request->status,
-            'per_page' => $request->per_page,
+            'search'     => $request->search,
+            'status'     => $request->status,
+            'per_page'   => $request->per_page,
+            'start_date' => $request->start_date,
+            'end_date'   => $request->end_date,
         ];
 
         $borrows = $this->borrowService->getAll($filters);
 
-        return ApiResponse::successResponse('Borrow data retrieved successfully', $borrows);
+        return ApiResponse::successResponse(__('Borrow data retrieved successfully'), $borrows);
     }
 
     public function store(StoreBorrowRequest $request): JsonResponse
@@ -44,7 +46,7 @@ class BorrowController extends Controller
             $request->user()
         );
 
-        return ApiResponse::successResponse('Borrow request created and waiting for admin approval',
+        return ApiResponse::successResponse(__('Borrow request created and waiting for admin approval'),
             $borrow,
             201
         );
@@ -57,7 +59,7 @@ class BorrowController extends Controller
             $request->user()
         );
 
-        return ApiResponse::successResponse('Direct borrow created successfully with open status',
+        return ApiResponse::successResponse(__('Direct borrow created successfully with open status'),
             $borrow,
             201
         );
@@ -69,38 +71,43 @@ class BorrowController extends Controller
     {
         $borrow = $this->borrowService->getByCode($code);
 
-        return ApiResponse::successResponse('Borrow details', $borrow);
+        return ApiResponse::successResponse(__('Borrow details'), $borrow);
     }
 
     public function update(UpdateBorrowRequest $request, Borrow $borrow): JsonResponse
     {
         $borrow = $this->borrowService->update($borrow, $request->validated());
 
-        return ApiResponse::successResponse('Borrow updated successfully', $borrow);
+        return ApiResponse::successResponse(__('Borrow updated successfully'), $borrow);
     }
 
     public function getBorrowByUser(Request $request): JsonResponse
     {
-        $borrows = $this->borrowService->getByUser($request->user());
+        $filters = [
+            'search'     => $request->search,
+            'start_date' => $request->start_date,
+            'end_date'   => $request->end_date,
+        ];
+        $borrows = $this->borrowService->getByUser($request->user(), $filters);
 
-        return ApiResponse::successResponse('User borrow data', $borrows);
+        return ApiResponse::successResponse(__('User borrow data'), $borrows);
     }
 
     public function assignCopies(Request $request, Borrow $borrow): JsonResponse
     {
         if (! $borrow->borrow_request_id) {
-            return ApiResponse::errorResponse('This borrow was not created from a request', null, 422);
+            return ApiResponse::errorResponse(__('This borrow was not created from a request'), null, 422);
         }
 
         if ($borrow->borrowDetails()->count() > 0) {
-            return ApiResponse::errorResponse('Book copies have already been assigned to this borrow', null, 422);
+            return ApiResponse::errorResponse(__('Book copies have already been assigned to this borrow'), null, 422);
         }
 
         $copyIds = $request->input('copy_ids', []);
 
         $borrow = $this->borrowRequestService->addCopiesToBorrow($borrow, $copyIds);
 
-        return ApiResponse::successResponse('Book copies assigned to borrow successfully', $borrow);
+        return ApiResponse::successResponse(__('Book copies assigned to borrow successfully'), $borrow);
     }
 
     public function complete(Borrow $borrow): JsonResponse
@@ -108,7 +115,7 @@ class BorrowController extends Controller
         try {
             $borrow = $this->borrowService->complete($borrow);
 
-            return ApiResponse::successResponse('Borrow completed and closed successfully', $borrow);
+            return ApiResponse::successResponse(__('Borrow completed and closed successfully'), $borrow);
         } catch (\Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }

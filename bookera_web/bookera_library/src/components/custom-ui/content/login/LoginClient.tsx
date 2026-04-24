@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth.store";
+import { LANDING_VISITED_KEY } from "@/constants/landing";
 
 import { AnimatePresence, motion } from "framer-motion";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
@@ -54,8 +55,17 @@ export default function LoginClient() {
   const handleLogin = async (email: string, password: string) => {
     try {
       const message = await login(email, password);
+      const user = useAuthStore.getState().user;
+
       toast.success(message || "Login successful!");
-      router.push("/");
+      // Tandai bahwa user sudah melewati landing page
+      localStorage.setItem(LANDING_VISITED_KEY, "true");
+
+      if (user && !user.profile) {
+        router.push("/setup-profile");
+      } else {
+        router.push("/home");
+      }
     } catch (err: any) {
       toast.error(err.response?.data?.message ?? t("loginFailed"));
     }
@@ -68,8 +78,10 @@ export default function LoginClient() {
   ) => {
     try {
       const message = await register(email, password, passwordConfirm);
-      toast.success(message || "Registration successful!");
-      router.push("/setup-profile");
+      toast.success(message || "Registration successful! Please check your email for activation.");
+      // Tandai bahwa user sudah melewati landing page
+      localStorage.setItem(LANDING_VISITED_KEY, "true");
+      setMode("login");
     } catch (err: any) {
       const errorData = err.response?.data;
       if (errorData?.data && typeof errorData.data === "object") {

@@ -16,7 +16,8 @@ class StoreFineTypeRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'type' => 'required|in:lost,damaged,late',
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required_unless:type,damaged|numeric|min:0',
+            'percentage' => 'required_if:type,damaged|numeric|min:0|max:100',
             'description' => 'nullable|string',
         ];
     }

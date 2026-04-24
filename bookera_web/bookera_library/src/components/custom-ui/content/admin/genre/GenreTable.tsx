@@ -1,0 +1,103 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Button,
+} from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import EmptyState from "@/components/custom-ui/EmptyState";
+import { Genre } from "@/types/genre";
+import { Edit, FolderOpen, Trash } from "lucide-react";
+
+export default function GenreTable({
+  data,
+  onEdit,
+  onDelete,
+}: {
+  data: Genre[];
+  onEdit: (genre: Genre) => void;
+  onDelete: (id: number) => void;
+}) {
+  const t = useTranslations("genre");
+
+  if (data.length === 0) {
+    return (
+      <EmptyState
+        title={t("noGenres")}
+        description={t("noGenresDesc")}
+        icon={<FolderOpen />}
+      />
+    );
+  }
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow className="bg-muted/50 hover:bg-muted/50">
+          <TableHead className="w-16 text-center">{t("noCol")}</TableHead>
+          <TableHead className="font-semibold">{t("genreCol")}</TableHead>
+          <TableHead className="font-semibold">{t("slugCol")}</TableHead>
+          <TableHead className="font-semibold">{t("descriptionCol")}</TableHead>
+          <TableHead className="font-semibold text-right">
+            {t("actionsCol")}
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {data.map((item, index) => (
+          <TableRow
+            key={item.id}
+            className="group hover:bg-primary/5 transition-colors border-b last:border-b-0"
+          >
+            <TableCell className="font-medium text-center text-muted-foreground">
+              {index + 1}
+            </TableCell>
+            <TableCell>
+              <span className="font-medium text-foreground">{item.name}</span>
+            </TableCell>
+            <TableCell>
+              <Badge variant="outline" className="font-mono text-xs">
+                /{item.slug}
+              </Badge>
+            </TableCell>
+            <TableCell>
+              <span className="font-medium text-foreground">
+                {item.description ? item.description : "-"}
+              </span>
+            </TableCell>
+            <TableCell>
+              <div className="flex justify-end items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="brand"
+                  onClick={() => onEdit(item)}
+                  className="h-8 gap-1"
+                >
+                  <Edit className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{t("edit")}</span>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => onDelete(item.id)}
+                  className="h-8 gap-1"
+                >
+                  <Trash className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{t("delete")}</span>
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}

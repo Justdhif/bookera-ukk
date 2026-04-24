@@ -20,51 +20,51 @@ class BorrowService
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
-        $query = Borrow::with([
+        $query = Borrow::query()->with([
             'borrowDetails.bookCopy.book.authors',
             'borrowDetails.bookCopy.book.publishers',
             'borrowDetails.bookCopy.book.categories',
+            'borrowDetails.bookCopy.book.genres',
             'borrowRequest.borrowRequestDetails.book.authors',
             'user.profile',
             'bookReturns.details.bookCopy.book.authors',
             'bookReturns.details.bookCopy.book.publishers',
             'bookReturns.details.bookCopy.book.categories',
+            'bookReturns.details.bookCopy.book.genres',
             'fines.fineType',
             'lostBooks.details.bookCopy.book.authors',
         ]);
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('id', 'like', "%{$search}%")
-                    ->orWhereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->where('email', 'like', "%{$search}%")
-                            ->orWhereHas('profile', function ($profileQuery) use ($search) {
-                                $profileQuery->where('full_name', 'like', "%{$search}%");
-                            });
-                    })
-                    ->orWhereHas('borrowDetails.bookCopy.book', function ($bookQuery) use ($search) {
-                        $bookQuery->where('title', 'like', "%{$search}%");
-                    });
-            });
+            $query->where('borrow_code', 'like', "%{$search}%");
         }
 
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        return $query->orderBy('id')->paginate($filters['per_page'] ?? 15);
+        if (!empty($filters['start_date'])) {
+            $query->whereDate('borrow_date', '>=', $filters['start_date']);
+        }
+
+        if (!empty($filters['end_date'])) {
+            $query->whereDate('borrow_date', '<=', $filters['end_date']);
+        }
+
+        return $query->orderBy('id', 'desc')->paginate($filters['per_page'] ?? 15);
     }
 
     public function create(array $data, User $user): Borrow
     {
-        // Check for active borrows
-        $hasActiveBorrow = Borrow::where('user_id', $user->id)
-            ->where('status', 'open')
+        $hasUnpaidFines = Borrow::where('user_id', $user->id)
+            ->whereHas('fines', function ($query) {
+                $query->where('status', 'unpaid');
+            })
             ->exists();
 
-        if ($hasActiveBorrow) {
-            abort(422, 'User masih memiliki peminjaman aktif yang belum dikembalikan.');
+        if ($hasUnpaidFines) {
+            abort(422, __('The user has unpaid fines. Please settle the fines before borrowing again.'));
         }
 
         $borrow = DB::transaction(function () use ($data, $user) {
@@ -104,6 +104,7 @@ class BorrowService
 
             $borrow->load([
                 'borrowDetails.bookCopy.book',
+                'borrowDetails.bookCopy.book.genres',
                 'user',
             ]);
 
@@ -131,13 +132,15 @@ class BorrowService
 
     public function createAdmin(array $data, User $admin): Borrow
     {
-        // Check for active borrows for the target user
-        $hasActiveBorrow = Borrow::where('user_id', $data['user_id'])
-            ->where('status', 'open')
+        // Check for unpaid fines for the target user
+        $hasUnpaidFines = Borrow::where('user_id', $data['user_id'])
+            ->whereHas('fines', function ($query) {
+                $query->where('status', 'unpaid');
+            })
             ->exists();
 
-        if ($hasActiveBorrow) {
-            abort(422, 'User tersebut masih memiliki peminjaman aktif yang belum dikembalikan.');
+        if ($hasUnpaidFines) {
+            abort(422, __('The user has unpaid fines. Please settle the fines before borrowing again.'));
         }
 
         $borrow = DB::transaction(function () use ($data, $admin) {
@@ -188,6 +191,7 @@ class BorrowService
 
             $borrow->load([
                 'borrowDetails.bookCopy.book',
+                'borrowDetails.bookCopy.book.genres',
                 'user.profile',
             ]);
 
@@ -223,11 +227,13 @@ class BorrowService
             'borrowDetails.bookCopy.book.authors',
             'borrowDetails.bookCopy.book.publishers',
             'borrowDetails.bookCopy.book.categories',
+            'borrowDetails.bookCopy.book.genres',
             'borrowRequest.borrowRequestDetails.book',
             'user.profile',
             'bookReturns.details.bookCopy.book.authors',
             'bookReturns.details.bookCopy.book.publishers',
             'bookReturns.details.bookCopy.book.categories',
+            'bookReturns.details.bookCopy.book.genres',
             'fines.fineType',
             'lostBooks.details.bookCopy.book.authors',
         ])->where('borrow_code', $code)->firstOrFail();
@@ -321,12 +327,12 @@ class BorrowService
             );
 
             if ($hasUnprocessedBooks) {
-                throw new \Exception('There are still books whose return or lost status has not been processed');
+                throw new \Exception(__('There are still books whose return or lost status has not been processed'));
             }
 
             $hasUnpaidFines = $borrow->fines()->where('status', 'unpaid')->exists();
             if ($hasUnpaidFines) {
-                throw new \Exception('There are still unpaid fines');
+                throw new \Exception(__('There are still unpaid fines'));
             }
 
             // Clean up lost book records if the admin eventually marked them as returned
@@ -352,30 +358,47 @@ class BorrowService
                 'borrowDetails.bookCopy.book.authors',
                 'borrowDetails.bookCopy.book.publishers',
                 'borrowDetails.bookCopy.book.categories',
+                'borrowDetails.bookCopy.book.genres',
                 'bookReturns.details.bookCopy.book.authors',
                 'bookReturns.details.bookCopy.book.publishers',
                 'bookReturns.details.bookCopy.book.categories',
+                'bookReturns.details.bookCopy.book.genres',
                 'fines.fineType',
                 'lostBooks.details.bookCopy.book.authors',
             ]);
         });
     }
 
-    public function getByUser(User $user): Collection
+    public function getByUser(User $user, array $filters = []): Collection
     {
-        return Borrow::with([
+        $query = Borrow::query()->with([
             'borrowDetails.bookCopy.book.authors',
             'borrowDetails.bookCopy.book.publishers',
             'borrowDetails.bookCopy.book.categories',
+            'borrowDetails.bookCopy.book.genres',
             'bookReturns.details.bookCopy.book.authors',
             'bookReturns.details.bookCopy.book.publishers',
             'bookReturns.details.bookCopy.book.categories',
+            'bookReturns.details.bookCopy.book.genres',
             'fines.fineType',
             'lostBooks.details.bookCopy.book.authors',
         ])
-            ->where('user_id', $user->id)
-            ->orderBy('id')
-            ->get();
+            ->where('user_id', $user->id);
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where('borrow_code', 'like', "%{$search}%");
+        }
+
+        if (!empty($filters['start_date'])) {
+            $query->whereDate('borrow_date', '>=', $filters['start_date']);
+        }
+
+        if (!empty($filters['end_date'])) {
+            $query->whereDate('borrow_date', '<=', $filters['end_date']);
+        }
+
+        return $query->orderBy('id', 'desc')->get();
     }
 
     private function generateBorrowCode(): string
