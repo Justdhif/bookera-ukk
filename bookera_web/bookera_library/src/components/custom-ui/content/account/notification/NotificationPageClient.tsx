@@ -2,11 +2,11 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { notificationService } from "@/services/notification.service";
 import {
-  notificationService,
+  Notification,
   NotificationFilterParams,
-} from "@/services/notification.service";
-import { Notification } from "@/types/notification";
+} from "@/types/notification";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import NotificationList from "./NotificationList";

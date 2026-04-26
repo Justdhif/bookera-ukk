@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { usePathnameCondition } from "@/hooks/usePathnameCondition";
 import { bookService } from "@/services/book.service";
@@ -17,9 +17,9 @@ import { Category } from "@/types/category";
 import { Genre } from "@/types/genre";
 import { Author } from "@/types/author";
 import { Publisher } from "@/types/publisher";
-import BookCopyList from "./BookCopyList";
-import BookSideCard from "../BookSideCard";
-import BookForm from "../BookForm";
+import BookCopyList from "@/components/custom-ui/content/admin/book/book-detail/BookCopyList";
+import BookSideCard from "@/components/custom-ui/content/admin/book/BookSideCard";
+import BookForm from "@/components/custom-ui/content/admin/book/BookForm";
 import AuthorFormDialog from "@/components/custom-ui/content/admin/author/AuthorFormDialog";
 import PublisherFormDialog from "@/components/custom-ui/content/admin/publisher/PublisherFormDialog";
 import FavoriteButton from "./FavoriteButton";
@@ -87,6 +87,10 @@ export default function BookDetailClient() {
   const [submitting, setSubmitting] = useState(false);
   const [coverError, setCoverError] = useState(false);
   const [formHasErrors, setFormHasErrors] = useState(false);
+  const relatedGenreIds = useMemo(
+    () => book?.genres?.map((genre) => genre.id) ?? [],
+    [book?.genres],
+  );
 
   useEffect(() => {
     if (!slug) return;
@@ -640,7 +644,10 @@ export default function BookDetailClient() {
                   {tPublic("exploreOtherBooksDesc") || "Discover more books from our collection"}
                 </p>
               </div>
-              <PublicBookGrid showBorrowActions={false} />
+              <PublicBookGrid
+                showBorrowActions={false}
+                genreIds={relatedGenreIds.length > 0 ? relatedGenreIds : undefined}
+              />
             </div>
           </>
         ))

@@ -7,7 +7,7 @@ import { Book } from "@/types/book";
 import { Category } from "@/types/category";
 import { publicService } from "@/services/public.service";
 import { favoriteService } from "@/services/favorite.service";
-import BookCard from "./BookCard";
+import BookCard from "./book-detail/BookCard";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
 import EmptyState from "@/components/custom-ui/EmptyState";
@@ -22,6 +22,7 @@ interface PublicBookGridProps {
   search?: string;
   authorIds?: number[];
   publisherIds?: number[];
+  genreIds?: number[];
   selectedBookIds?: number[];
   onSelectionChange?: (bookId: number, checked: boolean) => void;
   onVisibleBooksChange?: (books: Book[]) => void;
@@ -35,6 +36,7 @@ export default function PublicBookGrid({
   search,
   authorIds,
   publisherIds,
+  genreIds,
   selectedBookIds = [],
   onSelectionChange,
   onVisibleBooksChange,
@@ -149,6 +151,7 @@ export default function PublicBookGrid({
             category_ids: selectedCategoryId ? [selectedCategoryId] : undefined,
             author_ids: authorIds,
             publisher_ids: publisherIds,
+            genre_ids: genreIds,
             rating: selectedRatingRange !== null ? Number(selectedRatingRange) : undefined,
             min_reviews: selectedMinReviews !== null ? selectedMinReviews : undefined,
           });
@@ -189,6 +192,7 @@ export default function PublicBookGrid({
     selectedMinReviews,
     authorIds,
     publisherIds,
+    genreIds,
     fetchMode,
   ]);
 

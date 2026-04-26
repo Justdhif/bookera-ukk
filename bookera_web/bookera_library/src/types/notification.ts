@@ -1,5 +1,12 @@
 import { PaginatedResponse } from "./api";
 
+export interface NotificationFilterParams {
+  per_page?: number;
+  page?: number;
+  filter?: "read" | "unread";
+  module?: string;
+}
+
 export interface Notification {
   id: number;
   user_id: number;

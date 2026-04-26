@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\BorrowExport;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Borrow\StoreAdminBorrowRequest;
@@ -12,6 +13,8 @@ use App\Services\Borrow\BorrowService;
 use App\Services\BorrowRequest\BorrowRequestService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class BorrowController extends Controller
 {
@@ -26,13 +29,7 @@ class BorrowController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $filters = [
-            'search'     => $request->search,
-            'status'     => $request->status,
-            'per_page'   => $request->per_page,
-            'start_date' => $request->start_date,
-            'end_date'   => $request->end_date,
-        ];
+        $filters = $this->getFilters($request);
 
         $borrows = $this->borrowService->getAll($filters);
 
@@ -119,5 +116,26 @@ class BorrowController extends Controller
         } catch (\Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }
+    }
+
+    public function export(Request $request): BinaryFileResponse
+    {
+        $filters = $this->getFilters($request);
+
+        return Excel::download(
+            new BorrowExport($this->borrowService->getExportData($filters)),
+            'borrows_data_' . now()->format('Y-m-d_H-i-s') . '.xlsx'
+        );
+    }
+
+    private function getFilters(Request $request): array
+    {
+        return [
+            'search' => $request->search,
+            'status' => $request->status,
+            'per_page' => $request->per_page,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+        ];
     }
 }

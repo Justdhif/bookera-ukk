@@ -11,8 +11,8 @@ import DataLoading from "@/components/custom-ui/DataLoading";
 import { toast } from "sonner";
 import { Plus, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Genre } from "@/types/genre";
-import { genreService, GenreFilterParams } from "@/services/genre.service";
+import { Genre, GenreFilterParams } from "@/types/genre";
+import { genreService } from "@/services/genre.service";
 import GenreTable from "./GenreTable";
 import GenreFormDialog from "./GenreFormDialog";
 

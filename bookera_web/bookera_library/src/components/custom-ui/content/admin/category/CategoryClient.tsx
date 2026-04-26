@@ -4,11 +4,8 @@ import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
-import { Category } from "@/types/category";
-import {
-  categoryService,
-  CategoryFilterParams,
-} from "@/services/category.service";
+import { Category, CategoryFilterParams } from "@/types/category";
+import { categoryService } from "@/services/category.service";
 import CategoryTable from "./CategoryTable";
 import CategoryFormDialog from "./CategoryFormDialog";
 import { Button } from "@/components/ui/button";

@@ -3,7 +3,7 @@
 import BannerCarousel from "./BannerCarousel";
 import SpeakerMarquee from "./SpeakerMarquee";
 import DailyTimeline from "./DailyTimeline";
-import PublicBookGrid from "@/components/custom-ui/content/book/PublicBookGrid";
+import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid";
 
 export default function PublicPageClient() {
   return (

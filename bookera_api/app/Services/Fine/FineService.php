@@ -14,6 +14,24 @@ class FineService
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
+        return $this->buildQuery($filters)->paginate($filters['per_page'] ?? 15);
+    }
+
+    public function getExportData(array $filters): Collection
+    {
+        return $this->buildQuery($filters)->get();
+    }
+
+    public function getBorrowFines(Borrow $borrow): Collection
+    {
+        return FineBorrow::with(['fineType'])
+            ->where('borrow_id', $borrow->id)
+            ->orderBy('id')
+            ->get();
+    }
+
+    private function buildQuery(array $filters)
+    {
         $query = FineBorrow::with(['borrow.user.profile', 'fineType']);
 
         if (!empty($filters['status'])) {
@@ -37,15 +55,15 @@ class FineService
             });
         }
 
-        return $query->orderBy('borrow_id')->orderBy('id')->paginate($filters['per_page'] ?? 15);
-    }
+        if (!empty($filters['start_date'])) {
+            $query->whereDate('created_at', '>=', $filters['start_date']);
+        }
 
-    public function getBorrowFines(Borrow $borrow): Collection
-    {
-        return FineBorrow::with(['fineType'])
-            ->where('borrow_id', $borrow->id)
-            ->orderBy('id')
-            ->get();
+        if (!empty($filters['end_date'])) {
+            $query->whereDate('created_at', '<=', $filters['end_date']);
+        }
+
+        return $query->orderBy('borrow_id')->orderBy('id');
     }
 
     public function getMyFines(int $userId): Collection

@@ -23,6 +23,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
+import {
+  OCCUPATION_OPTIONS,
+  normalizeOccupationValue,
+} from "@/constants/user-occupation";
+import type { UserOccupation } from "@/types/user";
 interface ProfileRightCardProps {
   isEditMode: boolean;
   formData: Partial<UpdateUserData>;
@@ -46,6 +51,7 @@ export default function ProfileRightCard({
   isSubmitDisabled = false,
 }: ProfileRightCardProps) {
   const t = useTranslations("profile");
+  const common = useTranslations("common");
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -138,15 +144,27 @@ export default function ProfileRightCard({
             </div>
             <div className="space-y-2">
               <Label htmlFor="p-occupation">{t("occupationLabel")}</Label>
-              <Input
-                id="p-occupation"
-                name="occupation"
-                value={formData.occupation || ""}
-                onChange={handleInputChange}
-                placeholder={t("occupationPlaceholder")}
+              <Select
+                value={normalizeOccupationValue(formData.occupation) || ""}
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    occupation: value as UserOccupation,
+                  })
+                }
                 disabled={!isEditMode}
-                validationType={!isEditMode ? undefined : "letters-only"}
-              />
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("occupationPlaceholder")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {OCCUPATION_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {common(option.labelKey)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="p-institution">{t("institutionLabel")}</Label>

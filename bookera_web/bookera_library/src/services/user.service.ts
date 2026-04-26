@@ -14,8 +14,6 @@ export const userService = {
   getAll: (filters?: UserFilterParams) =>
     api.get<ApiResponse<UserListResponse>>("/admin/users", { params: filters }),
 
-
-
   getBySlug: (slug: string) =>
     api.get<ApiResponse<User>>(`/admin/users/slug/${slug}`),
 

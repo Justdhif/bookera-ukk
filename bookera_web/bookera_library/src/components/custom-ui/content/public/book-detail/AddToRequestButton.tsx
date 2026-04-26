@@ -7,7 +7,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { BookPlus } from "lucide-react";
 import { Book } from "@/types/book";
-import BorrowRequestDialog from "@/components/custom-ui/content/book/BorrowRequestDialog";
+import BorrowRequestDialog from "./BorrowRequestDialog";
 
 interface AddToRequestButtonProps {
   book: Book;

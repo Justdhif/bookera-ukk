@@ -21,13 +21,19 @@ import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import DateRangeFilter from "@/components/custom-ui/DateRangeFilter";
+import { getCurrentMonthRange } from "@/lib/month-range";
+import { downloadBlobFile } from "@/lib/download";
+import { Download } from "lucide-react";
 
 export default function BorrowClient() {
   const t = useTranslations("borrow");
+  const defaultMonthRange = getCurrentMonthRange();
   const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
   const [loadingBorrows, setLoadingBorrows] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [borrowFilters, setBorrowFilters] = useState<BorrowFilterParams>({
     per_page: ITEMS_PER_PAGE_OPTIONS[1],
+    ...defaultMonthRange,
   });
   const [borrowSearch, setBorrowSearch] = useState("");
   const [borrowPagination, setBorrowPagination] = useState({
@@ -142,6 +148,22 @@ export default function BorrowClient() {
     }));
   };
 
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const response = await borrowService.exportData(borrowFilters);
+      downloadBlobFile(
+        response.data,
+        `borrows_data_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
+      toast.success(t("exportSuccess"));
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t("exportError"));
+    } finally {
+      setExporting(false);
+    }
+  };
+
 
 
   const renderBorrowCards = (borrows: Borrow[]) => {
@@ -173,12 +195,23 @@ export default function BorrowClient() {
         description={t("managementDesc")}
         isAdmin
         rightActions={
-          <Link href="/admin/borrows/create">
-            <Button variant="submit">
-              <Plus className="h-4 w-4" />
-              {t("createBorrow")}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="h-8 gap-1 border-slate-200"
+              onClick={handleExport}
+              disabled={exporting}
+            >
+              <Download className="h-3.5 w-3.5" />
+              {t("exportData")}
             </Button>
-          </Link>
+            <Link href="/admin/borrows/create">
+              <Button variant="submit" className="h-8 gap-1">
+                <Plus className="h-4 w-4" />
+                {t("createBorrow")}
+              </Button>
+            </Link>
+          </div>
         }
       />
 
@@ -225,8 +258,8 @@ export default function BorrowClient() {
                 <h3 className="text-lg font-semibold">{label}</h3>
                 <p className="text-sm text-muted-foreground">{desc}</p>
               </div>
-              <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
-                <div className="relative flex-1 w-full">
+              <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center mb-6">
+                <div className="relative min-w-0 w-full">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder={t("searchByUserOrTitle")}
@@ -235,7 +268,12 @@ export default function BorrowClient() {
                     className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
                   />
                 </div>
-                <DateRangeFilter onFilter={handleDateFilter} />
+                <DateRangeFilter
+                  onFilter={handleDateFilter}
+                  defaultStartDate={defaultMonthRange.startDate}
+                  defaultEndDate={defaultMonthRange.endDate}
+                  className="w-full lg:w-auto"
+                />
               </div>
               <PaginatedContent
                 currentPage={borrowPagination.current_page}

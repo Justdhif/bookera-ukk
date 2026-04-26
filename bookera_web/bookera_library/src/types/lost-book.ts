@@ -38,4 +38,6 @@ export interface LostBookFilterParams {
   borrow_status?: string;
   per_page?: number;
   page?: number;
+  start_date?: string;
+  end_date?: string;
 }

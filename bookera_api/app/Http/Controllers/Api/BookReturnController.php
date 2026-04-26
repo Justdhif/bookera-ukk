@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\BookReturnExport;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BookReturn\StoreBookReturnRequest;
@@ -9,6 +10,9 @@ use App\Models\BookReturn;
 use App\Models\Borrow;
 use App\Services\BookReturn\BookReturnService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class BookReturnController extends Controller
 {
@@ -22,6 +26,14 @@ class BookReturnController extends Controller
     public function index(Borrow $borrow): JsonResponse
     {
         $returns = $this->bookReturnService->getByBorrow($borrow);
+
+        return ApiResponse::successResponse('Book return data retrieved successfully', $returns);
+    }
+
+    public function adminIndex(Request $request): JsonResponse
+    {
+        $filters = $this->getFilters($request);
+        $returns = $this->bookReturnService->getAll($filters);
 
         return ApiResponse::successResponse('Book return data retrieved successfully', $returns);
     }
@@ -42,6 +54,27 @@ class BookReturnController extends Controller
         $detail = $this->bookReturnService->getDetail($bookReturn);
 
         return ApiResponse::successResponse('Book return details', $detail);
+    }
+
+    public function export(Request $request): BinaryFileResponse
+    {
+        $filters = $this->getFilters($request);
+
+        return Excel::download(
+            new BookReturnExport($this->bookReturnService->getExportData($filters)),
+            'returns_data_' . now()->format('Y-m-d_H-i-s') . '.xlsx'
+        );
+    }
+
+    private function getFilters(Request $request): array
+    {
+        return [
+            'search' => $request->search,
+            'per_page' => $request->per_page,
+            'page' => $request->page,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+        ];
     }
 
 }

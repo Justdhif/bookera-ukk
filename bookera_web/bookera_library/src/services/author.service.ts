@@ -15,8 +15,6 @@ export const authorService = {
       params: filters,
     }),
 
-
-
   create: (data: CreateAuthorData) =>
     api.post<ApiResponse<Author>>("/admin/authors", buildAuthorFormData(data), {
       headers: { "Content-Type": "multipart/form-data" },

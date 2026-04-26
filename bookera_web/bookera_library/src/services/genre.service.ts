@@ -1,12 +1,6 @@
 import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
-import { Genre, GenreListResponse } from "@/types/genre";
-
-export interface GenreFilterParams {
-  search?: string;
-  per_page?: number;
-  page?: number;
-}
+import { Genre, GenreFilterParams, GenreListResponse } from "@/types/genre";
 
 export const genreService = {
   getAll: (filters?: GenreFilterParams) =>

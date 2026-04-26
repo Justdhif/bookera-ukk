@@ -1,12 +1,10 @@
 import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
-import { Category, CategoryListResponse } from "@/types/category";
-
-export interface CategoryFilterParams {
-  search?: string;
-  per_page?: number;
-  page?: number;
-}
+import {
+  Category,
+  CategoryFilterParams,
+  CategoryListResponse,
+} from "@/types/category";
 
 export const categoryService = {
   getAll: (filters?: CategoryFilterParams) =>

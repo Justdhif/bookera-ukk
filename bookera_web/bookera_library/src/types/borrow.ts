@@ -7,6 +7,19 @@ import { LostBook } from "./lost-book";
 import { BorrowRequest } from "./borrow-request";
 import { PaginatedResponse } from "./api";
 
+export interface BorrowReturnItemPayload {
+  borrow_detail_id: number;
+  status: "returned" | "lost";
+  condition: "good" | "damaged" | null;
+  fine_type_id?: number;
+  lost_date?: string;
+  notes?: string | null;
+}
+
+export interface BorrowReturnRequestData {
+  items: BorrowReturnItemPayload[];
+}
+
 export interface BorrowDetail {
   id: number;
   borrow_id: number;

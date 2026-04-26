@@ -1,4 +1,7 @@
 import { PaginatedResponse } from "./api";
+import type { OccupationValue } from "@/constants/user-occupation";
+
+export type UserOccupation = OccupationValue;
 
 export interface UserProfile {
   id: number;
@@ -11,7 +14,7 @@ export interface UserProfile {
   address: string | null;
   bio: string | null;
   identification_number: string | null;
-  occupation: string | null;
+  occupation: UserOccupation | null;
   institution: string | null;
   notification_enabled: boolean;
   notification_email: boolean;
@@ -57,7 +60,7 @@ export interface CreateUserData {
   address?: string;
   bio?: string;
   identification_number?: string;
-  occupation?: string;
+  occupation?: UserOccupation;
   institution?: string;
   avatar?: File | string;
 }

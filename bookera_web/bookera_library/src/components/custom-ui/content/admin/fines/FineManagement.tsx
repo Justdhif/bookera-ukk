@@ -17,17 +17,25 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
-import { Search } from "lucide-react";
+import { Download, Search } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import DateRangeFilter from "@/components/custom-ui/DateRangeFilter";
+import { getCurrentMonthRange } from "@/lib/month-range";
+import { downloadBlobFile } from "@/lib/download";
 
 export default function FineManagement() {
   const t = useTranslations("fines");
+  const defaultMonthRange = getCurrentMonthRange();
   const [fines, setFines] = useState<Fine[]>([]);
   const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [filters, setFilters] = useState<FineFilterParams>({ per_page: ITEMS_PER_PAGE_OPTIONS[1] });
+  const [filters, setFilters] = useState<FineFilterParams>({
+    per_page: ITEMS_PER_PAGE_OPTIONS[1],
+    ...defaultMonthRange,
+  });
   const [searchInput, setSearchInput] = useState("");
   const [pagination, setPagination] = useState({
     current_page: 1,
@@ -56,6 +64,14 @@ export default function FineManagement() {
     setFilters((prev) => ({
       ...prev,
       status: value === "all" ? undefined : value,
+      page: 1,
+    }));
+
+  const handleDateFilter = (start_date?: string, end_date?: string) =>
+    setFilters((prev) => ({
+      ...prev,
+      start_date,
+      end_date,
       page: 1,
     }));
 
@@ -100,6 +116,22 @@ export default function FineManagement() {
     }
   };
 
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const response = await fineService.exportData(filters);
+      downloadBlobFile(
+        response.data,
+        `fines_data_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
+      toast.success(t("exportSuccess"));
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t("exportError"));
+    } finally {
+      setExporting(false);
+    }
+  };
+
   useEffect(() => {
     fetchFineTypes();
   }, []);
@@ -125,10 +157,19 @@ export default function FineManagement() {
           <h2 className="text-2xl font-bold">{t("title")}</h2>
           <p className="text-muted-foreground">{t("finesTabDescription")}</p>
         </div>
+        <Button
+          variant="outline"
+          className="h-8 gap-1 border-slate-200 w-fit"
+          onClick={handleExport}
+          disabled={exporting}
+        >
+          <Download className="h-3.5 w-3.5" />
+          {t("exportData")}
+        </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
-        <div className="relative flex-2 w-full">
+      <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:items-center mb-6">
+        <div className="relative min-w-0 w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t("searchFines")}
@@ -137,10 +178,16 @@ export default function FineManagement() {
             className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
           />
         </div>
+        <DateRangeFilter
+          onFilter={handleDateFilter}
+          defaultStartDate={defaultMonthRange.startDate}
+          defaultEndDate={defaultMonthRange.endDate}
+          className="w-full xl:w-auto"
+        />
         <Select value={statusValue} onValueChange={handleStatusChange}>
-          <SelectTrigger className="flex-1 w-full sm:w-auto h-11! shadow-sm transition-all duration-300">
+          <SelectTrigger className="w-full xl:w-44 h-11! shadow-sm transition-all duration-300">
             <SelectValue placeholder={t("filterStatus")} />
-          </SelectTrigger>{" "}
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("allStatus")}</SelectItem>
             <SelectItem value="unpaid">{t("unpaid")}</SelectItem>

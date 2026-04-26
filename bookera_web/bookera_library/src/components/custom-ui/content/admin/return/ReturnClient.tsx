@@ -2,24 +2,32 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { PackageCheck, Search } from "lucide-react";
+import { Download, PackageCheck, Search } from "lucide-react";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { Input } from "@/components/ui/input";
-import { borrowService } from "@/services/borrow.service";
-import { Borrow, BorrowFilterParams } from "@/types/borrow";
+import { Button } from "@/components/ui/button";
+import DateRangeFilter from "@/components/custom-ui/DateRangeFilter";
+import { bookReturnService } from "@/services/book-return.service";
+import { Borrow } from "@/types/borrow";
+import { ReturnFilterParams } from "@/types/book-return";
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { toast } from "sonner";
 import { ReturnCard } from "./ReturnCard";
+import { getCurrentMonthRange } from "@/lib/month-range";
+import { downloadBlobFile } from "@/lib/download";
 
 export default function ReturnClient() {
   const t = useTranslations("return");
+  const defaultMonthRange = getCurrentMonthRange();
   const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState<BorrowFilterParams>({
+  const [exporting, setExporting] = useState(false);
+  const [filters, setFilters] = useState<ReturnFilterParams>({
     per_page: ITEMS_PER_PAGE_OPTIONS[1],
+    ...defaultMonthRange,
   });
   const [searchInput, setSearchInput] = useState("");
   const [pagination, setPagination] = useState({
@@ -46,18 +54,14 @@ export default function ReturnClient() {
     setSearchInput(e.target.value);
   };
 
-  const fetchAllData = async (activeFilters: BorrowFilterParams) => {
+  const fetchAllData = async (activeFilters: ReturnFilterParams) => {
     setLoading(true);
 
     try {
-      const borrowsRes = await borrowService.getAll(activeFilters);
+      const borrowsRes = await bookReturnService.getAll(activeFilters);
       const paginatedData = borrowsRes.data.data;
       const allData: Borrow[] = paginatedData.data ?? paginatedData;
-      const filteredBorrows = allData.filter(
-        (borrow) => (borrow.book_returns?.length ?? 0) > 0,
-      );
-
-      setAllBorrows(filteredBorrows);
+      setAllBorrows(allData);
       setPagination({
         current_page: paginatedData.current_page ?? 1,
         last_page: paginatedData.last_page ?? 1,
@@ -69,6 +73,31 @@ export default function ReturnClient() {
       toast.error(error.response?.data?.message || t("loadError"));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDateFilter = (start_date?: string, end_date?: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      start_date,
+      end_date,
+      page: 1,
+    }));
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const response = await bookReturnService.exportData(filters);
+      downloadBlobFile(
+        response.data,
+        `returns_data_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
+      toast.success(t("exportSuccess"));
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t("exportError"));
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -102,6 +131,17 @@ export default function ReturnClient() {
         title={t("managementTitle")}
         description={t("managementDesc")}
         isAdmin
+        rightActions={
+          <Button
+            variant="outline"
+            className="h-8 gap-1 border-slate-200"
+            onClick={handleExport}
+            disabled={exporting}
+          >
+            <Download className="h-3.5 w-3.5" />
+            {t("exportData")}
+          </Button>
+        }
       />
 
       <div className="space-y-4">
@@ -110,8 +150,8 @@ export default function ReturnClient() {
           <p className="text-sm text-muted-foreground">{t("returnedDesc")}</p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
-          <div className="relative flex-1 w-full">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center mb-6">
+          <div className="relative min-w-0 w-full">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={t("searchByUserOrTitle")}
@@ -120,6 +160,12 @@ export default function ReturnClient() {
               className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
             />
           </div>
+          <DateRangeFilter
+            onFilter={handleDateFilter}
+            defaultStartDate={defaultMonthRange.startDate}
+            defaultEndDate={defaultMonthRange.endDate}
+            className="w-full lg:w-auto"
+          />
         </div>
 
         <PaginatedContent

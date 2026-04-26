@@ -242,7 +242,7 @@ export default function BorrowDetailClient() {
       {loading ? (
         <DataLoading size="lg" />
       ) : !borrow ? (
-        <div className="flex flex-col items-center justify-center min-h-[400px] text-muted-foreground italic bg-muted/30 rounded-3xl border-2 border-dashed">
+        <div className="flex flex-col items-center justify-center min-h-100 text-muted-foreground italic bg-muted/30 rounded-3xl border-2 border-dashed">
           {t("noBorrowFound")}
         </div>
       ) : (

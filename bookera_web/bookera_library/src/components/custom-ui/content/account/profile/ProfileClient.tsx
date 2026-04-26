@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import AvatarUploadModal from "@/components/custom-ui/content/admin/user/AvatarUploadModal";
 import ProfileLeftCard from "./ProfileLeftCard";
 import ProfileRightCard from "./ProfileRightCard";
+import { normalizeOccupationValue } from "@/constants/user-occupation";
 export default function ProfileClient() {
   const router = useRouter();
   const t = useTranslations("profile");
@@ -43,7 +44,8 @@ export default function ProfileClient() {
         bio: userData.profile.bio || undefined,
         identification_number:
           userData.profile.identification_number || undefined,
-        occupation: userData.profile.occupation || undefined,
+        occupation:
+          normalizeOccupationValue(userData.profile.occupation) || undefined,
         institution: userData.profile.institution || undefined,
       });
       setAvatarPreview(userData.profile.avatar ?? "");
@@ -94,7 +96,7 @@ export default function ProfileClient() {
         address: user.profile.address || undefined,
         bio: user.profile.bio || undefined,
         identification_number: user.profile.identification_number || undefined,
-        occupation: user.profile.occupation || undefined,
+        occupation: normalizeOccupationValue(user.profile.occupation) || undefined,
         institution: user.profile.institution || undefined,
       });
       setAvatarPreview(user.profile.avatar ?? "");

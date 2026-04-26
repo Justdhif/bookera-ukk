@@ -12,6 +12,12 @@ export const lostBookService = {
       params: filters,
     }),
 
+  exportData: (filters?: LostBookFilterParams) =>
+    api.get("/admin/lost-books/export", {
+      params: filters,
+      responseType: "blob",
+    }),
+
   create: (
     borrowId: number,
     data: {
@@ -19,8 +25,6 @@ export const lostBookService = {
     },
   ) =>
     api.post<ApiResponse<any>>(`/borrows/${borrowId}/report-lost`, data),
-
-
 
   delete: (id: number) =>
     api.delete<ApiResponse<null>>(`/admin/lost-books/${id}`),

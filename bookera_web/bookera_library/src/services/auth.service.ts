@@ -1,24 +1,12 @@
 import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
+import {
+  LoginResponse,
+  MeResponse,
+  RegisterResponse,
+  SetupProfileResponse,
+} from "@/types/auth";
 import { User } from "@/types/user";
-
-interface LoginResponse {
-  token: string;
-  user: User;
-}
-
-interface RegisterResponse {
-  token: string;
-  user: User;
-}
-
-interface SetupProfileResponse {
-  user: User;
-}
-
-interface MeResponse {
-  user: User;
-}
 
 export const authService = {
   login: (email: string, password: string) =>

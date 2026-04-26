@@ -1,15 +1,12 @@
 import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
-import { Borrow, BorrowListResponse, BorrowFilterParams } from "@/types/borrow";
-
-interface BorrowReturnItemPayload {
-  borrow_detail_id: number;
-  status: "returned" | "lost";
-  condition: "good" | "damaged" | null;
-  fine_type_id?: number;
-  lost_date?: string;
-  notes?: string | null;
-}
+import {
+  Borrow,
+  BorrowFilterParams,
+  BorrowListResponse,
+  BorrowReturnItemPayload,
+  BorrowReturnRequestData,
+} from "@/types/borrow";
 
 export const borrowService = {
   getAll: (filters?: BorrowFilterParams) =>
@@ -17,13 +14,17 @@ export const borrowService = {
       params: filters,
     }),
 
+  exportData: (filters?: BorrowFilterParams) =>
+    api.get("/admin/borrows/export", {
+      params: filters,
+      responseType: "blob",
+    }),
+
   create: (data: any, isAdmin = false) =>
     api.post<ApiResponse<Borrow>>(
       isAdmin ? "/admin/borrows" : "/borrows",
       data,
     ),
-
-
 
   getByCode: (code: string, isAdmin = false) =>
     api.get<ApiResponse<Borrow>>(
@@ -40,7 +41,7 @@ export const borrowService = {
       params: filters,
     }),
 
-  requestReturn: (id: number, data: { items: BorrowReturnItemPayload[] }) =>
+  requestReturn: (id: number, data: BorrowReturnRequestData) =>
     api.post<ApiResponse<any>>(`/borrows/${id}/return`, data),
 
   reportLost: (id: number, data: { borrow_detail_ids: number[] }) =>

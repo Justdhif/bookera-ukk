@@ -1,13 +1,10 @@
 import api from "@/lib/axios";
 import { ApiResponse } from "@/types/api";
-import { Notification, NotificationListResponse } from "@/types/notification";
-
-export interface NotificationFilterParams {
-  per_page?: number;
-  page?: number;
-  filter?: "read" | "unread";
-  module?: string;
-}
+import {
+  Notification,
+  NotificationFilterParams,
+  NotificationListResponse,
+} from "@/types/notification";
 
 export const notificationService = {
   getAll: (params?: NotificationFilterParams) =>

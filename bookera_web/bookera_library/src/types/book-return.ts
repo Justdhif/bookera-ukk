@@ -2,6 +2,7 @@ import { Borrow } from "./borrow";
 import { BookCopy } from "./book-copy";
 import { Book } from "./book";
 import { Fine } from "./fine";
+import { PaginatedResponse } from "./api";
 
 export interface BookReturnDetail {
   id: number;
@@ -23,4 +24,14 @@ export interface BookReturn {
 
   created_at: string;
   updated_at: string;
+}
+
+export type ReturnListResponse = PaginatedResponse<Borrow>;
+
+export interface ReturnFilterParams {
+  search?: string;
+  per_page?: number;
+  page?: number;
+  start_date?: string;
+  end_date?: string;
 }

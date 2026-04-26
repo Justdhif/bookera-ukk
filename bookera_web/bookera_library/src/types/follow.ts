@@ -14,7 +14,6 @@ export interface FollowedUser {
   };
 }
 
-/** A record from the `follows` table returned by user-followers endpoints */
 export interface UserFollowRecord {
   id: number;
   user_id: number;
@@ -22,9 +21,7 @@ export interface UserFollowRecord {
   followable_type: string;
   created_at: string;
   updated_at: string;
-  /** Present in getUserFollowers — the user who is following */
   user?: User;
-  /** Present in getUserFollowing — the user being followed */
   followable?: User;
 }
 

@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserOccupation;
+use App\Helpers\AvatarHelper;
 use App\Models\User;
 use App\Models\UserProfile;
-use App\Helpers\AvatarHelper;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -25,9 +26,9 @@ class UserSeeder extends Seeder
                 gender: 'male',
                 phoneNumber: '6282113285557',
                 address: 'Jl. Bookera No. 1, Jakarta',
-                bio: 'Akun admin khusus untuk pengujian Bookera.',
+                bio: 'Akun staff/admin khusus untuk pengujian Bookera.',
                 identificationPrefix: 'NB',
-                occupation: 'Administrator',
+                occupation: UserOccupation::Staff,
                 institution: 'Bookera Academy',
             );
 
@@ -39,9 +40,9 @@ class UserSeeder extends Seeder
                 gender: 'male',
                 phoneNumber: '628123456788',
                 address: 'Jl. Bookera No. 2, Bandung',
-                bio: 'Akun user khusus untuk pengujian Bookera.',
+                bio: 'Akun user eksternal khusus untuk pengujian Bookera.',
                 identificationPrefix: 'JD',
-                occupation: 'Student',
+                occupation: UserOccupation::External,
                 institution: 'Bookera Community',
             );
 
@@ -71,7 +72,7 @@ class UserSeeder extends Seeder
         string $address,
         string $bio,
         string $identificationPrefix,
-        string $occupation,
+        UserOccupation $occupation,
         string $institution,
     ): void {
         $user = User::query()->firstOrNew(['email' => $email]);
@@ -95,7 +96,7 @@ class UserSeeder extends Seeder
                 'address' => $address,
                 'bio' => $bio,
                 'identification_number' => $identificationPrefix.'-'.str_pad($user->id, 4, '0', STR_PAD_LEFT),
-                'occupation' => $occupation,
+                'occupation' => $occupation->value,
                 'institution' => $institution,
                 'avatar' => AvatarHelper::generateDefaultAvatar($user->id),
                 'notification_enabled' => true,
@@ -115,7 +116,7 @@ class UserSeeder extends Seeder
                 'address' => 'Jl. Bookera',
                 'bio' => 'Akun Bookera.',
                 'identification_number' => 'UP-'.str_pad((string) $user->id, 4, '0', STR_PAD_LEFT),
-                'occupation' => 'Other',
+                'occupation' => UserOccupation::Other->value,
                 'institution' => 'Bookera',
                 'avatar' => AvatarHelper::generateDefaultAvatar($user->id),
                 'notification_enabled' => true,

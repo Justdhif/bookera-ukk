@@ -8,10 +8,10 @@ import { Publisher } from "@/types/publisher";
 import { publicService } from "@/services/public.service";
 import { Book } from "@/types/book";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
-import PublicBookGrid from "@/components/custom-ui/content/book/PublicBookGrid";
+import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import BorrowRequestDialog from "@/components/custom-ui/content/book/BorrowRequestDialog";
+import BorrowRequestDialog from "@/components/custom-ui/content/public/book-detail/BorrowRequestDialog";
 
 interface PublisherDetailClientProps {
   slug: string;
@@ -83,7 +83,6 @@ export default function PublisherDetailClient({ slug }: PublisherDetailClientPro
 
     return (
       <>
-        {/* Publisher Profile Card */}
         <div className="bg-card rounded-3xl border border-border/40 overflow-hidden shadow-xs hover:shadow-md transition-shadow">
           <div className="relative h-32 sm:h-48 bg-linear-to-r from-brand-primary/10 via-brand-primary/5 to-background overflow-hidden">
             <div className="absolute inset-0 bg-grid-black/5 dark:bg-grid-white/5 mask-[linear-gradient(to_bottom,white,transparent)]" />

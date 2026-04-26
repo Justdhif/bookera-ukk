@@ -66,4 +66,6 @@ export interface FineFilterParams {
   status?: string;
   per_page?: number;
   page?: number;
+  start_date?: string;
+  end_date?: string;
 }

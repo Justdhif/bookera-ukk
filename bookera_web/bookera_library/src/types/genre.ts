@@ -10,4 +10,10 @@ export interface Genre {
   updated_at: string;
 }
 
+export interface GenreFilterParams {
+  search?: string;
+  per_page?: number;
+  page?: number;
+}
+
 export type GenreListResponse = PaginatedResponse<Genre>;

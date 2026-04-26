@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\BookReturn\BookReturnNotificationService;
 use App\Services\NotificationService as DatabaseNotificationService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class LostBookService
@@ -78,16 +79,43 @@ class LostBookService
 
     public function getAll(array $filters): LengthAwarePaginator
     {
+        return $this->buildQuery($filters)->paginate($filters['per_page'] ?? 15);
+    }
+
+    public function getExportData(array $filters): Collection
+    {
+        return $this->buildQuery($filters)->get();
+    }
+
+    private function buildQuery(array $filters)
+    {
+        $applyDateRange = function ($detailQuery) use ($filters) {
+            if (!empty($filters['start_date'])) {
+                $detailQuery->whereDate('lost_date', '>=', $filters['start_date']);
+            }
+
+            if (!empty($filters['end_date'])) {
+                $detailQuery->whereDate('lost_date', '<=', $filters['end_date']);
+            }
+        };
+
         $query = LostBook::with([
             'borrow.user.profile',
             'borrow.fines.fineType',
-            'details.bookCopy.book',
+            'details' => function ($detailQuery) use ($applyDateRange) {
+                $detailQuery->with(['bookCopy.book.authors', 'bookCopy.book.publishers', 'bookCopy.book.categories', 'bookCopy.book.genres'])
+                    ->orderBy('id');
+
+                $applyDateRange($detailQuery);
+            },
         ]);
+
+        $query->whereHas('details', $applyDateRange);
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('id', 'like', "%{$search}%")
+            $query->where(function ($lostBookQuery) use ($search, $applyDateRange) {
+                $lostBookQuery->where('id', 'like', "%{$search}%")
                     ->orWhere('borrow_id', 'like', "%{$search}%")
                     ->orWhereHas('borrow.user', function ($userQuery) use ($search) {
                         $userQuery->where('email', 'like', "%{$search}%")
@@ -95,19 +123,23 @@ class LostBookService
                                 $profileQuery->where('full_name', 'like', "%{$search}%");
                             });
                     })
-                    ->orWhereHas('details.bookCopy.book', function ($bookQuery) use ($search) {
-                        $bookQuery->where('title', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('details.bookCopy', function ($copyQuery) use ($search) {
-                        $copyQuery->where('copy_code', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('details', function ($detailQuery) use ($search) {
-                        $detailQuery->where('notes', 'like', "%{$search}%");
+                    ->orWhereHas('details', function ($detailQuery) use ($search, $applyDateRange) {
+                        $applyDateRange($detailQuery);
+
+                        $detailQuery->where(function ($nestedQuery) use ($search) {
+                            $nestedQuery->where('notes', 'like', "%{$search}%")
+                                ->orWhereHas('bookCopy.book', function ($bookQuery) use ($search) {
+                                    $bookQuery->where('title', 'like', "%{$search}%");
+                                })
+                                ->orWhereHas('bookCopy', function ($copyQuery) use ($search) {
+                                    $copyQuery->where('copy_code', 'like', "%{$search}%");
+                                });
+                        });
                     });
             });
         }
 
-        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
+        return $query->latest()->orderByDesc('id');
     }
 
     public function createMany(Borrow $borrow, array $items): LostBook

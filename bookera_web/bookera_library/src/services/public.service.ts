@@ -15,16 +15,12 @@ import {
   PublisherFilterParams,
   PublisherListResponse,
 } from "@/types/publisher";
-import { CategoryListResponse } from "@/types/category";
-
-export interface PublicCategoryFilterParams {
-  search?: string;
-  per_page?: number;
-  page?: number;
-}
+import {
+  CategoryFilterParams,
+  CategoryListResponse,
+} from "@/types/category";
 
 export const publicService = {
-  // Books
   getBooks: (filters?: BookFilterParams) => {
     const { category_ids, genre_ids, ...params } = filters ?? {};
     if (category_ids?.length) {
@@ -37,38 +33,29 @@ export const publicService = {
     return api.get<ApiResponse<BookListResponse>>("/books", { params });
   },
 
-
-
   getBookBySlug: (slug: string) =>
     api.get<ApiResponse<Book>>(`/books/slug/${slug}`),
 
   getBookById: (id: number) =>
     api.get<ApiResponse<Book>>(`/books/${id}`),
 
-  // Authors
   getAuthors: (filters?: AuthorFilterParams) =>
     api.get<ApiResponse<AuthorListResponse>>("/authors", {
       params: { ...filters, is_active: true },
     }),
 
-
-  
-  getAuthorBySlug: (slug: string) => 
+  getAuthorBySlug: (slug: string) =>
     api.get<ApiResponse<Author>>(`/authors/slug/${slug}`),
 
-  // Publishers
   getPublishers: (filters?: PublisherFilterParams) =>
     api.get<ApiResponse<PublisherListResponse>>("/publishers", {
       params: { ...filters, is_active: true },
     }),
 
-
-    
-  getPublisherBySlug: (slug: string) => 
+  getPublisherBySlug: (slug: string) =>
     api.get<ApiResponse<Publisher>>(`/publishers/slug/${slug}`),
 
-  // Categories
-  getCategories: (filters?: PublicCategoryFilterParams) =>
+  getCategories: (filters?: CategoryFilterParams) =>
     api.get<ApiResponse<CategoryListResponse>>("/categories", {
       params: filters,
     }),

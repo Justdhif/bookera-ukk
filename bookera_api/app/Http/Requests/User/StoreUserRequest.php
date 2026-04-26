@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\User;
 
+use App\Enums\UserOccupation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -42,7 +43,7 @@ class StoreUserRequest extends FormRequest
             'address' => 'nullable|string',
             'bio' => 'nullable|string',
             'identification_number' => 'nullable|string|unique:user_profiles,identification_number',
-            'occupation' => 'nullable|string|max:100',
+            'occupation' => ['nullable', Rule::enum(UserOccupation::class)],
             'institution' => 'nullable|string|max:255',
         ];
 
@@ -53,5 +54,12 @@ class StoreUserRequest extends FormRequest
         }
 
         return $rules;
+    }
+
+    public function messages(): array
+    {
+        return [
+            'occupation.enum' => 'Pilih pekerjaan yang tersedia',
+        ];
     }
 }

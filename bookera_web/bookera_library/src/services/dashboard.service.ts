@@ -33,4 +33,3 @@ export const dashboardService = {
   getDayDetail: (year: number, month: number, day: number) =>
     api.get<ApiResponse<DayDetail>>(`/admin/dashboard/day-detail?year=${year}&month=${month}&day=${day}`),
 };
-

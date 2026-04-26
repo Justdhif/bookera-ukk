@@ -1,15 +1,12 @@
 import api from "@/lib/axios";
-import { Complaint, ComplaintComment, CreateComplaintData } from "@/types/complaint";
+import {
+    Complaint,
+    ComplaintComment,
+    ComplaintFilterParams,
+    CreateComplaintData,
+} from "@/types/complaint";
 import { ApiResponse, PaginatedResponse } from "@/types/api";
 import { buildComplaintFormData } from "./form-data/complaint.form-data";
-
-export interface ComplaintFilterParams {
-    category?: string;
-    status?: string;
-    search?: string;
-    per_page?: number;
-    page?: number;
-}
 
 export const complaintService = {
     getAll: (params?: ComplaintFilterParams) =>

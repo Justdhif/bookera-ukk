@@ -8,10 +8,10 @@ import { Author } from "@/types/author";
 import { publicService } from "@/services/public.service";
 import { Book } from "@/types/book";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
-import PublicBookGrid from "@/components/custom-ui/content/book/PublicBookGrid";
+import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import BorrowRequestDialog from "@/components/custom-ui/content/book/BorrowRequestDialog";
+import BorrowRequestDialog from "@/components/custom-ui/content/public/book-detail/BorrowRequestDialog";
 
 interface AuthorDetailClientProps {
   slug: string;

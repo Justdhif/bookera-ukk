@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\LostBookExport;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LostBook\StoreLostBookRequest;
-use App\Http\Requests\LostBook\UpdateLostBookRequest;
 use App\Models\Borrow;
 use App\Models\LostBook;
 use App\Services\LostBook\LostBookService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LostBookController extends Controller
 {
@@ -23,10 +25,7 @@ class LostBookController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $filters = [
-            'search'   => $request->search,
-            'per_page' => $request->per_page,
-        ];
+        $filters = $this->getFilters($request);
 
         $lostBooks = $this->lostBookService->getAll($filters);
 
@@ -52,5 +51,27 @@ class LostBookController extends Controller
         $this->lostBookService->delete($lostBook);
 
         return ApiResponse::successResponse('Record buku hilang berhasil dihapus');
+    }
+
+    public function export(Request $request): BinaryFileResponse
+    {
+        $filters = $this->getFilters($request);
+
+        return Excel::download(
+            new LostBookExport($this->lostBookService->getExportData($filters)),
+            'lost_books_data_' . now()->format('Y-m-d_H-i-s') . '.xlsx'
+        );
+    }
+
+    private function getFilters(Request $request): array
+    {
+        return [
+            'search' => $request->search,
+            'borrow_status' => $request->borrow_status,
+            'per_page' => $request->per_page,
+            'page' => $request->page,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+        ];
     }
 }

@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import UserSideCard from "./UserSideCard";
 import UserProfileForm from "./UserProfileForm";
+import { normalizeOccupationValue } from "@/constants/user-occupation";
 
 export default function UserDetailClient() {
   const t = useTranslations("user");
@@ -52,7 +53,8 @@ export default function UserDetailClient() {
         bio: res.data.data.profile.bio || undefined,
         identification_number:
           res.data.data.profile.identification_number || undefined,
-        occupation: res.data.data.profile.occupation || undefined,
+        occupation:
+          normalizeOccupationValue(res.data.data.profile.occupation) || undefined,
         institution: res.data.data.profile.institution || undefined,
       });
       setAvatarPreview(res.data.data.profile.avatar);
@@ -102,7 +104,7 @@ export default function UserDetailClient() {
         address: user.profile.address || undefined,
         bio: user.profile.bio || undefined,
         identification_number: user.profile.identification_number || undefined,
-        occupation: user.profile.occupation || undefined,
+        occupation: normalizeOccupationValue(user.profile.occupation) || undefined,
         institution: user.profile.institution || undefined,
       });
       setAvatarPreview(user.profile.avatar);

@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\FineExport;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Fine\StoreFineRequest;
-use App\Http\Requests\Fine\UpdateFineRequest;
 use App\Http\Requests\Fine\WaiveFineRequest;
 use App\Models\FineBorrow;
 use App\Models\Borrow;
 use App\Services\Fine\FineService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FineController extends Controller
 {
@@ -24,11 +26,7 @@ class FineController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $filters = [
-            'search'   => $request->search,
-            'status'   => $request->status,
-            'per_page' => $request->per_page,
-        ];
+        $filters = $this->getFilters($request);
 
         $fines = $this->fineService->getAll($filters);
 
@@ -88,5 +86,27 @@ class FineController extends Controller
         $this->fineService->delete($fine);
 
         return ApiResponse::successResponse('Denda berhasil dihapus');
+    }
+
+    public function export(Request $request): BinaryFileResponse
+    {
+        $filters = $this->getFilters($request);
+
+        return Excel::download(
+            new FineExport($this->fineService->getExportData($filters)),
+            'fines_data_' . now()->format('Y-m-d_H-i-s') . '.xlsx'
+        );
+    }
+
+    private function getFilters(Request $request): array
+    {
+        return [
+            'search' => $request->search,
+            'status' => $request->status,
+            'per_page' => $request->per_page,
+            'page' => $request->page,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+        ];
     }
 }

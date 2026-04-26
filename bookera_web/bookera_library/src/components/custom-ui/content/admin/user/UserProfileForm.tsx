@@ -10,6 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { PhoneInput } from "@/components/custom-ui/PhoneInput";
 import { Edit, X } from "lucide-react";
 import {
+  OCCUPATION_OPTIONS,
+  normalizeOccupationValue,
+} from "@/constants/user-occupation";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -25,6 +29,7 @@ import {
 } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
 import { format } from "date-fns";
+import type { UserOccupation } from "@/types/user";
 
 interface UserProfileFormProps {
   user?: User;
@@ -54,6 +59,7 @@ export default function UserProfileForm({
   isSubmitDisabled = false,
 }: UserProfileFormProps) {
   const t = useTranslations("user");
+  const common = useTranslations("common");
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -174,15 +180,27 @@ export default function UserProfileForm({
             </div>
             <div className="space-y-2">
               <Label htmlFor="occupation">{t("occupation")}</Label>
-              <Input
-                id="occupation"
-                name="occupation"
-                value={formData.occupation || ""}
-                onChange={handleInputChange}
-                placeholder={t("enterOccupation")}
+              <Select
+                value={normalizeOccupationValue(formData.occupation) || ""}
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    occupation: value as UserOccupation,
+                  })
+                }
                 disabled={!isEditMode}
-                validationType={!isEditMode ? undefined : "letters-only"}
-              />
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("enterOccupation")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {OCCUPATION_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {common(option.labelKey)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="institution">{t("institutionLabel")}</Label>

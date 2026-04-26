@@ -20,39 +20,12 @@ class BorrowService
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
-        $query = Borrow::query()->with([
-            'borrowDetails.bookCopy.book.authors',
-            'borrowDetails.bookCopy.book.publishers',
-            'borrowDetails.bookCopy.book.categories',
-            'borrowDetails.bookCopy.book.genres',
-            'borrowRequest.borrowRequestDetails.book.authors',
-            'user.profile',
-            'bookReturns.details.bookCopy.book.authors',
-            'bookReturns.details.bookCopy.book.publishers',
-            'bookReturns.details.bookCopy.book.categories',
-            'bookReturns.details.bookCopy.book.genres',
-            'fines.fineType',
-            'lostBooks.details.bookCopy.book.authors',
-        ]);
+        return $this->buildAdminQuery($filters)->paginate($filters['per_page'] ?? 15);
+    }
 
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where('borrow_code', 'like', "%{$search}%");
-        }
-
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-
-        if (!empty($filters['start_date'])) {
-            $query->whereDate('borrow_date', '>=', $filters['start_date']);
-        }
-
-        if (!empty($filters['end_date'])) {
-            $query->whereDate('borrow_date', '<=', $filters['end_date']);
-        }
-
-        return $query->orderBy('id', 'desc')->paginate($filters['per_page'] ?? 15);
+    public function getExportData(array $filters): Collection
+    {
+        return $this->buildAdminQuery($filters)->get();
     }
 
     public function create(array $data, User $user): Borrow
@@ -73,11 +46,11 @@ class BorrowService
             $returnDate = $borrowDate->copy()->addDays(5);
 
             $borrow = Borrow::create([
-                'user_id'     => $user->id,
+                'user_id' => $user->id,
                 'borrow_code' => $borrowCode,
                 'borrow_date' => $borrowDate->toDateString(),
                 'return_date' => $returnDate->toDateString(),
-                'status'      => 'open',
+                'status' => 'open',
             ]);
 
             $borrow->update(['qr_code_path' => $this->generateQrCode($borrowCode, $borrow->id)]);
@@ -92,11 +65,11 @@ class BorrowService
 
                 $borrow->borrowDetails()->create([
                     'book_copy_id' => $copy->id,
-                    'status'       => 'borrowed',
+                    'status' => 'borrowed',
                 ]);
 
                 $borrowedCopies[] = [
-                    'copy_id'    => $copy->id,
+                    'copy_id' => $copy->id,
                     'book_title' => $copy->book->title ?? 'Unknown',
                     'old_status' => $copy->status,
                 ];
@@ -113,9 +86,9 @@ class BorrowService
                 'borrow',
                 "Created borrow #{$borrow->id} for user {$borrow->user->email} with " . count($borrowedCopies) . " book(s)",
                 [
-                    'borrow_id'       => $borrow->id,
-                    'user'            => $borrow->user->email,
-                    'return_date'     => $borrow->return_date,
+                    'borrow_id' => $borrow->id,
+                    'user' => $borrow->user->email,
+                    'return_date' => $borrow->return_date,
                     'borrowed_copies' => $borrowedCopies,
                 ],
                 null,
@@ -149,11 +122,11 @@ class BorrowService
             $returnDate = $borrowDate->copy()->addDays(5);
 
             $borrow = Borrow::create([
-                'user_id'     => $data['user_id'],
+                'user_id' => $data['user_id'],
                 'borrow_code' => $borrowCode,
                 'borrow_date' => $borrowDate->toDateString(),
                 'return_date' => $returnDate->toDateString(),
-                'status'      => 'open',
+                'status' => 'open',
             ]);
 
             $borrow->update(['qr_code_path' => $this->generateQrCode($borrowCode, $borrow->id)]);
@@ -168,11 +141,11 @@ class BorrowService
 
                 $borrow->borrowDetails()->create([
                     'book_copy_id' => $copy->id,
-                    'status'       => 'borrowed',
+                    'status' => 'borrowed',
                 ]);
 
                 $borrowedCopies[] = [
-                    'copy_id'    => $copy->id,
+                    'copy_id' => $copy->id,
                     'book_title' => $copy->book->title ?? 'Unknown',
                     'old_status' => $copy->status,
                 ];
@@ -200,12 +173,12 @@ class BorrowService
                 'borrow',
                 "Admin created direct borrow #{$borrow->id} for user {$borrow->user->email} with " . count($borrowedCopies) . " book(s)",
                 [
-                    'borrow_id'       => $borrow->id,
-                    'user'            => $borrow->user->email,
-                    'return_date'     => $borrow->return_date,
-                    'status'          => 'open',
+                    'borrow_id' => $borrow->id,
+                    'user' => $borrow->user->email,
+                    'return_date' => $borrow->return_date,
+                    'status' => 'open',
                     'borrowed_copies' => $borrowedCopies,
-                    'admin'           => $admin->email,
+                    'admin' => $admin->email,
                 ],
                 null,
                 $borrow
@@ -239,6 +212,43 @@ class BorrowService
         ])->where('borrow_code', $code)->firstOrFail();
     }
 
+    private function buildAdminQuery(array $filters)
+    {
+        $query = Borrow::query()->with([
+            'borrowDetails.bookCopy.book.authors',
+            'borrowDetails.bookCopy.book.publishers',
+            'borrowDetails.bookCopy.book.categories',
+            'borrowDetails.bookCopy.book.genres',
+            'borrowRequest.borrowRequestDetails.book.authors',
+            'user.profile',
+            'bookReturns.details.bookCopy.book.authors',
+            'bookReturns.details.bookCopy.book.publishers',
+            'bookReturns.details.bookCopy.book.categories',
+            'bookReturns.details.bookCopy.book.genres',
+            'fines.fineType',
+            'lostBooks.details.bookCopy.book.authors',
+        ]);
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where('borrow_code', 'like', "%{$search}%");
+        }
+
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (!empty($filters['start_date'])) {
+            $query->whereDate('borrow_date', '>=', $filters['start_date']);
+        }
+
+        if (!empty($filters['end_date'])) {
+            $query->whereDate('borrow_date', '<=', $filters['end_date']);
+        }
+
+        return $query->orderBy('id', 'desc');
+    }
+
     public function update(Borrow $borrow, array $data): Borrow
     {
         return DB::transaction(function () use ($borrow, $data) {
@@ -256,11 +266,11 @@ class BorrowService
 
                 $borrow->borrowDetails()->create([
                     'book_copy_id' => $copy->id,
-                    'status'       => 'borrowed',
+                    'status' => 'borrowed',
                 ]);
 
                 $addedCopies[] = [
-                    'copy_id'    => $copy->id,
+                    'copy_id' => $copy->id,
                     'book_title' => $copy->book->title ?? 'Unknown',
                 ];
 
@@ -277,12 +287,12 @@ class BorrowService
                 'borrow',
                 "Updated borrow #{$borrow->id} - added " . count($addedCopies) . " book(s)",
                 [
-                    'borrow_id'       => $borrow->id,
+                    'borrow_id' => $borrow->id,
                     'new_return_date' => $borrow->return_date,
-                    'added_copies'    => $addedCopies,
+                    'added_copies' => $addedCopies,
                 ],
                 [
-                    'borrow_id'       => $borrow->id,
+                    'borrow_id' => $borrow->id,
                     'old_return_date' => $oldReturnDate,
                 ],
                 $borrow
@@ -315,15 +325,15 @@ class BorrowService
             ]);
 
             $processedCopyIds = collect($borrow->bookReturns)
-                ->flatMap(fn ($bookReturn) => $bookReturn->details->pluck('book_copy_id'))
+                ->flatMap(fn($bookReturn) => $bookReturn->details->pluck('book_copy_id'))
                 ->merge(
                     collect($borrow->lostBooks)
-                        ->flatMap(fn ($lostBook) => $lostBook->details->pluck('book_copy_id')),
+                        ->flatMap(fn($lostBook) => $lostBook->details->pluck('book_copy_id')),
                 )
                 ->unique();
 
             $hasUnprocessedBooks = $borrow->borrowDetails->contains(
-                fn ($detail) => ! $processedCopyIds->contains($detail->book_copy_id)
+                fn($detail) => !$processedCopyIds->contains($detail->book_copy_id)
             );
 
             if ($hasUnprocessedBooks) {

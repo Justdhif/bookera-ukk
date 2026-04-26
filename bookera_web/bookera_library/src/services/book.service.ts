@@ -18,14 +18,10 @@ export const bookService = {
       Object.assign(params, { genre_ids: genre_ids.join(",") });
     return api.get<ApiResponse<BookListResponse>>("/admin/books", { params });
   },
-  
+
   getById: (id: number) => api.get<ApiResponse<Book>>(`/admin/books/${id}`),
-  
+
   getBySlug: (slug: string) => api.get<ApiResponse<Book>>(`/admin/books/slug/${slug}`),
-
-
-
-
 
   create: (data: CreateBookData) =>
     api.post<ApiResponse<Book>>("/admin/books", buildBookFormData(data), {

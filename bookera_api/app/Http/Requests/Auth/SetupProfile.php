@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Enums\UserOccupation;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class SetupProfile extends FormRequest
 {
@@ -21,7 +23,7 @@ class SetupProfile extends FormRequest
             'address' => 'nullable|string|max:500',
             'bio' => 'nullable|string|max:1000',
             'identification_number' => 'nullable|string|max:50',
-            'occupation' => 'nullable|string|max:100',
+            'occupation' => ['nullable', Rule::enum(UserOccupation::class)],
             'institution' => 'nullable|string|max:255',
         ];
 
@@ -45,7 +47,7 @@ class SetupProfile extends FormRequest
             'address.max' => 'Alamat maksimal 500 karakter',
             'bio.max' => 'Bio maksimal 1000 karakter',
             'identification_number.max' => 'Nomor identifikasi maksimal 50 karakter',
-            'occupation.max' => 'Pekerjaan/jabatan maksimal 100 karakter',
+            'occupation.enum' => 'Pilih pekerjaan yang tersedia',
             'institution.max' => 'Institusi maksimal 255 karakter',
             'avatar.image' => 'Avatar harus berupa gambar',
             'avatar.mimes' => 'Avatar harus berformat jpeg, png, atau jpg',

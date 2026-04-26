@@ -10,9 +10,11 @@ use Illuminate\Http\Request;
 
 class PublicController extends Controller
 {
-    public function __construct(
-        private PublicService $publicService,
-    ) {
+    private PublicService $publicService;
+
+    public function __construct(PublicService $publicService)
+    {
+        $this->publicService = $publicService;
     }
 
     /**
@@ -21,7 +23,7 @@ class PublicController extends Controller
     public function books(Request $request): JsonResponse
     {
         $filters = $request->only([
-            'search', 'category_ids', 'rating', 'min_reviews',
+            'search', 'category_ids', 'genre_ids', 'rating', 'min_reviews',
             'status', 'has_stock', 'author_ids', 'publisher_ids',
             'per_page', 'page'
         ]);

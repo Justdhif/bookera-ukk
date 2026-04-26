@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserOccupation;
 use App\Models\UserProfile;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -21,7 +22,7 @@ class UserProfileFactory extends Factory
             'address' => fake()->word(),
             'bio' => fake()->word(),
             'identification_number' => fake()->word(),
-            'occupation' => fake()->word(),
+            'occupation' => fake()->randomElement(UserOccupation::values()),
             'institution' => fake()->word(),
             'notification_enabled' => true,
             'notification_email' => true,

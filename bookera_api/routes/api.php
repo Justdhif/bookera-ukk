@@ -194,6 +194,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('borrows')->group(function () {
             Route::get('/', [BorrowController::class, 'index']);
+            Route::get('/export', [BorrowController::class, 'export']);
             Route::post('/', [BorrowController::class, 'storeAdminBorrow']);
             Route::get('/code/{code}', [BorrowController::class, 'showByCode']);
             Route::post('/{borrow}/assign-copies', [BorrowController::class, 'assignCopies']);
@@ -213,6 +214,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('fines')->group(function () {
             Route::get('/', [FineController::class, 'index']);
+            Route::get('/export', [FineController::class, 'export']);
             Route::post('/borrows/{borrow}', [FineController::class, 'store']);
 
             Route::post('/{fine}/mark-paid', [FineController::class, 'markAsPaid']);
@@ -220,8 +222,14 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/{fine}', [FineController::class, 'destroy']);
         });
 
+        Route::prefix('returns')->group(function () {
+            Route::get('/', [BookReturnController::class, 'adminIndex']);
+            Route::get('/export', [BookReturnController::class, 'export']);
+        });
+
         Route::prefix('lost-books')->group(function () {
             Route::get('/', [LostBookController::class, 'index']);
+            Route::get('/export', [LostBookController::class, 'export']);
             Route::delete('/{lostBook}', [LostBookController::class, 'destroy']);
         });
 

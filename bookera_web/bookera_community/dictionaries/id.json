@@ -17,7 +17,12 @@
     "logout": "Keluar",
     "logoutTitle": "Konfirmasi Keluar",
     "logoutDesc": "Apakah Anda yakin ingin keluar? Anda perlu masuk kembali untuk mengakses akun Anda.",
-    "loggingOut": "Sedang keluar..."
+    "loggingOut": "Sedang keluar...",
+    "occupationStudent": "Siswa",
+    "occupationTeacher": "Guru",
+    "occupationStaff": "Staf Sekolah",
+    "occupationExternal": "Umum / Luar Sekolah",
+    "occupationOther": "Lainnya"
   },
   "sidebar": {
     "account": "Akun",
@@ -174,7 +179,7 @@
     "birthDateLabel": "Tanggal Lahir",
     "selectBirthDate": "Pilih tanggal lahir",
     "occupationLabel": "Pekerjaan",
-    "occupationPlaceholder": "Masukkan pekerjaan",
+    "occupationPlaceholder": "Pilih pekerjaan",
     "institutionLabel": "Institusi",
     "institutionPlaceholder": "Masukkan institusi",
     "addressLabel": "Alamat",
@@ -250,7 +255,7 @@
     "selectGender": "Pilih jenis kelamin",
     "selectBirthDate": "Pilih tanggal lahir",
     "idNumber": "Nomor identitas",
-    "occupationPlaceholder": "Pelajar, Guru, dll.",
+    "occupationPlaceholder": "Pilih pekerjaan",
     "organizationPlaceholder": "Sekolah atau organisasi",
     "addressPlaceholder": "Masukkan alamat lengkap Anda",
     "bioPlaceholder": "Ceritakan sedikit tentang diri Anda...",

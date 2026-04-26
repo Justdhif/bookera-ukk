@@ -106,7 +106,7 @@ export function PhoneInput({
       >
         <SelectTrigger
           className={cn(
-            "w-auto min-w-[80px] rounded-r-none border-r-0 px-2 gap-1 shrink-0",
+            "w-auto min-w-20 rounded-r-none border-r-0 px-2 gap-1 shrink-0",
             "focus:z-10",
           )}
         >

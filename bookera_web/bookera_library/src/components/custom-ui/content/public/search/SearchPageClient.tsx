@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
-import PublicBookGrid from "@/components/custom-ui/content/book/PublicBookGrid";
+import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid";
 
 export default function SearchPageClient() {
   const t = useTranslations("public.search");

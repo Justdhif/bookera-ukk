@@ -16,12 +16,14 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import RoleBadge from "@/components/custom-ui/badge/RoleBadge";
 import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import { Users, Eye, Trash } from "lucide-react";
+import { formatOccupationLabel } from "@/constants/user-occupation";
 interface Props {
   data: User[];
   onDelete: (id: number) => void;
 }
 export default function UserTable({ data, onDelete }: Props) {
   const t = useTranslations("user");
+  const common = useTranslations("common");
   if (data.length === 0) {
     return (
       <EmptyState
@@ -86,7 +88,7 @@ export default function UserTable({ data, onDelete }: Props) {
               </TableCell>
               <TableCell>
                 <span className="text-muted-foreground">
-                  {item.profile?.occupation || "N/A"}
+                  {formatOccupationLabel(item.profile?.occupation, common)}
                 </span>
               </TableCell>
               <TableCell>

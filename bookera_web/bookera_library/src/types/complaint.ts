@@ -3,6 +3,14 @@ import { User } from "./user";
 export type ComplaintCategory = 'website' | 'facility' | 'service' | 'other';
 export type ComplaintStatus = 'pending' | 'verified' | 'on_progress' | 'resolved' | 'rejected';
 
+export interface ComplaintFilterParams {
+    category?: string;
+    status?: string;
+    search?: string;
+    per_page?: number;
+    page?: number;
+}
+
 export interface ComplaintImage {
     id: number;
     complaint_id: number;

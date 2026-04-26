@@ -15,8 +15,6 @@ export const publisherService = {
       params: filters,
     }),
 
-
-
   create: (data: CreatePublisherData) =>
     api.post<ApiResponse<Publisher>>(
       "/admin/publishers",

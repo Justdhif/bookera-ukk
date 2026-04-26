@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserOccupation;
 use App\Helpers\AvatarHelper;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -61,7 +62,7 @@ class UserFactory extends Factory
                 'address' => fake()->address(),
                 'bio' => fake()->optional(0.7)->sentence(),
                 'identification_number' => strtoupper(fake()->lexify('??')).'-'.str_pad($user->id, 4, '0', STR_PAD_LEFT),
-                'occupation' => fake()->randomElement(['Student', 'Teacher', 'Staff', 'Public', 'Other']),
+                'occupation' => fake()->randomElement(UserOccupation::values()),
                 'institution' => fake()->company(),
                 'avatar' => AvatarHelper::generateDefaultAvatar($user->id),
                 'notification_enabled' => true,

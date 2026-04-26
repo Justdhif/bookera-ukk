@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { Book } from "@/types/book";
-import BorrowRequestDialog from "@/components/custom-ui/content/book/BorrowRequestDialog";
-import PublicBookGrid from "@/components/custom-ui/content/book/PublicBookGrid";
+import BorrowRequestDialog from "@/components/custom-ui/content/public/book-detail/BorrowRequestDialog";
+import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid";
 
 export default function FavoritesPageClient() {
   const t = useTranslations("public.favorites");

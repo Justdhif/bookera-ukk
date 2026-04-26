@@ -11,15 +11,23 @@ import { cn } from "@/lib/utils";
 interface DateRangeFilterProps {
   onFilter: (startDate?: string, endDate?: string) => void;
   className?: string;
+  defaultStartDate?: string;
+  defaultEndDate?: string;
 }
 
 export default function DateRangeFilter({
   onFilter,
   className,
+  defaultStartDate,
+  defaultEndDate,
 }: DateRangeFilterProps) {
   const t = useTranslations("borrow");
-  const [startDate, setStartDate] = useState<Date | undefined>();
-  const [endDate, setEndDate] = useState<Date | undefined>();
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    defaultStartDate ? new Date(`${defaultStartDate}T00:00:00`) : undefined,
+  );
+  const [endDate, setEndDate] = useState<Date | undefined>(
+    defaultEndDate ? new Date(`${defaultEndDate}T00:00:00`) : undefined,
+  );
 
   // Real-time filtering
   useEffect(() => {

@@ -13,12 +13,23 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Briefcase,
   Building2,
   MapPin,
   ArrowRight,
   ArrowLeft,
 } from "lucide-react";
+import {
+  OCCUPATION_OPTIONS,
+  normalizeOccupationValue,
+} from "@/constants/user-occupation";
 const iconPopTransition = {
   type: "spring" as const,
   stiffness: 400,
@@ -26,7 +37,6 @@ const iconPopTransition = {
   delay: 0.2,
 };
 interface FormErrors {
-  occupation: boolean;
   institution: boolean;
 }
 interface SetupStepProfessionalProps {
@@ -56,11 +66,11 @@ export default function SetupStepProfessional({
   onNext,
 }: SetupStepProfessionalProps) {
   const t = useTranslations("setup-profile");
+  const common = useTranslations("common");
   const [errors, setErrors] = useState<FormErrors>({
-    occupation: false,
     institution: false,
   });
-  const isValid = !errors.occupation && !errors.institution;
+  const isValid = !errors.institution;
   return (
     <>
       <CardHeader className="space-y-4 text-center pb-4">
@@ -90,18 +100,22 @@ export default function SetupStepProfessional({
               <Briefcase className="w-4 h-4" />
               {t("occupation")}
             </Label>
-            <Input
-              id="occupation"
-              name="occupation"
-              placeholder={t("occupationPlaceholder")}
-              value={occupation}
-              onChange={(e) => setOccupation(e.target.value)}
-              validationType="letters-only"
-              onValidationChange={(isValid) =>
-                setErrors((prev) => ({ ...prev, occupation: !isValid }))
-              }
+            <Select
+              value={normalizeOccupationValue(occupation) || ""}
+              onValueChange={(value) => setOccupation(value)}
               disabled={loading}
-            />
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={t("occupationPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {OCCUPATION_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {common(option.labelKey)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="institution">

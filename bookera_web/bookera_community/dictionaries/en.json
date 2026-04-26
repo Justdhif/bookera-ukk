@@ -17,7 +17,12 @@
     "logout": "Logout",
     "logoutTitle": "Logout Confirmation",
     "logoutDesc": "Are you sure you want to logout? You will need to login again to access your account.",
-    "loggingOut": "Logging out..."
+    "loggingOut": "Logging out...",
+    "occupationStudent": "Student",
+    "occupationTeacher": "Teacher",
+    "occupationStaff": "School Staff",
+    "occupationExternal": "Public / Outside School",
+    "occupationOther": "Other"
   },
   "sidebar": {
     "account": "Account",
@@ -174,7 +179,7 @@
     "birthDateLabel": "Birth Date",
     "selectBirthDate": "Select birth date",
     "occupationLabel": "Occupation",
-    "occupationPlaceholder": "Enter occupation",
+    "occupationPlaceholder": "Select occupation",
     "institutionLabel": "Institution",
     "institutionPlaceholder": "Enter institution",
     "addressLabel": "Address",
@@ -250,7 +255,7 @@
     "selectGender": "Select gender",
     "selectBirthDate": "Select birth date",
     "idNumber": "ID number",
-    "occupationPlaceholder": "Student, Teacher, etc.",
+    "occupationPlaceholder": "Select occupation",
     "organizationPlaceholder": "School or organization",
     "addressPlaceholder": "Enter your full address",
     "bioPlaceholder": "Tell us a little about yourself...",

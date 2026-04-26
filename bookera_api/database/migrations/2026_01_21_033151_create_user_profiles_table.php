@@ -27,7 +27,7 @@ return new class extends Migration
             $table->text('bio')->nullable();
 
             $table->string('identification_number')->nullable()->unique();
-            $table->string('occupation')->nullable();
+            $table->enum('occupation', ['student', 'teacher', 'staff', 'external', 'other'])->nullable();
             $table->string('institution')->nullable();
             $table->boolean('notification_enabled')->default(false);
             $table->boolean('notification_email')->default(false);

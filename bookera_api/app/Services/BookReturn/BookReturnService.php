@@ -14,6 +14,7 @@ use App\Models\LostBookDetail;
 use App\Services\BookReturn\BookReturnNotificationService;
 use App\Services\LostBook\LostBookService;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -41,6 +42,70 @@ class BookReturnService
             ->latest()
             ->orderByDesc('id')
             ->get();
+    }
+
+    public function getAll(array $filters): LengthAwarePaginator
+    {
+        return $this->buildAdminQuery($filters)->paginate($filters['per_page'] ?? 15);
+    }
+
+    public function getExportData(array $filters): Collection
+    {
+        return $this->buildAdminQuery($filters)->get();
+    }
+
+    private function buildAdminQuery(array $filters)
+    {
+        $applyReturnDateRange = function ($returnQuery) use ($filters) {
+            if (!empty($filters['start_date'])) {
+                $returnQuery->whereDate('return_date', '>=', $filters['start_date']);
+            }
+
+            if (!empty($filters['end_date'])) {
+                $returnQuery->whereDate('return_date', '<=', $filters['end_date']);
+            }
+        };
+
+        $query = Borrow::query()->with([
+            'user.profile',
+            'fines.fineType',
+            'bookReturns' => function ($bookReturnQuery) use ($applyReturnDateRange) {
+                $bookReturnQuery->with([
+                    'details.bookCopy.book.authors',
+                    'details.bookCopy.book.publishers',
+                    'details.bookCopy.book.categories',
+                    'details.bookCopy.book.genres',
+                ])->orderByDesc('return_date')->orderByDesc('id');
+
+                $applyReturnDateRange($bookReturnQuery);
+            },
+        ])->whereHas('bookReturns', $applyReturnDateRange);
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($borrowQuery) use ($search, $applyReturnDateRange) {
+                $borrowQuery->where('borrow_code', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('email', 'like', "%{$search}%")
+                            ->orWhereHas('profile', function ($profileQuery) use ($search) {
+                                $profileQuery->where('full_name', 'like', "%{$search}%");
+                            });
+                    })
+                    ->orWhereHas('bookReturns', function ($bookReturnQuery) use ($search, $applyReturnDateRange) {
+                        $applyReturnDateRange($bookReturnQuery);
+
+                        $bookReturnQuery->where(function ($nestedQuery) use ($search) {
+                            $nestedQuery->whereHas('details.bookCopy.book', function ($bookQuery) use ($search) {
+                                $bookQuery->where('title', 'like', "%{$search}%");
+                            })->orWhereHas('details.bookCopy', function ($copyQuery) use ($search) {
+                                $copyQuery->where('copy_code', 'like', "%{$search}%");
+                            });
+                        });
+                    });
+            });
+        }
+
+        return $query->orderByDesc('id');
     }
 
     public function create(Borrow $borrow, array $data): array
