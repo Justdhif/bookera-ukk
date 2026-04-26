@@ -6,6 +6,7 @@ import PublicHeader from "@/components/custom-ui/navbar/PublicHeader";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ChatbotWidget } from "@/components/custom-ui/ChatbotWidget";
 
 export default function AccountLayoutClient({
   children,
@@ -35,6 +36,7 @@ export default function AccountLayoutClient({
           <div className="p-4 md:p-6">{children}</div>
         </main>
       </SidebarInset>
+      <ChatbotWidget />
     </SidebarProvider>
   );
 }

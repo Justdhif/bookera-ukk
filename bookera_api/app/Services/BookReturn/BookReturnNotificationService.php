@@ -37,8 +37,8 @@ class BookReturnNotificationService extends BaseNotificationService
         }
 
         foreach ($lost as $item) {
-            $bookSummaryList[] = '  • '.$item['book_title'].' ('.$this->t('Lost').')';
-            $booksForMail[] = $item['book_title'].' ('.$this->t('Lost').')';
+            $bookSummaryList[] = '  • ' . $item['book_title'] . ' (' . $this->t('Lost') . ')';
+            $booksForMail[] = $item['book_title'] . ' (' . $this->t('Lost') . ')';
         }
 
         $titles = collect($booksForMail)->take(2)->implode(', ');
@@ -55,11 +55,11 @@ class BookReturnNotificationService extends BaseNotificationService
 
         $message = $isLostOnlyReport
             ? $this->t('A summary of your borrow activity for lost books (:books) has been processed. Total outstanding fines: Rp :amount.', [
-                'books' => $titles.$moreText,
+                'books' => $titles . $moreText,
                 'amount' => $fineAmountFormatted,
             ])
             : $this->t('A summary of your borrow activity for returned books (:books) has been processed. Total outstanding fines: Rp :amount.', [
-                'books' => $titles.$moreText,
+                'books' => $titles . $moreText,
                 'amount' => $fineAmountFormatted,
             ]);
 
@@ -84,7 +84,7 @@ class BookReturnNotificationService extends BaseNotificationService
         $details = [
             $this->t('Borrow Code') => $borrow->borrow_code,
             $this->t('Process Date') => now()->format('d M Y'),
-            $this->t('Total Fines') => 'Rp '.$fineAmountFormatted,
+            $this->t('Total Fines') => 'Rp ' . $fineAmountFormatted,
             $this->t('Status') => $isLostOnlyReport ? $this->t('Reported') : $this->t('Completed'),
         ];
 
@@ -107,32 +107,32 @@ class BookReturnNotificationService extends BaseNotificationService
 
         if (($hasReturnedItems || $isLostOnlyReport) && $profile->notification_whatsapp && $profile->phone_number) {
             $fineList = $unpaidFines->map(function ($f) {
-                return '  • '.($f->fineType->name ?? $this->t('Fine')).': *Rp '.number_format($f->amount, 0, ',', '.').'*';
+                return '  • ' . ($f->fineType->name ?? $this->t('Fine')) . ': *Rp ' . number_format($f->amount, 0, ',', '.') . '*';
             })->implode("\n");
 
             $fineSection = $totalFineAmount > 0
-                ? "\n".$this->t('💰 *Fine Information:*')."\n" . $fineList . "\n  ━━━━━━━━━━━━━━\n  *".$this->t('Total Amount').": Rp {$fineAmountFormatted}*\n"
-                : "\n".$this->t('✅ *No additional fines.*')."\n";
+                ? "\n" . $this->t('💰 *Fine Information:*') . "\n" . $fineList . "\n  ━━━━━━━━━━━━━━\n  *" . $this->t('Total Amount') . ": Rp {$fineAmountFormatted}*\n"
+                : "\n" . $this->t('✅ *No additional fines.*') . "\n";
 
             $whatsappMessage = $this->t("📄 *BOOKERA — Activity Summary*\n")
-                ."━━━━━━━━━━━━━━━━━━━━\n\n"
-                .$this->t('Hello, *:name*! 👋', ['name' => $userName])."\n\n"
-                .$this->t('This is a summary of your recent borrow activity.')."\n\n"
-                .$this->t('📋 *Transaction Details:*')."\n"
-                .$this->t('  🔖 Borrow Code : *:code*', ['code' => $borrow->borrow_code])."\n"
-                .$this->t('  📅 Date     : :date', ['date' => now()->format('d M Y')])."\n"
-                .$this->t('  📊 Status   : :status', ['status' => $isLostOnlyReport ? $this->t('Reported') : $this->t('Completed')])."\n\n"
-                .$this->t('📚 *Item Status:*')."\n"
-                .implode("\n", $bookSummaryList)."\n"
-                .$fineSection."\n"
-                ."━━━━━━━━━━━━━━━━━━━━\n"
-                .$this->t('Please visit the library counter to settle any outstanding payments.')."\n\n"
-                .$this->t('_This is an automated invoice summary from Bookera._');
+                . "━━━━━━━━━━━━━━━━━━━━\n\n"
+                . $this->t('Hello, *:name*! 👋', ['name' => $userName]) . "\n\n"
+                . $this->t('This is a summary of your recent borrow activity.') . "\n\n"
+                . $this->t('📋 *Transaction Details:*') . "\n"
+                . $this->t('  🔖 Borrow Code : *:code*', ['code' => $borrow->borrow_code]) . "\n"
+                . $this->t('  📅 Date     : :date', ['date' => now()->format('d M Y')]) . "\n"
+                . $this->t('  📊 Status   : :status', ['status' => $isLostOnlyReport ? $this->t('Reported') : $this->t('Completed')]) . "\n\n"
+                . $this->t('📚 *Item Status:*') . "\n"
+                . implode("\n", $bookSummaryList) . "\n"
+                . $fineSection . "\n"
+                . "━━━━━━━━━━━━━━━━━━━━\n"
+                . $this->t('Please visit the library counter to settle any outstanding payments.') . "\n\n"
+                . $this->t('_This is an automated invoice summary from Bookera._');
 
             try {
                 (new FonnteService)->send($profile->phone_number, $whatsappMessage);
             } catch (Throwable $exception) {
-                Log::error('Failed to send consolidated return WhatsApp: '.$exception->getMessage());
+                Log::error('Failed to send consolidated return WhatsApp: ' . $exception->getMessage());
             }
         }
     }

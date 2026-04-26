@@ -22,23 +22,21 @@ class BookReturnExport implements FromCollection, WithHeadings, WithTitle
             $fineTotal = (float) $borrow->fines->sum('amount');
             $outstandingFine = (float) $borrow->fines->where('status', 'unpaid')->sum('amount');
 
-            return $borrow->bookReturns->flatMap(function ($bookReturn) use ($borrow, $borrower, $fineTotal, $outstandingFine) {
-                return $bookReturn->details->map(function ($detail) use ($borrow, $borrower, $bookReturn, $fineTotal, $outstandingFine) {
-                    $book = $detail->bookCopy?->book;
+            return $borrow->bookReturns->map(function ($bookReturn) use ($borrow, $borrower, $fineTotal, $outstandingFine) {
+                $book = $bookReturn->bookCopy?->book;
 
-                    return [
-                        'borrow_code' => $borrow->borrow_code,
-                        'borrower' => $borrower,
-                        'borrow_date' => $borrow->borrow_date ? Carbon::parse($borrow->borrow_date)->format('Y-m-d') : '-',
-                        'return_date' => $bookReturn->return_date ? Carbon::parse($bookReturn->return_date)->format('Y-m-d') : '-',
-                        'book_title' => $book?->title ?? '-',
-                        'copy_code' => $detail->bookCopy?->copy_code ?? '-',
-                        'condition' => ucfirst($detail->condition ?? '-'),
-                        'total_fine' => $fineTotal,
-                        'outstanding_fine' => $outstandingFine,
-                        'created_at' => optional($bookReturn->created_at)->format('Y-m-d H:i:s'),
-                    ];
-                });
+                return [
+                    'borrow_code' => $borrow->borrow_code,
+                    'borrower' => $borrower,
+                    'borrow_date' => $borrow->borrow_date ? Carbon::parse($borrow->borrow_date)->format('Y-m-d') : '-',
+                    'return_date' => $bookReturn->return_date ? Carbon::parse($bookReturn->return_date)->format('Y-m-d') : '-',
+                    'book_title' => $book?->title ?? '-',
+                    'copy_code' => $bookReturn->bookCopy?->copy_code ?? '-',
+                    'condition' => ucfirst($bookReturn->condition ?? '-'),
+                    'total_fine' => $fineTotal,
+                    'outstanding_fine' => $outstandingFine,
+                    'created_at' => optional($bookReturn->created_at)->format('Y-m-d H:i:s'),
+                ];
             });
         })->values();
     }

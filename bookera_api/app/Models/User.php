@@ -28,6 +28,8 @@ class User extends Authenticatable
         'last_login_at',
     ];
 
+    protected $appends = ['has_pending_borrow_request', 'has_overdue_borrow'];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -104,5 +106,33 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Book::class, 'book_favorites', 'user_id', 'book_id')
             ->withTimestamps();
+    }
+
+    public function borrowRequests()
+    {
+        return $this->hasMany(BorrowRequest::class);
+    }
+
+    public function getHasPendingBorrowRequestAttribute(): bool
+    {
+        return $this->borrowRequests()
+            ->where('approval_status', '!=', 'canceled')
+            ->whereHas('borrowRequestDetails', function ($query) {
+                $query->where('approval_status', 'processing');
+            })
+            ->exists();
+    }
+
+    public function borrows()
+    {
+        return $this->hasMany(Borrow::class);
+    }
+
+    public function getHasOverdueBorrowAttribute(): bool
+    {
+        return $this->borrows()
+            ->where('status', 'open')
+            ->whereDate('return_date', '<', now()->toDateString())
+            ->exists();
     }
 }

@@ -7,7 +7,6 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LostBook\StoreLostBookRequest;
 use App\Models\Borrow;
-use App\Models\LostBook;
 use App\Services\LostBook\LostBookService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,21 +35,12 @@ class LostBookController extends Controller
     {
         $validated = $request->validated();
         try {
-            $borrow = $this->lostBookService->markBorrowDetailsLost($borrow, $validated['borrow_detail_ids']);
+            $borrow = $this->lostBookService->reportLostBook($borrow, $validated['borrow_detail_ids']);
 
             return ApiResponse::successResponse('Status buku hilang berhasil diperbarui', $borrow);
         } catch (\Exception $e) {
             return ApiResponse::errorResponse($e->getMessage(), null, 400);
         }
-    }
-
-
-
-    public function destroy(LostBook $lostBook): JsonResponse
-    {
-        $this->lostBookService->delete($lostBook);
-
-        return ApiResponse::successResponse('Record buku hilang berhasil dihapus');
     }
 
     public function export(Request $request): BinaryFileResponse
@@ -67,9 +57,7 @@ class LostBookController extends Controller
     {
         return [
             'search' => $request->search,
-            'borrow_status' => $request->borrow_status,
             'per_page' => $request->per_page,
-            'page' => $request->page,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
         ];

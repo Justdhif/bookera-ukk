@@ -201,7 +201,7 @@ export default function CreateBorrowClient() {
         isAdmin
       />
 
-      <div className="grid gap-6 lg:grid-cols-3 flex-1 overflow-hidden min-h-0">
+      <div className="grid gap-6 lg:grid-cols-3 lg:auto-rows-fr flex-1 overflow-hidden min-h-0">
         <div className="lg:col-span-1 space-y-6 overflow-y-auto scrollbar-hide">
           <UserSelectorCard
             users={users}
@@ -227,7 +227,7 @@ export default function CreateBorrowClient() {
           />
           <DueDateCard value={returnDate} onChange={handleReturnDateChange} />
         </div>
-        <div className="lg:col-span-2 min-h-0 flex flex-col gap-6">
+        <div className="lg:col-span-2 h-full min-h-0 flex flex-col gap-6 overflow-hidden">
           <BookCopySelectorCard
             selectedBooks={selectedBooks}
             selectedCopyIds={selectedCopyIds}

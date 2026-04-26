@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter, usePathname } from "next/navigation";
 import {
@@ -21,7 +21,15 @@ import { borrowRequestService } from "@/services/borrow-request.service";
 import { publicService } from "@/services/public.service";
 import { Book } from "@/types/book";
 import Image from "next/image";
-import { BookOpen, Building2, Star, AlertCircle, Calendar } from "lucide-react";
+import {
+  BookOpen,
+  Building2,
+  Star,
+  AlertCircle,
+  Calendar,
+  Minus,
+  Plus,
+} from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -44,7 +52,7 @@ export default function BorrowRequestDialog({
 }: BorrowRequestDialogProps) {
   const t = useTranslations("public");
   const tCommon = useTranslations("common");
-  const { isAuthenticated } = useAuthStore();
+  const { user, fetchUser, isAuthenticated } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
   const [borrowDate, setBorrowDate] = useState<Date | undefined>(undefined);
@@ -52,8 +60,40 @@ export default function BorrowRequestDialog({
   const [selectedBooks, setSelectedBooks] = useState<Book[]>([]);
   const [loadingBooks, setLoadingBooks] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [checkingUser, setCheckingUser] = useState(false);
+  const [quantities, setQuantities] = useState<Record<number, number>>({});
 
-  const uniqueBookIds = useMemo(() => Array.from(new Set(bookIds)), [bookIds]);
+  const hasPendingRequest = user?.has_pending_borrow_request ?? false;
+
+  const uniqueBookIdsStr = JSON.stringify(bookIds);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const uniqueBookIds = useMemo(
+    () => Array.from(new Set(bookIds)),
+    [uniqueBookIdsStr],
+  );
+
+  const initialBooksRef = useRef(initialBooks);
+  useEffect(() => {
+    initialBooksRef.current = initialBooks;
+  }, [initialBooks]);
+
+  useEffect(() => {
+    setQuantities((prev) => {
+      const next = { ...prev };
+      uniqueBookIds.forEach((id) => {
+        if (!next[id]) next[id] = 1;
+      });
+      return next;
+    });
+  }, [uniqueBookIds]);
+
+  const handleQuantityChange = (bookId: number, delta: number, max: number) => {
+    setQuantities((prev) => {
+      const current = prev[bookId] || 1;
+      const next = Math.max(1, Math.min(max, current + delta));
+      return { ...prev, [bookId]: next };
+    });
+  };
 
   const handleClose = () => {
     onClose();
@@ -64,9 +104,12 @@ export default function BorrowRequestDialog({
     setLoadingBooks(false);
   };
 
+  const isDataLoading = loadingBooks || checkingUser;
+
   const isSubmitDisabled =
     loading ||
-    loadingBooks ||
+    isDataLoading ||
+    hasPendingRequest ||
     uniqueBookIds.length === 0 ||
     selectedBooks.length < uniqueBookIds.length ||
     !borrowDate ||
@@ -79,10 +122,17 @@ export default function BorrowRequestDialog({
 
     let cancelled = false;
 
-    const loadSelectedBooks = async () => {
-      const cachedBooks = uniqueBookIds
-        .map((bookId) => initialBooks.find((book) => book.id === bookId))
-        .filter((book): book is Book => Boolean(book));
+    const loadData = async () => {
+      if (!isOpen || !isAuthenticated) return;
+
+      setCheckingUser(true);
+      await fetchUser();
+      if (cancelled) return;
+      setCheckingUser(false);
+
+      const cachedBooks = initialBooksRef.current.filter((book) =>
+        uniqueBookIds.includes(book.id),
+      );
 
       if (cachedBooks.length >= uniqueBookIds.length) {
         setSelectedBooks(cachedBooks);
@@ -105,7 +155,9 @@ export default function BorrowRequestDialog({
         );
 
         if (!cancelled) {
-          const fetchedBooks = responses.map((response: any) => response.data.data);
+          const fetchedBooks = responses.map(
+            (response: any) => response.data.data,
+          );
           const mergedBooks = uniqueBookIds
             .map(
               (bookId) =>
@@ -127,12 +179,12 @@ export default function BorrowRequestDialog({
       }
     };
 
-    loadSelectedBooks();
+    loadData();
 
     return () => {
       cancelled = true;
     };
-  }, [uniqueBookIds, initialBooks, isOpen]);
+  }, [uniqueBookIdsStr, isOpen, isAuthenticated, fetchUser]);
 
   useEffect(() => {
     if (borrowDate) {
@@ -168,11 +220,17 @@ export default function BorrowRequestDialog({
 
     try {
       setLoading(true);
+      const borrowItems = uniqueBookIds.map((id) => ({
+        id,
+        quantity: quantities[id] || 1,
+      }));
+
       await borrowRequestService.create({
-        book_ids: bookIds,
+        items: borrowItems,
         borrow_date: format(borrowDate, "yyyy-MM-dd"),
         return_date: format(returnDate, "yyyy-MM-dd"),
       });
+      await fetchUser();
       toast.success(t("common.borrowRequestSubmitted"));
       if (onSuccess) onSuccess();
       handleClose();
@@ -195,7 +253,21 @@ export default function BorrowRequestDialog({
 
         <Separator />
 
-        <div className="space-y-5">
+        {hasPendingRequest && (
+          <div className="mx-6 mt-4 flex items-start gap-3 rounded-2xl bg-amber-500/10 p-4 border border-amber-500/20">
+            <AlertCircle className="h-5 w-5 shrink-0 text-amber-600 mt-0.5" />
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-amber-700">
+                {t("pendingBorrowRequestTitle")}
+              </p>
+              <p className="text-xs text-amber-600/90 leading-relaxed">
+                {t("pendingBorrowRequestDesc")}
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-5 p-6 pt-0 mt-5">
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div className="space-y-1">
@@ -259,7 +331,7 @@ export default function BorrowRequestDialog({
                             "h-6 px-2.5 text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border-none",
                             (book.available_copies ?? 0) > 0
                               ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.1)]"
-                              : "bg-rose-500/15 text-rose-500 hover:bg-rose-500/25 shadow-[0_0_12px_rgba(244,63,94,0.15)] animate-pulse",
+                              : "bg-rose-500/10 text-rose-500 hover:bg-rose-500/20",
                           )}
                         >
                           {(book.available_copies ?? 0) > 0 ? (
@@ -282,11 +354,49 @@ export default function BorrowRequestDialog({
                       </div>
                     </div>
 
-                    <div className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-600">
-                      <Star className="h-3 w-3 fill-current" />
-                      {book.average_rating
-                        ? Number(book.average_rating).toFixed(1)
-                        : "0.0"}
+                    <div className="flex shrink-0 flex-col items-end justify-between gap-2">
+                      <div className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-600">
+                        <Star className="h-3 w-3 fill-current" />
+                        {book.average_rating
+                          ? Number(book.average_rating).toFixed(1)
+                          : "0.0"}
+                      </div>
+
+                      <div className="flex items-center gap-2 rounded-xl border border-border bg-background p-1 shadow-sm">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleQuantityChange(
+                              book.id,
+                              -1,
+                              book.available_copies ?? 0,
+                            )
+                          }
+                          disabled={quantities[book.id] <= 1}
+                          className="flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-muted disabled:opacity-30"
+                        >
+                          <Minus className="h-3.5 w-3.5" />
+                        </button>
+                        <span className="w-6 text-center text-xs font-bold text-foreground">
+                          {quantities[book.id] || 1}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleQuantityChange(
+                              book.id,
+                              1,
+                              book.available_copies ?? 0,
+                            )
+                          }
+                          disabled={
+                            quantities[book.id] >= (book.available_copies ?? 0)
+                          }
+                          className="flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-muted disabled:opacity-30"
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -313,7 +423,9 @@ export default function BorrowRequestDialog({
               <Label>{t("returnDateLabel")}</Label>
               <div className="flex h-9 w-full items-center gap-2 rounded-md border border-input bg-muted/30 px-3 py-2 text-sm font-normal text-muted-foreground cursor-not-allowed">
                 <Calendar className="h-4 w-4 shrink-0 opacity-50" />
-                {returnDate ? format(returnDate, "PPP") : t("selectBorrowDateFirst")}
+                {returnDate
+                  ? format(returnDate, "PPP")
+                  : t("selectBorrowDateFirst")}
               </div>
               <p className="text-[10px] text-primary/80 font-medium px-1">
                 {t("autoReturnDateInfo")}

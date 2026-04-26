@@ -5,10 +5,8 @@ namespace App\Services\Fine;
 use App\Helpers\ActivityLogger;
 use App\Models\Borrow;
 use App\Models\FineBorrow;
-use App\Models\FineType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\DB;
 
 class FineService
 {
@@ -77,46 +75,10 @@ class FineService
             ->get();
     }
 
-    public function create(Borrow $borrow, array $data): FineBorrow
-    {
-        $fineType = FineType::findOrFail($data['fine_type_id']);
-
-        return DB::transaction(function () use ($borrow, $fineType, $data) {
-            $amount = $data['amount'] ?? $fineType->amount;
-
-            $fine = FineBorrow::create([
-                'borrow_id'    => $borrow->id,
-                'fine_type_id' => $fineType->id,
-                'amount'       => $amount,
-                'status'       => 'unpaid',
-                'notes'        => $data['notes'] ?? null,
-            ]);
-
-            ActivityLogger::log(
-                'create',
-                'fine',
-                "Fine created for borrow #{$borrow->id} - {$fineType->name}",
-                [
-                    'fine_id'   => $fine->id,
-                    'borrow_id' => $borrow->id,
-                    'fine_type' => $fineType->name,
-                    'amount'    => $amount,
-                    'status'    => 'unpaid',
-                ],
-                null,
-                $fine
-            );
-
-            $fine->load(['borrow.user.profile', 'borrow.borrowDetails.bookCopy.book', 'fineType']);
-
-            return $fine;
-        });
-    }
-
-
-
     public function markAsPaid(FineBorrow $fine): FineBorrow
     {
+        $oldStatus = $fine->status;
+
         $fine->update([
             'status' => 'paid',
             'paid_at' => now(),
@@ -128,33 +90,9 @@ class FineService
             "Fine #{$fine->id} marked as paid",
             [
                 'fine_id' => $fine->id,
+                'borrow_id' => $fine->borrow_id,
                 'status' => 'paid',
                 'paid_at' => $fine->paid_at,
-            ],
-            ['status' => 'unpaid'],
-            $fine
-        );
-
-        return $fine->load(['borrow.user.profile', 'fineType']);
-    }
-
-    public function waiveFine(FineBorrow $fine, ?string $notes = null): FineBorrow
-    {
-        $oldStatus = $fine->status;
-
-        $fine->update([
-            'status' => 'waived',
-            'notes' => $notes ?? $fine->notes,
-        ]);
-
-        ActivityLogger::log(
-            'update',
-            'fine',
-            "Fine #{$fine->id} waived",
-            [
-                'fine_id' => $fine->id,
-                'status' => 'waived',
-                'notes' => $fine->notes,
             ],
             ['status' => $oldStatus],
             $fine
@@ -163,32 +101,8 @@ class FineService
         return $fine->load(['borrow.user.profile', 'fineType']);
     }
 
-    public function delete(FineBorrow $fine): void
-    {
-        ActivityLogger::log(
-            'delete',
-            'fine',
-            "Fine #{$fine->id} deleted",
-            [
-                'fine_id'   => $fine->id,
-                'borrow_id' => $fine->borrow_id,
-                'fine_type' => $fine->fineType->name ?? 'Unknown',
-                'amount' => $fine->amount,
-            ],
-            null,
-            $fine
-        );
-
-        $fine->delete();
-    }
-
     public function canMarkAsPaid(FineBorrow $fine): bool
     {
-        return $fine->status !== 'paid';
-    }
-
-    public function canWaive(FineBorrow $fine): bool
-    {
-        return $fine->status !== 'waived';
+        return $fine->status === 'unpaid';
     }
 }

@@ -107,7 +107,9 @@ class Borrow extends Model
 
     public function bookReturns()
     {
-        return $this->hasMany(BookReturn::class);
+        return $this->hasMany(BookReturn::class)
+            ->whereNotNull('book_copy_id')
+            ->orderBy('id');
     }
 
     public function fines()
@@ -122,7 +124,9 @@ class Borrow extends Model
 
     public function lostBooks()
     {
-        return $this->hasMany(LostBook::class)->orderBy('id');
+        return $this->hasMany(LostBook::class)
+            ->whereNotNull('book_copy_id')
+            ->orderBy('id');
     }
 
     public function getQrCodeUrlAttribute(): ?string

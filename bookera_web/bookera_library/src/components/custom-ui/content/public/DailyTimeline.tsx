@@ -120,20 +120,18 @@ export function getDayState(date: Date, borrows: Borrow[]): DayState {
   const hasStart = events.some((event) => event.type === "start");
   const hasActive = events.some((event) => event.type === "active");
 
+  if (hasDeadline) return "deadline";
+  if (hasStart) return "start";
+  if (hasActive) return "has-event";
+
   if (isSameDay(current, today)) {
     return "today";
   }
 
   if (current < today) {
-    if (hasDeadline) return "deadline";
-    if (hasStart) return "start";
-    if (hasActive) return "has-event";
     return "past";
   }
 
-  if (hasDeadline) return "deadline";
-  if (hasStart) return "start";
-  if (hasActive) return "has-event";
   return "future";
 }
 
@@ -407,6 +405,10 @@ export default function DailyTimeline() {
             <div className="flex items-center gap-2.5">
               <span className="h-2.5 w-2.5 rounded-full bg-blue-500/80 shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
               <span>{t("in_progress")}</span>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <span className="h-2.5 w-2.5 rounded-sm ring-2 ring-indigo-500/50 bg-indigo-50 dark:bg-indigo-900/30" />
+              <span>{t("today")}</span>
             </div>
           </div>
         </div>

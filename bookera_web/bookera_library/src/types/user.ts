@@ -34,6 +34,7 @@ export interface User {
   created_at: string;
   updated_at: string;
   is_following?: boolean;
+  has_pending_borrow_request?: boolean;
 
   profile: UserProfile | null;
 }

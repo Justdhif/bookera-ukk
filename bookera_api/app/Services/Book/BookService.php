@@ -13,6 +13,18 @@ class BookService
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
+        $query = $this->buildQuery($filters);
+
+        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
+    }
+
+    public function getExportData(array $filters): \Illuminate\Support\Collection
+    {
+        return $this->buildQuery($filters)->latest()->orderByDesc('id')->get();
+    }
+
+    private function buildQuery(array $filters): \Illuminate\Database\Eloquent\Builder
+    {
         $query = Book::query()
             ->with(['categories', 'genres', 'authors', 'publishers', 'reviews.user.profile', 'copies']);
 
@@ -90,26 +102,6 @@ class BookService
             });
         }
 
-        if (!empty($filters['author_ids'])) {
-            $authorIds = is_array($filters['author_ids'])
-                ? $filters['author_ids']
-                : explode(',', $filters['author_ids']);
-
-            $query->whereHas('authors', function ($authorQuery) use ($authorIds) {
-                $authorQuery->whereIn('authors.id', $authorIds);
-            });
-        }
-
-        if (!empty($filters['publisher_ids'])) {
-            $publisherIds = is_array($filters['publisher_ids'])
-                ? $filters['publisher_ids']
-                : explode(',', $filters['publisher_ids']);
-
-            $query->whereHas('publishers', function ($publisherQuery) use ($publisherIds) {
-                $publisherQuery->whereIn('publishers.id', $publisherIds);
-            });
-        }
-
         if (!empty($filters['status'])) {
             $query->where('is_active', $filters['status'] === 'active');
         }
@@ -120,8 +112,9 @@ class BookService
             });
         }
 
-        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
+        return $query;
     }
+
 
     public function create(array $data, ?UploadedFile $coverImage = null): Book
     {

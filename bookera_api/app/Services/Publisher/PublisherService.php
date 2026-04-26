@@ -34,10 +34,6 @@ class PublisherService
         return $query->paginate((int) $perPage);
     }
 
-
-
-
-
     public function create(array $data, UploadedFile $photo): Publisher
     {
         $data['slug'] = SlugGenerator::generate('publishers', 'slug', $data['name']);

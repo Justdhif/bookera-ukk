@@ -14,7 +14,7 @@ import FineStatusBadge from "@/components/custom-ui/badge/FineStatusBadge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Fine } from "@/types/fine";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { DollarSign, Trash, Eye, BookOpen, Hash } from "lucide-react";
+import { DollarSign, Eye, BookOpen, Hash } from "lucide-react";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
@@ -49,10 +49,8 @@ function UserAvatar({ name, avatar }: { name: string; avatar?: string }) {
 
 export default function FineTable({
   data,
-  onDelete,
 }: {
   data: Fine[];
-  onDelete: (id: number) => void;
 }) {
   const t = useTranslations("fines");
   if (data.length === 0) {
@@ -207,17 +205,6 @@ export default function FineTable({
                                 <span className="hidden sm:inline">Details</span>
                               </Button>
                             </Link>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              className="h-8"
-                              onClick={() => onDelete(item.id)}
-                            >
-                              <Trash className="h-3.5 w-3.5 mr-1" />
-                              <span className="hidden sm:inline">
-                                {t("delete")}
-                              </span>
-                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

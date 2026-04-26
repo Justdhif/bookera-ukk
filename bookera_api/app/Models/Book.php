@@ -25,13 +25,12 @@ class Book extends Model
     ];
 
     protected $casts = [
-        'price' => 'float',
+        'price' => 'decimal:2',
         'is_active' => 'boolean',
     ];
 
-    protected $withCount = ['favorites', 'total_copies', 'available_copies'];
-
-    protected $appends = ['author', 'publisher', 'average_rating', 'reviews_count', 'total_copies', 'available_copies'];
+    protected $withCount = ['favorites', 'available_copies'];
+    protected $appends = ['average_rating', 'reviews_count', 'author', 'publisher', 'available_copies'];
 
     public function getCoverImageAttribute($value)
     {
@@ -74,14 +73,13 @@ class Book extends Model
         return 0;
     }
 
-    public function getTotalCopiesAttribute()
-    {
-        return $this->total_copies_count ?? 0;
-    }
 
     public function getAvailableCopiesAttribute()
     {
-        return $this->available_copies_count ?? 0;
+        if (array_key_exists('available_copies_count', $this->attributes)) {
+            return $this->available_copies_count;
+        }
+        return $this->copies()->where('status', 'available')->count();
     }
 
     public function reviews()
@@ -109,10 +107,6 @@ class Book extends Model
         return $this->hasMany(BookFavorite::class);
     }
 
-    public function total_copies()
-    {
-        return $this->hasMany(BookCopy::class);
-    }
 
     public function available_copies()
     {
@@ -130,4 +124,5 @@ class Book extends Model
         return $this->belongsToMany(Publisher::class, 'book_publishers', 'book_id', 'publisher_id')
             ->withTimestamps();
     }
+
 }

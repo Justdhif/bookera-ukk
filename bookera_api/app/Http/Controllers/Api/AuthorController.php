@@ -37,8 +37,6 @@ class AuthorController extends Controller
         return ApiResponse::successResponse('Data penulis berhasil diambil', $authors);
     }
 
-
-
     public function store(StoreAuthorRequest $request): JsonResponse
     {
         $author = $this->authorService->create(

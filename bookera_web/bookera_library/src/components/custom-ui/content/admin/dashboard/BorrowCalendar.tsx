@@ -200,7 +200,7 @@ export default function BorrowCalendar() {
                         setSelectedDay(cell.day);
                       }}
                       className={cn(
-                        "relative flex min-h-[5rem] md:min-h-28 flex-col items-end justify-start overflow-hidden rounded-lg md:rounded-[1.15rem] p-1.5 md:p-3 pt-1 md:pt-2.5 text-right outline-none transition-all",
+                        "relative flex min-h-20 md:min-h-28 flex-col items-end justify-start overflow-hidden rounded-lg md:rounded-[1.15rem] p-1.5 md:p-3 pt-1 md:pt-2.5 text-right outline-none transition-all",
                         "border border-transparent shadow-sm focus-visible:ring-2 focus-visible:ring-brand-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                         "cursor-pointer disabled:cursor-default",
 
@@ -209,7 +209,13 @@ export default function BorrowCalendar() {
 
                         // Distinct Today styling
                         todayCell &&
-                          "ring-2 ring-indigo-500/50 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-200 shadow-md",
+                          "ring-2 ring-indigo-500/50 shadow-md",
+                        todayCell &&
+                          (!cell.data ||
+                            Number(cell.data.open_borrows) +
+                              Number(cell.data.close_borrows) ===
+                              0) &&
+                          "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-200",
 
                         // Distinct Selected styling
                         isSelected &&

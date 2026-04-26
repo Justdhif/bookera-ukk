@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Borrow;
+use App\Models\BorrowRequestDetail;
+use App\Models\User;
 
 class BorrowRequest extends Model
 {
@@ -32,11 +35,16 @@ class BorrowRequest extends Model
 
     public function borrowRequestDetails()
     {
-        return $this->hasMany(BorrowRequestDetail::class);
+        return $this->hasMany(BorrowRequestDetail::class)->orderBy('id');
     }
 
     public function details()
     {
         return $this->borrowRequestDetails();
+    }
+
+    public function borrow()
+    {
+        return $this->hasOne(Borrow::class);
     }
 }

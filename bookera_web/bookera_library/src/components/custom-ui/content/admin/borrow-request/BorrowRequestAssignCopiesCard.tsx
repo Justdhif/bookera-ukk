@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { BorrowRequest } from "@/types/borrow-request";
 import { BookCopy } from "@/types/book-copy";
 import { bookService } from "@/services/book.service";
+import { borrowRequestService } from "@/services/borrow-request.service";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -24,20 +26,20 @@ import { BookOpen, PackageCheck, AlertCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 interface BookCopyOption {
-  bookId: number;
+  detailId: number;
   bookTitle: string;
   copies: BookCopy[];
 }
 
 interface BorrowRequestAssignCopiesCardProps {
   request: BorrowRequest;
-  onSelectionChange: (copyIds: number[]) => void;
+  onAssigned: () => void;
   disabled?: boolean;
 }
 
 export function BorrowRequestAssignCopiesCard({
   request,
-  onSelectionChange,
+  onAssigned,
   disabled = false,
 }: BorrowRequestAssignCopiesCardProps) {
   const t = useTranslations("borrow");
@@ -47,28 +49,25 @@ export function BorrowRequestAssignCopiesCard({
     Record<number, number>
   >({});
   const [isLoadingCopies, setIsLoadingCopies] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const requestDetails = request.borrow_request_details ?? [];
+  const requestDetails = (request.borrow_request_details ?? []).filter(
+    (detail) => detail.approval_status === "approved" && !detail.book_copy_id,
+  );
 
   useEffect(() => {
     loadCopies();
-  }, [request.id]);
-
-  useEffect(() => {
-    const copyIds = requestDetails
-      .map((detail) => selectedCopyIds[detail.id])
-      .filter(Boolean);
-    
-    if (copyIds.length === requestDetails.length) {
-      onSelectionChange(copyIds);
-    } else {
-      onSelectionChange([]);
-    }
-  }, [selectedCopyIds, requestDetails.length]);
+  }, [request.id, requestDetails.map((detail) => detail.id).join("-")]);
 
   const loadCopies = async () => {
     setIsLoadingCopies(true);
     try {
+      if (requestDetails.length === 0) {
+        setCopyOptions([]);
+        setSelectedCopyIds({});
+        return;
+      }
+
       const options: BookCopyOption[] = [];
       const preSelected: Record<number, number> = {};
 
@@ -79,7 +78,7 @@ export function BorrowRequestAssignCopiesCard({
           (c: BookCopy) => c.status === "available",
         );
         options.push({
-          bookId: detail.id, // Using detail ID as key to handle multiple copies of same book if needed
+          detailId: detail.id,
           bookTitle: book.title,
           copies: available,
         });
@@ -98,7 +97,32 @@ export function BorrowRequestAssignCopiesCard({
     }
   };
 
-  if (request.approval_status !== "processing") return null;
+  const hasUnavailableStock = copyOptions.some((opt) => opt.copies.length === 0);
+  const isFormValid =
+    copyOptions.length > 0 &&
+    !hasUnavailableStock &&
+    copyOptions.every((opt) => Boolean(selectedCopyIds[opt.detailId]));
+
+  const handleAssign = async () => {
+    if (!isFormValid) {
+      toast.error(t("selectCopyError"));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const copyIds = copyOptions.map((opt) => selectedCopyIds[opt.detailId]);
+      await borrowRequestService.assignBorrow(request.id, copyIds);
+      toast.success(t("assignSuccess"));
+      onAssigned();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t("assignError"));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (requestDetails.length === 0) return null;
 
   return (
     <Card className="border-blue-200 bg-blue-50/30">
@@ -119,7 +143,7 @@ export function BorrowRequestAssignCopiesCard({
         ) : (
           <div className="space-y-4">
             {copyOptions.map((opt) => (
-              <div key={opt.bookId} className="space-y-2">
+              <div key={opt.detailId} className="space-y-2">
                 <div className="flex items-center gap-2">
                   <BookOpen className="h-4 w-4 text-muted-foreground shrink-0" />
                   <p className="font-medium text-sm truncate">
@@ -134,11 +158,11 @@ export function BorrowRequestAssignCopiesCard({
                 ) : (
                   <Select
                     disabled={disabled}
-                    value={String(selectedCopyIds[opt.bookId] ?? "")}
+                    value={String(selectedCopyIds[opt.detailId] ?? "")}
                     onValueChange={(val) =>
                       setSelectedCopyIds((prev) => ({
                         ...prev,
-                        [opt.bookId]: Number(val),
+                        [opt.detailId]: Number(val),
                       }))
                     }
                   >
@@ -159,12 +183,24 @@ export function BorrowRequestAssignCopiesCard({
                 )}
               </div>
             ))}
-            
-            {copyOptions.some(opt => opt.copies.length === 0) && (
-              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm italic">
+
+            {hasUnavailableStock && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm italic text-amber-800">
                 {tRequest("cannotApproveNoStock")}
               </div>
             )}
+
+            <div className="flex justify-end pt-2">
+              <Button
+                onClick={handleAssign}
+                disabled={disabled || isLoadingCopies || isSubmitting || !isFormValid}
+                className="gap-2"
+                variant="submit"
+                loading={isSubmitting}
+              >
+                {isSubmitting ? t("assigningBtn") : t("confirmAssignment")}
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>

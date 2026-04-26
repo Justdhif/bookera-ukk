@@ -34,10 +34,6 @@ class AuthorService
         return $query->paginate((int) $perPage);
     }
 
-
-
-
-
     public function create(array $data, UploadedFile $photo): Author
     {
         $data['slug'] = SlugGenerator::generate('authors', 'slug', $data['name']);

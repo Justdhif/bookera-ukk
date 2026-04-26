@@ -3,7 +3,7 @@ import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { FineType } from "@/types/fine";
-import { fineTypeService } from "@/services/fine.service";
+import { fineTypeService } from "@/services/fine-type.service";
 import FineTypeTable from "./FineTypeTable";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -17,7 +17,6 @@ export default function FineTypeManagement() {
   const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<FineType | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const confirmDelete = async () => {
@@ -45,11 +44,8 @@ export default function FineTypeManagement() {
   }, []);
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchFineTypes();
-    }, 300);
-    return () => clearTimeout(timeoutId);
-  }, [fetchFineTypes]);
+    void fetchFineTypes();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -62,7 +58,6 @@ export default function FineTypeManagement() {
         </div>
         <Button
           onClick={() => {
-            setEditing(null);
             setOpen(true);
           }}
           variant="submit"
@@ -78,10 +73,6 @@ export default function FineTypeManagement() {
       ) : (
         <FineTypeTable
           data={fineTypes}
-          onEdit={(fineType: FineType) => {
-            setEditing(fineType);
-            setOpen(true);
-          }}
           onDelete={(id: number) => setDeleteId(id)}
         />
       )}
@@ -97,7 +88,6 @@ export default function FineTypeManagement() {
       <FineTypeFormDialog
         open={open}
         setOpen={setOpen}
-        fineType={editing}
         onSuccess={fetchFineTypes}
       />
     </div>

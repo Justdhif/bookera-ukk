@@ -95,6 +95,8 @@ export function BorrowBooksCard({
   const damagedFineTypes = getFineTypesByType("damaged");
   const lateFineType = getFineTypesByType("late")[0];
   const lostFineType = getFineTypesByType("lost")[0];
+  const returnRecords = borrow.book_returns ?? [];
+  const lostRecords = borrow.lost_books ?? [];
 
   const hasAssignedCopies = (borrow.borrow_details?.length ?? 0) > 0;
   const requestedBooks = borrow.borrow_request?.borrow_request_details ?? [];
@@ -122,18 +124,12 @@ export function BorrowBooksCard({
   const lateFineAmount = Number(lateFineType?.amount ?? 0);
   const totalLateFine = daysLate * lateFineAmount;
 
-  const returnDetails =
-    borrow.book_returns?.flatMap(
-      (bookReturn: any) => bookReturn.details ?? [],
-    ) ?? [];
-  const lostDetails =
-    borrow.lost_books?.flatMap((lostBook: any) => lostBook.details ?? []) ?? [];
   const hasEditableDetails = borrow.borrow_details.some((detail) => {
-    const returnDetail = returnDetails.find(
-      (returnItem: any) => returnItem.book_copy_id === detail.book_copy_id,
+    const returnDetail = returnRecords.find(
+      (returnItem) => returnItem.book_copy_id === detail.book_copy_id,
     );
-    const lostDetail = lostDetails.find(
-      (lostItem: any) => lostItem.book_copy_id === detail.book_copy_id,
+    const lostDetail = lostRecords.find(
+      (lostItem) => lostItem.book_copy_id === detail.book_copy_id,
     );
 
     return !returnDetail && !lostDetail;
@@ -183,13 +179,11 @@ export function BorrowBooksCard({
         <div className="divide-y divide-border/60">
           {hasAssignedCopies &&
             borrow.borrow_details.map((detail) => {
-              const returnDetail = returnDetails.find(
-                (returnItem: any) =>
-                  returnItem.book_copy_id === detail.book_copy_id,
+              const returnDetail = returnRecords.find(
+                (returnItem) => returnItem.book_copy_id === detail.book_copy_id,
               );
-              const lostDetail = lostDetails.find(
-                (lostItem: any) =>
-                  lostItem.book_copy_id === detail.book_copy_id,
+              const lostDetail = lostRecords.find(
+                (lostItem) => lostItem.book_copy_id === detail.book_copy_id,
               );
               const isProcessed = Boolean(returnDetail || lostDetail);
               const canEditStatus = borrow.status === "open" && !isProcessed;
@@ -567,11 +561,19 @@ export function BorrowBooksCard({
                           <div className="space-y-0.5">
                             <p className="font-semibold text-foreground">
                               {t("processedAs", {
-                                status: tCommon(
+                                status: `${tCommon(
                                   detail.status === "borrowed"
                                     ? "borrowed"
                                     : detail.status,
-                                ),
+                                )}${
+                                  detail.status === "returned" && returnDetail?.condition
+                                    ? ` (${t(
+                                        returnDetail.condition === "good"
+                                          ? "conditionGood"
+                                          : "conditionDamaged",
+                                      )})`
+                                    : ""
+                                }`,
                               })}
                             </p>
                             <p className="text-xs text-muted-foreground">

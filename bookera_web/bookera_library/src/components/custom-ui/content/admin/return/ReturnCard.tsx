@@ -24,9 +24,7 @@ interface ReturnCardProps {
 
 type ReturnEntry = {
   key: string;
-  returnId: number;
   return_date: string;
-  detailId: number;
   bookTitle?: string;
   authors: string;
   publishers: string[];
@@ -35,6 +33,7 @@ type ReturnEntry = {
   publicationYear?: number;
   coverImage?: string;
   copyCode?: string;
+  condition?: "good" | "damaged";
 };
 
 function formatCurrency(amount: number) {
@@ -54,28 +53,25 @@ export function ReturnCard({ borrow }: ReturnCardProps) {
       new Date(right.return_date).getTime() - new Date(left.return_date).getTime(),
   );
   const latestReturn = returnRecords[0];
-  const returnEntries: ReturnEntry[] = returnRecords.flatMap((bookReturn) =>
-    (bookReturn.details ?? []).map((detail) => {
-      const book = detail.book_copy?.book;
-      return {
-        key: `${bookReturn.id}-${detail.id}`,
-        returnId: bookReturn.id,
-        return_date: bookReturn.return_date,
-        detailId: detail.id,
-        bookTitle: book?.title,
-        authors:
-          book?.authors?.map((author) => author.name).join(", ") ||
-          book?.author ||
-          tCommon("noData"),
-        publishers: book?.publishers?.map((publisher) => publisher.name) || [],
-        categories: book?.categories ?? [],
-        isbn: book?.isbn,
-        publicationYear: book?.publication_year,
-        coverImage: book?.cover_image,
-        copyCode: detail.book_copy?.copy_code,
-      };
-    }),
-  );
+  const returnEntries: ReturnEntry[] = returnRecords.map((bookReturn) => {
+    const book = bookReturn.book_copy?.book;
+    return {
+      key: `${bookReturn.id}`,
+      return_date: bookReturn.return_date,
+      bookTitle: book?.title,
+      authors:
+        book?.authors?.map((author) => author.name).join(", ") ||
+        book?.author ||
+        tCommon("noData"),
+      publishers: book?.publishers?.map((publisher) => publisher.name) || [],
+      categories: book?.categories ?? [],
+      isbn: book?.isbn,
+      publicationYear: book?.publication_year,
+      coverImage: book?.cover_image,
+      copyCode: bookReturn.book_copy?.copy_code,
+      condition: bookReturn.condition,
+    };
+  });
   const fines = borrow.fines ?? [];
   const totalFineAmount = fines.reduce((sum, fine) => sum + Number(fine.amount), 0);
   const outstandingFineAmount = fines
@@ -218,6 +214,15 @@ export function ReturnCard({ borrow }: ReturnCardProps) {
                         className="h-6 bg-muted/80 px-2.5 text-[11px] font-mono backdrop-blur border-border/50"
                       >
                         {entry.copyCode}
+                      </Badge>
+                      <Badge
+                        className={
+                          entry.condition === "damaged"
+                            ? "bg-destructive/10 text-destructive border-destructive/20"
+                            : "bg-primary/10 text-primary border-primary/20"
+                        }
+                      >
+                        {entry.condition || tCommon("noData")}
                       </Badge>
                       <Badge className="bg-primary/10 text-primary border-primary/20">
                         {format(new Date(entry.return_date), "dd MMM yyyy")}

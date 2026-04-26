@@ -1,4 +1,5 @@
 import { Book } from "./book";
+import { BookCopy } from "./book-copy";
 import { User } from "./user";
 import { PaginatedResponse } from "./api";
 
@@ -7,6 +8,10 @@ export interface BorrowRequestDetail {
   borrow_request_id: number;
   book_id: number;
   book: Book;
+  approval_status: "processing" | "approved" | "rejected";
+  reject_reason?: string | null;
+  book_copy_id?: number | null;
+  book_copy?: BookCopy | null;
 }
 
 export interface BorrowRequest {

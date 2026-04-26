@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Book;
+use App\Models\BookCopy;
+use App\Models\BorrowRequest;
 
 class BorrowRequestDetail extends Model
 {
@@ -14,6 +17,14 @@ class BorrowRequestDetail extends Model
     protected $fillable = [
         'borrow_request_id',
         'book_id',
+        'approval_status',
+        'reject_reason',
+        'book_copy_id',
+    ];
+
+    protected $casts = [
+        'approval_status' => 'string',
+        'reject_reason' => 'string',
     ];
 
     public function borrowRequest()
@@ -24,5 +35,10 @@ class BorrowRequestDetail extends Model
     public function book()
     {
         return $this->belongsTo(Book::class);
+    }
+
+    public function bookCopy()
+    {
+        return $this->belongsTo(BookCopy::class);
     }
 }

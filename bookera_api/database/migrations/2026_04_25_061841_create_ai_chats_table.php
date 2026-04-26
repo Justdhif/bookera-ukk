@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('book_return_details', function (Blueprint $table) {
+        Schema::create('ai_chats', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('book_return_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('book_copy_id')->constrained()->cascadeOnDelete();
-            $table->enum('condition', ['good', 'damaged'])->default('good');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->text('message');
+            $table->text('response');
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('book_return_details');
+        Schema::dropIfExists('ai_chats');
     }
 };

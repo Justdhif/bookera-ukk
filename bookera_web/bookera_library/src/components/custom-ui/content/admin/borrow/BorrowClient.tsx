@@ -58,6 +58,7 @@ export default function BorrowClient() {
     from: 0,
     to: 0,
   });
+  const [activeTab, setActiveTab] = useState("all");
 
 
   const fetchBorrows = async (activeFilters: BorrowFilterParams) => {
@@ -151,11 +152,26 @@ export default function BorrowClient() {
   const handleExport = async () => {
     setExporting(true);
     try {
-      const response = await borrowService.exportData(borrowFilters);
-      downloadBlobFile(
-        response.data,
-        `borrows_data_${new Date().toISOString().split("T")[0]}.xlsx`,
-      );
+      let response;
+      let fileName = `borrows_data_${new Date().toISOString().split("T")[0]}.xlsx`;
+
+      if (activeTab === "requests") {
+        response = await borrowRequestService.exportData({
+          search: requestSearch || undefined,
+        });
+        fileName = `borrow_requests_data_${new Date().toISOString().split("T")[0]}.xlsx`;
+      } else {
+        const filters = { ...borrowFilters };
+        if (activeTab === "open") filters.status = "open";
+        if (activeTab === "closed") filters.status = "close";
+        
+        response = await borrowService.exportData(filters);
+        if (activeTab !== "all") {
+          fileName = `${activeTab}_borrows_data_${new Date().toISOString().split("T")[0]}.xlsx`;
+        }
+      }
+
+      downloadBlobFile(response.data, fileName);
       toast.success(t("exportSuccess"));
     } catch (error: any) {
       toast.error(error.response?.data?.message || t("exportError"));
@@ -215,7 +231,12 @@ export default function BorrowClient() {
         }
       />
 
-      <Tabs defaultValue="all" className="space-y-4">
+      <Tabs 
+        defaultValue="all" 
+        value={activeTab} 
+        onValueChange={setActiveTab} 
+        className="space-y-4"
+      >
         <TabsList>
           <TabsTrigger value="all">
             {t("all")} ({allBorrows.length})

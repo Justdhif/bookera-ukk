@@ -26,6 +26,7 @@ export default function BookCard({
   onCheckedChange,
 }: BookCardProps) {
   const t = useTranslations("public");
+  const tCommon = useTranslations("common");
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -92,15 +93,39 @@ export default function BookCard({
           />
         </div>
       )}
-      <div className="relative">
+      <div className="relative group overflow-hidden rounded-lg">
         <Image
           src={book.cover_image ?? "/placeholder.png"}
-          className="aspect-3/4 object-cover rounded w-full"
+          className="aspect-3/4 object-cover rounded w-full transition-transform duration-500 group-hover:scale-105"
           alt={book.title}
           width={300}
           height={400}
           unoptimized
         />
+        
+        {/* Available Copies Badge */}
+        <div className="absolute top-2 right-2 z-20">
+          <Badge
+            variant="default"
+            className={cn(
+              "text-[10px] px-2 py-0.5 h-auto font-bold shadow-lg border-none backdrop-blur-md",
+              (book.available_copies ?? 0) > 0
+                ? "bg-emerald-500/90 text-white"
+                : "bg-rose-500/90 text-white"
+            )}
+          >
+            {(book.available_copies ?? 0) > 0 ? (
+              <div className="flex items-center gap-1">
+                <span>{book.available_copies}</span>
+                <span className="opacity-70">/</span>
+                <span>{book.total_copies}</span>
+                <span className="opacity-80 font-medium ml-0.5">{tCommon("available")}</span>
+              </div>
+            ) : (
+              t("outOfStock")
+            )}
+          </Badge>
+        </div>
         {visibleCategories.length > 0 && (
           <div className="absolute bottom-2 left-2 z-10 flex max-w-[calc(100%-1rem)] flex-wrap gap-1">
             {visibleCategories.map((cat) => (

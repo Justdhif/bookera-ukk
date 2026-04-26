@@ -32,7 +32,7 @@ export default function BookCopySelectorCard({
   const tCommon = useTranslations("common");
   if (selectedBooks.length === 0) {
     return (
-      <Card className="h-full flex items-center justify-center min-h-100">
+      <Card className="flex-1 min-h-0 flex items-center justify-center min-h-100">
         <CardContent className="text-center py-12">
           <EmptyState
             title={tCommon("noBooksSelected")}
@@ -46,7 +46,7 @@ export default function BookCopySelectorCard({
   }
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="flex-1 min-h-0 flex flex-col">
       <CardHeader className="shrink-0">
         <Label variant="required">
           <CardTitle>

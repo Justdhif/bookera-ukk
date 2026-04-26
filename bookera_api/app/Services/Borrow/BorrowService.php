@@ -7,7 +7,6 @@ use App\Helpers\ActivityLogger;
 use App\Models\BookCopy;
 use App\Models\Borrow;
 use App\Models\User;
-use App\Services\LostBook\LostBookService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -203,12 +202,15 @@ class BorrowService
             'borrowDetails.bookCopy.book.genres',
             'borrowRequest.borrowRequestDetails.book',
             'user.profile',
-            'bookReturns.details.bookCopy.book.authors',
-            'bookReturns.details.bookCopy.book.publishers',
-            'bookReturns.details.bookCopy.book.categories',
-            'bookReturns.details.bookCopy.book.genres',
+            'bookReturns.bookCopy.book.authors',
+            'bookReturns.bookCopy.book.publishers',
+            'bookReturns.bookCopy.book.categories',
+            'bookReturns.bookCopy.book.genres',
             'fines.fineType',
-            'lostBooks.details.bookCopy.book.authors',
+            'lostBooks.bookCopy.book.authors',
+            'lostBooks.bookCopy.book.publishers',
+            'lostBooks.bookCopy.book.categories',
+            'lostBooks.bookCopy.book.genres',
         ])->where('borrow_code', $code)->firstOrFail();
     }
 
@@ -221,12 +223,15 @@ class BorrowService
             'borrowDetails.bookCopy.book.genres',
             'borrowRequest.borrowRequestDetails.book.authors',
             'user.profile',
-            'bookReturns.details.bookCopy.book.authors',
-            'bookReturns.details.bookCopy.book.publishers',
-            'bookReturns.details.bookCopy.book.categories',
-            'bookReturns.details.bookCopy.book.genres',
+            'bookReturns.bookCopy.book.authors',
+            'bookReturns.bookCopy.book.publishers',
+            'bookReturns.bookCopy.book.categories',
+            'bookReturns.bookCopy.book.genres',
             'fines.fineType',
-            'lostBooks.details.bookCopy.book.authors',
+            'lostBooks.bookCopy.book.authors',
+            'lostBooks.bookCopy.book.publishers',
+            'lostBooks.bookCopy.book.categories',
+            'lostBooks.bookCopy.book.genres',
         ]);
 
         if (!empty($filters['search'])) {
@@ -320,16 +325,14 @@ class BorrowService
             $borrow->load([
                 'borrowDetails',
                 'fines',
-                'lostBooks.details.bookCopy.book',
-                'bookReturns.details.bookCopy.book',
+                'lostBooks.bookCopy.book',
+                'bookReturns.bookCopy.book',
             ]);
 
             $processedCopyIds = collect($borrow->bookReturns)
-                ->flatMap(fn($bookReturn) => $bookReturn->details->pluck('book_copy_id'))
-                ->merge(
-                    collect($borrow->lostBooks)
-                        ->flatMap(fn($lostBook) => $lostBook->details->pluck('book_copy_id')),
-                )
+                ->pluck('book_copy_id')
+                ->merge(collect($borrow->lostBooks)->pluck('book_copy_id'))
+                ->filter()
                 ->unique();
 
             $hasUnprocessedBooks = $borrow->borrowDetails->contains(
@@ -348,7 +351,8 @@ class BorrowService
             // Clean up lost book records if the admin eventually marked them as returned
             foreach ($borrow->borrowDetails as $detail) {
                 if ($detail->status === 'returned') {
-                    app(LostBookService::class)->removeByBorrowAndCopy($borrow, $detail->book_copy_id);
+                    $borrow->lostBooks()->where('book_copy_id', $detail->book_copy_id)->delete();
+
                     BookCopy::where('id', $detail->book_copy_id)->update(['status' => 'available']);
                 }
             }
@@ -369,12 +373,15 @@ class BorrowService
                 'borrowDetails.bookCopy.book.publishers',
                 'borrowDetails.bookCopy.book.categories',
                 'borrowDetails.bookCopy.book.genres',
-                'bookReturns.details.bookCopy.book.authors',
-                'bookReturns.details.bookCopy.book.publishers',
-                'bookReturns.details.bookCopy.book.categories',
-                'bookReturns.details.bookCopy.book.genres',
+                'bookReturns.bookCopy.book.authors',
+                'bookReturns.bookCopy.book.publishers',
+                'bookReturns.bookCopy.book.categories',
+                'bookReturns.bookCopy.book.genres',
                 'fines.fineType',
-                'lostBooks.details.bookCopy.book.authors',
+                'lostBooks.bookCopy.book.authors',
+                'lostBooks.bookCopy.book.publishers',
+                'lostBooks.bookCopy.book.categories',
+                'lostBooks.bookCopy.book.genres',
             ]);
         });
     }
@@ -386,12 +393,15 @@ class BorrowService
             'borrowDetails.bookCopy.book.publishers',
             'borrowDetails.bookCopy.book.categories',
             'borrowDetails.bookCopy.book.genres',
-            'bookReturns.details.bookCopy.book.authors',
-            'bookReturns.details.bookCopy.book.publishers',
-            'bookReturns.details.bookCopy.book.categories',
-            'bookReturns.details.bookCopy.book.genres',
+            'bookReturns.bookCopy.book.authors',
+            'bookReturns.bookCopy.book.publishers',
+            'bookReturns.bookCopy.book.categories',
+            'bookReturns.bookCopy.book.genres',
             'fines.fineType',
-            'lostBooks.details.bookCopy.book.authors',
+            'lostBooks.bookCopy.book.authors',
+            'lostBooks.bookCopy.book.publishers',
+            'lostBooks.bookCopy.book.categories',
+            'lostBooks.bookCopy.book.genres',
         ])
             ->where('user_id', $user->id);
 

@@ -1,13 +1,15 @@
 "use client";
 
+import ContentHeader from "@/components/custom-ui/content/ContentHeader";
+import { downloadBlobFile } from "@/lib/download";
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { Fine, FineType, FineFilterParams } from "@/types/fine";
-import { fineService, fineTypeService } from "@/services/fine.service";
+import { Fine, FineFilterParams } from "@/types/fine";
+import { fineService } from "@/services/fine.service";
 import FineTable from "./FineTable";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -16,22 +18,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import { Download, Search } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import DateRangeFilter from "@/components/custom-ui/DateRangeFilter";
 import { getCurrentMonthRange } from "@/lib/month-range";
-import { downloadBlobFile } from "@/lib/download";
 
 export default function FineManagement() {
   const t = useTranslations("fines");
   const defaultMonthRange = getCurrentMonthRange();
   const [fines, setFines] = useState<Fine[]>([]);
-  const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [filters, setFilters] = useState<FineFilterParams>({
     per_page: ITEMS_PER_PAGE_OPTIONS[1],
     ...defaultMonthRange,
@@ -75,18 +73,6 @@ export default function FineManagement() {
       page: 1,
     }));
 
-  const confirmDelete = async () => {
-    if (!deleteId) return;
-    try {
-      await fineService.delete(deleteId);
-      toast.success(t("deleteSuccess"));
-      setDeleteId(null);
-      fetchFines(filters);
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || t("loadError"));
-    }
-  };
-
   const fetchFines = async (activeFilters: FineFilterParams) => {
     setLoading(true);
     try {
@@ -107,15 +93,6 @@ export default function FineManagement() {
     }
   };
 
-  const fetchFineTypes = async () => {
-    try {
-      const res = await fineTypeService.getAll();
-      setFineTypes(res.data.data.data ?? res.data.data);
-    } catch (err) {
-      console.error("Failed to fetch fine types");
-    }
-  };
-
   const handleExport = async () => {
     setExporting(true);
     try {
@@ -133,40 +110,27 @@ export default function FineManagement() {
   };
 
   useEffect(() => {
-    fetchFineTypes();
-  }, []);
-
-  useEffect(() => {
     fetchFines(filters);
   }, [filters]);
 
-  const handleWaive = async (id: number) => {
-    try {
-      await fineService.waive(id);
-      toast.success(t("waiveSuccess"));
-      fetchFines(filters);
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || t("waiveError"));
-    }
-  };
-
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
-        <div>
-          <h2 className="text-2xl font-bold">{t("title")}</h2>
-          <p className="text-muted-foreground">{t("finesTabDescription")}</p>
-        </div>
-        <Button
-          variant="outline"
-          className="h-8 gap-1 border-slate-200 w-fit"
-          onClick={handleExport}
-          disabled={exporting}
-        >
-          <Download className="h-3.5 w-3.5" />
-          {t("exportData")}
-        </Button>
-      </div>
+      <ContentHeader
+        title={t("title")}
+        description={t("finesTabDescription")}
+        isAdmin
+        rightActions={
+          <Button
+            variant="outline"
+            className="h-8 gap-1 border-slate-200"
+            onClick={handleExport}
+            disabled={exporting}
+          >
+            <Download className="h-3.5 w-3.5" />
+            {t("exportData")}
+          </Button>
+        }
+      />
 
       <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:items-center mb-6">
         <div className="relative min-w-0 w-full">
@@ -208,17 +172,9 @@ export default function FineManagement() {
         {loading ? (
           <DataLoading size="lg" />
         ) : (
-          <FineTable data={fines} onDelete={(id) => setDeleteId(id)} />
+          <FineTable data={fines} />
         )}
       </PaginatedContent>
-
-      <DeleteConfirmDialog
-        open={deleteId !== null}
-        onOpenChange={(open) => !open && setDeleteId(null)}
-        title={t("deleteFine")}
-        description={t("deleteFineConfirm")}
-        onConfirm={confirmDelete}
-      />
     </div>
   );
 }

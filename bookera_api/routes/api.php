@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AIChatController;
 use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AuthorController;
@@ -145,9 +146,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('books')->group(function () {
             Route::get('/', [BookController::class, 'index']);
-            Route::get('/slug/{slug}', [BookController::class, 'showBySlug']);
-            Route::get('/template', [BookController::class, 'downloadTemplate']);
             Route::get('/export', [BookController::class, 'export']);
+            Route::get('/slug/{slug}', [BookController::class, 'showBySlug']);
             Route::post('/import', [BookController::class, 'import']);
 
             Route::post('/', [BookController::class, 'store']);
@@ -203,6 +203,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::prefix('borrow-requests')->group(function () {
             Route::get('/', [BorrowRequestController::class, 'index']);
+            Route::get('/export', [BorrowRequestController::class, 'export']);
             Route::get('/{borrowRequest}', [BorrowRequestController::class, 'show']);
             Route::post('/{borrowRequest}/assign', [BorrowRequestController::class, 'assignBorrow']);
             Route::patch('/{borrowRequest}/approve', [BorrowRequestController::class, 'approve']);
@@ -210,16 +211,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
         });
 
-        Route::apiResource('fine-types', FineTypeController::class)->except(['show']);
+        Route::apiResource('fine-types', FineTypeController::class)->only(['index', 'store', 'destroy']);
 
         Route::prefix('fines')->group(function () {
             Route::get('/', [FineController::class, 'index']);
             Route::get('/export', [FineController::class, 'export']);
-            Route::post('/borrows/{borrow}', [FineController::class, 'store']);
-
             Route::post('/{fine}/mark-paid', [FineController::class, 'markAsPaid']);
-            Route::post('/{fine}/waive', [FineController::class, 'waive']);
-            Route::delete('/{fine}', [FineController::class, 'destroy']);
         });
 
         Route::prefix('returns')->group(function () {
@@ -230,7 +227,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('lost-books')->group(function () {
             Route::get('/', [LostBookController::class, 'index']);
             Route::get('/export', [LostBookController::class, 'export']);
-            Route::delete('/{lostBook}', [LostBookController::class, 'destroy']);
         });
 
         Route::prefix('activity-logs')->group(function () {
@@ -273,13 +269,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [BorrowController::class, 'store']);
         Route::get('/code/{code}', [BorrowController::class, 'showByCode']);
 
-        Route::post('/{borrow}/return', [BookReturnController::class, 'store']);
-        Route::get('/{borrow}/returns', [BookReturnController::class, 'index']);
+        Route::post('/{borrow}/return', [BookReturnController::class, 'store'])->middleware('role:admin,officer:management');
+        Route::get('/{borrow}/returns', [BookReturnController::class, 'index'])->middleware('role:admin,officer:management');
         Route::post('/{borrow}/report-lost', [LostBookController::class, 'store']);
         Route::get('/{borrow}/fines', [FineController::class, 'borrowFines']);
     });
 
     Route::get('my-borrows', [BorrowController::class, 'getBorrowByUser']);
+
+    // AI Chatbot
+    Route::prefix('ai')->group(function () {
+        Route::post('/chat', [AIChatController::class, 'chat']);
+        Route::get('/history', [AIChatController::class, 'getHistory']);
+        Route::delete('/history', [AIChatController::class, 'clearHistory']);
+    });
 
     Route::prefix('borrow-requests')->group(function () {
         Route::post('/', [BorrowRequestController::class, 'store']);
@@ -291,7 +294,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('my-fines', [FineController::class, 'myFines']);
     Route::get('fine-types', [FineTypeController::class, 'index']);
-    Route::get('book-returns/{bookReturn}', [BookReturnController::class, 'show']);
+    Route::get('book-returns/{bookReturn}', [BookReturnController::class, 'show'])->middleware('role:admin,officer:management');
 
     Route::prefix('notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);

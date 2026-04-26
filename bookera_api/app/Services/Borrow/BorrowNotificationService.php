@@ -256,10 +256,10 @@ class BorrowNotificationService extends BaseNotificationService
             [
                 'request_id' => $borrowRequest->id,
                 'borrow_code' => $borrow->borrow_code,
-                'books' => $borrowRequest->borrowRequestDetails->map(fn($d) => [
-                    'title' => $d->book?->title,
-                    'cover' => $d->book?->cover_image,
-                    'author' => $d->book?->author
+                'books' => $borrow->borrowDetails->map(fn($d) => [
+                    'title' => $d->bookCopy?->book?->title,
+                    'cover' => $d->bookCopy?->book?->cover_image,
+                    'author' => $d->bookCopy?->book?->author
                 ])->toArray()
             ]
         );
@@ -279,8 +279,8 @@ class BorrowNotificationService extends BaseNotificationService
         }
 
         if ($profile->notification_whatsapp && $profile->phone_number) {
-            $bookList = $borrowRequest->borrowRequestDetails->map(function ($detail) {
-                return '  • '.($detail->book->title ?? $this->t('Unknown'));
+            $bookList = $borrow->borrowDetails->map(function ($detail) {
+                return '  • '.($detail->bookCopy?->book?->title ?? $this->t('Unknown'));
             })->implode("\n");
 
             $message = $this->t("🎉 *BOOKERA — Borrow Approved!*\n")

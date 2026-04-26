@@ -18,18 +18,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { FineType } from "@/types/fine";
-import { fineTypeService } from "@/services/fine.service";
+import { fineTypeService } from "@/services/fine-type.service";
 import { toast } from "sonner";
 export default function FineTypeFormDialog({
   open,
   setOpen,
-  fineType,
   onSuccess,
 }: {
   open: boolean;
   setOpen: (v: boolean) => void;
-  fineType: FineType | null;
   onSuccess: () => void;
 }) {
   const t = useTranslations("fines");
@@ -51,19 +48,8 @@ export default function FineTypeFormDialog({
       setType("lost");
       setValue("");
       setDescription("");
-    } else if (fineType) {
-      setName(fineType.name);
-      setType(fineType.type);
-      setValue(
-        String(
-          fineType.type === "damaged"
-            ? fineType.percentage ?? fineType.amount ?? 0
-            : fineType.amount ?? 0,
-        ),
-      );
-      setDescription(fineType.description || "");
     }
-  }, [fineType, open]);
+  }, [open]);
   const handleSubmit = async () => {
     if (!name || !value) {
       toast.error(
@@ -90,13 +76,8 @@ export default function FineTypeFormDialog({
         percentage: isDamaged ? numericValue : undefined,
         description: description || undefined,
       };
-      if (fineType) {
-        await fineTypeService.update(fineType.id, payload);
-        toast.success(t("fineTypeUpdateSuccess"));
-      } else {
-        await fineTypeService.create(payload);
-        toast.success(t("fineTypeAddSuccess"));
-      }
+      await fineTypeService.create(payload);
+      toast.success(t("fineTypeAddSuccess"));
       setOpen(false);
       onSuccess();
     } catch (err: any) {
@@ -110,7 +91,7 @@ export default function FineTypeFormDialog({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {fineType ? t("editFineType") : t("addFineType")}
+            {t("addFineType")}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
@@ -179,13 +160,7 @@ export default function FineTypeFormDialog({
             loading={isLoading}
             className="w-full"
           >
-            {isLoading
-              ? fineType
-                ? t("savingFineType")
-                : t("addingFineType")
-              : fineType
-                ? t("saveChangesFineType")
-                : t("addFineTypeBtn")}
+            {isLoading ? t("addingFineType") : t("addFineTypeBtn")}
           </Button>
         </div>
       </DialogContent>

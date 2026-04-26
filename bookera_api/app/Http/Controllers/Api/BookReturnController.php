@@ -25,7 +25,19 @@ class BookReturnController extends Controller
 
     public function index(Borrow $borrow): JsonResponse
     {
-        $returns = $this->bookReturnService->getByBorrow($borrow);
+        $returns = BookReturn::with([
+            'bookCopy.book.authors',
+            'bookCopy.book.publishers',
+            'bookCopy.book.categories',
+            'bookCopy.book.genres',
+            'borrow.user.profile',
+            'borrow.fines.fineType',
+        ])
+            ->whereNotNull('book_copy_id')
+            ->where('borrow_id', $borrow->id)
+            ->orderByDesc('return_date')
+            ->orderByDesc('id')
+            ->get();
 
         return ApiResponse::successResponse('Book return data retrieved successfully', $returns);
     }
@@ -40,18 +52,25 @@ class BookReturnController extends Controller
 
     public function store(StoreBookReturnRequest $request, Borrow $borrow): JsonResponse
     {
-        if (!$this->bookReturnService->canCreate($borrow)) {
+        if ($borrow->status !== 'open') {
             return ApiResponse::errorResponse('This borrow is not in open status', null, 400);
         }
 
-        $bookReturn = $this->bookReturnService->create($borrow, $request->validated());
+        $bookReturn = $this->bookReturnService->confirmReturn($borrow, $request->validated());
 
-        return ApiResponse::successResponse('Return request created successfully. Waiting for admin approval.', $bookReturn, 201);
+        return ApiResponse::successResponse('Book return confirmed successfully', $bookReturn, 201);
     }
 
     public function show(BookReturn $bookReturn): JsonResponse
     {
-        $detail = $this->bookReturnService->getDetail($bookReturn);
+        $detail = $bookReturn->load([
+            'bookCopy.book.authors',
+            'bookCopy.book.publishers',
+            'bookCopy.book.categories',
+            'bookCopy.book.genres',
+            'borrow.user.profile',
+            'borrow.fines.fineType',
+        ]);
 
         return ApiResponse::successResponse('Book return details', $detail);
     }
@@ -61,7 +80,7 @@ class BookReturnController extends Controller
         $filters = $this->getFilters($request);
 
         return Excel::download(
-            new BookReturnExport($this->bookReturnService->getExportData($filters)),
+            new BookReturnExport($this->bookReturnService->getAll($filters, false)),
             'returns_data_' . now()->format('Y-m-d_H-i-s') . '.xlsx'
         );
     }

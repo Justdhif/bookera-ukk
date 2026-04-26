@@ -119,6 +119,9 @@ export function ActiveBorrowPanel({
           <div className="flex h-full min-h-0 flex-col">
             <div className="flex-1 min-h-0 space-y-3 overflow-y-auto px-4 py-4 sm:px-5">
               {activeBorrowItems.map((borrow) => {
+                const hasLost = borrow.borrow_details?.some(
+                  (d) => d.status === "lost",
+                );
                 const dueDate = startOfDay(new Date(borrow.return_date));
                 const daysLeft = diffDays(today, dueDate);
                 const isOverdue = daysLeft < 0;
@@ -126,26 +129,35 @@ export function ActiveBorrowPanel({
                 const detailLink = userSlug
                   ? `/${userSlug}/my-borrows/${borrow.borrow_code}`
                   : `/my-borrows/${borrow.borrow_code}`;
-                const dueLabel = isOverdue
-                  ? t("overdue", { count: Math.abs(daysLeft) })
-                  : daysLeft === 0
-                  ? t("due_today")
-                  : t("due_in", { count: daysLeft });
-                const dueToneClass = isOverdue
-                  ? "border-red-200 bg-red-50/90 text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300"
-                  : isDueSoon
-                  ? "border-amber-200 bg-amber-50/90 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300"
-                  : "border-blue-200 bg-blue-50/90 text-blue-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300";
-                const iconToneClass = isOverdue
-                  ? "bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-300"
-                  : isDueSoon
-                  ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300"
-                  : "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300";
-                const itemShellClass = isOverdue
-                  ? "border-red-200 bg-red-50/70 dark:border-red-500/20 dark:bg-red-500/8"
-                  : isDueSoon
-                  ? "border-amber-200 bg-amber-50/70 dark:border-amber-500/20 dark:bg-amber-500/8"
-                  : "border-gray-200 bg-gray-50/80 dark:border-white/10 dark:bg-white/5";
+
+                const dueLabel = hasLost
+                  ? t("reminder_lost_title")
+                  : isOverdue
+                    ? t("overdue", { count: Math.abs(daysLeft) })
+                    : daysLeft === 0
+                      ? t("due_today")
+                      : t("due_in", { count: daysLeft });
+
+                const dueToneClass =
+                  hasLost || isOverdue
+                    ? "border-rose-200 bg-rose-50/90 text-rose-600 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300"
+                    : isDueSoon
+                      ? "border-amber-200 bg-amber-50/90 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300"
+                      : "border-blue-200 bg-blue-50/90 text-blue-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300";
+
+                const iconToneClass =
+                  hasLost || isOverdue
+                    ? "bg-rose-100 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300"
+                    : isDueSoon
+                      ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300"
+                      : "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300";
+
+                const itemShellClass =
+                  hasLost || isOverdue
+                    ? "border-rose-200 bg-rose-50/70 dark:border-rose-500/20 dark:bg-rose-500/8"
+                    : isDueSoon
+                      ? "border-amber-200 bg-amber-50/70 dark:border-amber-500/20 dark:bg-amber-500/8"
+                      : "border-gray-200 bg-gray-50/80 dark:border-white/10 dark:bg-white/5";
 
                 return (
                   <Link

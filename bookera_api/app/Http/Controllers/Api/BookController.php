@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\BookExport;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Book\StoreBookRequest;
 use App\Http\Requests\Book\UpdateBookRequest;
 use App\Models\Book;
 use App\Services\Book\BookService;
-use App\Exports\BookTemplateExport;
-use App\Exports\BookExport;
 use App\Imports\BookImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\JsonResponse;
@@ -27,14 +26,7 @@ class BookController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $filters = [
-            'search' => $request->search,
-            'category_ids' => $request->category_ids,
-            'genre_ids' => $request->genre_ids,
-            'status' => $request->status,
-            'has_stock' => $request->has_stock,
-            'per_page' => $request->per_page
-        ];
+        $filters = $this->getFilters($request);
 
         $books = $this->bookService->getAll($filters);
 
@@ -113,13 +105,31 @@ class BookController extends Controller
         }
     }
 
-    public function downloadTemplate(): BinaryFileResponse
+    public function export(Request $request): BinaryFileResponse
     {
-        return Excel::download(new BookTemplateExport, 'book_template.xlsx');
+        $filters = $this->getFilters($request);
+
+        return Excel::download(
+            new BookExport($this->bookService->getExportData($filters)),
+            'books_data_' . now()->format('Y-m-d_H-i-s') . '.xlsx'
+        );
     }
 
-    public function export(): BinaryFileResponse
+    private function getFilters(Request $request): array
     {
-        return Excel::download(new BookExport, 'books_data_' . date('Y-m-d_H-i-s') . '.xlsx');
+        return [
+            'search' => $request->search,
+            'category_ids' => $request->category_ids,
+            'genre_ids' => $request->genre_ids,
+            'status' => $request->status,
+            'has_stock' => $request->has_stock,
+            'per_page' => $request->per_page,
+            'author_ids' => $request->author_ids,
+            'publisher_ids' => $request->publisher_ids,
+            'min_rating' => $request->min_rating,
+            'max_rating' => $request->max_rating,
+            'min_reviews' => $request->min_reviews,
+        ];
     }
+
 }

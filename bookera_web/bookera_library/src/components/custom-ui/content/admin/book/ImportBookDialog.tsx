@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Download, Upload, FileSpreadsheet, Loader2 } from "lucide-react";
+import { Upload, FileSpreadsheet, Loader2 } from "lucide-react";
 import { bookService } from "@/services/book.service";
 import { toast } from "sonner";
 
@@ -31,31 +31,10 @@ export default function ImportBookDialog({
   const t = useTranslations("book");
   const [file, setFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
-  const [downloading, setDownloading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
-    }
-  };
-
-  const handleDownloadTemplate = async () => {
-    setDownloading(true);
-    try {
-      const response = await bookService.downloadTemplate();
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "book_template.xlsx");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      toast.success(t("templateDownloaded") || "Template downloaded successfully");
-    } catch (error) {
-      console.error("Error downloading template:", error);
-      toast.error(t("downloadTemplateError") || "Failed to download template");
-    } finally {
-      setDownloading(false);
     }
   };
 
@@ -95,29 +74,8 @@ export default function ImportBookDialog({
         </DialogHeader>
 
         <div className="grid gap-6 py-4">
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">{t("step1") || "Step 1: Download Template"}</Label>
-            <p className="text-xs text-muted-foreground">
-              {t("templateDesc") || "Use our standard Excel template to ensure your data is formatted correctly."}
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full h-9 gap-2 bg-slate-50 hover:bg-slate-100 border-slate-200"
-              onClick={handleDownloadTemplate}
-              disabled={downloading}
-            >
-              {downloading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Download className="w-4 h-4" />
-              )}
-              {t("downloadTemplate") || "Download Template"}
-            </Button>
-          </div>
-
           <div className="space-y-3">
-            <Label className="text-sm font-medium">{t("step2") || "Step 2: Upload File"}</Label>
+            <Label className="text-sm font-medium">{t("step2") || "Upload File"}</Label>
             <div className="grid w-full items-center gap-1.5">
               <div
                 className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 transition-colors ${

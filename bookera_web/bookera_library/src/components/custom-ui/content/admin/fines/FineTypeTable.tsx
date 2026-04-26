@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FineType } from "@/types/fine";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { DollarSign, Edit, Trash } from "lucide-react";
+import { DollarSign, Trash } from "lucide-react";
 const typeColors = {
   lost: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
   damaged:
@@ -21,11 +21,9 @@ const typeColors = {
 };
 export default function FineTypeTable({
   data,
-  onEdit,
   onDelete,
 }: {
   data: FineType[];
-  onEdit: (fineType: FineType) => void;
   onDelete: (id: number) => void;
 }) {
   const t = useTranslations("fines");
@@ -97,15 +95,6 @@ export default function FineTypeTable({
             </TableCell>
             <TableCell>
               <div className="flex justify-end items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="brand"
-                  onClick={() => onEdit(item)}
-                  className="h-8 gap-1"
-                >
-                  <Edit className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t("edit")}</span>
-                </Button>
                 <Button
                   size="sm"
                   variant="destructive"

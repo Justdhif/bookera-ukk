@@ -8,7 +8,7 @@ import { Borrow } from "@/types/borrow";
 
 export const borrowRequestService = {
   create: (data: {
-    book_ids: number[];
+    items: { id: number; quantity: number }[];
     borrow_date: string;
     return_date: string;
   }) => api.post<ApiResponse<BorrowRequest>>("/borrow-requests", data),
@@ -19,7 +19,7 @@ export const borrowRequestService = {
     ),
 
   getByUser: () => api.get<ApiResponse<BorrowRequest[]>>("/my-borrow-requests"),
-
+  
   cancel: (id: number) => api.patch(`/borrow-requests/${id}/cancel`),
 
   getAll: (filters?: {
@@ -32,20 +32,26 @@ export const borrowRequestService = {
       params: filters,
     }),
 
+  exportData: (filters?: { search?: string; approval_status?: string }) =>
+    api.get("/admin/borrow-requests/export", {
+      params: filters,
+      responseType: "blob",
+    }),
+
   assignBorrow: (id: number, copyIds: number[] = []) =>
     api.post<ApiResponse<Borrow>>(`/admin/borrow-requests/${id}/assign`, {
       copy_ids: copyIds,
     }),
 
-  approve: (id: number, copyIds: number[]) =>
-    api.patch<ApiResponse<Borrow>>(`/admin/borrow-requests/${id}/approve`, {
-      copy_ids: copyIds,
+  approve: (id: number, detailId: number) =>
+    api.patch<ApiResponse<BorrowRequest>>(`/admin/borrow-requests/${id}/approve`, {
+      detail_id: detailId,
     }),
 
-  reject: (id: number, rejectReason?: string) =>
+  reject: (id: number, detailId: number, rejectReason?: string) =>
     api.patch<ApiResponse<BorrowRequest>>(
       `/admin/borrow-requests/${id}/reject`,
-      { reject_reason: rejectReason },
+      { detail_id: detailId, reject_reason: rejectReason },
     ),
 
 };

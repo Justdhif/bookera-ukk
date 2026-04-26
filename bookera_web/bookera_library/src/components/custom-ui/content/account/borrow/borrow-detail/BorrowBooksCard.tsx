@@ -219,6 +219,32 @@ export function BorrowBooksCard({ borrow, onUpdate }: BorrowBooksCardProps) {
                       </div>
                     </div>
                   )}
+
+                  {/* Per-book Lost Fine Info */}
+                  {detail.status === "lost" && (
+                    <div className="mt-6 rounded-3xl border border-border/60 bg-rose-50/20 p-4 sm:p-5 shadow-sm">
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="space-y-1">
+                            <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-rose-600">
+                              <AlertCircle className="h-4 w-4" />
+                              {t("lostFineInfo")}
+                            </p>
+                            <p className="font-semibold text-foreground">
+                              {t("lostFineValueNote")}
+                            </p>
+                          </div>
+                          <span className="text-lg font-black text-rose-600">
+                            {new Intl.NumberFormat("id-ID", {
+                              style: "currency",
+                              currency: "IDR",
+                              minimumFractionDigits: 0,
+                            }).format(Number(book?.price ?? 0))}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}

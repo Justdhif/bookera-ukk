@@ -14,8 +14,9 @@ class StoreBorrowRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'book_ids' => ['required', 'array', 'min:1'],
-            'book_ids.*' => ['required', 'integer', 'exists:books,id'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.id' => ['required', 'integer', 'exists:books,id'],
+            'items.*.quantity' => ['required', 'integer', 'min:1'],
             'borrow_date' => ['required', 'date', 'after_or_equal:today'],
             'return_date' => ['sometimes', 'nullable', 'date', 'after:borrow_date'],
         ];

@@ -1,7 +1,6 @@
 "use client";
 
 import BannerCarousel from "./BannerCarousel";
-import SpeakerMarquee from "./SpeakerMarquee";
 import DailyTimeline from "./DailyTimeline";
 import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid";
 
@@ -11,7 +10,6 @@ export default function PublicPageClient() {
       <div className="container mx-auto px-4">
         <div className="flex flex-col gap-3">
           <BannerCarousel />
-          <SpeakerMarquee />
         </div>
       </div>
 

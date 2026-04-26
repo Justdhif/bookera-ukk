@@ -23,7 +23,6 @@ export default function BookClient() {
   const t = useTranslations("book");
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
-  const [exporting, setExporting] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -89,27 +88,31 @@ export default function BookClient() {
     setDeleteId(null);
     fetchBooks(filters);
   };
-  
+
   const handleExport = async () => {
-    setExporting(true);
     try {
-      const response = await bookService.exportData();
+      setLoading(true);
+      const response = await bookService.export(filters);
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      const date = new Date().toISOString().split("T")[0];
-      link.setAttribute("download", `books_data_${date}.xlsx`);
+      link.setAttribute(
+        "download",
+        `books_export_${new Date().getTime()}.xlsx`,
+      );
       document.body.appendChild(link);
       link.click();
       link.remove();
-      toast.success(t("exportSuccess") || "Data exported successfully");
+      toast.success(t("exportSuccess"));
     } catch (error) {
-      console.error("Error exporting data:", error);
-      toast.error(t("exportError") || "Failed to export data");
+      console.error("Export error:", error);
+      toast.error(t("exportError"));
     } finally {
-      setExporting(false);
+      setLoading(false);
     }
   };
+  
+
 
   return (
     <div className="space-y-6">
@@ -122,19 +125,19 @@ export default function BookClient() {
             <Button
               variant="outline"
               className="h-8 gap-1 border-slate-200"
-              onClick={handleExport}
-              disabled={exporting}
-            >
-              <Download className="w-3.5 h-3.5" />
-              {t("exportData")}
-            </Button>
-            <Button
-              variant="outline"
-              className="h-8 gap-1 border-slate-200"
               onClick={() => setIsImportDialogOpen(true)}
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
               {t("importData")}
+            </Button>
+            <Button
+              variant="outline"
+              className="h-8 gap-1 border-slate-200"
+              onClick={handleExport}
+              disabled={loading}
+            >
+              <Download className="w-3.5 h-3.5" />
+              {t("exportData")}
             </Button>
             <Link href="/admin/books/add">
               <Button variant="submit" className="h-8 gap-1">

@@ -62,14 +62,20 @@ class BookImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                     $row['publishers'] ?? ''
                 );
 
+                $isbn = $this->sanitizeField($row['isbn'] ?? null);
+                $description = $this->sanitizeField($row['description'] ?? null);
+                $publicationYear = $this->sanitizeField($row['publication_year'] ?? null);
+                $language = $this->sanitizeField($row['language'] ?? 'Indonesia') ?? 'Indonesia';
+                $price = $this->sanitizeField($row['price'] ?? 0) ?? 0;
+
                 // Prepare book data
                 $bookData = [
                     'title' => $row['title'],
-                    'isbn' => $row['isbn'] ?? null,
-                    'description' => $row['description'] ?? null,
-                    'publication_year' => $row['publication_year'] ?? null,
-                    'language' => $row['language'] ?? 'Indonesia',
-                    'price' => $row['price'] ?? 0,
+                    'isbn' => $isbn,
+                    'description' => $description,
+                    'publication_year' => $publicationYear !== null ? (int)$publicationYear : null,
+                    'language' => $language,
+                    'price' => (float)$price,
                     'is_active' => true,
                     'category_ids' => $categoryIds,
                     'author_ids' => $authorIds,
@@ -81,10 +87,10 @@ class BookImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
 
                 // Handle copies from Copy Codes column
                 $copyCodesString = $row['copy_codes'] ?? '';
-                
+
                 if (!empty($copyCodesString)) {
                     $copyCodes = array_map('trim', explode(',', $copyCodesString));
-                    
+
                     foreach ($copyCodes as $copyCode) {
                         if (empty($copyCode)) continue;
 
@@ -136,5 +142,13 @@ class BookImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
         }
 
         return $ids;
+    }
+
+    private function sanitizeField($value)
+    {
+        if ($value === '-' || trim((string)$value) === '') {
+            return null;
+        }
+        return $value;
     }
 }

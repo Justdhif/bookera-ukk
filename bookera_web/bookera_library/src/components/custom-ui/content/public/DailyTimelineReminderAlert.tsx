@@ -30,7 +30,12 @@ function diffDays(left: Date, right: Date) {
 function getReturnReminder(activeBorrows: Borrow[]): ReturnReminder | null {
   const today = startOfDay(new Date());
 
-  const nearestBorrow = activeBorrows
+  // Only consider borrows that have at least one book in "borrowed" status
+  const borrowedOnly = activeBorrows.filter((borrow) =>
+    borrow.borrow_details?.some((d) => d.status === "borrowed"),
+  );
+
+  const nearestBorrow = borrowedOnly
     .map((borrow) => ({
       daysLeft: diffDays(today, startOfDay(new Date(borrow.return_date))),
     }))
@@ -46,12 +51,22 @@ function getReturnReminder(activeBorrows: Borrow[]): ReturnReminder | null {
   };
 }
 
+function getLostBookCount(activeBorrows: Borrow[]): number {
+  let count = 0;
+  for (const borrow of activeBorrows) {
+    count +=
+      borrow.borrow_details?.filter((d) => d.status === "lost").length ?? 0;
+  }
+  return count;
+}
+
 export function DailyTimelineReminderAlert({
   activeBorrows,
   isAuthenticated,
 }: DailyTimelineReminderAlertProps) {
   const t = useTranslations("daily_timeline");
   const returnReminder = getReturnReminder(activeBorrows);
+  const lostCount = getLostBookCount(activeBorrows);
 
   if (!isAuthenticated) {
     return (
@@ -88,6 +103,27 @@ export function DailyTimelineReminderAlert({
             </p>
             <p className="mt-1 text-sm font-semibold leading-6 text-emerald-900 dark:text-emerald-100">
               {t("welcome_desc")}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (lostCount > 0) {
+    return (
+      <div className="relative z-10 px-4 pb-4 sm:px-5 sm:pb-5">
+        <div className="flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50/90 px-4 py-3 shadow-sm dark:border-rose-500/20 dark:bg-rose-500/10">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300">
+            <AlertTriangle size={18} />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-black uppercase tracking-[0.28em] text-rose-600 dark:text-rose-300">
+              {t("reminder_lost_title")}
+            </p>
+            <p className="mt-1 text-sm font-semibold leading-6 text-rose-900 dark:text-rose-100">
+              {t("reminder_lost_desc")}
             </p>
           </div>
         </div>

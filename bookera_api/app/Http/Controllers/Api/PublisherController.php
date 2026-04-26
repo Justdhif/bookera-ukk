@@ -37,8 +37,6 @@ class PublisherController extends Controller
         return ApiResponse::successResponse('Data penerbit berhasil diambil', $publishers);
     }
 
-
-
     public function store(StorePublisherRequest $request): JsonResponse
     {
         $publisher = $this->publisherService->create(

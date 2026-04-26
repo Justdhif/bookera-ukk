@@ -11,7 +11,7 @@ import DataLoading from "@/components/custom-ui/DataLoading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { borrowService } from "@/services/borrow.service";
-import { fineService } from "@/services/fine.service";
+import { fineTypeService } from "@/services/fine-type.service";
 import { Borrow } from "@/types/borrow";
 import { FineType } from "@/types/fine";
 import { BorrowBooksCard } from "./BorrowBooksCard";
@@ -35,21 +35,23 @@ function buildInitialReturnStates(
 ): BorrowReturnStates {
   const damagedFines =
     borrowData.fines?.filter((fine: any) => fine.fine_type?.type === "damaged") ?? [];
-  const returnDetails =
-    borrowData.book_returns?.flatMap((bookReturn: any) => bookReturn.details ?? []) ?? [];
-  const lostDetails =
-    borrowData.lost_books?.flatMap((lostBook: any) => lostBook.details ?? []) ?? [];
+  const returnRecords = borrowData.book_returns ?? [];
+  const lostRecords = borrowData.lost_books ?? [];
 
   const initialStates: BorrowReturnStates = {};
 
   borrowData.borrow_details.forEach((detail: any) => {
     let condition: "good" | "damaged" = "good";
-    const returnDetail = returnDetails.find(
+    const returnDetail = returnRecords.find(
       (returnItem: any) => returnItem.book_copy_id === detail.book_copy_id,
     );
-    const lostDetail = lostDetails.find(
+    const lostDetail = lostRecords.find(
       (lostItem: any) => lostItem.book_copy_id === detail.book_copy_id,
     );
+
+    if (lostDetail) {
+      condition = "good";
+    }
 
     if (returnDetail) {
       condition = returnDetail.condition === "damaged" ? "damaged" : "good";
@@ -67,7 +69,7 @@ function buildInitialReturnStates(
       undefined;
 
     initialStates[detail.id] = {
-      status: detail.status === "lost" ? "lost" : "returned",
+      status: lostDetail || detail.status === "lost" ? "lost" : "returned",
       condition,
       fineTypeId:
         condition === "damaged"
@@ -96,7 +98,7 @@ export default function BorrowDetailClient() {
 
   const fetchFineTypes = async (): Promise<FineType[]> => {
     try {
-      const res = await fineService.getAllFineTypes({ per_page: 1000 });
+      const res = await fineTypeService.getAll({ per_page: 1000 });
       return res.data.data.data ?? [];
     } catch (error) {
       console.error("Failed to fetch fine types:", error);
@@ -172,7 +174,7 @@ export default function BorrowDetailClient() {
 
     try {
       setIsSubmitting(true);
-      await borrowService.requestReturn(borrow.id, { items });
+      await borrowService.confirmReturn(borrow.id, { items });
       toast.success(t("processReturnLossSuccess"));
       await fetchBorrow(fineTypes);
     } catch (error: any) {
@@ -201,16 +203,14 @@ export default function BorrowDetailClient() {
     (fine) => fine.status === "paid" || fine.status === "waived",
   );
 
-  const returnDetails =
-    borrow?.book_returns?.flatMap((bookReturn: any) => bookReturn.details ?? []) ?? [];
-  const lostDetails =
-    borrow?.lost_books?.flatMap((lostBook: any) => lostBook.details ?? []) ?? [];
+  const returnRecords = borrow?.book_returns ?? [];
+  const lostRecords = borrow?.lost_books ?? [];
 
   const isAllBooksProcessed = borrow?.borrow_details?.every((detail) => {
-    const returnDetail = returnDetails.find(
+    const returnDetail = returnRecords.find(
       (returnItem: any) => returnItem.book_copy_id === detail.book_copy_id,
     );
-    const lostDetail = lostDetails.find(
+    const lostDetail = lostRecords.find(
       (lostItem: any) => lostItem.book_copy_id === detail.book_copy_id,
     );
 

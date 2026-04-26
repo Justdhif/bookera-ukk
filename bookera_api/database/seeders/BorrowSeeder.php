@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\BookCopy;
 use App\Models\BookReturn;
-use App\Models\BookReturnDetail;
 use App\Models\Borrow;
 use App\Models\BorrowDetail;
 use App\Models\User;
@@ -20,14 +19,14 @@ class BorrowSeeder extends Seeder
     public function run(): void
     {
         if ($this->command->confirm('Apakah Anda ingin membuat data seeder peminjaman?')) {
-            $user = User::where('email', 'noob1234five@gmail.com')->first();
+            $user = User::where('email', 'justdhif418@gmail.com')->first();
 
             if (!$user) {
-                $this->command->warn('User noob1234five tidak ditemukan. Silakan jalankan UserSeeder terlebih dahulu.');
+                $this->command->warn('User justdhif418 tidak ditemukan. Silakan jalankan UserSeeder terlebih dahulu.');
                 return;
             }
 
-            $count = (int) $this->command->ask('Berapa banyak data peminjaman yang ingin dibuat untuk noob1234five?', 5);
+            $count = (int) $this->command->ask('Berapa banyak data peminjaman yang ingin dibuat?', 5);
 
             if ($count <= 0) {
                 $this->command->info("Melewati pembuatan seeder peminjaman.");
@@ -80,12 +79,8 @@ class BorrowSeeder extends Seeder
 
                     $bookReturn = BookReturn::create([
                         'borrow_id' => $borrow->id,
-                        'return_date' => $actualReturnDate->format('Y-m-d'),
-                    ]);
-
-                    BookReturnDetail::create([
-                        'book_return_id' => $bookReturn->id,
                         'book_copy_id' => $bookCopy->id,
+                        'return_date' => $actualReturnDate->format('Y-m-d'),
                         'condition' => 'good',
                     ]);
                 }

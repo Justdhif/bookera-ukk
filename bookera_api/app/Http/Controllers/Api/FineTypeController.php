@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FineType\StoreFineTypeRequest;
-use App\Http\Requests\FineType\UpdateFineTypeRequest;
 use App\Models\FineType;
 use App\Services\FineType\FineTypeService;
 use Illuminate\Http\JsonResponse;
@@ -40,18 +39,9 @@ class FineTypeController extends Controller
         return ApiResponse::successResponse('Tipe denda berhasil dibuat', $fineType, 201);
     }
 
-
-
-    public function update(UpdateFineTypeRequest $request, FineType $fineType): JsonResponse
-    {
-        $fineType = $this->fineTypeService->update($fineType, $request->validated());
-
-        return ApiResponse::successResponse('Tipe denda berhasil diupdate', $fineType);
-    }
-
     public function destroy(FineType $fineType): JsonResponse
     {
-        if (!$this->fineTypeService->canDelete($fineType)) {
+        if ($fineType->fines()->exists()) {
             return ApiResponse::errorResponse('Tipe denda ini masih digunakan dan tidak dapat dihapus', null, 400);
         }
 

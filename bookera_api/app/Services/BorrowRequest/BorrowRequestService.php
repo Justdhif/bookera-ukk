@@ -7,6 +7,7 @@ use App\Models\BookCopy;
 use App\Models\Borrow;
 use App\Models\BorrowDetail;
 use App\Models\BorrowRequest;
+use App\Models\BorrowRequestDetail;
 use App\Models\User;
 use App\Services\Borrow\BorrowNotificationService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -21,8 +22,19 @@ class BorrowRequestService
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
+        return $this->buildQuery($filters)->paginate($filters['per_page'] ?? 15);
+    }
+
+    public function getExportData(array $filters): Collection
+    {
+        return $this->buildQuery($filters)->get();
+    }
+
+    private function buildQuery(array $filters)
+    {
         $query = BorrowRequest::with([
             'borrowRequestDetails.book',
+            'borrowRequestDetails.bookCopy',
             'user.profile',
         ]);
 
@@ -45,7 +57,7 @@ class BorrowRequestService
             $query->where('approval_status', $filters['approval_status']);
         }
 
-        return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
+        return $query->latest()->orderByDesc('id');
     }
 
     public function create(array $data, User $user): BorrowRequest
@@ -61,16 +73,41 @@ class BorrowRequestService
             abort(422, 'Anda memiliki denda yang belum dibayar. Silakan lunasi denda Anda terlebih dahulu sebelum meminjam kembali.');
         }
 
-        // Check for pending requests
-        $hasPendingRequest = BorrowRequest::where('user_id', $user->id)
-            ->where('approval_status', 'processing')
+        // Check for late active borrows
+        $hasLateActiveBorrow = Borrow::where('user_id', $user->id)
+            ->where('status', 'open')
+            ->whereDate('return_date', '<', now()->toDateString())
             ->exists();
 
-        if ($hasPendingRequest) {
-            abort(422, 'Anda memiliki permintaan peminjaman yang sedang diproses. Silakan tunggu hingga permintaan tersebut disetujui.');
+        if ($hasLateActiveBorrow) {
+            abort(422, 'Anda memiliki peminjaman yang aktif namun sudah melewati batas waktu pengembalian. Silakan kembalikan buku atau selesaikan peminjaman yang telat tersebut terlebih dahulu sebelum melakukan permintaan peminjaman baru.');
+        }
+
+        // Check for pending requests (any undecided items in non-canceled requests)
+        if ($user->has_pending_borrow_request) {
+            abort(422, 'Anda masih memiliki permintaan peminjaman yang belum sepenuhnya diproses (disetujui atau ditolak). Silakan tunggu hingga semua permintaan sebelumnya selesai diproses.');
         }
 
         $request = DB::transaction(function () use ($data, $user) {
+            // Aggregate quantities per book to prevent bypass if duplicate IDs are sent
+            $requestedQuantities = [];
+            foreach ($data['items'] as $item) {
+                $bookId = $item['id'];
+                $requestedQuantities[$bookId] = ($requestedQuantities[$bookId] ?? 0) + $item['quantity'];
+            }
+
+            // Validate stock availability first
+            foreach ($requestedQuantities as $bookId => $totalQuantity) {
+                $book = \App\Models\Book::find($bookId);
+                if (!$book) {
+                    abort(404, "Buku tidak ditemukan.");
+                }
+
+                if ($book->available_copies < $totalQuantity) {
+                    abort(422, "Stok buku '{$book->title}' tidak mencukupi. Tersedia: {$book->available_copies}, Diminta: {$totalQuantity}.");
+                }
+            }
+
             $borrowDate = Carbon::parse($data['borrow_date']);
             $returnDate = $borrowDate->copy()->addDays(5);
 
@@ -81,10 +118,16 @@ class BorrowRequestService
                 'approval_status' => 'processing',
             ]);
 
-            foreach ($data['book_ids'] as $bookId) {
-                $request->borrowRequestDetails()->create([
-                    'book_id' => $bookId,
-                ]);
+            foreach ($data['items'] as $item) {
+                $bookId = $item['id'];
+                $quantity = $item['quantity'];
+
+                for ($i = 0; $i < $quantity; $i++) {
+                    $request->borrowRequestDetails()->create([
+                        'book_id' => $bookId,
+                        'approval_status' => 'processing',
+                    ]);
+                }
             }
 
             $request->load([
@@ -101,7 +144,7 @@ class BorrowRequestService
                     'user'        => $user->email,
                     'borrow_date' => $request->borrow_date,
                     'return_date' => $request->return_date,
-                    'book_ids'    => $data['book_ids'],
+                    'items'       => $data['items'],
                 ],
                 null,
                 $request
@@ -118,7 +161,9 @@ class BorrowRequestService
     {
         return $request->load([
             'borrowRequestDetails.book',
+            'borrowRequestDetails.bookCopy',
             'user.profile',
+            'borrow.borrowDetails.bookCopy.book',
         ]);
     }
 
@@ -126,6 +171,7 @@ class BorrowRequestService
     {
         return BorrowRequest::with([
             'borrowRequestDetails.book',
+            'borrowRequestDetails.bookCopy',
         ])
             ->where('user_id', $user->id)
             ->latest()
@@ -158,108 +204,137 @@ class BorrowRequestService
         return $request;
     }
 
-    public function approve(BorrowRequest $borrowRequest, array $copyIds = []): Borrow
+    public function approve(BorrowRequest $borrowRequest, int $detailId): BorrowRequest
     {
-        abort_if(
-            $borrowRequest->approval_status !== 'processing',
-            422,
-            'Only processing requests can be approved'
-        );
+        return DB::transaction(function () use ($borrowRequest, $detailId) {
+            $borrowRequest = BorrowRequest::whereKey($borrowRequest->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $details = $borrowRequest->borrowRequestDetails;
-        if (empty($copyIds) || count($copyIds) !== $details->count()) {
-            abort(422, 'Sila berikan ID salinan buku untuk setiap buku yang diminta');
-        }
+            abort_if(
+                $borrowRequest->approval_status === 'canceled',
+                422,
+                'Canceled requests cannot be updated'
+            );
 
-        $borrow = DB::transaction(function () use ($borrowRequest, $copyIds, $details) {
-            $borrowCode = $this->generateBorrowCode();
+            $detail = $borrowRequest->borrowRequestDetails()
+                ->whereKey($detailId)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            $borrow = Borrow::create([
-                'user_id'            => $borrowRequest->user_id,
-                'borrow_request_id'  => $borrowRequest->id,
-                'borrow_code'        => $borrowCode,
-                'borrow_date'        => $borrowRequest->borrow_date,
-                'return_date'        => $borrowRequest->return_date,
-                'status'             => 'open',
-            ]);
+            abort_if(
+                $detail->approval_status !== 'processing',
+                422,
+                'Only processing books can be approved'
+            );
 
-            $borrow->update(['qr_code_path' => $this->generateBorrowQrCode($borrowCode, $borrow->id)]);
+            // Validasi ketersediaan stok buku (pastikan tidak over-approve)
+            $approvedButNotAssignedCount = BorrowRequestDetail::where('book_id', $detail->book_id)
+                ->where('approval_status', 'approved')
+                ->whereNull('book_copy_id')
+                ->count();
 
-            foreach ($details as $index => $detail) {
-                $copy = BookCopy::where('id', $copyIds[$index])
-                    ->where('book_id', $detail->book_id)
-                    ->where('status', 'available')
-                    ->lockForUpdate()
-                    ->firstOrFail();
+            $availableCopiesCount = $detail->book->copies()->where('status', 'available')->count();
 
-                BorrowDetail::create([
-                    'borrow_id'    => $borrow->id,
-                    'book_copy_id' => $copy->id,
-                    'status'       => 'borrowed',
-                ]);
-
-                $copy->update(['status' => 'borrowed']);
-
-                ActivityLogger::log(
-                    'update',
-                    'book_copy',
-                    "Book copy #{$copy->id} ({$copy->book->title}) assigned from request #{$borrowRequest->id}",
-                    ['copy_id' => $copy->id, 'new_status' => 'borrowed', 'borrow_id' => $borrow->id],
-                    ['copy_id' => $copy->id, 'old_status' => 'available'],
-                    $copy
-                );
+            if ($availableCopiesCount <= $approvedButNotAssignedCount) {
+                abort(422, "Stok buku '" . $detail->book->title . "' tidak mencukupi untuk disetujui. Total stok tersedia: {$availableCopiesCount}, sedang menunggu penugasan: {$approvedButNotAssignedCount}");
             }
 
-            $borrowRequest->update(['approval_status' => 'approved']);
+            $oldStatus = $detail->approval_status;
 
-            $borrowRequest->load(['borrowRequestDetails.book', 'user.profile']);
+            $detail->update([
+                'approval_status' => 'approved',
+                'reject_reason' => null,
+            ]);
 
-            $borrow->load(['borrowDetails.bookCopy.book', 'user.profile']);
+            $borrowRequest->load('borrowRequestDetails.book');
+            $borrowRequest = $this->syncBorrowRequestStatus($borrowRequest);
+
+            $borrowRequest->load(['borrowRequestDetails.book', 'borrowRequestDetails.bookCopy', 'user.profile']);
 
             ActivityLogger::log(
                 'update',
-                'borrow_request',
-                "Borrow request #{$borrowRequest->id} approved — borrow #{$borrow->id} created with assigned book copies",
-                ['request_id' => $borrowRequest->id, 'borrow_id' => $borrow->id, 'status' => 'approved'],
-                ['request_id' => $borrowRequest->id, 'status' => 'processing'],
-                $borrowRequest
+                'borrow_request_detail',
+                "Borrow request detail #{$detail->id} approved",
+                [
+                    'request_id' => $borrowRequest->id,
+                    'detail_id' => $detail->id,
+                    'book_id' => $detail->book_id,
+                    'status' => 'approved',
+                ],
+                [
+                    'detail_id' => $detail->id,
+                    'book_id' => $detail->book_id,
+                    'old_status' => $oldStatus,
+                ],
+                $detail
             );
 
-            return $borrow;
+            return $borrowRequest;
         });
-
-        (new BorrowNotificationService())->notifyBorrowRequestApproved($borrowRequest, $borrow);
-
-        return $borrow;
     }
 
-    public function reject(BorrowRequest $borrowRequest, ?string $rejectReason = null): BorrowRequest
+    public function reject(BorrowRequest $borrowRequest, int $detailId, ?string $rejectReason = null): BorrowRequest
     {
-        abort_if(
-            $borrowRequest->approval_status !== 'processing',
-            422,
-            'Only processing requests can be rejected'
-        );
+        return DB::transaction(function () use ($borrowRequest, $detailId, $rejectReason) {
+            $borrowRequest = BorrowRequest::whereKey($borrowRequest->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $borrowRequest->update([
-            'approval_status' => 'rejected',
-            'reject_reason'   => $rejectReason,
-        ]);
+            abort_if(
+                $borrowRequest->approval_status === 'canceled',
+                422,
+                'Canceled requests cannot be updated'
+            );
 
-        $borrowRequest->load(['borrowRequestDetails.book', 'user.profile']);
+            $detail = $borrowRequest->borrowRequestDetails()
+                ->whereKey($detailId)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        ActivityLogger::log(
-            'update',
-            'borrow_request',
-            "Borrow request #{$borrowRequest->id} rejected",
-            ['request_id' => $borrowRequest->id, 'status' => 'rejected', 'reason' => $rejectReason],
-            ['request_id' => $borrowRequest->id, 'status' => 'processing'],
-            $borrowRequest
-        );
+            abort_if(
+                $detail->approval_status !== 'processing',
+                422,
+                'Only processing books can be rejected'
+            );
 
-        (new BorrowNotificationService())->notifyBorrowRequestRejected($borrowRequest);
+            $oldStatus = $detail->approval_status;
 
-        return $borrowRequest;
+            $detail->update([
+                'approval_status' => 'rejected',
+                'reject_reason' => $rejectReason,
+            ]);
+
+            $borrowRequest->load('borrowRequestDetails.book');
+            $borrowRequest = $this->syncBorrowRequestStatus($borrowRequest);
+
+            $borrowRequest->load(['borrowRequestDetails.book', 'borrowRequestDetails.bookCopy', 'user.profile']);
+
+            ActivityLogger::log(
+                'update',
+                'borrow_request_detail',
+                "Borrow request detail #{$detail->id} rejected",
+                [
+                    'request_id' => $borrowRequest->id,
+                    'detail_id' => $detail->id,
+                    'book_id' => $detail->book_id,
+                    'status' => 'rejected',
+                    'reason' => $rejectReason,
+                ],
+                [
+                    'detail_id' => $detail->id,
+                    'book_id' => $detail->book_id,
+                    'old_status' => $oldStatus,
+                ],
+                $detail
+            );
+
+            if ($borrowRequest->approval_status === 'rejected') {
+                (new BorrowNotificationService())->notifyBorrowRequestRejected($borrowRequest);
+            }
+
+            return $borrowRequest;
+        });
     }
 
     /**
@@ -269,35 +344,64 @@ class BorrowRequestService
      */
     public function assignBorrow(BorrowRequest $borrowRequest, array $copyIds = []): Borrow
     {
-        $borrow = DB::transaction(function () use ($borrowRequest, $copyIds) {
-            $borrowCode = $this->generateBorrowCode();
+        $notifyBorrowApproval = false;
 
-            $borrow = Borrow::create([
-                'user_id'     => $borrowRequest->user_id,
-                'borrow_code' => $borrowCode,
-                'borrow_date' => $borrowRequest->borrow_date,
-                'return_date' => $borrowRequest->return_date,
-                'status'      => 'open',
-            ]);
+        $borrow = DB::transaction(function () use ($borrowRequest, $copyIds, &$notifyBorrowApproval) {
+            $borrowRequest = BorrowRequest::whereKey($borrowRequest->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            $borrow->update(['qr_code_path' => $this->generateBorrowQrCode($borrowCode, $borrow->id)]);
+            $pendingDetails = $borrowRequest->borrowRequestDetails()
+                ->where('approval_status', 'approved')
+                ->whereNull('book_copy_id')
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get();
 
-            $details = $borrowRequest->borrowRequestDetails;
+            $borrow = Borrow::where('borrow_request_id', $borrowRequest->id)
+                ->lockForUpdate()
+                ->first();
 
-            foreach ($details as $index => $detail) {
-                // Use the admin-selected copy if provided, otherwise auto-select the first available
-                if (!empty($copyIds) && isset($copyIds[$index])) {
-                    $copy = BookCopy::where('id', $copyIds[$index])
-                        ->where('book_id', $detail->book_id)
-                        ->where('status', 'available')
-                        ->lockForUpdate()
-                        ->firstOrFail();
-                } else {
-                    $copy = BookCopy::where('book_id', $detail->book_id)
-                        ->where('status', 'available')
-                        ->lockForUpdate()
-                        ->firstOrFail();
-                }
+            if ($pendingDetails->isEmpty()) {
+                abort_if(! $borrow, 422, 'No approved books are waiting for copy assignment');
+
+                $borrow->load(['borrowDetails.bookCopy.book', 'user.profile']);
+
+                return $borrow;
+            }
+
+            if (empty($copyIds) || count($copyIds) !== $pendingDetails->count()) {
+                abort(422, 'Sila berikan ID salinan buku untuk setiap buku yang telah disetujui');
+            }
+
+            if (! $borrow) {
+                $borrowCode = $this->generateBorrowCode();
+
+                $borrow = Borrow::create([
+                    'user_id'           => $borrowRequest->user_id,
+                    'borrow_request_id' => $borrowRequest->id,
+                    'borrow_code'       => $borrowCode,
+                    'borrow_date'       => $borrowRequest->borrow_date,
+                    'return_date'       => $borrowRequest->return_date,
+                    'status'            => 'open',
+                ]);
+
+                $borrow->update(['qr_code_path' => $this->generateBorrowQrCode($borrowCode, $borrow->id)]);
+                $notifyBorrowApproval = true;
+            } elseif ($borrow->status !== 'open') {
+                abort(422, 'Borrow is already closed');
+            }
+
+            foreach ($pendingDetails as $index => $detail) {
+                $copy = BookCopy::where('id', $copyIds[$index])
+                    ->where('book_id', $detail->book_id)
+                    ->where('status', 'available')
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $detail->update([
+                    'book_copy_id' => $copy->id,
+                ]);
 
                 BorrowDetail::create([
                     'borrow_id'    => $borrow->id,
@@ -311,49 +415,54 @@ class BorrowRequestService
                     'update',
                     'book_copy',
                     "Book copy #{$copy->id} ({$copy->book->title}) assigned from request #{$borrowRequest->id}",
-                    ['copy_id' => $copy->id, 'new_status' => 'borrowed', 'borrow_id' => $borrow->id],
-                    ['copy_id' => $copy->id, 'old_status' => 'available'],
+                    [
+                        'request_id' => $borrowRequest->id,
+                        'detail_id' => $detail->id,
+                        'copy_id' => $copy->id,
+                        'borrow_id' => $borrow->id,
+                        'new_status' => 'borrowed',
+                    ],
+                    [
+                        'detail_id' => $detail->id,
+                        'copy_id' => $copy->id,
+                        'old_status' => 'available',
+                    ],
                     $copy
                 );
             }
 
-            // Mark request as approved after borrow is created
-            $borrowRequest->update(['approval_status' => 'approved']);
+            $borrowRequest->load('borrowRequestDetails.book');
+            $borrowRequest = $this->syncBorrowRequestStatus($borrowRequest);
 
-            $borrow->load([
-                'borrowDetails.bookCopy.book',
-                'user.profile',
-            ]);
+            $borrow->load(['borrowDetails.bookCopy.book', 'user.profile']);
+            $borrowRequest->load(['borrowRequestDetails.book', 'borrowRequestDetails.bookCopy', 'user.profile']);
 
             ActivityLogger::log(
-                'create',
-                'borrow',
-                "Borrow #{$borrow->id} assigned from request for user {$borrow->user->email}",
+                'update',
+                'borrow_request',
+                "Borrow request #{$borrowRequest->id} assigned approved book copies",
                 [
-                    'borrow_id'  => $borrow->id,
-                    'user'       => $borrow->user->email,
-                    'borrow_date' => $borrow->borrow_date,
-                    'return_date' => $borrow->return_date,
+                    'request_id' => $borrowRequest->id,
+                    'borrow_id' => $borrow->id,
+                    'copies_assigned' => count($copyIds),
+                    'status' => $borrowRequest->approval_status,
                 ],
                 null,
-                $borrow
+                $borrowRequest
             );
 
-            $borrowRequest->load(['borrowRequestDetails.book', 'user.profile']);
             return $borrow;
         });
 
-        (new BorrowNotificationService())->notifyBorrowRequestApproved($borrowRequest, $borrow);
+        $borrowRequest->load(['borrowRequestDetails.book', 'borrowRequestDetails.bookCopy', 'user.profile']);
+
+        if ($notifyBorrowApproval) {
+            (new BorrowNotificationService())->notifyBorrowRequestApproved($borrowRequest, $borrow);
+        }
 
         return $borrow;
     }
 
-
-
-    /**
-     * Assign book copies to an already-created borrow (from an approved request).
-     * Must be called from the borrow detail page after approval.
-     */
     public function addCopiesToBorrow(Borrow $borrow, array $copyIds): Borrow
     {
         return DB::transaction(function () use ($borrow, $copyIds) {
@@ -404,6 +513,47 @@ class BorrowRequestService
 
             return $borrow;
         });
+    }
+
+    private function syncBorrowRequestStatus(BorrowRequest $borrowRequest): BorrowRequest
+    {
+        $borrowRequest->loadMissing(['borrowRequestDetails.book']);
+
+        $details = $borrowRequest->borrowRequestDetails;
+
+        if ($borrowRequest->approval_status === 'canceled' || $details->isEmpty()) {
+            return $borrowRequest;
+        }
+
+        if ($details->contains(fn ($detail) => $detail->approval_status === 'approved')) {
+            $borrowRequest->update([
+                'approval_status' => 'approved',
+                'reject_reason' => null,
+            ]);
+        } elseif ($details->every(fn ($detail) => $detail->approval_status === 'rejected')) {
+            $rejectReason = $details
+                ->filter(fn ($detail) => ! empty($detail->reject_reason))
+                ->map(function ($detail) {
+                    $bookTitle = $detail->book?->title;
+
+                    return $bookTitle
+                        ? $bookTitle.' - '.$detail->reject_reason
+                        : $detail->reject_reason;
+                })
+                ->implode("\n");
+
+            $borrowRequest->update([
+                'approval_status' => 'rejected',
+                'reject_reason' => $rejectReason ?: null,
+            ]);
+        } else {
+            $borrowRequest->update([
+                'approval_status' => 'processing',
+                'reject_reason' => null,
+            ]);
+        }
+
+        return $borrowRequest->refresh();
     }
 
 

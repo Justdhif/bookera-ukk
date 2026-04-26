@@ -47,13 +47,16 @@ export const bookService = {
     });
   },
 
-  downloadTemplate: () =>
-    api.get("/admin/books/template", {
+  export: (filters?: BookFilterParams) => {
+    const { category_ids, genre_ids, ...params } = filters ?? {};
+    if (category_ids?.length)
+      Object.assign(params, { category_ids: category_ids.join(",") });
+    if (genre_ids?.length)
+      Object.assign(params, { genre_ids: genre_ids.join(",") });
+    return api.get("/admin/books/export", {
+      params,
       responseType: "blob",
-    }),
-
-  exportData: () =>
-    api.get("/admin/books/export", {
-      responseType: "blob",
-    }),
+    });
+  },
 };
+

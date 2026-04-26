@@ -40,4 +40,8 @@ return [
         'url' => env('FONNTE_URL', 'https://api.fonnte.com/send'),
     ],
 
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+    ],
+
 ];

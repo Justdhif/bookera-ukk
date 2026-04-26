@@ -4,7 +4,6 @@ import {
   Borrow,
   BorrowFilterParams,
   BorrowListResponse,
-  BorrowReturnItemPayload,
   BorrowReturnRequestData,
 } from "@/types/borrow";
 
@@ -41,7 +40,7 @@ export const borrowService = {
       params: filters,
     }),
 
-  requestReturn: (id: number, data: BorrowReturnRequestData) =>
+  confirmReturn: (id: number, data: BorrowReturnRequestData) =>
     api.post<ApiResponse<any>>(`/borrows/${id}/return`, data),
 
   reportLost: (id: number, data: { borrow_detail_ids: number[] }) =>

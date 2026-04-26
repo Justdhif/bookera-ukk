@@ -3,42 +3,37 @@
 namespace App\Exports;
 
 use App\Models\Book;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
-class BookExport implements FromCollection, WithHeadings, WithMapping, WithTitle
+class BookExport implements FromCollection, WithHeadings, WithTitle, WithMapping
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function collection()
+    public function __construct(private Collection $books)
     {
-        return Book::with(['copies', 'categories', 'authors', 'publishers'])->latest()->get();
     }
 
-    /**
-     * @var Book $book
-     */
+    public function collection(): Collection
+    {
+        return $this->books;
+    }
+
     public function map($book): array
     {
-        $copyCodes = $book->copies->pluck('copy_code')->implode(', ');
-        $categories = $book->categories->pluck('name')->implode(', ');
-        $authors = $book->authors->pluck('name')->implode(', ');
-        $publishers = $book->publishers->pluck('name')->implode(', ');
-        
         return [
             $book->title,
-            $book->isbn,
-            $book->description,
-            $book->publication_year,
-            $book->language,
-            $book->price,
-            $categories,
-            $authors,
-            $publishers,
-            $copyCodes,
+            $book->isbn ?? '-',
+            $book->authors->pluck('name')->implode(', ') ?: '-',
+            $book->publishers->pluck('name')->implode(', ') ?: '-',
+            $book->categories->pluck('name')->implode(', ') ?: '-',
+            $book->genres->pluck('name')->implode(', ') ?: '-',
+            $book->publication_year ?? '-',
+            $book->language ?? '-',
+            (int) $book->total_copies_count,
+            (int) $book->available_copies_count,
+            (float) $book->price,
             $book->is_active ? 'Active' : 'Inactive',
             $book->created_at->format('Y-m-d H:i:s'),
         ];
@@ -49,14 +44,15 @@ class BookExport implements FromCollection, WithHeadings, WithMapping, WithTitle
         return [
             'Title',
             'ISBN',
-            'Description',
-            'Publication Year',
-            'Language',
-            'Price',
-            'Categories',
             'Authors',
             'Publishers',
-            'Copy Codes',
+            'Categories',
+            'Genres',
+            'Publication Year',
+            'Language',
+            'Total Copies',
+            'Available Copies',
+            'Price',
             'Status',
             'Created At',
         ];
