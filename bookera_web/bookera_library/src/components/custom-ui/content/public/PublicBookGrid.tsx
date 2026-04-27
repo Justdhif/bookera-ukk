@@ -234,6 +234,8 @@ export default function PublicBookGrid({
           selectedMinReviews={selectedMinReviews}
           onReviewSelect={handleReviewSelect}
           favoriteHref={favoriteHref}
+          borrowHref="/my-borrows"
+          fineHref="/my-fines"
           selectedCount={selectedBookIds.length}
           visibleCount={books.length}
           onSelectAll={onSelectAll}

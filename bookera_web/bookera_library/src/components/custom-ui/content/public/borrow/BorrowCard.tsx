@@ -29,9 +29,7 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
   const tCommon = useTranslations("common");
   const userSlug = useAuthStore((state) => state.user?.slug);
   
-  const detailLink = userSlug
-    ? `/${userSlug}/my-borrows/${borrow.borrow_code}`
-    : `/my-borrows/${borrow.borrow_code}`;
+  const detailLink = `/my-borrows/${borrow.borrow_code}`;
 
   return (
     <Card className="group relative overflow-hidden hover:shadow-premium transition-all duration-300 border-2">

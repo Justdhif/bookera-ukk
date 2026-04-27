@@ -18,8 +18,7 @@ export default function AppHeader({
   hideSidebarTrigger = false,
 }: AppHeaderProps) {
   const t = useTranslations("navbar");
-  const userSlug = useAuthStore((state) => state.user?.slug);
-  const settingsHref = userSlug ? `/${userSlug}/settings` : "/settings";
+  const settingsHref = "/settings";
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b flex h-16 md:h-18 lg:h-20 items-center justify-between px-4 md:px-6">
       <div className="flex items-center gap-2 md:gap-4 flex-1">

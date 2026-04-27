@@ -14,7 +14,7 @@ import { notificationService } from "@/services/notification.service";
 import { Notification } from "@/types/notification";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { NotificationIconBadge } from "@/components/custom-ui/content/account/notification/notification-utils";
+import { NotificationIconBadge } from "@/components/custom-ui/content/public/notification/notification-utils";
 import { useAuthStore } from "@/store/auth.store";
 interface NotificationDropdownProps {
   isAuthenticated?: boolean;
@@ -32,9 +32,7 @@ export default function NotificationDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isAdmin = pathname.startsWith("/admin");
-  const notificationsHref = userSlug
-    ? `/${userSlug}/notifications`
-    : "/notifications";
+  const notificationsHref = "/notifications";
   useEffect(() => {
     if (isAuthenticated) fetchUnreadCount();
   }, [isAuthenticated]);
@@ -80,14 +78,10 @@ export default function NotificationDropdown({
       }
     } else {
       if (notif.module === "borrow" && notif.data?.borrow_id) {
-        const borrowHref = userSlug
-          ? `/${userSlug}/my-borrows/${notif.data.borrow_id}`
-          : `/my-borrows/${notif.data.borrow_id}`;
+        const borrowHref = `/my-borrows/${notif.data.borrow_id}`;
         router.push(borrowHref);
       } else if (notif.module === "return" && notif.data?.borrow_id) {
-        const borrowHref = userSlug
-          ? `/${userSlug}/my-borrows/${notif.data.borrow_id}`
-          : `/my-borrows/${notif.data.borrow_id}`;
+        const borrowHref = `/my-borrows/${notif.data.borrow_id}`;
         router.push(borrowHref);
       } else {
         router.push(notificationsHref);

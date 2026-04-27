@@ -11,12 +11,16 @@ import AuthorPublisherSidebarSearch from "./AuthorPublisherSidebarSearch";
 import Link from "next/link";
 import { MessageSquareText, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 import AppSidebar from "./AppSidebar";
 
 export default function PublicSidebar() {
   const { open } = useSidebar();
   const t = useTranslations("navbar");
+  const tSidebar = useTranslations("sidebar");
+  const pathname = usePathname();
 
   return (
     <AppSidebar subtitle={t("myLibrary")}>
@@ -67,6 +71,7 @@ export default function PublicSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </div>
+
       <AuthorPublisherSidebarSearch />
     </AppSidebar>
   );
