@@ -8,6 +8,7 @@ import { Book } from "@/types/book";
 import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
 import { Star } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { id, enUS } from "date-fns/locale";
 import { useLocale } from "next-intl";
@@ -111,7 +112,10 @@ export default function BookReviewSection({
                 key={r.id}
                 className="flex gap-4 p-4 border rounded-xl bg-card hover:bg-muted/30 transition-colors"
               >
-                <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-primary/10">
+                <Link 
+                  href={`/${r.user?.slug}/profile`}
+                  className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-primary/10 hover:opacity-80 transition-opacity"
+                >
                   <Image
                     src={
                       r.user?.profile?.avatar ||
@@ -123,12 +127,15 @@ export default function BookReviewSection({
                     className="object-cover w-full h-full"
                     unoptimized
                   />
-                </div>
+                </Link>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start gap-2 mb-1">
-                    <div className="font-medium text-sm truncate">
+                    <Link 
+                      href={`/${r.user?.slug}/profile`}
+                      className="font-medium text-sm truncate hover:text-brand-primary transition-colors"
+                    >
                       {r.user?.profile?.full_name || ""}
-                    </div>
+                    </Link>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
                       {formatDistanceToNow(new Date(r.created_at), {
                         addSuffix: true,

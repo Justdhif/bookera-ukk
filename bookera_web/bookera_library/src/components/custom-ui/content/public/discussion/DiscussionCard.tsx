@@ -7,6 +7,7 @@ import { Heart, MessageCircle, ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 interface DiscussionCardProps {
   discussion: DiscussionPost;
@@ -27,16 +28,20 @@ export default function DiscussionCard({ discussion, className }: DiscussionCard
       <CardContent className="px-5 space-y-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 border-2 border-background shadow-sm group-hover:border-brand-primary/20 transition-colors">
-              <AvatarImage src={avatarUrl} alt={profile?.full_name || "User"} className="object-cover" />
-              <AvatarFallback className="bg-brand-primary/10 text-brand-primary text-xs font-bold">
-                {profile?.full_name?.charAt(0) || "U"}
-              </AvatarFallback>
-            </Avatar>
+            <Link href={`/${discussion.user?.slug}/profile`}>
+              <Avatar className="h-10 w-10 border-2 border-background shadow-sm group-hover:border-brand-primary/20 transition-colors">
+                <AvatarImage src={avatarUrl} alt={profile?.full_name || "User"} className="object-cover" />
+                <AvatarFallback className="bg-brand-primary/10 text-brand-primary text-xs font-bold">
+                  {profile?.full_name?.charAt(0) || "U"}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
             <div className="flex flex-col overflow-hidden">
-              <span className="text-sm font-bold leading-none truncate group-hover:text-brand-primary transition-colors">
-                {profile?.full_name || "Anonymous"}
-              </span>
+              <Link href={`/${discussion.user?.slug}/profile`}>
+                <span className="text-sm font-bold leading-none truncate group-hover:text-brand-primary transition-colors block">
+                  {profile?.full_name || "Anonymous"}
+                </span>
+              </Link>
               <span className="text-[11px] text-muted-foreground truncate">
                 @{discussion.user?.email.split("@")[0]}
               </span>

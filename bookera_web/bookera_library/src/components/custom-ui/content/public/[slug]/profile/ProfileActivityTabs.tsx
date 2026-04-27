@@ -17,9 +17,10 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 
 interface ProfileActivityTabsProps {
   user: User;
+  isMe?: boolean;
 }
 
-export default function ProfileActivityTabs({ user }: ProfileActivityTabsProps) {
+export default function ProfileActivityTabs({ user, isMe = false }: ProfileActivityTabsProps) {
   const t = useTranslations("profile");
   const tComplaint = useTranslations("complaint");
   const format = useFormatter();
@@ -61,11 +62,11 @@ export default function ProfileActivityTabs({ user }: ProfileActivityTabsProps) 
         <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="discussions" className="gap-2">
             <MessageSquare className="h-4 w-4" />
-            {t("myDiscussions")}
+            {isMe ? t("myDiscussions") : t("userDiscussions")}
           </TabsTrigger>
           <TabsTrigger value="complaints" className="gap-2">
             <AlertCircle className="h-4 w-4" />
-            {t("myComplaints")}
+            {isMe ? t("myComplaints") : t("userComplaints")}
           </TabsTrigger>
         </TabsList>
 

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { formatDistanceToNow } from "date-fns";
 import { id, enUS } from "date-fns/locale";
+import Link from "next/link";
 import { complaintService } from "@/services/complaint.service";
 import { ComplaintComment } from "@/types/complaint";
 import { PaginatedResponse } from "@/types/api";
@@ -158,21 +159,25 @@ export default function ComplaintCommentSection({
                   key={comment.id}
                   className="flex gap-4 p-5 border rounded-xl bg-card hover:bg-muted/30 transition-colors shadow-sm"
                 >
-                  <Avatar className="h-10 w-10 shrink-0">
-                    <AvatarImage src={comment.user?.profile?.avatar} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold uppercase">
-                      {comment.user?.profile?.full_name?.[0] ||
-                        comment.user?.email?.[0] ||
-                        "?"}
-                    </AvatarFallback>
-                  </Avatar>
+                  <Link href={`/${comment.user?.slug}/profile`}>
+                    <Avatar className="h-10 w-10 shrink-0 hover:opacity-80 transition-opacity ring-2 ring-background shadow-sm">
+                      <AvatarImage src={comment.user?.profile?.avatar} />
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold uppercase">
+                        {comment.user?.profile?.full_name?.[0] ||
+                          comment.user?.email?.[0] ||
+                          "?"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Link>
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col gap-0.5 mb-2">
                       <div className="flex items-center gap-2">
-                        <div className="font-bold text-sm truncate">
-                          {comment.user?.profile?.full_name ||
-                            comment.user?.email?.split("@")[0]}
-                        </div>
+                        <Link href={`/${comment.user?.slug}/profile`} className="hover:text-primary transition-colors">
+                          <div className="font-bold text-sm truncate">
+                            {comment.user?.profile?.full_name ||
+                              comment.user?.email?.split("@")[0]}
+                          </div>
+                        </Link>
                         {["admin", "officer:management", "officer:catalog"].includes(comment.user?.role) && (
                           <Badge 
                             variant="outline" 

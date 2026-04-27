@@ -40,6 +40,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import ComplaintCommentSection from "./ComplaintCommentSection";
 import ComplaintList from "./ComplaintList";
 
@@ -274,18 +275,22 @@ export default function ComplaintDetailClient() {
               </div>
 
               <div className="flex items-center gap-3 pt-4 border-t mt-2">
-                <Avatar className="h-10 w-10 ring-2 ring-background shadow-sm">
-                  <AvatarImage src={complaint.user.profile?.avatar} />
-                  <AvatarFallback className="bg-primary/5 text-primary font-bold uppercase">
-                    {complaint.user.profile?.full_name?.[0] ||
-                      complaint.user.email[0]}
-                  </AvatarFallback>
-                </Avatar>
+                <Link href={`/${complaint.user.slug}/profile`}>
+                  <Avatar className="h-10 w-10 ring-2 ring-background shadow-sm hover:ring-primary/50 transition-all">
+                    <AvatarImage src={complaint.user.profile?.avatar} />
+                    <AvatarFallback className="bg-primary/5 text-primary font-bold uppercase">
+                      {complaint.user.profile?.full_name?.[0] ||
+                        complaint.user.email[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
                 <div>
-                  <p className="font-bold text-sm">
-                    {complaint.user.profile?.full_name}
-                  </p>
-                  <span>{complaint.user.email}</span>
+                  <Link href={`/${complaint.user.slug}/profile`} className="hover:text-primary transition-colors">
+                    <p className="font-bold text-sm">
+                      {complaint.user.profile?.full_name}
+                    </p>
+                  </Link>
+                  <span className="text-xs text-muted-foreground">{complaint.user.email}</span>
                 </div>
               </div>
             </CardHeader>

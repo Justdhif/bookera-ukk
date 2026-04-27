@@ -89,8 +89,8 @@ export default function ComplaintCard({ complaint }: ComplaintCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Link href={`/complaints/${complaint.slug}`}>
-        <Card className="h-full overflow-hidden hover:shadow-xl transition-all duration-300 group border-2 hover:border-primary/20 bg-card/50 backdrop-blur-sm">
+      <Card className="h-full overflow-hidden hover:shadow-xl transition-all duration-300 group border-2 hover:border-primary/20 bg-card/50 backdrop-blur-sm">
+        <Link href={`/complaints/${complaint.slug}`} className="block">
           <CardHeader className="space-y-4">
             <div className="flex items-center justify-between gap-2">
               <Badge
@@ -137,34 +137,40 @@ export default function ComplaintCard({ complaint }: ComplaintCardProps) {
               </div>
             </div>
           )}
+        </Link>
 
-          <CardContent className="px-5 pt-0 pb-5">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-9 w-9 ring-2 ring-background shadow-sm">
+        <CardContent className="px-5 pt-0 pb-5">
+          <div className="flex items-center gap-3">
+            <Link href={`/${complaint.user.slug}/profile`}>
+              <Avatar className="h-9 w-9 ring-2 ring-background shadow-sm hover:ring-primary/50 transition-all">
                 <AvatarImage src={complaint.user.profile?.avatar} />
                 <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold uppercase">
                   {complaint.user.profile?.full_name?.[0] ||
                     complaint.user.email[0]}
                 </AvatarFallback>
               </Avatar>
-              <div className="overflow-hidden">
+            </Link>
+            <div className="overflow-hidden">
+              <Link href={`/${complaint.user.slug}/profile`} className="hover:text-primary transition-colors">
                 <p className="text-sm font-bold truncate">
                   {complaint.user.profile?.full_name ||
                     complaint.user.email.split("@")[0]}
                 </p>
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Calendar className="h-3 w-3" />
-                  <p className="text-[10px] sm:text-xs">
-                    {formatDistanceToNow(new Date(complaint.created_at), {
-                      addSuffix: true,
-                      locale: dateLocale,
-                    })}
-                  </p>
-                </div>
+              </Link>
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                <p className="text-[10px] sm:text-xs">
+                  {formatDistanceToNow(new Date(complaint.created_at), {
+                    addSuffix: true,
+                    locale: dateLocale,
+                  })}
+                </p>
               </div>
             </div>
-          </CardContent>
+          </div>
+        </CardContent>
 
+        <Link href={`/complaints/${complaint.slug}`} className="block">
           <CardFooter className="px-5 py-4 border-t bg-muted/30 flex items-center justify-between">
             <div className="flex items-center gap-4 text-muted-foreground">
               <div className="flex items-center gap-1.5 group/icon">
@@ -192,8 +198,8 @@ export default function ComplaintCard({ complaint }: ComplaintCardProps) {
               {t(`category.${complaint.category}`)}
             </Badge>
           </CardFooter>
-        </Card>
-      </Link>
+        </Link>
+      </Card>
     </motion.div>
   );
 }

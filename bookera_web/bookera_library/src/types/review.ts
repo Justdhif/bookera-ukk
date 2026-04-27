@@ -3,6 +3,7 @@ import { UserProfile } from "./user";
 
 export interface BookReviewUser {
   id: number;
+  slug?: string;
   profile?: UserProfile;
 }
 

@@ -1,36 +1,65 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useParams } from "next/navigation";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { useTranslations } from "next-intl";
 import { authService } from "@/services/auth.service";
+import { followService } from "@/services/follow.service";
 import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import DataLoading from "@/components/custom-ui/DataLoading";
-import { Edit, Phone, Briefcase, User as UserIcon } from "lucide-react";
+import { Edit, Phone, Briefcase, User as UserIcon, UserPlus, UserMinus } from "lucide-react";
 import { toast } from "sonner";
 import { normalizeOccupationValue, getOccupationLabelKey } from "@/constants/user-occupation";
 import Image from "next/image";
 import Link from "next/link";
 import ProfileActivityTabs from "./ProfileActivityTabs";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 export default function ProfileClient() {
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams();
+  const slug = params.slug as string;
   const t = useTranslations("profile");
+  
   const [user, setUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [avatarPreview, setAvatarPreview] = useState<string>("");
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isActionLoading, setIsActionLoading] = useState(false);
 
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const res = await authService.me();
-      const userData: User = res.data.data.user;
+      
+      let meData: User | null = null;
+      try {
+        const meRes = await authService.me();
+        meData = meRes.data.data.user;
+        setCurrentUser(meData);
+      } catch (err) {
+        // Not logged in, that's fine for public profiles
+        setCurrentUser(null);
+      }
+
+      let userData: User;
+      if (meData && (slug === meData.slug || slug === "me" || !slug)) {
+        userData = meData;
+      } else if (!meData && (slug === "me" || !slug)) {
+        router.push("/login");
+        return null;
+      } else {
+        const otherRes = await followService.getUserPublicProfile(slug);
+        userData = otherRes.data.data;
+      }
+
       setUser(userData);
+      setIsFollowing(userData.is_following ?? false);
       setAvatarPreview(userData.profile?.avatar ?? "");
       return userData;
     } catch (error: any) {
@@ -42,14 +71,36 @@ export default function ProfileClient() {
     }
   };
 
+  const handleFollowToggle = async () => {
+    if (!user) return;
+    try {
+      setIsActionLoading(true);
+      if (isFollowing) {
+        await followService.unfollow("user", user.id);
+        setIsFollowing(false);
+        setUser(prev => prev ? { ...prev, followers_count: (prev.followers_count ?? 1) - 1 } : null);
+        toast.success(t("unfollowedSuccess"));
+      } else {
+        await followService.follow("user", user.id);
+        setIsFollowing(true);
+        setUser(prev => prev ? { ...prev, followers_count: (prev.followers_count ?? 0) + 1 } : null);
+        toast.success(t("followedSuccess"));
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t("followActionFailed"));
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, [slug]);
 
   return (
     <div className="space-y-6">
       <ContentHeader
-        title={t("myProfile")}
+        title={t("userProfile")}
         description={
           loading ? (
             <DataLoading variant="inline" size="sm" className="justify-start mt-1" />
@@ -59,6 +110,7 @@ export default function ProfileClient() {
             })
           )
         }
+        showBackButton
       />
       {loading ? (
         <div className="flex justify-center py-16">
@@ -156,15 +208,38 @@ export default function ProfileClient() {
               )}
 
               <div className="w-full pt-2">
-                <Link href={`${pathname}/edit`} className="inline-block">
-                  <Button variant="outline" className="border-brand-primary/20 hover:bg-brand-primary/10 hover:text-brand-primary transition-all font-medium rounded-lg px-6">
-                    <Edit className="w-4 h-4 mr-2" />
-                    {t("editProfile")}
+                {currentUser && user?.id === currentUser?.id ? (
+                  <Link href={`${pathname}/edit`} className="inline-block">
+                    <Button variant="outline" className="border-brand-primary/20 hover:bg-brand-primary/10 hover:text-brand-primary transition-all font-medium rounded-lg px-6">
+                      <Edit className="w-4 h-4 mr-2" />
+                      {t("editProfile")}
+                    </Button>
+                  </Link>
+                ) : currentUser ? (
+                  <Button 
+                    variant={isFollowing ? "outline" : "default"}
+                    className={cn(
+                      "transition-all font-medium rounded-lg px-6",
+                      isFollowing 
+                        ? "border-brand-primary/20 hover:bg-brand-primary/10 hover:text-brand-primary" 
+                        : "bg-brand-primary hover:bg-brand-primary/90 text-white shadow-md shadow-brand-primary/20"
+                    )}
+                    onClick={handleFollowToggle}
+                    disabled={isActionLoading}
+                  >
+                    {isActionLoading ? (
+                      <DataLoading variant="inline" size="sm" className="mr-2" />
+                    ) : isFollowing ? (
+                      <UserMinus className="w-4 h-4 mr-2" />
+                    ) : (
+                      <UserPlus className="w-4 h-4 mr-2" />
+                    )}
+                    {isFollowing ? t("unfollow") : t("follow")}
                   </Button>
-                </Link>
+                ) : null}
               </div>
             </div>
-            <ProfileActivityTabs user={user} />
+            <ProfileActivityTabs user={user} isMe={user.id === currentUser?.id} />
             
             <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
               <DialogContent className="max-w-[90vw] md:max-w-2xl p-0 overflow-hidden border-none bg-transparent shadow-none flex items-center justify-center" showCloseButton={false}>

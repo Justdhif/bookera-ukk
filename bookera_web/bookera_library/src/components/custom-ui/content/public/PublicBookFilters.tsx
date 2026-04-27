@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Heart, Sparkles, Search, BookPlus, Star, BookOpen, DollarSign } from "lucide-react";
+import { Sparkles, BookPlus, Star } from "lucide-react";
 import { Category } from "@/types/category";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -28,9 +26,6 @@ interface PublicBookFiltersProps {
   onRatingSelect: (value: string) => void;
   selectedMinReviews: number | null;
   onReviewSelect: (value: string) => void;
-  favoriteHref: string;
-  borrowHref: string;
-  fineHref: string;
   selectedCount?: number;
   visibleCount?: number;
   onSelectAll?: (checked: boolean) => void;
@@ -49,9 +44,6 @@ export default function PublicBookFilters({
   onRatingSelect,
   selectedMinReviews,
   onReviewSelect,
-  favoriteHref,
-  borrowHref,
-  fineHref,
   selectedCount = 0,
   visibleCount = 0,
   onSelectAll,
@@ -62,59 +54,14 @@ export default function PublicBookFilters({
   const tCommon = useTranslations("common");
   const tPublic = useTranslations("public");
 
-  const pathname = usePathname();
-  const isFavoritePage = pathname === "/favorites";
-  const isMyBorrowsPage = pathname === "/my-borrows";
-  const isMyFinesPage = pathname === "/my-fines";
-
   return (
     <div className="space-y-4">
       <div
         className={cn(
           "flex flex-col md:flex-row md:items-center gap-4 w-full",
-          !isFavoritePage ? "justify-between" : "justify-end",
+          "justify-end",
         )}
       >
-        <div className="flex flex-wrap items-center gap-3">
-          {!isFavoritePage && (
-            <Link href={favoriteHref}>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 h-10 px-5 border-rose-500/20 text-rose-600 hover:bg-rose-500/5 hover:text-rose-600 rounded-full shadow-sm"
-              >
-                <Heart className="h-4 w-4" />
-                {t("myFavorites")}
-              </Button>
-            </Link>
-          )}
-
-          {!isMyBorrowsPage && (
-            <Link href={borrowHref}>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 h-10 px-5 border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/5 hover:text-emerald-600 rounded-full shadow-sm"
-              >
-                <BookOpen className="h-4 w-4" />
-                {t("myBorrows")}
-              </Button>
-            </Link>
-          )}
-
-          {!isMyFinesPage && (
-            <Link href={fineHref}>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 h-10 px-5 border-red-500/20 text-red-600 hover:bg-red-500/5 hover:text-red-600 rounded-full shadow-sm"
-              >
-                <DollarSign className="h-4 w-4" />
-                {t("myFines")}
-              </Button>
-            </Link>
-          )}
-        </div>
 
         {showBorrowActions && (
           <div className="flex items-center justify-between w-full md:w-auto gap-2 sm:gap-4 px-3 sm:px-4 py-2 bg-muted/40 rounded-full border border-border/50 shadow-sm backdrop-blur-sm shrink-0">

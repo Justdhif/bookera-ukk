@@ -101,7 +101,14 @@ class FollowController extends Controller
 
     public function userPublicProfile(string $userSlug): JsonResponse
     {
-        $user = User::with('profile')->where('slug', $userSlug)->firstOrFail();
+        $user = User::with('profile')
+            ->withCount(['followers', 'following', 'discussionPosts', 'complaints'])
+            ->where('slug', $userSlug)
+            ->firstOrFail();
+
+        if (\Illuminate\Support\Facades\Auth::check()) {
+            $user->is_following = $this->followService->isFollowing($user->id);
+        }
 
         return ApiResponse::successResponse('Profil pengguna berhasil diambil', $user);
     }

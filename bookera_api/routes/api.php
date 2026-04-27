@@ -90,6 +90,13 @@ Route::get('privacy-policies/active', [PrivacyPolicyController::class, 'getActiv
 Route::get('privacy-policies', [PrivacyPolicyController::class, 'index']);
 Route::get('privacy-policies/{privacyPolicy}', [PrivacyPolicyController::class, 'show']);
 
+Route::get('users/{userSlug}/followers', [FollowController::class, 'userFollowers']);
+Route::get('users/{userSlug}/following', [FollowController::class, 'userFollowing']);
+Route::get('users/{userSlug}/follow-counts', [FollowController::class, 'userFollowCounts']);
+Route::get('users/{userSlug}/profile', [FollowController::class, 'userPublicProfile']);
+
+Route::get('discussion-posts/user/{userSlug}', [DiscussionPostController::class, 'byUser']);
+
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
@@ -339,7 +346,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [DiscussionPostController::class, 'store']);
         Route::get('/feed/following', [DiscussionPostController::class, 'following']);
         Route::get('/active-users', [DiscussionPostController::class, 'activeUsers']);
-        Route::get('/user/{userSlug}', [DiscussionPostController::class, 'byUser']);
         Route::post('/{slug}/report', [DiscussionPostReportController::class, 'store']);
         Route::get('/{slug}', [DiscussionPostController::class, 'show']);
         Route::put('/{slug}', [DiscussionPostController::class, 'update']);
@@ -366,10 +372,4 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [ComplaintCommentController::class, 'destroy']);
     });
 
-    Route::prefix('users')->group(function () {
-        Route::get('/{userSlug}/followers', [FollowController::class, 'userFollowers']);
-        Route::get('/{userSlug}/following', [FollowController::class, 'userFollowing']);
-        Route::get('/{userSlug}/follow-counts', [FollowController::class, 'userFollowCounts']);
-        Route::get('/{userSlug}/profile', [FollowController::class, 'userPublicProfile']);
-    });
 });

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Search } from "lucide-react";
+import { Search, Heart } from "lucide-react";
 import { Book } from "@/types/book";
 import { Category } from "@/types/category";
 import { publicService } from "@/services/public.service";
@@ -12,9 +12,7 @@ import DataLoading from "@/components/custom-ui/DataLoading";
 import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/store/auth.store";
 import PublicBookFilters from "./PublicBookFilters";
-import { Heart } from "lucide-react";
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 
 interface PublicBookGridProps {
@@ -46,8 +44,6 @@ export default function PublicBookGrid({
 }: PublicBookGridProps) {
   const tPublic = useTranslations("public");
   const tFavorites = useTranslations("public.favorites");
-  const userSlug = useAuthStore((state) => state.user?.slug);
-  const favoriteHref = userSlug ? `/${userSlug}/favorites` : "/login";
   const requestIdRef = useRef(0);
   const [books, setBooks] = useState<Book[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -233,9 +229,6 @@ export default function PublicBookGrid({
           onRatingSelect={handleRatingSelect}
           selectedMinReviews={selectedMinReviews}
           onReviewSelect={handleReviewSelect}
-          favoriteHref={favoriteHref}
-          borrowHref="/my-borrows"
-          fineHref="/my-fines"
           selectedCount={selectedBookIds.length}
           visibleCount={books.length}
           onSelectAll={onSelectAll}
