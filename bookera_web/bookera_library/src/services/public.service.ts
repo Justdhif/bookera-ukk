@@ -59,6 +59,11 @@ export const publicService = {
     api.get<ApiResponse<CategoryListResponse>>("/categories", {
       params: filters,
     }),
+  getTopDiscussions: () =>
+    api.get<ApiResponse<import("@/types/discussion").DiscussionPost[]>>("/discussions/top"),
+
+  getDiscussions: (params?: { page?: number; per_page?: number }) =>
+    api.get<ApiResponse<import("@/types/api").PaginatedResponse<import("@/types/discussion").DiscussionPost>>>("/discussions", { params }),
 };
 
 export default publicService;

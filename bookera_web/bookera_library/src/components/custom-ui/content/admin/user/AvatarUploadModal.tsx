@@ -302,7 +302,7 @@ export default function AvatarUploadModal({
                       <div className="relative h-full w-full rounded-full overflow-hidden border-2 border-white dark:border-gray-900">
                         <Image
                           src={avatarUrl}
-                          alt="Default avatar"
+                          alt={t("defaultAvatarOption")}
                           fill
                           sizes="64px"
                           className="object-cover"

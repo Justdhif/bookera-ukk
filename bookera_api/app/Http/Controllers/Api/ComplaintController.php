@@ -25,6 +25,7 @@ class ComplaintController extends Controller
             'status'   => $request->get('status'),
             'search'   => $request->get('search'),
             'sort'     => $request->get('sort'),
+            'user_id'  => $request->get('user_id'),
         ];
 
         $complaints = $this->complaintService->getAll(

@@ -33,6 +33,7 @@ use App\Http\Controllers\Api\ComplaintCommentController;
 use App\Http\Controllers\Api\ComplaintVoteController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\NotificationSettingsController;
+use App\Http\Controllers\Api\PublicDiscussionController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -63,6 +64,8 @@ Route::get('/test-smtp', function () {
 Route::get('books', [PublicController::class, 'books']);
 Route::get('books/slug/{slug}', [PublicController::class, 'bookBySlug']);
 Route::get('books/{id}', [PublicController::class, 'bookById'])->whereNumber('id');
+Route::get('discussions/top', [PublicDiscussionController::class, 'topDiscussions']);
+Route::get('discussions', [PublicDiscussionController::class, 'index']);
 
 Route::get('books/{id}/reviews', [ReviewController::class, 'index']);
 Route::get('complaints', [ComplaintController::class, 'index']);

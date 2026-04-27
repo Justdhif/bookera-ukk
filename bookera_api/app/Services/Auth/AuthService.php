@@ -341,7 +341,7 @@ class AuthService
      */
     public function getCurrentUser(User $user): User
     {
-        return $user->load('profile');
+        return $user->load('profile')->loadCount(['followers', 'following', 'discussionPosts', 'complaints']);
     }
 
     /**

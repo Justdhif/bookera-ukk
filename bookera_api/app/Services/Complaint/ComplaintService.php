@@ -18,6 +18,10 @@ class ComplaintService
     public function getAll(?User $authUser, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $query = Complaint::with(['user.profile', 'images']);
+        
+        if (!empty($filters['user_id'])) {
+            $query->where('user_id', $filters['user_id']);
+        }
 
         if (!empty($filters['category'])) {
             $query->where('category', $filters['category']);

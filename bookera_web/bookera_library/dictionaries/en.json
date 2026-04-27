@@ -673,7 +673,8 @@
     "bookLabel": "Book",
     "unknownAuthor": "Unknown Author",
     "seeAllResultsFor": "See all results for \"{query}\"",
-    "complaint": "Complaint"
+    "complaint": "Complaint",
+    "discussions": "Discussions"
   },
   "modal": {},
   "forgot-password": {
@@ -827,6 +828,12 @@
     "uploadAvatar": "Upload Avatar",
     "roleLabel": "Role:",
     "statusLabel": "Status:",
+    "view": "View",
+    "posts": "Posts",
+    "complaints": "Complaints",
+    "followers": "Followers",
+    "following": "Following",
+    "avatarPreview": "Avatar Preview",
     "passwordLabel": "Password",
     "changePassword": "Change Password",
     "updateSuccess": "User updated successfully",
@@ -930,7 +937,19 @@
     "passwordMismatchError": "Password confirmation does not match",
     "batal": "Cancel",
     "verifikasi": "Verify",
-    "submit": "Send OTP"
+    "submit": "Send OTP",
+    "myDiscussions": "My Discussions",
+    "myComplaints": "My Complaints",
+    "noDiscussions": "No discussions yet",
+    "noComplaints": "No complaints yet",
+    "noDiscussionsDesc": "Start your first discussion!",
+    "noComplaintsDesc": "Voice your aspirations for a better Bookera.",
+    "occupationStudent": "Student",
+    "occupationTeacher": "Teacher",
+    "occupationStaff": "School Staff",
+    "occupationExternal": "External",
+    "occupationOther": "Other",
+    "removed": "Removed"
   },
   "public": {
     "fineStatus": {
@@ -1022,7 +1041,8 @@
       "selectAll": "Select All",
       "returnDateRequired": "Return date is required",
       "borrowRequestSubmitted": "Borrow request submitted successfully!",
-      "failedToBorrow": "Failed to borrow book"
+      "failedToBorrow": "Failed to borrow book",
+      "loadMore": "Load More"
     },
     "search": {
       "title": "Search Results",
@@ -1293,7 +1313,10 @@
     "lossReportError": "Failed to update lost status",
     "borrowInfoTitle": "Borrow Information",
     "selectedCount": "{count} / {total} selected",
-    "reportCount": "Report {count, plural, one {# Book} other {# Books}}"
+    "reportCount": "Report {count, plural, one {# Book} other {# Books}}",
+    "discussions": "What Do They Say?",
+    "communityVoices": "Community Voices",
+    "communityVoicesDesc": "Explore what's happening in our reading community"
   },
   "settings": {
     "title": "Settings",

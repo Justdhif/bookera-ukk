@@ -673,7 +673,8 @@
     "bookLabel": "Buku",
     "unknownAuthor": "Penulis Tidak Diketahui",
     "seeAllResultsFor": "Lihat semua hasil untuk \"{query}\"",
-    "complaint": "Pengaduan"
+    "complaint": "Pengaduan",
+    "discussions": "Diskusi"
   },
   "modal": {},
   "forgot-password": {
@@ -827,6 +828,12 @@
     "uploadAvatar": "Unggah Avatar",
     "roleLabel": "Peran:",
     "statusLabel": "Status:",
+    "view": "Lihat",
+    "posts": "Postingan",
+    "complaints": "Komplain",
+    "followers": "Pengikut",
+    "following": "Mengikuti",
+    "avatarPreview": "Pratinjau Avatar",
     "passwordLabel": "Kata Sandi",
     "changePassword": "Ganti Kata Sandi",
     "updateSuccess": "Pengguna berhasil diperbarui",
@@ -930,7 +937,19 @@
     "passwordMismatchError": "Konfirmasi password tidak cocok",
     "batal": "Batal",
     "verifikasi": "Verifikasi",
-    "submit": "Kirim OTP"
+    "submit": "Kirim OTP",
+    "myDiscussions": "Diskusi Saya",
+    "myComplaints": "Pengaduan Saya",
+    "noDiscussions": "Belum ada diskusi",
+    "noComplaints": "Belum ada pengaduan",
+    "noDiscussionsDesc": "Ayo mulai diskusi pertama Anda!",
+    "noComplaintsDesc": "Suarakan aspirasi Anda untuk Bookera yang lebih baik.",
+    "occupationStudent": "Siswa",
+    "occupationTeacher": "Guru",
+    "occupationStaff": "Staf Sekolah",
+    "occupationExternal": "Luar Sekolah",
+    "occupationOther": "Lainnya",
+    "removed": "Dihapus"
   },
   "public": {
     "fineStatus": {
@@ -1022,7 +1041,8 @@
       "selectAll": "Pilih Semua",
       "returnDateRequired": "Tanggal pengembalian wajib diisi",
       "borrowRequestSubmitted": "Permintaan peminjaman berhasil diajukan!",
-      "failedToBorrow": "Gagal melakukan peminjaman"
+      "failedToBorrow": "Gagal melakukan peminjaman",
+      "loadMore": "Muat Lebih Banyak"
     },
     "search": {
       "title": "Hasil Pencarian",
@@ -1293,7 +1313,10 @@
     "lossReportError": "Gagal memperbarui status hilang",
     "borrowInfoTitle": "Informasi Peminjaman",
     "selectedCount": "{count} / {total} dipilih",
-    "reportCount": "Laporkan {count} Buku"
+    "reportCount": "Laporkan {count, plural, one {# Buku} other {# Buku}}",
+    "discussions": "Apa Kata Mereka?",
+    "communityVoices": "Suara Komunitas",
+    "communityVoicesDesc": "Jelajahi apa yang sedang terjadi di komunitas membaca kita"
   },
   "settings": {
     "title": "Pengaturan",

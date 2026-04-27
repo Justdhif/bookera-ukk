@@ -35,6 +35,10 @@ export interface User {
   updated_at: string;
   is_following?: boolean;
   has_pending_borrow_request?: boolean;
+  followers_count?: number;
+  following_count?: number;
+  discussion_posts_count?: number;
+  complaints_count?: number;
 
   profile: UserProfile | null;
 }

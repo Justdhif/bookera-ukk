@@ -27,7 +27,9 @@ class DiscussionPostService
 
     public function getByUser(string $userSlug, ?User $authUser, int $perPage = 15): LengthAwarePaginator
     {
-        $targetUser = User::where('slug', $userSlug)->firstOrFail();
+        $targetUser = User::where('slug', $userSlug)
+            ->orWhere('id', $userSlug)
+            ->firstOrFail();
 
         $posts = DiscussionPost::with(['user.profile', 'images'])
             ->where('user_id', $targetUser->id)
