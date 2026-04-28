@@ -11,34 +11,29 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 import { complaintService } from "@/services/complaint.service";
-import { Complaint, ComplaintComment } from "@/types/complaint";
+import { Complaint } from "@/types/complaint";
 import { useAuthStore } from "@/store/auth.store";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
 import PublicComplaintGrid from "../PublicComplaintGrid";
+import CommentSection from "@/components/custom-ui/CommentSection";
+import ImageCarousel from "@/components/custom-ui/ImageCarousel";
 
 import {
   MessageCircle,
-  Send,
   ChevronDown,
   ChevronUp,
   ChevronLeft,
   ChevronRight,
   Reply,
-  Trash2,
   AlertTriangle,
-  LogIn,
-  X,
   ThumbsUp,
-  Calendar,
   Clock,
   Info,
   AlertCircle,
@@ -46,8 +41,6 @@ import {
   XCircle,
   Tag,
   Flag,
-  ShieldCheck,
-  ShieldAlert,
 } from "lucide-react";
 
 import {
@@ -57,306 +50,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-/* ------------------------------------------------------------------ */
-/*  Image Carousel with Lightbox                                         */
-/* ------------------------------------------------------------------ */
-function ImageCarousel({
-  images,
-}: {
-  images: { id: number; image_path: string }[];
-}) {
-  const [current, setCurrent] = useState(0);
-  const [lightbox, setLightbox] = useState(false);
-  const total = images.length;
-
-  if (total === 0) return null;
-  if (total === 1) {
-    return (
-      <>
-        <div
-          className="relative w-full overflow-hidden rounded-2xl border border-muted/30 cursor-zoom-in shadow-md"
-          style={{ aspectRatio: "16/9" }}
-          onClick={() => setLightbox(true)}
-        >
-          <img
-            src={images[0].image_path}
-            alt="complaint image"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        {lightbox && (
-          <LightboxModal
-            images={images}
-            index={0}
-            onClose={() => setLightbox(false)}
-          />
-        )}
-      </>
-    );
-  }
-
-  const prev = () => setCurrent((c) => (c - 1 + total) % total);
-  const next = () => setCurrent((c) => (c + 1) % total);
-
-  return (
-    <>
-      <div
-        className="relative w-full overflow-hidden rounded-2xl border border-muted/30 group shadow-md"
-        style={{ aspectRatio: "16/9" }}
-      >
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={current}
-            src={images[current].image_path}
-            alt={`complaint image ${current + 1}`}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="w-full h-full object-cover cursor-zoom-in"
-            onClick={() => setLightbox(true)}
-          />
-        </AnimatePresence>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            prev();
-          }}
-          className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100 backdrop-blur-md"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            next();
-          }}
-          className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100 backdrop-blur-md"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </button>
-
-        <div className="absolute bottom-3 right-3 bg-black/40 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full backdrop-blur-md tracking-widest">
-          {current + 1} / {total}
-        </div>
-      </div>
-
-      {lightbox && (
-        <LightboxModal
-          images={images}
-          index={current}
-          onClose={() => setLightbox(false)}
-        />
-      )}
-    </>
-  );
-}
-
-function LightboxModal({
-  images,
-  index,
-  onClose,
-}: {
-  images: { id: number; image_path: string }[];
-  index: number;
-  onClose: () => void;
-}) {
-  const [current, setCurrent] = useState(index);
-  const total = images.length;
-  const prev = () => setCurrent((c) => (c - 1 + total) % total);
-  const next = () => setCurrent((c) => (c + 1) % total);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowLeft") prev();
-      if (e.key === "ArrowRight") next();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [current]);
-
-  return (
-    <div
-      className="fixed inset-0 z-100 flex items-center justify-center bg-black/95 backdrop-blur-md"
-      onClick={onClose}
-    >
-      <div
-        className="relative max-w-5xl w-full mx-4 flex flex-col items-center"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={current}
-            src={images[current].image_path}
-            alt={`Image ${current + 1}`}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.25 }}
-            className="max-h-[85vh] max-w-full object-contain rounded-xl shadow-2xl"
-          />
-        </AnimatePresence>
-
-        {total > 1 && (
-          <>
-            <button
-              onClick={prev}
-              className="absolute -left-4 sm:left-4 top-1/2 -translate-y-1/2 h-12 w-12 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-all border border-white/10 backdrop-blur-md"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-            <button
-              onClick={next}
-              className="absolute -right-4 sm:right-4 top-1/2 -translate-y-1/2 h-12 w-12 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-all border border-white/10 backdrop-blur-md"
-            >
-              <ChevronRight className="h-6 w-6" />
-            </button>
-          </>
-        )}
-
-        <div className="absolute top-0 right-0 p-4 flex items-center gap-4">
-          <span className="text-white/60 text-xs font-bold tracking-widest">
-            {current + 1} / {total}
-          </span>
-          <button
-            onClick={onClose}
-            className="text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all border border-white/10 backdrop-blur-md"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CommentItem({
-  comment,
-  currentUserId,
-  onReply,
-  depth = 0,
-}: {
-  comment: ComplaintComment;
-  currentUserId?: number;
-  onReply: (commentId: number, name: string) => void;
-  depth?: number;
-}) {
-  const t = useTranslations("complaint");
-  const currentLocale = useLocale();
-  const dateLocale = currentLocale === "id" ? idLocale : enUS;
-
-  const [showReplies, setShowReplies] = useState(depth < 1);
-
-  const avatarUrl = comment.user?.profile?.avatar || "";
-  const displayName =
-    comment.user?.profile?.full_name ||
-    comment.user?.email?.split("@")[0] ||
-    "User";
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      className={cn(
-        "relative",
-        depth > 0 && "ml-10 mt-3 pt-3 border-t border-muted/30",
-      )}
-    >
-      {depth > 0 && (
-        <div className="absolute -left-6 top-0 bottom-0 w-0.5 bg-linear-to-b from-brand-primary/30 to-transparent" />
-      )}
-      <div className="flex gap-3">
-        <Avatar className="h-8 w-8 shrink-0 border-2 border-background shadow-sm mt-0.5">
-          <AvatarImage
-            src={avatarUrl}
-            alt={displayName}
-            className="object-cover"
-          />
-          <AvatarFallback className="bg-brand-primary/10 text-brand-primary text-[10px] font-bold">
-            {displayName.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-
-        <div className="flex-1 min-w-0 space-y-1.5">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="text-sm font-bold truncate">{displayName}</span>
-            {(comment.user?.role === "admin" ||
-              comment.user?.role?.startsWith("officer")) && (
-              <Badge className="h-4 px-1 rounded-sm flex items-center gap-0.5 text-[8px] font-bold uppercase tracking-tight bg-brand-primary text-brand-primary-foreground shrink-0 border-0">
-                <ShieldCheck className="h-2.5 w-2.5" />
-                Official
-              </Badge>
-            )}
-          </div>
-          <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-            {formatDistanceToNow(new Date(comment.created_at), {
-              addSuffix: true,
-              locale: dateLocale,
-            })}
-          </span>
-          <div className="text-sm text-foreground/80 leading-relaxed bg-muted/30 rounded-2xl rounded-tl-none p-3 border border-muted/20">
-            {comment.content}
-          </div>
-
-          <div className="flex items-center gap-4 px-1">
-            {currentUserId && depth === 0 && (
-              <button
-                onClick={() => onReply(comment.id, displayName)}
-                className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground hover:text-brand-primary transition-colors flex items-center gap-1"
-              >
-                <Reply className="h-3 w-3" />
-                {t("replyBtn", { fallback: "Balas" })}
-              </button>
-            )}
-            {comment.replies && comment.replies.length > 0 && (
-              <button
-                onClick={() => setShowReplies(!showReplies)}
-                className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground hover:text-brand-primary transition-colors flex items-center gap-1"
-              >
-                {showReplies ? (
-                  <ChevronUp className="h-3 w-3" />
-                ) : (
-                  <ChevronDown className="h-3 w-3" />
-                )}
-                {showReplies
-                  ? "Sembunyikan"
-                  : `${comment.replies.length} Balasan`}
-              </button>
-            )}
-          </div>
-
-          <AnimatePresence>
-            {showReplies && comment.replies && comment.replies.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
-              >
-                {comment.replies.map((reply) => (
-                  <CommentItem
-                    key={reply.id}
-                    comment={reply}
-                    currentUserId={currentUserId}
-                    onReply={onReply}
-                    depth={depth + 1}
-                  />
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Main Component                                                       */
-/* ------------------------------------------------------------------ */
 export default function ComplaintDetailClient() {
   const t = useTranslations("complaint");
   const params = useParams();
@@ -374,16 +67,6 @@ export default function ComplaintDetailClient() {
   const [votesCount, setVotesCount] = useState(0);
   const [votePending, setVotePending] = useState(false);
 
-  const [comments, setComments] = useState<ComplaintComment[]>([]);
-  const [commentsLoading, setCommentsLoading] = useState(true);
-  const [commentText, setCommentText] = useState("");
-  const [replyTo, setReplyTo] = useState<{ id: number; name: string } | null>(
-    null,
-  );
-  const [submitting, setSubmitting] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [moderationAlert, setModerationAlert] = useState<string | null>(null);
-
   useEffect(() => {
     if (!slug) return;
     setLoading(true);
@@ -399,10 +82,6 @@ export default function ComplaintDetailClient() {
       .finally(() => setLoading(false));
   }, [slug]);
 
-  useEffect(() => {
-    fetchComments();
-  }, [slug]);
-
   const fetchComplaint = async () => {
     if (!slug) return;
     try {
@@ -414,14 +93,6 @@ export default function ComplaintDetailClient() {
     } catch {
       toast.error(t("errorFetchingDetail"));
     }
-  };
-
-  const fetchComments = async () => {
-    if (!slug) return;
-    try {
-      const res = await complaintService.getComments(slug);
-      setComments(res.data.data.data);
-    } catch {}
   };
 
   const handleUpdateStatus = async (newStatus: string) => {
@@ -448,7 +119,6 @@ export default function ComplaintDetailClient() {
     try {
       const res = await complaintService.toggleVote(slug);
       setVoted(res.data.data.is_voted);
-      // Backend returns helpful_count or votes_count
       setVotesCount(
         res.data.data.helpful_count ?? (res.data.data as any).votes_count,
       );
@@ -459,51 +129,6 @@ export default function ComplaintDetailClient() {
       toast.error(t("voteError"));
     } finally {
       setVotePending(false);
-    }
-  };
-
-  const handleSubmitComment = async () => {
-    if (!commentText.trim()) return;
-    if (!user) {
-      toast.error("Silakan masuk untuk menanggapi");
-      return;
-    }
-    setSubmitting(true);
-    try {
-      const res = await complaintService.createComment(slug, {
-        content: commentText.trim(),
-        parent_id: replyTo?.id,
-      });
-      const newComment = res.data.data;
-
-      if (replyTo) {
-        setComments((prev) =>
-          prev.map((c) =>
-            c.id === replyTo.id
-              ? { ...c, replies: [...(c.replies || []), newComment] }
-              : c,
-          ),
-        );
-      } else {
-        setComments((prev) => [newComment, ...prev]);
-      }
-
-      setCommentText("");
-      setReplyTo(null);
-      setModerationAlert(null);
-      setComplaint((prev) =>
-        prev ? { ...prev, comments_count: prev.comments_count + 1 } : null,
-      );
-      toast.success(t("commentSuccess"));
-    } catch (error: any) {
-      if (error.response?.status === 422) {
-        setModerationAlert(error.response.data.message);
-        toast.error(t("moderationAlertTitle", { defaultValue: "Konten Tidak Pantas" }));
-      } else {
-        toast.error(t("commentError"));
-      }
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -559,7 +184,6 @@ export default function ComplaintDetailClient() {
         <div className="space-y-8 lg:sticky lg:top-4">
           <Card className="overflow-hidden border-2 border-muted/50 bg-card/40 backdrop-blur-md shadow-xl rounded-3xl">
             <CardHeader className="p-8 pb-4 space-y-6">
-              {/* Reporter Info & Stats Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-muted/30">
                 <div className="flex items-center gap-3">
                   <Link href={`/${complaint.user.slug}/profile`}>
@@ -727,9 +351,7 @@ export default function ComplaintDetailClient() {
           </Card>
         </div>
 
-        {/* Right Column: Sidebar */}
         <div className="space-y-6 lg:sticky lg:top-24">
-          {/* Vote/Helpful Card */}
           <Card className="border-2 border-muted/50 bg-brand-primary/5 backdrop-blur-md rounded-3xl overflow-hidden">
             <CardContent className="p-8 space-y-6">
               <div className="space-y-2">
@@ -778,162 +400,23 @@ export default function ComplaintDetailClient() {
             </CardContent>
           </Card>
 
-          {/* Comments Section */}
           <div className="space-y-6 pt-4">
-            {/* Moderation Alert Banner */}
-            <AnimatePresence>
-              {moderationAlert && (
-                <motion.div 
-                  initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                  animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
-                  exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="p-4 bg-red-500/10 border border-red-200/50 dark:border-red-800/30 rounded-2xl">
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
-                        <ShieldAlert className="h-4 w-4 text-red-600 dark:text-red-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-red-700 dark:text-red-400">
-                          {t("moderationAlertTitle", { defaultValue: "Pesan Tidak Dapat Dikirim" })}
-                        </p>
-                        <p className="text-xs text-red-600/80 dark:text-red-400/70 mt-0.5 leading-relaxed">
-                          {moderationAlert}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setModerationAlert(null)}
-                        className="h-6 w-6 shrink-0 text-red-500/60 hover:text-red-600 transition-colors"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-extrabold tracking-tight flex items-center gap-3">
-                <MessageCircle className="h-5 w-5 text-brand-primary" />
-                {t("responsesTitle")}
-                <span className="text-xs font-normal text-muted-foreground ml-1">
-                  ({complaint.comments_count})
-                </span>
-              </h2>
-            </div>
-
-            <Card className="border-2 border-muted/50 bg-card/40 backdrop-blur-md rounded-3xl overflow-hidden">
-              <CardContent className="p-6 space-y-6">
-                {/* New Comment Input */}
-                <div className="space-y-4">
-                  {replyTo && (
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-brand-primary/5 border border-brand-primary/20 text-xs">
-                      <Reply className="h-3.5 w-3.5 text-brand-primary" />
-                      <span className="text-muted-foreground font-medium">
-                        Membalas{" "}
-                        <span className="font-bold text-brand-primary">
-                          {replyTo.name}
-                        </span>
-                      </span>
-                      <button
-                        onClick={() => setReplyTo(null)}
-                        className="ml-auto text-muted-foreground hover:text-foreground"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  )}
-
-                  {user ? (
-                    <div className="flex gap-4">
-                      <Avatar className="h-9 w-9 shrink-0 border-2 border-background shadow-sm">
-                        <AvatarImage
-                          src={user.profile?.avatar}
-                          className="object-cover"
-                        />
-                        <AvatarFallback className="bg-brand-primary/10 text-brand-primary font-bold">
-                          {user.email[0].toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 space-y-3">
-                        <Textarea
-                          ref={textareaRef}
-                          value={commentText}
-                          onChange={(e) => setCommentText(e.target.value)}
-                          placeholder={t("writeResponsePlaceholder")}
-                          className="min-h-[80px] text-sm resize-none border-2 focus-visible:ring-brand-primary/20 rounded-2xl p-4 bg-background/50"
-                        />
-                        <div className="flex justify-end">
-                          <Button
-                            onClick={handleSubmitComment}
-                            disabled={submitting || !commentText.trim()}
-                            className="rounded-2xl px-5 font-bold uppercase tracking-widest text-[10px] h-9"
-                            variant="brand"
-                          >
-                            {submitting ? t("sending") : t("sendResponse")}
-                            <Send className="ml-2 h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="p-6 rounded-2xl border-2 border-dashed border-muted flex flex-col items-center justify-center text-center gap-2">
-                      <LogIn className="h-6 w-6 text-muted-foreground/40" />
-                      <div>
-                        <p className="text-xs font-bold text-muted-foreground">
-                          {t("loginToReview", {
-                            fallback: "Masuk untuk Menanggapi",
-                          })}
-                        </p>
-                      </div>
-                      <Link href="/login">
-                        <Button
-                          variant="outline"
-                          className="mt-1 h-8 rounded-xl text-[10px] font-bold uppercase tracking-widest px-4"
-                        >
-                          Login
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
-                </div>
-
-                {/* Comments List */}
-                <div className="space-y-6 pt-6 border-t border-muted/30">
-                  {commentsLoading ? (
-                    <DataLoading size="sm" />
-                  ) : comments.length === 0 ? (
-                    <EmptyState
-                      icon={<MessageCircle className="h-6 w-6" />}
-                      title={t("noResponsesYet")}
-                      description={t("responsesDesc")}
-                      variant="compact"
-                    />
-                  ) : (
-                    <div className="space-y-6">
-                      {comments.map((comment) => (
-                        <CommentItem
-                          key={comment.id}
-                          comment={comment}
-                          currentUserId={user?.id}
-                          onReply={(id, name) => {
-                            setReplyTo({ id, name });
-                            textareaRef.current?.focus();
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            <CommentSection
+              entitySlug={slug}
+              commentCount={complaint.comments_count}
+              onCommentCountChange={(count) =>
+                setComplaint((prev) =>
+                  prev ? { ...prev, comments_count: count } : prev,
+                )
+              }
+              namespace="complaint"
+              getComments={complaintService.getComments}
+              createComment={complaintService.createComment}
+            />
           </div>
         </div>
       </div>
 
-      {/* Explore More section */}
       <div className="pt-12 mt-8 border-t border-muted/30">
         <div className="mb-10">
           <h2 className="text-3xl font-black tracking-tight">
