@@ -76,6 +76,24 @@ export default function ProfileRightCard({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label
+                htmlFor="p-username"
+                variant={isEditMode ? "required" : "default"}
+              >
+                {t("usernameLabel", { fallback: "Username" })}
+              </Label>
+              <Input
+                id="p-username"
+                name="username"
+                required={isEditMode}
+                value={formData.username || ""}
+                onChange={handleInputChange}
+                placeholder={t("usernamePlaceholder", { fallback: "Enter username" })}
+                disabled={!isEditMode}
+                validationType={isEditMode ? "alphanumeric" : undefined}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label
                 htmlFor="p-full-name"
                 variant={isEditMode ? "required" : "default"}
               >
@@ -125,6 +143,7 @@ export default function ProfileRightCard({
                   <SelectItem value="prefer_not_to_say">
                     {t("preferNotToSay")}
                   </SelectItem>
+                  <SelectItem value="croissant">{t("croissant", { fallback: "Croissant" })}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

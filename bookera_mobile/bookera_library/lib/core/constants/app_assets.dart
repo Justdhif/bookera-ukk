@@ -1,1 +1,0 @@
-const String bookeraLogoAssetPath = '../../assets/logo/bookera-logo.png';

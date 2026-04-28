@@ -36,6 +36,7 @@ export default function ProfileEditClient() {
         email: userData.email,
         role: userData.role,
         is_active: userData.is_active,
+        username: userData.profile?.username || "",
         full_name: userData.profile?.full_name || "",
         gender: userData.profile?.gender || undefined,
         birth_date: userData.profile?.birth_date || undefined,
@@ -66,6 +67,10 @@ export default function ProfileEditClient() {
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!user) return;
+    if (!formData.username?.trim()) {
+      toast.error(t("usernameRequired", { fallback: "Username is required" }));
+      return;
+    }
     if (!formData.full_name?.trim()) {
       toast.error(t("fullNameRequired"));
       return;

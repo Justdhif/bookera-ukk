@@ -18,7 +18,8 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->string('full_name');
-            $table->enum('gender', ['male', 'female', 'prefer_not_to_say'])->nullable();
+            $table->string('username')->nullable()->unique();
+            $table->enum('gender', ['male', 'female', 'prefer_not_to_say', 'croissant'])->nullable();
             $table->date('birth_date')->nullable();
 
             $table->string('avatar')->nullable();

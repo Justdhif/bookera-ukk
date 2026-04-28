@@ -47,6 +47,7 @@ export default function SetupProfileClient() {
   const [step, setStep] = useState<SetupStep>("personal");
   const [submitting, setSubmitting] = useState(false);
 
+  const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [gender, setGender] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -79,6 +80,7 @@ export default function SetupProfileClient() {
     setSubmitting(true);
     try {
       const submitData = new FormData();
+      submitData.append("username", username);
       submitData.append("full_name", fullName);
       if (gender) submitData.append("gender", gender);
       if (birthDate) submitData.append("birth_date", birthDate);
@@ -139,6 +141,8 @@ export default function SetupProfileClient() {
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-1.5 bg-linear-to-r from-brand-primary to-brand-primary-light rounded-full" />
                 <SetupStepPersonal
                   user={user}
+                  username={username}
+                  setUsername={setUsername}
                   fullName={fullName}
                   setFullName={setFullName}
                   gender={gender}

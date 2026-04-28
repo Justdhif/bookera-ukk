@@ -56,8 +56,9 @@ class UserFactory extends Factory
     {
         return $this->afterCreating(function (User $user) {
             $user->profile()->create([
+                'username' => fake()->unique()->userName(),
                 'full_name' => fake()->name(),
-                'gender' => fake()->randomElement(['male', 'female', 'prefer_not_to_say']),
+                'gender' => fake()->randomElement(['male', 'female', 'prefer_not_to_say', 'croissant']),
                 'phone_number' => fake()->unique()->numerify('628#########'),
                 'address' => fake()->address(),
                 'bio' => fake()->optional(0.7)->sentence(),

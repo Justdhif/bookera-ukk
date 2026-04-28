@@ -15,6 +15,7 @@ class UserProfile extends Model
 
     protected $fillable = [
         'user_id',
+        'username',
         'full_name',
         'gender',
         'birth_date',

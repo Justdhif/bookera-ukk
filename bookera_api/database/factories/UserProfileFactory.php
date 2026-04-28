@@ -14,8 +14,9 @@ class UserProfileFactory extends Factory
     {
         return [
             'user_id' => null,
+            'username' => fake()->unique()->userName(),
             'full_name' => fake()->name(),
-            'gender' => fake()->randomElement(['male', 'female', 'prefer_not_to_say']),
+            'gender' => fake()->randomElement(['male', 'female', 'prefer_not_to_say', 'croissant']),
             'birth_date' => fake()->date(),
             'avatar' => fake()->word(),
             'phone_number' => fake()->unique()->numerify('628#########'),

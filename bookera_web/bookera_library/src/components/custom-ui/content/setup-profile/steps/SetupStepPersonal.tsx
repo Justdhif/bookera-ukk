@@ -38,6 +38,7 @@ const iconPopTransition = {
 };
 
 interface FormErrors {
+  username: boolean;
   full_name: boolean;
   phone_number: boolean;
   identification_number: boolean;
@@ -45,6 +46,8 @@ interface FormErrors {
 
 interface SetupStepPersonalProps {
   user: User | null;
+  username: string;
+  setUsername: (v: string) => void;
   fullName: string;
   setFullName: (v: string) => void;
   gender: string;
@@ -61,6 +64,8 @@ interface SetupStepPersonalProps {
 
 export default function SetupStepPersonal({
   user,
+  username,
+  setUsername,
   fullName,
   setFullName,
   gender,
@@ -76,13 +81,16 @@ export default function SetupStepPersonal({
 }: SetupStepPersonalProps) {
   const t = useTranslations("setup-profile");
   const [errors, setErrors] = useState<FormErrors>({
+    username: false,
     full_name: false,
     phone_number: false,
     identification_number: false,
   });
 
   const isValid =
+    username.trim() !== "" &&
     fullName.trim() !== "" &&
+    !errors.username &&
     !errors.full_name &&
     !errors.phone_number &&
     !errors.identification_number;
@@ -129,6 +137,25 @@ export default function SetupStepPersonal({
 
       <CardContent className="space-y-4 pb-8">
         <div className="space-y-2">
+          <Label htmlFor="username" variant="required">
+            <UserIcon className="w-4 h-4 inline" /> {t("username", { fallback: "Username" })}
+          </Label>
+          <Input
+            id="username"
+            name="username"
+            placeholder={t("enterUsername", { fallback: "Enter username" })}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            validationType="alphanumeric"
+            onValidationChange={(isValid) =>
+              setErrors((prev) => ({ ...prev, username: !isValid }))
+            }
+            disabled={loading}
+          />
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="full-name" variant="required">
             <UserIcon className="w-4 h-4" /> {t("fullName")}
           </Label>
@@ -162,6 +189,7 @@ export default function SetupStepPersonal({
                 <SelectItem value="prefer_not_to_say">
                   {t("preferNotToSay")}
                 </SelectItem>
+                <SelectItem value="croissant">{t("croissant", { fallback: "Croissant" })}</SelectItem>
               </SelectContent>
             </Select>
           </div>

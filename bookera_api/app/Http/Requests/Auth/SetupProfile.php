@@ -16,8 +16,9 @@ class SetupProfile extends FormRequest
     public function rules(): array
     {
         $rules = [
+            'username' => ['required', 'string', 'max:255', Rule::unique('user_profiles', 'username')->ignore(auth()->user()->profile->id ?? null)],
             'full_name' => 'required|string|max:255',
-            'gender' => 'nullable|in:male,female,prefer_not_to_say',
+            'gender' => 'nullable|in:male,female,prefer_not_to_say,croissant',
             'birth_date' => 'nullable|date',
             'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
@@ -39,9 +40,12 @@ class SetupProfile extends FormRequest
     public function messages(): array
     {
         return [
+            'username.required' => 'Username harus diisi',
+            'username.max' => 'Username maksimal 255 karakter',
+            'username.unique' => 'Username sudah digunakan',
             'full_name.required' => 'Nama lengkap harus diisi',
             'full_name.max' => 'Nama lengkap maksimal 255 karakter',
-            'gender.in' => 'Gender harus salah satu dari: male, female, prefer_not_to_say',
+            'gender.in' => 'Gender harus salah satu dari: male, female, prefer_not_to_say, croissant',
             'birth_date.date' => 'Format tanggal lahir tidak valid',
             'phone_number.max' => 'Nomor telepon maksimal 20 karakter',
             'address.max' => 'Alamat maksimal 500 karakter',

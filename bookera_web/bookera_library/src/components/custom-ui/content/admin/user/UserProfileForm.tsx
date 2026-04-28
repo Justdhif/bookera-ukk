@@ -94,7 +94,25 @@ export default function UserProfileForm({
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">{t("profileSection")}</h3>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2 sm:col-span-2">
+            <div className="space-y-2">
+              <Label
+                htmlFor="username"
+                variant={isEditMode ? "required" : "default"}
+              >
+                {t("username", { fallback: "Username" })}
+              </Label>
+              <Input
+                id="username"
+                name="username"
+                required={isEditMode}
+                value={formData.username || ""}
+                onChange={handleInputChange}
+                placeholder={t("enterUsername", { fallback: "Enter username" })}
+                disabled={!isEditMode}
+                validationType={isEditMode ? "alphanumeric" : undefined}
+              />
+            </div>
+            <div className="space-y-2">
               <Label
                 htmlFor="full_name"
                 variant={isEditMode ? "required" : "default"}
@@ -161,6 +179,7 @@ export default function UserProfileForm({
                   <SelectItem value="prefer_not_to_say">
                     {t("preferNotToSay")}
                   </SelectItem>
+                  <SelectItem value="croissant">{t("croissant", { fallback: "Croissant" })}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

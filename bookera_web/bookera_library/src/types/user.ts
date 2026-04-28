@@ -7,7 +7,8 @@ export interface UserProfile {
   id: number;
   user_id: number;
   full_name: string;
-  gender: "male" | "female" | "prefer_not_to_say" | null;
+  username: string | null;
+  gender: "male" | "female" | "prefer_not_to_say" | "croissant" | null;
   birth_date: string | null;
   avatar: string;
   phone_number: string | null;
@@ -59,7 +60,8 @@ export interface CreateUserData {
   role: UserRole;
   is_active?: boolean;
   full_name: string;
-  gender?: "male" | "female" | "prefer_not_to_say";
+  username?: string;
+  gender?: "male" | "female" | "prefer_not_to_say" | "croissant";
   birth_date?: string;
   phone_number?: string;
   address?: string;

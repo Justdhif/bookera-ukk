@@ -19,12 +19,13 @@ export default function AddUserClient() {
   const [formData, setFormData] = useState<CreateUserData>({
     email: "",
     password: "",
+    username: "",
     full_name: "",
     identification_number: "",
     phone_number: "",
     gender: undefined,
     birth_date: "",
-    occupation: "",
+    occupation: undefined,
     institution: "",
     address: "",
     bio: "",
@@ -38,6 +39,7 @@ export default function AddUserClient() {
     return (
       !!formData.email.trim() &&
       isPasswordValid(formData.password) &&
+      !!formData.username?.trim() &&
       !!formData.full_name.trim() &&
       isFullNameValid
     );

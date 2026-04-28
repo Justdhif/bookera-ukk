@@ -12,6 +12,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('borrow_request_id')->constrained('borrow_requests')->cascadeOnDelete();
             $table->foreignId('book_id')->constrained('books')->cascadeOnDelete();
+            $table->enum('approval_status', ['processing', 'approved', 'rejected'])->default('processing');
+            $table->text('reject_reason')->nullable();
+            $table->foreignId('book_copy_id')->nullable()->constrained('book_copies')->nullOnDelete();
             $table->timestamps();
         });
     }
