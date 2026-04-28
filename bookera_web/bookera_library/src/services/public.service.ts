@@ -62,8 +62,11 @@ export const publicService = {
   getTopDiscussions: () =>
     api.get<ApiResponse<import("@/types/discussion").DiscussionPost[]>>("/discussions/top"),
 
-  getDiscussions: (params?: { page?: number; per_page?: number }) =>
+  getDiscussions: (params?: { page?: number; per_page?: number; search?: string }) =>
     api.get<ApiResponse<import("@/types/api").PaginatedResponse<import("@/types/discussion").DiscussionPost>>>("/discussions", { params }),
+
+  getUsers: (params?: import("@/types/user").UserFilterParams) =>
+    api.get<ApiResponse<import("@/types/user").UserListResponse>>("/users", { params }),
 };
 
 export default publicService;

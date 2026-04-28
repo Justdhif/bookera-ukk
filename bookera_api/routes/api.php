@@ -33,7 +33,6 @@ use App\Http\Controllers\Api\ComplaintCommentController;
 use App\Http\Controllers\Api\ComplaintVoteController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\NotificationSettingsController;
-use App\Http\Controllers\Api\PublicDiscussionController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -64,8 +63,9 @@ Route::get('/test-smtp', function () {
 Route::get('books', [PublicController::class, 'books']);
 Route::get('books/slug/{slug}', [PublicController::class, 'bookBySlug']);
 Route::get('books/{id}', [PublicController::class, 'bookById'])->whereNumber('id');
-Route::get('discussions/top', [PublicDiscussionController::class, 'topDiscussions']);
-Route::get('discussions', [PublicDiscussionController::class, 'index']);
+Route::get('discussions/top', [PublicController::class, 'topDiscussions']);
+Route::get('discussions', [PublicController::class, 'discussions']);
+Route::get('users', [PublicController::class, 'users']);
 
 Route::get('books/{id}/reviews', [ReviewController::class, 'index']);
 Route::get('complaints', [ComplaintController::class, 'index']);
@@ -96,6 +96,8 @@ Route::get('users/{userSlug}/follow-counts', [FollowController::class, 'userFoll
 Route::get('users/{userSlug}/profile', [FollowController::class, 'userPublicProfile']);
 
 Route::get('discussion-posts/user/{userSlug}', [DiscussionPostController::class, 'byUser']);
+Route::get('discussion-posts/{slug}', [DiscussionPostController::class, 'show']);
+Route::get('discussion-posts/{slug}/comments', [DiscussionCommentController::class, 'index']);
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -347,11 +349,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/feed/following', [DiscussionPostController::class, 'following']);
         Route::get('/active-users', [DiscussionPostController::class, 'activeUsers']);
         Route::post('/{slug}/report', [DiscussionPostReportController::class, 'store']);
-        Route::get('/{slug}', [DiscussionPostController::class, 'show']);
         Route::put('/{slug}', [DiscussionPostController::class, 'update']);
         Route::delete('/{slug}', [DiscussionPostController::class, 'destroy']);
         Route::post('/{slug}/like', [DiscussionLikeController::class, 'toggle']);
-        Route::get('/{slug}/comments', [DiscussionCommentController::class, 'index']);
         Route::post('/{slug}/comments', [DiscussionCommentController::class, 'store']);
     });
 

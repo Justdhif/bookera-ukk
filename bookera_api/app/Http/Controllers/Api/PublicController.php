@@ -124,4 +124,36 @@ class PublicController extends Controller
 
         return ApiResponse::successResponse('Data kategori berhasil diambil', $categories);
     }
+
+    /**
+     * Display a listing of public users.
+     */
+    public function users(Request $request): JsonResponse
+    {
+        $users = $this->publicService->getAllUsers($request->all());
+
+        return ApiResponse::successResponse('Public user data retrieved successfully', $users);
+    }
+
+    /**
+     * Display a listing of top discussions.
+     */
+    public function topDiscussions(): JsonResponse
+    {
+        $discussions = $this->publicService->getTopDiscussions(10);
+
+        return ApiResponse::successResponse('Top discussions retrieved successfully', $discussions);
+    }
+
+    /**
+     * Display a listing of all discussions.
+     */
+    public function discussions(): JsonResponse
+    {
+        $perPage = request('per_page', 12);
+        $search = request('search');
+        $discussions = $this->publicService->getAllDiscussions($perPage, $search);
+
+        return ApiResponse::successResponse('Discussions retrieved successfully', $discussions);
+    }
 }

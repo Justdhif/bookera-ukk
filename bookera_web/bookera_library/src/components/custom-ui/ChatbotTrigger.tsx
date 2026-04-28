@@ -24,7 +24,6 @@ export function ChatbotTrigger({
     <div
       className={cn(
         "fixed bottom-6 right-6 flex flex-col items-end gap-3 transition-all duration-200",
-        isOpen ? "z-40" : "z-9998",
       )}
     >
       {hasUnread && !isOpen && (

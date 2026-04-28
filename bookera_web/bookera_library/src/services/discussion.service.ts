@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import { ApiResponse, PaginatedResponse } from "@/types/api";
-import { DiscussionPost } from "@/types/discussion";
+import { DiscussionPost, DiscussionComment } from "@/types/discussion";
 
 export const discussionService = {
   getAll: (params?: { page?: number; per_page?: number }) =>
@@ -29,8 +29,17 @@ export const discussionService = {
     api.post<ApiResponse<{ liked: boolean; likes_count: number }>>(`/discussion-posts/${slug}/like`),
 
   getComments: (slug: string, params?: { page?: number; per_page?: number }) =>
-    api.get<ApiResponse<PaginatedResponse<any>>>(`/discussion-posts/${slug}/comments`, { params }),
+    api.get<ApiResponse<PaginatedResponse<DiscussionComment>>>(`/discussion-posts/${slug}/comments`, { params }),
 
   createComment: (slug: string, data: { content: string; parent_id?: number }) =>
-    api.post<ApiResponse<any>>(`/discussion-posts/${slug}/comments`, data),
+    api.post<ApiResponse<DiscussionComment>>(`/discussion-posts/${slug}/comments`, data),
+
+  getReplies: (commentId: number, params?: { page?: number; per_page?: number }) =>
+    api.get<ApiResponse<PaginatedResponse<DiscussionComment>>>(`/discussion-comments/${commentId}/replies`, { params }),
+
+  updateComment: (commentId: number, content: string) =>
+    api.put<ApiResponse<DiscussionComment>>(`/discussion-comments/${commentId}`, { content }),
+
+  deleteComment: (commentId: number) =>
+    api.delete<ApiResponse<void>>(`/discussion-comments/${commentId}`),
 };

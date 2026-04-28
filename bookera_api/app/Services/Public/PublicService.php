@@ -5,8 +5,11 @@ namespace App\Services\Public;
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
+use App\Models\DiscussionPost;
 use App\Models\Publisher;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class PublicService
 {
@@ -250,5 +253,56 @@ class PublicService
         }
 
         return $query->latest()->orderByDesc('id')->paginate($filters['per_page'] ?? 15);
+    }
+
+    public function getAllUsers(array $filters): LengthAwarePaginator
+    {
+        $query = User::query()
+            ->with(['profile'])
+            ->where('is_active', true)
+            ->where('role', 'user');
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('email', 'like', "%{$search}%")
+                    ->orWhereHas('profile', function ($pq) use ($search) {
+                        $pq->where('full_name', 'like', "%{$search}%")
+                            ->orWhere('bio', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        return $query->latest()->paginate($filters['per_page'] ?? 15);
+    }
+
+    public function getTopDiscussions(int $limit = 10): Collection
+    {
+        return DiscussionPost::query()
+            ->notTakenDown()
+            ->with(['user.profile', 'images'])
+            ->orderByDesc('likes_count')
+            ->orderByDesc('created_at')
+            ->limit($limit)
+            ->get();
+    }
+
+    public function getAllDiscussions(int $perPage = 12, ?string $search = null)
+    {
+        $query = DiscussionPost::query()
+            ->notTakenDown()
+            ->with(['user.profile', 'images'])
+            ->orderByDesc('created_at');
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('caption', 'like', "%{$search}%")
+                    ->orWhereHas('user.profile', function ($uq) use ($search) {
+                        $uq->where('full_name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        return $query->paginate($perPage);
     }
 }

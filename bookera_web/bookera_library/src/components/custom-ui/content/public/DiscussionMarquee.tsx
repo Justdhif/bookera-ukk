@@ -5,8 +5,8 @@ import Marquee from "react-fast-marquee";
 import { DiscussionPost } from "@/types/discussion";
 import { publicService } from "@/services/public.service";
 import { useTranslations } from "next-intl";
-import DiscussionCard from "./discussion/DiscussionCard";
 import Link from "next/link";
+import PublicDiscussionCard from "./PublicDiscussionCard";
 
 export default function DiscussionMarquee() {
   const [discussions, setDiscussions] = useState<DiscussionPost[]>([]);
@@ -57,7 +57,7 @@ export default function DiscussionMarquee() {
         className="py-4 overflow-hidden"
       >
         {discussions.map((discussion) => (
-          <DiscussionCard
+          <PublicDiscussionCard
             key={discussion.id}
             discussion={discussion}
             className="mx-3 w-[320px]"

@@ -3,7 +3,6 @@
 import { useAuthStore } from "@/store/auth.store";
 import { useState, useEffect } from "react";
 import AppHeader from "./AppHeader";
-import PublicHeaderSearch from "./PublicHeaderSearch";
 
 export default function PublicHeader() {
   const { isAuthenticated } = useAuthStore();
@@ -14,6 +13,15 @@ export default function PublicHeader() {
   }, []);
 
   return (
-    <AppHeader leftContent={<PublicHeaderSearch />} isAuthenticated={isAuthenticated} />
+    <AppHeader
+      leftContent={
+        <div className="flex items-center px-2">
+          <span className="text-2xl font-black tracking-tighter text-primary">
+            Bookera
+          </span>
+        </div>
+      }
+      isAuthenticated={isAuthenticated}
+    />
   );
 }

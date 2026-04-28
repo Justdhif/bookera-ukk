@@ -43,7 +43,6 @@ export default function ProfileClient() {
         meData = meRes.data.data.user;
         setCurrentUser(meData);
       } catch (err) {
-        // Not logged in, that's fine for public profiles
         setCurrentUser(null);
       }
 
