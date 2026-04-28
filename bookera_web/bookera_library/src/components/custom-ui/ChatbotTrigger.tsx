@@ -6,26 +6,21 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import boteraLogo from "@/assets/logo/botera.png";
 import { Sparkles } from "lucide-react";
+import { ChatbotWidget } from "@/components/custom-ui/ChatbotWidget";
 
-interface ChatbotTriggerProps {
-  isOpen: boolean;
-  hasUnread: boolean;
-  onOpen: () => void;
-}
+import { useChatbotStore } from "@/store/chatbot.store";
 
-export function ChatbotTrigger({
-  isOpen,
-  hasUnread,
-  onOpen,
-}: ChatbotTriggerProps) {
+export function ChatbotTrigger() {
+  const { isOpen, setIsOpen, hasUnread } = useChatbotStore();
   const t = useTranslations("chatbot");
 
   return (
-    <div
-      className={cn(
-        "fixed bottom-6 right-6 flex flex-col items-end gap-3 transition-all duration-200",
-      )}
-    >
+    <>
+      <div
+        className={cn(
+          "fixed bottom-6 right-6 flex flex-col items-end gap-3 transition-all duration-200 z-10",
+        )}
+      >
       {hasUnread && !isOpen && (
         <Badge className="animate-fade-in bg-linear-to-r from-brand-primary to-brand-primary-dark text-white text-[11px] rounded-full px-3 py-1 shadow-lg shadow-brand-primary/40 font-medium backdrop-blur-sm">
           <Sparkles className="w-3 h-3 mr-1 inline" />
@@ -35,7 +30,7 @@ export function ChatbotTrigger({
 
       <button
         id="chatbot-toggle-btn"
-        onClick={onOpen}
+        onClick={() => setIsOpen(true)}
         aria-label="Buka Botera AI"
         className={cn(
           "group relative w-16 h-16 rounded-full flex items-center justify-center",
@@ -84,5 +79,8 @@ export function ChatbotTrigger({
         <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full rounded-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ease-in-out pointer-events-none" />
       </button>
     </div>
+
+    <ChatbotWidget />
+    </>
   );
 }

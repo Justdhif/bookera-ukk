@@ -1246,6 +1246,8 @@
     "totalCopies": "Total Copies",
     "categoriesSection": "Categories",
     "noCategoryPublic": "No category",
+    "genresSection": "Genres",
+    "noGenrePublic": "No genres",
     "authorsSection": "Authors",
     "publishersSection": "Publishers",
     "follow": "Follow",

@@ -9,21 +9,28 @@ import PublicComplaintCard from "./PublicComplaintCard";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
 import EmptyState from "@/components/custom-ui/EmptyState";
+import { cn } from "@/lib/utils";
 import PublicComplaintFilters from "./PublicComplaintFilters";
 import ComplaintFormSheet from "./complaints/ComplaintFormSheet";
 import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { usePathnameCondition } from "@/hooks/usePathnameCondition";
 
 interface PublicComplaintGridProps {
   search?: string;
+  showFilters?: boolean;
+  userId?: number;
 }
 
 export default function PublicComplaintGrid({
   search,
+  showFilters = true,
+  userId,
 }: PublicComplaintGridProps) {
   const t = useTranslations("complaint");
   const { isAuthenticated } = useAuthStore();
+  const { isExplore } = usePathnameCondition();
   const requestIdRef = useRef(0);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +71,7 @@ export default function PublicComplaintGrid({
           search: search || undefined,
           category: category || undefined,
           status: status || undefined,
+          user_id: userId || undefined,
         });
 
         if (!active || requestIdRef.current !== requestId) return;
@@ -101,9 +109,10 @@ export default function PublicComplaintGrid({
   const tExplore = useTranslations("explore");
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4">
-        {isAuthenticated && (
+    <div className={cn("space-y-6", !showFilters && "space-y-0")}>
+      {showFilters && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4">
+        {isAuthenticated && isExplore && (
           <div className="flex items-center gap-4 px-4 py-2 bg-muted/40 rounded-full border border-border/50 shadow-sm backdrop-blur-sm shrink-0 w-fit">
             <p className="hidden md:block text-xs font-medium text-muted-foreground">
               {t("welcomeSubtitle")}
@@ -125,14 +134,17 @@ export default function PublicComplaintGrid({
           </div>
         )}
       </div>
+      )}
 
-      <PublicComplaintFilters
-        selectedCategory={category}
-        onCategoryChange={setCategory}
-        selectedStatus={status}
-        onStatusChange={setStatus}
-        totalCount={total}
-      />
+      {showFilters && (
+        <PublicComplaintFilters
+          selectedCategory={category}
+          onCategoryChange={setCategory}
+          selectedStatus={status}
+          onStatusChange={setStatus}
+          totalCount={total}
+        />
+      )}
 
       {loading && complaints.length === 0 ? (
         <DataLoading />

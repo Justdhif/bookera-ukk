@@ -93,7 +93,7 @@ export default function PublicUserCard({ user, className }: PublicUserCardProps)
 
           {isAuthenticated && (
             <div className="mt-6 flex gap-2">
-              <Button size="sm" className="w-full rounded-xl gap-2 font-bold bg-brand-primary hover:bg-brand-primary/90 text-white">
+              <Button size="sm" className="rounded-xl gap-2 font-bold bg-brand-primary hover:bg-brand-primary/90 text-white">
                 <UserPlus className="h-4 w-4" />
                 {t("follow")}
               </Button>

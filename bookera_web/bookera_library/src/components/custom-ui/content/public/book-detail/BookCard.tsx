@@ -117,8 +117,6 @@ export default function BookCard({
             {(book.available_copies ?? 0) > 0 ? (
               <div className="flex items-center gap-1">
                 <span>{book.available_copies}</span>
-                <span className="opacity-70">/</span>
-                <span>{book.total_copies}</span>
                 <span className="opacity-80 font-medium ml-0.5">{tCommon("available")}</span>
               </div>
             ) : (

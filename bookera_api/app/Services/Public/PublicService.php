@@ -27,20 +27,20 @@ class PublicService
                 }
             ]);
 
-        // Override counts to only show available ones for public view
+        // Include both total and available counts
         $query->withCount([
             'favorites',
-            'available_copies as total_copies_count',
+            'copies as total_copies_count',
             'available_copies as available_copies_count',
             'reviews'
         ]);
 
         $query->where('is_active', true);
 
-        // Always filter by available stock for public listing
-        $query->whereHas('copies', function ($copyQuery) {
-            $copyQuery->where('status', 'available');
-        });
+        // Removed: Always filter by available stock for public listing
+        // $query->whereHas('copies', function ($copyQuery) {
+        //     $copyQuery->where('status', 'available');
+        // });
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
@@ -126,7 +126,7 @@ class PublicService
             ->where('is_active', true)
             ->withCount([
                 'favorites',
-                'available_copies as total_copies_count',
+                'copies as total_copies_count',
                 'available_copies as available_copies_count',
                 'reviews'
             ])
@@ -145,7 +145,7 @@ class PublicService
             ->where('is_active', true)
             ->withCount([
                 'favorites',
-                'available_copies as total_copies_count',
+                'copies as total_copies_count',
                 'available_copies as available_copies_count',
                 'reviews'
             ])

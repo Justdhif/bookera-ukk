@@ -30,7 +30,7 @@ class Book extends Model
     ];
 
     protected $withCount = ['favorites', 'available_copies'];
-    protected $appends = ['average_rating', 'reviews_count', 'author', 'publisher', 'available_copies'];
+    protected $appends = ['average_rating', 'reviews_count', 'author', 'publisher', 'available_copies', 'total_copies'];
 
     public function getCoverImageAttribute($value)
     {
@@ -79,7 +79,15 @@ class Book extends Model
         if (array_key_exists('available_copies_count', $this->attributes)) {
             return $this->available_copies_count;
         }
-        return $this->copies()->where('status', 'available')->count();
+        return $this->available_copies()->count();
+    }
+
+    public function getTotalCopiesAttribute()
+    {
+        if (array_key_exists('total_copies_count', $this->attributes)) {
+            return $this->total_copies_count;
+        }
+        return $this->copies()->count();
     }
 
     public function reviews()

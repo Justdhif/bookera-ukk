@@ -492,6 +492,22 @@ export default function BookDetailClient() {
                         </div>
                         <div className="space-y-1">
                           <Label className="text-muted-foreground">
+                            {tPublic("genresSection")}
+                          </Label>
+                          <p className="font-medium">
+                            {book.genres?.map((g) => g.name).join(", ") || "-"}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-muted-foreground">
+                            {tPublic("categoriesSection")}
+                          </Label>
+                          <p className="font-medium">
+                            {book.categories?.map((c) => c.name).join(", ") || "-"}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-muted-foreground">
                             {tPublic("available")}
                           </Label>
                           <p className="font-medium">
@@ -580,6 +596,25 @@ export default function BookDetailClient() {
                       ) : (
                         <p className="text-muted-foreground">
                           {tPublic("noCategoryPublic")}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-lg">
+                        {tPublic("genresSection")}
+                      </h3>
+                      {book.genres && book.genres.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {book.genres.map((genre) => (
+                            <Badge key={genre.id} variant="secondary">
+                              {genre.name}
+                            </Badge>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground">
+                          {tPublic("noGenrePublic")}
                         </p>
                       )}
                     </div>

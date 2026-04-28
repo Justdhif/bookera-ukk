@@ -6,7 +6,7 @@ import { Send, X, Sparkles, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { chatbotService, ChatMessage } from "@/services/chatbot.service";
-import { useAuthStore } from "@/store/auth.store";
+import { useChatbotStore } from "@/store/chatbot.store";
 import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 import boteraLogo from "@/assets/logo/botera.png";
@@ -14,7 +14,6 @@ import boteraLogo from "@/assets/logo/botera.png";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import { ChatbotTrigger } from "@/components/custom-ui/ChatbotTrigger";
 import DataLoading from "@/components/custom-ui/DataLoading";
 
 function TypingIndicator() {
@@ -93,14 +92,12 @@ const QUICK_PROMPTS = [
 
 export function ChatbotWidget() {
   const t = useTranslations("chatbot");
-  const { isAuthenticated } = useAuthStore();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, setIsOpen, hasUnread, setHasUnread } = useChatbotStore();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [hasUnread, setHasUnread] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -151,8 +148,8 @@ export function ChatbotWidget() {
   }, [t]);
 
   useEffect(() => {
-    if (isAuthenticated) fetchHistory();
-  }, [isAuthenticated, fetchHistory]);
+    fetchHistory();
+  }, [fetchHistory]);
 
   const sendMessage = async (text: string) => {
     const msgText = text.trim();
@@ -196,17 +193,8 @@ export function ChatbotWidget() {
     }
   };
 
-  if (!isAuthenticated) return null;
-
   return (
-    <>
-      <ChatbotTrigger
-        isOpen={isOpen}
-        hasUnread={hasUnread}
-        onOpen={() => setIsOpen(true)}
-      />
-
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent
           side="right"
           className="p-0 flex flex-col w-full sm:max-w-[480px] gap-0 overflow-hidden"
@@ -305,7 +293,6 @@ export function ChatbotWidget() {
             <p className="text-[10px] text-muted-foreground text-center mt-1.5">{t("enterToSubmit")}</p>
           </div>
         </SheetContent>
-      </Sheet>
-    </>
+    </Sheet>
   );
 }

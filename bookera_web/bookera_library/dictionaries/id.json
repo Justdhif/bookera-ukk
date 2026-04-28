@@ -1246,6 +1246,8 @@
     "totalCopies": "Total Eksemplar",
     "categoriesSection": "Kategori",
     "noCategoryPublic": "Tidak ada kategori",
+    "genresSection": "Genre",
+    "noGenrePublic": "Tidak ada genre",
     "authorsSection": "Penulis",
     "publishersSection": "Penerbit",
     "follow": "Ikuti",

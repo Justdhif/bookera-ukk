@@ -358,55 +358,57 @@ export default function BookForm({
             )}
           </div>
           <div className="space-y-2">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
-                  disabled={!isEditMode}
+            {isEditMode && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                    disabled={!isEditMode}
+                  >
+                    {formData.author_ids.length > 0
+                      ? t("authorsSelected", {
+                          count: formData.author_ids.length,
+                        })
+                      : t("selectAuthors")}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="p-0"
+                  style={{ width: "var(--radix-popover-trigger-width)" }}
                 >
-                  {formData.author_ids.length > 0
-                    ? t("authorsSelected", {
-                        count: formData.author_ids.length,
-                      })
-                    : t("selectAuthors")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="p-0"
-                style={{ width: "var(--radix-popover-trigger-width)" }}
-              >
-                <Command>
-                  <CommandInput placeholder={t("searchAuthors")} />
-                  <CommandEmpty>{t("noAuthorsFound")}</CommandEmpty>
-                  <CommandGroup>
-                    {authors.map((author) => (
-                      <CommandItem
-                        key={author.id}
-                        onSelect={() =>
-                          isEditMode && handleAuthorSelect(author.id)
-                        }
-                        className={cn(
-                          "cursor-pointer transition-colors duration-200",
-                          formData.author_ids.includes(author.id)
-                            ? "bg-brand-primary/10 text-brand-primary font-medium"
-                            : "hover:bg-accent",
-                        )}
-                      >
-                        <Checkbox
-                          checked={formData.author_ids.includes(author.id)}
-                          variant="circle"
-                          className="mr-2 border-brand-primary/40"
-                          disabled={!isEditMode}
-                        />
-                        {author.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
+                  <Command>
+                    <CommandInput placeholder={t("searchAuthors")} />
+                    <CommandEmpty>{t("noAuthorsFound")}</CommandEmpty>
+                    <CommandGroup>
+                      {authors.map((author) => (
+                        <CommandItem
+                          key={author.id}
+                          onSelect={() =>
+                            isEditMode && handleAuthorSelect(author.id)
+                          }
+                          className={cn(
+                            "cursor-pointer transition-colors duration-200",
+                            formData.author_ids.includes(author.id)
+                              ? "bg-brand-primary/10 text-brand-primary font-medium"
+                              : "hover:bg-accent",
+                          )}
+                        >
+                          <Checkbox
+                            checked={formData.author_ids.includes(author.id)}
+                            variant="circle"
+                            className="mr-2 border-brand-primary/40"
+                            disabled={!isEditMode}
+                          />
+                          {author.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            )}
             {formData.author_ids.length > 0 ? (
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.author_ids.map((id) => {
@@ -447,56 +449,67 @@ export default function BookForm({
             </h3>
           </div>
           <div className="space-y-2">
-            <Label>{t("selectGenresLabel")}</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
-                  disabled={!isEditMode}
-                >
-                  {formData.genre_ids && formData.genre_ids.length > 0
-                    ? t("genresSelected", {
-                        count: formData.genre_ids.length,
-                      })
-                    : t("selectGenresBtn")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="p-0"
-                style={{ width: "var(--radix-popover-trigger-width)" }}
-              >
-                <Command>
-                  <CommandInput placeholder={t("searchGenresPlaceholder")} />
-                  <CommandEmpty>{t("noGenresFound")}</CommandEmpty>
-                  <CommandGroup>
-                    {genres.map((genre) => (
-                      <CommandItem
-                        key={genre.id}
-                        onSelect={() =>
-                          isEditMode && handleGenreSelect(genre.id)
-                        }
-                        className={cn(
-                          "cursor-pointer transition-colors duration-200",
-                          formData.genre_ids.includes(genre.id)
-                            ? "bg-brand-primary/10 text-brand-primary font-medium"
-                            : "hover:bg-accent",
-                        )}
-                      >
-                        <Checkbox
-                          checked={formData.genre_ids.includes(genre.id)}
-                          variant="circle"
-                          className="mr-2 border-brand-primary/40"
-                          disabled={!isEditMode}
-                        />
-                        {genre.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            {isEditMode ? (
+              <>
+                <Label>{t("selectGenresLabel")}</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                      disabled={!isEditMode}
+                    >
+                      {formData.genre_ids && formData.genre_ids.length > 0
+                        ? t("genresSelected", {
+                            count: formData.genre_ids.length,
+                          })
+                        : t("selectGenresBtn")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="p-0"
+                    style={{ width: "var(--radix-popover-trigger-width)" }}
+                  >
+                    <Command>
+                      <CommandInput placeholder={t("searchGenresPlaceholder")} />
+                      <CommandEmpty>{t("noGenresFound")}</CommandEmpty>
+                      <CommandGroup>
+                        {genres.map((genre) => (
+                          <CommandItem
+                            key={genre.id}
+                            onSelect={() =>
+                              isEditMode && handleGenreSelect(genre.id)
+                            }
+                            className={cn(
+                              "cursor-pointer transition-colors duration-200",
+                              formData.genre_ids.includes(genre.id)
+                                ? "bg-brand-primary/10 text-brand-primary font-medium"
+                                : "hover:bg-accent",
+                            )}
+                          >
+                            <Checkbox
+                              checked={formData.genre_ids.includes(genre.id)}
+                              variant="circle"
+                              className="mr-2 border-brand-primary/40"
+                              disabled={!isEditMode}
+                            />
+                            {genre.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </>
+            ) : (
+              formData.genre_ids &&
+              formData.genre_ids.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  {t("noGenresFound")}
+                </p>
+              )
+            )}
             {formData.genre_ids && formData.genre_ids.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.genre_ids.map((id: number) => {
@@ -549,57 +562,59 @@ export default function BookForm({
             )}
           </div>
           <div className="space-y-2">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
-                  disabled={!isEditMode}
+            {isEditMode && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                    disabled={!isEditMode}
+                  >
+                    {formData.publisher_ids.length > 0
+                      ? t("publishersSelected", {
+                          count: formData.publisher_ids.length,
+                        })
+                      : t("selectPublishers")}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="p-0"
+                  style={{ width: "var(--radix-popover-trigger-width)" }}
                 >
-                  {formData.publisher_ids.length > 0
-                    ? t("publishersSelected", {
-                        count: formData.publisher_ids.length,
-                      })
-                    : t("selectPublishers")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="p-0"
-                style={{ width: "var(--radix-popover-trigger-width)" }}
-              >
-                <Command>
-                  <CommandInput placeholder={t("searchPublishers")} />
-                  <CommandEmpty>{t("noPublishersFound")}</CommandEmpty>
-                  <CommandGroup>
-                    {publishers.map((publisher) => (
-                      <CommandItem
-                        key={publisher.id}
-                        onSelect={() =>
-                          isEditMode && handlePublisherSelect(publisher.id)
-                        }
-                        className={cn(
-                          "cursor-pointer transition-colors duration-200",
-                          formData.publisher_ids.includes(publisher.id)
-                            ? "bg-brand-primary/10 text-brand-primary font-medium"
-                            : "hover:bg-accent",
-                        )}
-                      >
-                        <Checkbox
-                          checked={formData.publisher_ids.includes(
-                            publisher.id,
+                  <Command>
+                    <CommandInput placeholder={t("searchPublishers")} />
+                    <CommandEmpty>{t("noPublishersFound")}</CommandEmpty>
+                    <CommandGroup>
+                      {publishers.map((publisher) => (
+                        <CommandItem
+                          key={publisher.id}
+                          onSelect={() =>
+                            isEditMode && handlePublisherSelect(publisher.id)
+                          }
+                          className={cn(
+                            "cursor-pointer transition-colors duration-200",
+                            formData.publisher_ids.includes(publisher.id)
+                              ? "bg-brand-primary/10 text-brand-primary font-medium"
+                              : "hover:bg-accent",
                           )}
-                          variant="circle"
-                          className="mr-2 border-brand-primary/40"
-                          disabled={!isEditMode}
-                        />
-                        {publisher.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
+                        >
+                          <Checkbox
+                            checked={formData.publisher_ids.includes(
+                              publisher.id,
+                            )}
+                            variant="circle"
+                            className="mr-2 border-brand-primary/40"
+                            disabled={!isEditMode}
+                          />
+                          {publisher.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            )}
             {formData.publisher_ids.length > 0 ? (
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.publisher_ids.map((id) => {
@@ -636,58 +651,69 @@ export default function BookForm({
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">{t("categoriesSection")}</h3>
           <div className="space-y-2">
-            <Label>{t("selectCategoriesLabel")}</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
-                  disabled={!isEditMode}
-                >
-                  {formData.category_ids && formData.category_ids.length > 0
-                    ? t("categoriesSelected", {
-                        count: formData.category_ids.length,
-                      })
-                    : t("selectCategoriesBtn")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="p-0"
-                style={{ width: "var(--radix-popover-trigger-width)" }}
-              >
-                <Command>
-                  <CommandInput
-                    placeholder={t("searchCategoriesPlaceholder")}
-                  />
-                  <CommandEmpty>{t("noCategoriesFound")}</CommandEmpty>
-                  <CommandGroup>
-                    {categories.map((cat) => (
-                      <CommandItem
-                        key={cat.id}
-                        onSelect={() =>
-                          isEditMode && handleCategorySelect(cat.id)
-                        }
-                        className={cn(
-                          "cursor-pointer transition-colors duration-200",
-                          formData.category_ids.includes(cat.id)
-                            ? "bg-brand-primary/10 text-brand-primary font-medium"
-                            : "hover:bg-accent",
-                        )}
-                      >
-                        <Checkbox
-                          checked={formData.category_ids.includes(cat.id)}
-                          variant="circle"
-                          className="mr-2 border-brand-primary/40"
-                          disabled={!isEditMode}
-                        />
-                        {cat.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            {isEditMode ? (
+              <>
+                <Label>{t("selectCategoriesLabel")}</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                      disabled={!isEditMode}
+                    >
+                      {formData.category_ids && formData.category_ids.length > 0
+                        ? t("categoriesSelected", {
+                            count: formData.category_ids.length,
+                          })
+                        : t("selectCategoriesBtn")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="p-0"
+                    style={{ width: "var(--radix-popover-trigger-width)" }}
+                  >
+                    <Command>
+                      <CommandInput
+                        placeholder={t("searchCategoriesPlaceholder")}
+                      />
+                      <CommandEmpty>{t("noCategoriesFound")}</CommandEmpty>
+                      <CommandGroup>
+                        {categories.map((cat) => (
+                          <CommandItem
+                            key={cat.id}
+                            onSelect={() =>
+                              isEditMode && handleCategorySelect(cat.id)
+                            }
+                            className={cn(
+                              "cursor-pointer transition-colors duration-200",
+                              formData.category_ids.includes(cat.id)
+                                ? "bg-brand-primary/10 text-brand-primary font-medium"
+                                : "hover:bg-accent",
+                            )}
+                          >
+                            <Checkbox
+                              checked={formData.category_ids.includes(cat.id)}
+                              variant="circle"
+                              className="mr-2 border-brand-primary/40"
+                              disabled={!isEditMode}
+                            />
+                            {cat.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </>
+            ) : (
+              formData.category_ids &&
+              formData.category_ids.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  {t("noCategoriesFound")}
+                </p>
+              )
+            )}
             {formData.category_ids && formData.category_ids.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.category_ids.map((id: number) => {

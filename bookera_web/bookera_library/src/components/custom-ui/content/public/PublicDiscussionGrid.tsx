@@ -13,18 +13,25 @@ import { cn } from "@/lib/utils";
 import DiscussionFormSheet from "./discussions/DiscussionFormSheet";
 import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/button";
+import { usePathnameCondition } from "@/hooks/usePathnameCondition";
+import { discussionService } from "@/services/discussion.service";
 
 interface PublicDiscussionGridProps {
   search?: string;
+  showHeader?: boolean;
+  userSlug?: string;
 }
 
 export default function PublicDiscussionGrid({
   search,
+  showHeader = true,
+  userSlug,
 }: PublicDiscussionGridProps) {
   const t = useTranslations("public");
   const tDiscussion = useTranslations("discussion");
   const tExplore = useTranslations("explore");
   const { isAuthenticated } = useAuthStore();
+  const { isExplore } = usePathnameCondition();
   
   const requestIdRef = useRef(0);
   const [discussions, setDiscussions] = useState<DiscussionPost[]>([]);
@@ -63,7 +70,16 @@ export default function PublicDiscussionGrid({
         let fetchedLastPage = 1;
         let fetchedTotal = 0;
 
-        if (filter === "top") {
+        if (userSlug) {
+            const res = await discussionService.getByUser(userSlug, {
+                page,
+                per_page: 12,
+            });
+            if (!active || requestIdRef.current !== requestId) return;
+            nextData = res.data.data.data;
+            fetchedLastPage = res.data.data.last_page;
+            fetchedTotal = res.data.data.total;
+        } else if (filter === "top") {
             const res = await publicService.getTopDiscussions();
             if (!active || requestIdRef.current !== requestId) return;
             nextData = res.data.data;
@@ -109,8 +125,9 @@ export default function PublicDiscussionGrid({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className={cn("space-y-6", !showHeader && "space-y-0")}>
+      {showHeader && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
               <h2 className="text-xl font-bold tracking-tight">{t("whatDoTheySay")}</h2>
               <p className="text-sm text-muted-foreground">
@@ -118,7 +135,7 @@ export default function PublicDiscussionGrid({
               </p>
           </div>
 
-          {isAuthenticated && (
+          {isAuthenticated && isExplore && (
               <div className="flex items-center gap-4 px-4 py-2 bg-muted/40 rounded-full border border-border/50 shadow-sm backdrop-blur-sm shrink-0 w-fit self-end sm:self-auto">
                   <p className="hidden md:block text-xs font-medium text-muted-foreground">
                       {tDiscussion("shareSomething")}
@@ -139,7 +156,8 @@ export default function PublicDiscussionGrid({
                   />
               </div>
           )}
-      </div>
+        </div>
+      )}
 
       {loading && discussions.length === 0 ? (
         <DataLoading />

@@ -33,12 +33,12 @@ export default function ExploreClient() {
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col gap-6 mb-10">
+        <div className="flex flex-col gap-4 mb-8">
           <div>
-            <h1 className="text-4xl md:text-6xl font-extrabold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent tracking-tight pb-2 leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground tracking-tighter leading-[1.1] mb-2">
               {welcomeMessage}
             </h1>
-            <p className="text-muted-foreground mt-2 text-lg md:text-xl max-w-2xl leading-relaxed">
+            <p className="text-muted-foreground text-base md:text-lg max-w-none leading-relaxed">
               {activeTab === "books"
                 ? tExplore("booksSubtitle")
                 : activeTab === "discussions"
@@ -56,8 +56,8 @@ export default function ExploreClient() {
               onValueChange={setActiveTab}
               className="w-full"
             >
-              <div className="py-4 space-y-8">
-                <TabsList className="grid w-full max-w-xl grid-cols-4 h-12 p-1 bg-muted/50 rounded-2xl border border-border/50">
+              <div className="py-2 space-y-4">
+                <TabsList className="grid w-full max-w-xl grid-cols-4 h-11 p-1 bg-muted/40 rounded-2xl border border-border/50">
                   <TabsTrigger
                     value="users"
                     className="rounded-xl flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
@@ -112,12 +112,12 @@ export default function ExploreClient() {
                     }
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="pl-12 h-14 w-full rounded-2xl bg-card border-2 border-border/50 focus-visible:ring-primary shadow-sm text-base transition-all dark:bg-input/30"
+                    className="pl-12 h-12 w-full rounded-2xl bg-card border border-border/60 focus-visible:ring-primary/30 shadow-xs text-base transition-all dark:bg-input/30"
                   />
                 </div>
               </div>
 
-              <div className="mt-10">
+              <div className="mt-6">
                 <TabsContent value="users" className="mt-0 outline-none">
                   <PublicUserGrid search={search} />
                 </TabsContent>
