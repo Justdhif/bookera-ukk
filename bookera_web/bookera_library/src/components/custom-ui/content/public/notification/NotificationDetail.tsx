@@ -27,19 +27,24 @@ interface NotificationDetailProps {
   notification: Notification | null;
   onClose: () => void;
   onDelete: (id: number) => void;
+  className?: string;
 }
 
 export default function NotificationDetail({
   notification,
   onClose,
   onDelete,
+  className,
 }: NotificationDetailProps) {
   const t = useTranslations("notification");
   const format = useFormatter();
 
   if (!notification) {
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-7rem)] rounded-xl border border-dashed border-border/70 bg-muted/20">
+      <div className={cn(
+        "flex flex-col items-center justify-center h-full rounded-xl border border-dashed border-border/70 bg-muted/20",
+        className
+      )}>
         <div className="text-center space-y-4 p-8 max-w-xs">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/60 mx-auto">
             <Bell className="h-8 w-8 text-muted-foreground/50" />
@@ -72,7 +77,10 @@ export default function NotificationDetail({
         : null;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+    <div className={cn(
+      "flex flex-col h-full bg-card overflow-hidden",
+      className
+    )}>
       <div className="flex items-center justify-between px-5 py-3.5 border-b border-border bg-card/80 backdrop-blur-sm">
         <div className="flex items-center gap-2">
           <h3 className="font-semibold text-sm">{t("notificationDetail")}</h3>
@@ -131,7 +139,7 @@ export default function NotificationDetail({
                 </span>
                 <span className="text-muted-foreground/40">·</span>
                 <span className="text-muted-foreground/70">
-                  {format.relativeTime(new Date(notification.created_at))}
+                  {format.relativeTime(new Date(notification.created_at), { now: new Date() })}
                 </span>
               </div>
             </div>

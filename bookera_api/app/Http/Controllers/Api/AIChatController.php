@@ -26,25 +26,24 @@ class AIChatController extends Controller
         ]);
 
         $message = $request->input('message');
-        $user    = Auth::user();
+        $user    = $request->user('sanctum');
 
-        if (!$user) {
-            return ApiResponse::errorResponse('User tidak terautentikasi', 401);
-        }
+        $response = $this->aiChatService->generateResponse($message, $user, app()->getLocale());
 
-        $response = $this->aiChatService->generateResponse($message, $user);
 
         return ApiResponse::successResponse('Respons AI berhasil diambil', [
             'response' => $response,
         ]);
     }
 
-    public function getHistory(): JsonResponse
+    public function getHistory(Request $request): JsonResponse
     {
-        $user = Auth::user();
+        $user = $request->user('sanctum');
         
         if (!$user) {
-            return ApiResponse::errorResponse('User tidak terautentikasi', 401);
+            return ApiResponse::successResponse('Riwayat percakapan kosong (Tamu)', [
+                'history' => [],
+            ]);
         }
 
         $history = AIChat::where('user_id', $user->id)
@@ -56,12 +55,12 @@ class AIChatController extends Controller
         ]);
     }
 
-    public function clearHistory(): JsonResponse
+    public function clearHistory(Request $request): JsonResponse
     {
-        $user = Auth::user();
+        $user = $request->user('sanctum');
 
         if (!$user) {
-            return ApiResponse::errorResponse('User tidak terautentikasi', 401);
+            return ApiResponse::successResponse('Riwayat percakapan berhasil dihapus');
         }
 
         AIChat::where('user_id', $user->id)->delete();

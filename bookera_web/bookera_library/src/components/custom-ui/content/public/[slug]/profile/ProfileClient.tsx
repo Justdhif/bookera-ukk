@@ -9,7 +9,7 @@ import { followService } from "@/services/follow.service";
 import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import DataLoading from "@/components/custom-ui/DataLoading";
-import { Edit, Phone, Briefcase, User as UserIcon, UserPlus, UserMinus } from "lucide-react";
+import { Edit, Phone, Briefcase, User as UserIcon, UserPlus, UserMinus, MessageSquareText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { normalizeOccupationValue, getOccupationLabelKey } from "@/constants/user-occupation";
 import Image from "next/image";
@@ -215,26 +215,34 @@ export default function ProfileClient() {
                     </Button>
                   </Link>
                 ) : currentUser ? (
-                  <Button 
-                    variant={isFollowing ? "outline" : "default"}
-                    className={cn(
-                      "transition-all font-medium rounded-lg px-6",
-                      isFollowing 
-                        ? "border-brand-primary/20 hover:bg-brand-primary/10 hover:text-brand-primary" 
-                        : "bg-brand-primary hover:bg-brand-primary/90 text-white shadow-md shadow-brand-primary/20"
-                    )}
-                    onClick={handleFollowToggle}
-                    disabled={isActionLoading}
-                  >
-                    {isActionLoading ? (
-                      <DataLoading variant="inline" size="sm" className="mr-2" />
-                    ) : isFollowing ? (
-                      <UserMinus className="w-4 h-4 mr-2" />
-                    ) : (
-                      <UserPlus className="w-4 h-4 mr-2" />
-                    )}
-                    {isFollowing ? t("unfollow") : t("follow")}
-                  </Button>
+                  <div className="flex items-center gap-3">
+                    <Button 
+                      variant={isFollowing ? "outline" : "default"}
+                      className={cn(
+                        "transition-all font-medium rounded-lg px-6",
+                        isFollowing 
+                          ? "border-brand-primary/20 hover:bg-brand-primary/10 hover:text-brand-primary" 
+                          : "bg-brand-primary hover:bg-brand-primary/90 text-white shadow-md shadow-brand-primary/20"
+                      )}
+                      onClick={handleFollowToggle}
+                      disabled={isActionLoading}
+                    >
+                      {isActionLoading ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : isFollowing ? (
+                        <UserMinus className="w-4 h-4 mr-2" />
+                      ) : (
+                        <UserPlus className="w-4 h-4 mr-2" />
+                      )}
+                      {isFollowing ? t("unfollow") : t("follow")}
+                    </Button>
+                    <Link href={`/chat?user=${user.slug}`}>
+                      <Button variant="outline" className="transition-all font-medium rounded-lg px-6 border-brand-primary/20 hover:bg-brand-primary/10 hover:text-brand-primary">
+                        <MessageSquareText className="w-4 h-4 mr-2" />
+                        Message
+                      </Button>
+                    </Link>
+                  </div>
                 ) : null}
               </div>
             </div>

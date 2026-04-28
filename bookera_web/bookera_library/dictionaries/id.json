@@ -683,7 +683,7 @@
     "bookLabel": "Buku",
     "unknownAuthor": "Penulis Tidak Diketahui",
     "seeAllResultsFor": "Lihat semua hasil untuk \"{query}\"",
-    "complaint": "Pengaduan",
+    "complaint": "Lapor",
     "discussions": "Diskusi",
     "explore": "Jelajah",
     "users": "User"
@@ -803,6 +803,8 @@
       "borrow": "Peminjaman",
       "loan": "Peminjaman",
       "return": "Pengembalian",
+      "chat": "Chat",
+      "discussion": "Diskusi",
       "system": "Sistem",
       "user": "Pengguna",
       "fine": "Denda",
@@ -823,7 +825,9 @@
       "fine_paid": "Denda Lunas",
       "comment": "Komentar Baru",
       "like": "Suka Baru",
-      "mention": "Sebutan Baru"
+      "mention": "Sebutan Baru",
+      "info": "Informasi",
+      "chat_message": "Pesan Chat"
     },
     "confirmDeleteDesc": "Apakah Anda yakin ingin menghapus notifikasi ini? Tindakan ini tidak dapat dibatalkan.",
     "allMarkedReadSuccess": "Semua notifikasi ditandai sebagai dibaca",
@@ -2466,6 +2470,7 @@
     "cancel": "Batal",
     "saveChanges": "Simpan Perubahan",
     "saving": "Menyimpan...",
+    "saveUser": "Simpan Pengguna",
     "noUsers": "Belum ada pengguna",
     "noUsersDesc": "Pengguna akan muncul setelah kamu menambahkannya.",
     "user": "Pengguna",
@@ -2635,5 +2640,28 @@
     "firstComplaint": "Jadilah yang pertama untuk menyampaikan aspirasi Anda.",
     "addDiscussion": "Buat Diskusi",
     "addDiscussionDesc": "Bagikan pikiran, pertanyaan, atau ulasan buku Anda dengan komunitas."
+  },
+  "chat": {
+    "messagesTitle": "Pesan",
+    "searchMessages": "Cari pesan...",
+    "all": "Semua",
+    "unread": "Belum Dibaca",
+    "read": "Dibaca",
+    "following": "Mengikuti",
+    "noConversations": "Tidak Ada Obrolan",
+    "noMatchingMessages": "Pesan tidak ditemukan.",
+    "selectSomeoneToChat": "Pilih seseorang yang Anda ikuti untuk mulai mengobrol.",
+    "you": "Anda: ",
+    "yourMessages": "Pesan Anda",
+    "chooseConversation": "Pilih obrolan dari menu kiri atau pilih seseorang yang Anda ikuti untuk memulai obrolan baru.",
+    "noMessagesYet": "Belum ada pesan",
+    "sendToStart": "Kirim pesan untuk memulai obrolan.",
+    "typeMessage": "Ketik pesan...",
+    "conversationsCount": "percakapan",
+    "pressEsc": "Tekan ESC untuk membatalkan pilihan",
+    "moderationAlertTitle": "Pesan Tidak Dapat Dikirim",
+    "moderationAlertDefault": "Pesan Anda mengandung konten yang melanggar pedoman komunitas.",
+    "flaggedMessageFallback": "⚠️ Pesan dihapus karena melanggar pedoman komunitas."
   }
 }
+

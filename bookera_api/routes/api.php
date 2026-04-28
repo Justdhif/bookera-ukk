@@ -99,6 +99,13 @@ Route::get('discussion-posts/user/{userSlug}', [DiscussionPostController::class,
 Route::get('discussion-posts/{slug}', [DiscussionPostController::class, 'show']);
 Route::get('discussion-posts/{slug}/comments', [DiscussionCommentController::class, 'index']);
 
+// AI Chatbot
+Route::prefix('ai')->group(function () {
+    Route::post('/chat', [AIChatController::class, 'chat']);
+    Route::get('/history', [AIChatController::class, 'getHistory']);
+    Route::delete('/history', [AIChatController::class, 'clearHistory']);
+});
+
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
@@ -289,12 +296,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('my-borrows', [BorrowController::class, 'getBorrowByUser']);
 
-    // AI Chatbot
-    Route::prefix('ai')->group(function () {
-        Route::post('/chat', [AIChatController::class, 'chat']);
-        Route::get('/history', [AIChatController::class, 'getHistory']);
-        Route::delete('/history', [AIChatController::class, 'clearHistory']);
+
+
+    // User Chat
+    Route::prefix('chat')->group(function () {
+        Route::get('/conversations', [\App\Http\Controllers\Api\ChatController::class, 'getConversations']);
+        Route::post('/moderate', [\App\Http\Controllers\Api\ChatController::class, 'moderateMessage']);
+        Route::get('/{userSlug}', [\App\Http\Controllers\Api\ChatController::class, 'getMessages']);
+        Route::post('/{userSlug}', [\App\Http\Controllers\Api\ChatController::class, 'sendMessage']);
+        Route::patch('/{userSlug}/read', [\App\Http\Controllers\Api\ChatController::class, 'markAsRead']);
+        Route::delete('/{userSlug}', [\App\Http\Controllers\Api\ChatController::class, 'deleteConversation']);
+        Route::delete('/{userSlug}/clear', [\App\Http\Controllers\Api\ChatController::class, 'clearMessages']);
     });
+
 
     Route::prefix('borrow-requests')->group(function () {
         Route::post('/', [BorrowRequestController::class, 'store']);

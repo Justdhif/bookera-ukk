@@ -28,3 +28,8 @@ Broadcast::channel('admin', function ($user) {
 Broadcast::channel('discussion-posts', function () {
     return true;
 });
+
+// Private channel untuk chat messages
+Broadcast::channel('chat.{receiverId}', function ($user, $receiverId) {
+    return (int) $user->id === (int) $receiverId;
+});

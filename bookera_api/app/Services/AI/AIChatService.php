@@ -104,23 +104,24 @@ CONTEXT;
     /**
      * Generate an AI response based on user message and real DB context.
      */
-    public function generateResponse(string $message, User $user): string
+    public function generateResponse(string $message, ?User $user = null, string $locale = 'id'): string
     {
-        $userName = $user->profile?->full_name ?? $user->email;
+        $userName  = $user->profile->full_name ?? $user->username ?? 'Tamu';
         $dbContext = $this->buildDatabaseContext();
 
         // 1. Get recent chat history for context (last 5 exchanges)
-        $history = AIChat::where('user_id', $user->id)
+        $history = $user ? AIChat::where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get()
-            ->reverse();
+            ->reverse() : collect();
 
         $messages = [
             [
                 'role'    => 'system',
-                'content' => $this->buildSystemPrompt($userName, $dbContext),
+                'content' => AISystemPrompt::getBoteraPrompt($userName, $dbContext, $locale),
             ],
+
         ];
 
         // 2. Add history to messages
@@ -153,47 +154,16 @@ CONTEXT;
         $data = $response->json();
         $aiReply = $data['choices'][0]['message']['content'] ?? 'Maaf, saya tidak dapat memproses permintaan Anda saat ini.';
 
-        // 4. Save to database for persistence
-        AIChat::create([
-            'user_id'  => $user->id,
-            'message'  => $message,
-            'response' => $aiReply,
-        ]);
+        // 4. Save to database for persistence if user is logged in
+        if ($user) {
+            AIChat::create([
+                'user_id'  => $user->id,
+                'message'  => $message,
+                'response' => $aiReply,
+            ]);
+        }
 
         return $aiReply;
     }
-
-    private function buildSystemPrompt(string $userName, string $dbContext): string
-    {
-        return <<<PROMPT
-Anda adalah Botera AI, asisten virtual cerdas dan eksklusif untuk perpustakaan digital Bookera.
-
-=== IDENTITAS PENTING ===
-- Nama Anda: Botera AI.
-- Nama Website/Perpustakaan: Bookera.
-- Jika ditanya siapa Anda: Anda adalah Botera AI, asisten virtual Bookera.
-- Jika ditanya apa itu Bookera: Bookera adalah platform perpustakaan digital tempat pengguna berada sekarang.
-
-Nama pengguna yang bertanya: {$userName}.
-
-Anda memiliki akses ke data real-time perpustakaan berikut ini:
-
-{$dbContext}
-
-=== PANDUAN RESPONS KETAT ===
-Tugas utama Anda:
-- HANYA menjawab pertanyaan seputar Bookera (koleksi buku, peminjaman, fitur website, dan layanan perpustakaan).
-- Memberikan informasi akurat berdasarkan data real-time di atas.
-- Membantu pengguna memahami proses peminjaman dan pengembalian buku di Bookera.
-- Menjelaskan informasi denda dan kebijakan perpustakaan Bookera.
-
-Aturan Penting:
-- JIKA user bertanya hal di luar Bookera atau perpustakaan (misal: politik, matematika umum, masak, coding umum, dll), Anda WAJIB menolak dengan sopan. Contoh: "Maaf, sebagai asisten Botera AI, saya hanya dapat membantu Anda dengan informasi seputar perpustakaan Bookera."
-- SELALU gunakan Bahasa Indonesia yang baik dan sopan.
-- Jawaban harus singkat, jelas, dan informatif (maksimal 3 paragraf).
-- Jika ada data numerik, sebutkan angkanya secara spesifik dari konteks.
-- Jangan mengarang data. Jika data (buku terpopuler/denda) tertulis "Belum ada" atau "Tidak ada" di konteks, sampaikan bahwa data tersebut belum tersedia. JANGAN gunakan placeholder.
-- Gunakan emoji untuk kesan ramah namun profesional.
-PROMPT;
-    }
 }
+

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations, useFormatter } from "next-intl";
+import { useTranslations, useFormatter, useNow } from "next-intl";
 import { useState } from "react";
 import { Notification } from "@/types/notification";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,7 @@ export default function NotificationList({
 }: NotificationListProps) {
   const t = useTranslations("notification");
   const format = useFormatter();
+  const now = useNow();
   const [searchValue, setSearchValue] = useState("");
   const [statusValue, setStatusValue] = useState("all");
 
@@ -86,7 +87,7 @@ export default function NotificationList({
               size="sm"
               onClick={onMarkAllAsRead}
               disabled={isMarkingAll}
-              className="h-8 text-xs gap-1.5 text-primary hover:text-primary hover:bg-primary/10"
+              className="h-8 text-xs gap-1.5 text-white hover:text-white hover:bg-primary/10"
             >
               {isMarkingAll ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -118,7 +119,7 @@ export default function NotificationList({
                   className={cn(
                     "px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-150",
                     isActive
-                      ? "bg-brand-primary text-white shadow-sm"
+                      ? "bg-brand-primary text-white shadow-sm hover:bg-brand-primary/90"
                       : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
@@ -208,7 +209,7 @@ export default function NotificationList({
                         </span>
                       )}
                       <span className="text-[11px] text-muted-foreground/70">
-                        {format.relativeTime(new Date(notif.created_at))}
+                        {format.relativeTime(new Date(notif.created_at), now)}
                       </span>
                     </div>
                   </div>
@@ -219,5 +220,6 @@ export default function NotificationList({
         )}
       </div>
     </div>
+
   );
 }

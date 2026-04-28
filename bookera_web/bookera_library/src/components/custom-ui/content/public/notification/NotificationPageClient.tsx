@@ -12,10 +12,21 @@ import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialo
 import NotificationList from "./NotificationList";
 import NotificationDetail from "./NotificationDetail";
 
+import NotificationDetailSheet from "./NotificationDetailSheet";
+
 export default function NotificationPageClient() {
   const t = useTranslations("notification");
+  const [isMobile, setIsMobileState] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 1023px)");
+    const onChange = () => setIsMobileState(mql.matches);
+    mql.addEventListener("change", onChange);
+    setIsMobileState(mql.matches);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [selectedNotif, setSelectedNotif] = useState<Notification | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isMarkingAll, setIsMarkingAll] = useState(false);
@@ -32,13 +43,15 @@ export default function NotificationPageClient() {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setSelectedNotif(null);
+        setIsDetailOpen(false);
       }
     };
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, []);
-  const fetchNotifications = async () => {
-    setLoading(true);
+
+  const fetchNotifications = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const filters: NotificationFilterParams = { per_page: 50 };
       const response = await notificationService.getAll(filters);
@@ -47,7 +60,7 @@ export default function NotificationPageClient() {
       toast.error(t("failedLoadNotifications"));
       console.error("Failed to fetch notifications:", error);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -61,6 +74,10 @@ export default function NotificationPageClient() {
   };
 
   const handleNotificationClick = async (notif: Notification) => {
+    if (isMobile) {
+      setIsDetailOpen(true);
+    }
+    
     if (!notif.read_at) {
       try {
         await notificationService.markAsRead(notif.id);
@@ -83,7 +100,7 @@ export default function NotificationPageClient() {
     setIsMarkingAll(true);
     try {
       await notificationService.markAllAsRead();
-      fetchNotifications();
+      fetchNotifications(true);
       fetchUnreadCount();
       toast.success(t("allMarkedReadSuccess"));
     } catch (error) {
@@ -104,6 +121,7 @@ export default function NotificationPageClient() {
       setDeleteId(null);
       if (selectedNotif?.id === deleteId) {
         setSelectedNotif(null);
+        setIsDetailOpen(false);
       }
     } catch (error) {
       toast.error(t("failedDeleteNotification"));
@@ -126,7 +144,7 @@ export default function NotificationPageClient() {
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0">
-        <div className="lg:col-span-5">
+        <div className="col-span-1 lg:col-span-5">
           <NotificationList
             notifications={filteredNotifications}
             loading={loading}
@@ -139,14 +157,25 @@ export default function NotificationPageClient() {
             isMarkingAll={isMarkingAll}
           />
         </div>
-        <div className="lg:col-span-7">
+        <div className="hidden lg:block lg:col-span-7">
           <NotificationDetail
             notification={selectedNotif}
             onClose={() => setSelectedNotif(null)}
             onDelete={setDeleteId}
+            className="h-[calc(100vh-8rem)] rounded-xl border border-border bg-card shadow-sm overflow-hidden"
           />
         </div>
       </div>
+
+      {isMobile && (
+        <NotificationDetailSheet
+          open={isDetailOpen}
+          onOpenChange={setIsDetailOpen}
+          notification={selectedNotif}
+          onDelete={(id) => setDeleteId(id)}
+        />
+      )}
+
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
@@ -157,3 +186,4 @@ export default function NotificationPageClient() {
     </div>
   );
 }
+

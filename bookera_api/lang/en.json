@@ -268,5 +268,11 @@
   "📚 *Book Status:*": "📚 *Book Status:*",
   "📚 *Borrowed Books:*": "📚 *Borrowed Books:*",
   "📚 *Requested Books:*": "📚 *Requested Books:*",
-  "The user still has an active borrow that has not been returned.": "The user still has an active borrow that has not been returned."
+  "The user still has an active borrow that has not been returned.": "The user still has an active borrow that has not been returned.",
+  "Message contains inappropriate content.": "Message contains inappropriate content.",
+  "New Message": "New Message",
+  "You have a new message from :name": "You have a new message from :name",
+  "Someone": "Someone",
+  "Messages marked as read": "Messages marked as read",
+  "Conversation deleted successfully": "Conversation deleted successfully"
 }

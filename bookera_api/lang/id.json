@@ -268,5 +268,11 @@
   "📚 *Book Status:*": "📚 *Status Buku:*",
   "📚 *Borrowed Books:*": "📚 *Buku yang Dipinjam:*",
   "📚 *Requested Books:*": "📚 *Buku yang Diminta:*",
-  "The user still has an active borrow that has not been returned.": "User masih memiliki peminjaman aktif yang belum dikembalikan."
+  "The user still has an active borrow that has not been returned.": "User masih memiliki peminjaman aktif yang belum dikembalikan.",
+  "Message contains inappropriate content.": "Pesan mengandung konten yang tidak pantas.",
+  "New Message": "Pesan Baru",
+  "You have a new message from :name": "Anda memiliki pesan baru dari :name",
+  "Someone": "Seseorang",
+  "Messages marked as read": "Pesan telah ditandai sebagai sudah dibaca",
+  "Conversation deleted successfully": "Percakapan berhasil dihapus"
 }
