@@ -541,6 +541,12 @@
     "statusUpdateError": "Gagal memperbarui status",
     "exploreOtherComplaints": "Eksplorasi Pengaduan Lainnya",
     "exploreOtherComplaintsDesc": "Temukan pengaduan lain yang dilaporkan oleh pengguna",
+    "replyBtn": "Balas",
+    "role": {
+      "admin": "Admin",
+      "officer": "Petugas",
+      "user": "Siswa"
+    },
     "status": {
       "pending": "Menunggu",
       "verified": "Terverifikasi",

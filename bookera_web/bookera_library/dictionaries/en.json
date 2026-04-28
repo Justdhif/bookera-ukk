@@ -541,6 +541,12 @@
     "statusUpdateError": "Failed to update status",
     "exploreOtherComplaints": "Explore Other Complaints",
     "exploreOtherComplaintsDesc": "Discover other complaints reported by users",
+    "replyBtn": "Reply",
+    "role": {
+      "admin": "Admin",
+      "officer": "Officer",
+      "user": "Student"
+    },
     "status": {
       "pending": "Pending",
       "verified": "Verified",

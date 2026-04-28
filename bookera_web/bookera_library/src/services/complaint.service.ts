@@ -15,8 +15,8 @@ export const complaintService = {
     getBySlug: (slug: string) =>
         api.get<ApiResponse<Complaint>>(`/complaints/${slug}`),
 
-    create: (data: CreateComplaintData) =>
-        api.post<ApiResponse<Complaint>>("/complaints", buildComplaintFormData(data), {
+    create: (data: FormData) =>
+        api.post<ApiResponse<Complaint>>("/complaints", data, {
             headers: { "Content-Type": "multipart/form-data" },
         }),
 

@@ -9,8 +9,11 @@ import PublicComplaintCard from "./PublicComplaintCard";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { cn } from "@/lib/utils";
 import PublicComplaintFilters from "./PublicComplaintFilters";
+import ComplaintFormSheet from "./complaints/ComplaintFormSheet";
+import { useAuthStore } from "@/store/auth.store";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 interface PublicComplaintGridProps {
   search?: string;
@@ -20,6 +23,7 @@ export default function PublicComplaintGrid({
   search,
 }: PublicComplaintGridProps) {
   const t = useTranslations("complaint");
+  const { isAuthenticated } = useAuthStore();
   const requestIdRef = useRef(0);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,17 +59,19 @@ export default function PublicComplaintGrid({
     const fetchComplaints = async () => {
       try {
         const res = await complaintService.getAll({
-            page,
-            per_page: 12,
-            search: search || undefined,
-            category: category || undefined,
-            status: status || undefined,
+          page,
+          per_page: 12,
+          search: search || undefined,
+          category: category || undefined,
+          status: status || undefined,
         });
 
         if (!active || requestIdRef.current !== requestId) return;
 
         const paginatedData = res.data.data;
-        setComplaints((prev) => (isLoadMore ? [...prev, ...paginatedData.data] : paginatedData.data));
+        setComplaints((prev) =>
+          isLoadMore ? [...prev, ...paginatedData.data] : paginatedData.data,
+        );
         setTotalPages(paginatedData.last_page);
         setTotal(paginatedData.total);
       } catch (error) {
@@ -96,6 +102,30 @@ export default function PublicComplaintGrid({
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4">
+        {isAuthenticated && (
+          <div className="flex items-center gap-4 px-4 py-2 bg-muted/40 rounded-full border border-border/50 shadow-sm backdrop-blur-sm shrink-0 w-fit">
+            <p className="hidden md:block text-xs font-medium text-muted-foreground">
+              {t("welcomeSubtitle")}
+            </p>
+            <div className="hidden md:block w-px h-5 bg-border/80"></div>
+            <ComplaintFormSheet
+              onSuccess={resetPagination}
+              trigger={
+                <Button
+                  variant="submit"
+                  size="sm"
+                  className="h-8 gap-2 rounded-full px-5 shadow-xs transition-all hover:scale-[1.02]"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  {t("submitButton")}
+                </Button>
+              }
+            />
+          </div>
+        )}
+      </div>
+
       <PublicComplaintFilters
         selectedCategory={category}
         onCategoryChange={setCategory}
@@ -109,18 +139,21 @@ export default function PublicComplaintGrid({
       ) : complaints.length === 0 ? (
         <EmptyState
           icon={<AlertCircle />}
-          title={search ? tExplore("noComplaintsFound") : tExplore("complaintsSubtitle")}
-          description={search ? tExplore("noComplaintsDesc") : tExplore("firstComplaint")}
+          title={
+            search
+              ? tExplore("noComplaintsFound")
+              : tExplore("complaintsSubtitle")
+          }
+          description={
+            search ? tExplore("noComplaintsDesc") : tExplore("firstComplaint")
+          }
           variant="compact"
         />
       ) : (
         <div className="space-y-10">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {complaints.map((complaint) => (
-              <PublicComplaintCard
-                key={complaint.id}
-                complaint={complaint}
-              />
+              <PublicComplaintCard key={complaint.id} complaint={complaint} />
             ))}
           </div>
 
