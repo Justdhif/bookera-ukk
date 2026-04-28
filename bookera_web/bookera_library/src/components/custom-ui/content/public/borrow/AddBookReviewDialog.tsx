@@ -57,9 +57,10 @@ export function AddBookReviewDialog({
       setRating(5);
       onSuccess?.();
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || t("review.submitError")
-      );
+      const message = error.response?.status === 422 
+        ? (Object.values(error.response.data.errors || {})[0] as string[])?.[0] || error.response.data.message
+        : (error.response?.data?.message || t("review.submitError"));
+      toast.error(message);
     } finally {
       setLoading(false);
     }

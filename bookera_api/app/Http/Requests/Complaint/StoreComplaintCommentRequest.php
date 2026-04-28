@@ -14,7 +14,7 @@ class StoreComplaintCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content'   => ['required', 'string'],
+            'content'   => ['required', 'string', new \App\Rules\ModeratedContent()],
             'parent_id' => ['nullable', 'exists:complaint_comments,id'],
         ];
     }

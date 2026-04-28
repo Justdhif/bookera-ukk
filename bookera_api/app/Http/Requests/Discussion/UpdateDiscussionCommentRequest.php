@@ -14,7 +14,7 @@ class UpdateDiscussionCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => 'required|string|max:1000',
+            'content' => ['required', 'string', 'max:1000', new \App\Rules\ModeratedContent()],
         ];
     }
 }

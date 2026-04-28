@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { useRef, useEffect, useState } from "react";
-import { Send, X, Sparkles, Trash2 } from "lucide-react";
+import { Send, X, Sparkles, Trash2, ChevronDown } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { chatbotService, ChatMessage } from "@/services/chatbot.service";
@@ -33,8 +34,50 @@ function TypingIndicator() {
   );
 }
 
+import ChatBookList from "@/components/custom-ui/chat/ChatBookList";
+
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
+
+  const renderContent = (content: string) => {
+    const bookCardSlugs: string[] = [];
+    // Extract all slugs and remove the tags from the main text
+    const textWithoutCards = content.replace(/\[\[BOOK_CARD:(.*?)\]\]/g, (_, slug) => {
+      bookCardSlugs.push(slug);
+      return "";
+    });
+    
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="text-sm leading-relaxed wrap-break-word [&>p]:my-1 [&>ul]:my-1 [&>ul]:pl-4 [&>li]:my-0.5">
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => <p className="my-1 leading-relaxed">{children}</p>,
+              strong: ({ children }) => <strong className="font-semibold text-brand-primary">{children}</strong>,
+              em: ({ children }) => <em className="italic">{children}</em>,
+              ul: ({ children }) => <ul className="my-1 pl-4 list-disc">{children}</ul>,
+              ol: ({ children }) => <ol className="my-1 pl-4 list-decimal">{children}</ol>,
+              li: ({ children }) => <li className="my-0.5">{children}</li>,
+              h1: ({ children }) => <h1 className="font-bold text-base my-1">{children}</h1>,
+              h2: ({ children }) => <h2 className="font-semibold my-1">{children}</h2>,
+              h3: ({ children }) => <h3 className="font-semibold my-1">{children}</h3>,
+              code: ({ children }) => <code className="bg-background/60 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+              blockquote: ({ children }) => (
+                <blockquote className="border-l-2 border-brand-primary pl-3 my-1 text-muted-foreground italic">{children}</blockquote>
+              ),
+            }}
+          >
+            {textWithoutCards.trim()}
+          </ReactMarkdown>
+        </div>
+
+        {bookCardSlugs.length > 0 && (
+          <ChatBookList slugs={bookCardSlugs} />
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={cn("flex items-end gap-2 animate-fade-in max-w-full", isUser ? "flex-row-reverse" : "flex-row")}>
       {!isUser && (
@@ -44,7 +87,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       )}
       <div
         className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+          "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
           isUser
             ? "bg-linear-to-br from-brand-primary to-brand-primary-dark text-white rounded-br-sm shadow-md shadow-brand-primary/20"
             : "bg-muted border border-border/50 text-foreground rounded-bl-sm",
@@ -53,27 +96,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         {isUser ? (
           <span className="whitespace-pre-wrap wrap-break-word">{message.content}</span>
         ) : (
-          <div className="text-sm leading-relaxed wrap-break-word [&>p]:my-1 [&>ul]:my-1 [&>ul]:pl-4 [&>li]:my-0.5">
-            <ReactMarkdown
-              components={{
-                p: ({ children }) => <p className="my-1 leading-relaxed">{children}</p>,
-                strong: ({ children }) => <strong className="font-semibold text-brand-primary">{children}</strong>,
-                em: ({ children }) => <em className="italic">{children}</em>,
-                ul: ({ children }) => <ul className="my-1 pl-4 list-disc">{children}</ul>,
-                ol: ({ children }) => <ol className="my-1 pl-4 list-decimal">{children}</ol>,
-                li: ({ children }) => <li className="my-0.5">{children}</li>,
-                h1: ({ children }) => <h1 className="font-bold text-base my-1">{children}</h1>,
-                h2: ({ children }) => <h2 className="font-semibold my-1">{children}</h2>,
-                h3: ({ children }) => <h3 className="font-semibold my-1">{children}</h3>,
-                code: ({ children }) => <code className="bg-background/60 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
-                blockquote: ({ children }) => (
-                  <blockquote className="border-l-2 border-brand-primary pl-3 my-1 text-muted-foreground italic">{children}</blockquote>
-                ),
-              }}
-            >
-              {message.content}
-            </ReactMarkdown>
-          </div>
+          renderContent(message.content)
         )}
         <div className={cn("text-[10px] mt-1 select-none", isUser ? "text-white/60 text-right" : "text-muted-foreground")}>
           {message.timestamp.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
@@ -83,12 +106,6 @@ function MessageBubble({ message }: { message: ChatMessage }) {
   );
 }
 
-const QUICK_PROMPTS = [
-  "📚 Buku paling banyak dipinjam?",
-  "📊 Statistik perpustakaan",
-  "💰 Info denda keterlambatan",
-  "📋 Cara meminjam buku",
-];
 
 export function ChatbotWidget() {
   const t = useTranslations("chatbot");
@@ -99,8 +116,22 @@ export function ChatbotWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
+  const [showScrollButton, setShowScrollButton] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    // Show button if we are more than 100px away from bottom
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
+    setShowScrollButton(!isAtBottom);
+  };
 
   useEffect(() => {
     const textarea = inputRef.current;
@@ -217,7 +248,11 @@ export function ChatbotWidget() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3 min-h-0 relative">
+          <div 
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3 min-h-0 relative scroll-smooth"
+          >
             {isResetting ? (
               <div className="absolute inset-0 z-50 flex items-center justify-center p-6 bg-background/50 backdrop-blur-[2px] animate-fade-in">
                 <DataLoading variant="card" size="md" className="border-none bg-transparent shadow-none" />
@@ -231,21 +266,28 @@ export function ChatbotWidget() {
               </>
             )}
             <div ref={messagesEndRef} />
+
+            {/* Scroll to Bottom Button */}
+            <AnimatePresence>
+              {showScrollButton && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                  className="sticky bottom-2 left-0 right-0 flex justify-center z-20 pointer-events-none"
+                >
+                  <Button
+                    size="icon"
+                    onClick={() => scrollToBottom()}
+                    className="h-9 w-9 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-lg text-brand-primary hover:bg-brand-primary hover:text-white transition-all duration-300 pointer-events-auto"
+                  >
+                    <ChevronDown className="w-5 h-5 animate-bounce" />
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {messages.length === 1 && !isLoading && (
-            <div className="px-3 pb-2 flex flex-wrap gap-1.5 shrink-0">
-              {QUICK_PROMPTS.map((prompt) => (
-                <button
-                  key={prompt}
-                  onClick={() => sendMessage(prompt)}
-                  className="text-[11px] px-3 py-1.5 rounded-full border border-brand-primary/30 text-brand-primary hover:bg-brand-primary/10 hover:border-brand-primary/60 transition-all font-medium whitespace-nowrap"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-          )}
 
           <div className="px-3 pb-3 pt-2 border-t border-border/50 shrink-0">
             <div className="flex items-end gap-2">

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
 import NotificationDropdown from "@/components/custom-ui/navbar/NotificationDropdown";
+import ChatbotHeaderTrigger from "@/components/custom-ui/navbar/ChatbotHeaderTrigger";
 import Link from "next/link";
 import { useAuthStore } from "@/store/auth.store";
 export interface AppHeaderProps {
@@ -26,6 +27,7 @@ export default function AppHeader({
         {leftContent}
       </div>
       <div className="flex items-center gap-1.5 md:gap-3">
+        <ChatbotHeaderTrigger />
         <Link href={settingsHref} aria-label={t("goToSettings")}>
           <Button
             variant="outline"

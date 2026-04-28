@@ -519,6 +519,8 @@
     "voteSuccess": "Berhasil memberikan dukungan",
     "unvoteSuccess": "Batal memberikan dukungan",
     "voteError": "Gagal memberikan dukungan",
+    "moderationAlertTitle": "Konten Tidak Pantas",
+    "moderationAlertDefault": "Konten Anda mengandung bahasa yang melanggar pedoman komunitas kami.",
     "detailTitle": "Detail Pengaduan",
     "detailDesc": "Informasi lengkap mengenai pengaduan layanan",
     "backToList": "Kembali ke Daftar",
@@ -584,7 +586,9 @@
       "submitError": "Gagal mengirim pengaduan",
       "cancelBtn": "Batal",
       "submitBtn": "Kirim Pengaduan",
-      "submittingBtn": "Mengirim..."
+      "submittingBtn": "Mengirim...",
+      "moderationAlertTitle": "Konten Tidak Pantas",
+      "moderationAlertDefault": "Konten Anda mengandung bahasa yang melanggar pedoman komunitas kami."
     }
   },
   "borrowStatus": {
@@ -1413,7 +1417,9 @@
     "report": "Laporkan",
     "edit": "Edit",
     "delete": "Hapus",
-    "shareSomething": "Ada sesuatu yang ingin dibagikan?"
+    "shareSomething": "Ada sesuatu yang ingin dibagikan?",
+    "moderationAlertTitle": "Konten Tidak Pantas",
+    "moderationAlertDefault": "Konten Anda mengandung bahasa yang melanggar pedoman komunitas kami."
   },
   "settings": {
     "title": "Pengaturan",

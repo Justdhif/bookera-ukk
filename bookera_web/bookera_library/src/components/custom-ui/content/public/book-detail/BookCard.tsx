@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 
 export interface BookCardProps {
   book: Book;
+  size?: "sm" | "md";
   showCheckbox?: boolean;
   isChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
@@ -21,6 +22,7 @@ export interface BookCardProps {
 
 export default function BookCard({
   book,
+  size = "md",
   showCheckbox = false,
   isChecked = false,
   onCheckedChange,
@@ -31,6 +33,8 @@ export default function BookCard({
   const textRef = useRef<HTMLSpanElement>(null);
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
+
+  const isSmall = size === "sm";
 
   useEffect(() => {
     if (containerRef.current && textRef.current) {
@@ -50,7 +54,7 @@ export default function BookCard({
       ? book.publishers[0].name
       : book.publisher || null;
 
-  const visibleCategories = book.categories?.slice(0, 2) ?? [];
+  const visibleCategories = book.categories?.slice(0, isSmall ? 1 : 2) ?? [];
   const genreNames =
     book.genres && book.genres.length > 0
       ? book.genres.map((genre) => genre.name).join(", ")
@@ -67,7 +71,8 @@ export default function BookCard({
   return (
     <div
       className={cn(
-        "border rounded-lg p-3 flex flex-col gap-2 relative transition-colors duration-200 hover:border-border",
+        "border rounded-lg flex flex-col relative transition-colors duration-200 hover:border-border",
+        isSmall ? "p-2 gap-1.5 w-[160px]" : "p-3 gap-2",
         showCheckbox && onCheckedChange && "cursor-pointer",
         isChecked ? "border-brand-primary bg-brand-primary/5" : "border-border",
       )}
@@ -83,7 +88,10 @@ export default function BookCard({
     >
       {showCheckbox && (
         <div
-          className="absolute top-5 left-5 z-10 flex items-center justify-center cursor-pointer"
+          className={cn(
+            "absolute z-10 flex items-center justify-center cursor-pointer",
+            isSmall ? "top-3 left-3" : "top-5 left-5"
+          )}
           onClick={handleCheckboxClick}
         >
           <Checkbox
@@ -98,17 +106,18 @@ export default function BookCard({
           src={book.cover_image ?? "/placeholder.png"}
           className="aspect-3/4 object-cover rounded w-full transition-transform duration-500 group-hover:scale-105"
           alt={book.title}
-          width={300}
-          height={400}
+          width={isSmall ? 160 : 300}
+          height={isSmall ? 213 : 400}
           unoptimized
         />
         
         {/* Available Copies Badge */}
-        <div className="absolute top-2 right-2 z-20">
+        <div className={cn("absolute z-20", isSmall ? "top-1 right-1" : "top-2 right-2")}>
           <Badge
             variant="default"
             className={cn(
-              "text-[10px] px-2 py-0.5 h-auto font-bold shadow-lg border-none backdrop-blur-md",
+              "px-1.5 py-0 h-auto font-bold shadow-lg border-none backdrop-blur-md",
+              isSmall ? "text-[8px]" : "text-[10px]",
               (book.available_copies ?? 0) > 0
                 ? "bg-emerald-500/90 text-white"
                 : "bg-rose-500/90 text-white"
@@ -117,39 +126,31 @@ export default function BookCard({
             {(book.available_copies ?? 0) > 0 ? (
               <div className="flex items-center gap-1">
                 <span>{book.available_copies}</span>
-                <span className="opacity-80 font-medium ml-0.5">{tCommon("available")}</span>
+                <span className="opacity-80 font-medium ml-0.5">{isSmall ? "" : tCommon("available")}</span>
               </div>
             ) : (
-              t("outOfStock")
+              isSmall ? "X" : t("outOfStock")
             )}
           </Badge>
         </div>
         {visibleCategories.length > 0 && (
-          <div className="absolute bottom-2 left-2 z-10 flex max-w-[calc(100%-1rem)] flex-wrap gap-1">
+          <div className={cn("absolute z-10 flex max-w-[calc(100%-1rem)] flex-wrap gap-1", isSmall ? "bottom-1 left-1" : "bottom-2 left-2")}>
             {visibleCategories.map((cat) => (
               <Badge
                 key={`category-${cat.id}`}
                 variant="default"
-                className="text-[10px] px-1.5 py-0 h-4 font-normal shadow-sm backdrop-blur-sm"
+                className={cn("px-1.5 py-0 h-4 font-normal shadow-sm backdrop-blur-sm", isSmall ? "text-[8px]" : "text-[10px]")}
               >
                 {cat.name}
               </Badge>
             ))}
-            {(book.categories?.length ?? 0) > 2 && (
-              <Badge
-                variant="outline"
-                className="text-[10px] px-1.5 py-0 h-4 font-normal shadow-sm backdrop-blur-sm bg-background/85"
-              >
-                +{book.categories!.length - 2}
-              </Badge>
-            )}
           </div>
         )}
       </div>
       <div ref={containerRef} className="overflow-hidden">
         <motion.span
           ref={textRef}
-          className="font-semibold text-sm whitespace-nowrap inline-block"
+          className={cn("font-semibold whitespace-nowrap inline-block", isSmall ? "text-xs" : "text-sm")}
           animate={
             isHovering && scrollOffset > 0
               ? { x: [0, 0, -scrollOffset, -scrollOffset, 0] }
@@ -183,78 +184,76 @@ export default function BookCard({
         </motion.span>
       </div>
       {genreNames && (
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Bookmark className="h-3 w-3 shrink-0" />
+        <div className={cn("flex items-center gap-1 text-muted-foreground", isSmall ? "text-[10px]" : "text-xs")}>
+          <Bookmark className={cn("shrink-0", isSmall ? "h-2.5 w-2.5" : "h-3 w-3")} />
           <span className="truncate">{genreNames}</span>
         </div>
       )}
       {authorNames && (
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <BookOpen className="h-3 w-3 shrink-0" />
+        <div className={cn("flex items-center gap-1 text-muted-foreground", isSmall ? "text-[10px]" : "text-xs")}>
+          <BookOpen className={cn("shrink-0", isSmall ? "h-2.5 w-2.5" : "h-3 w-3")} />
           <span className="truncate">{authorNames}</span>
         </div>
       )}
       {publisherName && (
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Building2 className="h-3 w-3 shrink-0" />
+        <div className={cn("flex items-center gap-1 text-muted-foreground", isSmall ? "text-[10px]" : "text-xs")}>
+          <Building2 className={cn("shrink-0", isSmall ? "h-2.5 w-2.5" : "h-3 w-3")} />
           <span className="truncate">{publisherName}</span>
         </div>
       )}
       {book.publication_year && (
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <CalendarDays className="h-3 w-3 shrink-0" />
+        <div className={cn("flex items-center gap-1 text-muted-foreground", isSmall ? "text-[10px]" : "text-xs")}>
+          <CalendarDays className={cn("shrink-0", isSmall ? "h-2.5 w-2.5" : "h-3 w-3")} />
           <span>{book.publication_year}</span>
         </div>
       )}
-      <div className="mt-auto flex flex-col gap-3 pt-2">
-        <div className="flex items-center justify-between border-t border-border pt-3">
-          <div className="flex items-center">
-            <AvatarGroup>
-              {book.reviews && book.reviews.length > 0 ? (
-                book.reviews.slice(0, 3).map((review) => (
-                  <Avatar 
-                    key={review.id} 
-                    size="sm"
-                    className="border-2 border-background shadow-sm"
-                  >
-                    <AvatarImage 
-                      src={review.user?.profile?.avatar} 
-                      className="object-cover"
-                    />
-                    <AvatarFallback className="bg-muted text-[8px] font-bold">
-                      {review.user?.profile?.full_name?.[0]?.toUpperCase() || "U"}
-                    </AvatarFallback>
+      <div className={cn("mt-auto flex flex-col pt-2", isSmall ? "gap-2" : "gap-3")}>
+        <div className={cn("flex items-center justify-between border-t border-border", isSmall ? "pt-2" : "pt-3")}>
+          {!isSmall && (
+            <div className="flex items-center">
+              <AvatarGroup>
+                {book.reviews && book.reviews.length > 0 ? (
+                  book.reviews.slice(0, 3).map((review) => (
+                    <Avatar 
+                      key={review.id} 
+                      size="sm"
+                      className="border-2 border-background shadow-sm"
+                    >
+                      <AvatarImage 
+                        src={review.user?.profile?.avatar} 
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="bg-muted text-[8px] font-bold">
+                        {review.user?.profile?.full_name?.[0]?.toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  ))
+                ) : (
+                  <Avatar size="sm" className="border-2 border-background bg-muted flex items-center justify-center">
+                    <AvatarFallback className="text-[10px] text-muted-foreground">?</AvatarFallback>
                   </Avatar>
-                ))
-              ) : (
-                <Avatar size="sm" className="border-2 border-background bg-muted flex items-center justify-center">
-                  <AvatarFallback className="text-[10px] text-muted-foreground">?</AvatarFallback>
-                </Avatar>
-              )}
-              {book.reviews && book.reviews.length > 3 && (
-                <AvatarGroupCount className="size-6 text-[8px]">
-                  +{book.reviews.length - 3}
-                </AvatarGroupCount>
-              )}
-            </AvatarGroup>
-            <span className="text-[10px] text-muted-foreground ml-2">
-              {book.reviews_count || 0} {t("reviewsTotal")}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-xs font-bold text-foreground">
-            <div className="flex items-center gap-1" title={t("detail.favorites") || "Favorites"}>
-              <Heart className="h-3 w-3 text-red-500 fill-red-500" />
-              <span>{book.favorites_count || 0}</span>
+                )}
+                {book.reviews && book.reviews.length > 3 && (
+                  <AvatarGroupCount className="size-6 text-[8px]">
+                    +{book.reviews.length - 3}
+                  </AvatarGroupCount>
+                )}
+              </AvatarGroup>
+              <span className="text-[10px] text-muted-foreground ml-2">
+                {book.reviews_count || 0} {t("reviewsTotal")}
+              </span>
             </div>
+          )}
+          <div className={cn("flex items-center gap-2 font-bold text-foreground", isSmall ? "text-[10px] w-full justify-end" : "text-xs")}>
             <div className="flex items-center gap-1">
-              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+              <Star className={cn("fill-yellow-400 text-yellow-400", isSmall ? "h-2.5 w-2.5" : "h-3 w-3")} />
               <span>{book.average_rating ? Number(book.average_rating).toFixed(1) : "0.0"}</span>
             </div>
           </div>
         </div>
         <Link href={`/books/${book.slug}`} onClick={(e) => e.stopPropagation()}>
-          <Button size="sm" variant="outline" className="w-full h-8 gap-1">
-            <Eye className="h-3.5 w-3.5" />
+          <Button size="sm" variant="outline" className={cn("w-full gap-1", isSmall ? "h-7 text-[10px]" : "h-8")}>
+            <Eye className={cn(isSmall ? "h-3 w-3" : "h-3.5 w-3.5")} />
             {t("detail.detail")}
           </Button>
         </Link>

@@ -22,8 +22,9 @@ class AIChatService
         $this->groqApiKey = config('services.groq.key', env('GROQ_API_KEY', ''));
     }
 
-    private function buildDatabaseContext(): string
+    private function buildDatabaseContext(?User $user = null): string
     {
+        // 1. Top Borrowed Books
         $topBorrowedBooks = DB::table('borrow_details')
             ->join('book_copies', 'borrow_details.book_copy_id', '=', 'book_copies.id')
             ->join('books', 'book_copies.book_id', '=', 'books.id')
@@ -37,13 +38,13 @@ class AIChatService
             ? "Belum ada data peminjaman buku." 
             : $topBorrowedBooks->map(fn($b) => "- {$b->title} ({$b->total_borrows} peminjaman)")->join("\n");
 
+        // 2. Library Statistics
         $totalBooks    = Book::count();
         $totalUsers    = User::where('role', 'member')->count();
         $totalBorrows  = Borrow::count();
         $openBorrows   = Borrow::where('status', 'open')->count();
         $closeBorrows  = Borrow::where('status', 'close')->count();
 
-        // 3. Overdue (terlambat) borrows
         $overdueBorrows = Borrow::where('status', 'open')
             ->whereDate('return_date', '<', now()->toDateString())
             ->count();
@@ -53,6 +54,7 @@ class AIChatService
             $fineTypes = "Tidak ada data tipe denda.";
         }
 
+        // 3. Top Categories
         $topCategoriesData = DB::table('borrow_details')
             ->join('book_copies', 'borrow_details.book_copy_id', '=', 'book_copies.id')
             ->join('books', 'book_copies.book_id', '=', 'books.id')
@@ -68,9 +70,52 @@ class AIChatService
             ? "Belum ada kategori yang dipinjam."
             : $topCategoriesData->map(fn($c) => "- {$c->name} ({$c->total} peminjaman)")->join("\n");
 
+        // 4. Book Stock & Availability (Recent/Featured Books)
+        $bookStocks = Book::withCount(['copies', 'available_copies'])
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(fn($b) => "- {$b->title} (Slug: {$b->slug}): {$b->available_copies_count} tersedia dari total {$b->copies_count} eksemplar.")
+            ->join("\n");
+
+        // 5. Best Rated Books by Category/Genre
+        $bestRatedBooks = Book::withAvg('reviews', 'rating')
+            ->with(['categories', 'genres'])
+            ->orderByDesc('reviews_avg_rating')
+            ->limit(5)
+            ->get()
+            ->map(function($b) {
+                $cats = $b->categories->pluck('name')->join(', ');
+                $rating = number_format((float)$b->reviews_avg_rating, 1);
+                return "- {$b->title} (Slug: {$b->slug}) (Rating: {$rating}/5). Kategori: {$cats}";
+            })
+            ->join("\n");
+
         $availableCopies = DB::table('book_copies')->where('status', 'available')->count();
         $totalCopies     = DB::table('book_copies')->count();
         $borrowedCopies  = $totalCopies - $availableCopies;
+
+        // 6. User Specific Data (Active Borrows)
+        $userContext = "";
+        if ($user) {
+            $activeBorrows = Borrow::where('user_id', $user->id)
+                ->where('status', 'open')
+                ->with(['details.book_copy.book'])
+                ->get();
+
+            if ($activeBorrows->isNotEmpty()) {
+                $userContext = "\n📌 PEMINJAMAN AKTIF {$user->username}:\n";
+                foreach ($activeBorrows as $borrow) {
+                    foreach ($borrow->details as $detail) {
+                        $bookTitle = $detail->book_copy->book->title;
+                        $dueDate = $borrow->return_date->format('d M Y');
+                        $userContext .= "- {$bookTitle} (Harus kembali: {$dueDate})\n";
+                    }
+                }
+            } else {
+                $userContext = "\n📌 Status: {$user->username} tidak memiliki peminjaman aktif saat ini.";
+            }
+        }
 
         return <<<CONTEXT
 === DATA REAL-TIME PERPUSTAKAAN BOOKERA ===
@@ -80,6 +125,12 @@ class AIChatService
 - Total eksemplar: {$totalCopies} eksemplar
 - Eksemplar tersedia: {$availableCopies} eksemplar
 - Eksemplar dipinjam: {$borrowedCopies} eksemplar
+
+📦 Stok Buku (Sampel):
+{$bookStocks}
+
+🌟 Rekomendasi Buku Terbaik (Berdasarkan Rating & Ulasan):
+{$bestRatedBooks}
 
 👥 Pengguna:
 - Total anggota aktif: {$totalUsers} orang
@@ -98,6 +149,7 @@ class AIChatService
 
 💰 Tipe Denda Perpustakaan:
 {$fineTypes}
+{$userContext}
 CONTEXT;
     }
 
@@ -107,7 +159,7 @@ CONTEXT;
     public function generateResponse(string $message, ?User $user = null, string $locale = 'id'): string
     {
         $userName  = $user->profile->full_name ?? $user->username ?? 'Tamu';
-        $dbContext = $this->buildDatabaseContext();
+        $dbContext = $this->buildDatabaseContext($user);
 
         // 1. Get recent chat history for context (last 5 exchanges)
         $history = $user ? AIChat::where('user_id', $user->id)
@@ -119,9 +171,8 @@ CONTEXT;
         $messages = [
             [
                 'role'    => 'system',
-                'content' => AISystemPrompt::getBoteraPrompt($userName, $dbContext, $locale),
+                'content' => AISystemPrompt::getBoteraPrompt($userName, $dbContext, $locale, $user->role ?? 'member'),
             ],
-
         ];
 
         // 2. Add history to messages

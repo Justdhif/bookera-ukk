@@ -14,7 +14,7 @@ class StoreDiscussionPostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'caption' => 'nullable|string|max:2000',
+            'caption' => ['nullable', 'string', 'max:2000', new \App\Rules\ModeratedContent()],
             'images' => 'required|array|min:1|max:10',
             'images.*' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
         ];

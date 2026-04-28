@@ -37,12 +37,14 @@ import {
   AlertTriangle,
   LogIn,
   X,
+  ShieldAlert,
 } from "lucide-react";
 
-/* ------------------------------------------------------------------ */
-/*  Image Carousel with Lightbox                                         */
-/* ------------------------------------------------------------------ */
-function ImageCarousel({ images }: { images: { id: number; image_path: string }[] }) {
+function ImageCarousel({
+  images,
+}: {
+  images: { id: number; image_path: string }[];
+}) {
   const [current, setCurrent] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const total = images.length;
@@ -63,7 +65,11 @@ function ImageCarousel({ images }: { images: { id: number; image_path: string }[
           />
         </div>
         {lightbox && (
-          <LightboxModal images={images} index={0} onClose={() => setLightbox(false)} />
+          <LightboxModal
+            images={images}
+            index={0}
+            onClose={() => setLightbox(false)}
+          />
         )}
       </>
     );
@@ -74,7 +80,10 @@ function ImageCarousel({ images }: { images: { id: number; image_path: string }[
 
   return (
     <>
-      <div className="relative w-full overflow-hidden rounded-xl border border-muted/30 group" style={{ aspectRatio: "16/9" }}>
+      <div
+        className="relative w-full overflow-hidden rounded-xl border border-muted/30 group"
+        style={{ aspectRatio: "16/9" }}
+      >
         {/* Slides */}
         <AnimatePresence mode="wait">
           <motion.img
@@ -92,7 +101,10 @@ function ImageCarousel({ images }: { images: { id: number; image_path: string }[
 
         {/* Prev button */}
         <button
-          onClick={(e) => { e.stopPropagation(); prev(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            prev();
+          }}
           className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -100,7 +112,10 @@ function ImageCarousel({ images }: { images: { id: number; image_path: string }[
 
         {/* Next button */}
         <button
-          onClick={(e) => { e.stopPropagation(); next(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            next();
+          }}
           className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm"
         >
           <ChevronRight className="h-4 w-4" />
@@ -116,7 +131,10 @@ function ImageCarousel({ images }: { images: { id: number; image_path: string }[
           {images.map((_, i) => (
             <button
               key={i}
-              onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrent(i);
+              }}
               className={`rounded-full transition-all duration-200 ${
                 i === current
                   ? "w-4 h-1.5 bg-white"
@@ -128,7 +146,11 @@ function ImageCarousel({ images }: { images: { id: number; image_path: string }[
       </div>
 
       {lightbox && (
-        <LightboxModal images={images} index={current} onClose={() => setLightbox(false)} />
+        <LightboxModal
+          images={images}
+          index={current}
+          onClose={() => setLightbox(false)}
+        />
       )}
     </>
   );
@@ -201,7 +223,9 @@ function LightboxModal({
                   key={i}
                   onClick={() => setCurrent(i)}
                   className={`rounded-full transition-all duration-200 ${
-                    i === current ? "w-5 h-2 bg-white" : "w-2 h-2 bg-white/40 hover:bg-white/70"
+                    i === current
+                      ? "w-5 h-2 bg-white"
+                      : "w-2 h-2 bg-white/40 hover:bg-white/70"
                   }`}
                 />
               ))}
@@ -210,7 +234,9 @@ function LightboxModal({
         )}
 
         <div className="absolute top-2 right-2 flex items-center gap-2">
-          <span className="text-white/60 text-xs">{current + 1} / {total}</span>
+          <span className="text-white/60 text-xs">
+            {current + 1} / {total}
+          </span>
           <button
             onClick={onClose}
             className="text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-1.5 transition-all"
@@ -223,9 +249,6 @@ function LightboxModal({
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Single comment row                                                   */
-/* ------------------------------------------------------------------ */
 function CommentItem({
   comment,
   postSlug,
@@ -262,7 +285,10 @@ function CommentItem({
   const fetchReplies = async (page = 1) => {
     setLoadingReplies(true);
     try {
-      const res = await discussionService.getReplies(comment.id, { page, per_page: 10 });
+      const res = await discussionService.getReplies(comment.id, {
+        page,
+        per_page: 10,
+      });
       const data = res.data.data;
       setReplies((prev) => (page === 1 ? data.data : [...prev, ...data.data]));
       setTotalRepliesPages(data.last_page);
@@ -275,7 +301,11 @@ function CommentItem({
   };
 
   const handleToggleReplies = () => {
-    if (!showReplies && replies.length === 0 && (comment.replies_count ?? 0) > 0) {
+    if (
+      !showReplies &&
+      replies.length === 0 &&
+      (comment.replies_count ?? 0) > 0
+    ) {
       fetchReplies(1);
     }
     setShowReplies((v) => !v);
@@ -300,12 +330,21 @@ function CommentItem({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
       transition={{ duration: 0.18 }}
-      className={depth > 0 ? "ml-9 border-l-2 border-brand-primary/15 pl-3" : ""}
+      className={
+        depth > 0 ? "ml-9 border-l-2 border-brand-primary/15 pl-3" : ""
+      }
     >
       <div className="flex gap-2.5 group">
-        <Link href={`/${comment.user?.slug}/profile`} className="shrink-0 mt-0.5">
+        <Link
+          href={`/${comment.user?.slug}/profile`}
+          className="shrink-0 mt-0.5"
+        >
           <Avatar className="h-7 w-7 border border-border hover:ring-2 hover:ring-brand-primary/30 transition-all">
-            <AvatarImage src={avatarUrl} alt={displayName} className="object-cover" />
+            <AvatarImage
+              src={avatarUrl}
+              alt={displayName}
+              className="object-cover"
+            />
             <AvatarFallback className="bg-brand-primary/10 text-brand-primary text-[10px] font-bold">
               {displayName.charAt(0).toUpperCase()}
             </AvatarFallback>
@@ -349,7 +388,11 @@ function CommentItem({
                 onClick={handleToggleReplies}
                 className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-brand-primary font-medium transition-colors"
               >
-                {showReplies ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                {showReplies ? (
+                  <ChevronUp className="h-3 w-3" />
+                ) : (
+                  <ChevronDown className="h-3 w-3" />
+                )}
                 {showReplies
                   ? t("hideReplies")
                   : t("showReplies", { count: comment.replies_count ?? 0 })}
@@ -386,7 +429,9 @@ function CommentItem({
                       postSlug={postSlug}
                       currentUserId={currentUserId}
                       onReply={onReply}
-                      onDeleted={(id) => setReplies((prev) => prev.filter((r) => r.id !== id))}
+                      onDeleted={(id) =>
+                        setReplies((prev) => prev.filter((r) => r.id !== id))
+                      }
                       depth={depth + 1}
                     />
                   ))
@@ -407,9 +452,6 @@ function CommentItem({
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Main page                                                            */
-/* ------------------------------------------------------------------ */
 export default function DiscussionDetailClient() {
   const t = useTranslations("discussion");
   const params = useParams();
@@ -432,11 +474,14 @@ export default function DiscussionDetailClient() {
   const [loadingMore, setLoadingMore] = useState(false);
 
   const [commentText, setCommentText] = useState("");
-  const [replyTo, setReplyTo] = useState<{ id: number; name: string } | null>(null);
+  const [replyTo, setReplyTo] = useState<{ id: number; name: string } | null>(
+    null,
+  );
   const [submitting, setSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [moderationAlert, setModerationAlert] = useState<string | null>(null);
 
   useEffect(() => {
     if (!slug) return;
@@ -462,7 +507,10 @@ export default function DiscussionDetailClient() {
     if (page === 1) setCommentsLoading(true);
     else setLoadingMore(true);
     try {
-      const res = await discussionService.getComments(slug, { page, per_page: 15 });
+      const res = await discussionService.getComments(slug, {
+        page,
+        per_page: 15,
+      });
       const data = res.data.data;
       setComments((prev) => (page === 1 ? data.data : [...prev, ...data.data]));
       setTotalCommentsPages(data.last_page);
@@ -476,7 +524,10 @@ export default function DiscussionDetailClient() {
   };
 
   const handleToggleLike = async () => {
-    if (!user) { toast.error(t("loginToLike")); return; }
+    if (!user) {
+      toast.error(t("loginToLike"));
+      return;
+    }
     if (likePending) return;
     setLikePending(true);
     try {
@@ -497,10 +548,15 @@ export default function DiscussionDetailClient() {
 
   const handleSubmitComment = async () => {
     if (!commentText.trim()) return;
-    if (!user) { toast.error(t("loginToComment")); return; }
+    if (!user) {
+      toast.error(t("loginToComment"));
+      return;
+    }
     setSubmitting(true);
     try {
-      const payload: { content: string; parent_id?: number } = { content: commentText.trim() };
+      const payload: { content: string; parent_id?: number } = {
+        content: commentText.trim(),
+      };
       if (replyTo) payload.parent_id = replyTo.id;
 
       const res = await discussionService.createComment(slug, payload);
@@ -508,13 +564,23 @@ export default function DiscussionDetailClient() {
 
       if (!replyTo) {
         setComments((prev) => [newComment, ...prev]);
-        setPost((prev) => prev ? { ...prev, comments_count: prev.comments_count + 1 } : prev);
+        setPost((prev) =>
+          prev ? { ...prev, comments_count: prev.comments_count + 1 } : prev,
+        );
       }
       setCommentText("");
       setReplyTo(null);
+      setModerationAlert(null);
       toast.success(t("commentSuccess"));
-    } catch {
-      toast.error(t("commentError"));
+    } catch (error: any) {
+      if (error.response?.status === 422) {
+        setModerationAlert(error.response.data.message);
+        toast.error(
+          t("moderationAlertTitle", { defaultValue: "Konten Tidak Pantas" }),
+        );
+      } else {
+        toast.error(t("commentError"));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -522,13 +588,18 @@ export default function DiscussionDetailClient() {
 
   const handleDeleteComment = (commentId: number) => {
     setComments((prev) => prev.filter((c) => c.id !== commentId));
-    setPost((prev) => prev ? { ...prev, comments_count: Math.max(0, prev.comments_count - 1) } : prev);
+    setPost((prev) =>
+      prev
+        ? { ...prev, comments_count: Math.max(0, prev.comments_count - 1) }
+        : prev,
+    );
   };
 
   const images = post?.images ?? [];
   const profile = post?.user?.profile;
   const avatarUrl = profile?.avatar || "";
-  const displayName = profile?.full_name || post?.user?.email?.split("@")[0] || "User";
+  const displayName =
+    profile?.full_name || post?.user?.email?.split("@")[0] || "User";
 
   return (
     <div className="space-y-6">
@@ -550,8 +621,42 @@ export default function DiscussionDetailClient() {
       ) : (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-            {/* Right side: Comments */}
             <div className="lg:col-span-5 order-2 lg:order-2 space-y-4">
+              <AnimatePresence>
+                {moderationAlert && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                    animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
+                    exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-4 bg-red-500/10 border border-red-200/50 dark:border-red-800/30 rounded-2xl">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
+                          <ShieldAlert className="h-4 w-4 text-red-600 dark:text-red-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+                            {t("moderationAlertTitle", {
+                              defaultValue: "Pesan Tidak Dapat Dikirim",
+                            })}
+                          </p>
+                          <p className="text-xs text-red-600/80 dark:text-red-400/70 mt-0.5 leading-relaxed">
+                            {moderationAlert}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setModerationAlert(null)}
+                          className="h-6 w-6 shrink-0 text-red-500/60 hover:text-red-600 transition-colors"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {/* Comment form */}
               <Card className="border-muted/60 bg-card/60 backdrop-blur-md">
                 <CardContent className="p-4 space-y-3">
@@ -560,7 +665,9 @@ export default function DiscussionDetailClient() {
                       <Reply className="h-3.5 w-3.5 text-brand-primary shrink-0" />
                       <span className="text-muted-foreground text-xs">
                         {t("replyingTo")}{" "}
-                        <span className="font-semibold text-brand-primary">{replyTo.name}</span>
+                        <span className="font-semibold text-brand-primary">
+                          {replyTo.name}
+                        </span>
                       </span>
                       <button
                         onClick={() => setReplyTo(null)}
@@ -574,9 +681,15 @@ export default function DiscussionDetailClient() {
                   {user ? (
                     <div className="flex gap-2.5">
                       <Avatar className="h-8 w-8 shrink-0 border border-border mt-0.5">
-                        <AvatarImage src={user.profile?.avatar || ""} alt="You" className="object-cover" />
+                        <AvatarImage
+                          src={user.profile?.avatar || ""}
+                          alt="You"
+                          className="object-cover"
+                        />
                         <AvatarFallback className="bg-brand-primary/10 text-brand-primary text-xs font-bold">
-                          {(user.profile?.full_name || user.email).charAt(0).toUpperCase()}
+                          {(user.profile?.full_name || user.email)
+                            .charAt(0)
+                            .toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 space-y-2">
@@ -677,7 +790,7 @@ export default function DiscussionDetailClient() {
             </div>
 
             {/* Left side: Post card */}
-            <div className="lg:col-span-7 order-1 lg:order-1 space-y-4">
+            <div className="lg:col-span-7 order-1 lg:order-1 space-y-4 lg:sticky lg:top-4 h-fit">
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -689,7 +802,11 @@ export default function DiscussionDetailClient() {
                     <div className="flex items-center gap-3">
                       <Link href={`/${post.user?.slug}/profile`}>
                         <Avatar className="h-10 w-10 border-2 border-background shadow-sm hover:border-brand-primary/40 transition-colors">
-                          <AvatarImage src={avatarUrl} alt={displayName} className="object-cover" />
+                          <AvatarImage
+                            src={avatarUrl}
+                            alt={displayName}
+                            className="object-cover"
+                          />
                           <AvatarFallback className="bg-brand-primary/10 text-brand-primary font-bold">
                             {displayName.charAt(0).toUpperCase()}
                           </AvatarFallback>
@@ -726,20 +843,26 @@ export default function DiscussionDetailClient() {
                         onClick={handleToggleLike}
                         disabled={likePending}
                         className={`flex items-center gap-1.5 text-sm font-medium transition-all duration-200 ${
-                          liked ? "text-rose-500" : "text-muted-foreground hover:text-rose-500"
+                          liked
+                            ? "text-rose-500"
+                            : "text-muted-foreground hover:text-rose-500"
                         }`}
                       >
                         <Heart
                           className={`h-4 w-4 transition-all duration-200 ${liked ? "fill-rose-500 scale-110" : ""}`}
                         />
                         <span>{likesCount}</span>
-                        <span className="hidden sm:inline text-xs">{t("likes")}</span>
+                        <span className="hidden sm:inline text-xs">
+                          {t("likes")}
+                        </span>
                       </button>
 
                       <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
                         <MessageCircle className="h-4 w-4" />
                         <span>{post.comments_count}</span>
-                        <span className="hidden sm:inline text-xs">{t("comments")}</span>
+                        <span className="hidden sm:inline text-xs">
+                          {t("comments")}
+                        </span>
                       </div>
                     </div>
                   </CardContent>
@@ -748,18 +871,7 @@ export default function DiscussionDetailClient() {
             </div>
           </div>
 
-
-          <div className="pt-8 mt-4 border-t">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold tracking-tight">
-                {t("exploreOtherDiscussions")}
-              </h2>
-              <p className="text-muted-foreground">
-                {t("exploreOtherDiscussionsDesc")}
-              </p>
-            </div>
-            <PublicDiscussionGrid />
-          </div>
+          <PublicDiscussionGrid />
         </>
       )}
     </div>

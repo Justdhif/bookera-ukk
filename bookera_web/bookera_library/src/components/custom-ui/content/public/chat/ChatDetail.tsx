@@ -119,7 +119,7 @@ export default function ChatDetail({
 
       {/* Moderation Alert Banner */}
       {moderationAlert && (
-        <div className="px-4 py-3 bg-gradient-to-r from-red-500/10 via-orange-500/10 to-red-500/10 border-b border-red-200/50 dark:border-red-800/30 animate-in slide-in-from-top-2 duration-300 shrink-0">
+        <div className="px-4 py-3 bg-linear-to-r from-red-500/10 via-orange-500/10 to-red-500/10 border-b border-red-200/50 dark:border-red-800/30 animate-in slide-in-from-top-2 duration-300 shrink-0">
           <div className="flex items-start gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
               <ShieldAlert className="h-4 w-4 text-red-600 dark:text-red-400" />
@@ -172,7 +172,7 @@ export default function ChatDetail({
                   {msg.is_flagged ? (
                     <div className="px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed shadow-sm flex flex-col bg-red-50/80 dark:bg-red-950/20 border border-red-200/60 dark:border-red-800/30 rounded-br-sm">
                       <div className="flex items-center gap-2">
-                        <span className="text-red-600/80 dark:text-red-400/80 italic break-words">
+                        <span className="text-red-600/80 dark:text-red-400/80 italic wrap-break-word">
                           {msg.message}
                         </span>
                       </div>
@@ -191,7 +191,7 @@ export default function ChatDetail({
                           : "bg-muted/50 border border-border/50 text-card-foreground rounded-bl-sm"
                       }`}
                     >
-                      <span className="break-words">{msg.message}</span>
+                      <span className="wrap-break-word">{msg.message}</span>
                       <span
                         className={`text-[9px] self-end mt-1 font-medium ${
                           msg.is_sender

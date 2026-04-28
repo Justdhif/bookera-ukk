@@ -14,8 +14,8 @@ class StoreComplaintRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'       => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
+            'title'       => ['required', 'string', 'max:255', new \App\Rules\ModeratedContent()],
+            'description' => ['required', 'string', new \App\Rules\ModeratedContent()],
             'category'    => ['required', 'in:website,facility,service,other'],
             'images'      => ['nullable', 'array', 'max:5'],
             'images.*'    => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],

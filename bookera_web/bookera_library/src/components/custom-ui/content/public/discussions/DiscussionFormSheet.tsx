@@ -40,7 +40,10 @@ export default function DiscussionFormSheet({
       setOpen(false);
       onSuccess?.();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || t("addError"));
+      const message = error.response?.status === 422 
+        ? (Object.values(error.response.data.errors || {})[0] as string[])?.[0] || error.response.data.message
+        : (error.response?.data?.message || t("addError"));
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }

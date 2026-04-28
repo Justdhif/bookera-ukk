@@ -14,7 +14,7 @@ class UpdateDiscussionPostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'caption' => 'nullable|string|max:2000',
+            'caption' => ['nullable', 'string', 'max:2000', new \App\Rules\ModeratedContent()],
             'images' => 'nullable|array|min:1|max:10',
             'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:5120',
         ];

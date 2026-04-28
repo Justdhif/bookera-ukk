@@ -47,6 +47,7 @@ import {
   Tag,
   Flag,
   ShieldCheck,
+  ShieldAlert,
 } from "lucide-react";
 
 import {
@@ -381,6 +382,7 @@ export default function ComplaintDetailClient() {
   );
   const [submitting, setSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [moderationAlert, setModerationAlert] = useState<string | null>(null);
 
   useEffect(() => {
     if (!slug) return;
@@ -488,12 +490,18 @@ export default function ComplaintDetailClient() {
 
       setCommentText("");
       setReplyTo(null);
+      setModerationAlert(null);
       setComplaint((prev) =>
         prev ? { ...prev, comments_count: prev.comments_count + 1 } : null,
       );
       toast.success(t("commentSuccess"));
-    } catch {
-      toast.error(t("commentError"));
+    } catch (error: any) {
+      if (error.response?.status === 422) {
+        setModerationAlert(error.response.data.message);
+        toast.error(t("moderationAlertTitle", { defaultValue: "Konten Tidak Pantas" }));
+      } else {
+        toast.error(t("commentError"));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -772,6 +780,40 @@ export default function ComplaintDetailClient() {
 
           {/* Comments Section */}
           <div className="space-y-6 pt-4">
+            {/* Moderation Alert Banner */}
+            <AnimatePresence>
+              {moderationAlert && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                  animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
+                  exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-4 bg-red-500/10 border border-red-200/50 dark:border-red-800/30 rounded-2xl">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
+                        <ShieldAlert className="h-4 w-4 text-red-600 dark:text-red-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+                          {t("moderationAlertTitle", { defaultValue: "Pesan Tidak Dapat Dikirim" })}
+                        </p>
+                        <p className="text-xs text-red-600/80 dark:text-red-400/70 mt-0.5 leading-relaxed">
+                          {moderationAlert}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setModerationAlert(null)}
+                        className="h-6 w-6 shrink-0 text-red-500/60 hover:text-red-600 transition-colors"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-extrabold tracking-tight flex items-center gap-3">
                 <MessageCircle className="h-5 w-5 text-brand-primary" />

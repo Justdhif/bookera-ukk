@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import PublicHeader from "@/components/custom-ui/navbar/PublicHeader";
 import PublicSidebar from "@/components/custom-ui/sidebar/PublicSidebar";
-import { ChatbotTrigger } from "@/components/custom-ui/ChatbotTrigger";
 
 export const metadata: Metadata = {
   title: "Bookera | Library",
@@ -24,7 +23,6 @@ export default function PublicLayout({
           <div className="p-4 md:p-6">{children}</div>
         </main>
       </SidebarInset>
-      <ChatbotTrigger />
     </SidebarProvider>
   );
 }
