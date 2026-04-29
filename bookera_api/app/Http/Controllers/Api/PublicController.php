@@ -156,4 +156,14 @@ class PublicController extends Controller
 
         return ApiResponse::successResponse('Discussions retrieved successfully', $discussions);
     }
+
+    /**
+     * Get public statistics for the landing page.
+     */
+    public function publicStats(): JsonResponse
+    {
+        $stats = $this->publicService->getPublicStats();
+
+        return ApiResponse::successResponse('Public stats retrieved successfully', $stats);
+    }
 }

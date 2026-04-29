@@ -34,7 +34,7 @@ function TypingIndicator() {
   );
 }
 
-import ChatBookList from "@/components/custom-ui/chat/ChatBookList";
+import ChatBookList from "@/components/custom-ui/ChatBookList";
 
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";

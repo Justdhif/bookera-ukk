@@ -67,6 +67,41 @@ export const publicService = {
 
   getUsers: (params?: import("@/types/user").UserFilterParams) =>
     api.get<ApiResponse<import("@/types/user").UserListResponse>>("/users", { params }),
+
+  getStats: () =>
+    api.get<ApiResponse<{
+      total_books: number;
+      total_users: number;
+      top_rated_books: Array<{
+        id: number;
+        title: string;
+        slug: string;
+        cover_image: string;
+        author: string;
+        average_rating: number;
+        reviews_count: number;
+        favorites_count: number;
+        categories: string[];
+      }>;
+      recent_discussions: Array<{
+        id: number;
+        slug: string;
+        caption: string;
+        likes_count: number;
+        comments_count: number;
+        created_at: string;
+        user_name: string;
+        user_avatar: string | null;
+      }>;
+      recent_complaints: Array<{
+        id: number;
+        slug: string;
+        title: string;
+        category: string;
+        status: string;
+        created_at: string;
+      }>;
+    }>>("/stats"),
 };
 
 export default publicService;

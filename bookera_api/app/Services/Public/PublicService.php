@@ -5,11 +5,13 @@ namespace App\Services\Public;
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
+use App\Models\Complaint;
 use App\Models\DiscussionPost;
 use App\Models\Publisher;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class PublicService
 {
@@ -304,5 +306,87 @@ class PublicService
         }
 
         return $query->paginate($perPage);
+    }
+
+    /**
+     * Get public statistics for the landing page.
+     * Returns total books, total users, top rated books, recent discussions, and recent complaints.
+     */
+    public function getPublicStats(): array
+    {
+        $totalBooks = Book::where('is_active', true)->count();
+        $totalUsers = User::where('is_active', true)->where('role', 'user')->count();
+
+        // Top rated books: avg rating (min 1 review), load with categories and authors
+        $topRatedBooks = Book::query()
+            ->where('is_active', true)
+            ->with(['authors', 'categories', 'reviews'])
+            ->withCount(['reviews', 'favorites'])
+            ->withAvg('reviews', 'rating')
+            ->having('reviews_avg_rating', '>=', 1)
+            ->orderByDesc('reviews_avg_rating')
+            ->orderByDesc('reviews_count')
+            ->limit(6)
+            ->get()
+            ->map(function ($book) {
+                return [
+                    'id'             => $book->id,
+                    'title'          => $book->title,
+                    'slug'           => $book->slug,
+                    'cover_image'    => $book->cover_image,
+                    'author'         => $book->author,
+                    'average_rating' => round((float) $book->reviews_avg_rating, 1),
+                    'reviews_count'  => $book->reviews_count,
+                    'favorites_count'=> $book->favorites_count,
+                    'categories'     => $book->categories->pluck('name'),
+                ];
+            });
+
+        // Recent discussions (top 4)
+        $recentDiscussions = DiscussionPost::query()
+            ->notTakenDown()
+            ->with(['user.profile'])
+            ->orderByDesc('likes_count')
+            ->orderByDesc('created_at')
+            ->limit(4)
+            ->get()
+            ->map(function ($d) {
+                return [
+                    'id'             => $d->id,
+                    'slug'           => $d->slug,
+                    'caption'        => $d->caption,
+                    'likes_count'    => $d->likes_count,
+                    'comments_count' => $d->comments_count,
+                    'created_at'     => $d->created_at,
+                    'user_name'      => optional(optional($d->user)->profile)->full_name ?? 'Anonymous',
+                    'user_avatar'    => optional(optional($d->user)->profile)->avatar,
+                ];
+            });
+
+        // Recent complaints (resolved ones, up to 4)
+        $recentComplaints = Complaint::query()
+            ->with(['user.profile'])
+            ->where('status', 'resolved')
+            ->orderByDesc('created_at')
+            ->limit(4)
+            ->get()
+            ->map(function ($c) {
+                return [
+                    'id'       => $c->id,
+                    'slug'     => $c->slug,
+                    'title'    => $c->title,
+                    'category' => $c->category,
+                    'status'   => $c->status,
+                    'created_at' => $c->created_at,
+                ];
+            });
+
+        return [
+            'total_books'        => $totalBooks,
+            'total_users'        => $totalUsers,
+            'top_rated_books'    => $topRatedBooks,
+            'recent_discussions' => $recentDiscussions,
+            'recent_complaints'  => $recentComplaints,
+        ];
     }
 }

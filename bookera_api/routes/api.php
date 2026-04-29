@@ -73,6 +73,7 @@ Route::get('complaints/{slug}', [ComplaintController::class, 'show']);
 Route::get('complaints/{slug}/comments', [ComplaintCommentController::class, 'index']);
 
 Route::get('categories', [PublicController::class, 'categories']);
+Route::get('stats', [PublicController::class, 'publicStats']);
 
 Route::get('authors', [PublicController::class, 'authors']);
 Route::get('authors/slug/{slug}', [PublicController::class, 'authorBySlug']);
