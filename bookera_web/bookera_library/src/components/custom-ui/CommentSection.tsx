@@ -20,6 +20,8 @@ import {
   LogIn,
   Loader2,
 } from "lucide-react";
+import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
+import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 
 import { useAuthStore } from "@/store/auth.store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -45,6 +47,7 @@ interface GenericComment {
     profile?: {
       full_name: string | null;
       avatar: string | null;
+      gender?: string;
     };
   };
 }
@@ -170,15 +173,11 @@ function CommentItem({
               >
                 {displayName}
               </Link>
-              {(comment.user?.role === "admin" ||
-                comment.user?.role?.startsWith("officer")) && (
-                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-primary/10 border border-brand-primary/20 shadow-[0_0_10px_rgba(var(--brand-primary),0.05)]">
-                  <ShieldCheck className="h-2.5 w-2.5 text-brand-primary" />
-                  <span className="text-[8px] font-black uppercase tracking-widest text-brand-primary">
-                    Official
-                  </span>
-                </div>
-              )}
+              <div className="flex items-center gap-1 shrink-0">
+                {(comment.user?.role === "admin" ||
+                  comment.user?.role?.startsWith("officer")) && <AdminBadge className="h-3.5 px-1 text-[7px]" />}
+                {comment.user?.profile?.gender === "croissant" && <CroissantBadge className="h-3.5 px-1 text-[7px]" />}
+              </div>
               <span className="text-[9px] text-muted-foreground/60 font-medium ml-auto shrink-0">
                 {formatDistanceToNow(new Date(comment.created_at), {
                   addSuffix: true,

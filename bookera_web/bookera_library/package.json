@@ -32,6 +32,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "cookies-next": "^6.1.1",
+    "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
@@ -59,6 +60,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^20",
     "@types/nprogress": "^0.2.3",
     "@types/react": "^19",

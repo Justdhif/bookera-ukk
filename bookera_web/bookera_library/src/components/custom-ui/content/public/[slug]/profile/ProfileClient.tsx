@@ -6,6 +6,7 @@ import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { useTranslations } from "next-intl";
 import { authService } from "@/services/auth.service";
 import { followService } from "@/services/follow.service";
+import { useChatStore } from "@/store/chat.store";
 import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import DataLoading from "@/components/custom-ui/DataLoading";
@@ -15,7 +16,7 @@ import { normalizeOccupationValue, getOccupationLabelKey } from "@/constants/use
 import Image from "next/image";
 import Link from "next/link";
 import ProfileActivityTabs from "./ProfileActivityTabs";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import ImagePreviewDialog from "@/components/custom-ui/ImagePreviewDialog";
 import { cn } from "@/lib/utils";
 
 export default function ProfileClient() {
@@ -24,6 +25,7 @@ export default function ProfileClient() {
   const params = useParams();
   const slug = params.slug as string;
   const t = useTranslations("profile");
+  const { openChat } = useChatStore();
   
   const [user, setUser] = useState<User | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -236,32 +238,27 @@ export default function ProfileClient() {
                       )}
                       {isFollowing ? t("unfollow") : t("follow")}
                     </Button>
-                    <Link href={`/chat?user=${user.slug}`}>
-                      <Button variant="outline" className="transition-all font-medium rounded-lg px-6 border-brand-primary/20 hover:bg-brand-primary/10 hover:text-brand-primary">
-                        <MessageSquareText className="w-4 h-4 mr-2" />
-                        Message
-                      </Button>
-                    </Link>
+                    <Button 
+                      variant="outline" 
+                      className="transition-all font-medium rounded-lg px-6 border-brand-primary/20 hover:bg-brand-primary/10 hover:text-brand-primary"
+                      onClick={() => user && openChat(user)}
+                    >
+                      <MessageSquareText className="w-4 h-4 mr-2" />
+                      Message
+                    </Button>
                   </div>
                 ) : null}
               </div>
             </div>
             <ProfileActivityTabs user={user} isMe={user.id === currentUser?.id} />
             
-            <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-              <DialogContent className="max-w-[90vw] md:max-w-2xl p-0 overflow-hidden border-none bg-transparent shadow-none flex items-center justify-center" showCloseButton={false}>
-                <DialogTitle className="sr-only">{t("avatarPreview")}</DialogTitle>
-                <div className="relative w-full aspect-square max-h-[80vh]">
-                  <Image
-                    src={avatarPreview}
-                    alt={t("avatarPreview")}
-                    fill
-                    className="object-contain"
-                    priority
-                  />
-                </div>
-              </DialogContent>
-            </Dialog>
+            <ImagePreviewDialog
+              isOpen={isPreviewOpen}
+              onOpenChange={setIsPreviewOpen}
+              imageUrl={avatarPreview}
+              alt={t("avatarPreview")}
+              showCloseButton={false}
+            />
           </>
         )
       )}

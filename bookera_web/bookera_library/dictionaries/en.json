@@ -901,6 +901,8 @@
     "female": "Female",
     "preferNotToSay": "Prefer not to say",
     "croissant": "Croissant",
+    "croissantBadgeLabel": "Croissant",
+    "adminBadgeLabel": "Official",
     "usernameLabel": "Username",
     "usernamePlaceholder": "Enter username",
     "usernameRequired": "Username is required",
@@ -2732,9 +2734,16 @@
     "sendToStart": "Send a message to start the conversation.",
     "typeMessage": "Type a message...",
     "conversationsCount": "conversations",
+    "sentImage": "Sent an image",
+    "userFallback": "user",
+    "view": "View",
     "pressEsc": "Press ESC to deselect",
     "moderationAlertTitle": "Message Cannot Be Sent",
     "moderationAlertDefault": "Your message contains content that violates community guidelines.",
-    "flaggedMessageFallback": "⚠️ Message removed for violating community guidelines."
+    "flaggedMessageFallback": "⚠️ Message removed for violating community guidelines.",
+    "shareWallpaperPrompt": "Would you like this wallpaper to be visible to the other person as well?",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "encryptionNotice": "Messages are end-to-end encrypted. No one outside of this chat can read them."
   }
 }

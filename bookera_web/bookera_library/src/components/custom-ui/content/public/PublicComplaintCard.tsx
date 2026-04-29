@@ -26,6 +26,8 @@ import { id, enUS } from "date-fns/locale";
 import { useLocale } from "next-intl";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
+import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 
 interface ComplaintCardProps {
   complaint: Complaint;
@@ -151,12 +153,18 @@ export default function PublicComplaintCard({ complaint }: ComplaintCardProps) {
               </Avatar>
             </Link>
             <div className="overflow-hidden">
-              <Link href={`/${complaint.user.slug}/profile`} className="hover:text-primary transition-colors">
-                <p className="text-sm font-bold truncate">
-                  {complaint.user.profile?.full_name ||
-                    complaint.user.email.split("@")[0]}
-                </p>
-              </Link>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Link href={`/${complaint.user.slug}/profile`} className="hover:text-primary transition-colors">
+                  <p className="text-sm font-bold truncate">
+                    {complaint.user.profile?.full_name ||
+                      complaint.user.email.split("@")[0]}
+                  </p>
+                </Link>
+                <div className="flex items-center gap-1 shrink-0">
+                  {complaint.user.role === "admin" && <AdminBadge className="h-3.5 px-1 text-[7px]" />}
+                  {complaint.user.profile?.gender === "croissant" && <CroissantBadge className="h-3.5 px-1 text-[7px]" />}
+                </div>
+              </div>
               <div className="flex items-center gap-1.5 text-muted-foreground">
                 <Calendar className="h-3 w-3" />
                 <p className="text-[10px] sm:text-xs">

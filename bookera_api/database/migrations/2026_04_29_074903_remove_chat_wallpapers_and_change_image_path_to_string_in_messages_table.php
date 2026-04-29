@@ -11,14 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('messages', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('sender_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('receiver_id')->constrained('users')->cascadeOnDelete();
-            $table->text('message')->nullable();
-            $table->string('image_path')->nullable();
-            $table->boolean('is_read')->default(false);
-            $table->timestamps();
+        Schema::dropIfExists('chat_wallpapers');
+
+        Schema::table('messages', function (Blueprint $table) {
+            $table->string('image_path')->nullable()->change();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('messages', function (Blueprint $table) {
+            $table->text('image_path')->nullable()->change();
         });
 
         Schema::create('chat_wallpapers', function (Blueprint $table) {
@@ -31,14 +37,5 @@ return new class extends Migration
 
             $table->unique(['user_id', 'other_user_id']);
         });
-    }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('chat_wallpapers');
-        Schema::dropIfExists('messages');
     }
 };

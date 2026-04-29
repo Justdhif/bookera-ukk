@@ -48,6 +48,7 @@ class ChatController extends Controller
                 'last_message' => [
                     'id' => $message->id,
                     'message' => $message->message,
+                    'image_path' => $message->image_path,
                     'is_read' => $message->is_read,
                     'created_at' => $message->created_at,
                     'is_sender' => $message->sender_id === $userId
@@ -83,6 +84,7 @@ class ChatController extends Controller
             return [
                 'id' => $message->id,
                 'message' => $message->message,
+                'image_path' => $message->image_path,
                 'is_read' => $message->is_read,
                 'created_at' => $message->created_at,
                 'is_sender' => $message->sender_id === $authUserId,
@@ -119,29 +121,49 @@ class ChatController extends Controller
     public function sendMessage(Request $request, $userSlug)
     {
         $request->validate([
-            'message' => 'required|string|max:1000',
+            'message' => 'required_without:image,images|string|max:5000|nullable',
+            'image' => 'nullable|image|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'image|max:2048',
         ]);
 
         $receiver = User::where('slug', $userSlug)->firstOrFail();
         $sender = $request->user();
 
-        // AI moderation check
-        $moderationService = new ChatModerationService();
-        $moderation = $moderationService->moderate($request->message, app()->getLocale());
+        // AI moderation check for text
+        // Note: If message is encrypted, moderation might be limited or bypassed
+        if ($request->filled('message')) {
+            $moderationService = new ChatModerationService();
+            $moderation = $moderationService->moderate($request->message, app()->getLocale());
 
+            if ($moderation['is_inappropriate']) {
+                return response()->json([
+                    'flagged'  => true,
+                    'reason'   => $moderation['reason'],
+                    'message'  => __('Message contains inappropriate content.'),
+                ], 422);
+            }
+        }
 
-        if ($moderation['is_inappropriate']) {
-            return response()->json([
-                'flagged'  => true,
-                'reason'   => $moderation['reason'],
-                'message'  => __('Message contains inappropriate content.'),
-            ], 422);
+        $imagePaths = [];
+        
+        // Handle single image (backward compatibility)
+        if ($request->hasFile('image')) {
+            $imagePaths[] = $request->file('image')->store('chat-images', 'public');
+        }
+
+        // Handle multiple images
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $imagePaths[] = $image->store('chat-images', 'public');
+            }
         }
 
         $message = Message::create([
             'sender_id' => $sender->id,
             'receiver_id' => $receiver->id,
             'message' => $request->message,
+            'image_path' => !empty($imagePaths) ? $imagePaths : null,
             'is_read' => false,
         ]);
 
@@ -166,6 +188,7 @@ class ChatController extends Controller
         return response()->json([
             'id' => $message->id,
             'message' => $message->message,
+            'image_path' => $message->image_path,
             'is_read' => $message->is_read,
             'created_at' => $message->created_at,
             'is_sender' => true,
@@ -216,5 +239,6 @@ class ChatController extends Controller
     {
         return $this->deleteConversation($request, $userSlug);
     }
+
 }
 

@@ -10,9 +10,8 @@ import { followService } from "@/services/follow.service";
 import { useTranslations } from "next-intl";
 import ChatList from "./ChatList";
 import ChatDetail from "./ChatDetail";
-
-
 import ChatDetailSheet from "./ChatDetailSheet";
+import { encryptMessage } from "@/lib/crypto";
 
 export default function ChatClient() {
   const t = useTranslations("chat");
@@ -40,7 +39,6 @@ export default function ChatClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // Moderation state
   const [moderationAlert, setModerationAlert] = useState<string | null>(null);
   const [isModerating, setIsModerating] = useState(false);
 
@@ -48,7 +46,6 @@ export default function ChatClient() {
     setModerationAlert(null);
   }, []);
 
-  // Auto-dismiss moderation alert after 6 seconds
   useEffect(() => {
     if (moderationAlert) {
       const timer = setTimeout(() => setModerationAlert(null), 6000);
@@ -172,45 +169,65 @@ export default function ChatClient() {
     }
   }, [user?.id, activeUser?.id]);
 
-  const handleSendMessage = async (messageText: string) => {
-    if (!activeUser || !activeUser.slug) return;
+  const handleSendMessage = async (messageText: string, imageFiles?: File[]) => {
+    if (!activeUser || !activeUser.slug || !user) return;
+
+    if (!messageText.trim() && (!imageFiles || imageFiles.length === 0)) return;
+
+    const encryptedText = messageText.trim() 
+      ? encryptMessage(messageText.trim(), user.id, activeUser.id) 
+      : "";
 
     const optimisticId = Date.now();
 
-    // Optimistic UI update
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: optimisticId,
-        message: messageText,
-        is_read: false,
-        created_at: new Date().toISOString(),
-        is_sender: true,
-      },
-    ]);
+    if (messageText.trim() && (!imageFiles || imageFiles.length === 0)) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: optimisticId,
+          message: encryptedText,
+          is_read: false,
+          created_at: new Date().toISOString(),
+          is_sender: true,
+        },
+      ]);
+    }
 
     try {
       setIsModerating(true);
-      await chatService.sendMessage(activeUser.slug, messageText);
-      fetchConversations(true);
+
+      if (imageFiles && imageFiles.length > 0) {
+        for (let i = 0; i < imageFiles.length; i++) {
+          const formData = new FormData();
+          if (i === imageFiles.length - 1 && messageText.trim()) {
+            formData.append("message", encryptedText);
+          }
+          formData.append("image", imageFiles[i]);
+          await chatService.sendMessage(activeUser.slug, formData);
+        }
+        fetchConversations(true);
+        fetchMessagesAndSetUser(activeUser.slug);
+      } else {
+        const formData = new FormData();
+        formData.append("message", encryptedText);
+        await chatService.sendMessage(activeUser.slug, formData);
+        fetchConversations(true);
+      }
     } catch (error: any) {
-      // Check if it's a moderation rejection (422 with flagged: true)
       if (error?.response?.status === 422 && error?.response?.data?.flagged) {
         const reason = error.response.data.reason || "";
         setModerationAlert(reason);
 
-        // Replace the optimistic message with a flagged fallback
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === optimisticId
-              ? { ...msg, message: t("flaggedMessageFallback", { defaultValue: "⚠️ Message removed for violating community guidelines." }), is_flagged: true }
+              ? { ...msg, message: t("flaggedMessageFallback"), is_flagged: true }
               : msg
           )
         );
 
       } else {
         console.error("Failed to send message", error);
-        // Remove the optimistic message on other errors
         setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId));
       }
     } finally {
@@ -245,6 +262,7 @@ export default function ChatClient() {
             conversations={filteredConversations}
             followedUsers={followedUsers}
             activeUser={activeUser}
+            currentUser={user}
             loading={isConversationsLoading}
             onSelectUser={handleSelectUser}
             onSearchChange={setSearchQuery}
@@ -268,7 +286,6 @@ export default function ChatClient() {
         </div>
       </div>
 
-      {/* Mobile Chat Detail Sheet */}
       {isMobile && (
         <ChatDetailSheet
           open={isDetailOpen}

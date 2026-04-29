@@ -1,5 +1,8 @@
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
+import { chatService } from "@/services/chat.service";
+import { echo } from "@/lib/echo";
 
 import {
   SidebarMenu,
@@ -10,7 +13,11 @@ import {
 import { useTranslations } from "next-intl";
 import AuthorPublisherSidebarSearch from "./AuthorPublisherSidebarSearch";
 import Link from "next/link";
-import { Search as LucideSearch, MessageSquareText, MessageSquare } from "lucide-react";
+import {
+  Search as LucideSearch,
+  MessageSquareText,
+  MessageSquare,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,11 +33,63 @@ export default function PublicSidebar() {
   const { user } = useAuthStore();
   const chatHref = user ? "/chat" : "/login";
 
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchUnreadCount = useCallback(() => {
+    if (!user) return;
+    chatService
+      .getConversations()
+      .then((conversations) => {
+        const count = conversations.reduce(
+          (acc, conv) => acc + conv.unread_count,
+          0,
+        );
+        setUnreadCount(count);
+      })
+      .catch((err) =>
+        console.error("Failed to fetch unread messages count", err),
+      );
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchUnreadCount();
+
+      if (echo) {
+        const channel = echo.private(`chat.${user.id}`);
+
+        const handleNewMessage = () => {
+          fetchUnreadCount();
+        };
+
+        channel.listen(".message.sent", handleNewMessage);
+
+        return () => {
+          // Only stop this specific listener if possible, but standard echo might stop all if callback isn't supported correctly in this version.
+          // Providing callback usually works to remove only this listener.
+          channel.stopListening(".message.sent", handleNewMessage);
+        };
+      }
+    } else {
+      setUnreadCount(0);
+    }
+  }, [user, fetchUnreadCount]);
+
+  useEffect(() => {
+    if (user && pathname.startsWith("/chat")) {
+      fetchUnreadCount();
+    }
+  }, [pathname, user, fetchUnreadCount]);
+
+  const displayUnread = unreadCount > 99 ? "99+" : unreadCount;
+
   return (
     <AppSidebar subtitle={t("myLibrary")}>
       <div className="px-2 py-4 border-b border-border/40">
         <SidebarMenu>
-          <SidebarMenuItem className={cn(!open && "w-full flex justify-center")}>
+          <SidebarMenuItem
+            className={cn(!open && "w-full flex justify-center")}
+          >
             <SidebarMenuButton
               asChild
               tooltip={t("explore")}
@@ -40,18 +99,26 @@ export default function PublicSidebar() {
               )}
             >
               <Link href="/explore">
-                <div className={cn(
-                  "p-1.5 rounded-lg bg-primary/10 text-primary shrink-0",
-                  !open && "p-2"
-                )}>
+                <div
+                  className={cn(
+                    "p-1.5 rounded-lg bg-primary/10 text-primary shrink-0",
+                    !open && "p-2",
+                  )}
+                >
                   <LucideSearch className="h-4 w-4" />
                 </div>
-                {open && <span className="font-semibold text-sm ml-1">{t("explore")}</span>}
+                {open && (
+                  <span className="font-semibold text-sm ml-1">
+                    {t("explore")}
+                  </span>
+                )}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          
-          <SidebarMenuItem className={cn(!open && "w-full flex justify-center mt-2")}>
+
+          <SidebarMenuItem
+            className={cn(!open && "w-full flex justify-center mt-2")}
+          >
             <SidebarMenuButton
               asChild
               tooltip="Messages"
@@ -61,13 +128,29 @@ export default function PublicSidebar() {
               )}
             >
               <Link href={chatHref}>
-                <div className={cn(
-                  "p-1.5 rounded-lg bg-blue-500/10 text-blue-500 shrink-0",
-                  !open && "p-2"
-                )}>
+                <div
+                  className={cn(
+                    "p-1.5 rounded-lg bg-blue-500/10 text-blue-500 shrink-0 relative",
+                    !open && "p-2",
+                  )}
+                >
                   <MessageSquareText className="h-4 w-4" />
+                  {!open && user && unreadCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-[18px] min-w-[18px] px-1 flex items-center justify-center border-2 border-background shadow-sm">
+                      {displayUnread}
+                    </span>
+                  )}
                 </div>
-                {open && <span className="font-semibold text-sm ml-1">Messages</span>}
+                {open && (
+                  <div className="flex items-center justify-between flex-1 ml-1">
+                    <span className="font-semibold text-sm">Messages</span>
+                    {user && unreadCount > 0 && (
+                      <span className="bg-red-500 text-white text-[10px] font-bold rounded-full h-5 px-1.5 min-w-5 flex items-center justify-center shrink-0 ml-2 shadow-sm">
+                        {displayUnread}
+                      </span>
+                    )}
+                  </div>
+                )}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

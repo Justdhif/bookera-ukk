@@ -42,6 +42,8 @@ import {
 
 import CommentSection from "@/components/custom-ui/CommentSection";
 import ImageCarousel from "@/components/custom-ui/ImageCarousel";
+import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
+import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 
 export default function DiscussionDetailClient() {
   const t = useTranslations("discussion");
@@ -158,12 +160,18 @@ export default function DiscussionDetailClient() {
                         </Avatar>
                       </Link>
                       <div className="flex flex-col min-w-0">
-                        <Link
-                          href={`/${post.user?.slug}/profile`}
-                          className="text-sm font-bold hover:text-brand-primary transition-colors truncate"
-                        >
-                          {displayName}
-                        </Link>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Link
+                            href={`/${post.user?.slug}/profile`}
+                            className="text-sm font-bold hover:text-brand-primary transition-colors truncate"
+                          >
+                            {displayName}
+                          </Link>
+                          <div className="flex items-center gap-1 shrink-0">
+                            {post.user?.role === "admin" && <AdminBadge className="h-4 px-1.5 text-[8px]" />}
+                            {post.user?.profile?.gender === "croissant" && <CroissantBadge className="h-4 px-1.5 text-[8px]" />}
+                          </div>
+                        </div>
                         <span className="text-[11px] text-muted-foreground">
                           @{post.user?.email?.split("@")[0]} ·{" "}
                           {formatDistanceToNow(new Date(post.created_at), {

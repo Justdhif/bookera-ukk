@@ -6,6 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Heart, MessageCircle, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
+import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 
 interface DiscussionCardProps {
   discussion: DiscussionPost;
@@ -35,11 +37,15 @@ export default function PublicDiscussionCard({ discussion, className }: Discussi
               </Avatar>
             </Link>
             <div className="flex flex-col overflow-hidden">
-              <Link href={`/${discussion.user?.slug}/profile`} onClick={(e) => e.stopPropagation()}>
-                <span className="text-sm font-bold leading-none truncate group-hover:text-brand-primary transition-colors block">
-                  {profile?.full_name || "Anonymous"}
-                </span>
-              </Link>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-sm font-bold leading-none truncate group-hover:text-brand-primary transition-colors block">
+                    {profile?.full_name || "Anonymous"}
+                  </span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {discussion.user?.role === "admin" && <AdminBadge className="h-3.5 px-1 text-[7px]" />}
+                    {discussion.user?.profile?.gender === "croissant" && <CroissantBadge className="h-3.5 px-1 text-[7px]" />}
+                  </div>
+                </div>
               <span className="text-[11px] text-muted-foreground truncate">
                 @{discussion.user?.email.split("@")[0]}
               </span>

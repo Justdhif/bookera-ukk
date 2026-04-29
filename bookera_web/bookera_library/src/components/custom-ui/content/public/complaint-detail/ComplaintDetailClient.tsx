@@ -24,6 +24,8 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import PublicComplaintGrid from "../PublicComplaintGrid";
 import CommentSection from "@/components/custom-ui/CommentSection";
 import ImageCarousel from "@/components/custom-ui/ImageCarousel";
+import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
+import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 
 import {
   MessageCircle,
@@ -198,15 +200,21 @@ export default function ComplaintDetailClient() {
                     </Avatar>
                   </Link>
                   <div className="min-w-0">
-                    <Link
-                      href={`/${complaint.user.slug}/profile`}
-                      className="hover:text-brand-primary transition-colors"
-                    >
-                      <p className="text-sm font-black truncate leading-tight">
-                        {complaint.user.profile?.full_name ||
-                          complaint.user.email.split("@")[0]}
-                      </p>
-                    </Link>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Link
+                        href={`/${complaint.user.slug}/profile`}
+                        className="hover:text-brand-primary transition-colors"
+                      >
+                        <p className="text-sm font-black truncate leading-tight">
+                          {complaint.user.profile?.full_name ||
+                            complaint.user.email.split("@")[0]}
+                        </p>
+                      </Link>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {complaint.user.role === "admin" && <AdminBadge className="h-4 px-1.5 text-[8px]" />}
+                        {complaint.user.profile?.gender === "croissant" && <CroissantBadge className="h-4 px-1.5 text-[8px]" />}
+                      </div>
+                    </div>
                     <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mt-0.5">
                       {t(`role.${complaint.user.role}`, {
                         fallback: complaint.user.role,

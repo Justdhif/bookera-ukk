@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import { BookText, Building2 } from "lucide-react";
 import { Publisher } from "@/types/publisher";
@@ -12,6 +13,8 @@ import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid
 import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import BorrowRequestDialog from "@/components/custom-ui/content/public/book-detail/BorrowRequestDialog";
+import { WallpaperPattern } from "@/components/custom-ui/WallpaperPattern";
+
 
 interface PublisherDetailClientProps {
   slug: string;
@@ -21,8 +24,11 @@ export default function PublisherDetailClient({ slug }: PublisherDetailClientPro
   const t = useTranslations("public.publisherDetail");
   const tPublic = useTranslations("public");
   const tCommon = useTranslations("common");
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const [publisher, setPublisher] = useState<Publisher | null>(null);
   const [loading, setLoading] = useState(true);
+
   const [selectedBookIds, setSelectedBookIds] = useState<number[]>([]);
   const [showBorrowModal, setShowBorrowModal] = useState(false);
   const [visibleBooks, setVisibleBooks] = useState<Book[]>([]);
@@ -84,11 +90,16 @@ export default function PublisherDetailClient({ slug }: PublisherDetailClientPro
     return (
       <>
         <div className="bg-card rounded-3xl border border-border/40 overflow-hidden shadow-xs hover:shadow-md transition-shadow">
-          <div className="relative h-32 sm:h-48 bg-linear-to-r from-brand-primary/10 via-brand-primary/5 to-background overflow-hidden">
-            <div className="absolute inset-0 bg-grid-black/5 dark:bg-grid-white/5 mask-[linear-gradient(to_bottom,white,transparent)]" />
+          <div className="relative h-32 sm:h-48 overflow-hidden">
+            <WallpaperPattern 
+              className="opacity-60"
+              bgColor={isDark ? "rgba(var(--brand-primary-rgb), 0.1)" : "rgba(var(--brand-primary-rgb), 0.05)"}
+            />
+            <div className="absolute inset-0 bg-linear-to-b from-transparent to-card/50" />
             <div className="absolute -left-20 -top-20 w-64 h-64 bg-brand-primary/20 blur-3xl rounded-full opacity-50" />
             <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-primary/10 blur-3xl rounded-full opacity-50" />
           </div>
+
           <div className="px-6 sm:px-10 pb-8 relative">
             <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 sm:gap-8 -mt-16 sm:-mt-20">
               <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-3xl border-4 border-card bg-muted overflow-hidden shadow-lg shrink-0">

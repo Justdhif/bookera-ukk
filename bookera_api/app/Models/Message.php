@@ -10,11 +10,13 @@ class Message extends Model
         'sender_id',
         'receiver_id',
         'message',
+        'image_path',
         'is_read'
     ];
 
     protected $casts = [
         'is_read' => 'boolean',
+        'image_path' => 'array',
     ];
 
     public function sender()

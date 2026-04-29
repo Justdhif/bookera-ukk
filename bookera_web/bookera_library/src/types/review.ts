@@ -4,6 +4,8 @@ import { UserProfile } from "./user";
 export interface BookReviewUser {
   id: number;
   slug?: string;
+  email?: string;
+  role?: string;
   profile?: UserProfile;
 }
 

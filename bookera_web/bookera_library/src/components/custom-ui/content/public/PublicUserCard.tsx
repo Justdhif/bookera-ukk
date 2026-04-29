@@ -6,9 +6,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
+import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 import { MessageSquare, UserPlus, Users, MessageCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
+import { useChatStore } from "@/store/chat.store";
+import { WallpaperPattern } from "@/components/custom-ui/WallpaperPattern";
 
 interface PublicUserCardProps {
   user: User;
@@ -18,6 +22,7 @@ interface PublicUserCardProps {
 export default function PublicUserCard({ user, className }: PublicUserCardProps) {
   const t = useTranslations("explore");
   const { isAuthenticated } = useAuthStore();
+  const { openChat } = useChatStore();
   const profile = user.profile;
   const avatarUrl = profile?.avatar || "";
   const fullName = profile?.full_name || "User";
@@ -29,7 +34,9 @@ export default function PublicUserCard({ user, className }: PublicUserCardProps)
       className
     )}>
       <CardContent className="p-0">
-        <div className="h-20 bg-linear-to-r from-brand-primary/20 to-brand-primary-light/10 group-hover:from-brand-primary/30 group-hover:to-brand-primary-light/20 transition-all" />
+        <div className="h-20 relative overflow-hidden bg-linear-to-r from-brand-primary/20 to-brand-primary-light/10 group-hover:from-brand-primary/30 group-hover:to-brand-primary-light/20 transition-all">
+          <WallpaperPattern className="opacity-20" bgColor="transparent" />
+        </div>
         
         <div className="px-5 pb-6">
           <div className="relative -mt-10 mb-3">
@@ -49,11 +56,16 @@ export default function PublicUserCard({ user, className }: PublicUserCardProps)
                 {fullName}
               </h3>
             </Link>
-            <p className="text-sm text-muted-foreground truncate">
-              @{username}
-            </p>
+            <div className="flex flex-col gap-1.5">
+              <p className="text-sm text-muted-foreground truncate">
+                @{username}
+              </p>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {user.role === "admin" && <AdminBadge className="h-4 px-1.5 text-[8px]" />}
+                {user.profile?.gender === "croissant" && <CroissantBadge className="h-4 px-1.5 text-[8px]" />}
+              </div>
+            </div>
           </div>
-
           {profile?.bio && (
             <p className="mt-3 text-sm text-muted-foreground line-clamp-2 min-h-[40px]">
               {profile.bio}
@@ -97,7 +109,12 @@ export default function PublicUserCard({ user, className }: PublicUserCardProps)
                 <UserPlus className="h-4 w-4" />
                 {t("follow")}
               </Button>
-              <Button size="icon" variant="outline" className="shrink-0 rounded-xl border-muted/50 hover:bg-muted/50 transition-colors">
+              <Button 
+                size="icon" 
+                variant="outline" 
+                className="shrink-0 rounded-xl border-muted/50 hover:bg-muted/50 transition-colors"
+                onClick={() => openChat(user)}
+              >
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
               </Button>
             </div>

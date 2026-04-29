@@ -901,6 +901,8 @@
     "female": "Perempuan",
     "preferNotToSay": "Tidak ingin menyebutkan",
     "croissant": "Kroisan",
+    "croissantBadgeLabel": "Kroisan",
+    "adminBadgeLabel": "Resmi",
     "usernameLabel": "Username",
     "usernamePlaceholder": "Masukkan username",
     "usernameRequired": "Username wajib diisi",
@@ -2730,10 +2732,17 @@
     "sendToStart": "Kirim pesan untuk memulai obrolan.",
     "typeMessage": "Ketik pesan...",
     "conversationsCount": "percakapan",
+    "sentImage": "Mengirim gambar",
+    "userFallback": "pengguna",
+    "view": "Lihat",
     "pressEsc": "Tekan ESC untuk membatalkan pilihan",
     "moderationAlertTitle": "Pesan Tidak Dapat Dikirim",
     "moderationAlertDefault": "Pesan Anda mengandung konten yang melanggar pedoman komunitas.",
-    "flaggedMessageFallback": "⚠️ Pesan dihapus karena melanggar pedoman komunitas."
+    "flaggedMessageFallback": "⚠️ Pesan dihapus karena melanggar pedoman komunitas.",
+    "shareWallpaperPrompt": "Apakah Anda ingin wallpaper ini juga terlihat oleh lawan chat Anda?",
+    "today": "Hari Ini",
+    "yesterday": "Kemarin",
+    "encryptionNotice": "Pesan sudah terenkripsi secara end-to-end. Tidak ada orang di luar chat ini yang dapat membaca pesan Anda."
   }
 }
 

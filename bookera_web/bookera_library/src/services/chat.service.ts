@@ -3,11 +3,13 @@ import { User } from "@/types/user";
 
 export interface Message {
   id: number;
-  message: string;
+  message?: string;
+  image_path?: string | string[];
   is_read: boolean;
   created_at: string;
   is_sender: boolean;
   is_flagged?: boolean;
+  status?: "sending" | "sent" | "read";
 }
 
 export interface Conversation {
@@ -37,8 +39,12 @@ export const chatService = {
     return data;
   },
 
-  sendMessage: async (userSlug: string, message: string) => {
-    const { data } = await api.post(`/chat/${userSlug}`, { message });
+  sendMessage: async (userSlug: string, formData: FormData) => {
+    const { data } = await api.post(`/chat/${userSlug}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return data;
   },
 

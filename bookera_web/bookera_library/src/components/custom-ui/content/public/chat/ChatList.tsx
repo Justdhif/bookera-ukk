@@ -4,20 +4,24 @@ import { useState } from "react";
 import { User } from "@/types/user";
 import { Conversation } from "@/services/chat.service";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, MessageSquareText } from "lucide-react";
+import { Search, Filter, MessageSquareText, Check, CheckCheck, Image as ImageIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, formatChatDate } from "@/lib/utils";
+import { decryptMessage } from "@/lib/crypto";
 import { useTranslations } from "next-intl";
+import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
+import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 
 interface ChatListProps {
   conversations: Conversation[];
   followedUsers: User[];
   activeUser: User | null;
+  currentUser: User | null;
   loading: boolean;
   onSelectUser: (user: User) => void;
   onSearchChange: (search: string) => void;
@@ -30,6 +34,7 @@ export default function ChatList({
   conversations,
   followedUsers,
   activeUser,
+  currentUser,
   loading,
   onSelectUser,
   onSearchChange,
@@ -71,7 +76,7 @@ export default function ChatList({
                 {t("messagesTitle")}
               </h3>
               <p className="text-xs text-muted-foreground">
-                {conversations.length} {t("conversationsCount", { defaultValue: "Conversations" })}
+                {conversations.length} {t("conversationsCount")}
                 {unreadCount > 0 && (
                   <span className="ml-1 font-medium text-primary">
                     · {unreadCount} {t("unread")}
@@ -137,10 +142,11 @@ export default function ChatList({
             <ScrollArea className="w-full whitespace-nowrap">
               <div className="flex w-max space-x-3 px-1 py-1">
                 {followedUsers.map((followedUser) => (
-                  <button
+                  <Button
                     key={followedUser.id}
+                    variant="ghost"
                     onClick={() => onSelectUser(followedUser)}
-                    className="flex flex-col items-center gap-1.5 focus:outline-none group"
+                    className="flex flex-col items-center gap-1.5 focus:outline-none group h-auto p-0 hover:bg-transparent"
                   >
                     <div
                       className={cn(
@@ -161,7 +167,7 @@ export default function ChatList({
                       {followedUser.profile?.full_name?.split(" ")[0] ||
                         followedUser.email?.split("@")[0]}
                     </span>
-                  </button>
+                  </Button>
                 ))}
               </div>
               <ScrollBar orientation="horizontal" className="h-1" />
@@ -190,13 +196,14 @@ export default function ChatList({
               const isSelected = activeUser?.id === conv.user.id;
               const hasUnread = conv.unread_count > 0;
               return (
-                <button
+                <Button
                   key={conv.user.id}
+                  variant="ghost"
                   onClick={() => onSelectUser(conv.user)}
                   className={cn(
-                    "w-full relative flex gap-3 p-3.5 cursor-pointer transition-all duration-150 group text-left",
+                    "w-full relative flex items-start gap-3 p-3.5 cursor-pointer transition-all duration-150 group text-left h-auto rounded-none",
                     isSelected
-                      ? "bg-primary/8 dark:bg-primary/12"
+                      ? "bg-primary/8 dark:bg-primary/12 hover:bg-primary/10"
                       : hasUnread
                         ? "bg-blue-50/40 dark:bg-blue-950/10 hover:bg-muted/60"
                         : "hover:bg-muted/50",
@@ -211,38 +218,57 @@ export default function ChatList({
                   </Avatar>
                   <div className="flex-1 min-w-0 pr-3">
                     <div className="flex justify-between items-center mb-0.5">
-                      <h4
-                        className={cn(
-                          "text-sm truncate leading-snug",
-                          hasUnread ? "font-bold text-foreground" : "font-semibold text-foreground/90"
-                        )}
-                      >
-                        {conv.user.profile?.full_name ||
-                          conv.user.email?.split("@")[0]}
-                      </h4>
-                      <span className="text-[11px] text-muted-foreground/70 whitespace-nowrap ml-2">
-                        {new Date(conv.last_message.created_at).toLocaleTimeString(
-                          [],
-                          { hour: "2-digit", minute: "2-digit" },
-                        )}
-                      </span>
+                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                          <span className={cn(
+                            "truncate leading-snug",
+                            hasUnread ? "font-bold text-foreground" : "font-semibold text-foreground/90"
+                          )}>
+                            {conv.user.profile?.full_name ||
+                              conv.user.email?.split("@")[0]}
+                            {currentUser?.id === conv.user.id && ` (${t("you")})`}
+                          </span>
+                          <div className="flex items-center gap-1 shrink-0">
+                            {conv.user.role === "admin" && <AdminBadge className="h-4 px-1.5 text-[8px]" />}
+                            {conv.user.profile?.gender === "croissant" && <CroissantBadge className="h-4 px-1.5 text-[8px]" />}
+                          </div>
+                        </div>
+                      <div className="flex flex-col items-end gap-1 ml-2 shrink-0">
+                        <span className="text-[11px] text-muted-foreground/70 whitespace-nowrap">
+                          {formatChatDate(conv.last_message.created_at, t)}
+                        </span>
+                      </div>
                     </div>
                     <p
                       className={cn(
-                        "text-xs truncate leading-relaxed",
+                        "text-xs truncate leading-relaxed flex items-center",
                         hasUnread
                           ? "font-semibold text-foreground"
                           : "text-muted-foreground"
                       )}
                     >
-                      {conv.last_message.is_sender && <span className="opacity-70 mr-1">{t("you")}:</span>}
-                      {conv.last_message.message}
+                      {conv.last_message.is_sender && (
+                        <span className="mr-1 inline-flex items-center">
+                          {conv.last_message.is_read ? (
+                            <CheckCheck className="h-3.5 w-3.5 text-sky-500" />
+                          ) : (
+                            <Check className="h-3.5 w-3.5" />
+                          )}
+                        </span>
+                      )}
+                      {conv.last_message.image_path && (
+                        <ImageIcon className="h-3.5 w-3.5 mr-1 shrink-0 opacity-70" />
+                      )}
+                      <span className="truncate">
+                        {conv.last_message.message && currentUser
+                          ? decryptMessage(conv.last_message.message, currentUser.id, conv.user.id)
+                          : (conv.last_message.image_path ? t("sentImage") : "")}
+                      </span>
                     </p>
                   </div>
                   {hasUnread && (
                     <div className="absolute right-3 top-3.5 h-2 w-2 rounded-full bg-primary shadow-sm shadow-primary/30" />
                   )}
-                </button>
+                </Button>
               );
             })}
           </div>

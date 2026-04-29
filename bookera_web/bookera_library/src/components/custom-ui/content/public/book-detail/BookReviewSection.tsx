@@ -14,6 +14,8 @@ import { id, enUS } from "date-fns/locale";
 import { useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
+import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 
 interface BookReviewSectionProps {
   book: Book;
@@ -130,12 +132,18 @@ export default function BookReviewSection({
                 </Link>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start gap-2 mb-1">
-                    <Link 
-                      href={`/${r.user?.slug}/profile`}
-                      className="font-medium text-sm truncate hover:text-brand-primary transition-colors"
-                    >
-                      {r.user?.profile?.full_name || ""}
-                    </Link>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Link 
+                        href={`/${r.user?.slug}/profile`}
+                        className="font-medium text-sm truncate hover:text-brand-primary transition-colors"
+                      >
+                        {r.user?.profile?.full_name || ""}
+                      </Link>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {r.user?.role === "admin" && <AdminBadge className="h-3.5 px-1 text-[7px]" />}
+                        {r.user?.profile?.gender === "croissant" && <CroissantBadge className="h-3.5 px-1 text-[7px]" />}
+                      </div>
+                    </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
                       {formatDistanceToNow(new Date(r.created_at), {
                         addSuffix: true,
