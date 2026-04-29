@@ -2742,7 +2742,9 @@
     "shareWallpaperPrompt": "Apakah Anda ingin wallpaper ini juga terlihat oleh lawan chat Anda?",
     "today": "Hari Ini",
     "yesterday": "Kemarin",
-    "encryptionNotice": "Pesan sudah terenkripsi secara end-to-end. Tidak ada orang di luar chat ini yang dapat membaca pesan Anda."
+    "encryptionNotice": "Pesan sudah terenkripsi secara end-to-end. Tidak ada orang di luar chat ini yang dapat membaca pesan Anda.",
+    "mentionsSuggestions": "Saran Sebutan",
+    "aiMentionHint": "Tag untuk menggunakan bantuan AI"
   }
 }
 

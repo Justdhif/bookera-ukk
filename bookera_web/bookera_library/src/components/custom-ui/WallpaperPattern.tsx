@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useId } from "react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
@@ -395,6 +395,7 @@ export function WallpaperPattern({
   /** SVG pattern tile height */
   patternHeight?: number;
 }) {
+  const patternId = useId().replace(/:/g, "");
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -431,7 +432,7 @@ export function WallpaperPattern({
       >
         <defs>
           <pattern
-            id="libWallpaper"
+            id={patternId}
             x="0"
             y="0"
             width={patternWidth}
@@ -454,7 +455,7 @@ export function WallpaperPattern({
             })}
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill="url(#libWallpaper)" />
+        <rect width="100%" height="100%" fill={`url(#${patternId})`} />
       </svg>
     </div>
   );

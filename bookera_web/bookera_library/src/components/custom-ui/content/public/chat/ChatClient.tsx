@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { User } from "@/types/user";
 import { chatService, Conversation, Message } from "@/services/chat.service";
+import { chatbotService } from "@/services/chatbot.service";
 import { useAuthStore } from "@/store/auth.store";
 import { echo } from "@/lib/echo";
 import { followService } from "@/services/follow.service";
@@ -11,7 +12,7 @@ import { useTranslations } from "next-intl";
 import ChatList from "./ChatList";
 import ChatDetail from "./ChatDetail";
 import ChatDetailSheet from "./ChatDetailSheet";
-import { encryptMessage } from "@/lib/crypto";
+import { encryptMessage, decryptMessage } from "@/lib/crypto";
 
 export default function ChatClient() {
   const t = useTranslations("chat");
@@ -152,6 +153,7 @@ export default function ChatClient() {
               is_read: incomingMessage.is_read,
               created_at: incomingMessage.created_at,
               is_sender: false,
+              is_ai: incomingMessage.is_ai,
             },
           ]);
           chatService
@@ -174,9 +176,10 @@ export default function ChatClient() {
 
     if (!messageText.trim() && (!imageFiles || imageFiles.length === 0)) return;
 
-    const encryptedText = messageText.trim() 
-      ? encryptMessage(messageText.trim(), user.id, activeUser.id) 
-      : "";
+    // Don't encrypt if it's an AI trigger to avoid server moderation false positives on ciphertext
+    const encryptedText = messageText.includes("@boteraAI")
+      ? messageText.trim()
+      : (messageText.trim() ? encryptMessage(messageText.trim(), user.id, activeUser.id) : "");
 
     const optimisticId = Date.now();
 
@@ -196,20 +199,35 @@ export default function ChatClient() {
     try {
       setIsModerating(true);
 
-      if (imageFiles && imageFiles.length > 0) {
-        for (let i = 0; i < imageFiles.length; i++) {
-          const formData = new FormData();
-          if (i === imageFiles.length - 1 && messageText.trim()) {
-            formData.append("message", encryptedText);
-          }
-          formData.append("image", imageFiles[i]);
-          await chatService.sendMessage(activeUser.slug, formData);
+      // AI moderation check on raw text before encryption
+      if (messageText.trim()) {
+        const moderation = await chatService.moderateMessage(messageText.trim());
+        if (moderation.is_inappropriate) {
+          setModerationAlert(moderation.reason);
+          setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId));
+          return;
         }
+      }
+
+      if (imageFiles && imageFiles.length > 0) {
+        const formData = new FormData();
+        if (messageText.trim()) {
+          formData.append("message", encryptedText);
+          formData.append("is_encrypted", "1");
+        }
+        
+        // Append all images to 'images[]'
+        imageFiles.forEach((file) => {
+          formData.append("images[]", file);
+        });
+
+        await chatService.sendMessage(activeUser.slug, formData);
         fetchConversations(true);
         fetchMessagesAndSetUser(activeUser.slug);
       } else {
         const formData = new FormData();
         formData.append("message", encryptedText);
+        formData.append("is_encrypted", "1");
         await chatService.sendMessage(activeUser.slug, formData);
         fetchConversations(true);
       }
@@ -232,6 +250,31 @@ export default function ChatClient() {
       }
     } finally {
       setIsModerating(false);
+    }
+
+    // AI Intervention logic
+    if (messageText.includes("@boteraAI")) {
+      try {
+        const aiResponse = await chatbotService.sendMessage(messageText.replace("@boteraAI", "").trim());
+        const aiMessage = aiResponse.data.data.response;
+        
+        // SAVE AI MESSAGE TO DATABASE
+        // We don't add it manually to setMessages anymore because Echo will broadcast it back to us 
+        // since the sender is the opponent and receiver is us. This prevents duplication.
+        try {
+          const aiFormData = new FormData();
+          aiFormData.append("message", aiMessage);
+          aiFormData.append("is_ai", "1");
+          aiFormData.append("is_encrypted", "0");
+          await chatService.sendMessage(activeUser.slug, aiFormData);
+          // Refresh conversations to show AI message in list
+          fetchConversations(true);
+        } catch (saveError) {
+          console.error("Failed to save AI response to DB", saveError);
+        }
+      } catch (error) {
+        console.error("AI intervention failed", error);
+      }
     }
   };
 

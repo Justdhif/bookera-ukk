@@ -9,6 +9,7 @@ export interface Message {
   created_at: string;
   is_sender: boolean;
   is_flagged?: boolean;
+  is_ai?: boolean;
   status?: "sending" | "sent" | "read";
 }
 

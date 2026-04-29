@@ -8,11 +8,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { User as UserIcon, Send, MessageSquareText, ShieldAlert, AlertTriangle, Loader2, X, ImagePlus, Settings, Trash2, Lock, Clock, Check, CheckCheck } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ImagePreviewDialog from "@/components/custom-ui/ImagePreviewDialog";
+import Image from "next/image";
+import boteraLogo from "@/assets/logo/botera.png";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Sheet,
   SheetContent,
@@ -62,6 +66,9 @@ export default function ChatDetailSheet({
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string>("");
 
+  const [showMentionSuggestions, setShowMentionSuggestions] = useState(false);
+  const [mentionFilter, setMentionFilter] = useState("");
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
@@ -88,6 +95,29 @@ export default function ChatDetailSheet({
     setSelectedFiles([]);
     setImagePreviews([]);
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNewMessage(value);
+
+    // Detect @ for mentions
+    const words = value.split(" ");
+    const lastWord = words[words.length - 1];
+
+    if (lastWord.startsWith("@")) {
+      setMentionFilter(lastWord.slice(1).toLowerCase());
+      setShowMentionSuggestions(true);
+    } else {
+      setShowMentionSuggestions(false);
+    }
+  };
+
+  const insertMention = (mention: string) => {
+    const words = newMessage.split(" ");
+    words[words.length - 1] = mention + " ";
+    setNewMessage(words.join(" "));
+    setShowMentionSuggestions(false);
   };
 
 
@@ -228,8 +258,8 @@ export default function ChatDetailSheet({
 
                   {messages.length === 0 ? (
                     <div className="space-y-6">
-                      <div className="flex items-center justify-center py-2">
-                        <div className="px-3 py-1 bg-background/80 backdrop-blur-md rounded-md text-[10px] font-medium text-muted-foreground uppercase tracking-wider border border-border/50 shadow-sm">
+                      <div className="flex items-center justify-center py-4">
+                        <div className="px-5 py-1.5 bg-brand-primary/10 dark:bg-brand-primary/20 backdrop-blur-xl rounded-full text-[9px] font-black text-brand-primary dark:text-brand-primary-light uppercase tracking-[0.2em] border border-brand-primary/20 dark:border-brand-primary/30 shadow-xs ring-1 ring-brand-primary/10">
                           {t("today")}
                         </div>
                       </div>
@@ -244,8 +274,8 @@ export default function ChatDetailSheet({
                   ) : (
                     groupedMessages.map((group) => (
                       <div key={group.date} className="flex flex-col space-y-4">
-                        <div className="flex justify-center my-3 sticky top-0 z-10">
-                          <span className="bg-background/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-muted-foreground border border-border/50 shadow-sm">
+                        <div className="flex justify-center my-4 sticky top-5 z-20">
+                          <span className="bg-brand-primary/10 dark:bg-brand-primary/20 backdrop-blur-xl px-5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-brand-primary dark:text-brand-primary-light border border-brand-primary/20 dark:border-brand-primary/30 shadow-xs ring-1 ring-brand-primary/10">
                             {formatMessageDate(group.messages[0].created_at)}
                           </span>
                         </div>
@@ -259,12 +289,36 @@ export default function ChatDetailSheet({
                             <div
                               key={msg.id || i}
                               className={cn(
-                                "flex max-w-[80%]",
-                                msg.is_sender ? "self-end" : "self-start"
+                                "flex w-full mb-3 last:mb-0 gap-3 items-end",
+                                msg.is_sender && !msg.is_ai
+                                  ? "self-end flex-row-reverse text-right"
+                                  : "self-start flex-row text-left",
                               )}
                             >
+                              {!msg.is_sender && (
+                                <div className="flex flex-col items-center mb-1 shrink-0">
+                                  <Avatar className={cn(
+                                    "h-7 w-7 border",
+                                    msg.is_ai ? "border-brand-primary/50 shadow-sm" : "border-border"
+                                  )}>
+                                    {msg.is_ai ? (
+                                      <div className="w-full h-full bg-linear-to-br from-brand-primary to-brand-primary-dark flex items-center justify-center p-0.5">
+                                        <Image src={boteraLogo} alt="Botera" className="w-full h-full object-contain" />
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <AvatarImage src={activeUser.profile?.avatar || ""} className="object-cover" />
+                                        <AvatarFallback>
+                                          <UserIcon className="h-3.5 w-3.5 opacity-50" />
+                                        </AvatarFallback>
+                                      </>
+                                    )}
+                                  </Avatar>
+                                </div>
+                              )}
+
                               {msg.is_flagged ? (
-                                <div className="px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed shadow-sm flex flex-col bg-red-50/80 dark:bg-red-950/20 border border-red-200/60 dark:border-red-800/30 rounded-br-sm">
+                                <div className="px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed shadow-md flex flex-col bg-[#fff5f5] dark:bg-[#2a1a1a] border border-red-200 dark:border-red-900/50 rounded-br-sm">
                                   <div className="flex items-center gap-2">
                                     <AlertTriangle className="h-3.5 w-3.5 text-red-400 shrink-0" />
                                     <span className="text-red-600/80 dark:text-red-400/80 italic wrap-break-word">
@@ -281,13 +335,20 @@ export default function ChatDetailSheet({
                               ) : (
                                 <div
                                   className={cn(
-                                    "rounded-2xl text-[14px] leading-relaxed shadow-sm flex flex-col overflow-hidden",
+                                    "rounded-2xl text-[14px] leading-relaxed shadow-sm flex flex-col overflow-hidden relative",
                                     msg.image_path ? "p-1" : "px-4 py-2.5",
                                     msg.is_sender
                                       ? "bg-brand-primary text-white rounded-br-sm"
-                                      : "bg-background border border-border/50 text-card-foreground rounded-bl-sm"
+                                        : "bg-[#f8f9fa] dark:bg-[#2a2d31] border border-border/50 dark:border-white/10 text-card-foreground rounded-bl-sm shadow-sm"
                                   )}
                                 >
+                                  {msg.is_ai && !msg.image_path && (
+                                    <div className="absolute top-0 right-0 p-1.5">
+                                      <Badge className="bg-brand-primary text-[8px] font-black text-white uppercase tracking-tighter shadow-sm border border-white/10">
+                                        AI
+                                      </Badge>
+                                    </div>
+                                  )}
                                   {msg.image_path && (
                                     <div className={cn(
                                       "flex flex-wrap gap-2 mb-1",
@@ -295,7 +356,7 @@ export default function ChatDetailSheet({
                                     )}>
                                       {Array.isArray(msg.image_path) ? (
                                         msg.image_path.map((path, idx) => {
-                                          const fullPath = path.startsWith('blob:') ? path : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/storage/${path}`;
+                                          const fullPath = path;
                                           return (
                                             <Button 
                                               key={idx} 
@@ -324,14 +385,14 @@ export default function ChatDetailSheet({
                                         <Button 
                                           variant="ghost"
                                           onClick={() => {
-                                            const fullPath = msg.image_path!.toString().startsWith('blob:') ? msg.image_path!.toString() : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/storage/${msg.image_path}`;
+                                            const fullPath = msg.image_path!.toString();
                                             setSelectedImage(fullPath);
                                             setIsPreviewOpen(true);
                                           }}
                                           className="relative group/img overflow-hidden rounded-xl border border-border/20 transition-transform hover:scale-[1.02] active:scale-95 h-auto p-0"
                                         >
                                           <img 
-                                            src={msg.image_path!.toString().startsWith('blob:') ? msg.image_path!.toString() : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/storage/${msg.image_path}`} 
+                                            src={msg.image_path!.toString()} 
                                             alt="attachment" 
                                             className="max-w-[200px] object-cover" 
                                           />
@@ -342,8 +403,21 @@ export default function ChatDetailSheet({
                                       )}
                                     </div>
                                   )}
-                                  <div className={cn(msg.image_path ? "px-2.5 pb-1 pt-0.5 flex flex-col" : "flex flex-col")}>
-                                    <span className="wrap-break-word">{decryptedText}</span>
+                                  <div className={cn(msg.image_path ? "px-2.5 pb-1 pt-0.5 flex flex-col" : "flex flex-col", msg.is_ai && "pr-6")}>
+                                    <span className="wrap-break-word">
+                                      {decryptedText?.split(/(@boteraAI)/g).map((part, index) => 
+                                        part === "@boteraAI" ? (
+                                          <span key={index} className={cn(
+                                            "font-bold mx-0.5",
+                                            msg.is_sender ? "text-white underline decoration-white/30" : "text-brand-primary"
+                                          )}>
+                                            {part}
+                                          </span>
+                                        ) : (
+                                          part
+                                        )
+                                      )}
+                                    </span>
                                     <div className="flex items-center gap-1 self-end mt-1">
                                       <span
                                         className={cn(
@@ -409,13 +483,47 @@ export default function ChatDetailSheet({
                <ImagePlus className="h-5 w-5" />
                <input type="file" ref={fileInputRef} hidden accept="image/*" multiple onChange={handleImageChange} />
             </Button>
-            <Input
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder={t("typeMessage")}
-              className="flex-1 rounded-full border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-4 h-10 shadow-none text-sm"
-              disabled={loading || isModerating}
-            />
+            <div className="flex-1 relative">
+              <AnimatePresence>
+                {showMentionSuggestions && "boteraAI".startsWith(mentionFilter) && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute bottom-full mb-2 left-0 w-64 bg-card border border-border shadow-2xl rounded-2xl overflow-hidden z-50"
+                  >
+                    <div className="p-2 border-b border-border/50 bg-muted/30">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-2">
+                        {t("mentionsSuggestions") || "Suggestions"}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => insertMention("@boteraAI")}
+                      className="w-full flex items-center gap-3 p-3 hover:bg-brand-primary/5 transition-colors text-left group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-primary to-brand-primary-dark flex items-center justify-center shadow-md shrink-0 overflow-hidden p-1">
+                        <Image src={boteraLogo} alt="Botera" className="w-full h-full object-contain" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold group-hover:text-brand-primary transition-colors">BoteraAI</span>
+                        <span className="text-[11px] text-muted-foreground italic">{t("aiMentionHint")}</span>
+                      </div>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <Input
+                value={newMessage}
+                onChange={handleInputChange}
+                placeholder={t("typeMessage")}
+                className={cn(
+                  "flex-1 rounded-full border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-4 h-10 shadow-none text-sm transition-colors",
+                )}
+                disabled={loading || isModerating}
+              />
+            </div>
             <Button
               type="submit"
               size="icon"

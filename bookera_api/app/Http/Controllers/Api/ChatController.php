@@ -7,6 +7,7 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Events\MessageSent;
+use App\Events\MessagesRead;
 use App\Services\NotificationService;
 use App\Services\AI\ChatModerationService;
 use Illuminate\Support\Facades\DB;
@@ -51,7 +52,8 @@ class ChatController extends Controller
                     'image_path' => $message->image_path,
                     'is_read' => $message->is_read,
                     'created_at' => $message->created_at,
-                    'is_sender' => $message->sender_id === $userId
+                    'is_sender' => ($message->sender_id === $userId) && !$message->is_ai,
+                    'is_ai' => $message->is_ai
                 ],
                 'unread_count' => $unreadCount
             ];
@@ -87,7 +89,8 @@ class ChatController extends Controller
                 'image_path' => $message->image_path,
                 'is_read' => $message->is_read,
                 'created_at' => $message->created_at,
-                'is_sender' => $message->sender_id === $authUserId,
+                'is_sender' => ($message->sender_id === $authUserId) && !$message->is_ai,
+                'is_ai' => $message->is_ai
             ];
         });
 
@@ -121,7 +124,7 @@ class ChatController extends Controller
     public function sendMessage(Request $request, $userSlug)
     {
         $request->validate([
-            'message' => 'required_without:image,images|string|max:5000|nullable',
+            'message' => 'required_without_all:image,images|string|max:5000|nullable',
             'image' => 'nullable|image|max:2048',
             'images' => 'nullable|array',
             'images.*' => 'image|max:2048',
@@ -159,12 +162,20 @@ class ChatController extends Controller
             }
         }
 
+        $isAi = $request->boolean('is_ai');
+
+        // If it's an AI message, the "sender" should be the opponent, 
+        // and the "receiver" should be the authenticated user.
+        $finalSenderId = $isAi ? $receiver->id : $sender->id;
+        $finalReceiverId = $isAi ? $sender->id : $receiver->id;
+
         $message = Message::create([
-            'sender_id' => $sender->id,
-            'receiver_id' => $receiver->id,
+            'sender_id' => $finalSenderId,
+            'receiver_id' => $finalReceiverId,
             'message' => $request->message,
             'image_path' => !empty($imagePaths) ? $imagePaths : null,
             'is_read' => false,
+            'is_ai' => $isAi
         ]);
 
         $message->load('sender.profile');
@@ -191,7 +202,7 @@ class ChatController extends Controller
             'image_path' => $message->image_path,
             'is_read' => $message->is_read,
             'created_at' => $message->created_at,
-            'is_sender' => true,
+            'is_sender' => $message->sender_id === $sender->id,
         ], 201);
     }
 
@@ -207,6 +218,9 @@ class ChatController extends Controller
             ->where('receiver_id', $receiverId)
             ->where('is_read', false)
             ->update(['is_read' => true]);
+
+        // Broadcast that messages have been read
+        broadcast(new MessagesRead($receiverId, $sender->id));
 
         return response()->json(['message' => __('Messages marked as read')]);
     }

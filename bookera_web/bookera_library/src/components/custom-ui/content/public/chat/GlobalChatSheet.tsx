@@ -3,11 +3,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { useChatStore } from "@/store/chat.store";
 import { chatService, Message } from "@/services/chat.service";
+import { chatbotService } from "@/services/chatbot.service";
 import { useAuthStore } from "@/store/auth.store";
 import { echo } from "@/lib/echo";
 import { useTranslations } from "next-intl";
 import ChatDetailSheet from "./ChatDetailSheet";
-import { encryptMessage } from "@/lib/crypto";
+import { encryptMessage, decryptMessage } from "@/lib/crypto";
 
 export default function GlobalChatSheet() {
   const t = useTranslations("chat");
@@ -141,6 +142,32 @@ export default function GlobalChatSheet() {
       }
     } finally {
       setIsModerating(false);
+    }
+
+    // AI Intervention logic
+    if (messageText.includes("@boteraAI")) {
+      try {
+        const aiResponse = await chatbotService.sendMessage(messageText.replace("@boteraAI", "").trim());
+        const aiMessage = aiResponse.data.data.response;
+        
+        // Add AI response as an opponent message
+        const aiOptimisticId = Date.now() + 1;
+        const encryptedAI = encryptMessage(aiMessage, activeUser.id, user.id);
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: aiOptimisticId,
+            message: encryptedAI,
+            is_read: true,
+            created_at: new Date().toISOString(),
+            is_sender: false,
+            is_ai: true,
+          },
+        ]);
+      } catch (error) {
+        console.error("AI intervention failed", error);
+      }
     }
   };
 

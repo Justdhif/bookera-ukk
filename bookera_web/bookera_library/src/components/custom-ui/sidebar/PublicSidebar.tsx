@@ -63,11 +63,11 @@ export default function PublicSidebar() {
         };
 
         channel.listen(".message.sent", handleNewMessage);
+        channel.listen(".messages.read", handleNewMessage);
 
         return () => {
-          // Only stop this specific listener if possible, but standard echo might stop all if callback isn't supported correctly in this version.
-          // Providing callback usually works to remove only this listener.
           channel.stopListening(".message.sent", handleNewMessage);
+          channel.stopListening(".messages.read", handleNewMessage);
         };
       }
     } else {

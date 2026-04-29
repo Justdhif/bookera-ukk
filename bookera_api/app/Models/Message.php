@@ -11,13 +11,29 @@ class Message extends Model
         'receiver_id',
         'message',
         'image_path',
-        'is_read'
+        'is_read',
+        'is_ai'
     ];
 
     protected $casts = [
         'is_read' => 'boolean',
+        'is_ai' => 'boolean',
         'image_path' => 'array',
     ];
+
+    public function getImagePathAttribute($value)
+    {
+        if ($value) {
+            $paths = is_array($value) ? $value : json_decode($value, true);
+            if (is_array($paths)) {
+                return array_map(function ($path) {
+                    return storage_image($path);
+                }, $paths);
+            }
+            return storage_image($value);
+        }
+        return null;
+    }
 
     public function sender()
     {

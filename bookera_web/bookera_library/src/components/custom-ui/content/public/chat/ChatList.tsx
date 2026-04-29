@@ -259,6 +259,7 @@ export default function ChatList({
                         <ImageIcon className="h-3.5 w-3.5 mr-1 shrink-0 opacity-70" />
                       )}
                       <span className="truncate">
+                        {conv.last_message.is_ai && <span className="font-bold text-brand-primary">boteraAI: </span>}
                         {conv.last_message.message && currentUser
                           ? decryptMessage(conv.last_message.message, currentUser.id, conv.user.id)
                           : (conv.last_message.image_path ? t("sentImage") : "")}

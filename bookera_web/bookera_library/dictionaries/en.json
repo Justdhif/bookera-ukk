@@ -2744,6 +2744,8 @@
     "shareWallpaperPrompt": "Would you like this wallpaper to be visible to the other person as well?",
     "today": "Today",
     "yesterday": "Yesterday",
-    "encryptionNotice": "Messages are end-to-end encrypted. No one outside of this chat can read them."
+    "encryptionNotice": "Messages are end-to-end encrypted. No one outside of this chat can read them.",
+    "mentionsSuggestions": "Mentions",
+    "aiMentionHint": "Mention to use AI intervention"
   }
 }
