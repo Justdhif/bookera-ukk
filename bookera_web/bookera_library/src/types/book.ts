@@ -5,6 +5,7 @@ import { Author } from "./author";
 import { Publisher } from "./publisher";
 import { PaginatedResponse } from "./api";
 import { BookReview } from "./review";
+import { Reservation } from "./reservation";
 
 export interface Book {
   id: number;
@@ -34,6 +35,10 @@ export interface Book {
 
   total_copies?: number;
   available_copies?: number;
+
+  // Reservation-aware fields (injected by API for authenticated users)
+  user_reservation?: Reservation | null;
+  user_has_available_copy?: boolean;
 
   created_at: string;
   updated_at: string;

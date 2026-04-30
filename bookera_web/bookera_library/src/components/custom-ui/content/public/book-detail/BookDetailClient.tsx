@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { usePathnameCondition } from "@/hooks/usePathnameCondition";
+import { useAuthStore } from "@/store/auth.store";
 import { bookService } from "@/services/book.service";
 import { publicService } from "@/services/public.service";
 import { categoryService } from "@/services/category.service";
@@ -24,6 +25,7 @@ import AuthorFormDialog from "@/components/custom-ui/content/admin/author/Author
 import PublisherFormDialog from "@/components/custom-ui/content/admin/publisher/PublisherFormDialog";
 import FavoriteButton from "./FavoriteButton";
 import AddToRequestButton from "./AddToRequestButton";
+import ReservationButton from "./ReservationButton";
 import BookReviewSection from "./BookReviewSection";
 import BookCopyStatusBadge from "@/components/custom-ui/badge/BookCopyStatusBadge";
 import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
@@ -49,6 +51,8 @@ import {
   Star,
   X,
   Edit,
+  Bell,
+  Clock,
 } from "lucide-react";
 
 export default function BookDetailClient() {
@@ -56,6 +60,7 @@ export default function BookDetailClient() {
   const tPublic = useTranslations("public");
 
   const { isAdmin } = usePathnameCondition();
+  const { isAuthenticated } = useAuthStore();
   const router = useRouter();
   const params = useParams();
   const slug = params.slug as string;
@@ -297,10 +302,14 @@ export default function BookDetailClient() {
         isAdmin={isAdmin}
         rightActions={
           isAdmin ? null : (
-            book && (
+            book && isAuthenticated && (
               <div className="flex flex-wrap items-center gap-3">
                 <FavoriteButton bookId={book.id} />
-                <AddToRequestButton book={book} />
+                {/* Show AddToRequest only when stock is available OR user has a notified reservation */}
+                {((book.available_copies ?? 0) > 0 || book.user_has_available_copy) && (
+                  <AddToRequestButton book={book} />
+                )}
+                <ReservationButton book={book} onReservationChange={fetchBook} />
               </div>
             )
           )
@@ -455,6 +464,39 @@ export default function BookDetailClient() {
                         <span className="text-xs text-muted-foreground">
                           ({book.reviews_count || 0} {tPublic("reviewsTotal")})
                         </span>
+                      </div>
+                    )}
+                    
+                    {book.user_has_available_copy && (
+                      <div className="flex items-center gap-3 p-3 mt-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm">
+                        <div className="bg-emerald-500 p-1.5 rounded-lg">
+                          <Bell className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="font-bold text-emerald-600 dark:text-emerald-400">
+                            {tPublic("reservedCopyAvailable") || "Book Ready for You!"}
+                          </p>
+                          <p className="text-muted-foreground text-xs font-medium">
+                            {tPublic("reservedCopyAvailableDesc") || "A copy is reserved exclusively for you. Please borrow it within 24 hours."}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Queue Status Notification */}
+                    {book.user_reservation && book.user_reservation.status === "waiting" && (
+                      <div className="flex items-center gap-3 p-3 mt-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm">
+                        <div className="bg-amber-500 p-1.5 rounded-lg">
+                          <Clock className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="font-bold text-amber-600 dark:text-amber-400">
+                            {tPublic("queuePositionTitle") || "In Reservation Queue"}
+                          </p>
+                          <p className="text-muted-foreground text-xs font-medium">
+                            {tPublic("queuePosition", { pos: book.user_reservation.queue_position })}
+                          </p>
+                        </div>
                       </div>
                     )}
                   </CardHeader>

@@ -10,6 +10,7 @@ use App\Models\LostBook;
 use App\Models\FineBorrow;
 use App\Models\FineType;
 use App\Services\BookReturn\BookReturnNotificationService;
+use App\Services\Reservation\ReservationService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
@@ -134,6 +135,11 @@ class BookReturnService
 
                     $borrowDetail->update(['status' => 'returned']);
                     $bookCopy->update(['status' => 'available']);
+
+                    // Notify next user in reservation queue only when book is returned in good condition
+                    if ($condition === 'good') {
+                        app(ReservationService::class)->notifyAvailableWaiters($bookCopy->book_id);
+                    }
 
                     $results['returned'][] = [
                         'copy_id' => $bookCopy->id,

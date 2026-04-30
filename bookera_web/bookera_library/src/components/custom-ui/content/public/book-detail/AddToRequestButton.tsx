@@ -11,16 +11,24 @@ import BorrowRequestDialog from "./BorrowRequestDialog";
 
 interface AddToRequestButtonProps {
   book: Book;
+  variant?: "submit" | "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  size?: "default" | "sm" | "lg" | "icon";
+  className?: string;
 }
 
 export default function AddToRequestButton({
   book,
+  variant = "submit",
+  size = "sm",
+  className,
 }: AddToRequestButtonProps) {
-  const t = useTranslations("public");
   const { isAuthenticated } = useAuthStore();
+  const t = useTranslations("public");
   const router = useRouter();
   const pathname = usePathname();
   const [showDialog, setShowDialog] = useState(false);
+
+  if (!isAuthenticated) return null;
 
   const handleOpen = () => {
     if (!isAuthenticated) {

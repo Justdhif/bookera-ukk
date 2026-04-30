@@ -33,6 +33,7 @@ use App\Http\Controllers\Api\ComplaintCommentController;
 use App\Http\Controllers\Api\ComplaintVoteController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\NotificationSettingsController;
+use App\Http\Controllers\Api\ReservationController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -266,6 +267,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('complaints')->group(function () {
             Route::patch('/{slug}/status', [ComplaintController::class, 'updateStatus']);
         });
+
+        // Reservation management
+        Route::prefix('reservations')->group(function () {
+            Route::get('/', [ReservationController::class, 'index']);
+        });
     });
 
     Route::middleware('role:admin')->prefix('admin')->group(function () {
@@ -386,5 +392,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('complaint-comments')->group(function () {
         Route::delete('/{id}', [ComplaintCommentController::class, 'destroy']);
     });
+
+    Route::prefix('reservations')->group(function () {
+        Route::post('/', [ReservationController::class, 'store']);
+        Route::get('/prediction/{bookId}', [ReservationController::class, 'prediction']);
+        Route::delete('/{reservation}', [ReservationController::class, 'cancel']);
+        Route::get('/check/{bookId}', [ReservationController::class, 'check']);
+    });
+
+    Route::get('my-reservations', [ReservationController::class, 'myReservations']);
 
 });

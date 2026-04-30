@@ -76,10 +76,33 @@ class Book extends Model
 
     public function getAvailableCopiesAttribute()
     {
-        if (array_key_exists('available_copies_count', $this->attributes)) {
-            return $this->available_copies_count;
+        // 1. Get raw available copies count (status = 'available')
+        $rawCount = array_key_exists('available_copies_count', $this->attributes)
+            ? (int) $this->available_copies_count
+            : $this->available_copies()->count();
+
+        // 2. Get notified reservations count for this book
+        $notifiedCount = $this->reservations()
+            ->where('status', 'notified')
+            ->count();
+
+        // 3. Public available count
+        $publicAvailable = max(0, $rawCount - $notifiedCount);
+
+        // 4. If user is logged in, check if they have a 'notified' reservation for THIS book
+        $user = auth('sanctum')->user();
+        if ($user) {
+            $hasNotified = $this->reservations()
+                ->where('user_id', $user->id)
+                ->where('status', 'notified')
+                ->exists();
+
+            if ($hasNotified) {
+                return $publicAvailable + 1;
+            }
         }
-        return $this->available_copies()->count();
+
+        return $publicAvailable;
     }
 
     public function getTotalCopiesAttribute()
@@ -131,6 +154,11 @@ class Book extends Model
     {
         return $this->belongsToMany(Publisher::class, 'book_publishers', 'book_id', 'publisher_id')
             ->withTimestamps();
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
     }
 
 }

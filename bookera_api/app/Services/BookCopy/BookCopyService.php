@@ -8,10 +8,20 @@ use App\Models\BookCopy;
 
 class BookCopyService
 {
+    private \App\Services\Reservation\ReservationService $reservationService;
+
+    public function __construct(\App\Services\Reservation\ReservationService $reservationService)
+    {
+        $this->reservationService = $reservationService;
+    }
+
     public function create(Book $book, array $data): BookCopy
     {
         $copy = $book->copies()->create($data);
         $copy->load('book');
+
+        // Notify next user in queue if any
+        $this->reservationService->notifyAvailableWaiters($book->id);
 
         ActivityLogger::log(
             'create',

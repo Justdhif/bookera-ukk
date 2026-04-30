@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Models\Reservation;
 use App\Services\Public\PublicService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -38,7 +39,7 @@ class PublicController extends Controller
     /**
      * Display the specified book by slug.
      */
-    public function bookBySlug(string $slug): JsonResponse
+    public function bookBySlug(Request $request, string $slug): JsonResponse
     {
         $book = $this->publicService->getBookBySlug($slug);
 
@@ -46,19 +47,23 @@ class PublicController extends Controller
             return ApiResponse::errorResponse('Book not found', null, 404);
         }
 
+        $book = $this->injectReservationData($request, $book);
+
         return ApiResponse::successResponse('Book details', $book);
     }
 
     /**
      * Display the specified book by ID.
      */
-    public function bookById(int $id): JsonResponse
+    public function bookById(Request $request, int $id): JsonResponse
     {
         $book = $this->publicService->getBookById($id);
 
         if (!$book) {
             return ApiResponse::errorResponse('Book not found', null, 404);
         }
+
+        $book = $this->injectReservationData($request, $book);
 
         return ApiResponse::successResponse('Book details', $book);
     }
@@ -165,5 +170,58 @@ class PublicController extends Controller
         $stats = $this->publicService->getPublicStats();
 
         return ApiResponse::successResponse('Public stats retrieved successfully', $stats);
+    }
+
+    private function injectReservationData(Request $request, $book)
+    {
+        $user = auth('sanctum')->user();
+
+        if (! $user) {
+            $book->user_reservation         = null;
+            $book->user_has_available_copy  = false;
+        } else {
+            $reservation = Reservation::where('user_id', $user->id)
+                ->where('book_id', $book->id)
+                ->whereIn('status', ['waiting', 'notified'])
+                ->first();
+
+            $book->user_reservation        = $reservation;
+            $book->user_has_available_copy = $reservation?->status === 'notified';
+        }
+
+        // Eksklusivitas Salinan: Filter daftar copies yang dikirim ke frontend
+        // Jika buku memiliki relasi 'copies' yang dimuat
+        if ($book->relationLoaded('copies')) {
+            $notifiedCount = Reservation::where('book_id', $book->id)->where('status', 'notified')->count();
+            $rawAvailableCount = $book->copies->where('status', 'available')->count();
+            $publicAvailableCount = max(0, $rawAvailableCount - $notifiedCount);
+            
+            $hasNotified = $book->user_has_available_copy ?? false;
+            $reservedShown = false;
+
+            $filteredCopies = $book->copies->filter(function ($copy) use ($hasNotified, &$publicAvailableCount, &$reservedShown) {
+                if ($copy->status !== 'available') {
+                    return true;
+                }
+
+                // Jika user ini pemegang reservasi yang sudah dinotifikasi, tampilkan 1 salinan untuknya
+                if ($hasNotified && !$reservedShown) {
+                    $reservedShown = true;
+                    return true;
+                }
+
+                // Untuk salinan available lainnya, hanya tampilkan jika masih ada sisa stok publik
+                if ($publicAvailableCount > 0) {
+                    $publicAvailableCount--;
+                    return true;
+                }
+
+                return false; // Sembunyikan salinan 'milik orang lain'
+            });
+
+            $book->setRelation('copies', $filteredCopies->values());
+        }
+
+        return $book;
     }
 }

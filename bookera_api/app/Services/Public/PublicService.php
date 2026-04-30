@@ -37,12 +37,8 @@ class PublicService
             'reviews'
         ]);
 
-        $query->where('is_active', true);
-
-        // Removed: Always filter by available stock for public listing
-        // $query->whereHas('copies', function ($copyQuery) {
-        //     $copyQuery->where('status', 'available');
-        // });
+        $query->where('is_active', true)
+            ->has('copies');
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
@@ -314,12 +310,13 @@ class PublicService
      */
     public function getPublicStats(): array
     {
-        $totalBooks = Book::where('is_active', true)->count();
+        $totalBooks = Book::where('is_active', true)->has('copies')->count();
         $totalUsers = User::where('is_active', true)->where('role', 'user')->count();
 
         // Top rated books: avg rating (min 1 review), load with categories and authors
         $topRatedBooks = Book::query()
             ->where('is_active', true)
+            ->has('copies')
             ->with(['authors', 'categories', 'reviews'])
             ->withCount(['reviews', 'favorites'])
             ->withAvg('reviews', 'rating')

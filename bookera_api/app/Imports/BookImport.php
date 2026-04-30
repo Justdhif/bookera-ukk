@@ -20,10 +20,12 @@ use Illuminate\Support\Str;
 class BookImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
 {
     private BookService $bookService;
+    private \App\Services\Reservation\ReservationService $reservationService;
 
     public function __construct()
     {
         $this->bookService = app(BookService::class);
+        $this->reservationService = app(\App\Services\Reservation\ReservationService::class);
     }
 
     public function collection(Collection $rows)
@@ -104,6 +106,9 @@ class BookImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                             'status' => 'available'
                         ]);
                     }
+
+                    // Notify next user in queue if any after adding copies
+                    $this->reservationService->notifyAvailableWaiters($book->id);
                 }
             });
         }

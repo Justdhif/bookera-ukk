@@ -57,10 +57,15 @@ class BorrowService
             $borrowedCopies = [];
 
             foreach ($data['book_copy_ids'] as $copyId) {
-                $copy = BookCopy::where('id', $copyId)
+                $copy = BookCopy::with('book')->where('id', $copyId)
                     ->where('status', 'available')
                     ->lockForUpdate()
                     ->firstOrFail();
+
+                // Check if user is allowed to take this "available" copy based on notified reservations
+                if ($copy->book->available_copies <= 0) {
+                    abort(422, __('This book is currently reserved for other users.'));
+                }
 
                 $borrow->borrowDetails()->create([
                     'book_copy_id' => $copy->id,
