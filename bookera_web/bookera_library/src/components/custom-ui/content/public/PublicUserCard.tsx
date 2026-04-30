@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
+import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
 import { MessageSquare, UserPlus, Users, MessageCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
@@ -21,7 +22,7 @@ interface PublicUserCardProps {
 
 export default function PublicUserCard({ user, className }: PublicUserCardProps) {
   const t = useTranslations("explore");
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user: currentUser } = useAuthStore();
   const { openChat } = useChatStore();
   const profile = user.profile;
   const avatarUrl = profile?.avatar || "";
@@ -62,6 +63,7 @@ export default function PublicUserCard({ user, className }: PublicUserCardProps)
               </p>
               <div className="flex items-center gap-1.5 flex-wrap">
                 {user.role === "admin" && <AdminBadge />}
+                {user.role === "member" && <MemberBadge />}
                 {user.profile?.gender === "croissant" && <CroissantBadge />}
               </div>
             </div>
@@ -109,14 +111,16 @@ export default function PublicUserCard({ user, className }: PublicUserCardProps)
                 <UserPlus className="h-4 w-4" />
                 {t("follow")}
               </Button>
-              <Button 
-                size="icon" 
-                variant="outline" 
-                className="shrink-0 rounded-xl border-muted/50 hover:bg-muted/50 transition-colors"
-                onClick={() => openChat(user)}
-              >
-                <MessageSquare className="h-4 w-4 text-muted-foreground" />
-              </Button>
+              {currentUser?.role === "member" && (
+                <Button 
+                  size="icon" 
+                  variant="outline" 
+                  className="shrink-0 rounded-xl border-muted/50 hover:bg-muted/50 transition-colors"
+                  onClick={() => openChat(user)}
+                >
+                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              )}
             </div>
           )}
         </div>

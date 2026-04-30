@@ -34,6 +34,8 @@ use App\Http\Controllers\Api\ComplaintVoteController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\NotificationSettingsController;
 use App\Http\Controllers\Api\ReservationController;
+use App\Http\Controllers\Api\MembershipController;
+use App\Http\Controllers\Api\Admin\MembershipPlanController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -75,6 +77,11 @@ Route::get('complaints/{slug}/comments', [ComplaintCommentController::class, 'in
 
 Route::get('categories', [PublicController::class, 'categories']);
 Route::get('stats', [PublicController::class, 'publicStats']);
+
+// Membership Plans (public)
+Route::get('membership/plans', [MembershipController::class, 'plans']);
+// Midtrans webhook (no auth — Midtrans calls this)
+Route::post('membership/notification', [MembershipController::class, 'handleNotification']);
 
 Route::get('authors', [PublicController::class, 'authors']);
 Route::get('authors/slug/{slug}', [PublicController::class, 'authorBySlug']);
@@ -268,6 +275,10 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::patch('/{slug}/status', [ComplaintController::class, 'updateStatus']);
         });
 
+        // Membership Plans
+        Route::get('membership-plans', [MembershipPlanController::class, 'index']);
+        Route::put('membership-plans/{id}', [MembershipPlanController::class, 'update']);
+
         // Reservation management
         Route::prefix('reservations')->group(function () {
             Route::get('/', [ReservationController::class, 'index']);
@@ -401,5 +412,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('my-reservations', [ReservationController::class, 'myReservations']);
+
+    // Membership
+    Route::prefix('membership')->group(function () {
+        Route::post('/transaction', [MembershipController::class, 'createTransaction']);
+        Route::get('/status', [MembershipController::class, 'checkStatus']);
+    });
 
 });

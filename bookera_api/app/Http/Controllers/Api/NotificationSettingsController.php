@@ -15,7 +15,9 @@ class NotificationSettingsController extends Controller
      */
     public function show(): JsonResponse
     {
-        $user = Auth::user()->load('profile');
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $user->load('profile');
 
         $profile = $user->profile;
 
@@ -41,17 +43,24 @@ class NotificationSettingsController extends Controller
             'notification_whatsapp' => 'required|boolean',
         ]);
 
-        $user = Auth::user()->load('profile');
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        $user->load('profile');
         $profile = $user->profile;
 
         if (! $profile) {
             return ApiResponse::errorResponse('User profile not found', 404);
         }
 
+        $notificationWhatsapp = $validated['notification_whatsapp'];
+        if ($user->role !== 'member' && $notificationWhatsapp) {
+            $notificationWhatsapp = false;
+        }
+
         $profile->update([
             'notification_enabled' => $validated['notification_enabled'],
             'notification_email' => $validated['notification_email'],
-            'notification_whatsapp' => $validated['notification_whatsapp'],
+            'notification_whatsapp' => $notificationWhatsapp,
         ]);
 
         return ApiResponse::successResponse('Notification settings updated successfully', [

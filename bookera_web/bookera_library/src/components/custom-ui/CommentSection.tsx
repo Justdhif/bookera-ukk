@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
+import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
 
 import { useAuthStore } from "@/store/auth.store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -206,6 +207,7 @@ function CommentItem({
                         comment.user?.role?.startsWith("officer")) && (
                         <AdminBadge />
                       )}
+                      {comment.user?.role === "member" && <MemberBadge />}
                       {comment.user?.profile?.gender === "croissant" && (
                         <CroissantBadge />
                       )}
@@ -231,6 +233,7 @@ function CommentItem({
                       comment.user?.role?.startsWith("officer")) && (
                       <AdminBadge />
                     )}
+                    {comment.user?.role === "member" && <MemberBadge />}
                     {comment.user?.profile?.gender === "croissant" && (
                       <CroissantBadge />
                     )}

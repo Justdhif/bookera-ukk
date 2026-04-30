@@ -144,8 +144,8 @@ export default function GlobalChatSheet() {
       setIsModerating(false);
     }
 
-    // AI Intervention logic
-    if (messageText.includes("@boteraAI")) {
+    // AI Intervention logic - Only for members
+    if (messageText.includes("@boteraAI") && user.role === 'member') {
       try {
         const aiResponse = await chatbotService.sendMessage(messageText.replace("@boteraAI", "").trim());
         const aiMessage = aiResponse.data.data.response;
@@ -171,7 +171,7 @@ export default function GlobalChatSheet() {
     }
   };
 
-  if (!user) return null;
+  if (!user || user.role !== "member") return null;
 
   return (
     <ChatDetailSheet

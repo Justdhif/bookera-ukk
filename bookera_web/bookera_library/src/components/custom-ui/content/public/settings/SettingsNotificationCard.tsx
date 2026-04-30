@@ -21,7 +21,13 @@ import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 export default function SettingsNotificationCard() {
   const t = useTranslations("settings");
-  const userSlug = useAuthStore((state) => state.user?.slug);
+  const user = useAuthStore((state) => state.user);
+  const isMember = user?.role === 'member';
+
+  if (user?.role === 'user') {
+    return null;
+  }
+  const userSlug = user?.slug;
   const profileHref = userSlug ? `/${userSlug}/profile` : "/profile";
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -179,10 +185,11 @@ export default function SettingsNotificationCard() {
                     checked={
                       settings.notification_enabled &&
                       hasPhone &&
+                      isMember &&
                       settings.notification_whatsapp
                     }
                     onCheckedChange={handleWhatsappToggle}
-                    disabled={!settings.notification_enabled || !hasPhone}
+                    disabled={!settings.notification_enabled || !hasPhone || !isMember}
                   />
                 </div>
                 {!hasPhone && (
@@ -195,6 +202,11 @@ export default function SettingsNotificationCard() {
                       {t("notificationWhatsappGoToProfile")}
                     </Link>
                   </p>
+                )}
+                {!isMember && (
+                   <p className="text-xs text-amber-600 dark:text-amber-400 pl-1">
+                     {t("memberOnlyNotification", { defaultValue: "WhatsApp notifications are available for members only." })}
+                   </p>
                 )}
               </div>
             </div>

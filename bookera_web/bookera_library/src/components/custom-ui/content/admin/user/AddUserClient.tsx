@@ -29,7 +29,7 @@ export default function AddUserClient() {
     institution: "",
     address: "",
     bio: "",
-    role: "user",
+    role: "member",
     is_active: true,
   });
   const [avatarPreview, setAvatarPreview] = useState<string>("");

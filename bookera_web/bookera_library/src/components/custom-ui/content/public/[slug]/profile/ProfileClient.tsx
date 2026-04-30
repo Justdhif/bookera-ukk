@@ -10,7 +10,7 @@ import { useChatStore } from "@/store/chat.store";
 import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import DataLoading from "@/components/custom-ui/DataLoading";
-import { Edit, Phone, Briefcase, User as UserIcon, UserPlus, UserMinus, MessageSquareText, Loader2 } from "lucide-react";
+import { Edit, Phone, Briefcase, User as UserIcon, UserPlus, UserMinus, MessageSquareText, Loader2, Crown } from "lucide-react";
 import { toast } from "sonner";
 import { normalizeOccupationValue, getOccupationLabelKey } from "@/constants/user-occupation";
 import Image from "next/image";
@@ -18,6 +18,9 @@ import Link from "next/link";
 import ProfileActivityTabs from "./ProfileActivityTabs";
 import ImagePreviewDialog from "@/components/custom-ui/ImagePreviewDialog";
 import { cn } from "@/lib/utils";
+import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
+import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
+import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 
 export default function ProfileClient() {
   const router = useRouter();
@@ -151,9 +154,16 @@ export default function ProfileClient() {
                 </div>
 
                 <div className="flex flex-col justify-center flex-1">
-                  <h2 className="text-xl md:text-3xl font-bold tracking-tight text-foreground">
-                    {user.profile?.full_name}
-                  </h2>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-xl md:text-3xl font-bold tracking-tight text-foreground">
+                      {user.profile?.full_name}
+                    </h2>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {user.role === "admin" && <AdminBadge />}
+                      {user.role === "member" && <MemberBadge />}
+                      {user.profile?.gender === "croissant" && <CroissantBadge />}
+                    </div>
+                  </div>
                   
                   <div className="flex items-center gap-6 md:gap-8 mt-3">
                     <div className="flex items-end gap-1">
@@ -208,14 +218,24 @@ export default function ProfileClient() {
                 </div>
               )}
 
-              <div className="w-full pt-2">
+              <div className="w-full pt-2 flex flex-wrap gap-3 items-center">
                 {currentUser && user?.id === currentUser?.id ? (
-                  <Link href={`${pathname}/edit`} className="inline-block">
-                    <Button variant="outline" className="border-brand-primary/20 hover:bg-brand-primary/10 hover:text-brand-primary transition-all font-medium rounded-lg px-6">
-                      <Edit className="w-4 h-4 mr-2" />
-                      {t("editProfile")}
-                    </Button>
-                  </Link>
+                  <>
+                    <Link href={`${pathname}/edit`} className="inline-block">
+                      <Button variant="outline" className="border-brand-primary/20 hover:bg-brand-primary/10 hover:text-brand-primary transition-all font-medium rounded-lg px-6">
+                        <Edit className="w-4 h-4 mr-2" />
+                        {t("editProfile")}
+                      </Button>
+                    </Link>
+                    {user.role !== 'member' && (
+                      <Link href="/pricing" className="inline-block">
+                        <Button variant="brand" className="shadow-md shadow-brand-primary/20 transition-all font-medium rounded-lg px-6">
+                          <Crown className="w-4 h-4 mr-2" />
+                          Upgrade to Member
+                        </Button>
+                      </Link>
+                    )}
+                  </>
                 ) : currentUser ? (
                   <div className="flex items-center gap-3">
                     <Button 

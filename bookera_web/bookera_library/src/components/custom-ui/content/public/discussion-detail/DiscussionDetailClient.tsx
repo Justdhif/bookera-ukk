@@ -44,6 +44,7 @@ import CommentSection from "@/components/custom-ui/CommentSection";
 import ImageCarousel from "@/components/custom-ui/ImageCarousel";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
+import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
 
 export default function DiscussionDetailClient() {
   const t = useTranslations("discussion");
@@ -169,6 +170,7 @@ export default function DiscussionDetailClient() {
                           </Link>
                           <div className="flex items-center gap-1 shrink-0">
                             {post.user?.role === "admin" && <AdminBadge />}
+                            {post.user?.role === "member" && <MemberBadge />}
                             {post.user?.profile?.gender === "croissant" && <CroissantBadge />}
                           </div>
                         </div>

@@ -6,12 +6,18 @@ import { Sparkles } from "lucide-react";
 import Image from "next/image";
 import boteraLogo from "@/assets/logo/botera.png";
 import { useChatbotStore } from "@/store/chatbot.store";
+import { useAuthStore } from "@/store/auth.store";
 import { useTranslations } from "next-intl";
 import { ChatbotWidget } from "@/components/custom-ui/ChatbotWidget";
 
 export default function ChatbotHeaderTrigger() {
   const { isOpen, setIsOpen, hasUnread } = useChatbotStore();
   const t = useTranslations("chatbot");
+  const user = useAuthStore((state) => state.user);
+
+  if (user?.role !== "member") {
+    return null;
+  }
 
   return (
     <>
@@ -19,7 +25,7 @@ export default function ChatbotHeaderTrigger() {
         variant="outline"
         onClick={() => setIsOpen(true)}
         className={cn(
-          "relative flex items-center gap-2 h-9 md:h-10 px-3 md:px-4 transition-all duration-300",
+          "relative flex items-center gap-2 h-9 md:h-10 px-2.5 md:px-4 transition-all duration-300",
           "border-brand-primary/20 hover:border-brand-primary/40",
           "group overflow-hidden bg-linear-to-br from-background to-muted/30 hover:to-brand-primary/5 shadow-xs",
           isOpen && "border-brand-primary/50 bg-brand-primary/5 shadow-brand-primary/10"
@@ -42,7 +48,7 @@ export default function ChatbotHeaderTrigger() {
             />
           </div>
           
-          <div className="flex flex-col items-start leading-none gap-0.5">
+          <div className="hidden md:flex flex-col items-start leading-none gap-0.5">
             <span className="font-bold text-[11px] md:text-[13px] text-foreground group-hover:text-brand-primary transition-colors duration-300">
               {t("title")}
             </span>
@@ -51,7 +57,7 @@ export default function ChatbotHeaderTrigger() {
             </span>
           </div>
           
-          <div className="flex items-center justify-center ml-0.5">
+          <div className="hidden md:flex items-center justify-center ml-0.5">
             <Sparkles className="w-3.5 h-3.5 text-brand-primary/60 group-hover:text-brand-primary group-hover:rotate-12 transition-all duration-500" />
           </div>
         </div>

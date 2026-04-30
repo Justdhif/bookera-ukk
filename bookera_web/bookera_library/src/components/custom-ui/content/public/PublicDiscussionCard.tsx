@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
+import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
 
 interface DiscussionCardProps {
   discussion: DiscussionPost;
@@ -43,6 +44,7 @@ export default function PublicDiscussionCard({ discussion, className }: Discussi
                   </span>
                   <div className="flex items-center gap-1 shrink-0">
                     {discussion.user?.role === "admin" && <AdminBadge />}
+                    {discussion.user?.role === "member" && <MemberBadge />}
                     {discussion.user?.profile?.gender === "croissant" && <CroissantBadge />}
                   </div>
                 </div>

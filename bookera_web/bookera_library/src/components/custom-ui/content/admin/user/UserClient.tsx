@@ -15,6 +15,8 @@ import { Plus, User as UserIcon } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import UserFilter from "./UserFilter";
+import AdminMembershipPricing from "./AdminMembershipPricing";
+
 export default function UserClient() {
   const t = useTranslations("user");
   const [users, setUsers] = useState<User[]>([]);
@@ -27,7 +29,9 @@ export default function UserClient() {
     from: 0,
     to: 0,
   });
-  const [filters, setFilters] = useState<UserFilterParams>({ per_page: ITEMS_PER_PAGE_OPTIONS[1] });
+  const [filters, setFilters] = useState<UserFilterParams>({ 
+    per_page: ITEMS_PER_PAGE_OPTIONS[1],
+  });
   const confirmDelete = async () => {
     if (!deleteId) return;
     await userService.delete(deleteId);
@@ -72,6 +76,7 @@ export default function UserClient() {
           </Link>
         }
       />
+      <AdminMembershipPricing />
       <UserFilter
         onChange={(value) =>
           setFilters((prev) => ({

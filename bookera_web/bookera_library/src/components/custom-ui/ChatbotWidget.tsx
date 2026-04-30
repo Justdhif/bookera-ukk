@@ -35,6 +35,7 @@ function TypingIndicator() {
 }
 
 import ChatBookList from "@/components/custom-ui/ChatBookList";
+import { useAuthStore } from "@/store/auth.store";
 
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
@@ -109,9 +110,13 @@ function MessageBubble({ message }: { message: ChatMessage }) {
 
 export function ChatbotWidget() {
   const t = useTranslations("chatbot");
+  const { user } = useAuthStore();
 
   const { isOpen, setIsOpen, hasUnread, setHasUnread } = useChatbotStore();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+  // Only members can see and use the chatbot
+  if (user?.role !== "member") return null;
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -182,9 +187,10 @@ export function ChatbotWidget() {
     fetchHistory();
   }, [fetchHistory]);
 
-  const sendMessage = async (text: string) => {
+  const handleSendMessage = async (text: string): Promise<void> => {
+    const user = useAuthStore.getState().user;
     const msgText = text.trim();
-    if (!msgText || isLoading) return;
+    if (!msgText || isLoading || user?.role === 'user') return;
 
     setMessages((prev) => [...prev, { id: `user-${Date.now()}`, role: "user", content: msgText, timestamp: new Date() }]);
     setInput("");
@@ -208,7 +214,7 @@ export function ChatbotWidget() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      sendMessage(input);
+      handleSendMessage(input);
     }
   };
 
@@ -317,7 +323,7 @@ export function ChatbotWidget() {
                 />
 
                 <Button
-                  onClick={() => sendMessage(input)}
+                  onClick={() => handleSendMessage(input)}
                   disabled={isLoading || !input.trim()}
                   id="chatbot-send-btn"
                   size="icon"

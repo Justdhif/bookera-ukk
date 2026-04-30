@@ -32,21 +32,6 @@ export default function UserFilter({ onChange }: Props) {
     setStatusSelect(newValue);
     onChange({ status: newValue });
   };
-  const roles = [
-    { value: "admin", label: t("admin") },
-    { value: "officer:catalog", label: t("officerCatalog") },
-    { value: "officer:management", label: t("officerManagement") },
-    { value: "user", label: t("user") },
-  ];
-  const handleRoleChange = (val: string) => {
-    if (val === "all") {
-      setRoleValue(undefined);
-      onChange({ role: undefined });
-    } else {
-      setRoleValue(val);
-      onChange({ role: val });
-    }
-  };
   return (
     <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
       <div className="relative flex-2 w-full">
@@ -60,20 +45,6 @@ export default function UserFilter({ onChange }: Props) {
       </div>
 
       <div className="flex flex-row items-center gap-3 w-full sm:flex-1">
-        <Select value={roleValue ?? "all"} onValueChange={handleRoleChange}>
-          <SelectTrigger className="flex-1 sm:w-48 h-11! shadow-sm transition-all duration-300">
-            <SelectValue placeholder={t("allRoles")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("allRoles")}</SelectItem>
-            {roles.map((role) => (
-              <SelectItem key={role.value} value={role.value}>
-                {role.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
         <Select value={statusValue} onValueChange={handleStatusChange}>
           <SelectTrigger className="flex-1 sm:w-40 h-11! shadow-sm transition-all duration-300">
             <SelectValue placeholder={t("allStatus")} />

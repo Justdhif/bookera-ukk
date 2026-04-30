@@ -39,7 +39,7 @@ export function SidebarUserFooter() {
 
   const isAccountPage = Boolean(
     user?.slug &&
-      (pathname === `/${user.slug}` || pathname.startsWith(`/${user.slug}/`)),
+    (pathname === `/${user.slug}` || pathname.startsWith(`/${user.slug}/`)),
   );
 
   const isHomePage = pathname === "/home" || pathname === "/";

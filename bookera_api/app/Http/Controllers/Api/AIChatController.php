@@ -28,6 +28,10 @@ class AIChatController extends Controller
         $message = $request->input('message');
         $user    = $request->user('sanctum');
 
+        if ($user && $user->role !== 'member') {
+            return ApiResponse::forbiddenResponse('Only members can use the AI chat feature.');
+        }
+
         $response = $this->aiChatService->generateResponse($message, $user, app()->getLocale());
 
 

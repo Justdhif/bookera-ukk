@@ -32,6 +32,7 @@ import LocaleSwitcher from "@/components/custom-ui/LocaleSwitcher";
 import { Locale } from "@/i18n/config";
 import publicService from "@/services/public.service";
 import { chatbotService } from "@/services/chatbot.service";
+import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
 
 const fadeUp = (delay = 0): Variants => ({
@@ -112,6 +113,7 @@ export default function LandingPageClient() {
   const t = useTranslations("landing");
   const [locale, setLocale] = useState<Locale | undefined>();
   const [stats, setStats] = useState<StatsData | null>(null);
+  const user = useAuthStore((state) => state.user);
 
   const booksStat = getFormattedStat(stats?.total_books ?? 0);
   const usersStat = getFormattedStat(stats?.total_users ?? 0);
@@ -160,7 +162,7 @@ export default function LandingPageClient() {
 
   const handleAiSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!aiMessage.trim() || isTyping) return;
+    if (!aiMessage.trim() || isTyping || user?.role === 'user') return;
 
     const userMsg = aiMessage.trim();
     setChatHistory(prev => [...prev, { role: "user", text: userMsg }]);
@@ -440,13 +442,13 @@ export default function LandingPageClient() {
                       type="text"
                       value={aiMessage}
                       onChange={(e) => setAiMessage(e.target.value)}
-                      placeholder={t("aiPlaceholder")}
-                      className="w-full bg-gray-950 border border-gray-800 rounded-full py-3 px-5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-brand-primary/50 transition-colors"
-                      disabled={isTyping}
+                      placeholder={user?.role === 'user' ? "Upgrade to Member to use AI" : t("aiPlaceholder")}
+                      className="w-full bg-gray-950 border border-gray-800 rounded-full py-3 px-5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-brand-primary/50 transition-colors disabled:opacity-50"
+                      disabled={isTyping || user?.role === 'user'}
                     />
                     <button 
                       type="submit"
-                      disabled={!aiMessage.trim() || isTyping}
+                      disabled={!aiMessage.trim() || isTyping || user?.role === 'user'}
                       className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-brand-primary flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-primary-dark transition-colors"
                     >
                       <ArrowRight className="w-4 h-4 text-white" />

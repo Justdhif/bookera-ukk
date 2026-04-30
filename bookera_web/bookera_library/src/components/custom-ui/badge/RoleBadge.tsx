@@ -9,6 +9,8 @@ const ROLE_STYLES: Record<string, string> = {
     "bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300 border-amber-200 dark:border-amber-800",
   "officer:management":
     "bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300 border-blue-200 dark:border-blue-800",
+  member:
+    "bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300 border-purple-200 dark:border-purple-800",
   user: "bg-green-100 text-green-700 dark:bg-green-900/60 dark:text-green-300 border-green-200 dark:border-green-800",
 };
 interface RoleBadgeProps {
@@ -21,6 +23,8 @@ export default function RoleBadge({ role, className }: RoleBadgeProps) {
     switch (role) {
       case "admin":
         return t("roleAdmin");
+      case "member":
+        return t("roleMember", { fallback: "Member" });
       case "officer:catalog":
         return t("roleCatalogOfficer");
       case "officer:management":

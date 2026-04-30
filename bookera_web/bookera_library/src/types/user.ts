@@ -28,7 +28,7 @@ export interface User {
   id: number;
   email: string;
   slug?: string;
-  role: "admin" | "officer:catalog" | "officer:management" | "user";
+  role: "admin" | "officer:catalog" | "officer:management" | "user" | "member";
   is_active: boolean;
   last_login_at: string | null;
   email_verified_at: string | null;

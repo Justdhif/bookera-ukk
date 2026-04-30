@@ -51,6 +51,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
 
 export default function ComplaintDetailClient() {
   const t = useTranslations("complaint");
@@ -212,6 +213,7 @@ export default function ComplaintDetailClient() {
                       </Link>
                       <div className="flex items-center gap-1 shrink-0">
                         {complaint.user.role === "admin" && <AdminBadge />}
+                        {complaint.user.role === "member" && <MemberBadge />}
                         {complaint.user.profile?.gender === "croissant" && <CroissantBadge />}
                       </div>
                     </div>

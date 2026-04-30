@@ -29,6 +29,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { WallpaperPattern } from "@/components/custom-ui/WallpaperPattern";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
+import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
 
 
 interface ChatDetailSheetProps {
@@ -195,6 +196,7 @@ export default function ChatDetailSheet({
                 </SheetTitle>
                 <div className="flex items-center gap-1 shrink-0">
                   {activeUser.role === "admin" && <AdminBadge />}
+                  {activeUser.role === "member" && <MemberBadge />}
                   {activeUser.profile?.gender === "croissant" && <CroissantBadge />}
                 </div>
               </div>
@@ -485,7 +487,9 @@ export default function ChatDetailSheet({
             </Button>
             <div className="flex-1 relative">
               <AnimatePresence>
-                {showMentionSuggestions && "boteraAI".startsWith(mentionFilter) && (
+                {showMentionSuggestions &&
+                  currentUser?.role === "member" &&
+                  "boteraAI".startsWith(mentionFilter) && (
                   <motion.div
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}

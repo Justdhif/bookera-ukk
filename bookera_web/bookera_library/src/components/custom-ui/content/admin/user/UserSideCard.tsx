@@ -73,6 +73,8 @@ export default function UserSideCard({
 
   const getRoleDisplay = (role: string) => {
     switch (role) {
+      case "member":
+        return t("member", { fallback: "Member" });
       case "admin":
         return t("admin");
       case "officer:catalog":
@@ -106,7 +108,7 @@ export default function UserSideCard({
                 <Image
                   src={avatarPreview}
                   alt={
-                    user?.profile.full_name || formData.full_name || t("user")
+                    user?.profile?.full_name || formData.full_name || t("user")
                   }
                   fill
                   sizes="128px"
@@ -116,7 +118,7 @@ export default function UserSideCard({
                 <div className="h-full w-full bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
                   <span className="text-4xl font-medium text-gray-600 dark:text-gray-400">
                     {(formData.full_name ||
-                      user?.profile.full_name ||
+                      user?.profile?.full_name ||
                       "U")[0]?.toUpperCase()}
                   </span>
                 </div>
@@ -216,14 +218,8 @@ export default function UserSideCard({
                   <SelectValue>{getRoleDisplay(formData.role)}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">{t("admin")}</SelectItem>
-                  <SelectItem value="officer:catalog">
-                    {t("officerCatalog")}
-                  </SelectItem>
-                  <SelectItem value="officer:management">
-                    {t("officerManagement")}
-                  </SelectItem>
-                  <SelectItem value="user">{t("user")}</SelectItem>
+                  <SelectItem value="member">{t("member", { fallback: "Member" })}</SelectItem>
+                  <SelectItem value="user">{t("user", { fallback: "User" })}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -302,7 +298,7 @@ export default function UserSideCard({
         onOpenChange={setAvatarModalOpen}
         currentAvatar={avatarPreview}
         onSave={handleAvatarImageChange}
-        userName={formData.full_name || user?.profile.full_name || t("user")}
+        userName={formData.full_name || user?.profile?.full_name || t("user")}
       />
     </>
   );

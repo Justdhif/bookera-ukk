@@ -34,7 +34,7 @@ class UpdateUserRequest extends FormRequest
         $rules = [
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($this->user->id)],
             'password' => 'nullable|min:6',
-            'role' => ['required', Rule::in(['admin', 'officer:catalog', 'officer:management', 'user'])],
+            'role' => ['required', Rule::in(['admin', 'officer:catalog', 'officer:management', 'user', 'member'])],
             'is_active' => 'nullable|in:true,false,1,0',
             'username' => ['required', 'string', 'max:255', Rule::unique('user_profiles', 'username')->ignore($this->user->profile->id ?? null)],
             'full_name' => 'required|string|max:255',

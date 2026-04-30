@@ -177,7 +177,7 @@ export default function ChatClient() {
     if (!messageText.trim() && (!imageFiles || imageFiles.length === 0)) return;
 
     // Don't encrypt if it's an AI trigger to avoid server moderation false positives on ciphertext
-    const encryptedText = messageText.includes("@boteraAI")
+    const encryptedText = (messageText.includes("@boteraAI") && user.role === 'member')
       ? messageText.trim()
       : (messageText.trim() ? encryptMessage(messageText.trim(), user.id, activeUser.id) : "");
 
@@ -252,8 +252,8 @@ export default function ChatClient() {
       setIsModerating(false);
     }
 
-    // AI Intervention logic
-    if (messageText.includes("@boteraAI")) {
+    // AI Intervention logic - Only for members
+    if (messageText.includes("@boteraAI") && user.role === 'member') {
       try {
         const aiResponse = await chatbotService.sendMessage(messageText.replace("@boteraAI", "").trim());
         const aiMessage = aiResponse.data.data.response;

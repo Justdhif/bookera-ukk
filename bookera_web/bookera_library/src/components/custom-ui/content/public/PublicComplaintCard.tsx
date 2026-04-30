@@ -28,6 +28,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
+import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
 
 interface ComplaintCardProps {
   complaint: Complaint;
@@ -162,6 +163,7 @@ export default function PublicComplaintCard({ complaint }: ComplaintCardProps) {
                 </Link>
                 <div className="flex items-center gap-1 shrink-0">
                   {complaint.user.role === "admin" && <AdminBadge />}
+                  {complaint.user.role === "member" && <MemberBadge />}
                   {complaint.user.profile?.gender === "croissant" && <CroissantBadge />}
                 </div>
               </div>

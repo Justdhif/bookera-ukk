@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             BookReviewSeeder::class,
             FineTypeSeeder::class,
             BorrowSeeder::class,
+            MembershipPlanSeeder::class,
         ]);
 
         Schema::enableForeignKeyConstraints();

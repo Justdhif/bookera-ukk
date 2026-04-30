@@ -42,6 +42,10 @@ class ReservationController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        if ($request->user()->role !== 'member') {
+            return ApiResponse::forbiddenResponse('Only members can make reservations. Please upgrade your account.');
+        }
+
         $reservation = $this->reservationService->create(
             (int) $request->book_id,
             $request->user()

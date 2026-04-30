@@ -27,19 +27,23 @@ export default function AppHeader({
         {leftContent}
       </div>
       <div className="flex items-center gap-1.5 md:gap-3">
-        <ChatbotHeaderTrigger />
-        <Link href={settingsHref} aria-label={t("goToSettings")}>
-          <Button
-            variant="outline"
-            className="text-muted-foreground hover:text-foreground px-3 flex items-center gap-2 h-9 md:h-10"
-          >
-            <Settings className="h-4 w-4 md:h-5 md:w-5" />
-            <span className="hidden md:inline font-medium text-sm">
-              {t("settings")}
-            </span>
-          </Button>
-        </Link>
-        <NotificationDropdown isAuthenticated={isAuthenticated} />
+        {isAuthenticated && (
+          <>
+            <ChatbotHeaderTrigger />
+            <Link href={settingsHref} aria-label={t("goToSettings")}>
+              <Button
+                variant="outline"
+                className="text-muted-foreground hover:text-foreground px-3 flex items-center gap-2 h-9 md:h-10"
+              >
+                <Settings className="h-4 w-4 md:h-5 md:w-5" />
+                <span className="hidden md:inline font-medium text-sm">
+                  {t("settings")}
+                </span>
+              </Button>
+            </Link>
+            <NotificationDropdown isAuthenticated={isAuthenticated} />
+          </>
+        )}
       </div>
     </header>
   );

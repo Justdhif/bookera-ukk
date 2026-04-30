@@ -116,44 +116,46 @@ export default function PublicSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          <SidebarMenuItem
-            className={cn(!open && "w-full flex justify-center mt-2")}
-          >
-            <SidebarMenuButton
-              asChild
-              tooltip="Messages"
-              className={cn(
-                "rounded-xl transition-all h-10 px-3",
-                !open && "justify-center px-0 mx-auto",
-              )}
+          {user?.role === "member" && (
+            <SidebarMenuItem
+              className={cn(!open && "w-full flex justify-center mt-2")}
             >
-              <Link href={chatHref}>
-                <div
-                  className={cn(
-                    "p-1.5 rounded-lg bg-blue-500/10 text-blue-500 shrink-0 relative",
-                    !open && "p-2",
-                  )}
-                >
-                  <MessageSquareText className="h-4 w-4" />
-                  {!open && user && unreadCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-[18px] min-w-[18px] px-1 flex items-center justify-center border-2 border-background shadow-sm">
-                      {displayUnread}
-                    </span>
-                  )}
-                </div>
-                {open && (
-                  <div className="flex items-center justify-between flex-1 ml-1">
-                    <span className="font-semibold text-sm">Messages</span>
-                    {user && unreadCount > 0 && (
-                      <span className="bg-red-500 text-white text-[10px] font-bold rounded-full h-5 px-1.5 min-w-5 flex items-center justify-center shrink-0 ml-2 shadow-sm">
+              <SidebarMenuButton
+                asChild
+                tooltip="Messages"
+                className={cn(
+                  "rounded-xl transition-all h-10 px-3",
+                  !open && "justify-center px-0 mx-auto",
+                )}
+              >
+                <Link href={chatHref}>
+                  <div
+                    className={cn(
+                      "p-1.5 rounded-lg bg-blue-500/10 text-blue-500 shrink-0 relative",
+                      !open && "p-2",
+                    )}
+                  >
+                    <MessageSquareText className="h-4 w-4" />
+                    {!open && user && unreadCount > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-[18px] min-w-[18px] px-1 flex items-center justify-center border-2 border-background shadow-sm">
                         {displayUnread}
                       </span>
                     )}
                   </div>
-                )}
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+                  {open && (
+                    <div className="flex items-center justify-between flex-1 ml-1">
+                      <span className="font-semibold text-sm">Messages</span>
+                      {user && unreadCount > 0 && (
+                        <span className="bg-red-500 text-white text-[10px] font-bold rounded-full h-5 px-1.5 min-w-5 flex items-center justify-center shrink-0 ml-2 shadow-sm">
+                          {displayUnread}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
       </div>
 

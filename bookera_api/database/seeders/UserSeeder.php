@@ -46,6 +46,20 @@ class UserSeeder extends Seeder
                 institution: 'Bookera Community',
             );
 
+            $this->createCustomUser(
+                email: 'member@gmail.com',
+                slug: 'member-test',
+                role: 'member',
+                fullName: 'Member Tester',
+                gender: 'female',
+                phoneNumber: '628123456789',
+                address: 'Jl. Bookera No. 3, Yogyakarta',
+                bio: 'Akun member khusus untuk pengujian fitur reservasi dan WhatsApp.',
+                identificationPrefix: 'MB',
+                occupation: UserOccupation::Student,
+                institution: 'Bookera Academy',
+            );
+
             if ($count > 0) {
                 User::factory($count)->create();
             }

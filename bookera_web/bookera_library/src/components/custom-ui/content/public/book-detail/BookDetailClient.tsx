@@ -316,7 +316,6 @@ export default function BookDetailClient() {
         }
       />
 
-
       {loading ? (
         <div className="grid gap-6 lg:grid-cols-3">
           <DataLoading className="lg:col-span-1" size="lg" />

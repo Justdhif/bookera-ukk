@@ -9,6 +9,7 @@ import DataLoading from "@/components/custom-ui/DataLoading";
 import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Users } from "lucide-react";
+import { useAuthStore } from "@/store/auth.store";
 
 interface PublicUserGridProps {
   search?: string;
@@ -16,6 +17,7 @@ interface PublicUserGridProps {
 
 export default function PublicUserGrid({ search }: PublicUserGridProps) {
   const t = useTranslations("explore");
+  const { user: currentUser } = useAuthStore();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -32,7 +34,7 @@ export default function PublicUserGrid({ search }: PublicUserGridProps) {
       });
 
       const response = res.data.data;
-      const data = response.data;
+      const data = response.data.filter((u: User) => u.id !== currentUser?.id);
       
       if (isNewSearch) {
         setUsers(data);

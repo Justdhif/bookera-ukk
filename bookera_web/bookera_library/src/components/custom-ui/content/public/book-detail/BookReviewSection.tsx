@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
+import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
 
 interface BookReviewSectionProps {
   book: Book;
@@ -141,6 +142,7 @@ export default function BookReviewSection({
                       </Link>
                       <div className="flex items-center gap-1 shrink-0">
                         {r.user?.role === "admin" && <AdminBadge />}
+                        {r.user?.role === "member" && <MemberBadge />}
                         {r.user?.profile?.gender === "croissant" && <CroissantBadge />}
                       </div>
                     </div>

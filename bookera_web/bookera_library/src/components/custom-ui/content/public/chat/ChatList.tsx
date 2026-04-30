@@ -16,6 +16,7 @@ import { decryptMessage } from "@/lib/crypto";
 import { useTranslations } from "next-intl";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
+import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
 
 interface ChatListProps {
   conversations: Conversation[];
@@ -163,10 +164,17 @@ export default function ChatList({
                         </AvatarFallback>
                       </Avatar>
                     </div>
-                    <span className="text-[10px] w-12 truncate text-center font-medium group-hover:text-brand-primary transition-colors">
-                      {followedUser.profile?.full_name?.split(" ")[0] ||
-                        followedUser.email?.split("@")[0]}
-                    </span>
+                    <div className="flex flex-col items-center gap-1.5 w-14">
+                      <span className="text-[10px] w-full truncate text-center font-medium group-hover:text-brand-primary transition-colors">
+                        {followedUser.profile?.full_name?.split(" ")[0] ||
+                          followedUser.email?.split("@")[0]}
+                      </span>
+                      <div className="flex items-center gap-0.5 scale-[0.65] origin-center -mt-1">
+                        {followedUser.role === "admin" && <AdminBadge />}
+                        {followedUser.role === "member" && <MemberBadge />}
+                        {followedUser.profile?.gender === "croissant" && <CroissantBadge />}
+                      </div>
+                    </div>
                   </Button>
                 ))}
               </div>
@@ -229,6 +237,7 @@ export default function ChatList({
                           </span>
                           <div className="flex items-center gap-1 shrink-0">
                             {conv.user.role === "admin" && <AdminBadge />}
+                            {conv.user.role === "member" && <MemberBadge />}
                             {conv.user.profile?.gender === "croissant" && <CroissantBadge />}
                           </div>
                         </div>

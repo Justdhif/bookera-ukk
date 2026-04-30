@@ -30,6 +30,8 @@ class UserService
 
         if (!empty($filters['role'])) {
             $query->where('role', $filters['role']);
+        } else {
+            $query->whereIn('role', ['user', 'member']);
         }
 
         if (!empty($filters['status'])) {

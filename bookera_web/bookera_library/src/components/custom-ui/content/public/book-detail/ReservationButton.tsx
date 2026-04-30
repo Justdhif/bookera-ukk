@@ -25,12 +25,17 @@ export default function ReservationButton({
   onReservationChange,
 }: ReservationButtonProps) {
   const t = useTranslations("reservation");
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
 
   // Hide button completely if not authenticated
-  if (!isAuthenticated || !book) {
+  if (!isAuthenticated || !book || !user) {
+    return null;
+  }
+
+  // Only members can reserve
+  if (user.role !== 'member') {
     return null;
   }
 
