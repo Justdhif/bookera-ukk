@@ -194,8 +194,8 @@ export default function ChatDetailSheet({
                   {activeUser.profile?.full_name || activeUser.email?.split("@")[0]}
                 </SheetTitle>
                 <div className="flex items-center gap-1 shrink-0">
-                  {activeUser.role === "admin" && <AdminBadge className="h-4 px-1.5 text-[8px]" />}
-                  {activeUser.profile?.gender === "croissant" && <CroissantBadge className="h-4 px-1.5 text-[8px]" />}
+                  {activeUser.role === "admin" && <AdminBadge />}
+                  {activeUser.profile?.gender === "croissant" && <CroissantBadge />}
                 </div>
               </div>
               <p className="text-xs text-muted-foreground truncate">

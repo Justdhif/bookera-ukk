@@ -40,6 +40,7 @@ class ComplaintCommentController extends Controller
             $comment = $this->commentService->createComment($user, $complaint, [
                 'content'   => $request->input('content'),
                 'parent_id' => $request->input('parent_id'),
+                'image'     => $request->file('image'),
             ]);
 
             return ApiResponse::successResponse('Comment added successfully', $comment, 201);

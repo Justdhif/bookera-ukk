@@ -31,8 +31,10 @@ export const discussionService = {
   getComments: (slug: string, params?: { page?: number; per_page?: number }) =>
     api.get<ApiResponse<PaginatedResponse<DiscussionComment>>>(`/discussion-posts/${slug}/comments`, { params }),
 
-  createComment: (slug: string, data: { content: string; parent_id?: number }) =>
-    api.post<ApiResponse<DiscussionComment>>(`/discussion-posts/${slug}/comments`, data),
+  createComment: (slug: string, data: FormData) =>
+    api.post<ApiResponse<DiscussionComment>>(`/discussion-posts/${slug}/comments`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
 
   getReplies: (commentId: number, params?: { page?: number; per_page?: number }) =>
     api.get<ApiResponse<PaginatedResponse<DiscussionComment>>>(`/discussion-comments/${commentId}/replies`, { params }),

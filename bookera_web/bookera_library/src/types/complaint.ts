@@ -46,6 +46,8 @@ export interface ComplaintComment {
     user_id: number;
     parent_id: number | null;
     content: string;
+    image?: string | null;
+    replies_count?: number;
     created_at: string;
     updated_at: string;
     user: User;

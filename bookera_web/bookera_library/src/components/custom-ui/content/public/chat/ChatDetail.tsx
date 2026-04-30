@@ -224,10 +224,10 @@ export default function ChatDetail({
               </h3>
               <div className="flex items-center gap-1 shrink-0">
                 {activeUser.role === "admin" && (
-                  <AdminBadge className="h-4 px-1.5 text-[8px]" />
+                  <AdminBadge />
                 )}
                 {activeUser.profile?.gender === "croissant" && (
-                  <CroissantBadge className="h-4 px-1.5 text-[8px]" />
+                  <CroissantBadge />
                 )}
               </div>
             </div>

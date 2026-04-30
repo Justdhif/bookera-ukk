@@ -140,8 +140,8 @@ export default function BookReviewSection({
                         {r.user?.profile?.full_name || ""}
                       </Link>
                       <div className="flex items-center gap-1 shrink-0">
-                        {r.user?.role === "admin" && <AdminBadge className="h-3.5 px-1 text-[7px]" />}
-                        {r.user?.profile?.gender === "croissant" && <CroissantBadge className="h-3.5 px-1 text-[7px]" />}
+                        {r.user?.role === "admin" && <AdminBadge />}
+                        {r.user?.profile?.gender === "croissant" && <CroissantBadge />}
                       </div>
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">

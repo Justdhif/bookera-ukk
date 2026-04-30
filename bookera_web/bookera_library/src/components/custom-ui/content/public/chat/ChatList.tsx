@@ -228,8 +228,8 @@ export default function ChatList({
                             {currentUser?.id === conv.user.id && ` (${t("you")})`}
                           </span>
                           <div className="flex items-center gap-1 shrink-0">
-                            {conv.user.role === "admin" && <AdminBadge className="h-4 px-1.5 text-[8px]" />}
-                            {conv.user.profile?.gender === "croissant" && <CroissantBadge className="h-4 px-1.5 text-[8px]" />}
+                            {conv.user.role === "admin" && <AdminBadge />}
+                            {conv.user.profile?.gender === "croissant" && <CroissantBadge />}
                           </div>
                         </div>
                       <div className="flex flex-col items-end gap-1 ml-2 shrink-0">

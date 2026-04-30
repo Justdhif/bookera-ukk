@@ -46,7 +46,8 @@ class DiscussionCommentController extends Controller
                 $user,
                 $post,
                 $request->input('content'),
-                $request->input('parent_id')
+                $request->input('parent_id'),
+                $request->file('image')
             );
             return ApiResponse::successResponse('Comment added successfully', $comment, 201);
         } catch (ModelNotFoundException) {

@@ -16,6 +16,7 @@ class DiscussionComment extends Model
         'post_id',
         'parent_id',
         'content',
+        'image',
     ];
 
     public function user()
@@ -31,6 +32,14 @@ class DiscussionComment extends Model
     public function parent()
     {
         return $this->belongsTo(DiscussionComment::class, 'parent_id');
+    }
+
+    public function getImageAttribute($value)
+    {
+        if ($value) {
+            return storage_image($value);
+        }
+        return null;
     }
 
     public function replies()

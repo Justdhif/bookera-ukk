@@ -19,6 +19,7 @@ import {
   X,
   LogIn,
   Loader2,
+  Image as ImageIcon,
 } from "lucide-react";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
@@ -32,14 +33,17 @@ import { Badge } from "@/components/ui/badge";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
+import ImagePreviewDialog from "@/components/custom-ui/ImagePreviewDialog";
 
 interface GenericComment {
   id: number;
   user_id: number;
   parent_id: number | null;
   content: string;
+  image?: string | null;
   created_at: string;
   replies_count?: number;
+  replies?: GenericComment[];
   user?: {
     slug: string;
     email: string;
@@ -60,8 +64,13 @@ interface CommentItemProps {
   onDeleted: (commentId: number) => void;
   depth?: number;
   namespace: string;
-  getReplies?: (commentId: number, params?: { page?: number; per_page?: number }) => Promise<any>;
+  getReplies?: (
+    commentId: number,
+    params?: { page?: number; per_page?: number },
+  ) => Promise<any>;
   deleteComment?: (commentId: number) => Promise<any>;
+  lastReply?: { parentId: number; reply: GenericComment } | null;
+  replyingToName?: string | null;
 }
 
 function CommentItem({
@@ -74,17 +83,32 @@ function CommentItem({
   namespace,
   getReplies,
   deleteComment,
+  lastReply,
+  replyingToName,
 }: CommentItemProps) {
   const t = useTranslations(namespace);
   const currentLocale = useLocale();
   const dateLocale = currentLocale === "id" ? idLocale : enUS;
 
   const [showReplies, setShowReplies] = useState(false);
-  const [replies, setReplies] = useState<GenericComment[]>([]);
+  const [replies, setReplies] = useState<GenericComment[]>(
+    comment.replies || [],
+  );
   const [loadingReplies, setLoadingReplies] = useState(false);
   const [repliesPage, setRepliesPage] = useState(1);
   const [totalRepliesPages, setTotalRepliesPages] = useState(1);
   const [deleting, setDeleting] = useState(false);
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+
+  useEffect(() => {
+    if (lastReply && lastReply.parentId === comment.id) {
+      setReplies((prev) => {
+        if (prev.some((r) => r.id === lastReply.reply.id)) return prev;
+        return [lastReply.reply, ...prev];
+      });
+      setShowReplies(true);
+    }
+  }, [lastReply, comment.id]);
 
   const isOwner = currentUserId === comment.user_id;
   const avatarUrl = comment.user?.profile?.avatar || "";
@@ -106,7 +130,9 @@ function CommentItem({
       setTotalRepliesPages(data.last_page);
       setRepliesPage(page);
     } catch {
-      toast.error(t("loadRepliesError", { defaultValue: "Failed to load replies" }));
+      toast.error(
+        t("loadRepliesError", { defaultValue: "Failed to load replies" }),
+      );
     } finally {
       setLoadingReplies(false);
     }
@@ -115,8 +141,8 @@ function CommentItem({
   const handleToggleReplies = () => {
     if (
       !showReplies &&
-      replies.length === 0 &&
-      (comment.replies_count ?? 0) > 0
+      replies.length <= 1 &&
+      (comment.replies_count ?? 0) > 1
     ) {
       fetchReplies(1);
     }
@@ -131,7 +157,9 @@ function CommentItem({
       onDeleted(comment.id);
       toast.success(t("commentDeleted", { defaultValue: "Comment deleted" }));
     } catch {
-      toast.error(t("commentDeleteError", { defaultValue: "Failed to delete comment" }));
+      toast.error(
+        t("commentDeleteError", { defaultValue: "Failed to delete comment" }),
+      );
     } finally {
       setDeleting(false);
     }
@@ -143,9 +171,7 @@ function CommentItem({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
       transition={{ duration: 0.18 }}
-      className={
-        depth > 0 ? "ml-9 border-l-2 border-brand-primary/15 pl-3" : ""
-      }
+      className={depth > 0 ? "pl-0" : ""}
     >
       <div className="flex gap-2.5 group">
         <Link
@@ -166,32 +192,93 @@ function CommentItem({
 
         <div className="flex-1 min-w-0">
           <div className="bg-muted/40 dark:bg-muted/20 rounded-2xl rounded-tl-sm px-3 py-2 border border-muted/50">
-            <div className="flex items-center gap-1.5 mb-1">
-              <Link
-                href={`/${comment.user?.slug}/profile`}
-                className="text-xs font-bold hover:text-brand-primary transition-colors truncate max-w-[150px]"
-              >
-                {displayName}
-              </Link>
-              <div className="flex items-center gap-1 shrink-0">
-                {(comment.user?.role === "admin" ||
-                  comment.user?.role?.startsWith("officer")) && <AdminBadge className="h-3.5 px-1 text-[7px]" />}
-                {comment.user?.profile?.gender === "croissant" && <CroissantBadge className="h-3.5 px-1 text-[7px]" />}
+            {depth === 0 ? (
+              // Parent Comment Layout: Name on top, content below
+              <>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <Link
+                    href={`/${comment.user?.slug}/profile`}
+                    className="font-bold hover:text-brand-primary transition-colors inline-flex items-center gap-1.5"
+                  >
+                    {displayName}
+                    <div className="inline-flex items-center gap-1">
+                      {(comment.user?.role === "admin" ||
+                        comment.user?.role?.startsWith("officer")) && (
+                        <AdminBadge />
+                      )}
+                      {comment.user?.profile?.gender === "croissant" && (
+                        <CroissantBadge />
+                      )}
+                    </div>
+                  </Link>
+                </div>
+                {comment.content && (
+                  <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">
+                    {comment.content}
+                  </p>
+                )}
+              </>
+            ) : (
+              // Reply Layout: Inline name, mention, and content
+              <div className="text-sm leading-relaxed">
+                <Link
+                  href={`/${comment.user?.slug}/profile`}
+                  className="font-bold hover:text-brand-primary transition-colors inline-flex items-center gap-1 mr-1.5"
+                >
+                  {displayName}
+                  <div className="inline-flex items-center gap-1">
+                    {(comment.user?.role === "admin" ||
+                      comment.user?.role?.startsWith("officer")) && (
+                      <AdminBadge />
+                    )}
+                    {comment.user?.profile?.gender === "croissant" && (
+                      <CroissantBadge />
+                    )}
+                  </div>
+                </Link>
+
+                {replyingToName && (
+                  <span className="text-brand-primary font-semibold mr-1.5">
+                    @{replyingToName.toLowerCase().replace(/\s+/g, "")}
+                  </span>
+                )}
+
+                <span className="text-foreground/90 whitespace-pre-line">
+                  {comment.content}
+                </span>
               </div>
-              <span className="text-[9px] text-muted-foreground/60 font-medium ml-auto shrink-0">
+            )}
+
+            {comment.image && (
+              <>
+                <div className="mt-2 rounded-xl overflow-hidden border border-muted/50 bg-muted/20">
+                  <img
+                    src={comment.image}
+                    alt="Comment image"
+                    className="max-h-[300px] w-auto object-contain cursor-pointer hover:opacity-95 transition-opacity"
+                    onClick={() => setIsImagePreviewOpen(true)}
+                  />
+                </div>
+                <ImagePreviewDialog
+                  isOpen={isImagePreviewOpen}
+                  onOpenChange={setIsImagePreviewOpen}
+                  imageUrl={comment.image}
+                  alt={`Comment by ${displayName}`}
+                />
+              </>
+            )}
+            <div className="flex justify-end mt-1">
+              <span className="text-[9px] text-muted-foreground/50 font-medium">
                 {formatDistanceToNow(new Date(comment.created_at), {
                   addSuffix: true,
                   locale: dateLocale,
                 })}
               </span>
             </div>
-            <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">
-              {comment.content}
-            </p>
           </div>
 
           <div className="flex items-center gap-3 mt-1 px-1">
-            {currentUserId && depth === 0 && (
+            {currentUserId && (
               <button
                 onClick={() => onReply(comment.id, displayName)}
                 className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-brand-primary font-medium transition-colors"
@@ -201,21 +288,29 @@ function CommentItem({
               </button>
             )}
 
-            {(comment.replies_count ?? 0) > 0 && depth === 0 && getReplies && (
-              <button
-                onClick={handleToggleReplies}
-                className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-brand-primary font-medium transition-colors"
-              >
-                {showReplies ? (
-                  <ChevronUp className="h-3 w-3" />
-                ) : (
-                  <ChevronDown className="h-3 w-3" />
-                )}
-                {showReplies
-                  ? t("hideReplies", { defaultValue: "Hide replies" })
-                  : t("showReplies", { count: comment.replies_count ?? 0, defaultValue: `Show ${comment.replies_count} replies` })}
-              </button>
-            )}
+            {((comment.replies_count ?? 0) > 1 || replies.length > 1) &&
+              depth === 0 &&
+              getReplies && (
+                <button
+                  onClick={handleToggleReplies}
+                  className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-brand-primary font-medium transition-colors"
+                >
+                  {showReplies ? (
+                    <ChevronUp className="h-3 w-3" />
+                  ) : (
+                    <ChevronDown className="h-3 w-3" />
+                  )}
+                  {showReplies
+                    ? t("hideReplies", { defaultValue: "Hide replies" })
+                    : t("showReplies", {
+                        count:
+                          (comment.replies_count ?? 0) > 0
+                            ? (comment.replies_count ?? 0) - 1
+                            : 0,
+                        defaultValue: `Show ${(comment.replies_count ?? 1) - 1} more replies`,
+                      })}
+                </button>
+              )}
 
             {isOwner && deleteComment && (
               <button
@@ -224,49 +319,81 @@ function CommentItem({
                 className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive font-medium transition-colors ml-auto opacity-0 group-hover:opacity-100"
               >
                 <Trash2 className="h-3 w-3" />
-                {deleting ? t("deleting", { defaultValue: "Deleting..." }) : t("deleteComment", { defaultValue: "Delete" })}
+                {deleting
+                  ? t("deleting", { defaultValue: "Deleting..." })
+                  : t("deleteComment", { defaultValue: "Delete" })}
               </button>
             )}
           </div>
 
-          <AnimatePresence>
-            {showReplies && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-2 space-y-2 overflow-hidden"
-              >
-                {loadingReplies && replies.length === 0 ? (
-                  <DataLoading size="sm" />
-                ) : (
-                  replies.map((reply) => (
-                    <CommentItem
-                      key={reply.id}
-                      comment={reply}
-                      entitySlug={entitySlug}
-                      currentUserId={currentUserId}
-                      onReply={onReply}
-                      onDeleted={(id) =>
-                        setReplies((prev) => prev.filter((r) => r.id !== id))
-                      }
-                      depth={depth + 1}
-                      namespace={namespace}
-                      getReplies={getReplies}
-                      deleteComment={deleteComment}
-                    />
-                  ))
-                )}
-                {repliesPage < totalRepliesPages && (
-                  <LoadMoreButton
-                    onClick={() => fetchReplies(repliesPage + 1)}
-                    loading={loadingReplies}
-                    variant="ghost"
-                  />
-                )}
-              </motion.div>
+          {/* Replies Section */}
+          <div className="mt-2 space-y-2">
+            {/* Always show the first reply if it exists and we're at top level */}
+            {depth === 0 && replies.length > 0 && (
+              <CommentItem
+                key={replies[0].id}
+                comment={replies[0]}
+                entitySlug={entitySlug}
+                currentUserId={currentUserId}
+                onReply={onReply}
+                onDeleted={(id) =>
+                  setReplies((prev) => prev.filter((r) => r.id !== id))
+                }
+                depth={depth + 1}
+                namespace={namespace}
+                getReplies={getReplies}
+                deleteComment={deleteComment}
+                lastReply={lastReply}
+                replyingToName={displayName}
+              />
             )}
-          </AnimatePresence>
+
+            {/* Show remaining replies when expanded */}
+            <AnimatePresence>
+              {showReplies && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-2 overflow-hidden"
+                >
+                  {loadingReplies && replies.length <= 1 ? (
+                    <DataLoading size="sm" />
+                  ) : (
+                    replies
+                      .slice(1)
+                      .map((reply) => (
+                        <CommentItem
+                          key={reply.id}
+                          comment={reply}
+                          entitySlug={entitySlug}
+                          currentUserId={currentUserId}
+                          onReply={onReply}
+                          onDeleted={(id) =>
+                            setReplies((prev) =>
+                              prev.filter((r) => r.id !== id),
+                            )
+                          }
+                          depth={depth + 1}
+                          namespace={namespace}
+                          getReplies={getReplies}
+                          deleteComment={deleteComment}
+                          lastReply={lastReply}
+                          replyingToName={displayName}
+                        />
+                      ))
+                  )}
+                  {repliesPage < totalRepliesPages && (
+                    <LoadMoreButton
+                      onClick={() => fetchReplies(repliesPage + 1)}
+                      loading={loadingReplies}
+                      variant="ghost"
+                    />
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -278,10 +405,15 @@ interface CommentSectionProps {
   commentCount: number;
   onCommentCountChange?: (count: number) => void;
   namespace?: string;
-  // Actions
-  getComments: (slug: string, params?: { page?: number; per_page?: number }) => Promise<any>;
-  createComment: (slug: string, data: { content: string; parent_id?: number }) => Promise<any>;
-  getReplies?: (commentId: number, params?: { page?: number; per_page?: number }) => Promise<any>;
+  getComments: (
+    slug: string,
+    params?: { page?: number; per_page?: number },
+  ) => Promise<any>;
+  createComment: (slug: string, data: FormData) => Promise<any>;
+  getReplies?: (
+    commentId: number,
+    params?: { page?: number; per_page?: number },
+  ) => Promise<any>;
   deleteComment?: (commentId: number) => Promise<any>;
 }
 
@@ -298,6 +430,7 @@ export default function CommentSection({
   const t = useTranslations(namespace);
   const { user } = useAuthStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [comments, setComments] = useState<GenericComment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -311,6 +444,12 @@ export default function CommentSection({
   );
   const [submitting, setSubmitting] = useState(false);
   const [moderationAlert, setModerationAlert] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [lastReply, setLastReply] = useState<{
+    parentId: number;
+    reply: GenericComment;
+  } | null>(null);
 
   useEffect(() => {
     fetchComments(1);
@@ -326,40 +465,77 @@ export default function CommentSection({
         per_page: 15,
       });
       const data = res.data.data;
-      setComments((prev) => (pageNum === 1 ? data.data : [...prev, ...data.data]));
+      setComments((prev) =>
+        pageNum === 1 ? data.data : [...prev, ...data.data],
+      );
       setTotalPages(data.last_page);
       setPage(pageNum);
     } catch {
-      toast.error(t("loadCommentsError", { defaultValue: "Failed to load comments" }));
+      toast.error(
+        t("loadCommentsError", { defaultValue: "Failed to load comments" }),
+      );
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(
+          t("imageTooLarge", { defaultValue: "Image is too large (max 5MB)" }),
+        );
+        return;
+      }
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleSubmitComment = async () => {
-    if (!commentText.trim() || !user) return;
+    if ((!commentText.trim() && !selectedImage) || !user) return;
 
     setSubmitting(true);
     try {
-      const payload: { content: string; parent_id?: number } = {
-        content: commentText.trim(),
-      };
-      if (replyTo) payload.parent_id = replyTo.id;
+      const formData = new FormData();
+      formData.append("content", commentText.trim());
+      if (replyTo) formData.append("parent_id", replyTo.id.toString());
+      if (selectedImage) formData.append("image", selectedImage);
 
-      const res = await createComment(entitySlug, payload);
+      const res = await createComment(entitySlug, formData);
       const newComment = res.data.data;
 
       if (!replyTo) {
         setComments((prev) => [newComment, ...prev]);
         onCommentCountChange?.(commentCount + 1);
       } else {
+        setLastReply({ parentId: replyTo.id, reply: newComment });
+        setComments((prev) =>
+          prev.map((c) =>
+            c.id === replyTo.id
+              ? { ...c, replies_count: (c.replies_count || 0) + 1 }
+              : c,
+          ),
+        );
         toast.success(t("replySuccess", { defaultValue: "Reply sent" }));
       }
 
       setCommentText("");
       setReplyTo(null);
       setModerationAlert(null);
+      removeImage();
       toast.success(t("commentSuccess", { defaultValue: "Comment sent" }));
     } catch (error: any) {
       if (error.response?.status === 422) {
@@ -368,7 +544,9 @@ export default function CommentSection({
           t("moderationAlertTitle", { defaultValue: "Inappropriate Content" }),
         );
       } else {
-        toast.error(t("commentError", { defaultValue: "Failed to send comment" }));
+        toast.error(
+          t("commentError", { defaultValue: "Failed to send comment" }),
+        );
       }
     } finally {
       setSubmitting(false);
@@ -388,7 +566,6 @@ export default function CommentSection({
   return (
     <Card className="border-muted/60 bg-card/60 backdrop-blur-md overflow-hidden">
       <CardContent className="p-5 space-y-6">
-        {/* Moderation Alert */}
         <AnimatePresence>
           {moderationAlert && (
             <motion.div
@@ -397,7 +574,7 @@ export default function CommentSection({
               exit={{ opacity: 0, height: 0, marginBottom: 0 }}
               className="overflow-hidden"
             >
-              <div className="p-4 bg-red-500/10 border border-red-200/50 dark:border-red-800/30 rounded-2xl">
+              <div className="p-4 bg-red-500/10 border border-red-200/50 dark:border-red-800/30 rounded-2xl mb-4">
                 <div className="flex items-start gap-3">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
                     <ShieldAlert className="h-4 w-4 text-red-600 dark:text-red-400" />
@@ -424,7 +601,6 @@ export default function CommentSection({
           )}
         </AnimatePresence>
 
-        {/* Comment Input Section */}
         <div className="space-y-3">
           {replyTo && (
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-brand-primary/5 border border-brand-primary/20 text-sm">
@@ -466,8 +642,13 @@ export default function CommentSection({
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder={
                       replyTo
-                        ? t("replyPlaceholder", { name: replyTo.name, defaultValue: `Reply to ${replyTo.name}...` })
-                        : t("commentPlaceholder", { defaultValue: "Write a comment..." })
+                        ? t("replyPlaceholder", {
+                            name: replyTo.name,
+                            defaultValue: `Reply to ${replyTo.name}...`,
+                          })
+                        : t("commentPlaceholder", {
+                            defaultValue: "Write a comment...",
+                          })
                     }
                     className="min-h-[100px] rounded-2xl resize-none bg-background/50 focus:bg-background transition-all border-muted/60 focus:ring-brand-primary/20 text-sm p-4"
                     onKeyDown={(e) => {
@@ -478,14 +659,50 @@ export default function CommentSection({
                     }}
                   />
                 </div>
+
+                {imagePreview && (
+                  <div className="relative group w-24 h-24 rounded-2xl overflow-hidden border-2 border-brand-primary/30 shadow-lg ring-4 ring-brand-primary/5 ml-1">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      onClick={removeImage}
+                      className="absolute top-1.5 right-1.5 h-6 w-6 bg-black/70 text-white rounded-full flex items-center justify-center opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:scale-110"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
                 <div className="flex justify-between items-center">
-                  <span className="text-[11px] text-muted-foreground">
-                    Ctrl+Enter {t("toSubmit", { defaultValue: "to submit" })}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageChange}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-lg text-muted-foreground hover:text-brand-primary hover:bg-brand-primary/10 transition-all"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <ImageIcon className="h-4 w-4" />
+                    </Button>
+                    <span className="text-[11px] text-muted-foreground">
+                      Ctrl+Enter {t("toSubmit", { defaultValue: "to submit" })}
+                    </span>
+                  </div>
                   <Button
                     size="sm"
                     variant="brand"
-                    disabled={submitting || !commentText.trim()}
+                    disabled={
+                      submitting || (!commentText.trim() && !selectedImage)
+                    }
                     onClick={handleSubmitComment}
                     className="gap-2 px-4 h-9 text-xs rounded-xl font-semibold shadow-lg shadow-brand-primary/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
                   >
@@ -504,7 +721,9 @@ export default function CommentSection({
           ) : (
             <div className="flex items-center gap-3 p-4 rounded-2xl bg-muted/30 border border-dashed border-muted-foreground/20 text-sm text-muted-foreground">
               <LogIn className="h-4 w-4 text-brand-primary shrink-0" />
-              <span className="flex-1">{t("loginToComment", { defaultValue: "Log in to comment" })}</span>
+              <span className="flex-1">
+                {t("loginToComment", { defaultValue: "Log in to comment" })}
+              </span>
               <Link href="/login">
                 <Badge
                   variant="outline"
@@ -521,7 +740,10 @@ export default function CommentSection({
         <div className="space-y-4 pt-2">
           <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/80 px-1">
             <MessageCircle className="h-4 w-4 text-brand-primary" />
-            {t("commentsTitle", { count: commentCount, defaultValue: `${commentCount} Comments` })}
+            {t("commentsTitle", {
+              count: commentCount,
+              defaultValue: `${commentCount} Comments`,
+            })}
           </h3>
 
           {loading ? (
@@ -532,7 +754,9 @@ export default function CommentSection({
             <EmptyState
               icon={<MessageCircle className="opacity-20" />}
               title={t("noComments", { defaultValue: "No comments yet" })}
-              description={t("noCommentsDesc", { defaultValue: "Be the first to comment!" })}
+              description={t("noCommentsDesc", {
+                defaultValue: "Be the first to comment!",
+              })}
               variant="compact"
             />
           ) : (
@@ -549,6 +773,7 @@ export default function CommentSection({
                     namespace={namespace}
                     getReplies={getReplies}
                     deleteComment={deleteComment}
+                    lastReply={lastReply}
                   />
                 ))}
               </AnimatePresence>

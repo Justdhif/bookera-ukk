@@ -161,8 +161,8 @@ export default function PublicComplaintCard({ complaint }: ComplaintCardProps) {
                   </p>
                 </Link>
                 <div className="flex items-center gap-1 shrink-0">
-                  {complaint.user.role === "admin" && <AdminBadge className="h-3.5 px-1 text-[7px]" />}
-                  {complaint.user.profile?.gender === "croissant" && <CroissantBadge className="h-3.5 px-1 text-[7px]" />}
+                  {complaint.user.role === "admin" && <AdminBadge />}
+                  {complaint.user.profile?.gender === "croissant" && <CroissantBadge />}
                 </div>
               </div>
               <div className="flex items-center gap-1.5 text-muted-foreground">

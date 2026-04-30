@@ -26,8 +26,10 @@ export const complaintService = {
     getComments: (slug: string, params?: { per_page?: number; page?: number }) =>
         api.get<ApiResponse<PaginatedResponse<ComplaintComment>>>(`/complaints/${slug}/comments`, { params }),
 
-    createComment: (slug: string, data: { content: string; parent_id?: number }) =>
-        api.post<ApiResponse<ComplaintComment>>(`/complaints/${slug}/comments`, data),
+    createComment: (slug: string, data: FormData) =>
+        api.post<ApiResponse<ComplaintComment>>(`/complaints/${slug}/comments`, data, {
+            headers: { "Content-Type": "multipart/form-data" },
+        }),
 
     updateStatus: (slug: string, status: string) =>
         api.patch<ApiResponse<Complaint>>(`/admin/complaints/${slug}/status`, { status })

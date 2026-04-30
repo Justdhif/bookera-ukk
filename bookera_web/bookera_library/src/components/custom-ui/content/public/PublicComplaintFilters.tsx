@@ -51,10 +51,10 @@ export default function PublicComplaintFilters({
 
               <div className="rounded-2xl border border-border/70 bg-background/80 px-3 py-2 shadow-sm backdrop-blur hidden sm:block">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  Total Cases
+                  {t("totalCases")}
                 </p>
                 <p className="mt-1 text-sm font-semibold text-foreground">
-                  {totalCount} Complaints
+                  {totalCount} {t("title")}
                 </p>
               </div>
             </div>
@@ -103,23 +103,23 @@ export default function PublicComplaintFilters({
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/15 bg-orange-500/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-600 dark:text-orange-400">
                 <Filter className="h-3.5 w-3.5" />
-                Status
+                {t("statusLabel")}
               </div>
             </div>
 
             <div className="space-y-2">
                 <p className="text-xs font-medium text-muted-foreground">
-                  Resolution Status
+                  {t("resolutionStatus")}
                 </p>
                 <Select
                   value={selectedStatus || "all"}
                   onValueChange={(val) => onStatusChange(val === "all" ? "" : val)}
                 >
                   <SelectTrigger className="w-full rounded-xl border-border/50">
-                    <SelectValue placeholder="All Status" />
+                    <SelectValue placeholder={t("allStatus")} />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl border-border/50">
-                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="all">{t("allStatus")}</SelectItem>
                     {statuses.map((s) => (
                       <SelectItem key={s} value={s}>
                         {t(`status.${s}`)}

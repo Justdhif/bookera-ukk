@@ -42,8 +42,8 @@ export default function PublicDiscussionCard({ discussion, className }: Discussi
                     {profile?.full_name || "Anonymous"}
                   </span>
                   <div className="flex items-center gap-1 shrink-0">
-                    {discussion.user?.role === "admin" && <AdminBadge className="h-3.5 px-1 text-[7px]" />}
-                    {discussion.user?.profile?.gender === "croissant" && <CroissantBadge className="h-3.5 px-1 text-[7px]" />}
+                    {discussion.user?.role === "admin" && <AdminBadge />}
+                    {discussion.user?.profile?.gender === "croissant" && <CroissantBadge />}
                   </div>
                 </div>
               <span className="text-[11px] text-muted-foreground truncate">

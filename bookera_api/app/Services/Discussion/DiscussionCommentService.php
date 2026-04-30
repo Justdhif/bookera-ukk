@@ -8,12 +8,14 @@ use App\Models\DiscussionPost;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class DiscussionCommentService
 {
     public function getAll(DiscussionPost $post, int $perPage = 20): LengthAwarePaginator
     {
-        $query = DiscussionComment::with(['user.profile', 'replies.user.profile'])
+        $query = DiscussionComment::with(['user.profile', 'replies.user.profile'])->withCount('replies')
             ->where('post_id', $post->id)
             ->whereNull('parent_id');
 
@@ -28,7 +30,7 @@ class DiscussionCommentService
             ->paginate($perPage);
     }
 
-    public function create(User $user, DiscussionPost $post, string $content, ?int $parentId = null): DiscussionComment
+    public function create(User $user, DiscussionPost $post, ?string $content, ?int $parentId = null, ?UploadedFile $image = null): DiscussionComment
     {
         $parent = null;
         if ($parentId !== null) {
@@ -37,11 +39,17 @@ class DiscussionCommentService
                 ->firstOrFail();
         }
 
+        $imagePath = null;
+        if ($image) {
+            $imagePath = $image->store('discussions/comments', 'public');
+        }
+
         $comment = DiscussionComment::create([
             'user_id'   => $user->id,
             'post_id'   => $post->id,
             'parent_id' => $parent?->id,
             'content'   => $content,
+            'image'     => $imagePath,
         ]);
 
         $post->increment('comments_count');

@@ -211,8 +211,8 @@ export default function ComplaintDetailClient() {
                         </p>
                       </Link>
                       <div className="flex items-center gap-1 shrink-0">
-                        {complaint.user.role === "admin" && <AdminBadge className="h-4 px-1.5 text-[8px]" />}
-                        {complaint.user.profile?.gender === "croissant" && <CroissantBadge className="h-4 px-1.5 text-[8px]" />}
+                        {complaint.user.role === "admin" && <AdminBadge />}
+                        {complaint.user.profile?.gender === "croissant" && <CroissantBadge />}
                       </div>
                     </div>
                     <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mt-0.5">
@@ -233,12 +233,6 @@ export default function ComplaintDetailClient() {
                     <MessageCircle className="h-4 w-4 text-brand-primary/60" />
                     <span className="text-[11px] font-bold uppercase tracking-wider">
                       {t("commentsCount", { count: complaint.comments_count })}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ThumbsUp className="h-4 w-4 text-brand-primary/60" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider">
-                      {votesCount} Dukungan
                     </span>
                   </div>
                 </div>
@@ -326,7 +320,7 @@ export default function ComplaintDetailClient() {
                     {t(`category.${complaint.category}`)}
                   </Badge>
                   {complaint.is_priority && (
-                    <Badge className="px-4 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-rose-500 text-white border-0 animate-pulse">
+                    <Badge className="px-4 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-rose-500 text-white border-0">
                       <Flag className="h-3.5 w-3.5 mr-1.5" />
                       {t("isPriority")}
                     </Badge>
@@ -355,30 +349,20 @@ export default function ComplaintDetailClient() {
                   <ImageCarousel images={complaint.images} />
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </div>
 
-        <div className="space-y-6 lg:sticky lg:top-24">
-          <Card className="border-2 border-muted/50 bg-brand-primary/5 backdrop-blur-md rounded-3xl overflow-hidden">
-            <CardContent className="p-8 space-y-6">
-              <div className="space-y-2">
-                <h3 className="text-lg font-black tracking-tight">
-                  {t("supportTitle")}
-                </h3>
-                <p className="text-sm text-muted-foreground font-medium leading-relaxed">
-                  {t("supportDesc")}
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-black text-brand-primary">
-                    {votesCount}
-                  </span>
-                  <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
-                    Dukungan
-                  </span>
+              <div className="pt-6 mt-6 border-t border-muted/30 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center h-10 w-10 rounded-2xl bg-brand-primary/5 text-brand-primary">
+                    <ThumbsUp className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-black leading-none text-brand-primary">
+                      {votesCount}
+                    </p>
+                    <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mt-1">
+                      Dukungan
+                    </p>
+                  </div>
                 </div>
 
                 <Button
@@ -386,20 +370,20 @@ export default function ComplaintDetailClient() {
                   disabled={votePending}
                   variant={voted ? "outline" : "brand"}
                   className={cn(
-                    "w-full h-14 rounded-2xl font-black uppercase tracking-[0.15em] text-xs transition-all shadow-lg",
+                    "h-11 rounded-2xl font-black uppercase tracking-widest text-[10px] px-6 transition-all",
                     voted
-                      ? "border-brand-primary text-brand-primary bg-transparent"
-                      : "shadow-brand-primary/20",
+                      ? "border-brand-primary/30 text-brand-primary bg-brand-primary/5 hover:bg-brand-primary/10"
+                      : "shadow-lg shadow-brand-primary/20",
                   )}
                 >
                   {voted ? (
                     <>
-                      <CheckCircle2 className="mr-2 h-5 w-5" />
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
                       {t("votedBtn")}
                     </>
                   ) : (
                     <>
-                      <ThumbsUp className="mr-2 h-5 w-5" />
+                      <ThumbsUp className="mr-2 h-4 w-4" />
                       {t("voteBtn")}
                     </>
                   )}
@@ -407,8 +391,10 @@ export default function ComplaintDetailClient() {
               </div>
             </CardContent>
           </Card>
+        </div>
 
-          <div className="space-y-6 pt-4">
+        <div className="space-y-6 lg:sticky lg:top-4">
+          <div className="space-y-6">
             <CommentSection
               entitySlug={slug}
               commentCount={complaint.comments_count}

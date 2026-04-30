@@ -168,8 +168,8 @@ export default function DiscussionDetailClient() {
                             {displayName}
                           </Link>
                           <div className="flex items-center gap-1 shrink-0">
-                            {post.user?.role === "admin" && <AdminBadge className="h-4 px-1.5 text-[8px]" />}
-                            {post.user?.profile?.gender === "croissant" && <CroissantBadge className="h-4 px-1.5 text-[8px]" />}
+                            {post.user?.role === "admin" && <AdminBadge />}
+                            {post.user?.profile?.gender === "croissant" && <CroissantBadge />}
                           </div>
                         </div>
                         <span className="text-[11px] text-muted-foreground">

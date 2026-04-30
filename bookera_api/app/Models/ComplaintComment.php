@@ -16,6 +16,7 @@ class ComplaintComment extends Model
         'user_id',
         'parent_id',
         'content',
+        'image',
     ];
 
     public function complaint()
@@ -31,6 +32,14 @@ class ComplaintComment extends Model
     public function parent()
     {
         return $this->belongsTo(ComplaintComment::class, 'parent_id');
+    }
+
+    public function getImageAttribute($value)
+    {
+        if ($value) {
+            return storage_image($value);
+        }
+        return null;
     }
 
     public function replies()

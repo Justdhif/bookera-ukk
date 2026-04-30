@@ -14,8 +14,9 @@ class StoreComplaintCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content'   => ['required', 'string', new \App\Rules\ModeratedContent()],
+            'content'   => ['required_without:image', 'string', new \App\Rules\ModeratedContent()],
             'parent_id' => ['nullable', 'exists:complaint_comments,id'],
+            'image'     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ];
     }
 }

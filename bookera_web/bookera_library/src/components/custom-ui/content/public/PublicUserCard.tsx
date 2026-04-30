@@ -61,8 +61,8 @@ export default function PublicUserCard({ user, className }: PublicUserCardProps)
                 @{username}
               </p>
               <div className="flex items-center gap-1.5 flex-wrap">
-                {user.role === "admin" && <AdminBadge className="h-4 px-1.5 text-[8px]" />}
-                {user.profile?.gender === "croissant" && <CroissantBadge className="h-4 px-1.5 text-[8px]" />}
+                {user.role === "admin" && <AdminBadge />}
+                {user.profile?.gender === "croissant" && <CroissantBadge />}
               </div>
             </div>
           </div>
