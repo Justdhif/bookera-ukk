@@ -18,7 +18,7 @@ export default function AdminLayout({
 
       <SidebarInset className="h-screen flex flex-col overflow-hidden">
         <AdminHeader />
-        <main className="p-6 flex-1 overflow-y-auto">{children}</main>
+        <main className="p-6 flex-1 overflow-y-auto overflow-x-hidden">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

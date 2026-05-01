@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Genre } from "@/types/genre";
 import { genreService } from "@/services/genre.service";
 import { toast } from "sonner";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 interface FormData {
   name: string;
@@ -107,51 +108,57 @@ export default function GenreFormDialog({
             {genre ? t("editGenre") : t("addGenre")}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-6">
+        <StaggerContainer className="space-y-6">
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name" variant="required">
-                {t("genreName")}
-              </Label>
-              <Input
-                id="name"
-                name="name"
-                placeholder={t("namePlaceholder")}
-                value={formData.name}
-                onChange={handleInputChange}
-                validationType="letters-only"
-                onValidationChange={(isValid: boolean) =>
-                  setErrors((prev) => ({ ...prev, name: !isValid }))
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">{t("descriptionLabel")}</Label>
-              <Input
-                id="description"
-                name="description"
-                placeholder={t("descriptionPlaceholder")}
-                value={formData.description}
-                onChange={handleInputChange}
-              />
-            </div>
+            <FadeUp delay={0.1}>
+              <div className="space-y-2">
+                <Label htmlFor="name" variant="required">
+                  {t("genreName")}
+                </Label>
+                <Input
+                  id="name"
+                  name="name"
+                  placeholder={t("namePlaceholder")}
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  validationType="letters-only"
+                  onValidationChange={(isValid: boolean) =>
+                    setErrors((prev) => ({ ...prev, name: !isValid }))
+                  }
+                />
+              </div>
+            </FadeUp>
+            <FadeUp delay={0.2}>
+              <div className="space-y-2">
+                <Label htmlFor="description">{t("descriptionLabel")}</Label>
+                <Input
+                  id="description"
+                  name="description"
+                  placeholder={t("descriptionPlaceholder")}
+                  value={formData.description}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </FadeUp>
           </div>
-          <Button
-            onClick={handleSubmit}
-            variant="submit"
-            disabled={isSubmitDisabled()}
-            loading={isLoading}
-            className="w-full"
-          >
-            {isLoading
-              ? genre
-                ? t("saving")
-                : t("adding")
-              : genre
-                ? t("saveChanges")
-                : t("addGenre")}
-          </Button>
-        </div>
+          <FadeUp delay={0.3}>
+            <Button
+              onClick={handleSubmit}
+              variant="submit"
+              disabled={isSubmitDisabled()}
+              loading={isLoading}
+              className="w-full"
+            >
+              {isLoading
+                ? genre
+                  ? t("saving")
+                  : t("adding")
+                : genre
+                  ? t("saveChanges")
+                  : t("addGenre")}
+            </Button>
+          </FadeUp>
+        </StaggerContainer>
       </DialogContent>
     </Dialog>
   );

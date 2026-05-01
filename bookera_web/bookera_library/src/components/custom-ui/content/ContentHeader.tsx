@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BlurIn, FadeIn } from "@/components/custom-ui/motion";
 
 interface ContentHeaderProps {
   title: ReactNode;
@@ -57,23 +58,24 @@ export default function ContentHeader({
           </Button>
         )}
         <div className={cn("flex flex-col", !isAdmin && "space-y-1")}>
-          <h1
+          <BlurIn
             className={cn(
               "font-bold tracking-tight text-foreground line-clamp-1 transition-all",
               isAdmin ? "text-3xl" : "text-2xl md:text-3xl"
             )}
           >
             {title}
-          </h1>
+          </BlurIn>
           {description && (
-            <div
+            <FadeIn
+              delay={0.1}
               className={cn(
                 "text-muted-foreground transition-all",
                 isAdmin ? "text-base" : "text-sm md:text-base"
               )}
             >
               {description}
-            </div>
+            </FadeIn>
           )}
         </div>
       </div>

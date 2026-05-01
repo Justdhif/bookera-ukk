@@ -10,6 +10,7 @@ import {
 import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import { useTranslations } from "next-intl";
+import { FadeUp } from "@/components/custom-ui/motion";
 
 interface BorrowDateCardProps {
   value: Date | undefined;
@@ -31,12 +32,14 @@ export default function BorrowDateCard({
         <CardDescription>{t("borrowDateDesc")}</CardDescription>
       </CardHeader>
       <CardContent>
-        <DatePicker
-          value={value}
-          onChange={onChange}
-          placeholder={t("borrowDatePlaceholder")}
-          dateMode="future"
-        />
+        <FadeUp delay={0.1}>
+          <DatePicker
+            value={value}
+            onChange={onChange}
+            placeholder={t("borrowDatePlaceholder")}
+            dateMode="future"
+          />
+        </FadeUp>
       </CardContent>
     </Card>
   );

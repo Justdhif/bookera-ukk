@@ -13,6 +13,7 @@ import {
 import { Calendar, DollarSign, RotateCcw, User } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 interface BorrowInfoCardProps {
   borrow: Borrow;
@@ -35,8 +36,8 @@ export function BorrowInfoCard({ borrow }: BorrowInfoCardProps) {
           {t("detailDescription")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-3">
+      <StaggerContainer as={CardContent} className="space-y-6">
+        <FadeUp delay={0.1} className="space-y-3">
           <h3 className="font-semibold text-base flex items-center gap-2">
             <User className="h-4 w-4" />
             {t("borrowerTitle")}
@@ -69,9 +70,9 @@ export function BorrowInfoCard({ borrow }: BorrowInfoCardProps) {
               </div>
             )}
           </div>
-        </div>
+        </FadeUp>
 
-        <div className="space-y-3">
+        <FadeUp delay={0.15} className="space-y-3">
           <h3 className="font-semibold text-base flex items-center gap-2">
             <Calendar className="h-4 w-4" />
             {t("datesTitle")}
@@ -96,10 +97,10 @@ export function BorrowInfoCard({ borrow }: BorrowInfoCardProps) {
               </p>
             </div>
           </div>
-        </div>
+        </FadeUp>
 
         {borrow.book_returns && borrow.book_returns.length > 0 && (
-          <div className="space-y-3">
+          <FadeUp delay={0.2} className="space-y-3">
             <h3 className="font-semibold text-base flex items-center gap-2">
               <RotateCcw className="h-4 w-4" />
               {t("returnRecords")} ({borrow.book_returns.length})
@@ -133,9 +134,9 @@ export function BorrowInfoCard({ borrow }: BorrowInfoCardProps) {
                 </div>
               ))}
             </div>
-          </div>
+          </FadeUp>
         )}
-      </CardContent>
+      </StaggerContainer>
     </Card>
   );
 }

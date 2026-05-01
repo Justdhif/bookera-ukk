@@ -50,6 +50,7 @@ import {
   X,
   Edit,
 } from "lucide-react";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 export default function BookDetailClient() {
   const tAdmin = useTranslations("book");
@@ -283,29 +284,31 @@ export default function BookDetailClient() {
   };
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={isAdmin ? tAdmin("bookDetail") : tPublic("bookDetailTitle")}
-        description={
-          isAdmin
-            ? isEditMode
-              ? tAdmin("editBookInfo")
-              : tAdmin("viewBookDetails")
-            : tPublic("completeBookDesc")
-        }
-        showBackButton
-        isAdmin={isAdmin}
-        rightActions={
-          isAdmin ? null : (
-            book && (
-              <div className="flex flex-wrap items-center gap-3">
-                <FavoriteButton bookId={book.id} />
-                <AddToRequestButton book={book} />
-              </div>
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={isAdmin ? tAdmin("bookDetail") : tPublic("bookDetailTitle")}
+          description={
+            isAdmin
+              ? isEditMode
+                ? tAdmin("editBookInfo")
+                : tAdmin("viewBookDetails")
+              : tPublic("completeBookDesc")
+          }
+          showBackButton
+          isAdmin={isAdmin}
+          rightActions={
+            isAdmin ? null : (
+              book && (
+                <div className="flex flex-wrap items-center gap-3">
+                  <FavoriteButton bookId={book.id} />
+                  <AddToRequestButton book={book} />
+                </div>
+              )
             )
-          )
-        }
-      />
+          }
+        />
+      </FadeUp>
 
 
       {loading ? (
@@ -316,9 +319,9 @@ export default function BookDetailClient() {
       ) : (
         book &&
         (isAdmin ? (
-          <>
+          <StaggerContainer className="space-y-6">
             <div className="grid gap-6 lg:grid-cols-3">
-              <div className="lg:self-start lg:sticky lg:top-4">
+              <FadeUp delay={0.1} className="lg:self-start lg:sticky lg:top-4">
                 <BookSideCard
                   coverPreview={coverPreview}
                   isEditMode={isEditMode}
@@ -330,43 +333,47 @@ export default function BookDetailClient() {
                   coverError={coverError}
                   onCoverValidationChange={handleCoverValidationChange}
                 />
-              </div>
-              <BookForm
-                book={book}
-                isEditMode={isEditMode}
-                formData={formData}
-                setFormData={setFormData}
-                onInputChange={handleInputChange}
-                onYearChange={handleYearChange}
-                onCategoryChange={handleCategoryChange}
-                onGenreChange={handleGenreChange}
-                onAuthorChange={handleAuthorChange}
-                onPublisherChange={handlePublisherChange}
-                onAddAuthor={() => setAuthorDialogOpen(true)}
-                onAddPublisher={() => setPublisherDialogOpen(true)}
-                genres={genres}
-                categories={categories}
-                authors={authors}
-                publishers={publishers}
-                onValidationChange={handleFormValidationChange}
-                onSubmit={handleSubmit}
-                onCancel={handleCancelEdit}
-                onEdit={() => setIsEditMode(true)}
-                submitting={submitting}
-                isSubmitDisabled={isSubmitDisabled()}
-              />
+              </FadeUp>
+              <FadeUp delay={0.2} className="lg:col-span-2">
+                <BookForm
+                  book={book}
+                  isEditMode={isEditMode}
+                  formData={formData}
+                  setFormData={setFormData}
+                  onInputChange={handleInputChange}
+                  onYearChange={handleYearChange}
+                  onCategoryChange={handleCategoryChange}
+                  onGenreChange={handleGenreChange}
+                  onAuthorChange={handleAuthorChange}
+                  onPublisherChange={handlePublisherChange}
+                  onAddAuthor={() => setAuthorDialogOpen(true)}
+                  onAddPublisher={() => setPublisherDialogOpen(true)}
+                  genres={genres}
+                  categories={categories}
+                  authors={authors}
+                  publishers={publishers}
+                  onValidationChange={handleFormValidationChange}
+                  onSubmit={handleSubmit}
+                  onCancel={handleCancelEdit}
+                  onEdit={() => setIsEditMode(true)}
+                  submitting={submitting}
+                  isSubmitDisabled={isSubmitDisabled()}
+                />
+              </FadeUp>
             </div>
             {!isEditMode && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">
-                    {tAdmin("bookCopies")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <BookCopyList book={book} onChange={fetchBook} />
-                </CardContent>
-              </Card>
+              <FadeUp delay={0.3}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-xl">
+                      {tAdmin("bookCopies")}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <BookCopyList book={book} onChange={fetchBook} />
+                  </CardContent>
+                </Card>
+              </FadeUp>
             )}
             <AuthorFormDialog
               open={authorDialogOpen}
@@ -378,7 +385,7 @@ export default function BookDetailClient() {
               setOpen={setPublisherDialogOpen}
               onSuccess={() => fetchPublishers()}
             />
-          </>
+          </StaggerContainer>
         ) : (
           <>
             <div className="grid gap-6 lg:grid-cols-3">
@@ -687,6 +694,6 @@ export default function BookDetailClient() {
           </>
         ))
       )}
-    </div>
+    </StaggerContainer>
   );
 }

@@ -26,6 +26,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
 interface BorrowBooksCardProps {
   borrow: Borrow;
@@ -176,7 +177,7 @@ export function BorrowBooksCard({
       </CardHeader>
 
       <CardContent className="p-0">
-        <div className="divide-y divide-border/60">
+        <StaggerContainer className="divide-y divide-border/60">
           {hasAssignedCopies &&
             borrow.borrow_details.map((detail) => {
               const returnDetail = returnRecords.find(
@@ -207,8 +208,10 @@ export function BorrowBooksCard({
               const categories = book?.categories ?? [];
 
               return (
-                <div
+                <SlideIn
                   key={detail.id}
+                  direction="up"
+                  distance={20}
                   className={`p-6 lg:p-8 transition-colors ${
                     !isProcessed ? "hover:bg-muted/30" : "bg-muted/20"
                   }`}
@@ -588,14 +591,16 @@ export function BorrowBooksCard({
                       </div>
                     )}
                   </div>
-                </div>
+                </SlideIn>
               );
             })}
 
           {showRequested &&
             requestedBooks.map((detail) => (
-              <div
+              <SlideIn
                 key={detail.id}
+                direction="up"
+                distance={20}
                 className="mx-6 my-3 flex items-start gap-3 rounded-lg border bg-card p-4 transition-shadow hover:shadow-md"
               >
                 <BookOpen className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
@@ -608,9 +613,9 @@ export function BorrowBooksCard({
                     <span>{t("pendingCopyAssignment")}</span>
                   </div>
                 </div>
-              </div>
+              </SlideIn>
             ))}
-        </div>
+        </StaggerContainer>
       </CardContent>
     </Card>
   );

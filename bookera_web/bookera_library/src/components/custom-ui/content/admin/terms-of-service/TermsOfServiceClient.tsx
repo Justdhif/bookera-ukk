@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion";
+
 export default function TermsOfServiceClient() {
   const t = useTranslations("terms-of-service");
   const [items, setItems] = useState<TermsOfService[]>([]);
@@ -44,36 +46,42 @@ export default function TermsOfServiceClient() {
     fetchData();
   }, []);
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("title")}
-        description={t("description")}
-        isAdmin
-        rightActions={
-          <Button
-            onClick={() => {
-              setEditing(null);
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("title")}
+          description={t("description")}
+          isAdmin
+          rightActions={
+            <Button
+              onClick={() => {
+                setEditing(null);
+                setOpen(true);
+              }}
+              variant="submit"
+              className="h-8 gap-1"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              {t("addTerms")}
+            </Button>
+          }
+        />
+      </FadeUp>
+      {loading ? (
+        <FadeIn key="loading">
+          <DataLoading size="lg" />
+        </FadeIn>
+      ) : (
+        <FadeIn key="content">
+          <TermsOfServiceList
+            data={items}
+            onEdit={(item) => {
+              setEditing(item);
               setOpen(true);
             }}
-            variant="submit"
-            className="h-8 gap-1"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            {t("addTerms")}
-          </Button>
-        }
-      />
-      {loading ? (
-        <DataLoading size="lg" />
-      ) : (
-        <TermsOfServiceList
-          data={items}
-          onEdit={(item) => {
-            setEditing(item);
-            setOpen(true);
-          }}
-          onDelete={(id) => setDeleteId(id)}
-        />
+            onDelete={(id) => setDeleteId(id)}
+          />
+        </FadeIn>
       )}
       <TermsOfServiceFormDialog
         open={open}
@@ -88,6 +96,6 @@ export default function TermsOfServiceClient() {
         description={t("deleteConfirm")}
         onConfirm={confirmDelete}
       />
-    </div>
+    </StaggerContainer>
   );
 }

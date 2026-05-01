@@ -30,6 +30,7 @@ import {
 import { DatePicker } from "@/components/ui/date-picker";
 import { format } from "date-fns";
 import type { UserOccupation } from "@/types/user";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 interface UserProfileFormProps {
   user?: User;
@@ -90,8 +91,8 @@ export default function UserProfileForm({
           {isEditMode ? t("editInfoDesc") : t("fullUserDetails")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
+      <StaggerContainer as={CardContent} className="space-y-6">
+        <FadeUp delay={0.1} className="space-y-4">
           <h3 className="font-semibold text-lg">{t("profileSection")}</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
@@ -258,7 +259,7 @@ export default function UserProfileForm({
               />
             </div>
           </div>
-        </div>
+        </FadeUp>
 
         {isEditMode ? (
           onSubmit && (
@@ -301,7 +302,7 @@ export default function UserProfileForm({
             </div>
           )
         )}
-      </CardContent>
+      </StaggerContainer>
     </Card>
   );
 }

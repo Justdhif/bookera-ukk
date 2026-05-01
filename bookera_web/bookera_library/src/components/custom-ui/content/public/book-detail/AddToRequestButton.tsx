@@ -28,7 +28,8 @@ export default function AddToRequestButton({
   const pathname = usePathname();
   const [showDialog, setShowDialog] = useState(false);
 
-  if (!isAuthenticated) return null;
+  const user = useAuthStore((state) => state.user);
+  if (!isAuthenticated || !user || user.role === 'user') return null;
 
   const handleOpen = () => {
     if (!isAuthenticated) {

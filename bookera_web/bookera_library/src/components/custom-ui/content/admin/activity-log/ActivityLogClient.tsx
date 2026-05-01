@@ -16,6 +16,7 @@ import ActivityFilters from "./ActivityFilters";
 import ActivityDetailDialog from "./ActivityDetailDialog";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion";
 import { useAuthStore } from "@/store/auth.store";
 import { useRouter } from "next/navigation";
 
@@ -76,47 +77,75 @@ export default function ActivityLogClient() {
   };
 
   return (
-    <div className="space-y-8">
-      <ContentHeader
-        title={t("title")}
-        description={t("description")}
-        isAdmin
-      />
-
-      {loading ? <DataLoading size="lg" /> : data && <ActivityStatistics statistics={data.statistics} />}
-
-      {loading ? <DataLoading size="lg" /> : data && <ActivityCharts charts={data.charts} onYearChange={handleYearChange} />}
-
-      <ActivityFilters
-        filters={filters}
-        onFilterChange={setFilters}
-      />
+    <StaggerContainer className="space-y-8">
+      <FadeUp>
+        <ContentHeader
+          title={t("title")}
+          description={t("description")}
+          isAdmin
+        />
+      </FadeUp>
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <DataLoading variant="inline" size="lg" />
-        </div>
+        <FadeIn key="loading-stats">
+          <DataLoading size="lg" />
+        </FadeIn>
       ) : (
         data && (
-          <div className="space-y-4">
-            <PaginatedContent
-              currentPage={data.logs.current_page}
-              lastPage={data.logs.last_page}
-              total={data.logs.total}
-              from={data.logs.from}
-              to={data.logs.to}
-              onPageChange={handlePageChange}
-            >
-              <ActivityTable
-                logs={data.logs.data}
-                pagination={data.logs}
-                onRowClick={handleRowClick}
-                onPageChange={handlePageChange}
-                filters={filters}
-                onFilterChange={setFilters}
-              />
-            </PaginatedContent>
+          <FadeUp delay={0.1}>
+            <ActivityStatistics statistics={data.statistics} />
+          </FadeUp>
+        )
+      )}
+
+      {loading ? (
+        <FadeIn key="loading-charts">
+          <DataLoading size="lg" />
+        </FadeIn>
+      ) : (
+        data && (
+          <FadeUp delay={0.2}>
+            <ActivityCharts
+              charts={data.charts}
+              onYearChange={handleYearChange}
+            />
+          </FadeUp>
+        )
+      )}
+
+      <FadeUp delay={0.3}>
+        <ActivityFilters filters={filters} onFilterChange={setFilters} />
+      </FadeUp>
+
+      {loading ? (
+        <FadeIn key="loading-table">
+          <div className="flex justify-center py-12">
+            <DataLoading variant="inline" size="lg" />
           </div>
+        </FadeIn>
+      ) : (
+        data && (
+          <FadeIn key="content-table">
+            <div className="space-y-4">
+              <PaginatedContent
+                currentPage={data.logs.current_page}
+                lastPage={data.logs.last_page}
+                total={data.logs.total}
+                from={data.logs.from}
+                to={data.logs.to}
+                onPageChange={handlePageChange}
+              >
+                <ActivityTable
+                  logs={data.logs.data}
+                  pagination={data.logs}
+                  onRowClick={handleRowClick}
+                  onPageChange={handlePageChange}
+                  filters={filters}
+                  onFilterChange={setFilters}
+                />
+              </PaginatedContent>
+            </div>
+          </FadeIn>
         )
       )}
 
@@ -125,6 +154,6 @@ export default function ActivityLogClient() {
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
       />
-    </div>
+    </StaggerContainer>
   );
 }

@@ -30,6 +30,7 @@ import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
 import Image from "next/image";
 import { BookOpen } from "lucide-react";
 import EmptyState from "@/components/custom-ui/EmptyState";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 interface UserSideCardProps {
   mode?: "add" | "detail";
@@ -101,8 +102,8 @@ export default function UserSideCard({
                 : t("avatarTitle")}
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col items-center gap-4">
-          <div className="relative h-32 w-32">
+        <StaggerContainer as={CardContent} className="flex flex-col items-center gap-4">
+          <FadeUp delay={0.1} className="relative h-32 w-32">
             <div className="relative h-full w-full rounded-full overflow-hidden ring-4 ring-gray-100 dark:ring-gray-800">
               {avatarPreview ? (
                 <Image
@@ -124,18 +125,20 @@ export default function UserSideCard({
                 </div>
               )}
             </div>
-          </div>
-          <Button
-            type="button"
-            variant="submit"
-            onClick={() => setAvatarModalOpen(true)}
-            className="w-full"
-            disabled={!canEdit}
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            {t("uploadAvatar")}
-          </Button>
-          <div className="w-full border-t pt-3 space-y-3">
+          </FadeUp>
+          <FadeUp delay={0.15} className="w-full">
+            <Button
+              type="button"
+              variant="submit"
+              onClick={() => setAvatarModalOpen(true)}
+              className="w-full"
+              disabled={!canEdit}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              {t("uploadAvatar")}
+            </Button>
+          </FadeUp>
+          <FadeUp delay={0.2} className="w-full border-t pt-3 space-y-3">
             <h4 className="font-semibold text-sm">{t("accountSection")}</h4>
             <div className="space-y-1.5">
               <Label
@@ -201,8 +204,8 @@ export default function UserSideCard({
                 visible={true}
               />
             </div>
-          </div>
-          <div className="space-y-2 w-full">
+          </FadeUp>
+          <FadeUp delay={0.25} className="space-y-2 w-full">
             <div className="flex items-center gap-2">
               <Label className="text-muted-foreground text-xs w-16">
                 {t("role")}:
@@ -245,9 +248,9 @@ export default function UserSideCard({
                 </SelectContent>
               </Select>
             </div>
-          </div>
+          </FadeUp>
           {recentBorrows !== undefined && (
-            <div className="border-t pt-4 mt-2 w-full">
+            <FadeUp delay={0.3} className="border-t pt-4 mt-2 w-full">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="font-semibold text-sm">{t("recentBorrows")}</h4>
                 <Link
@@ -289,9 +292,10 @@ export default function UserSideCard({
                   className="py-4 border-none"
                 />
               )}
-            </div>
+            </FadeUp>
           )}
-        </CardContent>
+        </StaggerContainer>
+
       </Card>
       <AvatarUploadModal
         open={avatarModalOpen}

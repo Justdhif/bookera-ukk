@@ -16,6 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Genre } from "@/types/genre";
 import { Edit, FolderOpen, Trash } from "lucide-react";
+import { motion } from "framer-motion";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
 export default function GenreTable({
   data,
@@ -51,10 +53,20 @@ export default function GenreTable({
           </TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <StaggerContainer
+        as={motion.tbody}
+        staggerDelay={0.05}
+        data-slot="table-body"
+        className="[&_tr:last-child]:border-0"
+      >
         {data.map((item, index) => (
-          <TableRow
+          <SlideIn
             key={item.id}
+            as={motion.tr}
+            direction="up"
+            distance={20}
+            delay={index * 0.05}
+            data-slot="table-row"
             className="group hover:bg-primary/5 transition-colors border-b last:border-b-0"
           >
             <TableCell className="font-medium text-center text-muted-foreground">
@@ -95,9 +107,9 @@ export default function GenreTable({
                 </Button>
               </div>
             </TableCell>
-          </TableRow>
+          </SlideIn>
         ))}
-      </TableBody>
+      </StaggerContainer>
     </Table>
   );
 }

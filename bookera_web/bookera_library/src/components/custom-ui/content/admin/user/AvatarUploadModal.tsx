@@ -16,6 +16,7 @@ import { Upload, X, Check, FileWarning, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Image from "next/image";
+import { FadeUp } from "@/components/custom-ui/motion";
 
 interface AvatarUploadModalProps {
   open: boolean;
@@ -177,7 +178,7 @@ export default function AvatarUploadModal({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-6">
-          <div
+          <FadeUp delay={0.1}
             className={cn(
               "relative flex flex-col items-center gap-4 p-6 rounded-xl transition-all duration-200",
               !previewUrl && "cursor-pointer border-2 border-dashed",
@@ -273,8 +274,8 @@ export default function AvatarUploadModal({
                 </div>
               </>
             )}
-          </div>
-          <div className="space-y-4">
+          </FadeUp>
+          <FadeUp delay={0.2} className="space-y-4">
             <h4 className="text-sm font-semibold flex items-center gap-2">
               <span className="h-1 w-1 rounded-full bg-brand-primary"></span>
               {t("defaultAvatars")}
@@ -318,8 +319,8 @@ export default function AvatarUploadModal({
                 );
               })}
             </div>
-          </div>
-          <div className="space-y-3 pt-2">
+          </FadeUp>
+          <FadeUp delay={0.3} className="space-y-3 pt-2">
             <h4 className="text-sm font-semibold flex items-center gap-2">
               <span className="h-1 w-1 rounded-full bg-brand-primary"></span>
               {t("uploadYourOwn")}
@@ -349,7 +350,7 @@ export default function AvatarUploadModal({
                 {t("formatHint")}
               </p>
             </div>
-          </div>
+          </FadeUp>
         </div>
         <DialogFooter className="flex-row gap-3 pt-4 border-t">
           <Button 

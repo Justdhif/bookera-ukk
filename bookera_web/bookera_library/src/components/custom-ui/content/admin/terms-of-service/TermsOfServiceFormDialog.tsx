@@ -1,4 +1,5 @@
 "use client";
+
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import {
@@ -14,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import { TermsOfService } from "@/types/terms-of-service";
 import { termsOfServiceService } from "@/services/terms-of-service.service";
 import { toast } from "sonner";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
+
 export default function TermsOfServiceFormDialog({
   open,
   setOpen,
@@ -71,48 +74,54 @@ export default function TermsOfServiceFormDialog({
             {item ? t("editTerms") : t("addTerms")}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="title" variant="required">
-              {t("titleLabel")}
-            </Label>
-            <Input
-              id="title"
-              placeholder={t("titlePlaceholder")}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="content" variant="required">
-              {t("contentHTML")}
-            </Label>
-            <Textarea
-              id="content"
-              placeholder={t.raw("contentPlaceholder")}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={16}
-              className="font-mono text-sm"
-            />
-            <p className="text-xs text-muted-foreground">{t("useHTMLTags")}</p>
-          </div>
-          <Button
-            onClick={handleSubmit}
-            variant="submit"
-            disabled={isLoading || !title.trim() || !content.trim()}
-            loading={isLoading}
-            className="w-full"
-          >
-            {isLoading
-              ? item
-                ? t("saving")
-                : t("adding")
-              : item
-                ? t("saveChanges")
-                : t("add")}
-          </Button>
-        </div>
+        <StaggerContainer className="space-y-4">
+          <FadeUp delay={0.1}>
+            <div className="space-y-2">
+              <Label htmlFor="title" variant="required">
+                {t("titleLabel")}
+              </Label>
+              <Input
+                id="title"
+                placeholder={t("titlePlaceholder")}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+          </FadeUp>
+          <FadeUp delay={0.2}>
+            <div className="space-y-2">
+              <Label htmlFor="content" variant="required">
+                {t("contentHTML")}
+              </Label>
+              <Textarea
+                id="content"
+                placeholder={t.raw("contentPlaceholder")}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={16}
+                className="font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">{t("useHTMLTags")}</p>
+            </div>
+          </FadeUp>
+          <FadeUp delay={0.3}>
+            <Button
+              onClick={handleSubmit}
+              variant="submit"
+              disabled={isLoading || !title.trim() || !content.trim()}
+              loading={isLoading}
+              className="w-full"
+            >
+              {isLoading
+                ? item
+                  ? t("saving")
+                  : t("adding")
+                : item
+                  ? t("saveChanges")
+                  : t("add")}
+            </Button>
+          </FadeUp>
+        </StaggerContainer>
       </DialogContent>
     </Dialog>
   );

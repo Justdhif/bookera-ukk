@@ -14,6 +14,8 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import { Building2, Edit, Trash } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
 export default function PublisherTable({
   data,
@@ -54,10 +56,20 @@ export default function PublisherTable({
           </TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <StaggerContainer
+        as={motion.tbody}
+        staggerDelay={0.05}
+        data-slot="table-body"
+        className="[&_tr:last-child]:border-0"
+      >
         {data.map((item, index) => (
-          <TableRow
+          <SlideIn
             key={item.id}
+            as={motion.tr}
+            direction="up"
+            distance={20}
+            delay={index * 0.05}
+            data-slot="table-row"
             className="group hover:bg-primary/5 transition-colors border-b last:border-b-0"
           >
             <TableCell className="text-center text-muted-foreground font-medium">
@@ -109,9 +121,9 @@ export default function PublisherTable({
                 </Button>
               </div>
             </TableCell>
-          </TableRow>
+          </SlideIn>
         ))}
-      </TableBody>
+      </StaggerContainer>
     </Table>
   );
 }

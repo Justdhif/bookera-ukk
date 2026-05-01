@@ -23,6 +23,7 @@ import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import DateRangeFilter from "@/components/custom-ui/DateRangeFilter";
 import { getCurrentMonthRange } from "@/lib/month-range";
+import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion";
 
 export default function FineManagement() {
   const t = useTranslations("fines");
@@ -114,67 +115,81 @@ export default function FineManagement() {
   }, [filters]);
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("title")}
-        description={t("finesTabDescription")}
-        isAdmin
-        rightActions={
-          <Button
-            variant="outline"
-            className="h-8 gap-1 border-slate-200"
-            onClick={handleExport}
-            disabled={exporting}
-          >
-            <Download className="h-3.5 w-3.5" />
-            {t("exportData")}
-          </Button>
-        }
-      />
-
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:items-center mb-6">
-        <div className="relative min-w-0 w-full">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={t("searchFines")}
-            value={searchInput}
-            onChange={handleSearchChange}
-            className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
-          />
-        </div>
-        <DateRangeFilter
-          onFilter={handleDateFilter}
-          defaultStartDate={defaultMonthRange.startDate}
-          defaultEndDate={defaultMonthRange.endDate}
-          className="w-full xl:w-auto"
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("title")}
+          description={t("finesTabDescription")}
+          isAdmin
+          rightActions={
+            <Button
+              variant="outline"
+              className="h-8 gap-1 border-slate-200"
+              onClick={handleExport}
+              disabled={exporting}
+            >
+              <Download className="h-3.5 w-3.5" />
+              {t("exportData")}
+            </Button>
+          }
         />
-        <Select value={statusValue} onValueChange={handleStatusChange}>
-          <SelectTrigger className="w-full xl:w-44 h-11! shadow-sm transition-all duration-300">
-            <SelectValue placeholder={t("filterStatus")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("allStatus")}</SelectItem>
-            <SelectItem value="unpaid">{t("unpaid")}</SelectItem>
-            <SelectItem value="paid">{t("paid")}</SelectItem>
-            <SelectItem value="waived">{t("waived")}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      </FadeUp>
 
-      <PaginatedContent
-        currentPage={pagination.current_page}
-        lastPage={pagination.last_page}
-        total={pagination.total}
-        from={pagination.from}
-        to={pagination.to}
-        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
-      >
-        {loading ? (
-          <DataLoading size="lg" />
-        ) : (
-          <FineTable data={fines} />
-        )}
-      </PaginatedContent>
-    </div>
+      <FadeUp delay={0.1}>
+        <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:items-center mb-6">
+          <div className="relative min-w-0 w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={t("searchFines")}
+              value={searchInput}
+              onChange={handleSearchChange}
+              className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
+            />
+          </div>
+          <DateRangeFilter
+            onFilter={handleDateFilter}
+            defaultStartDate={defaultMonthRange.startDate}
+            defaultEndDate={defaultMonthRange.endDate}
+            className="w-full xl:w-auto"
+          />
+          <Select value={statusValue} onValueChange={handleStatusChange}>
+            <SelectTrigger className="w-full xl:w-44 h-11! shadow-sm transition-all duration-300">
+              <SelectValue placeholder={t("filterStatus")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("allStatus")}</SelectItem>
+              <SelectItem value="unpaid">{t("unpaid")}</SelectItem>
+              <SelectItem value="paid">{t("paid")}</SelectItem>
+              <SelectItem value="waived">{t("waived")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </FadeUp>
+
+      <FadeUp delay={0.2}>
+        <PaginatedContent
+          currentPage={pagination.current_page}
+          lastPage={pagination.last_page}
+          total={pagination.total}
+          from={pagination.from}
+          to={pagination.to}
+          onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+        >
+          {loading ? (
+            <FadeIn
+              key="loading"
+            >
+              <DataLoading size="lg" />
+            </FadeIn>
+          ) : (
+            <FadeIn
+              key="content"
+            >
+              <FineTable data={fines} />
+            </FadeIn>
+          )}
+        </PaginatedContent>
+      </FadeUp>
+    </StaggerContainer>
   );
 }

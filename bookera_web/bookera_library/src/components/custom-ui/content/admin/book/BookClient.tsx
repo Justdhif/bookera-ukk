@@ -18,6 +18,7 @@ import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import ImportBookDialog from "./ImportBookDialog";
 import { BookOpen, Plus, FileSpreadsheet, Download } from "lucide-react";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 export default function BookClient() {
   const t = useTranslations("book");
@@ -115,72 +116,78 @@ export default function BookClient() {
 
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("title")}
-        description={t("manageCollection")}
-        isAdmin
-        rightActions={
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              className="h-8 gap-1 border-slate-200"
-              onClick={() => setIsImportDialogOpen(true)}
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5" />
-              {t("importData")}
-            </Button>
-            <Button
-              variant="outline"
-              className="h-8 gap-1 border-slate-200"
-              onClick={handleExport}
-              disabled={loading}
-            >
-              <Download className="w-3.5 h-3.5" />
-              {t("exportData")}
-            </Button>
-            <Link href="/admin/books/add">
-              <Button variant="submit" className="h-8 gap-1">
-                <Plus className="w-3.5 h-3.5" />
-                {t("addBook")}
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("title")}
+          description={t("manageCollection")}
+          isAdmin
+          rightActions={
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                className="h-8 gap-1 border-slate-200"
+                onClick={() => setIsImportDialogOpen(true)}
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                {t("importData")}
               </Button>
-            </Link>
-          </div>
-        }
-      />
+              <Button
+                variant="outline"
+                className="h-8 gap-1 border-slate-200"
+                onClick={handleExport}
+                disabled={loading}
+              >
+                <Download className="w-3.5 h-3.5" />
+                {t("exportData")}
+              </Button>
+              <Link href="/admin/books/add">
+                <Button variant="submit" className="h-8 gap-1">
+                  <Plus className="w-3.5 h-3.5" />
+                  {t("addBook")}
+                </Button>
+              </Link>
+            </div>
+          }
+        />
+      </FadeUp>
 
-      <BookFilter
-        categories={categories}
-        onChange={(partial) =>
-          setFilters((prev) => ({
-            ...prev,
-            ...partial,
-            page: 1,
-            status:
-              partial.status !== undefined
-                ? (partial.status as BookFilterParams["status"])
-                : "status" in partial
-                  ? undefined
-                  : prev.status,
-          }))
-        }
-        isLoading={loading}
-      />
+      <FadeUp delay={0.1}>
+        <BookFilter
+          categories={categories}
+          onChange={(partial) =>
+            setFilters((prev) => ({
+              ...prev,
+              ...partial,
+              page: 1,
+              status:
+                partial.status !== undefined
+                  ? (partial.status as BookFilterParams["status"])
+                  : "status" in partial
+                    ? undefined
+                    : prev.status,
+            }))
+          }
+          isLoading={loading}
+        />
+      </FadeUp>
 
-      <PaginatedContent
-        currentPage={pagination.current_page}
-        lastPage={pagination.last_page}
-        total={pagination.total}
-        from={pagination.from}
-        to={pagination.to}
-        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
-      >
-        {loading ? (
-          <DataLoading size="lg" />
-        ) : (
-          <BookTable data={books} onDelete={(id) => setDeleteId(id)} />
-        )}
-      </PaginatedContent>
+      <FadeUp delay={0.2}>
+        <PaginatedContent
+          currentPage={pagination.current_page}
+          lastPage={pagination.last_page}
+          total={pagination.total}
+          from={pagination.from}
+          to={pagination.to}
+          onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+        >
+          {loading ? (
+            <DataLoading size="lg" />
+          ) : (
+            <BookTable data={books} onDelete={(id) => setDeleteId(id)} />
+          )}
+        </PaginatedContent>
+      </FadeUp>
 
       <DeleteConfirmDialog
         open={deleteId !== null}
@@ -195,6 +202,6 @@ export default function BookClient() {
         onOpenChange={setIsImportDialogOpen}
         onSuccess={() => fetchBooks(filters)}
       />
-    </div>
+    </StaggerContainer>
   );
 }

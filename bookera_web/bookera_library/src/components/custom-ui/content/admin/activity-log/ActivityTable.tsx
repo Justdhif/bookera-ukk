@@ -28,6 +28,8 @@ import { formatDistanceToNow } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 import { Search, RotateCcw, Filter, Activity } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { motion } from "framer-motion";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
 interface ActivityTableProps {
   logs: ActivityLog[];
@@ -112,7 +114,11 @@ export default function ActivityTable({
             <TableHead className="font-semibold">{t("timeCol")}</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <StaggerContainer
+          as={motion.tbody}
+          staggerDelay={0.05}
+          className="[&_tr:last-child]:border-0"
+        >
           {logs.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} className="p-0">
@@ -126,8 +132,12 @@ export default function ActivityTable({
             </TableRow>
           ) : (
             logs.map((log, index) => (
-              <TableRow
+              <SlideIn
                 key={log.id}
+                as={motion.tr}
+                direction="up"
+                distance={20}
+                delay={index * 0.05}
                 className="group cursor-pointer hover:bg-primary/5 transition-colors border-b last:border-b-0"
                 onClick={() => onRowClick(log.id)}
               >
@@ -187,10 +197,10 @@ export default function ActivityTable({
                     locale: idLocale,
                   })}
                 </TableCell>
-              </TableRow>
+              </SlideIn>
             ))
           )}
-        </TableBody>
+        </StaggerContainer>
       </Table>
     </div>
   );

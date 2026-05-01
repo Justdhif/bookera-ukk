@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Calendar, Globe, Monitor, User } from "lucide-react";
 import RoleBadge from "@/components/custom-ui/badge/RoleBadge";
 import { useTranslations } from "next-intl";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 interface ActivityDetailDialogProps {
   activityId: number | null;
@@ -75,142 +76,180 @@ export default function ActivityDetailDialog({
             <p className="mt-4 text-muted-foreground">{t("loading")}</p>
           </div>
         ) : detail ? (
-          <div className="space-y-6">
-            <div className="bg-linear-to-br from-brand-primary/5 to-brand-primary-dark/5 dark:from-brand-primary/10 dark:to-brand-primary-dark/10 p-5 rounded-xl border border-brand-primary/20">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="p-2 bg-brand-primary/10 rounded-lg">
-                  <User className="h-5 w-5 text-brand-primary" />
+          <StaggerContainer className="space-y-6">
+            <FadeUp delay={0.1}>
+              <div className="bg-linear-to-br from-brand-primary/5 to-brand-primary-dark/5 dark:from-brand-primary/10 dark:to-brand-primary-dark/10 p-5 rounded-xl border border-brand-primary/20">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-2 bg-brand-primary/10 rounded-lg">
+                    <User className="h-5 w-5 text-brand-primary" />
+                  </div>
+                  <h3 className="font-semibold text-lg">
+                    {t("userInformation")}
+                  </h3>
                 </div>
-                <h3 className="font-semibold text-lg">{t("userInformation")}</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      {t("nameLabel")}:
+                    </span>
+                    <span className="font-medium">
+                      {detail.user?.profile?.full_name || "Unknown"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      {t("emailLabel")}:
+                    </span>
+                    <span className="font-medium">{detail.user?.email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      {t("roleLabel")}:
+                    </span>
+                    <RoleBadge role={detail.user?.role ?? "user"} />
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t("nameLabel")}:</span>
-                  <span className="font-medium">
-                    {detail.user?.profile?.full_name || "Unknown"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t("emailLabel")}:</span>
-                  <span className="font-medium">{detail.user?.email}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t("roleLabel")}:</span>
-                  <RoleBadge role={detail.user?.role ?? "user"} />
-                </div>
-              </div>
-            </div>
+            </FadeUp>
             <Separator />
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="p-2 bg-blue-500/10 rounded-lg">
-                  <Calendar className="h-5 w-5 text-blue-500" />
+            <FadeUp delay={0.2}>
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-2 bg-blue-500/10 rounded-lg">
+                    <Calendar className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <h3 className="font-semibold text-lg">
+                    {t("activityInformation")}
+                  </h3>
                 </div>
-                <h3 className="font-semibold text-lg">{t("activityInformation")}</h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">
+                      {t("actionLabel")}:
+                    </span>
+                    <Badge className={getActionColor(detail.action)}>
+                      {detail.action}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">
+                      {t("moduleLabel")}:
+                    </span>
+                    <Badge variant="outline">{detail.module}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      {t("descriptionLabel")}:
+                    </span>
+                    <span className="font-medium text-right">
+                      {detail.description}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      {t("timeLabel")}:
+                    </span>
+                    <span className="font-medium">
+                      {new Date(detail.created_at).toLocaleString("id-ID", {
+                        dateStyle: "full",
+                        timeStyle: "medium",
+                      })}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">{t("actionLabel")}:</span>
-                  <Badge className={getActionColor(detail.action)}>
-                    {detail.action}
-                  </Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">{t("moduleLabel")}:</span>
-                  <Badge variant="outline">{detail.module}</Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t("descriptionLabel")}:</span>
-                  <span className="font-medium text-right">
-                    {detail.description}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t("timeLabel")}:</span>
-                  <span className="font-medium">
-                    {new Date(detail.created_at).toLocaleString("id-ID", {
-                      dateStyle: "full",
-                      timeStyle: "medium",
-                    })}
-                  </span>
-                </div>
-              </div>
-            </div>
+            </FadeUp>
             <Separator />
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="p-2 bg-purple-500/10 rounded-lg">
-                  <Globe className="h-5 w-5 text-purple-500" />
+            <FadeUp delay={0.3}>
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-2 bg-purple-500/10 rounded-lg">
+                    <Globe className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <h3 className="font-semibold text-lg">
+                    {t("networkInformation")}
+                  </h3>
                 </div>
-                <h3 className="font-semibold text-lg">{t("networkInformation")}</h3>
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t("ipAddressLabel")}:</span>
-                  <span className="font-mono">{detail.ip_address}</span>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      {t("ipAddressLabel")}:
+                    </span>
+                    <span className="font-mono">{detail.ip_address}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="p-2 bg-orange-500/10 rounded-lg">
-                  <Monitor className="h-5 w-5 text-orange-500" />
+            </FadeUp>
+            <FadeUp delay={0.4}>
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-2 bg-orange-500/10 rounded-lg">
+                    <Monitor className="h-5 w-5 text-orange-500" />
+                  </div>
+                  <h3 className="font-semibold text-lg">{t("userAgent")}</h3>
                 </div>
-                <h3 className="font-semibold text-lg">{t("userAgent")}</h3>
+                <p className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-xl break-all border">
+                  {detail.user_agent}
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-xl break-all border">
-                {detail.user_agent}
-              </p>
-            </div>
+            </FadeUp>
             {detail.old_data && (
               <>
                 <Separator />
-                <div>
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
-                    {t("oldData")}
-                  </h3>
-                  <pre className="bg-linear-to-br from-muted/50 to-muted p-4 rounded-xl text-xs overflow-x-auto border-2 border-red-200 dark:border-red-900/50">
-                    {JSON.stringify(detail.old_data, null, 2)}
-                  </pre>
-                </div>
+                <FadeUp delay={0.5}>
+                  <div>
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                      {t("oldData")}
+                    </h3>
+                    <pre className="bg-linear-to-br from-muted/50 to-muted p-4 rounded-xl text-xs overflow-x-auto border-2 border-red-200 dark:border-red-900/50">
+                      {JSON.stringify(detail.old_data, null, 2)}
+                    </pre>
+                  </div>
+                </FadeUp>
               </>
             )}
             {detail.new_data && (
               <>
                 <Separator />
-                <div>
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-brand-primary" />
-                    {t("newData")}
-                  </h3>
-                  <pre className="bg-linear-to-br from-muted/50 to-muted p-4 rounded-xl text-xs overflow-x-auto border-2 border-brand-primary/30">
-                    {JSON.stringify(detail.new_data, null, 2)}
-                  </pre>
-                </div>
+                <FadeUp delay={0.6}>
+                  <div>
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-brand-primary" />
+                      {t("newData")}
+                    </h3>
+                    <pre className="bg-linear-to-br from-muted/50 to-muted p-4 rounded-xl text-xs overflow-x-auto border-2 border-brand-primary/30">
+                      {JSON.stringify(detail.new_data, null, 2)}
+                    </pre>
+                  </div>
+                </FadeUp>
               </>
             )}
             {detail.subject && (
               <>
                 <Separator />
-                <div>
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-purple-500" />
-                    {t("relatedData")}
-                  </h3>
-                  <div className="space-y-2 text-sm mb-3">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{t("typeLabel")}:</span>
-                      <Badge variant="outline">{detail.subject_type}</Badge>
+                <FadeUp delay={0.7}>
+                  <div>
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-purple-500" />
+                      {t("relatedData")}
+                    </h3>
+                    <div className="space-y-2 text-sm mb-3">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          {t("typeLabel")}:
+                        </span>
+                        <Badge variant="outline">{detail.subject_type}</Badge>
+                      </div>
                     </div>
+                    <pre className="bg-linear-to-br from-muted/50 to-muted p-4 rounded-xl text-xs overflow-x-auto border-2 border-purple-200 dark:border-purple-900/50">
+                      {JSON.stringify(detail.subject, null, 2)}
+                    </pre>
                   </div>
-                  <pre className="bg-linear-to-br from-muted/50 to-muted p-4 rounded-xl text-xs overflow-x-auto border-2 border-purple-200 dark:border-purple-900/50">
-                    {JSON.stringify(detail.subject, null, 2)}
-                  </pre>
-                </div>
+                </FadeUp>
               </>
             )}
-          </div>
+          </StaggerContainer>
         ) : null}
       </DialogContent>
     </Dialog>

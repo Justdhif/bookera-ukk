@@ -22,7 +22,8 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuthStore } from "@/store/auth.store";
-
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
+import { motion } from "framer-motion";
 import AppSidebar from "./AppSidebar";
 
 export default function PublicSidebar() {
@@ -87,75 +88,81 @@ export default function PublicSidebar() {
     <AppSidebar subtitle={t("myLibrary")}>
       <div className="px-2 py-4 border-b border-border/40">
         <SidebarMenu>
-          <SidebarMenuItem
-            className={cn(!open && "w-full flex justify-center")}
-          >
-            <SidebarMenuButton
-              asChild
-              tooltip={t("explore")}
-              className={cn(
-                "rounded-xl transition-all h-10 px-3",
-                !open && "justify-center px-0 mx-auto",
-              )}
-            >
-              <Link href="/explore">
-                <div
+          <StaggerContainer as={motion.div} staggerDelay={0.05} className="flex flex-col gap-1">
+            <SlideIn direction="left" delay={0.1}>
+              <SidebarMenuItem
+                className={cn(!open && "w-full flex justify-center")}
+              >
+                <SidebarMenuButton
+                  asChild
+                  tooltip={t("explore")}
                   className={cn(
-                    "p-1.5 rounded-lg bg-primary/10 text-primary shrink-0",
-                    !open && "p-2",
+                    "rounded-xl transition-all h-10 px-3",
+                    !open && "justify-center px-0 mx-auto",
                   )}
                 >
-                  <LucideSearch className="h-4 w-4" />
-                </div>
-                {open && (
-                  <span className="font-semibold text-sm ml-1">
-                    {t("explore")}
-                  </span>
-                )}
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          {user?.role !== "user" && (
-            <SidebarMenuItem
-              className={cn(!open && "w-full flex justify-center mt-2")}
-            >
-              <SidebarMenuButton
-                asChild
-                tooltip="Messages"
-                className={cn(
-                  "rounded-xl transition-all h-10 px-3",
-                  !open && "justify-center px-0 mx-auto",
-                )}
-              >
-                <Link href={chatHref}>
-                  <div
-                    className={cn(
-                      "p-1.5 rounded-lg bg-blue-500/10 text-blue-500 shrink-0 relative",
-                      !open && "p-2",
-                    )}
-                  >
-                    <MessageSquareText className="h-4 w-4" />
-                    {!open && user && unreadCount > 0 && (
-                      <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-[18px] min-w-[18px] px-1 flex items-center justify-center border-2 border-background shadow-sm">
-                        {displayUnread}
+                  <Link href="/explore">
+                    <div
+                      className={cn(
+                        "p-1.5 rounded-lg bg-primary/10 text-primary shrink-0",
+                        !open && "p-2",
+                      )}
+                    >
+                      <LucideSearch className="h-4 w-4" />
+                    </div>
+                    {open && (
+                      <span className="font-semibold text-sm ml-1">
+                        {t("explore")}
                       </span>
                     )}
-                  </div>
-                  {open && (
-                    <div className="flex items-center justify-between flex-1 ml-1">
-                      <span className="font-semibold text-sm">Messages</span>
-                      {user && unreadCount > 0 && (
-                        <span className="bg-red-500 text-white text-[10px] font-bold rounded-full h-5 px-1.5 min-w-5 flex items-center justify-center shrink-0 ml-2 shadow-sm">
-                          {displayUnread}
-                        </span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SlideIn>
+
+            {user?.role !== "user" && (
+              <SlideIn direction="left" delay={0.15}>
+                <SidebarMenuItem
+                  className={cn(!open && "w-full flex justify-center mt-2")}
+                >
+                  <SidebarMenuButton
+                    asChild
+                    tooltip="Messages"
+                    className={cn(
+                      "rounded-xl transition-all h-10 px-3",
+                      !open && "justify-center px-0 mx-auto",
+                    )}
+                  >
+                    <Link href={chatHref}>
+                      <div
+                        className={cn(
+                          "p-1.5 rounded-lg bg-blue-500/10 text-blue-500 shrink-0 relative",
+                          !open && "p-2",
+                        )}
+                      >
+                        <MessageSquareText className="h-4 w-4" />
+                        {!open && user && unreadCount > 0 && (
+                          <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-[18px] min-w-[18px] px-1 flex items-center justify-center border-2 border-background shadow-sm">
+                            {displayUnread}
+                          </span>
+                        )}
+                      </div>
+                      {open && (
+                        <div className="flex items-center justify-between flex-1 ml-1">
+                          <span className="font-semibold text-sm">Messages</span>
+                          {user && unreadCount > 0 && (
+                            <span className="bg-red-500 text-white text-[10px] font-bold rounded-full h-5 px-1.5 min-w-5 flex items-center justify-center shrink-0 ml-2 shadow-sm">
+                              {displayUnread}
+                            </span>
+                          )}
+                        </div>
                       )}
-                    </div>
-                  )}
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SlideIn>
+            )}
+          </StaggerContainer>
         </SidebarMenu>
       </div>
 

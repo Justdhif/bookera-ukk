@@ -38,6 +38,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+import { StaggerContainer, FadeUp, SlideIn, FadeIn } from "@/components/custom-ui/motion";
+
 interface LostBookCardProps {
   borrow: LostBook["borrow"];
   items: LostBook[];
@@ -350,75 +352,89 @@ export default function LostBooksClient() {
     }
 
     return (
-      <div className="grid gap-4">
-        {books.map((lostBook) => (
-          <LostBookCard
+      <StaggerContainer className="grid gap-4">
+        {books.map((lostBook, index) => (
+          <SlideIn
             key={lostBook.id}
-            borrow={lostBook.borrow}
-            items={[lostBook]}
-          />
+            direction="up"
+            distance={20}
+            delay={index * 0.05}
+          >
+            <LostBookCard
+              borrow={lostBook.borrow}
+              items={[lostBook]}
+            />
+          </SlideIn>
         ))}
-      </div>
+      </StaggerContainer>
     );
   };
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("title")}
-        description={t("description")}
-        isAdmin
-        rightActions={
-          <Button
-            variant="outline"
-            className="h-8 gap-1 border-slate-200"
-            onClick={handleExport}
-            disabled={exporting}
-          >
-            <Download className="h-3.5 w-3.5" />
-            {t("exportData")}
-          </Button>
-        }
-      />
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("title")}
+          description={t("description")}
+          isAdmin
+          rightActions={
+            <Button
+              variant="outline"
+              className="h-8 gap-1 border-slate-200"
+              onClick={handleExport}
+              disabled={exporting}
+            >
+              <Download className="h-3.5 w-3.5" />
+              {t("exportData")}
+            </Button>
+          }
+        />
+      </FadeUp>
 
       <div className="space-y-4">
-        <div className="mb-6 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-          <div className="relative min-w-0 w-full">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
-            <Input
-              placeholder={t("searchPlaceholder")}
-              value={searchInput}
-              onChange={handleSearchChange}
-              className="h-11! w-full pl-9 shadow-sm transition-all duration-300"
+        <FadeUp delay={0.1}>
+          <div className="mb-6 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+            <div className="relative min-w-0 w-full">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+              <Input
+                placeholder={t("searchPlaceholder")}
+                value={searchInput}
+                onChange={handleSearchChange}
+                className="h-11! w-full pl-9 shadow-sm transition-all duration-300"
+              />
+            </div>
+            <DateRangeFilter
+              onFilter={handleDateFilter}
+              defaultStartDate={defaultMonthRange.startDate}
+              defaultEndDate={defaultMonthRange.endDate}
+              className="w-full lg:w-auto"
             />
           </div>
-          <DateRangeFilter
-            onFilter={handleDateFilter}
-            defaultStartDate={defaultMonthRange.startDate}
-            defaultEndDate={defaultMonthRange.endDate}
-            className="w-full lg:w-auto"
-          />
-        </div>
+        </FadeUp>
 
-        <PaginatedContent
-          currentPage={pagination.current_page}
-          lastPage={pagination.last_page}
-          total={pagination.total}
-          from={pagination.from}
-          to={pagination.to}
-          onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
-        >
-          {loading ? (
-            <div className="grid gap-4">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <DataLoading key={index} size="lg" />
-              ))}
-            </div>
-          ) : (
-            renderCards(lostBooks)
-          )}
-        </PaginatedContent>
+        <FadeUp delay={0.2}>
+          <PaginatedContent
+            currentPage={pagination.current_page}
+            lastPage={pagination.last_page}
+            total={pagination.total}
+            from={pagination.from}
+            to={pagination.to}
+            onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+          >
+            {loading ? (
+              <FadeIn key="loading" className="grid gap-4">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <DataLoading key={index} size="lg" />
+                ))}
+              </FadeIn>
+            ) : (
+              <FadeIn key="content">
+                {renderCards(lostBooks)}
+              </FadeIn>
+            )}
+          </PaginatedContent>
+        </FadeUp>
       </div>
-    </div>
+    </StaggerContainer>
   );
 }

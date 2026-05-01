@@ -15,6 +15,7 @@ import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialo
 import { Plus, Search, Tag } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion";
 
 export default function CategoryClient() {
   const t = useTranslations("category");
@@ -85,57 +86,67 @@ export default function CategoryClient() {
   }, [filters]);
   
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("title")}
-        description={t("managementDesc")}
-        isAdmin
-        rightActions={
-          <Button
-            onClick={() => {
-              setEditing(null);
-              setOpen(true);
-            }}
-            variant="submit"
-            className="h-8 gap-1"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            {t("addCategory")}
-          </Button>
-        }
-      />
-      <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={t("searchCategoriesPlaceholder")}
-            value={searchInput}
-            onChange={handleSearchChange}
-            className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
-          />
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("title")}
+          description={t("managementDesc")}
+          isAdmin
+          rightActions={
+            <Button
+              onClick={() => {
+                setEditing(null);
+                setOpen(true);
+              }}
+              variant="submit"
+              className="h-8 gap-1"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              {t("addCategory")}
+            </Button>
+          }
+        />
+      </FadeUp>
+      <FadeUp delay={0.1}>
+        <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={t("searchCategoriesPlaceholder")}
+              value={searchInput}
+              onChange={handleSearchChange}
+              className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
+            />
+          </div>
         </div>
-      </div>
-      <PaginatedContent
-        currentPage={pagination.current_page}
-        lastPage={pagination.last_page}
-        total={pagination.total}
-        from={pagination.from}
-        to={pagination.to}
-        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
-      >
-        {loading ? (
-          <DataLoading size="lg" />
-        ) : (
-          <CategoryTable
-            data={categories}
-            onEdit={(cat) => {
-              setEditing(cat);
-              setOpen(true);
-            }}
-            onDelete={(id) => setDeleteId(id)}
-          />
-        )}
-      </PaginatedContent>
+      </FadeUp>
+      <FadeUp delay={0.2}>
+        <PaginatedContent
+          currentPage={pagination.current_page}
+          lastPage={pagination.last_page}
+          total={pagination.total}
+          from={pagination.from}
+          to={pagination.to}
+          onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+        >
+          {loading ? (
+            <FadeIn key="loading">
+              <DataLoading size="lg" />
+            </FadeIn>
+          ) : (
+            <FadeIn key="content">
+              <CategoryTable
+                data={categories}
+                onEdit={(cat) => {
+                  setEditing(cat);
+                  setOpen(true);
+                }}
+                onDelete={(id) => setDeleteId(id)}
+              />
+            </FadeIn>
+          )}
+        </PaginatedContent>
+      </FadeUp>
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={() => setDeleteId(null)}
@@ -149,6 +160,6 @@ export default function CategoryClient() {
         category={editing}
         onSuccess={() => fetchCategories(filters)}
       />
-    </div>
+    </StaggerContainer>
   );
 }

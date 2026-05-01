@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Upload, FileSpreadsheet, Loader2 } from "lucide-react";
 import { bookService } from "@/services/book.service";
 import { toast } from "sonner";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 interface ImportBookDialogProps {
   open: boolean;
@@ -73,8 +74,8 @@ export default function ImportBookDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-6 py-4">
-          <div className="space-y-3">
+        <StaggerContainer className="grid gap-6 py-4">
+          <FadeUp delay={0.1} className="space-y-3">
             <Label className="text-sm font-medium">{t("step2") || "Upload File"}</Label>
             <div className="grid w-full items-center gap-1.5">
               <div
@@ -105,8 +106,8 @@ export default function ImportBookDialog({
                 </label>
               </div>
             </div>
-          </div>
-        </div>
+          </FadeUp>
+        </StaggerContainer>
 
         <DialogFooter>
           <Button

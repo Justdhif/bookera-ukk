@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 import Image from "next/image";
 import { Book } from "@/types/book";
 import {
@@ -62,7 +63,7 @@ export default function BookSelectorCard({
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-100 pr-4">
-          <div className="space-y-2">
+          <StaggerContainer className="space-y-2">
             {books.map((book) => {
               const isSelected = selectedBooks.some((b) => b.id === book.id);
               const availableCopiesCount =
@@ -70,8 +71,10 @@ export default function BookSelectorCard({
                   .length || 0;
 
               return (
-                <div
+                <SlideIn
                   key={book.id}
+                  direction="up"
+                  distance={20}
                   className={cn(
                     "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
                     isSelected
@@ -118,10 +121,10 @@ export default function BookSelectorCard({
                       </Badge>
                     </div>
                   </div>
-                </div>
+                </SlideIn>
               );
             })}
-          </div>
+          </StaggerContainer>
           {hasMore && (
             <div className="py-4 flex justify-center border-t mt-4">
               <Button

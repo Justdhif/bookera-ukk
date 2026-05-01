@@ -19,6 +19,7 @@ import { Building2, FileWarning, Upload, X, Trash, Eye } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 export default function PublisherFormDialog({
   open,
@@ -139,160 +140,170 @@ export default function PublisherFormDialog({
         <DialogHeader>
           <DialogTitle>{publisher ? t("editPublisher") : t("addPublisher")}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-5">
-          <div className="space-y-2">
-            <Label variant="required">{t("photo")}</Label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/jpg,image/png,image/webp"
-              className="hidden"
-              onChange={handlePhotoChange}
-            />
-            <div
-              className={cn(
-                "relative flex flex-col items-center gap-3 p-5 rounded-xl border-2 border-dashed transition-all duration-200",
-                isDragging &&
-                  "border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10",
-                photoError
-                  ? "border-red-400 bg-red-50 dark:border-red-700 dark:bg-red-950/30"
-                  : !photoPreview
-                    ? "border-muted-foreground/30 hover:border-muted-foreground/50 cursor-pointer"
-                    : "border-muted",
-              )}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={(e) => {
-                e.preventDefault();
-                setIsDragging(false);
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                setIsDragging(false);
-                const file = e.dataTransfer.files?.[0];
-                if (file) handleFileSelect(file);
-              }}
-              onClick={() => {
-                if (!photoPreview) fileInputRef.current?.click();
-              }}
-            >
-              {photoPreview ? (
-                <div className="flex flex-col items-center gap-2">
-                  <div className="relative">
-                    <div className="h-24 w-24 rounded-full overflow-hidden ring-4 ring-muted">
-                      <Image
-                        src={photoPreview}
-                        alt="Preview"
-                        width={96}
-                        height={96}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute -top-1 -right-1 h-6 w-6 rounded-full"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemovePhoto();
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {t("removePhotoHint")}
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-2 py-2 text-center">
-                  <div
-                    className={cn(
-                      "p-3 rounded-full",
-                      photoError ? "bg-red-100 dark:bg-red-900/50" : "bg-muted",
-                    )}
-                  >
-                    {photoError ? (
-                      <FileWarning className="h-7 w-7 text-red-600 dark:text-red-400" />
-                    ) : (
-                      <Upload className="h-7 w-7 text-muted-foreground" />
-                    )}
-                  </div>
-                  <p
-                    className={cn(
-                      "text-sm font-medium",
-                      photoError && "text-red-600 dark:text-red-400",
-                    )}
-                  >
-                    {photoError ? photoError : t("dragDropUpload")}
-                  </p>
-                </div>
-              )}
-            </div>
-            <div className="space-y-1.5 pt-1">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full gap-2"
+        <StaggerContainer className="space-y-5">
+          <FadeUp delay={0.1}>
+            <div className="space-y-2">
+              <Label variant="required">{t("photo")}</Label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                className="hidden"
+                onChange={handlePhotoChange}
+              />
+              <div
+                className={cn(
+                  "relative flex flex-col items-center gap-3 p-5 rounded-xl border-2 border-dashed transition-all duration-200",
+                  isDragging &&
+                    "border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10",
+                  photoError
+                    ? "border-red-400 bg-red-50 dark:border-red-700 dark:bg-red-950/30"
+                    : !photoPreview
+                      ? "border-muted-foreground/30 hover:border-muted-foreground/50 cursor-pointer"
+                      : "border-muted",
+                )}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                  const file = e.dataTransfer.files?.[0];
+                  if (file) handleFileSelect(file);
+                }}
+                onClick={() => {
+                  if (!photoPreview) fileInputRef.current?.click();
+                }}
               >
-                <Upload className="h-4 w-4" />
-                {photoPreview ? t("changePhoto") : t("browseFiles")}
-              </Button>
-              <p className="text-xs text-muted-foreground text-center">
-                {t("formatHint")}
-              </p>
+                {photoPreview ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="relative">
+                      <div className="h-24 w-24 rounded-full overflow-hidden ring-4 ring-muted">
+                        <Image
+                          src={photoPreview}
+                          alt="Preview"
+                          width={96}
+                          height={96}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute -top-1 -right-1 h-6 w-6 rounded-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemovePhoto();
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {t("removePhotoHint")}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 py-2 text-center">
+                    <div
+                      className={cn(
+                        "p-3 rounded-full",
+                        photoError ? "bg-red-100 dark:bg-red-900/50" : "bg-muted",
+                      )}
+                    >
+                      {photoError ? (
+                        <FileWarning className="h-7 w-7 text-red-600 dark:text-red-400" />
+                      ) : (
+                        <Upload className="h-7 w-7 text-muted-foreground" />
+                      )}
+                    </div>
+                    <p
+                      className={cn(
+                        "text-sm font-medium",
+                        photoError && "text-red-600 dark:text-red-400",
+                      )}
+                    >
+                      {photoError ? photoError : t("dragDropUpload")}
+                    </p>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-1.5 pt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full gap-2"
+                >
+                  <Upload className="h-4 w-4" />
+                  {photoPreview ? t("changePhoto") : t("browseFiles")}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  {t("formatHint")}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="name" variant="required">
-              {t("name")}
-            </Label>
-            <Input
-              id="name"
-              name="name"
-              placeholder={t("namePlaceholder")}
-              value={formData.name}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">{t("descriptionLabel")}</Label>
-            <Textarea
-              id="description"
-              name="description"
-              placeholder={t("descriptionPlaceholder")}
-              value={formData.description}
-              onChange={handleInputChange}
-              rows={3}
-            />
-          </div>
-          <div className="flex items-center justify-between rounded-lg border p-3">
-            <div>
-              <Label htmlFor="is_active" className="font-medium">
-                {t("active")}
+          </FadeUp>
+          <FadeUp delay={0.2}>
+            <div className="space-y-2">
+              <Label htmlFor="name" variant="required">
+                {t("name")}
               </Label>
-              <p className="text-xs text-muted-foreground">{t("activeDesc")}</p>
+              <Input
+                id="name"
+                name="name"
+                placeholder={t("namePlaceholder")}
+                value={formData.name}
+                onChange={handleInputChange}
+              />
             </div>
-            <Switch
-              id="is_active"
-              checked={formData.is_active}
-              onCheckedChange={handleSwitchChange}
-            />
-          </div>
-          <Button
-            onClick={handleSubmit}
-            variant="submit"
-            disabled={isSubmitDisabled()}
-            loading={isLoading}
-            className="w-full"
-          >
-            {publisher ? t("saveChanges") : t("addPublisher")}
-          </Button>
-        </div>
+          </FadeUp>
+          <FadeUp delay={0.3}>
+            <div className="space-y-2">
+              <Label htmlFor="description">{t("descriptionLabel")}</Label>
+              <Textarea
+                id="description"
+                name="description"
+                placeholder={t("descriptionPlaceholder")}
+                value={formData.description}
+                onChange={handleInputChange}
+                rows={3}
+              />
+            </div>
+          </FadeUp>
+          <FadeUp delay={0.4}>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div>
+                <Label htmlFor="is_active" className="font-medium">
+                  {t("active")}
+                </Label>
+                <p className="text-xs text-muted-foreground">{t("activeDesc")}</p>
+              </div>
+              <Switch
+                id="is_active"
+                checked={formData.is_active}
+                onCheckedChange={handleSwitchChange}
+              />
+            </div>
+          </FadeUp>
+          <FadeUp delay={0.5}>
+            <Button
+              onClick={handleSubmit}
+              variant="submit"
+              disabled={isSubmitDisabled()}
+              loading={isLoading}
+              className="w-full"
+            >
+              {publisher ? t("saveChanges") : t("addPublisher")}
+            </Button>
+          </FadeUp>
+        </StaggerContainer>
       </DialogContent>
     </Dialog>
   );

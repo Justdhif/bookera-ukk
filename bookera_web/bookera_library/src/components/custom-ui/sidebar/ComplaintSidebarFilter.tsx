@@ -16,6 +16,9 @@ interface ComplaintSidebarFilterProps {
     onCategoryChange: (category: string) => void;
 }
 
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
+import { motion } from "framer-motion";
+
 export default function ComplaintSidebarFilter({ activeCategory, onCategoryChange }: ComplaintSidebarFilterProps) {
     const t = useTranslations("complaint");
     const { open } = useSidebar();
@@ -31,48 +34,54 @@ export default function ComplaintSidebarFilter({ activeCategory, onCategoryChang
     return (
         <div className="flex flex-col gap-2 p-2">
             {open && (
-                <div className="px-3 py-2">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
-                        Filter Kategori
-                    </p>
-                </div>
+                <SlideIn direction="left" delay={0.1}>
+                    <div className="px-3 py-2">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                            Filter Kategori
+                        </p>
+                    </div>
+                </SlideIn>
             )}
             <SidebarMenu>
-                {categories.map((cat) => {
-                    const Icon = cat.icon;
-                    const isActive = activeCategory === cat.id || (cat.id === "all" && !activeCategory);
-                    
-                    return (
-                        <SidebarMenuItem key={cat.id}>
-                            <SidebarMenuButton
-                                onClick={() => onCategoryChange(cat.id === "all" ? "" : cat.id)}
-                                tooltip={t(cat.label)}
-                                isActive={isActive}
-                                className={cn(
-                                    "rounded-xl transition-all h-11 px-3",
-                                    !open && "justify-center px-0 mx-auto",
-                                    isActive && "bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/15"
-                                )}
-                            >
-                                <div className={cn(
-                                    "p-1.5 rounded-lg shrink-0 transition-colors",
-                                    isActive ? "bg-brand-primary text-white" : cat.color,
-                                    !open && "p-2"
-                                )}>
-                                    <Icon className="h-4 w-4" />
-                                </div>
-                                {open && (
-                                    <span className={cn(
-                                        "font-semibold text-sm ml-2",
-                                        isActive ? "text-brand-primary" : "text-muted-foreground"
-                                    )}>
-                                        {t(cat.label)}
-                                    </span>
-                                )}
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    );
-                })}
+                <StaggerContainer as={motion.div} staggerDelay={0.05} className="flex flex-col gap-1">
+                    {categories.map((cat, index) => {
+                        const Icon = cat.icon;
+                        const isActive = activeCategory === cat.id || (cat.id === "all" && !activeCategory);
+                        
+                        return (
+                            <SlideIn key={cat.id} direction="left" delay={0.15 + index * 0.05}>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton
+                                        onClick={() => onCategoryChange(cat.id === "all" ? "" : cat.id)}
+                                        tooltip={t(cat.label)}
+                                        isActive={isActive}
+                                        className={cn(
+                                            "rounded-xl transition-all h-11 px-3",
+                                            !open && "justify-center px-0 mx-auto",
+                                            isActive && "bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/15"
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            "p-1.5 rounded-lg shrink-0 transition-colors",
+                                            isActive ? "bg-brand-primary text-white" : cat.color,
+                                            !open && "p-2"
+                                        )}>
+                                            <Icon className="h-4 w-4" />
+                                        </div>
+                                        {open && (
+                                            <span className={cn(
+                                                "font-semibold text-sm ml-2",
+                                                isActive ? "text-brand-primary" : "text-muted-foreground"
+                                            )}>
+                                                {t(cat.label)}
+                                            </span>
+                                        )}
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            </SlideIn>
+                        );
+                    })}
+                </StaggerContainer>
             </SidebarMenu>
         </div>
     );

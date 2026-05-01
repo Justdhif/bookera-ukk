@@ -16,6 +16,7 @@ import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import UserFilter from "./UserFilter";
 import AdminMembershipPricing from "./AdminMembershipPricing";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 export default function UserClient() {
   const t = useTranslations("user");
@@ -62,44 +63,52 @@ export default function UserClient() {
     fetchUsers(filters);
   }, [filters]);
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("title")}
-        description={t("userManagementDesc")}
-        isAdmin
-        rightActions={
-          <Link href="/admin/users/add">
-            <Button variant="submit" className="h-8 gap-1">
-              <Plus className="w-3.5 h-3.5" />
-              {t("addUser")}
-            </Button>
-          </Link>
-        }
-      />
-      <AdminMembershipPricing />
-      <UserFilter
-        onChange={(value) =>
-          setFilters((prev) => ({
-            ...prev,
-            ...value,
-            page: 1,
-          }))
-        }
-      />
-      <PaginatedContent
-        currentPage={pagination.current_page}
-        lastPage={pagination.last_page}
-        total={pagination.total}
-        from={pagination.from}
-        to={pagination.to}
-        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
-      >
-        {loading ? (
-          <DataLoading size="lg" />
-        ) : (
-          <UserTable data={users} onDelete={(id) => setDeleteId(id)} />
-        )}
-      </PaginatedContent>
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("title")}
+          description={t("userManagementDesc")}
+          isAdmin
+          rightActions={
+            <Link href="/admin/users/add">
+              <Button variant="submit" className="h-8 gap-1">
+                <Plus className="w-3.5 h-3.5" />
+                {t("addUser")}
+              </Button>
+            </Link>
+          }
+        />
+      </FadeUp>
+      <FadeUp delay={0.1}>
+        <AdminMembershipPricing />
+      </FadeUp>
+      <FadeUp delay={0.2}>
+        <UserFilter
+          onChange={(value) =>
+            setFilters((prev) => ({
+              ...prev,
+              ...value,
+              page: 1,
+            }))
+          }
+        />
+      </FadeUp>
+      <FadeUp delay={0.3}>
+        <PaginatedContent
+          currentPage={pagination.current_page}
+          lastPage={pagination.last_page}
+          total={pagination.total}
+          from={pagination.from}
+          to={pagination.to}
+          onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+        >
+          {loading ? (
+            <DataLoading size="lg" />
+          ) : (
+            <UserTable data={users} onDelete={(id) => setDeleteId(id)} />
+          )}
+        </PaginatedContent>
+      </FadeUp>
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}
@@ -107,6 +116,6 @@ export default function UserClient() {
         description={t("deleteUserConfirm")}
         onConfirm={confirmDelete}
       />
-    </div>
+    </StaggerContainer>
   );
 }

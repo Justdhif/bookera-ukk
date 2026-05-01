@@ -18,6 +18,7 @@ import { useTranslations } from "next-intl";
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import BorrowDateCard from "./BorrowDateCard";
 import BookCopySelectorCard from "./BookCopySelectorCard";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 export default function CreateBorrowClient() {
   const router = useRouter();
@@ -193,46 +194,58 @@ export default function CreateBorrowClient() {
   );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-7rem)] space-y-6 pb-6">
-      <ContentHeader
-        title={t("createBorrowTitle")}
-        description={t("createBorrowDesc")}
-        showBackButton
-        isAdmin
-      />
+    <StaggerContainer className="flex flex-col h-[calc(100vh-7rem)] space-y-6 pb-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("createBorrowTitle")}
+          description={t("createBorrowDesc")}
+          showBackButton
+          isAdmin
+        />
+      </FadeUp>
 
       <div className="grid gap-6 lg:grid-cols-3 lg:auto-rows-fr flex-1 overflow-hidden min-h-0">
         <div className="lg:col-span-1 space-y-6 overflow-y-auto scrollbar-hide">
-          <UserSelectorCard
-            users={users}
-            selectedUserId={selectedUserId}
-            onSelectUser={handleUserSelect}
-            popoverOpen={userPopoverOpen}
-            onPopoverOpenChange={setUserPopoverOpen}
-            hasMore={hasMoreUsers}
-            onLoadMore={handleLoadMoreUsers}
-            isLoading={isLoadingUsers}
-          />
-          <BookSelectorCard
-            books={availableBooks}
-            selectedBooks={selectedBooks}
-            onBookToggle={handleBookToggle}
-            hasMore={hasMoreBooks}
-            onLoadMore={handleLoadMoreBooks}
-            isLoading={isLoadingBooks}
-          />
-          <BorrowDateCard
-            value={borrowDate}
-            onChange={handleBorrowDateChange}
-          />
-          <DueDateCard value={returnDate} onChange={handleReturnDateChange} />
+          <FadeUp delay={0.1}>
+            <UserSelectorCard
+              users={users}
+              selectedUserId={selectedUserId}
+              onSelectUser={handleUserSelect}
+              popoverOpen={userPopoverOpen}
+              onPopoverOpenChange={setUserPopoverOpen}
+              hasMore={hasMoreUsers}
+              onLoadMore={handleLoadMoreUsers}
+              isLoading={isLoadingUsers}
+            />
+          </FadeUp>
+          <FadeUp delay={0.15}>
+            <BookSelectorCard
+              books={availableBooks}
+              selectedBooks={selectedBooks}
+              onBookToggle={handleBookToggle}
+              hasMore={hasMoreBooks}
+              onLoadMore={handleLoadMoreBooks}
+              isLoading={isLoadingBooks}
+            />
+          </FadeUp>
+          <FadeUp delay={0.2}>
+            <BorrowDateCard
+              value={borrowDate}
+              onChange={handleBorrowDateChange}
+            />
+          </FadeUp>
+          <FadeUp delay={0.25}>
+            <DueDateCard value={returnDate} onChange={handleReturnDateChange} />
+          </FadeUp>
         </div>
         <div className="lg:col-span-2 h-full min-h-0 flex flex-col gap-6 overflow-hidden">
-          <BookCopySelectorCard
-            selectedBooks={selectedBooks}
-            selectedCopyIds={selectedCopyIds}
-            onCopyToggle={handleCopyToggle}
-          />
+          <FadeUp delay={0.1} className="flex-1 flex flex-col min-h-0">
+            <BookCopySelectorCard
+              selectedBooks={selectedBooks}
+              selectedCopyIds={selectedCopyIds}
+              onCopyToggle={handleCopyToggle}
+            />
+          </FadeUp>
           <div className="flex justify-end pt-2">
             <Button
               onClick={handleSubmit}
@@ -252,6 +265,6 @@ export default function CreateBorrowClient() {
           </div>
         </div>
       </div>
-    </div>
+    </StaggerContainer>
   );
 }

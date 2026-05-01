@@ -1,5 +1,6 @@
 "use client";
 import { useTranslations } from "next-intl";
+import { StaggerContainer, SlideIn, FadeUp } from "@/components/custom-ui/motion";
 
 import Image from "next/image";
 import { Book } from "@/types/book";
@@ -32,14 +33,16 @@ export default function BookCopySelectorCard({
   const tCommon = useTranslations("common");
   if (selectedBooks.length === 0) {
     return (
-      <Card className="flex-1 min-h-0 flex items-center justify-center min-h-100">
+      <Card className="flex-1 flex items-center justify-center min-h-100">
         <CardContent className="text-center py-12">
-          <EmptyState
-            title={tCommon("noBooksSelected")}
-            description={tCommon("selectBooksFromLeftDesc")}
-            icon={<BookOpen />}
-            className="border-none h-auto p-0"
-          />
+          <FadeUp>
+            <EmptyState
+              title={tCommon("noBooksSelected")}
+              description={tCommon("selectBooksFromLeftDesc")}
+              icon={<BookOpen />}
+              className="border-none h-auto p-0"
+            />
+          </FadeUp>
         </CardContent>
       </Card>
     );
@@ -62,7 +65,7 @@ export default function BookCopySelectorCard({
       </CardHeader>
       <CardContent className="flex-1 min-h-0">
         <ScrollArea className="h-full pr-4">
-          <div className="space-y-4">
+          <StaggerContainer className="space-y-4">
             {selectedBooks.map((book) => {
               const availableCopies =
                 book.copies?.filter((copy) => copy.status === "available") ||
@@ -71,8 +74,10 @@ export default function BookCopySelectorCard({
 
               if (availableCopies.length === 0) {
                 return (
-                  <div
+                  <SlideIn
                     key={book.id}
+                    direction="up"
+                    distance={20}
                     className="border rounded-lg p-4 bg-muted/20"
                   >
                     <div className="flex gap-3 items-start">
@@ -103,13 +108,15 @@ export default function BookCopySelectorCard({
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </SlideIn>
                 );
               }
 
               return (
-                <div
+                <SlideIn
                   key={book.id}
+                  direction="up"
+                  distance={20}
                   className="border rounded-lg overflow-hidden"
                 >
                   <div className="flex gap-3 p-4 bg-muted/30">
@@ -144,42 +151,49 @@ export default function BookCopySelectorCard({
                     <Label className="text-xs text-muted-foreground">
                       {tCommon("selectCopies")}:
                     </Label>
-                    {availableCopies.map((copy) => {
-                      const isSelected = selectedCopyIds.includes(copy.id);
-                      return (
-                        <div
-                          key={copy.id}
-                          className={cn(
-                            "flex items-center gap-3 p-2.5 rounded-md border transition cursor-pointer",
-                            isSelected
-                              ? "bg-brand-primary/10 border-brand-primary"
-                              : "hover:bg-muted/50"
-                          )}
-                          onClick={() => onCopyToggle(copy.id)}
-                        >
-                          <Checkbox
-                            checked={isSelected}
-                            onCheckedChange={() => onCopyToggle(copy.id)}
-                            className="data-[state=checked]:bg-brand-primary data-[state=checked]:border-brand-primary"
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                          <span className="flex-1 text-sm font-medium select-none">
-                            {copy.copy_code}
-                          </span>
-                          <Badge
-                            variant="outline"
-                            className="text-[10px] px-1.5 py-0"
+                    <StaggerContainer className="space-y-2">
+                      {availableCopies.map((copy) => {
+                        const isSelected = selectedCopyIds.includes(copy.id);
+                        return (
+                          <SlideIn
+                            key={copy.id}
+                            direction="up"
+                            distance={10}
                           >
-                            {tCommon("available")}
-                          </Badge>
-                        </div>
-                      );
-                    })}
+                            <div
+                              className={cn(
+                                "flex items-center gap-3 p-2.5 rounded-md border transition cursor-pointer",
+                                isSelected
+                                  ? "bg-brand-primary/10 border-brand-primary"
+                                  : "hover:bg-muted/50"
+                              )}
+                              onClick={() => onCopyToggle(copy.id)}
+                            >
+                              <Checkbox
+                                checked={isSelected}
+                                onCheckedChange={() => onCopyToggle(copy.id)}
+                                className="data-[state=checked]:bg-brand-primary data-[state=checked]:border-brand-primary"
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              <span className="flex-1 text-sm font-medium select-none">
+                                {copy.copy_code}
+                              </span>
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] px-1.5 py-0"
+                              >
+                                {tCommon("available")}
+                              </Badge>
+                            </div>
+                          </SlideIn>
+                        );
+                      })}
+                    </StaggerContainer>
                   </div>
-                </div>
+                </SlideIn>
               );
             })}
-          </div>
+          </StaggerContainer>
         </ScrollArea>
       </CardContent>
     </Card>

@@ -24,6 +24,7 @@ import {
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { BookOpen, PackageCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 interface BookCopyOption {
   bookId: number;
@@ -128,60 +129,60 @@ export function BorrowAssignCopiesCard({
           {t("assignCopiesDesc")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <StaggerContainer as={CardContent} className="space-y-4">
         {isLoadingCopies ? (
-          <div className="flex justify-center py-6">
-            <DataLoading variant="inline" size="md" />
-          </div>
+            <FadeUp className="flex justify-center py-6">
+              <DataLoading variant="inline" size="md" />
+            </FadeUp>
         ) : (
           <>
-            <div className="space-y-4">
-              {copyOptions.map((opt) => (
-                <div key={opt.bookId} className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <p className="font-medium text-sm truncate">
-                      {opt.bookTitle}
-                    </p>
-                  </div>
-                  {opt.copies.length === 0 ? (
-                    <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-                      {t("noCopiesAvailableForThisBook")}
+              <div className="space-y-4">
+                {copyOptions.map((opt, index) => (
+                  <FadeUp key={opt.bookId} delay={index * 0.05} className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <p className="font-medium text-sm truncate">
+                        {opt.bookTitle}
+                      </p>
                     </div>
-                  ) : (
-                    <Select
-                      value={String(selectedCopyIds[opt.bookId] ?? "")}
-                      onValueChange={(val) =>
-                        setSelectedCopyIds((prev) => ({
-                          ...prev,
-                          [opt.bookId]: Number(val),
-                        }))
-                      }
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder={t("selectCopyPlaceholder")} />
-                      </SelectTrigger>{" "}
-                      <SelectContent>
-                        {" "}
-                        {opt.copies.map((copy) => (
-                          <SelectItem key={copy.id} value={String(copy.id)}>
-                            {" "}
-                            <span className="font-mono">
-                              {copy.copy_code}
-                            </span>{" "}
-                            <span className="ml-2 text-xs text-muted-foreground capitalize">
+                    {opt.copies.length === 0 ? (
+                      <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+                        {t("noCopiesAvailableForThisBook")}
+                      </div>
+                    ) : (
+                      <Select
+                        value={String(selectedCopyIds[opt.bookId] ?? "")}
+                        onValueChange={(val) =>
+                          setSelectedCopyIds((prev) => ({
+                            ...prev,
+                            [opt.bookId]: Number(val),
+                          }))
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={t("selectCopyPlaceholder")} />
+                        </SelectTrigger>{" "}
+                        <SelectContent>
+                          {" "}
+                          {opt.copies.map((copy) => (
+                            <SelectItem key={copy.id} value={String(copy.id)}>
                               {" "}
-                              {copy.status}{" "}
-                            </span>{" "}
-                          </SelectItem>
-                        ))}{" "}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end pt-2">
+                              <span className="font-mono">
+                                {copy.copy_code}
+                              </span>{" "}
+                              <span className="ml-2 text-xs text-muted-foreground capitalize">
+                                {" "}
+                                {copy.status}{" "}
+                              </span>{" "}
+                            </SelectItem>
+                          ))}{" "}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </FadeUp>
+                ))}
+              </div>
+            <FadeUp delay={0.2} className="flex justify-end pt-2">
               <Button
                 onClick={handleAssign}
                 disabled={isSubmitDisabled()}
@@ -191,10 +192,10 @@ export function BorrowAssignCopiesCard({
               >
                 {isLoading ? t("assigningBtn") : t("confirmAssignment")}
               </Button>
-            </div>
+            </FadeUp>
           </>
         )}
-      </CardContent>
+      </StaggerContainer>
     </Card>
   );
 }

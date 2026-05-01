@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { ReturnCard } from "./ReturnCard";
 import { getCurrentMonthRange } from "@/lib/month-range";
 import { downloadBlobFile } from "@/lib/download";
+import { StaggerContainer, FadeUp, SlideIn, FadeIn } from "@/components/custom-ui/motion";
 
 export default function ReturnClient() {
   const t = useTranslations("return");
@@ -117,76 +118,98 @@ export default function ReturnClient() {
     }
 
     return (
-      <div className="grid gap-4">
-        {borrows.map((borrow) => (
-          <ReturnCard key={borrow.id} borrow={borrow} />
+      <StaggerContainer className="grid gap-4">
+        {borrows.map((borrow, index) => (
+          <SlideIn
+            key={borrow.id}
+            direction="up"
+            distance={20}
+            delay={index * 0.05}
+          >
+            <ReturnCard borrow={borrow} />
+          </SlideIn>
         ))}
-      </div>
+      </StaggerContainer>
     );
   };
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("managementTitle")}
-        description={t("managementDesc")}
-        isAdmin
-        rightActions={
-          <Button
-            variant="outline"
-            className="h-8 gap-1 border-slate-200"
-            onClick={handleExport}
-            disabled={exporting}
-          >
-            <Download className="h-3.5 w-3.5" />
-            {t("exportData")}
-          </Button>
-        }
-      />
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("managementTitle")}
+          description={t("managementDesc")}
+          isAdmin
+          rightActions={
+            <Button
+              variant="outline"
+              className="h-8 gap-1 border-slate-200"
+              onClick={handleExport}
+              disabled={exporting}
+            >
+              <Download className="h-3.5 w-3.5" />
+              {t("exportData")}
+            </Button>
+          }
+        />
+      </FadeUp>
 
       <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold">{t("title")}</h3>
-          <p className="text-sm text-muted-foreground">{t("returnedDesc")}</p>
-        </div>
+        <FadeUp delay={0.1}>
+          <div>
+            <h3 className="text-lg font-semibold">{t("title")}</h3>
+            <p className="text-sm text-muted-foreground">{t("returnedDesc")}</p>
+          </div>
+        </FadeUp>
 
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center mb-6">
-          <div className="relative min-w-0 w-full">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder={t("searchByUserOrTitle")}
-              value={searchInput}
-              onChange={handleSearchChange}
-              className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
+        <FadeUp delay={0.2}>
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center mb-6">
+            <div className="relative min-w-0 w-full">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder={t("searchByUserOrTitle")}
+                value={searchInput}
+                onChange={handleSearchChange}
+                className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
+              />
+            </div>
+            <DateRangeFilter
+              onFilter={handleDateFilter}
+              defaultStartDate={defaultMonthRange.startDate}
+              defaultEndDate={defaultMonthRange.endDate}
+              className="w-full lg:w-auto"
             />
           </div>
-          <DateRangeFilter
-            onFilter={handleDateFilter}
-            defaultStartDate={defaultMonthRange.startDate}
-            defaultEndDate={defaultMonthRange.endDate}
-            className="w-full lg:w-auto"
-          />
-        </div>
+        </FadeUp>
 
-        <PaginatedContent
-          currentPage={pagination.current_page}
-          lastPage={pagination.last_page}
-          total={pagination.total}
-          from={pagination.from}
-          to={pagination.to}
-          onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
-        >
-          {loading ? (
-            <div className="grid gap-4">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <DataLoading key={index} size="lg" />
-              ))}
-            </div>
-          ) : (
-            renderBorrowCards(allBorrows)
-          )}
-        </PaginatedContent>
+        <FadeUp delay={0.3}>
+          <PaginatedContent
+            currentPage={pagination.current_page}
+            lastPage={pagination.last_page}
+            total={pagination.total}
+            from={pagination.from}
+            to={pagination.to}
+            onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+          >
+            {loading ? (
+              <FadeIn
+                key="loading"
+                className="grid gap-4"
+              >
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <DataLoading key={index} size="lg" />
+                ))}
+              </FadeIn>
+            ) : (
+              <FadeIn
+                key="content"
+              >
+                {renderBorrowCards(allBorrows)}
+              </FadeIn>
+            )}
+          </PaginatedContent>
+        </FadeUp>
       </div>
-    </div>
+    </StaggerContainer>
   );
 }

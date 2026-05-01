@@ -24,6 +24,9 @@ import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 
 type TabAction = "author" | "publisher";
 
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
+import { motion } from "framer-motion";
+
 export default function AuthorPublisherSidebarSearch() {
   const t = useTranslations("public");
   const { open, setOpen } = useSidebar();
@@ -96,174 +99,182 @@ export default function AuthorPublisherSidebarSearch() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div
-        className={cn(
-          "border-b border-border/40 shrink-0",
-          !open ? "p-2 py-4" : "p-4 pt-0 space-y-4",
-        )}
-      >
-        {open ? (
-          <>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={t("searchAuthorPublisher")}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 h-9 bg-muted/50 text-sm"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge
-                variant={activeTab === "author" ? "default" : "secondary"}
-                className="cursor-pointer"
-                onClick={() => {
-                  if (activeTab !== "author") {
-                    setLoading(true);
-                    setActiveTab("author");
-                  }
-                }}
-              >
-                Authors
-              </Badge>
-              <Badge
-                variant={activeTab === "publisher" ? "default" : "secondary"}
-                className="cursor-pointer"
-                onClick={() => {
-                  if (activeTab !== "publisher") {
-                    setLoading(true);
-                    setActiveTab("publisher");
-                  }
-                }}
-              >
-                Publishers
-              </Badge>
-            </div>
-          </>
-        ) : (
-          <SidebarMenu>
-            <SidebarMenuItem className="w-full flex justify-center">
-              <SidebarMenuButton
-                onClick={() => setOpen(true)}
-                className="justify-center px-0 mx-auto"
-                tooltip={t("searchAuthorPublisher")}
-              >
-                <Search className="h-5 w-5 shrink-0" />
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        )}
-      </div>
+      <SlideIn direction="down" delay={0.2}>
+        <div
+          className={cn(
+            "border-b border-border/40 shrink-0",
+            !open ? "p-2 py-4" : "p-4 pt-0 space-y-4",
+          )}
+        >
+          {open ? (
+            <>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={t("searchAuthorPublisher")}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 h-9 bg-muted/50 text-sm"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant={activeTab === "author" ? "default" : "secondary"}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    if (activeTab !== "author") {
+                      setLoading(true);
+                      setActiveTab("author");
+                    }
+                  }}
+                >
+                  Authors
+                </Badge>
+                <Badge
+                  variant={activeTab === "publisher" ? "default" : "secondary"}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    if (activeTab !== "publisher") {
+                      setLoading(true);
+                      setActiveTab("publisher");
+                    }
+                  }}
+                >
+                  Publishers
+                </Badge>
+              </div>
+            </>
+          ) : (
+            <SidebarMenu>
+              <SidebarMenuItem className="w-full flex justify-center">
+                <SidebarMenuButton
+                  onClick={() => setOpen(true)}
+                  className="justify-center px-0 mx-auto"
+                  tooltip={t("searchAuthorPublisher")}
+                >
+                  <Search className="h-5 w-5 shrink-0" />
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          )}
+        </div>
+      </SlideIn>
       <div className="flex-1 overflow-y-auto p-2">
         {loading ? (
           <div className="flex justify-center py-6">
             <DataLoading variant="inline" size="md" />
           </div>
         ) : (
-          <SidebarMenu>
+          <StaggerContainer as={SidebarMenu} staggerDelay={0.03}>
             {activeTab === "author" && authors.length === 0 && (
-              <EmptyState
-                variant="compact"
-                icon={<UserSquare className="h-5 w-5" />}
-                title="Tidak ada author ditemukan"
-                description="Coba gunakan kata kunci lain."
-              />
+              <SlideIn direction="up">
+                <EmptyState
+                  variant="compact"
+                  icon={<UserSquare className="h-5 w-5" />}
+                  title="Tidak ada author ditemukan"
+                  description="Coba gunakan kata kunci lain."
+                />
+              </SlideIn>
             )}
             {activeTab === "publisher" && publishers.length === 0 && (
-              <EmptyState
-                variant="compact"
-                icon={<Building2 className="h-5 w-5" />}
-                title="Tidak ada publisher ditemukan"
-                description="Coba gunakan kata kunci lain."
-              />
+              <SlideIn direction="up">
+                <EmptyState
+                  variant="compact"
+                  icon={<Building2 className="h-5 w-5" />}
+                  title="Tidak ada publisher ditemukan"
+                  description="Coba gunakan kata kunci lain."
+                />
+              </SlideIn>
             )}
             {activeTab === "author" &&
-              authors.map((author) => (
-                <SidebarMenuItem
-                  key={author.id}
-                  className={!open ? "w-full flex justify-center" : ""}
-                >
-                  <SidebarMenuButton
-                    asChild
-                    className={cn(
-                      "h-auto py-2 flex items-center gap-3",
-                      !open && "justify-center px-0 mx-auto",
-                    )}
-                    tooltip={!open ? author.name : undefined}
+              authors.map((author, index) => (
+                <SlideIn key={author.id} direction="left" delay={index * 0.02}>
+                  <SidebarMenuItem
+                    className={!open ? "w-full flex justify-center" : ""}
                   >
-                    <Link href={`/authors/${author.slug}`}>
-                      <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
-                        {author.photo ? (
-                          <Image
-                            src={author.photo}
-                            alt={author.name}
-                            className="w-full h-full object-cover"
-                            width={300}
-                            height={400}
-                            unoptimized
-                          />
-                        ) : (
-                          <UserSquare className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </div>
-                      {open && (
-                        <div className="flex flex-col overflow-hidden">
-                          <span className="text-sm font-medium truncate">
-                            {author.name}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                            <BookText className="w-3 h-3" />
-                            {author.books_count || 0} Buku
-                          </span>
-                        </div>
+                    <SidebarMenuButton
+                      asChild
+                      className={cn(
+                        "h-auto py-2 flex items-center gap-3",
+                        !open && "justify-center px-0 mx-auto",
                       )}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                      tooltip={!open ? author.name : undefined}
+                    >
+                      <Link href={`/authors/${author.slug}`}>
+                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
+                          {author.photo ? (
+                            <Image
+                              src={author.photo}
+                              alt={author.name}
+                              className="w-full h-full object-cover"
+                              width={300}
+                              height={400}
+                              unoptimized
+                            />
+                          ) : (
+                            <UserSquare className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </div>
+                        {open && (
+                          <div className="flex flex-col overflow-hidden">
+                            <span className="text-sm font-medium truncate">
+                              {author.name}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                              <BookText className="w-3 h-3" />
+                              {author.books_count || 0} Buku
+                            </span>
+                          </div>
+                        )}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SlideIn>
               ))}
             {activeTab === "publisher" &&
-              publishers.map((publisher) => (
-                <SidebarMenuItem
-                  key={publisher.id}
-                  className={!open ? "w-full flex justify-center" : ""}
-                >
-                  <SidebarMenuButton
-                    asChild
-                    className={cn(
-                      "h-auto py-2 flex items-center gap-3",
-                      !open && "justify-center px-0 mx-auto",
-                    )}
-                    tooltip={!open ? publisher.name : undefined}
+              publishers.map((publisher, index) => (
+                <SlideIn key={publisher.id} direction="left" delay={index * 0.02}>
+                  <SidebarMenuItem
+                    className={!open ? "w-full flex justify-center" : ""}
                   >
-                    <Link href={`/publishers/${publisher.slug}`}>
-                      <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
-                        {publisher.photo ? (
-                          <Image
-                            src={publisher.photo}
-                            alt={publisher.name}
-                            className="w-full h-full object-cover"
-                            width={300}
-                            height={400}
-                            unoptimized
-                          />
-                        ) : (
-                          <Building2 className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </div>
-                      {open && (
-                        <div className="flex flex-col overflow-hidden">
-                          <span className="text-sm font-medium truncate">
-                            {publisher.name}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                            <BookText className="w-3 h-3" />
-                            {publisher.books_count || 0} Buku
-                          </span>
-                        </div>
+                    <SidebarMenuButton
+                      asChild
+                      className={cn(
+                        "h-auto py-2 flex items-center gap-3",
+                        !open && "justify-center px-0 mx-auto",
                       )}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                      tooltip={!open ? publisher.name : undefined}
+                    >
+                      <Link href={`/publishers/${publisher.slug}`}>
+                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
+                          {publisher.photo ? (
+                            <Image
+                              src={publisher.photo}
+                              alt={publisher.name}
+                              className="w-full h-full object-cover"
+                              width={300}
+                              height={400}
+                              unoptimized
+                            />
+                          ) : (
+                            <Building2 className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </div>
+                        {open && (
+                          <div className="flex flex-col overflow-hidden">
+                            <span className="text-sm font-medium truncate">
+                              {publisher.name}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                              <BookText className="w-3 h-3" />
+                              {publisher.books_count || 0} Buku
+                            </span>
+                          </div>
+                        )}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SlideIn>
               ))}
             {page < lastPage && open && (
               <div className="p-2 mt-2">
@@ -276,7 +287,7 @@ export default function AuthorPublisherSidebarSearch() {
                 />
               </div>
             )}
-          </SidebarMenu>
+          </StaggerContainer>
         )}
       </div>
     </div>

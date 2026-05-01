@@ -18,6 +18,8 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import { BookOpen, Eye, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
 interface Props {
   data: Book[];
@@ -55,10 +57,20 @@ export function BookTable({ data, onDelete }: Props) {
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <StaggerContainer
+          as={motion.tbody}
+          staggerDelay={0.05}
+          data-slot="table-body"
+          className="[&_tr:last-child]:border-0"
+        >
           {data.map((book, index) => (
-            <TableRow
+            <SlideIn
               key={book.id}
+              as={motion.tr}
+              direction="up"
+              distance={20}
+              delay={index * 0.05}
+              data-slot="table-row"
               className="group hover:bg-primary/5 transition-colors border-b last:border-b-0"
             >
               <TableCell className="font-medium text-center text-muted-foreground">
@@ -91,7 +103,7 @@ export function BookTable({ data, onDelete }: Props) {
                         "flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase border transition-all duration-300",
                         book.available_copies && book.available_copies > 0
                           ? "bg-emerald-50 text-emerald-600 border-emerald-200/50 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
-                          : "bg-rose-50 text-rose-600 border-rose-200/50 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
+                          : "bg-rose-50 text-rose-600 border-rose-200/50 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20",
                       )}
                     >
                       <span
@@ -99,7 +111,7 @@ export function BookTable({ data, onDelete }: Props) {
                           "w-1.5 h-1.5 rounded-full animate-pulse",
                           book.available_copies && book.available_copies > 0
                             ? "bg-emerald-500"
-                            : "bg-rose-500"
+                            : "bg-rose-500",
                         )}
                       />
                       {book.available_copies || 0}/{book.total_copies || 0}{" "}
@@ -144,9 +156,9 @@ export function BookTable({ data, onDelete }: Props) {
                   </Button>
                 </div>
               </TableCell>
-            </TableRow>
+            </SlideIn>
           ))}
-        </TableBody>
+        </StaggerContainer>
       </Table>
     </div>
   );

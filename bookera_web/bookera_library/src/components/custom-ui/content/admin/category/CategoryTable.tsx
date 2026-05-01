@@ -21,6 +21,8 @@ import { Badge } from "@/components/ui/badge";
 import { Category } from "@/types/category";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { FolderOpen, Edit, Trash } from "lucide-react";
+import { motion } from "framer-motion";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 export default function CategoryTable({
   data,
   onEdit,
@@ -53,11 +55,21 @@ export default function CategoryTable({
           </TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <StaggerContainer
+        as={motion.tbody}
+        staggerDelay={0.05}
+        data-slot="table-body"
+        className="[&_tr:last-child]:border-0"
+      >
         {data.map((item, index) => {
           return (
-            <TableRow
+            <SlideIn
               key={item.id}
+              as={motion.tr}
+              direction="up"
+              distance={20}
+              delay={index * 0.05}
+              data-slot="table-row"
               className="group hover:bg-primary/5 transition-colors border-b last:border-b-0"
             >
               <TableCell className="font-medium text-center text-muted-foreground">
@@ -98,10 +110,10 @@ export default function CategoryTable({
                   </Button>
                 </div>
               </TableCell>
-            </TableRow>
+            </SlideIn>
           );
         })}
-      </TableBody>
+      </StaggerContainer>
     </Table>
   );
 }

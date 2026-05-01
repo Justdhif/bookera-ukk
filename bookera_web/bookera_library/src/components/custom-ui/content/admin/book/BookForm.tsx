@@ -35,6 +35,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, UserSquare, Building2, Bookmark, X, Trash, Edit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import YearPicker from "@/components/custom-ui/YearPicker";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 interface FormData {
   title: string;
@@ -238,8 +239,8 @@ export default function BookForm({
           {isEditMode ? t("editBookInfoCorrectly") : t("bookDetailsComplete")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
+      <StaggerContainer as={CardContent} className="space-y-6">
+        <FadeUp delay={0.1} className="space-y-4">
           <h3 className="font-semibold text-lg">{t("basicInfo")}</h3>
           <div className="space-y-2">
             <Label
@@ -262,8 +263,8 @@ export default function BookForm({
               }
             />
           </div>
-        </div>
-        <div className="space-y-4">
+        </FadeUp>
+        <FadeUp delay={0.2} className="space-y-4">
           <h3 className="font-semibold text-lg">{t("publicationDetails")}</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
@@ -339,8 +340,8 @@ export default function BookForm({
               </div>
             </div>
           </div>
-        </div>
-        <div className="space-y-4">
+        </FadeUp>
+        <FadeUp delay={0.3} className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-lg flex items-center gap-2">
               <UserSquare className="h-5 w-5" /> {t("authorsSection")}
@@ -441,8 +442,8 @@ export default function BookForm({
               </div>
             ) : null}
           </div>
-        </div>
-        <div className="space-y-4">
+        </FadeUp>
+        <FadeUp delay={0.4} className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-lg flex items-center gap-2">
               <Bookmark className="h-5 w-5" /> {t("genresSection")}
@@ -543,8 +544,8 @@ export default function BookForm({
               </div>
             )}
           </div>
-        </div>
-        <div className="space-y-4">
+        </FadeUp>
+        <FadeUp delay={0.5} className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-lg flex items-center gap-2">
               <Building2 className="h-5 w-5" /> {t("publishersSection")}
@@ -647,8 +648,8 @@ export default function BookForm({
               </div>
             ) : null}
           </div>
-        </div>
-        <div className="space-y-4">
+        </FadeUp>
+        <FadeUp delay={0.6} className="space-y-4">
           <h3 className="font-semibold text-lg">{t("categoriesSection")}</h3>
           <div className="space-y-2">
             {isEditMode ? (
@@ -749,8 +750,8 @@ export default function BookForm({
               </div>
             )}
           </div>
-        </div>
-        <div className="space-y-4">
+        </FadeUp>
+        <FadeUp delay={0.7} className="space-y-4">
           <h3 className="font-semibold text-lg">{t("descriptionSection")}</h3>
           <div className="space-y-2">
             <Label htmlFor="description">{t("bookDescLabel")}</Label>
@@ -765,7 +766,7 @@ export default function BookForm({
               disabled={!isEditMode}
             />
           </div>
-        </div>
+        </FadeUp>
 
         {isEditMode ? (
           onSubmit && (
@@ -808,7 +809,7 @@ export default function BookForm({
             </div>
           )
         )}
-      </CardContent>
+      </StaggerContainer>
     </Card>
   );
 }

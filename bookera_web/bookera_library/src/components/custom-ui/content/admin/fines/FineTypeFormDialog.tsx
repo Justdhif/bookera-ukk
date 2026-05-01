@@ -1,5 +1,6 @@
 "use client";
 import { useTranslations } from "next-intl";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -94,75 +95,87 @@ export default function FineTypeFormDialog({
             {t("addFineType")}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">
-              {t("fineTypeName")} <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="name"
-              placeholder={t("fineNamePlaceholder")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+        <StaggerContainer className="space-y-6">
+          <div className="space-y-4">
+            <FadeUp delay={0.1}>
+              <div className="space-y-2">
+                <Label htmlFor="name">
+                  {t("fineTypeName")} <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="name"
+                  placeholder={t("fineNamePlaceholder")}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+            </FadeUp>
+            <FadeUp delay={0.2}>
+              <div className="space-y-2">
+                <Label htmlFor="type">
+                  {t("fineType")} <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={type}
+                  onValueChange={(v: any) => {
+                    setType(v);
+                    setValue("");
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="lost">{t("lost")}</SelectItem>
+                    <SelectItem value="damaged">{t("damaged")}</SelectItem>
+                    <SelectItem value="late">{t("late")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </FadeUp>
+            <FadeUp delay={0.3}>
+              <div className="space-y-2">
+                <Label htmlFor="value">
+                  {valueLabel} <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="value"
+                  type="number"
+                  placeholder={valuePlaceholder}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  min={0}
+                  max={isDamaged ? 100 : undefined}
+                  step="0.01"
+                />
+              </div>
+            </FadeUp>
+            <FadeUp delay={0.4}>
+              <div className="space-y-2">
+                <Label htmlFor="description">{t("fineDescription")}</Label>
+                <Textarea
+                  id="description"
+                  placeholder={t("fineDescPlaceholder")}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={3}
+                  className="resize-none"
+                />
+              </div>
+            </FadeUp>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="type">
-              {t("fineType")} <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={type}
-              onValueChange={(v: any) => {
-                setType(v);
-                setValue("");
-              }}
+          <FadeUp delay={0.5}>
+            <Button
+              onClick={handleSubmit}
+              variant="submit"
+              disabled={isLoading || !name || !value}
+              loading={isLoading}
+              className="w-full"
             >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="lost">{t("lost")}</SelectItem>
-                <SelectItem value="damaged">{t("damaged")}</SelectItem>
-                <SelectItem value="late">{t("late")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="value">
-              {valueLabel} <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="value"
-              type="number"
-              placeholder={valuePlaceholder}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              min={0}
-              max={isDamaged ? 100 : undefined}
-              step="0.01"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">{t("fineDescription")}</Label>
-            <Textarea
-              id="description"
-              placeholder={t("fineDescPlaceholder")}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              className="resize-none"
-            />
-          </div>
-          <Button
-            onClick={handleSubmit}
-            variant="submit"
-            disabled={isLoading || !name || !value}
-            loading={isLoading}
-            className="w-full"
-          >
-            {isLoading ? t("addingFineType") : t("addFineTypeBtn")}
-          </Button>
-        </div>
+              {isLoading ? t("addingFineType") : t("addFineTypeBtn")}
+            </Button>
+          </FadeUp>
+        </StaggerContainer>
       </DialogContent>
     </Dialog>
   );

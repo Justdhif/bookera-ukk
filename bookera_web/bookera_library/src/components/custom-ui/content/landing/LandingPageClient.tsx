@@ -34,20 +34,7 @@ import publicService from "@/services/public.service";
 import { chatbotService } from "@/services/chatbot.service";
 import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
-
-const fadeUp = (delay = 0): Variants => ({
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, delay, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
-});
-
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
-};
+import { FadeUp, StaggerContainer, FadeIn, ScaleIn } from "@/components/custom-ui/motion";
 
 type StatsData = {
   total_books: number;
@@ -162,7 +149,8 @@ export default function LandingPageClient() {
 
   const handleAiSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!aiMessage.trim() || isTyping || user?.role === 'user') return;
+    const isRestricted = !user || user.role === 'user';
+    if (!aiMessage.trim() || isTyping || isRestricted) return;
 
     const userMsg = aiMessage.trim();
     setChatHistory(prev => [...prev, { role: "user", text: userMsg }]);
@@ -217,23 +205,27 @@ export default function LandingPageClient() {
           </div>
 
           <div className="container mx-auto px-6 md:px-12 lg:px-20 relative z-10 text-center max-w-4xl">
-            <motion.div initial="hidden" animate="visible" variants={stagger} className="space-y-8">
-              <motion.div variants={fadeUp(0)}>
+            <StaggerContainer className="space-y-8">
+              <FadeUp>
                 <Badge variant="secondary" className="px-4 py-1.5 bg-brand-primary/10 text-brand-primary border-brand-primary/20 hover:bg-brand-primary/15 transition-colors">
                   <Sparkles className="w-3.5 h-3.5 mr-2" />
                   {t("badge")}
                 </Badge>
-              </motion.div>
+              </FadeUp>
               
-              <motion.h1 variants={fadeUp(0.1)} className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-[1.1]">
-                {t("heroTitle")} <span className="text-gradient-brand">{t("heroTitleBrand")}</span>
-              </motion.h1>
+              <FadeUp delay={0.1}>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-[1.1]">
+                  {t("heroTitle")} <span className="text-gradient-brand">{t("heroTitleBrand")}</span>
+                </h1>
+              </FadeUp>
 
-              <motion.p variants={fadeUp(0.2)} className="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                {t("heroDesc")}
-              </motion.p>
+              <FadeUp delay={0.2}>
+                <p className="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                  {t("heroDesc")}
+                </p>
+              </FadeUp>
 
-              <motion.div variants={fadeUp(0.3)} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+              <FadeUp delay={0.3} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                 <Link href="/home" className="w-full sm:w-auto">
                   <Button size="lg" variant="brand" className="w-full h-14 px-8 text-base shadow-xl shadow-brand-primary/25 hover:shadow-brand-primary/40 rounded-full transition-all">
                     {t("heroCta")} <ArrowRight className="ml-2 w-5 h-5" />
@@ -242,8 +234,8 @@ export default function LandingPageClient() {
                 <Button size="lg" variant="outline" onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })} className="w-full sm:w-auto h-14 px-8 text-base rounded-full border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900">
                   {t("heroCtaSecondary")}
                 </Button>
-              </motion.div>
-            </motion.div>
+              </FadeUp>
+            </StaggerContainer>
           </div>
         </section>
 
@@ -442,13 +434,13 @@ export default function LandingPageClient() {
                       type="text"
                       value={aiMessage}
                       onChange={(e) => setAiMessage(e.target.value)}
-                      placeholder={user?.role === 'user' ? "Upgrade to Member to use AI" : t("aiPlaceholder")}
+                      placeholder={(!user || user.role === 'user') ? "Upgrade to Member to use AI" : t("aiPlaceholder")}
                       className="w-full bg-gray-950 border border-gray-800 rounded-full py-3 px-5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-brand-primary/50 transition-colors disabled:opacity-50"
-                      disabled={isTyping || user?.role === 'user'}
+                      disabled={isTyping || !user || user.role === 'user'}
                     />
                     <button 
                       type="submit"
-                      disabled={!aiMessage.trim() || isTyping || user?.role === 'user'}
+                      disabled={!aiMessage.trim() || isTyping || !user || user.role === 'user'}
                       className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-brand-primary flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-primary-dark transition-colors"
                     >
                       <ArrowRight className="w-4 h-4 text-white" />

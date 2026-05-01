@@ -17,6 +17,8 @@ import RoleBadge from "@/components/custom-ui/badge/RoleBadge";
 import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import { Users, Eye, Trash } from "lucide-react";
 import { formatOccupationLabel } from "@/constants/user-occupation";
+import { motion } from "framer-motion";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 interface Props {
   data: User[];
   onDelete: (id: number) => void;
@@ -38,7 +40,9 @@ export default function UserTable({ data, onDelete }: Props) {
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
-            <TableHead className="w-16 text-center font-semibold">{t("noCol")}</TableHead>
+            <TableHead className="w-16 text-center font-semibold">
+              {t("noCol")}
+            </TableHead>
             <TableHead className="font-semibold">{t("user")}</TableHead>
             <TableHead className="font-semibold">{t("email")}</TableHead>
             <TableHead className="font-semibold">{t("role")}</TableHead>
@@ -49,10 +53,20 @@ export default function UserTable({ data, onDelete }: Props) {
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <StaggerContainer
+          as={motion.tbody}
+          staggerDelay={0.05}
+          data-slot="table-body"
+          className="[&_tr:last-child]:border-0"
+        >
           {data.map((item, index) => (
-            <TableRow
+            <SlideIn
               key={item.id}
+              as={motion.tr}
+              direction="up"
+              distance={20}
+              delay={index * 0.05}
+              data-slot="table-row"
               className="group hover:bg-primary/5 transition-colors border-b last:border-b-0"
             >
               <TableCell className="font-medium text-center text-muted-foreground">
@@ -66,7 +80,9 @@ export default function UserTable({ data, onDelete }: Props) {
                       alt={item.profile?.full_name || "User"}
                       className="object-cover"
                     />
-                    <AvatarFallback>{item.profile?.full_name?.[0] || "U"}</AvatarFallback>
+                    <AvatarFallback>
+                      {item.profile?.full_name?.[0] || "U"}
+                    </AvatarFallback>
                   </Avatar>
                   <div>
                     <div className="font-medium text-foreground">
@@ -100,7 +116,9 @@ export default function UserTable({ data, onDelete }: Props) {
                     <Link href={`/admin/users/${item.slug}`}>
                       <Button size="sm" variant="outline" className="h-8 gap-1">
                         <Eye className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">{t("viewUser")}</span>
+                        <span className="hidden sm:inline">
+                          {t("viewUser")}
+                        </span>
                       </Button>
                     </Link>
                   ) : (
@@ -125,9 +143,9 @@ export default function UserTable({ data, onDelete }: Props) {
                   </Button>
                 </div>
               </TableCell>
-            </TableRow>
+            </SlideIn>
           ))}
-        </TableBody>
+        </StaggerContainer>
       </Table>
     </div>
   );

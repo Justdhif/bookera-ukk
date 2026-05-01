@@ -1,4 +1,5 @@
 "use client";
+
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -13,6 +14,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/store/auth.store";
+import { motion } from "framer-motion";
 import BookeraLogo from "@/assets/logo/bookera-logo-hd.png";
 import {
   BookOpen,
@@ -32,6 +34,7 @@ import {
 } from "lucide-react";
 import { SidebarUserFooter } from "@/components/custom-ui/sidebar/SidebarUserFooter";
 import { cn } from "@/lib/utils";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
 type MenuItem = {
   title: string;
@@ -170,16 +173,24 @@ export function AdminSidebar() {
     <AppSidebar subtitle={roleDisplay}>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu className={!open ? "flex flex-col items-center" : ""}>
+            <StaggerContainer
+              as={motion.ul}
+              staggerDelay={0.05}
+              data-slot="sidebar-menu"
+              data-sidebar="menu"
+              className={cn("flex w-full min-w-0 flex-col gap-1", !open ? "items-center" : "")}
+            >
               {menuGroups.map((group, groupIndex) => (
                 <React.Fragment key={group.title}>
                   {open ? (
-                    <div className="flex items-center gap-2 px-4 py-2 bg-muted/40 dark:bg-white/5 border-b border-border dark:border-white/10">
-                      <div className="h-1.5 w-1.5 rounded-full bg-brand-primary/60 animate-pulse" />
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground dark:text-white/60">
-                        {group.title}
-                      </span>
-                    </div>
+                    <SlideIn direction="left" delay={groupIndex * 0.1}>
+                      <div className="flex items-center gap-2 px-4 py-2 bg-muted/40 dark:bg-white/5 border-b border-border dark:border-white/10 mt-2 first:mt-0">
+                        <div className="h-1.5 w-1.5 rounded-full bg-brand-primary/60 animate-pulse" />
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground dark:text-white/60">
+                          {group.title}
+                        </span>
+                      </div>
+                    </SlideIn>
                   ) : (
                     groupIndex > 0 && (
                       <div className="flex items-center justify-center w-full py-3">
@@ -187,7 +198,7 @@ export function AdminSidebar() {
                       </div>
                     )
                   )}
-                  {group.items.map((item) => {
+                  {group.items.map((item, itemIndex) => {
                     if (
                       item.roles &&
                       user?.role &&
@@ -197,9 +208,14 @@ export function AdminSidebar() {
                     }
                     const isActive = pathname === item.href;
                     return (
-                      <SidebarMenuItem
+                      <SlideIn
                         key={item.href}
-                        className={!open ? "w-full flex justify-center" : ""}
+                        as={motion.li}
+                        direction="left"
+                        delay={(groupIndex + itemIndex) * 0.05}
+                        data-slot="sidebar-menu-item"
+                        data-sidebar="menu-item"
+                        className={cn("group/menu-item relative", !open ? "w-full flex justify-center" : "")}
                       >
                         <SidebarMenuButton
                           asChild
@@ -221,19 +237,21 @@ export function AdminSidebar() {
                               )}
                             />
                             {open && (
-                              <span className="font-medium">{item.title}</span>
+                              <span className="font-medium">
+                                {item.title}
+                              </span>
                             )}
                             {isActive && open && (
                               <div className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-primary animate-pulse" />
                             )}
                           </Link>
                         </SidebarMenuButton>
-                      </SidebarMenuItem>
+                      </SlideIn>
                     );
                   })}
                 </React.Fragment>
               ))}
-            </SidebarMenu>
+            </StaggerContainer>
           </SidebarGroupContent>
         </SidebarGroup>
     </AppSidebar>

@@ -17,6 +17,7 @@ import EmptyState from "@/components/custom-ui/EmptyState";
 import { DollarSign, Eye, BookOpen, Hash } from "lucide-react";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
 function groupFinesByBorrow(fines: Fine[]) {
   const map = new Map<number, { borrow: Fine["borrow"]; fines: Fine[] }>();
@@ -64,7 +65,7 @@ export default function FineTable({
   }
   const grouped = groupFinesByBorrow(data);
   return (
-    <div className="space-y-4">
+    <StaggerContainer className="space-y-4">
       {grouped.map(({ borrow, fines }, groupIndex) => {
         const borrowId = fines[0]?.borrow_id;
         const borrowerName = borrow?.user?.profile?.full_name || "-";
@@ -75,8 +76,11 @@ export default function FineTable({
             ?.map((d) => d.book_copy?.book?.title)
             .filter(Boolean) ?? [];
         return (
-          <div
+          <SlideIn
             key={borrowId ?? groupIndex}
+            direction="up"
+            distance={20}
+            delay={groupIndex * 0.05}
             className="border rounded-lg overflow-hidden"
           >
             <div className="bg-muted/40 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b">
@@ -213,9 +217,9 @@ export default function FineTable({
                 </Table>
               </div>
             )}
-          </div>
+          </SlideIn>
         );
       })}
-    </div>
+    </StaggerContainer>
   );
 }

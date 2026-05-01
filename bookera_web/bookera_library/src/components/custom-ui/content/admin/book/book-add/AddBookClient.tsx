@@ -21,6 +21,7 @@ import BookSideCard from "../BookSideCard";
 import BookForm from "../BookForm";
 import AuthorFormDialog from "@/components/custom-ui/content/admin/author/AuthorFormDialog";
 import PublisherFormDialog from "@/components/custom-ui/content/admin/publisher/PublisherFormDialog";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 export default function AddBookClient() {
   const t = useTranslations("book");
@@ -138,16 +139,18 @@ export default function AddBookClient() {
   };
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("addBook")}
-        description={t("addBookDesc")}
-        showBackButton
-        isAdmin
-      />
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("addBook")}
+          description={t("addBookDesc")}
+          showBackButton
+          isAdmin
+        />
+      </FadeUp>
       <div>
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:self-start lg:sticky lg:top-4">
+          <FadeUp delay={0.1} className="lg:self-start lg:sticky lg:top-4">
             <BookSideCard
               coverPreview={coverPreview}
               formData={{ is_active: formData.is_active }}
@@ -158,22 +161,24 @@ export default function AddBookClient() {
               coverError={coverError}
               onCoverValidationChange={handleCoverValidationChange}
             />
-          </div>
-          <BookForm
-            isEditMode={true}
-            formData={formData}
-            setFormData={setFormData}
-            genres={genres}
-            categories={categories}
-            authors={authors}
-            publishers={publishers}
-            onAddAuthor={() => setAuthorDialogOpen(true)}
-            onAddPublisher={() => setPublisherDialogOpen(true)}
-            onValidationChange={setFormHasErrors}
-            onSubmit={handleSubmit}
-            submitting={submitting}
-            isSubmitDisabled={!isFormValid()}
-          />
+          </FadeUp>
+          <FadeUp delay={0.2} className="lg:col-span-2">
+            <BookForm
+              isEditMode={true}
+              formData={formData}
+              setFormData={setFormData}
+              genres={genres}
+              categories={categories}
+              authors={authors}
+              publishers={publishers}
+              onAddAuthor={() => setAuthorDialogOpen(true)}
+              onAddPublisher={() => setPublisherDialogOpen(true)}
+              onValidationChange={setFormHasErrors}
+              onSubmit={handleSubmit}
+              submitting={submitting}
+              isSubmitDisabled={!isFormValid()}
+            />
+          </FadeUp>
         </div>
       </div>
       <AuthorFormDialog
@@ -186,6 +191,6 @@ export default function AddBookClient() {
         setOpen={setPublisherDialogOpen}
         onSuccess={() => fetchPublishers()}
       />
-    </div>
+    </StaggerContainer>
   );
 }

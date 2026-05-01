@@ -11,6 +11,7 @@ import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialo
 import { Plus } from "lucide-react";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import FineTypeFormDialog from "./FineTypeFormDialog";
+import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion";
 
 export default function FineTypeManagement() {
   const t = useTranslations("fines");
@@ -48,34 +49,46 @@ export default function FineTypeManagement() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
-        <div>
-          <h2 className="text-2xl font-bold">{t("fineTypesTab")}</h2>
-          <p className="text-muted-foreground">
-            {t("fineTypesTabDescription")}
-          </p>
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+          <div>
+            <h2 className="text-2xl font-bold">{t("fineTypesTab")}</h2>
+            <p className="text-muted-foreground">
+              {t("fineTypesTabDescription")}
+            </p>
+          </div>
+          <Button
+            onClick={() => {
+              setOpen(true);
+            }}
+            variant="submit"
+            className="h-8 gap-1"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Fine Type
+          </Button>
         </div>
-        <Button
-          onClick={() => {
-            setOpen(true);
-          }}
-          variant="submit"
-          className="h-8 gap-1"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Add Fine Type
-        </Button>
-      </div>
+      </FadeUp>
 
-      {loading ? (
-        <DataLoading size="lg" />
-      ) : (
-        <FineTypeTable
-          data={fineTypes}
-          onDelete={(id: number) => setDeleteId(id)}
-        />
-      )}
+      <FadeUp delay={0.1}>
+        {loading ? (
+          <FadeIn
+            key="loading"
+          >
+            <DataLoading size="lg" />
+          </FadeIn>
+        ) : (
+          <FadeIn
+            key="content"
+          >
+            <FineTypeTable
+              data={fineTypes}
+              onDelete={(id: number) => setDeleteId(id)}
+            />
+          </FadeIn>
+        )}
+      </FadeUp>
 
       <DeleteConfirmDialog
         open={deleteId !== null}
@@ -90,6 +103,6 @@ export default function FineTypeManagement() {
         setOpen={setOpen}
         onSuccess={fetchFineTypes}
       />
-    </div>
+    </StaggerContainer>
   );
 }

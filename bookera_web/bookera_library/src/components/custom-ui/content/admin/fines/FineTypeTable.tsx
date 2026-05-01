@@ -1,5 +1,7 @@
 "use client";
+import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 import {
   Table,
   TableBody,
@@ -66,10 +68,18 @@ export default function FineTypeTable({
           </TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <StaggerContainer
+        as={motion.tbody}
+        staggerDelay={0.05}
+        className="[&_tr:last-child]:border-0"
+      >
         {data.map((item, index) => (
-          <TableRow
+          <SlideIn
             key={item.id}
+            as={motion.tr}
+            direction="up"
+            distance={20}
+            delay={index * 0.05}
             className="group hover:bg-primary/5 transition-colors border-b last:border-b-0"
           >
             <TableCell className="font-medium text-center text-muted-foreground">
@@ -106,9 +116,9 @@ export default function FineTypeTable({
                 </Button>
               </div>
             </TableCell>
-          </TableRow>
+          </SlideIn>
         ))}
-      </TableBody>
+      </StaggerContainer>
     </Table>
   );
 }

@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Crown, Save, Edit2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FadeUp } from "@/components/custom-ui/motion";
+import DataLoading from "@/components/custom-ui/DataLoading";
 
 export default function AdminMembershipPricing() {
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
@@ -19,6 +21,7 @@ export default function AdminMembershipPricing() {
   const [editMode, setEditMode] = useState<number | null>(null);
   const [formData, setFormData] = useState<Partial<MembershipPlan>>({});
   const t = useTranslations("pricing");
+  const tCommon = useTranslations("common");
 
   useEffect(() => {
     fetchPlans();
@@ -67,13 +70,7 @@ export default function AdminMembershipPricing() {
     }).format(price);
 
   if (loading) {
-    return (
-      <Card>
-        <CardContent className="p-6 flex justify-center items-center h-32">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        </CardContent>
-      </Card>
-    );
+    return <DataLoading />;
   }
 
   return (
@@ -100,7 +97,7 @@ export default function AdminMembershipPricing() {
       </div>
 
       <CardContent className="p-6">
-        <div className="w-full">
+        <FadeUp delay={0.1} className="w-full">
           {plans.map((plan) => {
             const isEditing = editMode === Number(plan.id);
             const isSaving = saving === Number(plan.id);
@@ -140,7 +137,7 @@ export default function AdminMembershipPricing() {
                       {t("saveChanges")}
                     </Button>
                     <Button variant="outline" size="sm" onClick={handleCancel} disabled={isSaving}>
-                      {useTranslations("common")("cancel")}
+                      {tCommon("cancel")}
                     </Button>
                   </div>
                 </div>
@@ -170,7 +167,7 @@ export default function AdminMembershipPricing() {
               {t("noData")}
             </div>
           )}
-        </div>
+        </FadeUp>
       </CardContent>
     </Card>
   );

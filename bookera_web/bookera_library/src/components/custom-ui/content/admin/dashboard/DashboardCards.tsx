@@ -14,6 +14,11 @@ import {
   TrendingUp,
   BarChart3,
 } from "lucide-react";
+import {
+  StaggerContainer,
+  ScaleIn,
+  BounceIn,
+} from "@/components/custom-ui/motion";
 
 type CardItem = {
   label: string;
@@ -40,9 +45,11 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
       value: data.total_users,
       icon: Users,
       gradient: "from-blue-500 to-cyan-500",
-      bgGradient: "from-blue-50/40 to-cyan-50/40 dark:from-blue-950/20 dark:to-cyan-950/20",
+      bgGradient:
+        "from-blue-50/40 to-cyan-50/40 dark:from-blue-950/20 dark:to-cyan-950/20",
       borderColor: "border-blue-200/50 dark:border-blue-800/50",
-      hoverBorderColor: "group-hover:border-blue-300 dark:group-hover:border-blue-700",
+      hoverBorderColor:
+        "group-hover:border-blue-300 dark:group-hover:border-blue-700",
       iconBg: "bg-linear-to-br from-blue-500 to-cyan-500",
       statIcon: Sparkles,
       statText: t("activeUsers"),
@@ -54,9 +61,11 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
       value: data.total_books,
       icon: BookOpen,
       gradient: "from-emerald-500 to-teal-500",
-      bgGradient: "from-emerald-50/40 to-teal-50/40 dark:from-emerald-950/20 dark:to-teal-950/20",
+      bgGradient:
+        "from-emerald-50/40 to-teal-50/40 dark:from-emerald-950/20 dark:to-teal-950/20",
       borderColor: "border-emerald-200/50 dark:border-emerald-800/50",
-      hoverBorderColor: "group-hover:border-emerald-300 dark:group-hover:border-emerald-700",
+      hoverBorderColor:
+        "group-hover:border-emerald-300 dark:group-hover:border-emerald-700",
       iconBg: "bg-linear-to-br from-emerald-500 to-teal-500",
       statIcon: Library,
       statText: t("inCollection"),
@@ -68,9 +77,11 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
       value: data.total_borrows,
       icon: ArrowUpFromLine,
       gradient: "from-purple-500 to-pink-500",
-      bgGradient: "from-purple-50/40 to-pink-50/40 dark:from-purple-950/20 dark:to-pink-950/20",
+      bgGradient:
+        "from-purple-50/40 to-pink-50/40 dark:from-purple-950/20 dark:to-pink-950/20",
       borderColor: "border-purple-200/50 dark:border-purple-800/50",
-      hoverBorderColor: "group-hover:border-purple-300 dark:group-hover:border-purple-700",
+      hoverBorderColor:
+        "group-hover:border-purple-300 dark:group-hover:border-purple-700",
       iconBg: "bg-linear-to-br from-purple-500 to-pink-500",
       statIcon: CalendarClock,
       statText: t("borrowRecords"),
@@ -82,9 +93,11 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
       value: data.total_returns,
       icon: ArrowDownToLine,
       gradient: "from-orange-500 to-amber-500",
-      bgGradient: "from-orange-50/40 to-amber-50/40 dark:from-orange-950/20 dark:to-amber-950/20",
+      bgGradient:
+        "from-orange-50/40 to-amber-50/40 dark:from-orange-950/20 dark:to-amber-950/20",
       borderColor: "border-orange-200/50 dark:border-orange-800/50",
-      hoverBorderColor: "group-hover:border-orange-300 dark:group-hover:border-orange-700",
+      hoverBorderColor:
+        "group-hover:border-orange-300 dark:group-hover:border-orange-700",
       iconBg: "bg-linear-to-br from-orange-500 to-amber-500",
       statIcon: Clock,
       statText: t("returnRecords"),
@@ -115,11 +128,12 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div
+              <BounceIn
+                delay={0.2}
                 className={`relative p-2.5 rounded-xl ${item.iconBg} text-white shadow-lg ring-1 ring-white/20 group-hover:shadow-xl group-hover:scale-105 transition-all duration-300`}
               >
                 <Icon className="h-4 w-4" />
-              </div>
+              </BounceIn>
               <div>
                 <p className="text-sm font-medium text-muted-foreground/80">
                   {item.label}
@@ -177,9 +191,12 @@ export default function DashboardCards({ data }: { data: DashboardTotals }) {
   };
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {cardItems.map(renderCard)}
-    </div>
+    <StaggerContainer className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {cardItems.map((item, index) => (
+        <ScaleIn key={item.label} delay={index * 0.1}>
+          {renderCard(item)}
+        </ScaleIn>
+      ))}
+    </StaggerContainer>
   );
 }
-

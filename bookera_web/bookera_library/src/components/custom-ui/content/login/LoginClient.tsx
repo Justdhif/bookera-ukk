@@ -12,6 +12,7 @@ import Image from "next/image";
 import { BookOpen, GraduationCap, Users, Globe } from "lucide-react";
 import { TermsOfServiceModal } from "@/components/custom-ui/modal/TermsOfServiceModal";
 import { PrivacyPolicyModal } from "@/components/custom-ui/modal/PrivacyPolicyModal";
+import { FadeUp, StaggerContainer } from "@/components/custom-ui/motion";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 
@@ -105,51 +106,42 @@ export default function LoginClient() {
       </div>{" "}
       <div className="relative w-full max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-12">
         {" "}
-        <div className="w-full lg:w-1/2 text-center lg:text-left space-y-8">
-          {" "}
-          <div className="flex flex-col items-center lg:items-start space-y-4">
-            {" "}
+        <StaggerContainer className="w-full lg:w-1/2 text-center lg:text-left space-y-8">
+          <FadeUp className="flex flex-col items-center lg:items-start space-y-4">
             <Image
               src={BookeraLogo}
               alt="Bookera Logo"
               className="w-48 lg:w-56 brightness-0 dark:invert"
               priority
-            />{" "}
+            />
             <div className="space-y-3">
-              {" "}
               <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white leading-tight transition-colors">
-                {" "}
                 Digital School{" "}
                 <span className="block text-brand-primary">
                   {t("library")}
-                </span>{" "}
-              </h1>{" "}
+                </span>
+              </h1>
               <p className="text-gray-600 dark:text-gray-300 text-lg max-w-md transition-colors">
-                {" "}
-                {t("heroDesc")}{" "}
-              </p>{" "}
-            </div>{" "}
-          </div>{" "}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto lg:mx-0">
-            {" "}
+                {t("heroDesc")}
+              </p>
+            </div>
+          </FadeUp>
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto lg:mx-0">
             {FEATURES.map(({ icon: Icon, label }) => (
-              <div
+              <FadeUp
                 key={label}
                 className="flex items-center gap-3 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg border border-gray-100 dark:border-gray-700 transition-colors"
               >
-                {" "}
                 <div className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/10 dark:bg-brand-primary/20 flex items-center justify-center">
-                  {" "}
-                  <Icon className="w-4 h-4 text-brand-primary" />{" "}
-                </div>{" "}
+                  <Icon className="w-4 h-4 text-brand-primary" />
+                </div>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors">
-                  {" "}
-                  {label}{" "}
-                </span>{" "}
-              </div>
-            ))}{" "}
-          </div>{" "}
-        </div>{" "}
+                  {label}
+                </span>
+              </FadeUp>
+            ))}
+          </StaggerContainer>
+        </StaggerContainer>{" "}
         <div className="w-full max-w-md relative" style={{ minHeight: 480 }}>
           {" "}
           <AnimatePresence mode="wait" custom={direction}>

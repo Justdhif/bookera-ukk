@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import UserSideCard from "./UserSideCard";
 import UserProfileForm from "./UserProfileForm";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 import { normalizeOccupationValue } from "@/constants/user-occupation";
 
 export default function UserDetailClient() {
@@ -40,24 +41,25 @@ export default function UserDetailClient() {
     try {
       setLoading(true);
       const res = await userService.getBySlug(slug);
-      setUser(res.data.data);
+      const userData = res.data.data;
+      const profile = userData.profile;
+      setUser(userData);
       setFormData({
-        email: res.data.data.email,
-        role: res.data.data.role,
-        is_active: res.data.data.is_active,
-        full_name: res.data.data.profile.full_name,
-        gender: res.data.data.profile.gender || undefined,
-        birth_date: res.data.data.profile.birth_date || undefined,
-        phone_number: res.data.data.profile.phone_number || undefined,
-        address: res.data.data.profile.address || undefined,
-        bio: res.data.data.profile.bio || undefined,
-        identification_number:
-          res.data.data.profile.identification_number || undefined,
-        occupation:
-          normalizeOccupationValue(res.data.data.profile.occupation) || undefined,
-        institution: res.data.data.profile.institution || undefined,
+        email: userData.email,
+        role: userData.role,
+        is_active: userData.is_active,
+        username: profile?.username || "",
+        full_name: profile?.full_name || "",
+        gender: profile?.gender || undefined,
+        birth_date: profile?.birth_date || undefined,
+        phone_number: profile?.phone_number || undefined,
+        address: profile?.address || undefined,
+        bio: profile?.bio || undefined,
+        identification_number: profile?.identification_number || undefined,
+        occupation: profile?.occupation ? normalizeOccupationValue(profile.occupation) : undefined,
+        institution: profile?.institution || undefined,
       });
-      setAvatarPreview(res.data.data.profile.avatar);
+      setAvatarPreview(profile?.avatar || "");
     } catch (error: any) {
       toast.error(error.response?.data?.message || t("loadError"));
       router.push("/admin/users");
@@ -93,33 +95,37 @@ export default function UserDetailClient() {
 
   const handleCancelEdit = () => {
     if (user) {
+      const profile = user.profile;
       setFormData({
         email: user.email,
         role: user.role,
         is_active: user.is_active,
-        full_name: user.profile.full_name,
-        gender: user.profile.gender || undefined,
-        birth_date: user.profile.birth_date || undefined,
-        phone_number: user.profile.phone_number || undefined,
-        address: user.profile.address || undefined,
-        bio: user.profile.bio || undefined,
-        identification_number: user.profile.identification_number || undefined,
-        occupation: normalizeOccupationValue(user.profile.occupation) || undefined,
-        institution: user.profile.institution || undefined,
+        username: profile?.username || "",
+        full_name: profile?.full_name || "",
+        gender: profile?.gender || undefined,
+        birth_date: profile?.birth_date || undefined,
+        phone_number: profile?.phone_number || undefined,
+        address: profile?.address || undefined,
+        bio: profile?.bio || undefined,
+        identification_number: profile?.identification_number || undefined,
+        occupation: profile?.occupation ? normalizeOccupationValue(profile.occupation) : undefined,
+        institution: profile?.institution || undefined,
       });
-      setAvatarPreview(user.profile.avatar);
+      setAvatarPreview(profile?.avatar || "");
     }
     setIsEditMode(false);
   };
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("userDetail")}
-        description={isEditMode ? t("editUserInfo") : t("viewUserDetail")}
-        showBackButton
-        isAdmin
-      />
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("userDetail")}
+          description={isEditMode ? t("editUserInfo") : t("viewUserDetail")}
+          showBackButton
+          isAdmin
+        />
+      </FadeUp>
       {loading ? (
         <div className="flex justify-center py-16">
           <DataLoading variant="inline" size="lg" />
@@ -127,7 +133,7 @@ export default function UserDetailClient() {
       ) : (
         user && (
           <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
+            <FadeUp delay={0.1} className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
               <UserSideCard
                 mode="detail"
                 user={user}
@@ -137,28 +143,30 @@ export default function UserDetailClient() {
                 setFormData={setFormData}
                 setAvatarPreview={setAvatarPreview}
               />
-            </div>
-            <UserProfileForm
-              user={user}
-              isEditMode={isEditMode}
-              formData={formData}
-              setFormData={setFormData}
-              onFullNameValidChange={setIsFullNameValid}
-              onSubmit={handleSubmit}
-              onCancel={handleCancelEdit}
-              onEdit={() => setIsEditMode(true)}
-              submitting={submitting}
-              isSubmitDisabled={
-                submitting ||
-                !formData.email?.trim() ||
-                !formData.full_name?.trim() ||
-                !formData.role ||
-                !isFullNameValid
-              }
-            />
+            </FadeUp>
+            <FadeUp delay={0.2} className="lg:col-span-2">
+              <UserProfileForm
+                user={user}
+                isEditMode={isEditMode}
+                formData={formData}
+                setFormData={setFormData}
+                onFullNameValidChange={setIsFullNameValid}
+                onSubmit={handleSubmit}
+                onCancel={handleCancelEdit}
+                onEdit={() => setIsEditMode(true)}
+                submitting={submitting}
+                isSubmitDisabled={
+                  submitting ||
+                  !formData.email?.trim() ||
+                  !formData.full_name?.trim() ||
+                  !formData.role ||
+                  !isFullNameValid
+                }
+              />
+            </FadeUp>
           </div>
         )
       )}
-    </div>
+    </StaggerContainer>
   );
 }

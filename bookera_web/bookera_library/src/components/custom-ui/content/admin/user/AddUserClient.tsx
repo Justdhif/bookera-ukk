@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { isPasswordValid } from "@/components/custom-ui/content/admin/auth/PasswordRequirements";
 import UserSideCard from "./UserSideCard";
 import UserProfileForm from "./UserProfileForm";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 export default function AddUserClient() {
   const t = useTranslations("user");
@@ -59,16 +60,18 @@ export default function AddUserClient() {
     }
   };
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("addUser")}
-        description={t("addUserDesc")}
-        showBackButton
-        isAdmin
-      />
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("addUser")}
+          description={t("addUserDesc")}
+          showBackButton
+          isAdmin
+        />
+      </FadeUp>
       <div>
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
+          <FadeUp delay={0.1} className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
             <UserSideCard
               mode="add"
               avatarPreview={avatarPreview}
@@ -77,18 +80,20 @@ export default function AddUserClient() {
               setFormData={setFormData}
               setAvatarPreview={setAvatarPreview}
             />
-          </div>
-          <UserProfileForm
-            isEditMode={true}
-            formData={formData}
-            setFormData={setFormData}
-            onFullNameValidChange={setIsFullNameValid}
-            onSubmit={handleSubmit}
-            submitting={submitting}
-            isSubmitDisabled={isSubmitDisabled()}
-          />
+          </FadeUp>
+          <FadeUp delay={0.2} className="lg:col-span-2">
+            <UserProfileForm
+              isEditMode={true}
+              formData={formData}
+              setFormData={setFormData}
+              onFullNameValidChange={setIsFullNameValid}
+              onSubmit={handleSubmit}
+              submitting={submitting}
+              isSubmitDisabled={isSubmitDisabled()}
+            />
+          </FadeUp>
         </div>
       </div>
-    </div>
+    </StaggerContainer>
   );
 }

@@ -15,6 +15,7 @@ import { fineService } from "@/services/fine.service";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
 interface BorrowFinesCardProps {
   fines: Fine[];
@@ -64,10 +65,12 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="relative">
-        <div className="grid gap-4">
+        <StaggerContainer className="grid gap-4">
           {fines.map((fine) => (
-            <div
+            <SlideIn
               key={fine.id}
+              direction="up"
+              distance={20}
               className="flex items-center justify-between p-5 bg-background/50 backdrop-blur-sm rounded-2xl border border-border/50 shadow-sm group hover:border-amber-500/30 transition-all duration-300"
             >
               <div className="flex items-center gap-5">
@@ -130,9 +133,9 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
                   </Button>
                 )}
               </div>
-            </div>
+            </SlideIn>
           ))}
-        </div>
+        </StaggerContainer>
       </CardContent>
     </Card>
   );

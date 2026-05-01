@@ -12,7 +12,8 @@ import { useAuthStore } from "@/store/auth.store";
 
 export default function PublicPageClient() {
   const t = useTranslations("navbar");
-  const userSlug = useAuthStore((state) => state.user?.slug);
+  const user = useAuthStore((state) => state.user);
+  const userSlug = user?.slug;
   const favoriteHref = userSlug ? `/${userSlug}/favorites` : "/login";
 
   return (
@@ -29,27 +30,31 @@ export default function PublicPageClient() {
 
         <div className="space-y-6">
           <div className="flex flex-wrap items-center gap-3">
-            <Link href={favoriteHref}>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 h-10 px-5 border-rose-500/20 text-rose-600 hover:bg-rose-500/5 hover:text-rose-600 rounded-full shadow-sm"
-              >
-                <Heart className="h-4 w-4" />
-                {t("myFavorites")}
-              </Button>
-            </Link>
+            {user?.role !== 'user' && (
+              <>
+                <Link href={favoriteHref}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 h-10 px-5 border-rose-500/20 text-rose-600 hover:bg-rose-500/5 hover:text-rose-600 rounded-full shadow-sm"
+                  >
+                    <Heart className="h-4 w-4" />
+                    {t("myFavorites")}
+                  </Button>
+                </Link>
 
-            <Link href="/my-borrows">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 h-10 px-5 border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/5 hover:text-emerald-600 rounded-full shadow-sm"
-              >
-                <BookOpen className="h-4 w-4" />
-                {t("myBorrows")}
-              </Button>
-            </Link>
+                <Link href="/my-borrows">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 h-10 px-5 border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/5 hover:text-emerald-600 rounded-full shadow-sm"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    {t("myBorrows")}
+                  </Button>
+                </Link>
+              </>
+            )}
 
             <Link href="/my-fines">
               <Button

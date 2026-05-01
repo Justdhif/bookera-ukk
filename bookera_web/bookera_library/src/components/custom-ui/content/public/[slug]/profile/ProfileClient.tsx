@@ -227,7 +227,7 @@ export default function ProfileClient() {
                         {t("editProfile")}
                       </Button>
                     </Link>
-                    {user.role !== 'member' && (
+                    {user.role === 'user' && (
                       <Link href="/pricing" className="inline-block">
                         <Button variant="brand" className="shadow-md shadow-brand-primary/20 transition-all font-medium rounded-lg px-6">
                           <Crown className="w-4 h-4 mr-2" />

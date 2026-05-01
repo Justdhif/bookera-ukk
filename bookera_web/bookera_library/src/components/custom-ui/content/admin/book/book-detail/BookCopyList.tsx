@@ -10,6 +10,7 @@ import { Trash } from "lucide-react";
 import BookCopyStatusBadge from "@/components/custom-ui/badge/BookCopyStatusBadge";
 import { useTranslations } from "next-intl";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
 export default function BookCopyList({
   book,
@@ -54,11 +55,14 @@ export default function BookCopyList({
           {t("addCopy")}
         </Button>
       </div>
-      <ul className="space-y-2">
-        {book.copies?.map((copy) => (
-          <li
+      <StaggerContainer as="ul" className="space-y-2">
+        {book.copies?.map((copy, index) => (
+          <SlideIn
             key={copy.id}
-            className="flex items-center justify-between border rounded-xl p-3 bg-card/50 hover:bg-card transition-colors duration-200"
+            as="li"
+            direction="left"
+            delay={index * 0.05}
+            className="flex items-center justify-between border rounded-xl p-3 bg-card/50 hover:bg-card transition-colors duration-200 group"
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary font-bold text-xs">
@@ -69,26 +73,28 @@ export default function BookCopyList({
                 <BookCopyStatusBadge status={copy.status} />
               </div>
             </div>
-            <Button
-              size="icon"
-              variant="destructive"
-              onClick={() => setDeleteId(copy.id)}
-              className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <Trash className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              size="sm"
-              variant="destructive"
-              onClick={() => setDeleteId(copy.id)}
-              className="h-8 gap-1 sm:flex hidden"
-            >
-              <Trash className="h-3.5 w-3.5" />
-              {t("deleteCopy")}
-            </Button>
-          </li>
+            <div className="flex items-center gap-2">
+              <Button
+                size="icon"
+                variant="destructive"
+                onClick={() => setDeleteId(copy.id)}
+                className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity sm:hidden flex"
+              >
+                <Trash className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => setDeleteId(copy.id)}
+                className="h-8 gap-1 sm:flex hidden"
+              >
+                <Trash className="h-3.5 w-3.5" />
+                {t("deleteCopy")}
+              </Button>
+            </div>
+          </SlideIn>
         ))}
-      </ul>
+      </StaggerContainer>
       <DeleteConfirmDialog
         open={deleteId !== null}
         onOpenChange={(open) => !open && setDeleteId(null)}

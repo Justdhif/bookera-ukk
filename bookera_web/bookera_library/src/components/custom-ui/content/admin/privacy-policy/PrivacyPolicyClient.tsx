@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion";
 
 export default function PrivacyPolicyClient() {
   const t = useTranslations("privacy-policy");
@@ -49,37 +50,43 @@ export default function PrivacyPolicyClient() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("title")}
-        description={t("description")}
-        isAdmin
-        rightActions={
-          <Button
-            onClick={() => {
-              setEditing(null);
-              setOpen(true);
-            }}
-            variant="submit"
-            className="h-8 gap-1"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            {t("addPrivacyPolicy")}
-          </Button>
-        }
-      />
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("title")}
+          description={t("description")}
+          isAdmin
+          rightActions={
+            <Button
+              onClick={() => {
+                setEditing(null);
+                setOpen(true);
+              }}
+              variant="submit"
+              className="h-8 gap-1"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              {t("addPrivacyPolicy")}
+            </Button>
+          }
+        />
+      </FadeUp>
 
       {loading ? (
-        <DataLoading size="lg" />
+        <FadeIn key="loading">
+          <DataLoading size="lg" />
+        </FadeIn>
       ) : (
-        <PrivacyPolicyList
-          data={items}
-          onEdit={(item) => {
-            setEditing(item);
-            setOpen(true);
-          }}
-          onDelete={(id) => setDeleteId(id)}
-        />
+        <FadeIn key="content">
+          <PrivacyPolicyList
+            data={items}
+            onEdit={(item) => {
+              setEditing(item);
+              setOpen(true);
+            }}
+            onDelete={(id) => setDeleteId(id)}
+          />
+        </FadeIn>
       )}
 
       <PrivacyPolicyFormDialog
@@ -96,6 +103,6 @@ export default function PrivacyPolicyClient() {
         description={t("deleteConfirm")}
         onConfirm={confirmDelete}
       />
-    </div>
+    </StaggerContainer>
   );
 }

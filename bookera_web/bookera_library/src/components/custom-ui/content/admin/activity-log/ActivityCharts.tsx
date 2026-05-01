@@ -73,6 +73,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
+import { FadeUp } from "@/components/custom-ui/motion";
+
 export default function ActivityCharts({
   charts,
   onYearChange,
@@ -96,143 +98,145 @@ export default function ActivityCharts({
   const allYears = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="border-b pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-bold flex items-center gap-2">
-            <div className="w-1 h-6 bg-linear-to-b from-cyan-500 to-pink-500 rounded-full" />
-            {t("moduleComparisonChart")}
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="brand"
-              size="icon"
-              onClick={handlePrevYear}
-              className="h-8 w-8"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Select
-              value={charts.current_year.toString()}
-              onValueChange={handleYearSelect}
-            >
-              <SelectTrigger className="w-24 h-8 border-2 border-gray-200 dark:border-gray-700 font-bold">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {allYears.map((year) => (
-                  <SelectItem key={year} value={year.toString()}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              variant="brand"
-              size="icon"
-              onClick={handleNextYear}
-              className="h-8 w-8"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+    <FadeUp>
+      <Card className="overflow-hidden">
+        <CardHeader className="border-b pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-xl font-bold flex items-center gap-2">
+              <div className="w-1 h-6 bg-linear-to-b from-cyan-500 to-pink-500 rounded-full" />
+              {t("moduleComparisonChart")}
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="brand"
+                size="icon"
+                onClick={handlePrevYear}
+                className="h-8 w-8"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Select
+                value={charts.current_year.toString()}
+                onValueChange={handleYearSelect}
+              >
+                <SelectTrigger className="w-24 h-8 border-2 border-gray-200 dark:border-gray-700 font-bold">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {allYears.map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                variant="brand"
+                size="icon"
+                onClick={handleNextYear}
+                className="h-8 w-8"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-6">
-        {hasData ? (
-          <ResponsiveContainer width="100%" height={400}>
-            <AreaChart data={charts.monthly}>
-              <defs>
-                {charts.modules.map((module, index) => (
-                  <linearGradient
-                    key={module}
-                    id={`gradient${module}`}
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop
-                      offset="5%"
-                      stopColor={COLORS[index % COLORS.length]}
-                      stopOpacity={0.4}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor={COLORS[index % COLORS.length]}
-                      stopOpacity={0.05}
-                    />
-                  </linearGradient>
-                ))}
-              </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#e5e7eb"
-                className="dark:stroke-gray-800"
-                vertical={false}
-              />
-              <XAxis
-                dataKey="month"
-                tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
-                axisLine={{ stroke: "#e5e7eb" }}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
-                axisLine={{ stroke: "#e5e7eb" }}
-                tickLine={false}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend
-                verticalAlign="bottom"
-                height={50}
-                iconType="line"
-                wrapperStyle={{
-                  paddingTop: "24px",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                }}
-                formatter={(value) => (
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">
-                    {value}
-                  </span>
-                )}
-              />
-              {charts.modules.map((module, index) => (
-                <Area
-                  key={module}
-                  type="monotone"
-                  dataKey={module}
-                  stroke={COLORS[index % COLORS.length]}
-                  strokeWidth={2.5}
-                  fill={`url(#gradient${module})`}
-                  fillOpacity={1}
-                  dot={{
-                    fill: COLORS[index % COLORS.length],
-                    r: 4.5,
-                    strokeWidth: 2.5,
-                    stroke: "#fff",
-                    className: "drop-shadow-sm",
-                  }}
-                  activeDot={{
-                    r: 6.5,
-                    strokeWidth: 3,
-                    stroke: "#fff",
-                    className: "drop-shadow-md",
-                  }}
-                  animationBegin={0}
-                  animationDuration={800}
-                  animationEasing="ease-in-out"
+        </CardHeader>
+        <CardContent className="pt-6">
+          {hasData ? (
+            <ResponsiveContainer width="100%" height={400}>
+              <AreaChart data={charts.monthly}>
+                <defs>
+                  {charts.modules.map((module, index) => (
+                    <linearGradient
+                      key={module}
+                      id={`gradient${module}`}
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor={COLORS[index % COLORS.length]}
+                        stopOpacity={0.4}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor={COLORS[index % COLORS.length]}
+                        stopOpacity={0.05}
+                      />
+                    </linearGradient>
+                  ))}
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#e5e7eb"
+                  className="dark:stroke-gray-800"
+                  vertical={false}
                 />
-              ))}
-            </AreaChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="flex items-center justify-center h-100 text-muted-foreground">
-            {t("noData")}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                <XAxis
+                  dataKey="month"
+                  tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                  axisLine={{ stroke: "#e5e7eb" }}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fill: "#6b7280", fontSize: 12, fontWeight: 500 }}
+                  axisLine={{ stroke: "#e5e7eb" }}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend
+                  verticalAlign="bottom"
+                  height={50}
+                  iconType="line"
+                  wrapperStyle={{
+                    paddingTop: "24px",
+                    fontSize: "14px",
+                    fontWeight: 500,
+                  }}
+                  formatter={(value) => (
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">
+                      {value}
+                    </span>
+                  )}
+                />
+                {charts.modules.map((module, index) => (
+                  <Area
+                    key={module}
+                    type="monotone"
+                    dataKey={module}
+                    stroke={COLORS[index % COLORS.length]}
+                    strokeWidth={2.5}
+                    fill={`url(#gradient${module})`}
+                    fillOpacity={1}
+                    dot={{
+                      fill: COLORS[index % COLORS.length],
+                      r: 4.5,
+                      strokeWidth: 2.5,
+                      stroke: "#fff",
+                      className: "drop-shadow-sm",
+                    }}
+                    activeDot={{
+                      r: 6.5,
+                      strokeWidth: 3,
+                      stroke: "#fff",
+                      className: "drop-shadow-md",
+                    }}
+                    animationBegin={0}
+                    animationDuration={800}
+                    animationEasing="ease-in-out"
+                  />
+                ))}
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-100 text-muted-foreground">
+              {t("noData")}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </FadeUp>
   );
 }

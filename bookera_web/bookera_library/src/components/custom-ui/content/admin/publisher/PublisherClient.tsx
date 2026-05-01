@@ -21,6 +21,7 @@ import {
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import { useTranslations } from "next-intl";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 export default function PublisherClient() {
   const t = useTranslations("publisher");
   const [publishers, setPublishers] = useState<Publisher[]>([]);
@@ -109,64 +110,70 @@ export default function PublisherClient() {
   };
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("title")}
-        description={t("description")}
-        isAdmin
-        rightActions={
-          <Button
-            onClick={() => {
-              setSelectedPublisher(null);
-              setAddOpen(true);
-            }}
-            variant="submit"
-            className="h-8 gap-1"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            {t("addPublisher")}
-          </Button>
-        }
-      />
-      <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
-        <div className="relative flex-2 w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={t("searchPublishers")}
-            value={searchInput}
-            onChange={handleSearchChange}
-            className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
-          />
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("title")}
+          description={t("description")}
+          isAdmin
+          rightActions={
+            <Button
+              onClick={() => {
+                setSelectedPublisher(null);
+                setAddOpen(true);
+              }}
+              variant="submit"
+              className="h-8 gap-1"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              {t("addPublisher")}
+            </Button>
+          }
+        />
+      </FadeUp>
+      <FadeUp delay={0.1}>
+        <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+          <div className="relative flex-2 w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={t("searchPublishers")}
+              value={searchInput}
+              onChange={handleSearchChange}
+              className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
+            />
+          </div>
+          <Select value={statusValue} onValueChange={handleStatusChange}>
+            <SelectTrigger className="flex-1 w-full sm:w-auto h-11! shadow-sm transition-all duration-300">
+              <SelectValue placeholder={t("allStatus")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("allStatus")}</SelectItem>
+              <SelectItem value="active">{t("active")}</SelectItem>
+              <SelectItem value="inactive">{t("inactive")}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={statusValue} onValueChange={handleStatusChange}>
-          <SelectTrigger className="flex-1 w-full sm:w-auto h-11! shadow-sm transition-all duration-300">
-            <SelectValue placeholder={t("allStatus")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("allStatus")}</SelectItem>
-            <SelectItem value="active">{t("active")}</SelectItem>
-            <SelectItem value="inactive">{t("inactive")}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <PaginatedContent
-        currentPage={pagination.current_page}
-        lastPage={pagination.last_page}
-        total={pagination.total}
-        from={pagination.from}
-        to={pagination.to}
-        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
-      >
-        {loading ? (
-          <DataLoading size="lg" />
-        ) : (
-          <PublisherTable
-            data={publishers}
-            onEdit={handleEdit}
-            onDelete={(id) => setDeleteId(id)}
-          />
-        )}
-      </PaginatedContent>
+      </FadeUp>
+      <FadeUp delay={0.2}>
+        <PaginatedContent
+          currentPage={pagination.current_page}
+          lastPage={pagination.last_page}
+          total={pagination.total}
+          from={pagination.from}
+          to={pagination.to}
+          onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+        >
+          {loading ? (
+            <DataLoading size="lg" />
+          ) : (
+            <PublisherTable
+              data={publishers}
+              onEdit={handleEdit}
+              onDelete={(id) => setDeleteId(id)}
+            />
+          )}
+        </PaginatedContent>
+      </FadeUp>
       <PublisherFormDialog
         open={addOpen}
         setOpen={setAddOpen}
@@ -181,6 +188,6 @@ export default function PublisherClient() {
         description={t("deletePublisherConfirm")}
         onConfirm={confirmDelete}
       />
-    </div>
+    </StaggerContainer>
   );
 }

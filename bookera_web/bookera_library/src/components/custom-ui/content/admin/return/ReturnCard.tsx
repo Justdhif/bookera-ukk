@@ -17,6 +17,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
 interface ReturnCardProps {
   borrow: Borrow;
@@ -160,10 +161,13 @@ export function ReturnCard({ borrow }: ReturnCardProps) {
             </h4>
           </div>
 
-          <div className="grid gap-4">
-            {returnEntries.map((entry) => (
-              <div
+          <StaggerContainer className="grid gap-4">
+            {returnEntries.map((entry, index) => (
+              <SlideIn
                 key={entry.key}
+                direction="up"
+                distance={20}
+                delay={index * 0.05}
                 className="group/item flex flex-col gap-4 rounded-xl border border-border/50 bg-card p-4 transition-all duration-300 hover:border-primary/30 hover:shadow-premium sm:flex-row sm:items-start"
               >
                 <div className="relative h-32 w-24 shrink-0 overflow-hidden rounded-lg shadow-lg transition-transform duration-300 group-hover/item:scale-105 sm:h-28 sm:w-20">
@@ -245,9 +249,9 @@ export function ReturnCard({ borrow }: ReturnCardProps) {
                     </div>
                   )}
                 </div>
-              </div>
+              </SlideIn>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
 
         {fines.length > 0 && (
@@ -263,10 +267,13 @@ export function ReturnCard({ borrow }: ReturnCardProps) {
               </Badge>
             </div>
 
-            <div className="grid gap-4">
-              {fines.map((fine) => (
-                <div
+            <StaggerContainer className="grid gap-4">
+              {fines.map((fine, index) => (
+                <SlideIn
                   key={fine.id}
+                  direction="up"
+                  distance={20}
+                  delay={index * 0.05}
                   className="flex flex-col gap-4 rounded-2xl border border-border/50 bg-background/70 p-4 shadow-sm transition-shadow hover:shadow-md sm:flex-row sm:items-start sm:justify-between"
                 >
                   <div className="space-y-1.5">
@@ -296,9 +303,9 @@ export function ReturnCard({ borrow }: ReturnCardProps) {
                   <div className="flex shrink-0 items-center gap-2">
                     <FineStatusBadge status={fine.status} />
                   </div>
-                </div>
+                </SlideIn>
               ))}
-            </div>
+            </StaggerContainer>
 
             <div className="flex flex-col gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>

@@ -24,6 +24,7 @@ import DateRangeFilter from "@/components/custom-ui/DateRangeFilter";
 import { getCurrentMonthRange } from "@/lib/month-range";
 import { downloadBlobFile } from "@/lib/download";
 import { Download } from "lucide-react";
+import { StaggerContainer, FadeUp, SlideIn, FadeIn } from "@/components/custom-ui/motion";
 
 export default function BorrowClient() {
   const t = useTranslations("borrow");
@@ -193,11 +194,13 @@ export default function BorrowClient() {
       );
     }
     return (
-      <div className="grid gap-4">
-        {borrows.map((borrow) => (
-          <BorrowCard key={borrow.id} borrow={borrow} />
+      <StaggerContainer className="grid gap-4">
+        {borrows.map((borrow, index) => (
+          <SlideIn key={borrow.id} direction="up" distance={20} delay={index * 0.05}>
+            <BorrowCard borrow={borrow} />
+          </SlideIn>
         ))}
-      </div>
+      </StaggerContainer>
     );
   };
 
@@ -205,176 +208,220 @@ export default function BorrowClient() {
   const closedBorrows = allBorrows.filter((b) => b.status === "close");
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("managementTitle")}
-        description={t("managementDesc")}
-        isAdmin
-        rightActions={
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              className="h-8 gap-1 border-slate-200"
-              onClick={handleExport}
-              disabled={exporting}
-            >
-              <Download className="h-3.5 w-3.5" />
-              {t("exportData")}
-            </Button>
-            <Link href="/admin/borrows/create">
-              <Button variant="submit" className="h-8 gap-1">
-                <Plus className="h-4 w-4" />
-                {t("createBorrow")}
-              </Button>
-            </Link>
-          </div>
-        }
-      />
-
-      <Tabs 
-        defaultValue="all" 
-        value={activeTab} 
-        onValueChange={setActiveTab} 
-        className="space-y-4"
-      >
-        <TabsList>
-          <TabsTrigger value="all">
-            {t("all")} ({allBorrows.length})
-          </TabsTrigger>
-          <TabsTrigger value="open">
-            {t("open")} ({openBorrows.length})
-          </TabsTrigger>
-          <TabsTrigger value="closed">
-            {t("closed")} ({closedBorrows.length})
-          </TabsTrigger>
-          <TabsTrigger value="requests" className="flex items-center gap-1">
-            <ClipboardList className="h-3.5 w-3.5" />
-            {t("requests")} ({requests.length})
-          </TabsTrigger>
-        </TabsList>
-
-        {[
-          {
-            value: "all",
-            label: t("allBorrows"),
-            desc: t("allBorrowsDesc"),
-            data: allBorrows,
-          },
-          {
-            value: "open",
-            label: t("openBorrows"),
-            desc: t("openBorrowsDesc"),
-            data: openBorrows,
-          },
-          {
-            value: "closed",
-            label: t("closedBorrows"),
-            desc: t("closedBorrowsDesc"),
-            data: closedBorrows,
-          },
-        ].map(({ value, label, desc, data }) => (
-          <TabsContent key={value} value={value} className="space-y-4">
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold">{label}</h3>
-                <p className="text-sm text-muted-foreground">{desc}</p>
-              </div>
-              <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center mb-6">
-                <div className="relative min-w-0 w-full">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder={t("searchByUserOrTitle")}
-                    value={borrowSearch}
-                    onChange={handleBorrowSearchChange}
-                    className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
-                  />
-                </div>
-                <DateRangeFilter
-                  onFilter={handleDateFilter}
-                  defaultStartDate={defaultMonthRange.startDate}
-                  defaultEndDate={defaultMonthRange.endDate}
-                  className="w-full lg:w-auto"
-                />
-              </div>
-              <PaginatedContent
-                currentPage={borrowPagination.current_page}
-                lastPage={borrowPagination.last_page}
-                total={borrowPagination.total}
-                from={borrowPagination.from}
-                to={borrowPagination.to}
-                onPageChange={(page) =>
-                  setBorrowFilters((prev) => ({ ...prev, page }))
-                }
+    <StaggerContainer key={activeTab} className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("managementTitle")}
+          description={t("managementDesc")}
+          isAdmin
+          rightActions={
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                className="h-8 gap-1 border-slate-200"
+                onClick={handleExport}
+                disabled={exporting}
               >
-                {loadingBorrows ? (
-                  <div className="grid gap-4">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <DataLoading key={i} size="lg" />
-                    ))}
+                <Download className="h-3.5 w-3.5" />
+                {t("exportData")}
+              </Button>
+              <Link href="/admin/borrows/create">
+                <Button variant="submit" className="h-8 gap-1">
+                  <Plus className="h-4 w-4" />
+                  {t("createBorrow")}
+                </Button>
+              </Link>
+            </div>
+          }
+        />
+      </FadeUp>
+
+      <FadeUp delay={0.1}>
+        <Tabs 
+          defaultValue="all" 
+          value={activeTab} 
+          onValueChange={setActiveTab} 
+          className="space-y-4"
+        >
+          <TabsList>
+            <TabsTrigger value="all">
+              {t("all")} ({allBorrows.length})
+            </TabsTrigger>
+            <TabsTrigger value="open">
+              {t("open")} ({openBorrows.length})
+            </TabsTrigger>
+            <TabsTrigger value="closed">
+              {t("closed")} ({closedBorrows.length})
+            </TabsTrigger>
+            <TabsTrigger value="requests" className="flex items-center gap-1">
+              <ClipboardList className="h-3.5 w-3.5" />
+              {t("requests")} ({requests.length})
+            </TabsTrigger>
+          </TabsList>
+
+          {[
+            {
+              value: "all",
+              label: t("allBorrows"),
+              desc: t("allBorrowsDesc"),
+              data: allBorrows,
+            },
+            {
+              value: "open",
+              label: t("openBorrows"),
+              desc: t("openBorrowsDesc"),
+              data: openBorrows,
+            },
+            {
+              value: "closed",
+              label: t("closedBorrows"),
+              desc: t("closedBorrowsDesc"),
+              data: closedBorrows,
+            },
+          ].map(({ value, label, desc, data }) => (
+            <TabsContent key={value} value={value} className="space-y-4">
+              <div className="space-y-4">
+                <FadeUp delay={0.1}>
+                  <div>
+                    <h3 className="text-lg font-semibold">{label}</h3>
+                    <p className="text-sm text-muted-foreground">{desc}</p>
                   </div>
-                ) : (
-                  renderBorrowCards(data)
-                )}
-              </PaginatedContent>
+                </FadeUp>
+                
+                <FadeUp delay={0.2}>
+                  <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center mb-6">
+                    <div className="relative min-w-0 w-full">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder={t("searchByUserOrTitle")}
+                        value={borrowSearch}
+                        onChange={handleBorrowSearchChange}
+                        className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
+                      />
+                    </div>
+                    <DateRangeFilter
+                      onFilter={handleDateFilter}
+                      defaultStartDate={defaultMonthRange.startDate}
+                      defaultEndDate={defaultMonthRange.endDate}
+                      className="w-full lg:w-auto"
+                    />
+                  </div>
+                </FadeUp>
+
+                <FadeUp key={value + "-pagination"} delay={0.3}>
+                  <PaginatedContent
+                    currentPage={borrowPagination.current_page}
+                    lastPage={borrowPagination.last_page}
+                    total={borrowPagination.total}
+                    from={borrowPagination.from}
+                    to={borrowPagination.to}
+                    onPageChange={(page) =>
+                      setBorrowFilters((prev) => ({ ...prev, page }))
+                    }
+                  >
+                    {loadingBorrows ? (
+                      <FadeIn
+                        key="loading-borrows"
+                        className="grid gap-4"
+                      >
+                        {Array.from({ length: 3 }).map((_, i) => (
+                          <DataLoading key={i} size="lg" />
+                        ))}
+                      </FadeIn>
+                    ) : (
+                      <FadeIn
+                        key="content-borrows"
+                      >
+                        {renderBorrowCards(data)}
+                      </FadeIn>
+                    )}
+                  </PaginatedContent>
+                </FadeUp>
+              </div>
+            </TabsContent>
+          ))}
+
+          <TabsContent value="requests" className="space-y-4">
+            <div className="space-y-4">
+              <FadeUp delay={0.1}>
+                <div>
+                  <h3 className="text-lg font-semibold">{t("borrowRequests")}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {t("borrowRequestsDesc")}
+                  </p>
+                </div>
+              </FadeUp>
+
+              <FadeUp delay={0.2}>
+                <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
+                  <div className="relative flex-1 w-full">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder={t("searchByNameOrTitle")}
+                      value={requestSearch}
+                      onChange={handleRequestSearchChange}
+                      className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
+                    />
+                  </div>
+                </div>
+              </FadeUp>
+
+              <FadeUp key="requests-pagination" delay={0.3}>
+                <PaginatedContent
+                  currentPage={requestPagination.current_page}
+                  lastPage={requestPagination.last_page}
+                  total={requestPagination.total}
+                  from={requestPagination.from}
+                  to={requestPagination.to}
+                  onPageChange={(page) =>
+                    setRequestFilters((prev) => ({ ...prev, page }))
+                  }
+                >
+                  {loadingRequests ? (
+                    <FadeIn
+                      key="loading-requests"
+                      className="space-y-4"
+                    >
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <DataLoading key={i} size="lg" />
+                      ))}
+                    </FadeIn>
+                  ) : requests.length === 0 ? (
+                    <FadeIn
+                      key="empty-requests"
+                    >
+                      <EmptyState
+                        icon={<ClipboardList />}
+                        title={t("noRequestsFound")}
+                        description={t("noRequestsFoundDesc")}
+                      />
+                    </FadeIn>
+                  ) : (
+                    <FadeIn
+                      key="content-requests"
+                    >
+                      <StaggerContainer className="space-y-4">
+                        {requests.map((req, index) => (
+                          <SlideIn
+                            key={req.id}
+                            direction="up"
+                            distance={20}
+                            delay={index * 0.05}
+                          >
+                            <BorrowRequestCard
+                              req={req}
+                            />
+                          </SlideIn>
+                        ))}
+                      </StaggerContainer>
+                    </FadeIn>
+                  )}
+                </PaginatedContent>
+              </FadeUp>
             </div>
           </TabsContent>
-        ))}
-
-        <TabsContent value="requests" className="space-y-4">
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold">{t("borrowRequests")}</h3>
-              <p className="text-sm text-muted-foreground">
-                {t("borrowRequestsDesc")}
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
-              <div className="relative flex-1 w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={t("searchByNameOrTitle")}
-                  value={requestSearch}
-                  onChange={handleRequestSearchChange}
-                  className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
-                />
-              </div>
-            </div>
-            <PaginatedContent
-              currentPage={requestPagination.current_page}
-              lastPage={requestPagination.last_page}
-              total={requestPagination.total}
-              from={requestPagination.from}
-              to={requestPagination.to}
-              onPageChange={(page) =>
-                setRequestFilters((prev) => ({ ...prev, page }))
-              }
-            >
-              {loadingRequests ? (
-                <div className="space-y-4">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <DataLoading key={i} size="lg" />
-                  ))}
-                </div>
-              ) : requests.length === 0 ? (
-                <EmptyState
-                  icon={<ClipboardList />}
-                  title={t("noRequestsFound")}
-                  description={t("noRequestsFoundDesc")}
-                />
-              ) : (
-                <div className="space-y-4">
-                  {requests.map((req) => (
-                    <BorrowRequestCard
-                      key={req.id}
-                      req={req}
-                    />
-                  ))}
-                </div>
-              )}
-            </PaginatedContent>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+        </Tabs>
+      </FadeUp>
+    </StaggerContainer>
   );
 }
