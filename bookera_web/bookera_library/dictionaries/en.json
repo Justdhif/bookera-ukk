@@ -1934,7 +1934,18 @@
     "overdueUnreturnedBooks": "Unreturned Books",
     "overdueBooksUnit": "books",
     "overdueEstimatedFine": "Estimated Fine",
-    "overdueWarningNote": "The actual fine will be calculated when books are returned and may differ from this estimate. Please return books immediately to avoid larger fines."
+    "overdueWarningNote": "The actual fine will be calculated when books are returned and may differ from this estimate. Please return books immediately to avoid larger fines.",
+    "infoUser": "User Info",
+    "booksBorrowed": "Books Borrowed",
+    "borrowInfo": "Borrow Info",
+    "totalBooks": "Total Books",
+    "bookUnit": "{count} Book(s)",
+    "nimLabel": "NIM.",
+    "viewAll": "View all ({count})",
+    "showLess": "Show less",
+    "borrowDate": "Borrow Date",
+    "returnDate": "Return Date",
+    "detail": "Detail"
   },
   "borrow-request": {
     "title": "Borrow Requests",
@@ -1993,7 +2004,15 @@
     "cannotApproveNoStock": "Some approved books have no stock available. You cannot assign copies until stock is available.",
     "requestRejected": "Request Rejected",
     "noRejectReason": "No rejection reason was provided.",
-    "rejectHint": "The member can submit a new borrow request after this one has been rejected."
+    "rejectHint": "The member can submit a new borrow request after this one has been rejected.",
+    "infoUser": "User Info",
+    "booksBorrowed": "Books Borrowed",
+    "borrowInfo": "Borrow Info",
+    "totalBooks": "Total Books",
+    "bookUnit": "{count} Book(s)",
+    "nimLabel": "NIM.",
+    "viewAll": "View all ({count})",
+    "showLess": "Show less"
   },
   "category": {
     "title": "Categories",

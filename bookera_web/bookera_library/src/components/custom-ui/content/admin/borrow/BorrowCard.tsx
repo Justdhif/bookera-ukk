@@ -1,252 +1,286 @@
+"use client";
+
 import { Borrow } from "@/types/borrow";
 import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
-import BorrowDetailStatusBadge from "@/components/custom-ui/badge/BorrowDetailStatusBadge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import { Card, CardContent } from "@/components/ui/card";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { BookOpen, Calendar, User, Eye, Building2, Tag, Hash, ArrowRight } from "lucide-react";
+  BookOpen,
+  Calendar,
+  ChevronDown,
+  Mail,
+  Phone,
+  User,
+  Hash,
+  ExternalLink,
+} from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 interface BorrowCardProps {
   borrow: Borrow;
 }
 
-export function BorrowCard({ borrow }: BorrowCardProps) {
-  const t = useTranslations("public");
-  const tCommon = useTranslations("common");
-  
-  return (
-    <Card>
-      <CardHeader className="pb-4 border-b border-border/50 bg-muted/30">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              <CardTitle className="text-xl font-bold tracking-tight">
-                {t("borrowHash")}{borrow.id}
-              </CardTitle>
-              <BorrowStatusBadge status={borrow.status} />
-              <Badge variant="outline" className="text-[10px] font-mono border-dashed">
-                {borrow.borrow_code}
-              </Badge>
-            </div>
-            <CardDescription className="flex items-center gap-4 text-xs font-medium">
-              <span className="flex items-center gap-1.5 text-foreground/80">
-                <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-3 w-3 text-primary" />
-                </div>
-                {borrow.user?.profile?.full_name || borrow.user?.email || "Unknown User"}
-              </span>
-              <span className="flex items-center gap-1.5 text-foreground/80">
-                <Calendar className="h-3 w-3 text-muted-foreground" />
-                {format(new Date(borrow.borrow_date), "dd MMM yyyy")}
-              </span>
-              <span className="flex items-center gap-1.5 text-destructive bg-destructive/5 px-2 py-0.5 rounded-full">
-                <Calendar className="h-3 w-3" />
-                {t("returnLabel")}: {format(new Date(borrow.return_date), "dd MMM yyyy")}
-              </span>
-            </CardDescription>
-          </div>
-          <div className="flex gap-2 items-center self-end md:self-center">
-            {borrow.borrow_code && (
-              <Link href={`/admin/borrows/${borrow.borrow_code}`}>
-                <Button size="sm" variant="outline" className="h-8 gap-1">
-                  <Eye className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{tCommon("view")}</span>
-                </Button>
-              </Link>
-            )}
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-6">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground/70 flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              {t("borrowedBooks")} <span className="text-primary truncate max-w-37.5">
-                ({(borrow.borrow_details?.length || 0) > 0 ? borrow.borrow_details?.length : borrow.borrow_request?.borrow_request_details?.length || 0})
-              </span>
-            </h4>
-          </div>
-          
-          <div className="grid gap-4">
-            {(borrow.borrow_details?.length || 0) > 0 ? (
-              borrow.borrow_details.map((detail) => {
-                const book = detail.book_copy?.book;
-                const authors = book?.authors?.map(a => a.name).join(", ") || book?.author || tCommon("noData");
-                
-                return (
-                  <div
-                    key={detail.id}
-                    className="group flex flex-col sm:flex-row items-center sm:items-start gap-4 rounded-xl border border-border/50 bg-card p-4 hover:border-primary/30 hover:shadow-premium transition-all duration-300 overflow-hidden relative"
-                  >
-                    <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    
-                    <div className="relative w-24 h-32 sm:w-20 sm:h-28 shrink-0 shadow-lg group-hover:scale-105 transition-transform duration-300 z-10">
-                      <Image
-                        src={book?.cover_image || "/placeholder.png"}
-                        alt={book?.title || "Book"}
-                        fill
-                        className="object-cover rounded-lg"
-                        unoptimized
-                      />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0 space-y-2 z-10 w-full">
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <p className="font-bold text-base sm:text-lg tracking-tight truncate group-hover:text-primary transition-colors">
-                            {book?.title || tCommon("noData")}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[10px] font-bold uppercase text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
-                              <span className="truncate max-w-30">{authors}</span>
-                            </div>
-                            {book?.publishers && book.publishers.length > 0 && (
-                              <div className="flex items-center gap-1">
-                                <Building2 className="h-3 w-3" />
-                                <span className="truncate max-w-30">{book.publishers[0].name}</span>
-                              </div>
-                            )}
-                            {book?.isbn && (
-                              <div className="flex items-center gap-1">
-                                <Hash className="h-3 w-3" />
-                                <span className="truncate max-w-25">{book.isbn}</span>
-                              </div>
-                            )}
-                            {book?.publication_year && (
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                <span>{book.publication_year}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end gap-1.5 shrink-0">
-                          <BorrowDetailStatusBadge status={detail.status} className="text-[10px] h-6 px-3" />
-                          <Badge variant="secondary" className="font-mono text-[11px] h-6 px-2.5 bg-muted/80 backdrop-blur border-border/50">
-                            {detail.book_copy?.copy_code}
-                          </Badge>
-                        </div>
-                      </div>
-                      
-                      {book?.categories && book.categories.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 pt-1">
-                          {book.categories.slice(0, 3).map((cat) => (
-                            <Badge 
-                              key={cat.id} 
-                              variant="outline" 
-                              className="bg-primary/5 text-[10px] py-0 px-2.5 h-6 border-primary/20 text-primary/80 font-medium"
-                            >
-                              <Tag className="h-3 w-3 mr-1.5" />
-                              {cat.name}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
+const MAX_VISIBLE_BOOKS = 2;
 
-                      {detail.note && (
-                        <div className="mt-3 text-xs text-destructive/80 bg-destructive/5 border border-destructive/10 p-2.5 rounded-lg flex items-start gap-2">
-                          <span className="p-1 rounded-full bg-destructive/10">
-                            <Eye className="h-3 w-3" />
-                          </span>
-                          <div>
-                            <span className="font-bold block text-[10px] uppercase tracking-wider mb-0.5">{t("noteLabel")}</span>
-                            {detail.note}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+export function BorrowCard({ borrow }: BorrowCardProps) {
+  const t = useTranslations("borrow");
+  const tCommon = useTranslations("common");
+  const [showAll, setShowAll] = useState(false);
+
+  const borrowDetails = borrow.borrow_details || [];
+  const requestDetails = borrow.borrow_request?.borrow_request_details || [];
+  const hasBorrowDetails = borrowDetails.length > 0;
+
+  const books = hasBorrowDetails ? borrowDetails : requestDetails;
+  const visibleBooks = showAll ? books : books.slice(0, MAX_VISIBLE_BOOKS);
+  const hiddenCount = books.length - MAX_VISIBLE_BOOKS;
+
+  const profile = borrow.user?.profile;
+  const returnDate = new Date(borrow.return_date);
+  const isOverdue = borrow.status === "open" && returnDate < new Date();
+
+  return (
+    <Card className="transition-all duration-200 overflow-hidden relative group border-border/40 p-0 shadow-sm hover:shadow-md">
+      <CardContent className="p-0">
+        <div className="flex flex-col md:flex-row md:items-stretch min-h-[160px]">
+          {/* ── Col 1: INFO USER ── */}
+          <div className="flex-1 p-5 space-y-4">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/60">
+              {t("infoUser")}
+            </p>
+            <div className="flex items-start gap-5">
+              {profile?.avatar ? (
+                <div className="relative group/avatar shrink-0">
+                  <Image
+                    src={profile.avatar}
+                    alt={profile.full_name ?? ""}
+                    width={80}
+                    height={80}
+                    className="h-20 w-20 rounded-full object-cover ring-4 ring-primary/5 shadow-xl transition-transform duration-300 group-hover/avatar:scale-105"
+                    unoptimized
+                  />
+                  <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/5" />
+                </div>
+              ) : (
+                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/5 ring-4 ring-primary/5 shadow-inner">
+                  <User className="h-10 w-10 text-primary/30" />
+                </div>
+              )}
+
+              <div className="min-w-0 space-y-2 flex-1">
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-extrabold text-lg leading-tight text-foreground truncate group-hover:text-primary transition-colors">
+                      {profile?.full_name || borrow.user?.email || "-"}
+                    </p>
                   </div>
-                );
-              })
-            ) : (
-              borrow.borrow_request?.borrow_request_details?.map((detail) => {
-                const book = detail.book;
-                const authors = book?.authors?.map(a => a.name).join(", ") || book?.author || tCommon("noData");
-                
-                return (
-                  <div
-                    key={detail.id}
-                    className="group flex flex-col sm:flex-row items-center sm:items-start gap-4 rounded-xl border border-border/50 bg-card p-4 hover:border-primary/30 hover:shadow-premium transition-all duration-300 overflow-hidden relative"
-                  >
-                    <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    
-                    <div className="relative w-24 h-32 sm:w-20 sm:h-28 shrink-0 shadow-lg group-hover:scale-105 transition-transform duration-300 z-10">
-                      <Image
-                        src={book?.cover_image || "/placeholder.png"}
-                        alt={book?.title || "Book"}
-                        fill
-                        className="object-cover rounded-lg"
-                        unoptimized
-                      />
+
+                  {profile?.identification_number && (
+                    <div className="flex items-center gap-2 text-xs font-bold text-primary/80">
+                      <div className="p-0.5 rounded bg-primary/10">
+                        <Hash className="h-3 w-3 shrink-0" />
+                      </div>
+                      <span className="tracking-tight">
+                        {t("nimLabel")} {profile.identification_number}
+                      </span>
                     </div>
-                    
-                    <div className="flex-1 min-w-0 space-y-2 z-10 w-full">
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <p className="font-bold text-base sm:text-lg tracking-tight truncate group-hover:text-primary transition-colors">
-                            {book?.title || tCommon("noData")}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[10px] font-bold uppercase text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
-                              <span className="truncate max-w-30">{authors}</span>
-                            </div>
-                            {book?.isbn && (
-                              <div className="flex items-center gap-1">
-                                <Hash className="h-3 w-3" />
-                                <span className="truncate max-w-25">{book.isbn}</span>
-                              </div>
-                            )}
-                            {book?.publication_year && (
-                              <div className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                <span>{book.publication_year}</span>
-                              </div>
-                            )}
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1.5 pt-1">
+                  {borrow.user?.email && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground/90 font-medium">
+                      <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
+                      <span className="truncate">{borrow.user.email}</span>
+                    </div>
+                  )}
+
+                  {profile?.phone_number && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground/90 font-medium">
+                      <Phone className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
+                      <span>{profile.phone_number}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden md:flex py-5">
+            <Separator orientation="vertical" className="h-full bg-border/60" />
+          </div>
+          <Separator orientation="horizontal" className="md:hidden mx-5 w-auto" />
+
+          {/* ── Col 2: BUKU YANG DIPINJAM ── */}
+          <div className="flex-1 p-5 space-y-4">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/60">
+              {t("booksBorrowed")}
+            </p>
+
+            {books.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-4 text-center">
+                <BookOpen className="h-8 w-8 text-muted-foreground/20 mb-2" />
+                <p className="text-xs text-muted-foreground italic font-medium">
+                  {tCommon("noData")}
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-3">
+                  {visibleBooks.map((detail: any) => {
+                    const book = hasBorrowDetails
+                      ? detail.book_copy?.book
+                      : detail.book;
+                    return (
+                      <div
+                        key={detail.id}
+                        className="flex items-start gap-3 group/book"
+                      >
+                        {book?.cover_image ? (
+                          <div className="relative shrink-0 shadow-md group-hover/book:shadow-lg transition-all">
+                            <Image
+                              src={book.cover_image}
+                              alt={book.title}
+                              width={40}
+                              height={56}
+                              className="h-14 w-10 rounded-md object-cover transition-transform group-hover/book:scale-105"
+                              unoptimized
+                            />
+                            <div className="absolute inset-0 rounded-md ring-1 ring-inset ring-black/5" />
                           </div>
-                        </div>
-                        <div className="flex flex-col items-end gap-1.5 shrink-0">
-                          <Badge variant="outline" className="text-[10px] h-6 px-3 bg-amber-500/10 text-amber-500 border-amber-500/20">
-                            {tCommon("waiting")}
-                          </Badge>
+                        ) : (
+                          <div className="flex h-14 w-10 shrink-0 items-center justify-center rounded-md bg-muted/50 border border-border/50 shadow-sm">
+                            <BookOpen className="h-5 w-5 text-muted-foreground/30" />
+                          </div>
+                        )}
+                        <div className="min-w-0 space-y-0.5">
+                          <p className="font-bold leading-tight text-sm text-foreground line-clamp-1 group-hover/book:text-primary transition-colors">
+                            {book?.title || "-"}
+                          </p>
+                          <p className="text-[11px] font-bold text-muted-foreground/80 truncate uppercase tracking-tight">
+                            {book?.author || "-"}
+                          </p>
+                          {book?.isbn && (
+                            <p className="text-[10px] text-muted-foreground/50 font-mono tracking-tighter">
+                              ISBN: {book.isbn}
+                            </p>
+                          )}
                         </div>
                       </div>
-                      
-                      {book?.categories && book.categories.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 pt-1">
-                          {book.categories.slice(0, 3).map((cat) => (
-                            <Badge 
-                              key={cat.id} 
-                              variant="outline" 
-                              className="bg-primary/5 text-[10px] py-0 px-2.5 h-6 border-primary/20 text-primary/80 font-medium"
-                            >
-                              <Tag className="h-3 w-3 mr-1.5" />
-                              {cat.name}
-                            </Badge>
-                          ))}
-                        </div>
+                    );
+                  })}
+                </div>
+
+                {hiddenCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAll((prev) => !prev)}
+                    className="flex items-center gap-1.5 text-[11px] font-bold text-primary hover:text-primary/80 transition-colors mt-3 uppercase tracking-wider bg-primary/5 px-3 py-1.5 rounded-lg w-fit"
+                  >
+                    {showAll
+                      ? t("showLess")
+                      : t("viewAll", { count: books.length })}
+                    <ChevronDown
+                      className={cn(
+                        "h-3.5 w-3.5 transition-transform duration-300",
+                        showAll && "rotate-180"
                       )}
-                    </div>
-                  </div>
-                );
-              })
+                    />
+                  </button>
+                )}
+              </>
             )}
+          </div>
+
+          <div className="hidden md:flex py-5">
+            <Separator orientation="vertical" className="h-full bg-border/60" />
+          </div>
+          <Separator orientation="horizontal" className="md:hidden mx-5 w-auto" />
+
+          {/* ── Col 3: INFO PEMINJAMAN ── */}
+          <div className="flex-1 p-5 space-y-4">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/60">
+                {t("borrowInfo")}
+              </p>
+              <div className="flex items-center gap-2 shrink-0">
+                <BorrowStatusBadge
+                  status={borrow.status}
+                  className="h-6 px-2.5 text-[10px] font-black uppercase tracking-wider shadow-xs"
+                />
+                {borrow.borrow_code && (
+                  <Link href={`/admin/borrows/${borrow.borrow_code}`}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 px-3 text-[11px] font-bold border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all gap-1.5"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                      {t("detail")}
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2.5 text-sm">
+              <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-muted/20 border border-border/5">
+                <div className="flex items-center gap-2 text-muted-foreground font-medium">
+                  <div className="p-1 rounded-lg bg-background shadow-xs">
+                    <Calendar className="h-3.5 w-3.5 shrink-0" />
+                  </div>
+                  <span className="text-[11px] uppercase tracking-wider">
+                    {t("borrowDate")}
+                  </span>
+                </div>
+                <span className="font-bold text-foreground tracking-tight">
+                  {format(new Date(borrow.borrow_date), "dd MMM yyyy")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-muted/20 border border-border/5">
+                <div className="flex items-center gap-2 text-muted-foreground font-medium">
+                  <div className="p-1 rounded-lg bg-background shadow-xs">
+                    <Calendar className="h-3.5 w-3.5 shrink-0" />
+                  </div>
+                  <span className="text-[11px] uppercase tracking-wider">
+                    {t("returnDate")}
+                  </span>
+                </div>
+                <span
+                  className={cn(
+                    "font-bold tracking-tight",
+                    isOverdue ? "text-red-500 animate-pulse" : "text-foreground"
+                  )}
+                >
+                  {format(returnDate, "dd MMM yyyy")}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-1 flex items-center gap-4 rounded-2xl bg-brand-primary/30 px-5 py-4 border-2 border-brand-primary shadow-lg shadow-brand-primary/10">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-inner ring-1 ring-white/30">
+                <BookOpen className="h-6 w-6 text-white" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 leading-none">
+                  {t("totalBooks")}
+                </p>
+                <div className="text-2xl font-black leading-none text-white flex items-baseline gap-1.5">
+                  <span className="text-20 font-extrabold text-white uppercase tracking-wider">
+                    {t("bookUnit", { count: books.length })}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>
-      <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl -z-10 group-hover:bg-primary/20 transition-colors" />
     </Card>
   );
 }

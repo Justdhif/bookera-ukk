@@ -70,6 +70,7 @@ export function BorrowRequestAssignCopiesCard({
 
       const options: BookCopyOption[] = [];
       const preSelected: Record<number, number> = {};
+      const usedCopyIds = new Set<number>();
 
       for (const detail of requestDetails) {
         const res = await bookService.getById(detail.book_id);
@@ -83,8 +84,11 @@ export function BorrowRequestAssignCopiesCard({
           copies: available,
         });
 
-        if (available.length > 0) {
-          preSelected[detail.id] = available[0].id;
+        // Find the first available copy that hasn't been used yet for another detail in this request
+        const nextAvailable = available.find((c: BookCopy) => !usedCopyIds.has(c.id));
+        if (nextAvailable) {
+          preSelected[detail.id] = nextAvailable.id;
+          usedCopyIds.add(nextAvailable.id);
         }
       }
       setCopyOptions(options);
@@ -97,11 +101,18 @@ export function BorrowRequestAssignCopiesCard({
     }
   };
 
-  const hasUnavailableStock = copyOptions.some((opt) => opt.copies.length === 0);
+  const hasUnavailableStock = copyOptions.some((opt) => {
+    // For each book type, count how many copies are needed and how many are available
+    const bookId = requestDetails.find(d => d.id === opt.detailId)?.book_id;
+    const neededCount = requestDetails.filter(d => d.book_id === bookId).length;
+    return opt.copies.length < neededCount;
+  });
+
   const isFormValid =
     copyOptions.length > 0 &&
     !hasUnavailableStock &&
-    copyOptions.every((opt) => Boolean(selectedCopyIds[opt.detailId]));
+    copyOptions.every((opt) => Boolean(selectedCopyIds[opt.detailId])) &&
+    new Set(Object.values(selectedCopyIds)).size === Object.values(selectedCopyIds).length;
 
   const handleAssign = async () => {
     if (!isFormValid) {
@@ -111,8 +122,8 @@ export function BorrowRequestAssignCopiesCard({
 
     setIsSubmitting(true);
     try {
-      const copyIds = copyOptions.map((opt) => selectedCopyIds[opt.detailId]);
-      await borrowRequestService.assignBorrow(request.id, copyIds);
+      const assignments = selectedCopyIds;
+      await borrowRequestService.assignBorrow(request.id, assignments);
       toast.success(t("assignSuccess"));
       onAssigned();
     } catch (error: any) {
@@ -170,14 +181,27 @@ export function BorrowRequestAssignCopiesCard({
                       <SelectValue placeholder={t("selectCopyPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {opt.copies.map((copy) => (
-                        <SelectItem key={copy.id} value={String(copy.id)}>
-                          <span className="font-mono">{copy.copy_code}</span>
-                          <span className="ml-2 text-xs text-muted-foreground capitalize">
-                            {copy.status}
-                          </span>
-                        </SelectItem>
-                      ))}
+                      {opt.copies.map((copy) => {
+                        const isAlreadySelected = Object.entries(selectedCopyIds).some(
+                          ([detailId, selectedId]) =>
+                            Number(detailId) !== opt.detailId &&
+                            selectedId === copy.id,
+                        );
+                        return (
+                          <SelectItem
+                            key={copy.id}
+                            value={String(copy.id)}
+                            disabled={isAlreadySelected}
+                          >
+                            <div className="flex items-center justify-between w-full gap-4">
+                              <span className="font-mono">{copy.copy_code}</span>
+                              <span className="text-xs text-muted-foreground capitalize">
+                                {copy.status}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 )}

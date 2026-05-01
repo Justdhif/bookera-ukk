@@ -393,11 +393,32 @@ class BorrowRequestService
             }
 
             foreach ($pendingDetails as $index => $detail) {
-                $copy = BookCopy::where('id', $copyIds[$index])
+                // Support both indexed array and associative array (detail_id => copy_id)
+                $copyId = isset($copyIds[$detail->id]) ? $copyIds[$detail->id] : ($copyIds[$index] ?? null);
+
+                if (! $copyId) {
+                    abort(422, "ID salinan buku untuk detail #{$detail->id} tidak ditemukan.");
+                }
+
+                $copy = BookCopy::where('id', $copyId)
                     ->where('book_id', $detail->book_id)
                     ->where('status', 'available')
                     ->lockForUpdate()
-                    ->firstOrFail();
+                    ->first();
+
+                if (! $copy) {
+                    $exists = BookCopy::find($copyId);
+                    if (! $exists) {
+                        abort(404, "Salinan buku dengan ID {$copyId} tidak ditemukan.");
+                    }
+                    if ($exists->book_id !== $detail->book_id) {
+                        abort(422, "Salinan buku '{$exists->copy_code}' bukan milik buku '{$detail->book->title}'.");
+                    }
+                    if ($exists->status !== 'available') {
+                        abort(422, "Salinan buku '{$exists->copy_code}' sudah tidak tersedia (status: {$exists->status}). Silakan pilih salinan lain.");
+                    }
+                    abort(422, "Gagal menetapkan salinan buku '{$exists->copy_code}'.");
+                }
 
                 $detail->update([
                     'book_copy_id' => $copy->id,
@@ -476,11 +497,31 @@ class BorrowRequestService
             }
 
             foreach ($details as $index => $detail) {
-                $copy = BookCopy::where('id', $copyIds[$index])
+                $copyId = isset($copyIds[$detail->id]) ? $copyIds[$detail->id] : ($copyIds[$index] ?? null);
+
+                if (! $copyId) {
+                    abort(422, "ID salinan buku untuk detail #{$detail->id} tidak ditemukan.");
+                }
+
+                $copy = BookCopy::where('id', $copyId)
                     ->where('book_id', $detail->book_id)
                     ->where('status', 'available')
                     ->lockForUpdate()
-                    ->firstOrFail();
+                    ->first();
+
+                if (! $copy) {
+                    $exists = BookCopy::find($copyId);
+                    if (! $exists) {
+                        abort(404, "Salinan buku dengan ID {$copyId} tidak ditemukan.");
+                    }
+                    if ($exists->book_id !== $detail->book_id) {
+                        abort(422, "Salinan buku '{$exists->copy_code}' bukan milik buku '{$detail->book->title}'.");
+                    }
+                    if ($exists->status !== 'available') {
+                        abort(422, "Salinan buku '{$exists->copy_code}' sudah tidak tersedia (status: {$exists->status}). Silakan pilih salinan lain.");
+                    }
+                    abort(422, "Gagal menetapkan salinan buku '{$exists->copy_code}'.");
+                }
 
                 BorrowDetail::create([
                     'borrow_id'    => $borrow->id,

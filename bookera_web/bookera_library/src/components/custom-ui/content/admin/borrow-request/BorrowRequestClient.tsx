@@ -14,6 +14,7 @@ import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import { Input } from "@/components/ui/input";
 import BorrowRequestListItem from "./BorrowRequestListItem";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import { StaggerContainer, FadeUp, FadeIn, SlideIn } from "@/components/custom-ui/motion";
 
 export default function BorrowRequestClient() {
   const router = useRouter();
@@ -78,51 +79,67 @@ export default function BorrowRequestClient() {
 
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("title")}
-        description={t("description")}
-        isAdmin
-      />
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder={t("searchRequests")}
-            value={searchInput}
-            onChange={handleSearchChange}
-            className="pl-9"
-          />
-        </div>
-      </div>
-      <PaginatedContent
-        currentPage={pagination.current_page}
-        lastPage={pagination.last_page}
-        total={pagination.total}
-        from={pagination.from}
-        to={pagination.to}
-        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
-      >
-        {loading ? (
-          <DataLoading size="lg" />
-        ) : requests.length === 0 ? (
-          <EmptyState
-            icon={<ClipboardList />}
-            title={t("noRequests")}
-            description={t("noRequestsDesc")}
-          />
-        ) : (
-          <div className="space-y-4">
-            {requests.map((req) => (
-              <BorrowRequestListItem
-                key={req.id}
-                request={req}
-              />
-            ))}
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("title")}
+          description={t("description")}
+          isAdmin
+        />
+      </FadeUp>
+      
+      <FadeUp delay={0.1}>
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder={t("searchRequests")}
+              value={searchInput}
+              onChange={handleSearchChange}
+              className="pl-9 h-11! shadow-sm transition-all duration-300"
+            />
           </div>
-        )}
-      </PaginatedContent>
+        </div>
+      </FadeUp>
 
-    </div>
+      <FadeUp delay={0.2}>
+        <PaginatedContent
+          currentPage={pagination.current_page}
+          lastPage={pagination.last_page}
+          total={pagination.total}
+          from={pagination.from}
+          to={pagination.to}
+          onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+        >
+          {loading ? (
+            <FadeIn key="loading" className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <DataLoading key={i} size="lg" />
+              ))}
+            </FadeIn>
+          ) : requests.length === 0 ? (
+            <FadeIn key="empty">
+              <EmptyState
+                icon={<ClipboardList />}
+                title={t("noRequests")}
+                description={t("noRequestsDesc")}
+              />
+            </FadeIn>
+          ) : (
+            <FadeIn key="content">
+              <StaggerContainer className="space-y-4">
+                {requests.map((req, index) => (
+                  <SlideIn key={req.id} direction="up" distance={20} delay={index * 0.05}>
+                    <BorrowRequestListItem
+                      request={req}
+                    />
+                  </SlideIn>
+                ))}
+              </StaggerContainer>
+            </FadeIn>
+          )}
+        </PaginatedContent>
+      </FadeUp>
+    </StaggerContainer>
   );
 }

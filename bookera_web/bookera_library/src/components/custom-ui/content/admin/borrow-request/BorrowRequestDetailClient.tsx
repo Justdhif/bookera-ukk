@@ -14,6 +14,7 @@ import BorrowRequestRejectReasonCard from "./BorrowRequestRejectReasonCard";
 import BorrowRequestRejectDialog from "./BorrowRequestRejectDialog";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { BorrowRequestAssignCopiesCard } from "./BorrowRequestAssignCopiesCard";
+import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion";
 
 export default function AdminBorrowRequestDetailClient() {
   const router = useRouter();
@@ -96,45 +97,58 @@ export default function AdminBorrowRequestDetailClient() {
   const isBusy = actionLoading !== null;
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={`${tCommon("request")} #${request?.id || requestId}`}
-        description={t("requestInfoDesc")}
-        showBackButton
-        isAdmin
-      />
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={`${tCommon("request")} #${request?.id || requestId}`}
+          description={t("requestInfoDesc")}
+          showBackButton
+          isAdmin
+        />
+      </FadeUp>
 
       {loading ? (
-        <DataLoading size="lg" />
+        <FadeIn>
+          <DataLoading size="lg" />
+        </FadeIn>
       ) : !request ? (
-        <div className="flex flex-col items-center justify-center min-h-[400px] text-muted-foreground italic">
+        <FadeIn className="flex flex-col items-center justify-center min-h-[400px] text-muted-foreground italic">
           {t("loadDetailError")}
-        </div>
+        </FadeIn>
       ) : (
-        <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
-            <BorrowRequestSummaryCard request={request} />
-            <BorrowRequestInfoCard request={request} />
+            <FadeUp delay={0.1}>
+              <BorrowRequestSummaryCard request={request} />
+            </FadeUp>
+            <FadeUp delay={0.2}>
+              <BorrowRequestInfoCard request={request} />
+            </FadeUp>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <BorrowRequestBooksCard
-              request={request}
-              onApproveDetail={handleApproveDetail}
-              onRejectDetail={handleOpenRejectDialog}
-              loadingDetailId={actionLoading?.detailId ?? null}
-              loadingAction={actionLoading?.action ?? null}
-              disabled={isBusy}
-            />
-            {request.approval_status === "rejected" ? (
-              <BorrowRequestRejectReasonCard request={request} />
-            ) : (
-              <BorrowRequestAssignCopiesCard
+            <FadeUp delay={0.3}>
+              <BorrowRequestBooksCard
                 request={request}
-                onAssigned={fetchRequest}
+                onApproveDetail={handleApproveDetail}
+                onRejectDetail={handleOpenRejectDialog}
+                loadingDetailId={actionLoading?.detailId ?? null}
+                loadingAction={actionLoading?.action ?? null}
                 disabled={isBusy}
               />
-            )}
+            </FadeUp>
+            
+            <FadeUp delay={0.4}>
+              {request.approval_status === "rejected" ? (
+                <BorrowRequestRejectReasonCard request={request} />
+              ) : (
+                <BorrowRequestAssignCopiesCard
+                  request={request}
+                  onAssigned={fetchRequest}
+                  disabled={isBusy}
+                />
+              )}
+            </FadeUp>
           </div>
 
           <BorrowRequestRejectDialog
@@ -145,6 +159,6 @@ export default function AdminBorrowRequestDetailClient() {
           />
         </div>
       )}
-    </div>
+    </StaggerContainer>
   );
 }

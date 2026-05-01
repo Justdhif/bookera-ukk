@@ -38,7 +38,7 @@ export const borrowRequestService = {
       responseType: "blob",
     }),
 
-  assignBorrow: (id: number, copyIds: number[] = []) =>
+  assignBorrow: (id: number, copyIds: number[] | Record<number, number> = []) =>
     api.post<ApiResponse<Borrow>>(`/admin/borrow-requests/${id}/assign`, {
       copy_ids: copyIds,
     }),
