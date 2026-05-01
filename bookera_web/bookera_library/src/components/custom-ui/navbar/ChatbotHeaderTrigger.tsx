@@ -15,7 +15,7 @@ export default function ChatbotHeaderTrigger() {
   const t = useTranslations("chatbot");
   const user = useAuthStore((state) => state.user);
 
-  if (user?.role !== "member") {
+  if (!user || user.role === "user") {
     return null;
   }
 

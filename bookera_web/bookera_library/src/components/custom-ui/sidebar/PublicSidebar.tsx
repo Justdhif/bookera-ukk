@@ -116,7 +116,7 @@ export default function PublicSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          {user?.role === "member" && (
+          {user?.role !== "user" && (
             <SidebarMenuItem
               className={cn(!open && "w-full flex justify-center mt-2")}
             >

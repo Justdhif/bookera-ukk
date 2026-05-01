@@ -34,8 +34,8 @@ export default function ReservationButton({
     return null;
   }
 
-  // Only members can reserve
-  if (user.role !== 'member') {
+  // Only members and staff can reserve
+  if (!user || user.role === 'user') {
     return null;
   }
 

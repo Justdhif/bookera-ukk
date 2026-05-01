@@ -1,4 +1,5 @@
 "use client";
+
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -19,16 +20,12 @@ import { userService } from "@/services/user.service";
 import { NotificationSettings } from "@/types/user";
 import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
+
 export default function SettingsNotificationCard() {
   const t = useTranslations("settings");
   const user = useAuthStore((state) => state.user);
-  const isMember = user?.role === 'member';
+  const isUser = user?.role === 'user';
 
-  if (user?.role === 'user') {
-    return null;
-  }
-  const userSlug = user?.slug;
-  const profileHref = userSlug ? `/${userSlug}/profile` : "/profile";
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
@@ -37,7 +34,10 @@ export default function SettingsNotificationCard() {
     notification_email: false,
     notification_whatsapp: false,
   });
+
   useEffect(() => {
+    if (!user) return;
+    
     const fetchData = async () => {
       try {
         const [settingsRes, meRes] = await Promise.all([
@@ -52,7 +52,15 @@ export default function SettingsNotificationCard() {
       }
     };
     fetchData();
-  }, []);
+  }, [user]);
+
+  if (!user) {
+    return null;
+  }
+
+  const userSlug = user?.slug;
+  const profileHref = userSlug ? `/${userSlug}/profile` : "/profile";
+
   const hasPhone = Boolean(phoneNumber);
   const handleMasterToggle = (checked: boolean) => {
     setSettings((prev) => ({ ...prev, notification_enabled: checked }));
@@ -185,11 +193,11 @@ export default function SettingsNotificationCard() {
                     checked={
                       settings.notification_enabled &&
                       hasPhone &&
-                      isMember &&
+                      !isUser &&
                       settings.notification_whatsapp
                     }
                     onCheckedChange={handleWhatsappToggle}
-                    disabled={!settings.notification_enabled || !hasPhone || !isMember}
+                    disabled={!settings.notification_enabled || !hasPhone || isUser}
                   />
                 </div>
                 {!hasPhone && (
@@ -203,7 +211,7 @@ export default function SettingsNotificationCard() {
                     </Link>
                   </p>
                 )}
-                {!isMember && (
+                {isUser && (
                    <p className="text-xs text-amber-600 dark:text-amber-400 pl-1">
                      {t("memberOnlyNotification", { defaultValue: "WhatsApp notifications are available for members only." })}
                    </p>

@@ -115,8 +115,8 @@ export function ChatbotWidget() {
   const { isOpen, setIsOpen, hasUnread, setHasUnread } = useChatbotStore();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  // Only members can see and use the chatbot
-  if (user?.role !== "member") return null;
+  // Only members and staff can see and use the chatbot
+  if (!user || user.role === "user") return null;
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -190,7 +190,7 @@ export function ChatbotWidget() {
   const handleSendMessage = async (text: string): Promise<void> => {
     const user = useAuthStore.getState().user;
     const msgText = text.trim();
-    if (!msgText || isLoading || user?.role === 'user') return;
+    if (!msgText || isLoading || !user || user.role === 'user') return;
 
     setMessages((prev) => [...prev, { id: `user-${Date.now()}`, role: "user", content: msgText, timestamp: new Date() }]);
     setInput("");

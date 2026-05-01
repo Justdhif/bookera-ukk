@@ -46,7 +46,8 @@ export default function FavoriteButton({ bookId }: FavoriteButtonProps) {
     }
   };
 
-  if (!isAuthenticated) {
+  const user = useAuthStore((state) => state.user);
+  if (!isAuthenticated || !user || user.role === 'user') {
     return null;
   }
 
