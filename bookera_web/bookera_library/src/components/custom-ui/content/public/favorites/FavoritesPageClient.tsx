@@ -6,12 +6,19 @@ import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { Book } from "@/types/book";
 import BorrowRequestDialog from "@/components/custom-ui/content/public/book-detail/BorrowRequestDialog";
 import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid";
+import { useAuthStore } from "@/store/auth.store";
 
 export default function FavoritesPageClient() {
   const t = useTranslations("public.favorites");
+  const user = useAuthStore((state) => state.user);
+  const initialLoading = useAuthStore((state) => state.initialLoading);
   const [selectedBookIds, setSelectedBookIds] = useState<number[]>([]);
   const [showBorrowModal, setShowBorrowModal] = useState(false);
   const [visibleBooks, setVisibleBooks] = useState<Book[]>([]);
+
+  if (initialLoading || !user || user.role === "user") {
+    return null;
+  }
 
   const handleSelectBook = (bookId: number, checked: boolean) => {
     if (checked) {
@@ -32,26 +39,25 @@ export default function FavoritesPageClient() {
   return (
     <div className="container space-y-6">
       <div className="space-y-6">
-        <ContentHeader
-          title={t("title")}
-          description={t("description")}
-        />
+        <ContentHeader title={t("title")} description={t("description")} />
       </div>
-      
+
       <div className="space-y-3">
-          <PublicBookGrid 
-            fetchMode="favorites"
-            onSelectAll={handleSelectAll}
-            onBorrowRequest={() => setShowBorrowModal(true)}
-            selectedBookIds={selectedBookIds}
-            onSelectionChange={handleSelectBook}
-            onVisibleBooksChange={setVisibleBooks}
-          />
+        <PublicBookGrid
+          fetchMode="favorites"
+          onSelectAll={handleSelectAll}
+          onBorrowRequest={() => setShowBorrowModal(true)}
+          selectedBookIds={selectedBookIds}
+          onSelectionChange={handleSelectBook}
+          onVisibleBooksChange={setVisibleBooks}
+        />
       </div>
 
       <BorrowRequestDialog
         bookIds={selectedBookIds}
-        initialBooks={visibleBooks.filter((book) => selectedBookIds.includes(book.id))}
+        initialBooks={visibleBooks.filter((book) =>
+          selectedBookIds.includes(book.id),
+        )}
         isOpen={showBorrowModal}
         onClose={() => setShowBorrowModal(false)}
         onSuccess={() => {

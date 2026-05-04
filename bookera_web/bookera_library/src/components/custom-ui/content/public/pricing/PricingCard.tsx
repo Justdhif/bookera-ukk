@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { Sparkles, Crown, Check, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -10,6 +11,8 @@ import { MemberBadgeIcon } from "@/components/custom-ui/badge/MemberBadge";
 interface PricingCardProps {
   plan: MembershipPlan;
   isCurrentPlan: boolean;
+  isLoggedIn: boolean;
+  isAuthLoading: boolean;
   isLoading: boolean;
   snapLoaded: boolean;
   onPay: (planId: string) => void;
@@ -18,12 +21,15 @@ interface PricingCardProps {
 export default function PricingCard({
   plan,
   isCurrentPlan,
+  isLoggedIn,
+  isAuthLoading,
   isLoading,
   snapLoaded,
   onPay,
 }: PricingCardProps) {
   const tp = useTranslations("pricing");
   const tc = useTranslations("common");
+  const showLoginButton = !isAuthLoading && !isLoggedIn;
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("id-ID", {
@@ -130,20 +136,33 @@ export default function PricingCard({
             </div>
 
             <div className="shrink-0">
-              <Button
-                variant="brand"
-                size="lg"
-                className="w-full sm:w-auto min-w-[240px] h-16 rounded-2xl text-xl font-black shadow-2xl shadow-brand-primary/30 hover:shadow-brand-primary/40 hover:-translate-y-1 active:scale-95 transition-all duration-300"
-                disabled={isLoading || !snapLoaded}
-                onClick={() => onPay(String(plan.id))}
-              >
-                {isLoading ? (
-                  <Loader2 className="w-6 h-6 animate-spin mr-3" />
-                ) : (
-                  <Sparkles className="w-5 h-5 mr-3" />
-                )}
-                {tp("upgradeNow")}
-              </Button>
+              {showLoginButton ? (
+                <Link href="/login?redirect=/pricing">
+                  <Button
+                    variant="brand"
+                    size="lg"
+                    className="w-full sm:w-auto min-w-60 h-16 rounded-2xl text-xl font-black shadow-2xl shadow-brand-primary/30 hover:shadow-brand-primary/40 hover:-translate-y-1 active:scale-95 transition-all duration-300"
+                  >
+                    <Sparkles className="w-5 h-5 mr-3" />
+                    {tp("loginNow")}
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  variant="brand"
+                  size="lg"
+                  className="w-full sm:w-auto min-w-60 h-16 rounded-2xl text-xl font-black shadow-2xl shadow-brand-primary/30 hover:shadow-brand-primary/40 hover:-translate-y-1 active:scale-95 transition-all duration-300"
+                  disabled={isLoading || !snapLoaded}
+                  onClick={() => onPay(String(plan.id))}
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-6 h-6 animate-spin mr-3" />
+                  ) : (
+                    <Sparkles className="w-5 h-5 mr-3" />
+                  )}
+                  {tp("upgradeNow")}
+                </Button>
+              )}
             </div>
           </div>
         )}

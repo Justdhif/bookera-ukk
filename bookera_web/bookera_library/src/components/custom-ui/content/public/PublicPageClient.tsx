@@ -13,8 +13,10 @@ import { useAuthStore } from "@/store/auth.store";
 export default function PublicPageClient() {
   const t = useTranslations("navbar");
   const user = useAuthStore((state) => state.user);
-  const userSlug = user?.slug;
-  const favoriteHref = userSlug ? `/${userSlug}/favorites` : "/login";
+  const canUseFavoriteAction = Boolean(user && user.role !== "user");
+  const favoriteHref = "/favorites";
+  const myBorrowsHref = user ? "/my-borrows" : "/login?redirect=/my-borrows";
+  const myFinesHref = user ? "/my-fines" : "/login?redirect=/my-fines";
 
   return (
     <div className="space-y-8 pb-10">
@@ -30,7 +32,7 @@ export default function PublicPageClient() {
 
         <div className="space-y-6">
           <div className="flex flex-wrap items-center gap-3">
-            {user?.role !== 'user' && (
+            {canUseFavoriteAction && (
               <>
                 <Link href={favoriteHref}>
                   <Button
@@ -42,21 +44,21 @@ export default function PublicPageClient() {
                     {t("myFavorites")}
                   </Button>
                 </Link>
-
-                <Link href="/my-borrows">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 h-10 px-5 border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/5 hover:text-emerald-600 rounded-full shadow-sm"
-                  >
-                    <BookOpen className="h-4 w-4" />
-                    {t("myBorrows")}
-                  </Button>
-                </Link>
               </>
             )}
 
-            <Link href="/my-fines">
+            <Link href={myBorrowsHref}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 h-10 px-5 border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/5 hover:text-emerald-600 rounded-full shadow-sm"
+              >
+                <BookOpen className="h-4 w-4" />
+                {t("myBorrows")}
+              </Button>
+            </Link>
+
+            <Link href={myFinesHref}>
               <Button
                 variant="outline"
                 size="sm"

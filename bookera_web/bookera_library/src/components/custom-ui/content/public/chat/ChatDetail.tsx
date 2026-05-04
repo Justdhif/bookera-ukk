@@ -203,7 +203,7 @@ export default function ChatDetail({
         className,
       )}
     >
-      <div className="p-4 flex items-center justify-between bg-card/95 backdrop-blur-sm z-10 shrink-0 h-[68px]">
+      <div className="p-4 flex items-center justify-between bg-card/95 backdrop-blur-sm z-10 shrink-0 h-17">
         <Link
           href={`/${activeUser.slug}`}
           className="flex items-center gap-3 hover:opacity-80 transition-opacity group min-w-0"

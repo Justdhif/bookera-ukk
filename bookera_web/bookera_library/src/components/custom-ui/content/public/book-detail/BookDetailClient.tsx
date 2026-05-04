@@ -60,10 +60,11 @@ export default function BookDetailClient() {
   const tPublic = useTranslations("public");
 
   const { isAdmin } = usePathnameCondition();
-  const { isAuthenticated } = useAuthStore();
+  const { user } = useAuthStore();
   const router = useRouter();
   const params = useParams();
   const slug = params.slug as string;
+  const canUseMemberActions = Boolean(user && user.role !== "user");
 
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
@@ -174,10 +175,12 @@ export default function BookDetailClient() {
         });
         setCoverPreview(bookData.cover_image || "");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const loadError = error as { response?: { data?: { message?: string } } };
+
       if (isAdmin) {
         toast.error(
-          error.response?.data?.message || "Failed to load book data",
+          loadError.response?.data?.message || "Failed to load book data",
         );
         router.push("/admin/books");
       } else {
@@ -257,8 +260,9 @@ export default function BookDetailClient() {
       toast.success(tAdmin("updateSuccess"));
       setIsEditMode(false);
       fetchBook();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || tAdmin("updateError"));
+    } catch (error: unknown) {
+      const updateError = error as { response?: { data?: { message?: string } } };
+      toast.error(updateError.response?.data?.message || tAdmin("updateError"));
     } finally {
       setSubmitting(false);
     }
@@ -302,7 +306,7 @@ export default function BookDetailClient() {
         isAdmin={isAdmin}
         rightActions={
           isAdmin ? null : (
-            book && isAuthenticated && (
+            book && canUseMemberActions && (
               <div className="flex flex-wrap items-center gap-3">
                 <FavoriteButton bookId={book.id} />
                 {/* Show AddToRequest only when stock is available OR user has a notified reservation */}

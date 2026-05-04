@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User } from "@/types/user";
 import { MessageSquare, AlertCircle } from "lucide-react";
 import PublicDiscussionGrid from "../../PublicDiscussionGrid";
-import PublicComplaintGrid from "../../PublicComplaintGrid";
+import PublicComplaintGrid from "../../complaints/PublicComplaintGrid";
 
 interface ProfileActivityTabsProps {
   user: User;

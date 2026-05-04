@@ -11,22 +11,25 @@ import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { cn } from "@/lib/utils";
 import PublicComplaintFilters from "./PublicComplaintFilters";
-import ComplaintFormSheet from "./complaints/ComplaintFormSheet";
+import ComplaintFormSheet from "./ComplaintFormSheet";
 import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { usePathnameCondition } from "@/hooks/usePathnameCondition";
+import { FadeUp, StaggerContainer } from "@/components/custom-ui/motion";
 
 interface PublicComplaintGridProps {
   search?: string;
   showFilters?: boolean;
   userId?: number;
+  refreshToken?: number;
 }
 
 export default function PublicComplaintGrid({
   search,
   showFilters = true,
   userId,
+  refreshToken,
 }: PublicComplaintGridProps) {
   const t = useTranslations("complaint");
   const { isAuthenticated } = useAuthStore();
@@ -50,7 +53,7 @@ export default function PublicComplaintGrid({
 
   useEffect(() => {
     resetPagination();
-  }, [search, category, status]);
+  }, [search, category, status, refreshToken]);
 
   useEffect(() => {
     const requestId = ++requestIdRef.current;
@@ -99,7 +102,7 @@ export default function PublicComplaintGrid({
     return () => {
       active = false;
     };
-  }, [page, search, category, status]);
+  }, [page, search, category, status, refreshToken]);
 
   const handleLoadMore = () => {
     if (loading || loadingMore || page >= totalPages) return;
@@ -109,77 +112,87 @@ export default function PublicComplaintGrid({
   const tExplore = useTranslations("explore");
 
   return (
-    <div className={cn("space-y-6", !showFilters && "space-y-0")}>
+    <StaggerContainer className={cn("space-y-6", !showFilters && "space-y-0")}>
       {showFilters && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4">
-        {isAuthenticated && isExplore && (
-          <div className="flex items-center gap-4 px-4 py-2 bg-muted/40 rounded-full border border-border/50 shadow-sm backdrop-blur-sm shrink-0 w-fit">
-            <p className="hidden md:block text-xs font-medium text-muted-foreground">
-              {t("welcomeSubtitle")}
-            </p>
-            <div className="hidden md:block w-px h-5 bg-border/80"></div>
-            <ComplaintFormSheet
-              onSuccess={resetPagination}
-              trigger={
-                <Button
-                  variant="submit"
-                  size="sm"
-                  className="h-8 gap-2 rounded-full px-5 shadow-xs transition-all hover:scale-[1.02]"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  {t("submitButton")}
-                </Button>
-              }
-            />
+        <FadeUp>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4">
+            {isAuthenticated && isExplore && (
+              <div className="flex items-center gap-4 px-4 py-2 bg-muted/40 rounded-full border border-border/50 shadow-sm backdrop-blur-sm shrink-0 w-fit">
+                <p className="hidden md:block text-xs font-medium text-muted-foreground">
+                  {t("welcomeSubtitle")}
+                </p>
+                <div className="hidden md:block w-px h-5 bg-border/80"></div>
+                <ComplaintFormSheet
+                  onSuccess={resetPagination}
+                  trigger={
+                    <Button
+                      variant="submit"
+                      size="sm"
+                      className="h-8 gap-2 rounded-full px-5 shadow-xs transition-all hover:scale-[1.02]"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      {t("submitButton")}
+                    </Button>
+                  }
+                />
+              </div>
+            )}
+          </div>
+        </FadeUp>
+      )}
+
+      {showFilters && (
+        <FadeUp delay={0.08}>
+          <PublicComplaintFilters
+            selectedCategory={category}
+            onCategoryChange={setCategory}
+            selectedStatus={status}
+            onStatusChange={setStatus}
+            totalCount={total}
+          />
+        </FadeUp>
+      )}
+
+      <FadeUp delay={0.16}>
+        {loading && complaints.length === 0 ? (
+          <DataLoading />
+        ) : complaints.length === 0 ? (
+          <EmptyState
+            icon={<AlertCircle />}
+            title={
+              search
+                ? tExplore("noComplaintsFound")
+                : tExplore("complaintsSubtitle")
+            }
+            description={
+              search ? tExplore("noComplaintsDesc") : tExplore("firstComplaint")
+            }
+            variant="compact"
+          />
+        ) : (
+          <div className="space-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {complaints.map((complaint, index) => (
+                <PublicComplaintCard
+                  key={complaint.id}
+                  complaint={complaint}
+                  delay={index * 0.05}
+                />
+              ))}
+            </div>
+
+            {page < totalPages && (
+              <div className="flex justify-center pt-4">
+                <LoadMoreButton
+                  onClick={handleLoadMore}
+                  loading={loadingMore}
+                  variant="outline"
+                />
+              </div>
+            )}
           </div>
         )}
-      </div>
-      )}
-
-      {showFilters && (
-        <PublicComplaintFilters
-          selectedCategory={category}
-          onCategoryChange={setCategory}
-          selectedStatus={status}
-          onStatusChange={setStatus}
-          totalCount={total}
-        />
-      )}
-
-      {loading && complaints.length === 0 ? (
-        <DataLoading />
-      ) : complaints.length === 0 ? (
-        <EmptyState
-          icon={<AlertCircle />}
-          title={
-            search
-              ? tExplore("noComplaintsFound")
-              : tExplore("complaintsSubtitle")
-          }
-          description={
-            search ? tExplore("noComplaintsDesc") : tExplore("firstComplaint")
-          }
-          variant="compact"
-        />
-      ) : (
-        <div className="space-y-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {complaints.map((complaint) => (
-              <PublicComplaintCard key={complaint.id} complaint={complaint} />
-            ))}
-          </div>
-
-          {page < totalPages && (
-            <div className="flex justify-center pt-4">
-              <LoadMoreButton
-                onClick={handleLoadMore}
-                loading={loadingMore}
-                variant="outline"
-              />
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+      </FadeUp>
+    </StaggerContainer>
   );
 }

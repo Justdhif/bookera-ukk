@@ -21,11 +21,12 @@ import { Badge } from "@/components/ui/badge";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import PublicComplaintGrid from "../PublicComplaintGrid";
+import PublicComplaintGrid from "../complaints/PublicComplaintGrid";
 import CommentSection from "@/components/custom-ui/CommentSection";
 import ImageCarousel from "@/components/custom-ui/ImageCarousel";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
+import { FadeUp, StaggerContainer } from "@/components/custom-ui/motion";
 
 import {
   MessageCircle,
@@ -176,16 +177,19 @@ export default function ComplaintDetailClient() {
     );
 
   return (
-    <div className="space-y-8 pb-12">
-      <ContentHeader
-        title={t("detailTitle")}
-        description={t("detailDesc")}
-        showBackButton
-      />
+    <StaggerContainer className="space-y-8 pb-12">
+      <FadeUp>
+        <ContentHeader
+          title={t("detailTitle")}
+          description={t("detailDesc")}
+          showBackButton
+        />
+      </FadeUp>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        <div className="space-y-8 lg:sticky lg:top-4">
-          <Card className="overflow-hidden border-2 border-muted/50 bg-card/40 backdrop-blur-md shadow-xl rounded-3xl">
+      <FadeUp delay={0.08}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          <div className="space-y-8 lg:sticky lg:top-4">
+            <Card className="overflow-hidden border-2 border-muted/50 bg-card/40 backdrop-blur-md shadow-xl rounded-3xl">
             <CardHeader className="p-8 pb-4 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-muted/30">
                 <div className="flex items-center gap-3">
@@ -395,35 +399,38 @@ export default function ComplaintDetailClient() {
           </Card>
         </div>
 
-        <div className="space-y-6 lg:sticky lg:top-4">
-          <div className="space-y-6">
-            <CommentSection
-              entitySlug={slug}
-              commentCount={complaint.comments_count}
-              onCommentCountChange={(count) =>
-                setComplaint((prev) =>
-                  prev ? { ...prev, comments_count: count } : prev,
-                )
-              }
-              namespace="complaint"
-              getComments={complaintService.getComments}
-              createComment={complaintService.createComment}
-            />
+          <div className="space-y-6 lg:sticky lg:top-4">
+            <div className="space-y-6">
+              <CommentSection
+                entitySlug={slug}
+                commentCount={complaint.comments_count}
+                onCommentCountChange={(count) =>
+                  setComplaint((prev) =>
+                    prev ? { ...prev, comments_count: count } : prev,
+                  )
+                }
+                namespace="complaint"
+                getComments={complaintService.getComments}
+                createComment={complaintService.createComment}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </FadeUp>
 
-      <div className="pt-12 mt-8 border-t border-muted/30">
-        <div className="mb-10">
-          <h2 className="text-3xl font-black tracking-tight">
-            {t("exploreOtherComplaints")}
-          </h2>
-          <p className="text-muted-foreground font-medium mt-2">
-            {t("exploreOtherComplaintsDesc")}
-          </p>
+      <FadeUp delay={0.16}>
+        <div className="pt-12 mt-8 border-t border-muted/30">
+          <div className="mb-10">
+            <h2 className="text-3xl font-black tracking-tight">
+              {t("exploreOtherComplaints")}
+            </h2>
+            <p className="text-muted-foreground font-medium mt-2">
+              {t("exploreOtherComplaintsDesc")}
+            </p>
+          </div>
+          <PublicComplaintGrid />
         </div>
-        <PublicComplaintGrid />
-      </div>
-    </div>
+      </FadeUp>
+    </StaggerContainer>
   );
 }

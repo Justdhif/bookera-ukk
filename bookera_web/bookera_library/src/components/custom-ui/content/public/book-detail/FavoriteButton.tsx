@@ -16,16 +16,18 @@ interface FavoriteButtonProps {
 export default function FavoriteButton({ bookId }: FavoriteButtonProps) {
   const t = useTranslations("public");
   const { isAuthenticated } = useAuthStore();
+  const user = useAuthStore((state) => state.user);
+  const canUseFavorite = isAuthenticated && !!user && user.role !== "user";
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated || !bookId) return;
+    if (!canUseFavorite || !bookId) return;
     favoriteService
       .check(bookId)
       .then((res) => setIsFavorite(res.data.data.is_favorite))
       .catch(() => {});
-  }, [bookId, isAuthenticated]);
+  }, [bookId, canUseFavorite]);
 
   const handleToggle = async () => {
     setLoading(true);
@@ -39,15 +41,15 @@ export default function FavoriteButton({ bookId }: FavoriteButtonProps) {
         setIsFavorite(true);
         toast.success(t("addedToFavorites"));
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || t("actionFailed"));
+    } catch (error: unknown) {
+      const favoriteError = error as { response?: { data?: { message?: string } } };
+      toast.error(favoriteError.response?.data?.message || t("actionFailed"));
     } finally {
       setLoading(false);
     }
   };
 
-  const user = useAuthStore((state) => state.user);
-  if (!isAuthenticated || !user || user.role === 'user') {
+  if (!canUseFavorite) {
     return null;
   }
 

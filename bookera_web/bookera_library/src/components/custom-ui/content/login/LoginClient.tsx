@@ -1,6 +1,6 @@
 "use client";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth.store";
@@ -35,12 +35,26 @@ export const cardTransition = {
   opacity: { duration: 0.25 },
   scale: { duration: 0.25 },
 };
+
+type AuthError = {
+  response?: {
+    data?: {
+      message?: string;
+      data?: unknown;
+    };
+  };
+};
+
 export default function LoginClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const login = useAuthStore((s) => s.login);
   const register = useAuthStore((s) => s.register);
   const loading = useAuthStore((s) => s.loading);
   const t = useTranslations("login");
+  const redirectTarget = searchParams.get("redirect");
+  const safeRedirectTarget =
+    redirectTarget?.startsWith("/") ? redirectTarget : null;
   const FEATURES = [
     { icon: BookOpen, label: t("thousandsBooks") },
     { icon: GraduationCap, label: t("learningMaterials") },
@@ -62,13 +76,16 @@ export default function LoginClient() {
       // Tandai bahwa user sudah melewati landing page
       localStorage.setItem(LANDING_VISITED_KEY, "true");
 
-      if (user && !user.profile) {
+      if (safeRedirectTarget) {
+        router.push(safeRedirectTarget);
+      } else if (user && !user.profile) {
         router.push("/setup-profile");
       } else {
         router.push("/home");
       }
-    } catch (err: any) {
-      toast.error(err.response?.data?.message ?? t("loginFailed"));
+    } catch (err: unknown) {
+      const authError = err as AuthError;
+      toast.error(authError.response?.data?.message ?? t("loginFailed"));
     }
   };
 
@@ -83,11 +100,12 @@ export default function LoginClient() {
       // Tandai bahwa user sudah melewati landing page
       localStorage.setItem(LANDING_VISITED_KEY, "true");
       setMode("login");
-    } catch (err: any) {
-      const errorData = err.response?.data;
+    } catch (err: unknown) {
+      const authError = err as AuthError;
+      const errorData = authError.response?.data;
       if (errorData?.data && typeof errorData.data === "object") {
-        const errors = Object.values(errorData.data).flat();
-        errors.forEach((error: any) => toast.error(error));
+        const errors = Object.values(errorData.data as Record<string, string[]>).flat();
+        errors.forEach((errorMessage) => toast.error(errorMessage));
       } else {
         toast.error(errorData?.message ?? t("registrationFailed"));
       }

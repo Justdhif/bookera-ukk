@@ -200,8 +200,8 @@ export default function LandingPageClient() {
       <main className="flex-1 pt-24">
         <section className="relative pt-20 pb-32 overflow-hidden">
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-brand-primary/10 dark:bg-brand-primary/5 blur-[120px] -translate-y-1/2 translate-x-1/3" />
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-teal-400/10 dark:bg-teal-500/5 blur-[100px] translate-y-1/3 -translate-x-1/4" />
+            <div className="absolute top-0 right-0 w-150 h-150 rounded-full bg-brand-primary/10 dark:bg-brand-primary/5 blur-[120px] -translate-y-1/2 translate-x-1/3" />
+            <div className="absolute bottom-0 left-0 w-125 h-125 rounded-full bg-teal-400/10 dark:bg-teal-500/5 blur-[100px] translate-y-1/3 -translate-x-1/4" />
           </div>
 
           <div className="container mx-auto px-6 md:px-12 lg:px-20 relative z-10 text-center max-w-4xl">
@@ -352,7 +352,7 @@ export default function LandingPageClient() {
 
         <section className="relative py-24 bg-gray-950 dark:bg-black text-white overflow-hidden">
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-primary/20 blur-[150px] rounded-full" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-200 bg-brand-primary/20 blur-[150px] rounded-full" />
             <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
               <defs><pattern id="grid-dark" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1" /></pattern></defs>
               <rect width="100%" height="100%" fill="url(#grid-dark)" />
@@ -591,7 +591,7 @@ export default function LandingPageClient() {
                 </div>
               </div>
 
-              <div className="rounded-3xl overflow-hidden shadow-2xl h-[400px] border border-gray-200 dark:border-gray-800">
+              <div className="rounded-3xl overflow-hidden shadow-2xl h-100 border border-gray-200 dark:border-gray-800">
                 <iframe 
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.0738213049867!2d106.86741237507168!3d-6.384473862448673!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69ebaff005f277%3A0x9fcd41028665eea8!2sSMKS%20TARUNA%20BHAKTI%20DEPOK!5e0!3m2!1sen!2sid!4v1777427247665!5m2!1sen!2sid" 
                   width="100%" 

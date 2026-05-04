@@ -178,7 +178,7 @@ export default function ChatDetailSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="p-0 w-full sm:max-w-lg border-l-0 flex flex-col h-full bg-background shadow-2xl gap-0">
-        <SheetHeader className="p-4 pr-12 flex-row items-center gap-3 bg-card/95 backdrop-blur-sm shrink-0 h-[68px] space-y-0 text-left">
+        <SheetHeader className="p-4 pr-12 flex-row items-center gap-3 bg-card/95 backdrop-blur-sm shrink-0 h-17 space-y-0 text-left">
           <Link 
             href={`/${activeUser.slug}`}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity group min-w-0"
@@ -374,7 +374,7 @@ export default function ChatDetailSheet({
                                                 alt={`attachment-${idx}`} 
                                                 className={cn(
                                                   "object-cover",
-                                                  msg.image_path && Array.isArray(msg.image_path) && msg.image_path.length > 1 ? "h-24 w-full" : "max-w-[200px]"
+                                                  msg.image_path && Array.isArray(msg.image_path) && msg.image_path.length > 1 ? "h-24 w-full" : "max-w-50"
                                                 )} 
                                               />
                                               <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
@@ -396,7 +396,7 @@ export default function ChatDetailSheet({
                                           <img 
                                             src={msg.image_path!.toString()} 
                                             alt="attachment" 
-                                            className="max-w-[200px] object-cover" 
+                                            className="max-w-50 object-cover" 
                                           />
                                           <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
                                             <span className="text-white text-[10px] font-medium bg-black/40 px-2 py-1 rounded-full">{t("view")}</span>

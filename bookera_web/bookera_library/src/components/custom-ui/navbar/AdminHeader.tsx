@@ -1,20 +1,19 @@
 "use client";
 import React from "react";
-import Link from "next/link";
 import {
   Breadcrumb,
-  BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Settings, FileText, Shield } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import AppHeader from "./AppHeader";
 import { useAuthStore } from "@/store/auth.store";
+import { motion } from "framer-motion";
+import { SlideIn, StaggerContainer } from "@/components/custom-ui/motion";
+
 export default function AdminHeader() {
   const pathname = usePathname();
   const t = useTranslations("navbar");
@@ -32,31 +31,75 @@ export default function AdminHeader() {
       ? "/admin/users"
       : "/admin";
 
+  const breadcrumbItems = [
+    {
+      label: t("dashboard"),
+      href: dashboardHref,
+      current: segments.length === 0,
+    },
+    ...segments.map((seg, idx) => ({
+      label: formatSegment(seg),
+      href: `/admin/${segments.slice(0, idx + 1).join("/")}`,
+      current: idx === segments.length - 1,
+    })),
+  ];
+
   const breadcrumbs = (
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink href={dashboardHref}>{t("dashboard")}</BreadcrumbLink>
-        </BreadcrumbItem>
-        {segments.map((seg, idx) => {
-          const href = `/admin/${segments.slice(0, idx + 1).join("/")}`;
-          return (
-            <React.Fragment key={idx}>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                {idx === segments.length - 1 ? (
-                  <BreadcrumbPage>{formatSegment(seg)}</BreadcrumbPage>
+    <StaggerContainer
+      key={pathname}
+      as={motion.nav}
+      staggerDelay={0.08}
+      delayChildren={0.05}
+      className="min-w-0"
+    >
+      <Breadcrumb>
+        <BreadcrumbList>
+          {breadcrumbItems.map((item, index) => (
+            <React.Fragment key={item.href}>
+              {index > 0 ? (
+                <SlideIn
+                  as={motion.li}
+                  direction="up"
+                  distance={8}
+                  duration={0.35}
+                  delay={0.04 * index}
+                  className="flex items-center text-muted-foreground"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </SlideIn>
+              ) : null}
+              <SlideIn
+                as={motion.li}
+                direction="left"
+                distance={18}
+                duration={0.55}
+                delay={0.05 + index * 0.05}
+                className="inline-flex items-center gap-1.5"
+              >
+                {item.current ? (
+                  <BreadcrumbPage>{item.label}</BreadcrumbPage>
                 ) : (
-                  <BreadcrumbLink href={href}>
-                    {formatSegment(seg)}
-                  </BreadcrumbLink>
+                  <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
                 )}
-              </BreadcrumbItem>
+              </SlideIn>
             </React.Fragment>
-          );
-        })}
-      </BreadcrumbList>
-    </Breadcrumb>
+          ))}
+        </BreadcrumbList>
+      </Breadcrumb>
+    </StaggerContainer>
   );
-  return <AppHeader leftContent={breadcrumbs} isAuthenticated={true} />;
+
+  return (
+    <AppHeader
+      topLeftContent={
+        <span className="text-2xl font-black tracking-tighter text-primary">
+          Bookera Admin
+        </span>
+      }
+      bottomLeftContent={breadcrumbs}
+      isAuthenticated={true}
+    />
+  );
 }

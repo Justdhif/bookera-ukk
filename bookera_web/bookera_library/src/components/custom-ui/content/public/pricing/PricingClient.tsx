@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { authService } from "@/services/auth.service";
 import { User } from "@/types/user";
 import { Crown } from "lucide-react";
+import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import PricingHeader from "./PricingHeader";
 import { PricingCommonFeatures, PricingAICard } from "./PricingFeatures";
 import PricingProfilePreview from "./PricingProfilePreview";
@@ -19,15 +20,25 @@ import PricingCard from "./PricingCard";
 
 declare global {
   interface Window {
-    snap: any;
+    snap?: {
+      pay: (
+        token: string,
+        options: {
+          onSuccess?: () => void;
+          onPending?: () => void;
+          onError?: () => void;
+          onClose?: () => void;
+        },
+      ) => void;
+    };
   }
 }
 
 export default function PricingClient() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, initialLoading } = useAuthStore();
   const tp = useTranslations("pricing");
-  
+
   const [fullUser, setFullUser] = useState<User | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
@@ -71,7 +82,7 @@ export default function PricingClient() {
       .then((res) => setPlans(res.data.data.plans))
       .catch(() => toast.error(tp("loadPlansError")))
       .finally(() => setLoading(false));
-  }, []);
+  }, [tp]);
 
   const handlePay = async (planId: string) => {
     if (!user) {
@@ -89,7 +100,7 @@ export default function PricingClient() {
       const res = await membershipService.createTransaction(planId);
       const { snap_token, order_id } = res.data.data;
 
-      window.snap.pay(snap_token, {
+      window.snap?.pay(snap_token, {
         onSuccess: () => {
           router.push(`/payment/success?order_id=${order_id}`);
         },
@@ -104,15 +115,26 @@ export default function PricingClient() {
           setPaying(null);
         },
       });
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || tp("paymentStartError"));
+    } catch (err: unknown) {
+      const paymentError = err as {
+        response?: { data?: { message?: string } };
+      };
+      toast.error(
+        paymentError.response?.data?.message || tp("paymentStartError"),
+      );
     } finally {
       setPaying(null);
     }
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6">
+      <ContentHeader
+        title={tp("title")}
+        description={tp("description")}
+        showBackButton
+      />
+
       <PricingHeader />
 
       <div className="space-y-4">
@@ -126,9 +148,9 @@ export default function PricingClient() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-stretch">
           <PricingCommonFeatures />
           <PricingAICard />
-          <PricingProfilePreview 
-            fullUser={fullUser} 
-            isUserLoading={isUserLoading} 
+          <PricingProfilePreview
+            fullUser={fullUser}
+            isUserLoading={isUserLoading}
           />
         </div>
       </div>
@@ -141,6 +163,8 @@ export default function PricingClient() {
             key={plan.id}
             plan={plan}
             isCurrentPlan={user?.role === "member"}
+            isLoggedIn={Boolean(user)}
+            isAuthLoading={initialLoading}
             isLoading={paying === String(plan.id)}
             snapLoaded={snapLoaded}
             onPay={handlePay}

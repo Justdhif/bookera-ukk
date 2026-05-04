@@ -142,7 +142,7 @@ export default function PublicSidebar() {
                       >
                         <MessageSquareText className="h-4 w-4" />
                         {!open && user && unreadCount > 0 && (
-                          <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-[18px] min-w-[18px] px-1 flex items-center justify-center border-2 border-background shadow-sm">
+                          <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-4.5 min-w-4.5 px-1 flex items-center justify-center border-2 border-background shadow-sm">
                             {displayUnread}
                           </span>
                         )}

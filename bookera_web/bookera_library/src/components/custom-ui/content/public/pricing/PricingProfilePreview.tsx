@@ -47,7 +47,7 @@ export default function PricingProfilePreview({ fullUser, isUserLoading }: Prici
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
               {tp("afterUpgrade")}
             </p>
-            <div className="rounded-xl border border-border/60 bg-card/80 dark:bg-card/60 backdrop-blur-md p-3.5 shadow-sm flex-1 min-h-[110px] flex flex-col justify-center">
+            <div className="rounded-xl border border-border/60 bg-card/80 dark:bg-card/60 backdrop-blur-md p-3.5 shadow-sm flex-1 min-h-27.5 flex flex-col justify-center">
               {isUserLoading ? (
                 <DataLoading variant="inline" size="sm" />
               ) : fullUser ? (
@@ -68,7 +68,7 @@ export default function PricingProfilePreview({ fullUser, isUserLoading }: Prici
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-                        <span className="text-xs font-bold text-foreground truncate max-w-[120px]">
+                        <span className="text-xs font-bold text-foreground truncate max-w-30">
                           {fullUser.profile?.full_name}
                         </span>
                         <MemberBadge />
@@ -113,7 +113,7 @@ export default function PricingProfilePreview({ fullUser, isUserLoading }: Prici
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
               {tp("withoutBadge")}
             </p>
-            <div className="rounded-xl border border-border/40 bg-muted/20 p-3.5 opacity-60 flex-1 min-h-[110px] flex flex-col justify-center">
+            <div className="rounded-xl border border-border/40 bg-muted/20 p-3.5 opacity-60 flex-1 min-h-27.5 flex flex-col justify-center">
               {isUserLoading ? (
                 <DataLoading variant="inline" size="sm" />
               ) : fullUser ? (

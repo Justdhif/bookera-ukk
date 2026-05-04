@@ -20,7 +20,7 @@ interface NotificationDropdownProps {
   isAuthenticated?: boolean;
 }
 export default function NotificationDropdown({
-  isAuthenticated = true,
+  isAuthenticated = false,
 }: NotificationDropdownProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -33,8 +33,14 @@ export default function NotificationDropdown({
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isAdmin = pathname.startsWith("/admin");
   const notificationsHref = "/notifications";
+  
   useEffect(() => {
-    if (isAuthenticated) fetchUnreadCount();
+    if (isAuthenticated) {
+      fetchUnreadCount();
+    } else {
+      setUnreadCount(0);
+      setNotifications([]);
+    }
   }, [isAuthenticated]);
   const fetchNotifications = async () => {
     if (!isAuthenticated) return;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Sparkles, Filter, AlertCircle } from "lucide-react";
+import { Sparkles, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -35,7 +35,6 @@ export default function PublicComplaintFilters({
   return (
     <div className="space-y-4">
       <div className="grid gap-4 xl:grid-cols-[1fr_auto] xl:items-stretch">
-        {/* Category Filter */}
         <div className="relative h-full overflow-hidden rounded-3xl border border-border/70 bg-linear-to-br from-background via-background/95 to-orange-500/5 p-4 pb-0 shadow-sm backdrop-blur-sm">
           <div className="relative flex flex-col">
             <div className="flex items-start justify-between gap-3">
@@ -45,7 +44,7 @@ export default function PublicComplaintFilters({
                   {t("form.categoryLabel")}
                 </div>
                 <p className="max-w-xl text-sm text-muted-foreground">
-                  Filter complaints by category to find specific issues.
+                    {t("form.filterSubtitle")}
                 </p>
               </div>
 
@@ -96,8 +95,7 @@ export default function PublicComplaintFilters({
           </div>
         </div>
 
-        {/* Status Filter */}
-        <div className="relative h-full overflow-hidden rounded-3xl border border-border/70 bg-background/80 p-4 shadow-sm backdrop-blur-sm min-w-[200px]">
+        <div className="relative h-full min-w-50 overflow-hidden rounded-3xl border border-border/70 bg-background/80 p-4 shadow-sm backdrop-blur-sm">
           <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-orange-500/5 via-transparent to-transparent" />
           <div className="relative flex flex-col h-full justify-between gap-4">
             <div className="space-y-2">
@@ -108,25 +106,25 @@ export default function PublicComplaintFilters({
             </div>
 
             <div className="space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">
-                  {t("resolutionStatus")}
-                </p>
-                <Select
-                  value={selectedStatus || "all"}
-                  onValueChange={(val) => onStatusChange(val === "all" ? "" : val)}
-                >
-                  <SelectTrigger className="w-full rounded-xl border-border/50">
-                    <SelectValue placeholder={t("allStatus")} />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl border-border/50">
-                    <SelectItem value="all">{t("allStatus")}</SelectItem>
-                    {statuses.map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {t(`status.${s}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <p className="text-xs font-medium text-muted-foreground">
+                {t("resolutionStatus")}
+              </p>
+              <Select
+                value={selectedStatus || "all"}
+                onValueChange={(val) => onStatusChange(val === "all" ? "" : val)}
+              >
+                <SelectTrigger className="w-full rounded-xl border-border/50">
+                  <SelectValue placeholder={t("allStatus")} />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-border/50">
+                  <SelectItem value="all">{t("allStatus")}</SelectItem>
+                  {statuses.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {t(`status.${s}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>

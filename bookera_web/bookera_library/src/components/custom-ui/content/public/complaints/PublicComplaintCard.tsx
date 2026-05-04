@@ -25,16 +25,20 @@ import { formatDistanceToNow } from "date-fns";
 import { id, enUS } from "date-fns/locale";
 import { useLocale } from "next-intl";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
+import { FadeUp } from "@/components/custom-ui/motion";
 
 interface ComplaintCardProps {
   complaint: Complaint;
+  delay?: number;
 }
 
-export default function PublicComplaintCard({ complaint }: ComplaintCardProps) {
+export default function PublicComplaintCard({
+  complaint,
+  delay = 0,
+}: ComplaintCardProps) {
   const t = useTranslations("complaint");
   const currentLocale = useLocale();
   const dateLocale = currentLocale === "id" ? id : enUS;
@@ -87,14 +91,10 @@ export default function PublicComplaintCard({ complaint }: ComplaintCardProps) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
+    <FadeUp delay={delay}>
       <Card className="h-full overflow-hidden hover:shadow-xl transition-all duration-300 group border-2 hover:border-primary/20 bg-card/50 backdrop-blur-sm">
         <Link href={`/complaints/${complaint.slug}`} className="block">
-          <CardHeader className="space-y-4">
+          <CardHeader className="space-y-4 mb-4">
             <div className="flex items-center justify-between gap-2">
               <Badge
                 variant="outline"
@@ -118,7 +118,7 @@ export default function PublicComplaintCard({ complaint }: ComplaintCardProps) {
               <h3 className="font-bold text-xl line-clamp-1 group-hover:text-primary transition-colors">
                 {complaint.title}
               </h3>
-              <p className="text-muted-foreground text-sm line-clamp-2 min-h-[40px]">
+              <p className="text-muted-foreground text-sm line-clamp-2 min-h-10">
                 {complaint.description}
               </p>
             </div>
@@ -210,6 +210,6 @@ export default function PublicComplaintCard({ complaint }: ComplaintCardProps) {
           </CardFooter>
         </Link>
       </Card>
-    </motion.div>
+    </FadeUp>
   );
 }

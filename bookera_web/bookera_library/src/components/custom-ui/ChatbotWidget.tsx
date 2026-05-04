@@ -234,7 +234,7 @@ export function ChatbotWidget() {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent
           side="right"
-          className="p-0 flex flex-col w-full sm:max-w-[480px] gap-0 overflow-hidden"
+          className="p-0 flex flex-col w-full sm:max-w-120 gap-0 overflow-hidden"
         >
           <SheetTitle className="sr-only">{t("title")}</SheetTitle>
 
@@ -318,7 +318,7 @@ export function ChatbotWidget() {
                   placeholder={t("inputPlaceholder")}
                   disabled={isLoading}
                   rows={1}
-                  className="flex-1 bg-transparent resize-none border-none focus-visible:ring-0 shadow-none text-sm placeholder:text-muted-foreground disabled:opacity-50 leading-relaxed min-h-[40px] py-2 overflow-y-hidden"
+                  className="flex-1 bg-transparent resize-none border-none focus-visible:ring-0 shadow-none text-sm placeholder:text-muted-foreground disabled:opacity-50 leading-relaxed min-h-10 py-2 overflow-y-hidden"
                   style={{ scrollbarWidth: "none", height: "40px" }}
                 />
 
