@@ -12,9 +12,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('order_id')->unique();
-            $table->string('plan')->default('monthly'); // monthly, yearly
+            $table->string('plan')->default('monthly');
             $table->unsignedBigInteger('amount');
-            $table->string('status')->default('pending'); // pending, paid, failed, expired
+            $table->string('status')->default('pending');
             $table->string('payment_type')->nullable();
             $table->string('snap_token')->nullable();
             $table->json('midtrans_payload')->nullable();

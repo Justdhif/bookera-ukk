@@ -88,7 +88,11 @@ export default function PublicSidebar() {
     <AppSidebar subtitle={t("myLibrary")}>
       <div className="px-2 py-4 border-b border-border/40">
         <SidebarMenu>
-          <StaggerContainer as={motion.div} staggerDelay={0.05} className="flex flex-col gap-1">
+          <StaggerContainer
+            as={motion.div}
+            staggerDelay={0.05}
+            className="flex flex-col gap-1"
+          >
             <SlideIn direction="left" delay={0.1}>
               <SidebarMenuItem
                 className={cn(!open && "w-full flex justify-center")}
@@ -149,7 +153,9 @@ export default function PublicSidebar() {
                       </div>
                       {open && (
                         <div className="flex items-center justify-between flex-1 ml-1">
-                          <span className="font-semibold text-sm">Messages</span>
+                          <span className="font-semibold text-sm">
+                            Messages
+                          </span>
                           {user && unreadCount > 0 && (
                             <span className="bg-red-500 text-white text-[10px] font-bold rounded-full h-5 px-1.5 min-w-5 flex items-center justify-center shrink-0 ml-2 shadow-sm">
                               {displayUnread}

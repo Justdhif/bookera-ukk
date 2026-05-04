@@ -13,7 +13,8 @@ return new class extends Migration
             $table->foreignId('complaint_id')->constrained('complaints')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('parent_id')->nullable()->constrained('complaint_comments')->cascadeOnDelete();
-            $table->text('content');
+            $table->text('content')->nullable();
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

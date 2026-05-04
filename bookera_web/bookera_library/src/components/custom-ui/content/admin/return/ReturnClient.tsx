@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Download, PackageCheck, Search } from "lucide-react";
+import { PackageCheck, Search } from "lucide-react";
+import ExportButton from "@/components/custom-ui/button/ExportButton";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
@@ -141,15 +142,11 @@ export default function ReturnClient() {
           description={t("managementDesc")}
           isAdmin
           rightActions={
-            <Button
-              variant="outline"
-              className="h-8 gap-1 border-slate-200"
+            <ExportButton
               onClick={handleExport}
-              disabled={exporting}
-            >
-              <Download className="h-3.5 w-3.5" />
-              {t("exportData")}
-            </Button>
+              loading={exporting}
+              label={t("exportData")}
+            />
           }
         />
       </FadeUp>

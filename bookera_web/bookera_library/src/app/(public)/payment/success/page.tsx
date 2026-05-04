@@ -34,12 +34,12 @@ export default function PaymentSuccessPage() {
         const data = res.data.data;
         const memberStatus = data.is_member;
         const currentStatus = data.transaction?.status || null;
-        
+
         setDbStatus(currentStatus);
-        
+
         if (memberStatus && user) {
           setUser({ ...user, role: "member" });
-          setCookie("role", "member", { maxAge: 60 * 60 * 24 });
+          setCookie("role", "member", { maxAge: 60 * 60 * 24, path: "/" });
         }
 
         // Stop polling if success or failed
@@ -50,7 +50,7 @@ export default function PaymentSuccessPage() {
       } catch (error) {
         console.error("Polling error:", error);
       }
-      
+
       attempts++;
       if (attempts >= maxAttempts) {
         setChecking(false);
@@ -108,14 +108,18 @@ export default function PaymentSuccessPage() {
         {/* Title */}
         <div className="space-y-2">
           <h1 className="text-2xl md:text-3xl font-black tracking-tight">
-            {showPending ? t("pendingTitle") : isSuccess ? t("successTitle") : t("errorTitle")}
+            {showPending
+              ? t("pendingTitle")
+              : isSuccess
+                ? t("successTitle")
+                : t("errorTitle")}
           </h1>
           <p className="text-muted-foreground text-sm leading-relaxed">
             {showPending
               ? t("pendingDescription")
               : isSuccess
-              ? t("successDescription")
-              : t("errorDescription")}
+                ? t("successDescription")
+                : t("errorDescription")}
           </p>
           {orderId && (
             <p className="text-xs text-muted-foreground/70 font-mono">
@@ -147,7 +151,6 @@ export default function PaymentSuccessPage() {
             ))}
           </div>
         )}
-
 
         {/* Actions */}
         <div className="flex flex-col gap-3">

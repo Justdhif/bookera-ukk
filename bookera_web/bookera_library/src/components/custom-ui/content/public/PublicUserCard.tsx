@@ -9,7 +9,7 @@ import Link from "next/link";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
-import { MessageSquare, UserPlus, Users, MessageCircle, AlertCircle } from "lucide-react";
+import { MessageSquare, UserPlus, Users, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
 import { useChatStore } from "@/store/chat.store";
@@ -74,14 +74,7 @@ export default function PublicUserCard({ user, className }: PublicUserCardProps)
             </p>
           )}
 
-          <div className="grid grid-cols-2 gap-3 mt-5">
-            <div className="flex flex-col">
-              <span className="text-sm font-bold flex items-center gap-1">
-                <MessageCircle className="h-3 w-3 text-brand-primary/60" />
-                {user.discussion_posts_count || 0}
-              </span>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{t("post")}</span>
-            </div>
+          <div className="grid grid-cols-3 gap-3 mt-5">
             <div className="flex flex-col">
               <span className="text-sm font-bold flex items-center gap-1">
                 <AlertCircle className="h-3 w-3 text-amber-500/60" />

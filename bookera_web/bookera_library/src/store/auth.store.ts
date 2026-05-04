@@ -40,8 +40,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       const { token, user } = res.data.data;
 
-      setCookie("token", token, { maxAge: 60 * 60 * 24 });
-      setCookie("role", user.role, { maxAge: 60 * 60 * 24 });
+      setCookie("token", token, { maxAge: 60 * 60 * 24, path: "/" });
+      setCookie("role", user.role, { maxAge: 60 * 60 * 24, path: "/" });
 
       set({
         user,
@@ -114,7 +114,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   setUser: (user: User) => {
-    set({ user });
+    set({ user, isAuthenticated: true, initialLoading: false });
   },
 
   setInitialLoadingComplete: () => {

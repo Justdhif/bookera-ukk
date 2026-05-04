@@ -9,7 +9,7 @@ import { publicService } from "@/services/public.service";
 import { favoriteService } from "@/services/favorite.service";
 import BookCard from "./book-detail/BookCard";
 import DataLoading from "@/components/custom-ui/DataLoading";
-import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
+import LoadMoreButton from "@/components/custom-ui/button/LoadMoreButton";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { cn } from "@/lib/utils";
 import PublicBookFilters from "./PublicBookFilters";
@@ -27,6 +27,7 @@ interface PublicBookGridProps {
   onSelectAll?: (checked: boolean) => void;
   onBorrowRequest?: () => void;
   showBorrowActions?: boolean;
+  refreshKey?: number;
 }
 
 export default function PublicBookGrid({
@@ -41,6 +42,7 @@ export default function PublicBookGrid({
   onSelectAll,
   onBorrowRequest,
   showBorrowActions = true,
+  refreshKey = 0,
 }: PublicBookGridProps) {
   const tPublic = useTranslations("public");
   const tFavorites = useTranslations("public.favorites");
@@ -130,13 +132,19 @@ export default function PublicBookGrid({
             page,
             search: effectiveSearch || undefined,
             category_id: selectedCategoryId || undefined,
-            rating: selectedRatingRange !== null ? Number(selectedRatingRange) : undefined,
-            min_reviews: selectedMinReviews !== null ? selectedMinReviews : undefined,
+            rating:
+              selectedRatingRange !== null
+                ? Number(selectedRatingRange)
+                : undefined,
+            min_reviews:
+              selectedMinReviews !== null ? selectedMinReviews : undefined,
           });
-          
+
           if (!active || requestIdRef.current !== requestId) return;
-          
-          nextBooks = res.data.data.data.map((fav) => fav.book!).filter(Boolean);
+
+          nextBooks = res.data.data.data
+            .map((fav) => fav.book!)
+            .filter(Boolean);
           fetchedLastPage = res.data.data.last_page;
         } else {
           const res = await publicService.getBooks({
@@ -148,8 +156,12 @@ export default function PublicBookGrid({
             author_ids: authorIds,
             publisher_ids: publisherIds,
             genre_ids: genreIds,
-            rating: selectedRatingRange !== null ? Number(selectedRatingRange) : undefined,
-            min_reviews: selectedMinReviews !== null ? selectedMinReviews : undefined,
+            rating:
+              selectedRatingRange !== null
+                ? Number(selectedRatingRange)
+                : undefined,
+            min_reviews:
+              selectedMinReviews !== null ? selectedMinReviews : undefined,
           });
 
           if (!active || requestIdRef.current !== requestId) return;
@@ -190,8 +202,8 @@ export default function PublicBookGrid({
     publisherIds,
     genreIds,
     fetchMode,
+    refreshKey,
   ]);
-
 
   const handleCategorySelect = (categoryId: number | null) => {
     setSelectedCategoryId((current) =>
@@ -242,12 +254,20 @@ export default function PublicBookGrid({
           <div className="space-y-4">
             <EmptyState
               icon={fetchMode === "favorites" ? <Heart /> : <Search />}
-              title={fetchMode === "favorites"
-                 ? (effectiveSearch || selectedCategoryId ? tFavorites("noResults") : tFavorites("noFavorites")) 
-                 : tPublic("notFound")}
-              description={fetchMode === "favorites"
-                 ? (effectiveSearch || selectedCategoryId ? tFavorites("noResultsDesc") : tFavorites("noFavoritesDesc")) 
-                 : tPublic("notFoundDesc")}
+              title={
+                fetchMode === "favorites"
+                  ? effectiveSearch || selectedCategoryId
+                    ? tFavorites("noResults")
+                    : tFavorites("noFavorites")
+                  : tPublic("notFound")
+              }
+              description={
+                fetchMode === "favorites"
+                  ? effectiveSearch || selectedCategoryId
+                    ? tFavorites("noResultsDesc")
+                    : tFavorites("noFavoritesDesc")
+                  : tPublic("notFoundDesc")
+              }
               variant="compact"
             />
 
@@ -294,7 +314,7 @@ export default function PublicBookGrid({
             )}
           </div>
         )}
-    </div>
+      </div>
     </div>
   );
 }

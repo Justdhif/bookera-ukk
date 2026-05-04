@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
+import LoadMoreButton from "@/components/custom-ui/button/LoadMoreButton";
 import { Search, Loader2, UserSquare, Building2, BookText } from "lucide-react";
 import { publicService } from "@/services/public.service";
 import { Author } from "@/types/author";
@@ -233,7 +233,11 @@ export default function AuthorPublisherSidebarSearch() {
               ))}
             {activeTab === "publisher" &&
               publishers.map((publisher, index) => (
-                <SlideIn key={publisher.id} direction="left" delay={index * 0.02}>
+                <SlideIn
+                  key={publisher.id}
+                  direction="left"
+                  delay={index * 0.02}
+                >
                   <SidebarMenuItem
                     className={!open ? "w-full flex justify-center" : ""}
                   >

@@ -12,10 +12,7 @@ use App\Http\Controllers\Api\BorrowRequestController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\GenreController;
 use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\DiscussionCommentController;
-use App\Http\Controllers\Api\DiscussionLikeController;
-use App\Http\Controllers\Api\DiscussionPostController;
-use App\Http\Controllers\Api\DiscussionPostReportController;
+
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\FineController;
 use App\Http\Controllers\Api\FineTypeController;
@@ -36,6 +33,9 @@ use App\Http\Controllers\Api\NotificationSettingsController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\MembershipController;
 use App\Http\Controllers\Api\Admin\MembershipPlanController;
+
+use App\Http\Controllers\Api\Admin\NewsController as AdminNewsController;
+use App\Http\Controllers\Api\NewsController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -66,8 +66,7 @@ Route::get('/test-smtp', function () {
 Route::get('books', [PublicController::class, 'books']);
 Route::get('books/slug/{slug}', [PublicController::class, 'bookBySlug']);
 Route::get('books/{id}', [PublicController::class, 'bookById'])->whereNumber('id');
-Route::get('discussions/top', [PublicController::class, 'topDiscussions']);
-Route::get('discussions', [PublicController::class, 'discussions']);
+
 Route::get('users', [PublicController::class, 'users']);
 
 Route::get('books/{id}/reviews', [ReviewController::class, 'index']);
@@ -77,6 +76,10 @@ Route::get('complaints/{slug}/comments', [ComplaintCommentController::class, 'in
 
 Route::get('categories', [PublicController::class, 'categories']);
 Route::get('stats', [PublicController::class, 'publicStats']);
+
+Route::get('news', [NewsController::class, 'index']);
+Route::get('news/{slug}', [NewsController::class, 'show']);
+Route::get('news/{news}/comments', [NewsController::class, 'getComments']);
 
 // Membership Plans (public)
 Route::get('membership/plans', [MembershipController::class, 'plans']);
@@ -104,9 +107,7 @@ Route::get('users/{userSlug}/following', [FollowController::class, 'userFollowin
 Route::get('users/{userSlug}/follow-counts', [FollowController::class, 'userFollowCounts']);
 Route::get('users/{userSlug}/profile', [FollowController::class, 'userPublicProfile']);
 
-Route::get('discussion-posts/user/{userSlug}', [DiscussionPostController::class, 'byUser']);
-Route::get('discussion-posts/{slug}', [DiscussionPostController::class, 'show']);
-Route::get('discussion-posts/{slug}/comments', [DiscussionCommentController::class, 'index']);
+
 
 // AI Chatbot
 Route::prefix('ai')->group(function () {
@@ -262,13 +263,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/{id}', [ActivityController::class, 'show']);
         });
 
-        // Discussion moderation
-        Route::prefix('discussion-posts')->group(function () {
-            Route::get('/reports', [DiscussionPostReportController::class, 'index']);
-            Route::patch('/reports/{report}', [DiscussionPostReportController::class, 'update']);
-            Route::patch('/{slug}/takedown', [DiscussionPostReportController::class, 'takedown']);
-            Route::patch('/{slug}/restore', [DiscussionPostReportController::class, 'restore']);
-        });
+
 
         // Complaint management
         Route::prefix('complaints')->group(function () {
@@ -283,6 +278,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('reservations')->group(function () {
             Route::get('/', [ReservationController::class, 'index']);
         });
+
+        Route::apiResource('news', AdminNewsController::class)->except(['index', 'show']);
     });
 
     Route::middleware('role:admin')->prefix('admin')->group(function () {
@@ -375,29 +372,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/', [FollowController::class, 'unfollow']);
     });
 
-    Route::prefix('discussion-posts')->group(function () {
-        Route::get('/', [DiscussionPostController::class, 'index']);
-        Route::post('/', [DiscussionPostController::class, 'store']);
-        Route::get('/feed/following', [DiscussionPostController::class, 'following']);
-        Route::get('/active-users', [DiscussionPostController::class, 'activeUsers']);
-        Route::post('/{slug}/report', [DiscussionPostReportController::class, 'store']);
-        Route::put('/{slug}', [DiscussionPostController::class, 'update']);
-        Route::delete('/{slug}', [DiscussionPostController::class, 'destroy']);
-        Route::post('/{slug}/like', [DiscussionLikeController::class, 'toggle']);
-        Route::post('/{slug}/comments', [DiscussionCommentController::class, 'store']);
-    });
 
-    Route::prefix('discussion-comments')->group(function () {
-        Route::put('/{comment}', [DiscussionCommentController::class, 'update']);
-        Route::delete('/{comment}', [DiscussionCommentController::class, 'destroy']);
-        Route::get('/{comment}/replies', [DiscussionCommentController::class, 'replies']);
-    });
 
     Route::prefix('complaints')->group(function () {
         Route::post('/', [ComplaintController::class, 'store']);
         Route::delete('/{slug}', [ComplaintController::class, 'destroy']);
         Route::post('/{slug}/vote', [ComplaintVoteController::class, 'toggle']);
         Route::post('/{slug}/comments', [ComplaintCommentController::class, 'store']);
+    });
+
+    Route::prefix('news')->group(function () {
+        Route::post('/{news}/comments', [NewsController::class, 'storeComment']);
+    });
+
+    Route::prefix('news-comments')->group(function () {
+        Route::delete('/{comment}', [NewsController::class, 'destroyComment']);
     });
 
     Route::prefix('complaint-comments')->group(function () {

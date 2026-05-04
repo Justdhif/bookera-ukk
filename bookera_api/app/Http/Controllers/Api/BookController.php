@@ -63,7 +63,7 @@ class BookController extends Controller
         $book = $this->bookService->getById($id);
 
         if (!$book) {
-            return ApiResponse::errorResponse('Book not found', 404);
+            return ApiResponse::notFoundResponse('Book not found');
         }
 
         return ApiResponse::successResponse('Book details retrieved successfully', $book);
@@ -74,7 +74,7 @@ class BookController extends Controller
         $book = $this->bookService->getBySlug($slug);
 
         if (!$book) {
-            return ApiResponse::errorResponse('Book not found', 404);
+            return ApiResponse::notFoundResponse('Book not found');
         }
 
         return ApiResponse::successResponse('Book details retrieved successfully', $book);

@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('messages', function (Blueprint $table) {
@@ -18,27 +15,13 @@ return new class extends Migration
             $table->text('message')->nullable();
             $table->string('image_path')->nullable();
             $table->boolean('is_read')->default(false);
+            $table->boolean('is_ai')->default(false);
             $table->timestamps();
-        });
-
-        Schema::create('chat_wallpapers', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('other_user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('wallpaper_path');
-            $table->boolean('is_shared')->default(false);
-            $table->timestamps();
-
-            $table->unique(['user_id', 'other_user_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('chat_wallpapers');
         Schema::dropIfExists('messages');
     }
 };

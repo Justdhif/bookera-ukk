@@ -23,8 +23,8 @@ import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import DateRangeFilter from "@/components/custom-ui/DateRangeFilter";
 import { getCurrentMonthRange } from "@/lib/month-range";
 import { downloadBlobFile } from "@/lib/download";
-import { Download } from "lucide-react";
 import { StaggerContainer, FadeUp, SlideIn, FadeIn } from "@/components/custom-ui/motion";
+import ExportButton from "@/components/custom-ui/button/ExportButton";
 
 export default function BorrowClient() {
   const t = useTranslations("borrow");
@@ -216,15 +216,11 @@ export default function BorrowClient() {
           isAdmin
           rightActions={
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                className="h-8 gap-1 border-slate-200"
+              <ExportButton
                 onClick={handleExport}
-                disabled={exporting}
-              >
-                <Download className="h-3.5 w-3.5" />
-                {t("exportData")}
-              </Button>
+                loading={exporting}
+                label={t("exportData")}
+              />
               <Link href="/admin/borrows/create">
                 <Button variant="submit" className="h-8 gap-1">
                   <Plus className="h-4 w-4" />

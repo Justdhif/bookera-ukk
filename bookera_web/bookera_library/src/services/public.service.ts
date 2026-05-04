@@ -59,11 +59,6 @@ export const publicService = {
     api.get<ApiResponse<CategoryListResponse>>("/categories", {
       params: filters,
     }),
-  getTopDiscussions: () =>
-    api.get<ApiResponse<import("@/types/discussion").DiscussionPost[]>>("/discussions/top"),
-
-  getDiscussions: (params?: { page?: number; per_page?: number; search?: string }) =>
-    api.get<ApiResponse<import("@/types/api").PaginatedResponse<import("@/types/discussion").DiscussionPost>>>("/discussions", { params }),
 
   getUsers: (params?: import("@/types/user").UserFilterParams) =>
     api.get<ApiResponse<import("@/types/user").UserListResponse>>("/users", { params }),
@@ -82,16 +77,6 @@ export const publicService = {
         reviews_count: number;
         favorites_count: number;
         categories: string[];
-      }>;
-      recent_discussions: Array<{
-        id: number;
-        slug: string;
-        caption: string;
-        likes_count: number;
-        comments_count: number;
-        created_at: string;
-        user_name: string;
-        user_avatar: string | null;
       }>;
       recent_complaints: Array<{
         id: number;

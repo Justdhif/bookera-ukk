@@ -3,7 +3,7 @@
 import BannerCarousel from "./BannerCarousel";
 import DailyTimeline from "./DailyTimeline";
 import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid";
-import DiscussionMarquee from "./DiscussionMarquee";
+
 import { Heart, BookOpen, DollarSign } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ export default function PublicPageClient() {
         <div className="flex flex-col gap-3">
           <BannerCarousel />
         </div>
-        <DiscussionMarquee />
+
       </div>
 
       <div className="container mx-auto px-4 space-y-10">

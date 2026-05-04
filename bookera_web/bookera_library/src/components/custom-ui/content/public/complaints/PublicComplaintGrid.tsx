@@ -7,7 +7,7 @@ import { Complaint } from "@/types/complaint";
 import { complaintService } from "@/services/complaint.service";
 import PublicComplaintCard from "./PublicComplaintCard";
 import DataLoading from "@/components/custom-ui/DataLoading";
-import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
+import LoadMoreButton from "@/components/custom-ui/button/LoadMoreButton";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { cn } from "@/lib/utils";
 import PublicComplaintFilters from "./PublicComplaintFilters";

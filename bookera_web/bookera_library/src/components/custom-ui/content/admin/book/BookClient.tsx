@@ -17,8 +17,10 @@ import { categoryService } from "@/services/category.service";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import ImportBookDialog from "./ImportBookDialog";
-import { BookOpen, Plus, FileSpreadsheet, Download } from "lucide-react";
+import { BookOpen, Plus } from "lucide-react";
 import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
+import ExportButton from "@/components/custom-ui/button/ExportButton";
+import ImportButton from "@/components/custom-ui/button/ImportButton";
 
 export default function BookClient() {
   const t = useTranslations("book");
@@ -124,23 +126,15 @@ export default function BookClient() {
           isAdmin
           rightActions={
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                className="h-8 gap-1 border-slate-200"
+              <ImportButton
                 onClick={() => setIsImportDialogOpen(true)}
-              >
-                <FileSpreadsheet className="w-3.5 h-3.5" />
-                {t("importData")}
-              </Button>
-              <Button
-                variant="outline"
-                className="h-8 gap-1 border-slate-200"
+                label={t("importData")}
+              />
+              <ExportButton
                 onClick={handleExport}
-                disabled={loading}
-              >
-                <Download className="w-3.5 h-3.5" />
-                {t("exportData")}
-              </Button>
+                loading={loading}
+                label={t("exportData")}
+              />
               <Link href="/admin/books/add">
                 <Button variant="submit" className="h-8 gap-1">
                   <Plus className="w-3.5 h-3.5" />

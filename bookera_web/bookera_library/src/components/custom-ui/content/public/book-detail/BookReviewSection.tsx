@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { reviewService } from "@/services/review.service";
 import { PaginatedReviewResponse } from "@/types/review";
 import { Book } from "@/types/book";
-import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
+import LoadMoreButton from "@/components/custom-ui/button/LoadMoreButton";
 import { Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -68,10 +68,7 @@ export default function BookReviewSection({
     }
   }, [book.id]);
 
-  const renderStars = (
-    starCount: number,
-    displayRating: number,
-  ) => {
+  const renderStars = (starCount: number, displayRating: number) => {
     const stars = [];
     for (let i = 1; i <= starCount; i++) {
       const isFilled = i <= displayRating;
@@ -115,7 +112,7 @@ export default function BookReviewSection({
                 key={r.id}
                 className="flex gap-4 p-4 border rounded-xl bg-card hover:bg-muted/30 transition-colors"
               >
-                <Link 
+                <Link
                   href={`/${r.user?.slug}/profile`}
                   className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-primary/10 hover:opacity-80 transition-opacity"
                 >
@@ -134,7 +131,7 @@ export default function BookReviewSection({
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start gap-2 mb-1">
                     <div className="flex items-center gap-2 min-w-0">
-                      <Link 
+                      <Link
                         href={`/${r.user?.slug}/profile`}
                         className="font-medium text-sm truncate hover:text-brand-primary transition-colors"
                       >
@@ -143,7 +140,9 @@ export default function BookReviewSection({
                       <div className="flex items-center gap-1 shrink-0">
                         {r.user?.role === "admin" && <AdminBadge />}
                         {r.user?.role === "member" && <MemberBadge />}
-                        {r.user?.profile?.gender === "croissant" && <CroissantBadge />}
+                        {r.user?.profile?.gender === "croissant" && (
+                          <CroissantBadge />
+                        )}
                       </div>
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">

@@ -102,7 +102,7 @@ class FollowController extends Controller
     public function userPublicProfile(string $userSlug): JsonResponse
     {
         $user = User::with('profile')
-            ->withCount(['followers', 'following', 'discussionPosts', 'complaints'])
+            ->withCount(['followers', 'following', 'complaints'])
             ->where('slug', $userSlug)
             ->firstOrFail();
 

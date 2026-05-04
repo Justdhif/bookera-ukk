@@ -40,7 +40,7 @@ export default function PublicHeader() {
               "group inline-flex items-center text-sm font-semibold transition-colors",
               isComplaintsActive
                 ? "text-foreground underline decoration-2 underline-offset-8"
-                : "text-muted-foreground hover:text-foreground",
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             <span className="transition-all group-hover:underline decoration-2 underline-offset-8">
@@ -54,7 +54,7 @@ export default function PublicHeader() {
               "group inline-flex items-center text-sm font-semibold transition-colors",
               isNewsActive
                 ? "text-foreground underline decoration-2 underline-offset-8"
-                : "text-muted-foreground hover:text-foreground",
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             <span className="transition-all group-hover:underline decoration-2 underline-offset-8">

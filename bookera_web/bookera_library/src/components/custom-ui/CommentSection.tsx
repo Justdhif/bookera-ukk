@@ -33,7 +33,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
+import LoadMoreButton from "@/components/custom-ui/button/LoadMoreButton";
 import ImagePreviewDialog from "@/components/custom-ui/ImagePreviewDialog";
 
 interface GenericComment {
@@ -424,7 +424,7 @@ export default function CommentSection({
   entitySlug,
   commentCount,
   onCommentCountChange,
-  namespace = "discussion",
+  namespace = "comment",
   getComments,
   createComment,
   getReplies,

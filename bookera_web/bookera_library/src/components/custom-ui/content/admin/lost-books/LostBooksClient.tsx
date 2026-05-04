@@ -29,7 +29,6 @@ import {
   AlertCircle,
   Building2,
   Calendar,
-  Download,
   Eye,
   Hash,
   Search,
@@ -39,6 +38,7 @@ import {
 import { toast } from "sonner";
 
 import { StaggerContainer, FadeUp, SlideIn, FadeIn } from "@/components/custom-ui/motion";
+import ExportButton from "@/components/custom-ui/button/ExportButton";
 
 interface LostBookCardProps {
   borrow: LostBook["borrow"];
@@ -378,15 +378,11 @@ export default function LostBooksClient() {
           description={t("description")}
           isAdmin
           rightActions={
-            <Button
-              variant="outline"
-              className="h-8 gap-1 border-slate-200"
+            <ExportButton
               onClick={handleExport}
-              disabled={exporting}
-            >
-              <Download className="h-3.5 w-3.5" />
-              {t("exportData")}
-            </Button>
+              loading={exporting}
+              label={t("exportData")}
+            />
           }
         />
       </FadeUp>

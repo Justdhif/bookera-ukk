@@ -13,7 +13,6 @@ return new class extends Migration
             $table->foreignId('complaint_id')->constrained('complaints')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
-
             $table->unique(['complaint_id', 'user_id']);
         });
     }

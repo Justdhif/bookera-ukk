@@ -13,11 +13,14 @@ import DataLoading from "@/components/custom-ui/DataLoading";
 import FineTypeFormDialog from "./FineTypeFormDialog";
 import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion";
 
-export default function FineTypeManagement() {
+export default function FineTypeManagement({
+  refreshKey,
+}: {
+  refreshKey: number;
+}) {
   const t = useTranslations("fines");
   const [fineTypes, setFineTypes] = useState<FineType[]>([]);
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const confirmDelete = async () => {
@@ -46,31 +49,10 @@ export default function FineTypeManagement() {
 
   useEffect(() => {
     void fetchFineTypes();
-  }, []);
+  }, [fetchFineTypes, refreshKey]);
 
   return (
     <StaggerContainer className="space-y-6">
-      <FadeUp>
-        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
-          <div>
-            <h2 className="text-2xl font-bold">{t("fineTypesTab")}</h2>
-            <p className="text-muted-foreground">
-              {t("fineTypesTabDescription")}
-            </p>
-          </div>
-          <Button
-            onClick={() => {
-              setOpen(true);
-            }}
-            variant="submit"
-            className="h-8 gap-1"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Add Fine Type
-          </Button>
-        </div>
-      </FadeUp>
-
       <FadeUp delay={0.1}>
         {loading ? (
           <FadeIn
@@ -96,12 +78,6 @@ export default function FineTypeManagement() {
         title={t("deleteFineType")}
         description={t("deleteFineConfirm")}
         onConfirm={confirmDelete}
-      />
-
-      <FineTypeFormDialog
-        open={open}
-        setOpen={setOpen}
-        onSuccess={fetchFineTypes}
       />
     </StaggerContainer>
   );

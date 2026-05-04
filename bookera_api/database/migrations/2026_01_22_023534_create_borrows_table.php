@@ -6,18 +6,12 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('borrows', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('borrow_request_id')
-                ->nullable()
-                ->constrained('borrow_requests')
-                ->nullOnDelete();
+            $table->foreignId('borrow_request_id')->nullable()->constrained('borrow_requests')->nullOnDelete();
             $table->string('borrow_code')->unique();
             $table->string('qr_code_path')->nullable();
             $table->date('borrow_date');
@@ -27,9 +21,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('borrows');

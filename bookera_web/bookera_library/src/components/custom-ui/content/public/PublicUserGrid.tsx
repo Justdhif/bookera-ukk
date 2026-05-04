@@ -6,16 +6,20 @@ import { User } from "@/types/user";
 import { publicService } from "@/services/public.service";
 import PublicUserCard from "./PublicUserCard";
 import DataLoading from "@/components/custom-ui/DataLoading";
-import LoadMoreButton from "@/components/custom-ui/LoadMoreButton";
+import LoadMoreButton from "@/components/custom-ui/button/LoadMoreButton";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Users } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 
 interface PublicUserGridProps {
   search?: string;
+  refreshKey?: number;
 }
 
-export default function PublicUserGrid({ search }: PublicUserGridProps) {
+export default function PublicUserGrid({
+  search,
+  refreshKey = 0,
+}: PublicUserGridProps) {
   const t = useTranslations("explore");
   const { user: currentUser } = useAuthStore();
   const [users, setUsers] = useState<User[]>([]);
@@ -35,7 +39,7 @@ export default function PublicUserGrid({ search }: PublicUserGridProps) {
 
       const response = res.data.data;
       const data = response.data.filter((u: User) => u.id !== currentUser?.id);
-      
+
       if (isNewSearch) {
         setUsers(data);
       } else {
@@ -54,7 +58,7 @@ export default function PublicUserGrid({ search }: PublicUserGridProps) {
   useEffect(() => {
     setPage(1);
     fetchUsers(1, true);
-  }, [search]);
+  }, [search, refreshKey]);
 
   const handleLoadMore = () => {
     if (!loading && hasMore) {
@@ -63,7 +67,6 @@ export default function PublicUserGrid({ search }: PublicUserGridProps) {
       fetchUsers(nextPage);
     }
   };
-
 
   return (
     <div className="space-y-6">

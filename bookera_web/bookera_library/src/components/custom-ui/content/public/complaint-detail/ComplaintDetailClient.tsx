@@ -115,7 +115,7 @@ export default function ComplaintDetailClient() {
 
   const handleToggleVote = async () => {
     if (!user) {
-      toast.error("Silakan masuk untuk memberikan dukungan");
+      toast.error(t("loginToSupport"));
       return;
     }
     if (votePending) return;
@@ -366,7 +366,7 @@ export default function ComplaintDetailClient() {
                       {votesCount}
                     </p>
                     <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest mt-1">
-                      Dukungan
+                      {t("votesLabel")}
                     </p>
                   </div>
                 </div>

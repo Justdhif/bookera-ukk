@@ -30,7 +30,7 @@ export default function ComplaintFormSheet({
   onSuccess,
   trigger,
 }: ComplaintFormSheetProps) {
-  const t = useTranslations("complaint.form");
+  const t = useTranslations("complaint");
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -41,7 +41,7 @@ export default function ComplaintFormSheet({
     try {
       const formData = buildComplaintFormData(data);
       await complaintService.create(formData);
-      toast.success(t("submitSuccess"));
+      toast.success(t("form.submitSuccess"));
       setOpen(false);
       onSuccess?.();
     } catch (error: any) {
@@ -50,7 +50,7 @@ export default function ComplaintFormSheet({
           ? (
               Object.values(error.response.data.errors || {})[0] as string[]
             )?.[0] || error.response.data.message
-          : error.response?.data?.message || t("submitError");
+          : error.response?.data?.message || t("form.submitError");
       toast.error(message);
     } finally {
       setSubmitting(false);
@@ -63,7 +63,7 @@ export default function ComplaintFormSheet({
         {trigger || (
           <Button className="rounded-2xl gap-2 shadow-lg shadow-brand-primary/20 hover:scale-105 transition-all bg-brand-primary hover:bg-brand-primary/90 text-white">
             <MessageSquarePlus className="h-4 w-4" />
-            {t("submitBtn")}
+            {t("form.submitBtn")}
           </Button>
         )}
       </SheetTrigger>
@@ -74,17 +74,17 @@ export default function ComplaintFormSheet({
         <div className="h-full flex flex-col">
           <div className="absolute top-0 right-0 w-full h-32 bg-linear-to-b from-brand-primary/10 to-transparent pointer-events-none" />
 
-          <FadeUp className="px-8 pt-10 pb-6 relative">
+          <FadeUp className="px-8 py-6 relative">
             <SheetHeader>
               <div className="inline-flex items-center gap-2 rounded-full border border-brand-primary/15 bg-brand-primary/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-primary mb-4 w-fit">
                 <Sparkles className="h-3.5 w-3.5" />
-                Service
+                {t("category.service")}
               </div>
               <SheetTitle className="text-3xl font-extrabold tracking-tight bg-linear-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-                {t("sheetTitle")}
+                {t("form.sheetTitle")}
               </SheetTitle>
               <SheetDescription className="text-base text-muted-foreground leading-relaxed pt-2">
-                {t("sheetDescription")}
+                {t("form.sheetDescription")}
               </SheetDescription>
             </SheetHeader>
           </FadeUp>
@@ -99,12 +99,12 @@ export default function ComplaintFormSheet({
                 <EmptyState
                   variant="compact"
                   icon={<LogIn />}
-                  title={t("loginRequired", { defaultValue: "Login Required" })}
-                  description={t("loginRequiredDesc", {
+                  title={t("form.loginRequired", { defaultValue: "Login Required" })}
+                  description={t("form.loginRequiredDesc", {
                     defaultValue:
                       "Sign in to create a complaint and share your feedback.",
                   })}
-                  linkLabel={t("loginBtn", { defaultValue: "Sign In" })}
+                  linkLabel={t("form.loginBtn", { defaultValue: "Sign In" })}
                   linkHref="/login?redirect=/complaints"
                   className="w-full max-w-sm"
                 />

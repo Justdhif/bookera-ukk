@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('book_id')->constrained('books')->cascadeOnDelete();
             $table->foreignId('author_id')->constrained('authors')->cascadeOnDelete();
             $table->timestamps();
-
             $table->unique(['book_id', 'author_id']);
         });
     }

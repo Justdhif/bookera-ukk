@@ -68,7 +68,7 @@ export default function PaginatedContent({
   return (
     <div className="space-y-4">
       {lastPage > 1 && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2">
           <p className="text-sm text-muted-foreground">
             {from != null && to != null
               ? t.rich("showingResultsRange", {
@@ -76,14 +76,14 @@ export default function PaginatedContent({
                   to,
                   total,
                   bold: (chunks: React.ReactNode) => (
-                    <span className="font-medium text-foreground">{chunks}</span>
+                    <span className="font-bold text-foreground">{chunks}</span>
                   ),
                 })
               : t.rich("showingPageNumber", {
                   current: currentPage,
                   total: lastPage,
                   bold: (chunks: React.ReactNode) => (
-                    <span className="font-medium text-foreground">{chunks}</span>
+                    <span className="font-bold text-foreground">{chunks}</span>
                   ),
                 })}
           </p>
@@ -132,6 +132,7 @@ export default function PaginatedContent({
           </Pagination>
         </div>
       )}
+
       <div className="relative overflow-hidden">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div

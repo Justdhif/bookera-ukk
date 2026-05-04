@@ -12,8 +12,6 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
-    use HasFactory;
-
     /**
      * The attributes that are mass assignable.
      *
@@ -68,20 +66,7 @@ class User extends Authenticatable
         return $this->hasMany(Complaint::class);
     }
 
-    public function discussionPosts()
-    {
-        return $this->hasMany(DiscussionPost::class);
-    }
 
-    public function discussionLikes()
-    {
-        return $this->hasMany(DiscussionLike::class);
-    }
-
-    public function discussionComments()
-    {
-        return $this->hasMany(DiscussionComment::class);
-    }
 
     /** Users that follow this user */
     public function followers()
@@ -95,17 +80,7 @@ class User extends Authenticatable
         return $this->hasMany(Follow::class, 'user_id')->where('followable_type', self::class);
     }
 
-    /** Discussion Post Reports created by this user */
-    public function reportedPosts()
-    {
-        return $this->hasMany(DiscussionPostReport::class, 'reporter_id');
-    }
 
-    /** Discussion Post Reports reviewed by this admin/user */
-    public function reviewedReports()
-    {
-        return $this->hasMany(DiscussionPostReport::class, 'reviewed_by');
-    }
 
     public function favoriteBooks()
     {

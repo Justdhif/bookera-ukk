@@ -6,7 +6,7 @@ use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
 use App\Models\Complaint;
-use App\Models\DiscussionPost;
+
 use App\Models\Publisher;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -274,39 +274,11 @@ class PublicService
         return $query->latest()->paginate($filters['per_page'] ?? 15);
     }
 
-    public function getTopDiscussions(int $limit = 10): Collection
-    {
-        return DiscussionPost::query()
-            ->notTakenDown()
-            ->with(['user.profile', 'images'])
-            ->orderByDesc('likes_count')
-            ->orderByDesc('created_at')
-            ->limit($limit)
-            ->get();
-    }
 
-    public function getAllDiscussions(int $perPage = 12, ?string $search = null)
-    {
-        $query = DiscussionPost::query()
-            ->notTakenDown()
-            ->with(['user.profile', 'images'])
-            ->orderByDesc('created_at');
-
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->where('caption', 'like', "%{$search}%")
-                    ->orWhereHas('user.profile', function ($uq) use ($search) {
-                        $uq->where('full_name', 'like', "%{$search}%");
-                    });
-            });
-        }
-
-        return $query->paginate($perPage);
-    }
 
     /**
      * Get public statistics for the landing page.
-     * Returns total books, total users, top rated books, recent discussions, and recent complaints.
+     * Returns total books, total users, top rated books, and recent complaints.
      */
     public function getPublicStats(): array
     {
@@ -339,27 +311,6 @@ class PublicService
                 ];
             });
 
-        // Recent discussions (top 4)
-        $recentDiscussions = DiscussionPost::query()
-            ->notTakenDown()
-            ->with(['user.profile'])
-            ->orderByDesc('likes_count')
-            ->orderByDesc('created_at')
-            ->limit(4)
-            ->get()
-            ->map(function ($d) {
-                return [
-                    'id'             => $d->id,
-                    'slug'           => $d->slug,
-                    'caption'        => $d->caption,
-                    'likes_count'    => $d->likes_count,
-                    'comments_count' => $d->comments_count,
-                    'created_at'     => $d->created_at,
-                    'user_name'      => optional(optional($d->user)->profile)->full_name ?? 'Anonymous',
-                    'user_avatar'    => optional(optional($d->user)->profile)->avatar,
-                ];
-            });
-
         // Recent complaints (resolved ones, up to 4)
         $recentComplaints = Complaint::query()
             ->with(['user.profile'])
@@ -382,7 +333,6 @@ class PublicService
             'total_books'        => $totalBooks,
             'total_users'        => $totalUsers,
             'top_rated_books'    => $topRatedBooks,
-            'recent_discussions' => $recentDiscussions,
             'recent_complaints'  => $recentComplaints,
         ];
     }

@@ -49,18 +49,18 @@ export default function DateRangeFilter({
   }, [startDate]);
 
   return (
-    <div className={cn("flex flex-col sm:flex-row items-center gap-2", className)}>
-      <div className="w-full sm:w-44">
+    <div className={cn("flex flex-row items-center gap-1.5 sm:gap-2", className)}>
+      <div className="flex-1 sm:w-44">
         <DatePicker
           value={startDate}
           onChange={setStartDate}
           placeholder={t("selectStartDate")}
         />
       </div>
-      <div className="hidden sm:block text-muted-foreground font-bold">
+      <div className="text-muted-foreground font-bold shrink-0">
         -
       </div>
-      <div className="w-full sm:w-44">
+      <div className="flex-1 sm:w-44">
         <DatePicker
           value={endDate}
           onChange={setEndDate}

@@ -8,7 +8,8 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = getCookie("token");
-  const locale = (getCookie("NEXT_LOCALE") as Locale | undefined) ?? defaultLocale;
+  const locale =
+    (getCookie("NEXT_LOCALE") as Locale | undefined) ?? defaultLocale;
 
   config.headers = config.headers ?? {};
 

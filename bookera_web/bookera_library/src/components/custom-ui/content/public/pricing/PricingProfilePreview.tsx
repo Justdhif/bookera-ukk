@@ -80,12 +80,8 @@ export default function PricingProfilePreview({ fullUser, isUserLoading }: Prici
                       </p>
                     </div>
                   </div>
-                  <div className="mt-2.5 pt-2.5 border-t border-border/50 grid grid-cols-4 gap-1 text-center">
+                  <div className="mt-2.5 pt-2.5 border-t border-border/50 grid grid-cols-3 gap-1 text-center">
                     <div>
-                      <p className="text-xs font-bold text-foreground">{fullUser.discussion_posts_count || 0}</p>
-                      <p className="text-[9px] text-muted-foreground truncate">{t("posts")}</p>
-                    </div>
-                    <div className="border-l border-border/50">
                       <p className="text-xs font-bold text-foreground">{fullUser.complaints_count || 0}</p>
                       <p className="text-[9px] text-muted-foreground truncate">{t("complaints")}</p>
                     </div>
@@ -140,12 +136,8 @@ export default function PricingProfilePreview({ fullUser, isUserLoading }: Prici
                       </p>
                     </div>
                   </div>
-                  <div className="mt-2.5 pt-2.5 border-t border-border/50 grid grid-cols-4 gap-1 text-center grayscale-[0.5]">
+                  <div className="mt-2.5 pt-2.5 border-t border-border/50 grid grid-cols-3 gap-1 text-center grayscale-[0.5]">
                     <div>
-                      <p className="text-xs font-bold text-foreground">{fullUser.discussion_posts_count || 0}</p>
-                      <p className="text-[9px] text-muted-foreground truncate">{t("posts")}</p>
-                    </div>
-                    <div className="border-l border-border/50">
                       <p className="text-xs font-bold text-foreground">{fullUser.complaints_count || 0}</p>
                       <p className="text-[9px] text-muted-foreground truncate">{t("complaints")}</p>
                     </div>

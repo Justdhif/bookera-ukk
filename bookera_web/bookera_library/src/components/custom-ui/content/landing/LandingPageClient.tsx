@@ -2,19 +2,17 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion, Variants, useInView, animate } from "framer-motion";
+import { motion, useInView, animate } from "framer-motion";
 import {
   ArrowRight,
   BookOpen,
   Users,
-  MessageSquare,
   Sparkles,
   MapPin,
   Mail,
   Phone,
   Star,
   MessageCircle,
-  ThumbsUp,
   CheckCircle2,
   Bot,
   Library,
@@ -34,7 +32,7 @@ import publicService from "@/services/public.service";
 import { chatbotService } from "@/services/chatbot.service";
 import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
-import { FadeUp, StaggerContainer, FadeIn, ScaleIn } from "@/components/custom-ui/motion";
+import { FadeUp, StaggerContainer } from "@/components/custom-ui/motion";
 
 type StatsData = {
   total_books: number;
@@ -49,16 +47,6 @@ type StatsData = {
     reviews_count: number;
     favorites_count: number;
     categories: string[];
-  }>;
-  recent_discussions: Array<{
-    id: number;
-    slug: string;
-    caption: string;
-    likes_count: number;
-    comments_count: number;
-    created_at: string;
-    user_name: string;
-    user_avatar: string | null;
   }>;
   recent_complaints: Array<{
     id: number;
@@ -275,7 +263,7 @@ export default function LandingPageClient() {
               </div>
               <div className="flex flex-col items-center text-center space-y-3 p-6 rounded-3xl bg-white dark:bg-gray-950 shadow-xl shadow-gray-200/20 dark:shadow-none border border-gray-100 dark:border-gray-800">
                 <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-2">
-                  <MessageSquare className="w-6 h-6 text-amber-500" />
+                  <Sparkles className="w-6 h-6 text-amber-500" />
                 </div>
                 <h3 className="text-4xl font-bold text-gray-900 dark:text-white">
                   <AnimatedCounter value={100} suffix="%" />
@@ -354,7 +342,7 @@ export default function LandingPageClient() {
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-200 bg-brand-primary/20 blur-[150px] rounded-full" />
             <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
-              <defs><pattern id="grid-dark" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1" /></pattern></defs>
+              <defs><pattern id="grid-dark" width="40" height="40" patternUnits="userSpaceOnUse"><pattern id="grid-dark" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1" /></pattern></pattern></defs>
               <rect width="100%" height="100%" fill="url(#grid-dark)" />
             </svg>
           </div>
@@ -459,51 +447,7 @@ export default function LandingPageClient() {
               <p className="text-gray-500 dark:text-gray-400">{t("communityDesc")}</p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-12">
-              <div className="space-y-8">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                      <MessageSquare className="w-6 h-6 text-brand-primary" /> {t("discussionTitle")}
-                    </h3>
-                    <p className="text-sm text-gray-500 mt-1">{t("discussionSubtitle")}</p>
-                  </div>
-                  <Link href="/home" className="hidden sm:block">
-                    <Button variant="outline" size="sm" className="flex">
-                      {t("discussionViewAll")}
-                    </Button>
-                  </Link>
-                </div>
-
-                <div className="space-y-4">
-                  {stats?.recent_discussions && stats.recent_discussions.length > 0 ? (
-                    stats.recent_discussions.map((disc) => (
-                      <div key={disc.id} className="p-5 bg-white dark:bg-gray-950 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center gap-3 mb-3">
-                          <Avatar className="w-8 h-8 bg-gray-200 dark:bg-gray-800">
-                             <AvatarImage src={disc.user_avatar || ""} alt={disc.user_name} className="object-cover" />
-                             <AvatarFallback><Users className="w-4 h-4 text-gray-500" /></AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white">{disc.user_name}</p>
-                            <p className="text-xs text-gray-500">{new Date(disc.created_at).toLocaleDateString()}</p>
-                          </div>
-                        </div>
-                        <p className="text-gray-700 dark:text-gray-300 text-sm line-clamp-2 mb-4">{disc.caption}</p>
-                        <div className="flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-400">
-                          <span className="flex items-center gap-1.5"><ThumbsUp className="w-3.5 h-3.5" /> {disc.likes_count} {t("discussionLikes")}</span>
-                          <span className="flex items-center gap-1.5"><MessageCircle className="w-3.5 h-3.5" /> {disc.comments_count} {t("discussionComments")}</span>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-8 text-center bg-white dark:bg-gray-950 border border-dashed border-gray-200 dark:border-gray-800 rounded-2xl">
-                      <p className="text-gray-500">{t("discussionEmpty")}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
+            <div className="max-w-4xl mx-auto">
               <div className="space-y-8">
                 <div className="flex items-center justify-between">
                   <div>
@@ -519,7 +463,7 @@ export default function LandingPageClient() {
                   </Link>
                 </div>
 
-                <div className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
                   {stats?.recent_complaints && stats.recent_complaints.length > 0 ? (
                     stats.recent_complaints.map((comp) => (
                       <div key={comp.id} className="p-5 bg-white dark:bg-gray-950 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm flex items-start gap-4">
@@ -537,14 +481,14 @@ export default function LandingPageClient() {
                       </div>
                     ))
                   ) : (
-                    <div className="p-8 text-center bg-white dark:bg-gray-950 border border-dashed border-gray-200 dark:border-gray-800 rounded-2xl">
+                    <div className="col-span-2 p-8 text-center bg-white dark:bg-gray-950 border border-dashed border-gray-200 dark:border-gray-800 rounded-2xl">
                       <p className="text-gray-500">{t("complaintEmpty")}</p>
                     </div>
                   )}
-                  
-                  <div className="pt-4 p-5 rounded-2xl bg-brand-primary/5 border border-brand-primary/10 text-center">
-                     <p className="text-sm font-medium text-brand-primary-dark dark:text-brand-primary-light">"{t("complaintThankYou")}"</p>
-                  </div>
+                </div>
+                
+                <div className="pt-4 p-5 rounded-2xl bg-brand-primary/5 border border-brand-primary/10 text-center">
+                   <p className="text-sm font-medium text-brand-primary-dark dark:text-brand-primary-light">"{t("complaintThankYou")}"</p>
                 </div>
               </div>
             </div>

@@ -30,13 +30,14 @@ class DatabaseSeeder extends Seeder
             BookSeeder::class,
             BookFavoriteSeeder::class,
             BookCopySeeder::class,
-            DiscussionSeeder::class,
-            ComplaintSeeder::class,
+
             ActivityLogSeeder::class,
             BookReviewSeeder::class,
             FineTypeSeeder::class,
             BorrowSeeder::class,
             MembershipPlanSeeder::class,
+            ComplaintSeeder::class,
+            NewsSeeder::class,
         ]);
 
         Schema::enableForeignKeyConstraints();

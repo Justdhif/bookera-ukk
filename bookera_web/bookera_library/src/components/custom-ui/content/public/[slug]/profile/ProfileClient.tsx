@@ -10,9 +10,9 @@ import { useChatStore } from "@/store/chat.store";
 import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import DataLoading from "@/components/custom-ui/DataLoading";
-import { Edit, Phone, Briefcase, User as UserIcon, UserPlus, UserMinus, MessageSquareText, Loader2, Crown } from "lucide-react";
+import { Edit, Briefcase, User as UserIcon, UserPlus, UserMinus, MessageSquareText, Loader2, Crown } from "lucide-react";
 import { toast } from "sonner";
-import { normalizeOccupationValue, getOccupationLabelKey } from "@/constants/user-occupation";
+import { getOccupationLabelKey } from "@/constants/user-occupation";
 import Image from "next/image";
 import Link from "next/link";
 import ProfileActivityTabs from "./ProfileActivityTabs";
@@ -166,10 +166,6 @@ export default function ProfileClient() {
                   </div>
                   
                   <div className="flex items-center gap-6 md:gap-8 mt-3">
-                    <div className="flex items-end gap-1">
-                      <span className="font-bold text-lg text-foreground">{user.discussion_posts_count ?? 0}</span>
-                      <span className="text-xs text-muted-foreground">{t("posts")}</span>
-                    </div>
                     <div className="flex items-end gap-1">
                       <span className="font-bold text-lg text-foreground">{user.complaints_count ?? 0}</span>
                       <span className="text-xs text-muted-foreground">{t("complaints")}</span>

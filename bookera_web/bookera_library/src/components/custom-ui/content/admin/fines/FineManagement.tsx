@@ -1,7 +1,5 @@
 "use client";
 
-import ContentHeader from "@/components/custom-ui/content/ContentHeader";
-import { downloadBlobFile } from "@/lib/download";
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -9,7 +7,6 @@ import { Fine, FineFilterParams } from "@/types/fine";
 import { fineService } from "@/services/fine.service";
 import FineTable from "./FineTable";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -18,23 +15,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Download, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import DateRangeFilter from "@/components/custom-ui/DateRangeFilter";
 import { getCurrentMonthRange } from "@/lib/month-range";
 import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion";
 
-export default function FineManagement() {
+export default function FineManagement({
+  filters,
+  setFilters,
+}: {
+  filters: FineFilterParams;
+  setFilters: React.Dispatch<React.SetStateAction<FineFilterParams>>;
+}) {
   const t = useTranslations("fines");
   const defaultMonthRange = getCurrentMonthRange();
   const [fines, setFines] = useState<Fine[]>([]);
   const [loading, setLoading] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const [filters, setFilters] = useState<FineFilterParams>({
-    per_page: ITEMS_PER_PAGE_OPTIONS[1],
-    ...defaultMonthRange,
-  });
   const [searchInput, setSearchInput] = useState("");
   const [pagination, setPagination] = useState({
     current_page: 1,
@@ -94,47 +92,12 @@ export default function FineManagement() {
     }
   };
 
-  const handleExport = async () => {
-    setExporting(true);
-    try {
-      const response = await fineService.exportData(filters);
-      downloadBlobFile(
-        response.data,
-        `fines_data_${new Date().toISOString().split("T")[0]}.xlsx`,
-      );
-      toast.success(t("exportSuccess"));
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || t("exportError"));
-    } finally {
-      setExporting(false);
-    }
-  };
-
   useEffect(() => {
     fetchFines(filters);
   }, [filters]);
 
   return (
     <StaggerContainer className="space-y-6">
-      <FadeUp>
-        <ContentHeader
-          title={t("title")}
-          description={t("finesTabDescription")}
-          isAdmin
-          rightActions={
-            <Button
-              variant="outline"
-              className="h-8 gap-1 border-slate-200"
-              onClick={handleExport}
-              disabled={exporting}
-            >
-              <Download className="h-3.5 w-3.5" />
-              {t("exportData")}
-            </Button>
-          }
-        />
-      </FadeUp>
-
       <FadeUp delay={0.1}>
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto_auto] xl:items-center mb-6">
           <div className="relative min-w-0 w-full">

@@ -4,14 +4,51 @@ import { useTranslations } from "next-intl";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DollarSign, Settings } from "lucide-react";
+import { DollarSign, Settings, Plus } from "lucide-react";
 import FineTypeManagement from "./FineTypeManagement";
 import FineManagement from "./FineManagement";
 import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
+import { Button } from "@/components/ui/button";
+import { fineService } from "@/services/fine.service";
+import { downloadBlobFile } from "@/lib/download";
+import { toast } from "sonner";
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
+import { getCurrentMonthRange } from "@/lib/month-range";
+import { FineFilterParams } from "@/types/fine";
+import FineTypeFormDialog from "./FineTypeFormDialog";
+import ExportButton from "@/components/custom-ui/button/ExportButton";
 
 export default function FinesClient() {
   const t = useTranslations("fines");
   const [activeTab, setActiveTab] = useState("fines");
+
+  // Fine Management State
+  const defaultMonthRange = getCurrentMonthRange();
+  const [filters, setFilters] = useState<FineFilterParams>({
+    per_page: ITEMS_PER_PAGE_OPTIONS[1],
+    ...defaultMonthRange,
+  });
+  const [exporting, setExporting] = useState(false);
+
+  // Fine Type Management State
+  const [isTypeDialogOpen, setIsTypeDialogOpen] = useState(false);
+  const [refreshTypesKey, setRefreshTypesKey] = useState(0);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const response = await fineService.exportData(filters);
+      downloadBlobFile(
+        response.data,
+        `fines_data_${new Date().toISOString().split("T")[0]}.xlsx`,
+      );
+      toast.success(t("exportSuccess"));
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t("exportError"));
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <StaggerContainer className="space-y-6">
@@ -20,6 +57,23 @@ export default function FinesClient() {
           title={t("managementTitle")}
           description={t("managementDescription")}
           isAdmin
+          rightActions={
+            <div className="flex items-center gap-2">
+              <ExportButton
+                onClick={handleExport}
+                loading={exporting}
+                label={t("exportData")}
+              />
+              <Button
+                onClick={() => setIsTypeDialogOpen(true)}
+                variant="submit"
+                className="h-8 gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                {t("addFineType")}
+              </Button>
+            </div>
+          }
         />
       </FadeUp>
 
@@ -36,13 +90,24 @@ export default function FinesClient() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="fines" className="mt-6">
-            <FineManagement />
+            <FineManagement 
+              filters={filters} 
+              setFilters={setFilters} 
+            />
           </TabsContent>
           <TabsContent value="fine-types" className="mt-6">
-            <FineTypeManagement />
+            <FineTypeManagement 
+              refreshKey={refreshTypesKey} 
+            />
           </TabsContent>
         </Tabs>
       </FadeUp>
+
+      <FineTypeFormDialog
+        open={isTypeDialogOpen}
+        setOpen={setIsTypeDialogOpen}
+        onSuccess={() => setRefreshTypesKey(prev => prev + 1)}
+      />
     </StaggerContainer>
   );
 }

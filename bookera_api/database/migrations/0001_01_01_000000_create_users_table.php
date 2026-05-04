@@ -22,6 +22,7 @@ return new class extends Migration
                 'officer:catalog',
                 'officer:management',
                 'user',
+                'member',
             ])->default('user');
             $table->boolean('is_active')->default(false);
             $table->timestamp('last_login_at')->nullable();

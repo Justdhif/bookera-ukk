@@ -1,9 +1,7 @@
 "use client";
 import { useTranslations } from "next-intl";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User } from "@/types/user";
-import { MessageSquare, AlertCircle } from "lucide-react";
-import PublicDiscussionGrid from "../../PublicDiscussionGrid";
+import { AlertCircle } from "lucide-react";
 import PublicComplaintGrid from "../../complaints/PublicComplaintGrid";
 
 interface ProfileActivityTabsProps {
@@ -16,32 +14,21 @@ export default function ProfileActivityTabs({ user, isMe = false }: ProfileActiv
 
   return (
     <div className="mt-8">
-      <Tabs defaultValue="discussions" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2 h-11 p-1 bg-muted/40 rounded-2xl border border-border/50">
-          <TabsTrigger value="discussions" className="gap-2 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            <MessageSquare className="h-4 w-4" />
-            {isMe ? t("myDiscussions") : t("userDiscussions")}
-          </TabsTrigger>
-          <TabsTrigger value="complaints" className="gap-2 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm">
-            <AlertCircle className="h-4 w-4" />
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center gap-3 px-1">
+          <div className="p-2 rounded-xl bg-orange-500/10 text-orange-600">
+            <AlertCircle className="h-5 w-5" />
+          </div>
+          <h2 className="text-xl font-bold tracking-tight">
             {isMe ? t("myComplaints") : t("userComplaints")}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="discussions" className="mt-6 outline-none">
-          <PublicDiscussionGrid 
-            showHeader={false} 
-            userSlug={user.slug || user.id.toString()} 
-          />
-        </TabsContent>
-
-        <TabsContent value="complaints" className="mt-6 outline-none">
-          <PublicComplaintGrid 
-            showFilters={false} 
-            userId={user.id} 
-          />
-        </TabsContent>
-      </Tabs>
+          </h2>
+        </div>
+        
+        <PublicComplaintGrid 
+          showFilters={false} 
+          userId={user.id} 
+        />
+      </div>
     </div>
   );
 }

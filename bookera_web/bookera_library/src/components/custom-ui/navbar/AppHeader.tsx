@@ -43,6 +43,31 @@ export default function AppHeader({
         delayChildren={0.04}
         className="flex w-full flex-col gap-2 px-4 py-3 md:px-6"
       >
+        {(bottomLeftContent || bottomRightContent) ? (
+          <div className="flex min-w-0 items-center justify-between gap-4">
+            <SlideIn
+              as={motion.div}
+              direction="left"
+              distance={12}
+              duration={0.5}
+              delay={0.02}
+              className="min-w-0"
+            >
+              {bottomLeftContent}
+            </SlideIn>
+            <SlideIn
+              as={motion.div}
+              direction="right"
+              distance={12}
+              duration={0.5}
+              delay={0.02}
+              className="shrink-0"
+            >
+              {bottomRightContent}
+            </SlideIn>
+          </div>
+        ) : null}
+
         <div className="flex min-h-12 items-center justify-between gap-4">
           <SlideIn
             as={motion.div}
@@ -90,13 +115,6 @@ export default function AppHeader({
             />
           </SlideIn>
         </div>
-
-        {(bottomLeftContent || bottomRightContent) ? (
-          <div className="flex min-w-0 items-center justify-between gap-4">
-            <div className="min-w-0">{bottomLeftContent}</div>
-            <div className="shrink-0">{bottomRightContent}</div>
-          </div>
-        ) : null}
       </StaggerContainer>
     </header>
   );

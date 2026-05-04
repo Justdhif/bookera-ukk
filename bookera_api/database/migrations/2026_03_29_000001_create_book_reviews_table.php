@@ -12,10 +12,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('book_id')->constrained()->cascadeOnDelete();
-            $table->unsignedTinyInteger('rating'); // 1-5
+            $table->unsignedTinyInteger('rating');
             $table->text('review')->nullable();
             $table->timestamps();
-
             $table->unique(['user_id', 'book_id']);
         });
     }
