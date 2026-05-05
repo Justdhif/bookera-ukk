@@ -23,6 +23,8 @@ interface CancelReservationDialogProps {
   onSuccess: () => void;
 }
 
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
+
 export default function CancelReservationDialog({
   reservation,
   isOpen,
@@ -51,43 +53,49 @@ export default function CancelReservationDialog({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-amber-500" />
-            {t("cancelTitle")}
-          </DialogTitle>
-          <DialogDescription className="space-y-2 pt-1">
-            {isNotified ? (
-              <>
-                <span className="block font-medium text-amber-600 dark:text-amber-400">
-                  {t("cancelNotifiedWarning")}
-                </span>
-                <span className="block text-muted-foreground">
-                  {t("cancelNotifiedDesc")}
-                </span>
-              </>
-            ) : (
-              <span className="block">{t("cancelWaitingDesc")}</span>
-            )}
-          </DialogDescription>
-        </DialogHeader>
+        <StaggerContainer>
+          <FadeUp>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-amber-500" />
+                {t("cancelTitle")}
+              </DialogTitle>
+              <DialogDescription className="space-y-2 pt-1">
+                {isNotified ? (
+                  <>
+                    <span className="block font-medium text-amber-600 dark:text-amber-400">
+                      {t("cancelNotifiedWarning")}
+                    </span>
+                    <span className="block text-muted-foreground">
+                      {t("cancelNotifiedDesc")}
+                    </span>
+                  </>
+                ) : (
+                  <span className="block">{t("cancelWaitingDesc")}</span>
+                )}
+              </DialogDescription>
+            </DialogHeader>
+          </FadeUp>
 
-        <DialogFooter className="gap-2 pt-2">
-          <Button variant="outline" onClick={onClose} disabled={loading}>
-            {t("keepReservation")}
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleCancel}
-            disabled={loading}
-            className="gap-2"
-          >
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : null}
-            {loading ? t("cancelling") : t("confirmCancel")}
-          </Button>
-        </DialogFooter>
+          <FadeUp delay={0.1}>
+            <DialogFooter className="gap-2 pt-6">
+              <Button variant="outline" onClick={onClose} disabled={loading}>
+                {t("keepReservation")}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleCancel}
+                disabled={loading}
+                className="gap-2"
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : null}
+                {loading ? t("cancelling") : t("confirmCancel")}
+              </Button>
+            </DialogFooter>
+          </FadeUp>
+        </StaggerContainer>
       </DialogContent>
     </Dialog>
   );

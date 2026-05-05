@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { User } from "@/types/user";
 import { chatService, Conversation, Message } from "@/services/chat.service";
 import { chatbotService } from "@/services/chatbot.service";
@@ -9,6 +9,11 @@ import { useAuthStore } from "@/store/auth.store";
 import { echo } from "@/lib/echo";
 import { followService } from "@/services/follow.service";
 import { useTranslations } from "next-intl";
+import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { StaggerContainer, FadeUp, FadeIn, SlideIn } from "@/components/custom-ui/motion";
 import ChatList from "./ChatList";
 import ChatDetail from "./ChatDetail";
 import ChatDetailSheet from "./ChatDetailSheet";
@@ -16,7 +21,16 @@ import { encryptMessage, decryptMessage } from "@/lib/crypto";
 
 export default function ChatClient() {
   const t = useTranslations("chat");
-  const { user } = useAuthStore();
+  const tCommon = useTranslations("common");
+  const router = useRouter();
+  const { user, isAuthenticated, initialLoading } = useAuthStore();
+
+  useEffect(() => {
+    if (!initialLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [initialLoading, isAuthenticated, router]);
+
   const [isMobile, setIsMobileState] = useState(false);
 
   useEffect(() => {
@@ -86,6 +100,7 @@ export default function ChatClient() {
       setConversations(data);
     } catch (error) {
       console.error("Failed to fetch conversations", error);
+      toast.error(t("loadError") || "Failed to load conversations");
     } finally {
       if (!silent) setIsConversationsLoading(false);
     }
@@ -259,16 +274,12 @@ export default function ChatClient() {
         const aiResponse = await chatbotService.sendMessage(messageText.replace("@boteraAI", "").trim());
         const aiMessage = aiResponse.data.data.response;
         
-        // SAVE AI MESSAGE TO DATABASE
-        // We don't add it manually to setMessages anymore because Echo will broadcast it back to us 
-        // since the sender is the opponent and receiver is us. This prevents duplication.
         try {
           const aiFormData = new FormData();
           aiFormData.append("message", aiMessage);
           aiFormData.append("is_ai", "1");
           aiFormData.append("is_encrypted", "0");
           await chatService.sendMessage(activeUser.slug, aiFormData);
-          // Refresh conversations to show AI message in list
           fetchConversations(true);
         } catch (saveError) {
           console.error("Failed to save AI response to DB", saveError);
@@ -279,7 +290,7 @@ export default function ChatClient() {
     }
   };
 
-  if (!user) {
+  if (initialLoading || !isAuthenticated) {
     return null;
   }
 
@@ -299,9 +310,9 @@ export default function ChatClient() {
   });
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] overflow-hidden">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0">
-        <div className="col-span-1 lg:col-span-5">
+    <StaggerContainer className="flex flex-col h-[calc(100vh-10rem)] overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 h-full">
+        <SlideIn direction="left" className="col-span-1 lg:col-span-5 h-full">
           <ChatList
             conversations={filteredConversations}
             followedUsers={followedUsers}
@@ -314,20 +325,20 @@ export default function ChatClient() {
             searchValue={searchQuery}
             statusValue={statusFilter}
           />
-        </div>
-        <div className="hidden lg:block lg:col-span-7">
+        </SlideIn>
+        <SlideIn direction="right" className="hidden lg:block lg:col-span-7 h-full">
           <ChatDetail
             activeUser={activeUser}
             messages={messages}
             loading={isMessagesLoading}
             onSendMessage={handleSendMessage}
             onClose={() => setActiveUser(null)}
-            className="h-[calc(100vh-8rem)] rounded-xl border border-border bg-card shadow-sm"
+            className="h-full rounded-xl border border-border bg-card shadow-sm"
             moderationAlert={moderationAlert}
             onDismissAlert={dismissModerationAlert}
             isModerating={isModerating}
           />
-        </div>
+        </SlideIn>
       </div>
 
       {isMobile && (
@@ -343,8 +354,9 @@ export default function ChatClient() {
           isModerating={isModerating}
         />
       )}
-    </div>
+    </StaggerContainer>
   );
 }
+
 
 

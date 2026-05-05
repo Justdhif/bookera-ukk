@@ -15,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { publicService } from "@/services/public.service";
+import { followService } from "@/services/follow.service";
 import { Author } from "@/types/author";
 import { Publisher } from "@/types/publisher";
 import { User } from "@/types/user";
@@ -53,6 +54,12 @@ export default function AuthorPublisherSidebarSearch() {
   const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
+    if (pathname.includes("/authors/")) setActiveTab("author");
+    else if (pathname.includes("/publishers/")) setActiveTab("publisher");
+    else if (pathname.includes("/profile")) setActiveTab("user");
+  }, [pathname]);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
     }, 500);
@@ -78,10 +85,25 @@ export default function AuthorPublisherSidebarSearch() {
             page: currentPage,
           });
           const data = res.data.data;
+          let fetchedData = data.data;
+
+          if (!isLoadMore && pathname.startsWith("/authors/")) {
+            const activeSlug = pathname.split("/authors/")[1];
+            if (activeSlug && !fetchedData.some((a: Author) => a.slug === activeSlug)) {
+              try {
+                const activeRes = await publicService.getAuthorBySlug(activeSlug);
+                if (activeRes.data?.data) fetchedData = [activeRes.data.data, ...fetchedData];
+              } catch (e) {}
+            }
+          }
+
           if (isLoadMore) {
-            setAuthors((prev) => [...prev, ...data.data]);
+            setAuthors((prev) => {
+              const newItems = fetchedData.filter((newItem: Author) => !prev.some(p => p.id === newItem.id));
+              return [...prev, ...newItems];
+            });
           } else {
-            setAuthors(data.data);
+            setAuthors(fetchedData);
           }
           setLastPage(data.last_page);
         } else if (activeTab === "publisher") {
@@ -91,10 +113,25 @@ export default function AuthorPublisherSidebarSearch() {
             page: currentPage,
           });
           const data = res.data.data;
+          let fetchedData = data.data;
+
+          if (!isLoadMore && pathname.startsWith("/publishers/")) {
+            const activeSlug = pathname.split("/publishers/")[1];
+            if (activeSlug && !fetchedData.some((p: Publisher) => p.slug === activeSlug)) {
+              try {
+                const activeRes = await publicService.getPublisherBySlug(activeSlug);
+                if (activeRes.data?.data) fetchedData = [activeRes.data.data, ...fetchedData];
+              } catch (e) {}
+            }
+          }
+
           if (isLoadMore) {
-            setPublishers((prev) => [...prev, ...data.data]);
+            setPublishers((prev) => {
+              const newItems = fetchedData.filter((newItem: Publisher) => !prev.some(p => p.id === newItem.id));
+              return [...prev, ...newItems];
+            });
           } else {
-            setPublishers(data.data);
+            setPublishers(fetchedData);
           }
           setLastPage(data.last_page);
         } else {
@@ -104,14 +141,29 @@ export default function AuthorPublisherSidebarSearch() {
             page: currentPage,
           });
           const response = res.data.data;
-          const data = response.data.filter(
+          let fetchedData = response.data.filter(
             (u: User) => u.id !== currentUser?.id,
           );
 
+          if (!isLoadMore && pathname.includes("/profile")) {
+            const activeSlug = pathname.split("/")[1];
+            if (activeSlug && activeSlug !== "me" && !fetchedData.some((u: User) => u.slug === activeSlug)) {
+              try {
+                const activeRes = await followService.getUserPublicProfile(activeSlug);
+                if (activeRes.data?.data && activeRes.data.data.id !== currentUser?.id) {
+                  fetchedData = [activeRes.data.data, ...fetchedData];
+                }
+              } catch (e) {}
+            }
+          }
+
           if (isLoadMore) {
-            setUsers((prev) => [...prev, ...data]);
+            setUsers((prev) => {
+              const newItems = fetchedData.filter((newItem: User) => !prev.some(p => p.id === newItem.id));
+              return [...prev, ...newItems];
+            });
           } else {
-            setUsers(data);
+            setUsers(fetchedData);
           }
           setLastPage(response.last_page);
         }
@@ -249,7 +301,6 @@ export default function AuthorPublisherSidebarSearch() {
                   >
                     <SidebarMenuButton
                       asChild
-                      isActive={pathname === `/authors/${author.slug}`}
                       className={cn(
                         "h-auto py-2 px-3 flex items-center gap-2 transition-all duration-300 rounded-xl",
                         pathname === `/authors/${author.slug}`
@@ -260,7 +311,7 @@ export default function AuthorPublisherSidebarSearch() {
                       tooltip={!open ? author.name : undefined}
                     >
                       <Link href={`/authors/${author.slug}`} className="w-full">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 w-full">
                           <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
                             {author.photo ? (
                               <Image
@@ -277,7 +328,7 @@ export default function AuthorPublisherSidebarSearch() {
                           </div>
                           {open && (
                             <>
-                              <div className="flex flex-col overflow-hidden">
+                              <div className="flex flex-col overflow-hidden flex-1">
                                 <span className="text-sm font-medium truncate">
                                   {author.name}
                                 </span>
@@ -287,7 +338,7 @@ export default function AuthorPublisherSidebarSearch() {
                                 </span>
                               </div>
                               {pathname === `/authors/${author.slug}` && (
-                                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-primary animate-pulse" />
+                                <div className="ml-auto shrink-0 h-2 w-2 rounded-full bg-brand-primary animate-pulse" />
                               )}
                             </>
                           )}
@@ -309,7 +360,6 @@ export default function AuthorPublisherSidebarSearch() {
                   >
                     <SidebarMenuButton
                       asChild
-                      isActive={pathname === `/publishers/${publisher.slug}`}
                       className={cn(
                         "h-auto py-2 px-3 flex items-center gap-2 transition-all duration-300 rounded-xl",
                         pathname === `/publishers/${publisher.slug}`
@@ -320,7 +370,7 @@ export default function AuthorPublisherSidebarSearch() {
                       tooltip={!open ? publisher.name : undefined}
                     >
                       <Link href={`/publishers/${publisher.slug}`} className="w-full">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 w-full">
                           <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
                             {publisher.photo ? (
                               <Image
@@ -337,7 +387,7 @@ export default function AuthorPublisherSidebarSearch() {
                           </div>
                           {open && (
                             <>
-                              <div className="flex flex-col overflow-hidden">
+                              <div className="flex flex-col overflow-hidden flex-1">
                                 <span className="text-sm font-medium truncate">
                                   {publisher.name}
                                 </span>
@@ -347,7 +397,7 @@ export default function AuthorPublisherSidebarSearch() {
                                 </span>
                               </div>
                               {pathname === `/publishers/${publisher.slug}` && (
-                                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-primary animate-pulse" />
+                                <div className="ml-auto shrink-0 h-2 w-2 rounded-full bg-brand-primary animate-pulse" />
                               )}
                             </>
                           )}
@@ -365,7 +415,6 @@ export default function AuthorPublisherSidebarSearch() {
                   >
                     <SidebarMenuButton
                       asChild
-                      isActive={pathname === `/${item.slug}/profile`}
                       className={cn(
                         "h-auto py-2 px-3 flex items-center gap-2 transition-all duration-300 rounded-xl",
                         pathname === `/${item.slug}/profile`
@@ -380,7 +429,7 @@ export default function AuthorPublisherSidebarSearch() {
                       }
                     >
                       <Link href={`/${item.slug}/profile`} className="w-full">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 w-full">
                           <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
                             {item.profile?.avatar ? (
                               <Image
@@ -397,7 +446,7 @@ export default function AuthorPublisherSidebarSearch() {
                           </div>
                           {open && (
                             <>
-                              <div className="flex flex-col overflow-hidden">
+                              <div className="flex flex-col overflow-hidden flex-1">
                                 <span className="text-sm font-medium truncate">
                                   {item.profile?.full_name ||
                                     item.email.split("@")[0]}
@@ -407,7 +456,7 @@ export default function AuthorPublisherSidebarSearch() {
                                 </span>
                               </div>
                               {pathname === `/${item.slug}/profile` && (
-                                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-primary animate-pulse" />
+                                <div className="ml-auto shrink-0 h-2 w-2 rounded-full bg-brand-primary animate-pulse" />
                               )}
                             </>
                           )}

@@ -44,6 +44,8 @@ interface NotificationDetailSheetProps {
   onDelete: (id: number) => void;
 }
 
+import { ScaleIn, SlideIn } from "@/components/custom-ui/motion";
+
 export default function NotificationDetailSheet({
   open,
   onOpenChange,
@@ -58,14 +60,18 @@ export default function NotificationDetailSheet({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="right" className="p-0 w-full sm:max-w-lg border-l-0 flex flex-col items-center justify-center bg-muted/20">
           <div className="text-center space-y-4 p-8 max-w-xs">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/60 mx-auto">
-              <Bell className="h-8 w-8 text-muted-foreground/50" />
-            </div>
-            <div>
-              <h3 className="text-base font-semibold text-foreground/80">
-                {t("selectNotification")}
-              </h3>
-            </div>
+            <ScaleIn>
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/60 mx-auto">
+                <Bell className="h-8 w-8 text-muted-foreground/50" />
+              </div>
+            </ScaleIn>
+            <SlideIn direction="right" delay={0.1}>
+              <div>
+                <h3 className="text-base font-semibold text-foreground/80">
+                  {t("selectNotification")}
+                </h3>
+              </div>
+            </SlideIn>
           </div>
         </SheetContent>
       </Sheet>

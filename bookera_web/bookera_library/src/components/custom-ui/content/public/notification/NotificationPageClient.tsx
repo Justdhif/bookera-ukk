@@ -2,20 +2,29 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/auth.store";
 import { notificationService } from "@/services/notification.service";
-import {
-  Notification,
-  NotificationFilterParams,
-} from "@/types/notification";
+import { Notification, NotificationFilterParams } from "@/types/notification";
 import { toast } from "sonner";
 import DeleteConfirmDialog from "@/components/custom-ui/modal/DeleteConfirmDialog";
 import NotificationList from "./NotificationList";
 import NotificationDetail from "./NotificationDetail";
 
 import NotificationDetailSheet from "./NotificationDetailSheet";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
 export default function NotificationPageClient() {
   const t = useTranslations("notification");
+  const router = useRouter();
+  const { isAuthenticated, initialLoading } = useAuthStore();
+
+  useEffect(() => {
+    if (!initialLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [initialLoading, isAuthenticated, router]);
+
   const [isMobile, setIsMobileState] = useState(false);
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 1023px)");
@@ -35,9 +44,11 @@ export default function NotificationPageClient() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchNotifications();
-    fetchUnreadCount();
-  }, []);
+    if (isAuthenticated) {
+      fetchNotifications();
+      fetchUnreadCount();
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -77,7 +88,7 @@ export default function NotificationPageClient() {
     if (isMobile) {
       setIsDetailOpen(true);
     }
-    
+
     if (!notif.read_at) {
       try {
         await notificationService.markAsRead(notif.id);
@@ -141,10 +152,14 @@ export default function NotificationPageClient() {
     return matchesSearch && matchesStatus;
   });
 
+  if (initialLoading || !isAuthenticated) {
+    return null;
+  }
+
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] overflow-hidden">
+    <StaggerContainer className="flex flex-col h-[calc(100vh-10rem)] overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0">
-        <div className="col-span-1 lg:col-span-5">
+        <SlideIn direction="left" className="col-span-1 lg:col-span-5 h-full">
           <NotificationList
             notifications={filteredNotifications}
             loading={loading}
@@ -156,15 +171,18 @@ export default function NotificationPageClient() {
             onMarkAllAsRead={handleMarkAllAsRead}
             isMarkingAll={isMarkingAll}
           />
-        </div>
-        <div className="hidden lg:block lg:col-span-7">
+        </SlideIn>
+        <SlideIn
+          direction="right"
+          className="hidden lg:block lg:col-span-7 h-full"
+        >
           <NotificationDetail
             notification={selectedNotif}
             onClose={() => setSelectedNotif(null)}
             onDelete={setDeleteId}
-            className="h-[calc(100vh-8rem)] rounded-xl border border-border bg-card shadow-sm overflow-hidden"
+            className="h-full rounded-xl border border-border bg-card shadow-sm overflow-hidden"
           />
-        </div>
+        </SlideIn>
       </div>
 
       {isMobile && (
@@ -183,7 +201,6 @@ export default function NotificationPageClient() {
         description={t("confirmDeleteDesc")}
         onConfirm={confirmDelete}
       />
-    </div>
+    </StaggerContainer>
   );
 }
-

@@ -26,6 +26,8 @@ interface NotificationListProps {
   isMarkingAll?: boolean;
 }
 
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
+
 export default function NotificationList({
   notifications,
   loading,
@@ -60,7 +62,7 @@ export default function NotificationList({
   ];
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+    <div className="flex flex-col h-full rounded-xl border border-border bg-card shadow-sm overflow-hidden">
       <div className="px-4 pt-4 pb-3 border-b border-border bg-card/80 backdrop-blur-sm">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -117,7 +119,7 @@ export default function NotificationList({
                   key={option.value}
                   onClick={() => handleStatusClick(option.value)}
                   className={cn(
-                    "px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-150",
+                    "px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-150 h-7",
                     isActive
                       ? "bg-brand-primary text-white shadow-sm hover:bg-brand-primary/90"
                       : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -155,13 +157,15 @@ export default function NotificationList({
             className="h-full border-0"
           />
         ) : (
-          <div className="divide-y divide-border/50">
-            {notifications.map((notif) => {
+          <StaggerContainer className="divide-y divide-border/50">
+            {notifications.map((notif, idx) => {
               const isSelected = selectedId === notif.id;
               const isUnread = !notif.read_at;
               return (
-                <div
+                <SlideIn
                   key={notif.id}
+                  direction="left"
+                  delay={idx * 0.03}
                   onClick={() => onSelectNotification(notif)}
                   className={cn(
                     "relative flex gap-3 p-3.5 cursor-pointer transition-all duration-150 group",
@@ -213,10 +217,10 @@ export default function NotificationList({
                       </span>
                     </div>
                   </div>
-                </div>
+                </SlideIn>
               );
             })}
-          </div>
+          </StaggerContainer>
         )}
       </div>
     </div>

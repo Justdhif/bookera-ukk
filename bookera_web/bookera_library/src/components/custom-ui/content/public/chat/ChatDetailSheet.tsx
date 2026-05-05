@@ -32,6 +32,8 @@ import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
 
 
+import { FadeIn, FadeUp, BlurIn, ScaleIn } from "@/components/custom-ui/motion";
+
 interface ChatDetailSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -161,14 +163,18 @@ export default function ChatDetailSheet({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="right" className="p-0 w-full sm:max-w-lg border-l-0 flex flex-col items-center justify-center bg-muted/20">
           <div className="text-center space-y-4 p-8 max-w-xs">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/60 mx-auto">
-              <MessageSquareText className="h-8 w-8 text-muted-foreground/50" />
-            </div>
-            <div>
-              <h3 className="text-base font-semibold text-foreground/80">
-                {t("yourMessages")}
-              </h3>
-            </div>
+            <ScaleIn>
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/60 mx-auto">
+                <MessageSquareText className="h-8 w-8 text-muted-foreground/50" />
+              </div>
+            </ScaleIn>
+            <FadeUp delay={0.1}>
+              <div>
+                <h3 className="text-base font-semibold text-foreground/80">
+                  {t("yourMessages")}
+                </h3>
+              </div>
+            </FadeUp>
           </div>
         </SheetContent>
       </Sheet>
@@ -178,7 +184,7 @@ export default function ChatDetailSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="p-0 w-full sm:max-w-lg border-l-0 flex flex-col h-full bg-background shadow-2xl gap-0">
-        <SheetHeader className="p-4 pr-12 flex-row items-center gap-3 bg-card/95 backdrop-blur-sm shrink-0 h-17 space-y-0 text-left">
+        <SheetHeader className="p-4 pr-12 flex-row items-center gap-3 bg-card/95 backdrop-blur-sm shrink-0 h-17 border-b space-y-0 text-left">
           <Link 
             href={`/${activeUser.slug}`}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity group min-w-0"
@@ -208,7 +214,7 @@ export default function ChatDetailSheet({
         </SheetHeader>
 
         {moderationAlert && (
-          <div className="px-4 py-3 bg-linear-to-r from-red-500/10 via-orange-500/10 to-red-500/10 border-b border-red-200/50 dark:border-red-800/30 animate-in slide-in-from-top-2 duration-300 shrink-0">
+          <FadeIn className="px-4 py-3 bg-linear-to-r from-red-500/10 via-orange-500/10 to-red-500/10 border-b border-red-200/50 dark:border-red-800/30 shrink-0">
             <div className="flex items-start gap-3">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
                 <ShieldAlert className="h-4 w-4 text-red-600 dark:text-red-400" />
@@ -232,7 +238,7 @@ export default function ChatDetailSheet({
                 </Button>
               )}
             </div>
-          </div>
+          </FadeIn>
         )}
 
         <div className="flex-1 overflow-hidden relative">
@@ -247,8 +253,8 @@ export default function ChatDetailSheet({
                 </div>
               ) : (
                 <>
-                  <div className="flex justify-center mb-0">
-                    <div className="bg-amber-100 dark:bg-[#1a1608] border border-amber-200 dark:border-amber-900 px-6 py-2 rounded-xl max-w-[85%] shadow-md">
+                  <FadeUp className="flex justify-center mb-0">
+                    <div className="bg-amber-100 dark:bg-[#1a1608] border border-amber-200 dark:border-amber-900 px-6 py-2 rounded-xl max-[85%] shadow-md">
                       <div className="flex items-start gap-2">
                         <Lock className="h-3 w-3 text-amber-600 dark:text-amber-500 mt-0.5 shrink-0" />
                         <p className="text-[11px] text-amber-900 dark:text-amber-400 leading-relaxed text-center font-medium">
@@ -256,22 +262,22 @@ export default function ChatDetailSheet({
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </FadeUp>
 
                   {messages.length === 0 ? (
                     <div className="space-y-6">
-                      <div className="flex items-center justify-center py-4">
+                      <FadeIn className="flex items-center justify-center py-4">
                         <div className="px-5 py-1.5 bg-brand-primary/10 dark:bg-brand-primary/20 backdrop-blur-xl rounded-full text-[9px] font-black text-brand-primary dark:text-brand-primary-light uppercase tracking-[0.2em] border border-brand-primary/20 dark:border-brand-primary/30 shadow-xs ring-1 ring-brand-primary/10">
                           {t("today")}
                         </div>
-                      </div>
-                      <div className="flex flex-col items-center justify-center py-10 opacity-70">
+                      </FadeIn>
+                      <FadeUp delay={0.1} className="flex flex-col items-center justify-center py-10 opacity-70">
                         <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-3">
                           <MessageSquareText className="w-8 h-8 text-muted-foreground" />
                         </div>
                         <p className="text-sm font-medium">{t("noMessagesYet")}</p>
                         <p className="text-xs text-muted-foreground">{t("sendToStart")}</p>
-                      </div>
+                      </FadeUp>
                     </div>
                   ) : (
                     groupedMessages.map((group) => (

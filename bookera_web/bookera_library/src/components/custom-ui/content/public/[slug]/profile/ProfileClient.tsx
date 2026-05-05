@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
+import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion";
 
 export default function ProfileClient() {
   const router = useRouter();
@@ -102,28 +103,31 @@ export default function ProfileClient() {
   }, [slug]);
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("userProfile")}
-        description={
-          loading ? (
-            <DataLoading variant="inline" size="sm" className="justify-start mt-1" />
-          ) : (
-            t("viewProfileDescription", {
-              name: user?.profile?.full_name ?? "",
-            })
-          )
-        }
-        showBackButton
-      />
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("userProfile")}
+          description={
+            loading ? (
+              <DataLoading variant="inline" size="sm" className="justify-start mt-1" />
+            ) : (
+              t("viewProfileDescription", {
+                name: user?.profile?.full_name ?? "",
+              })
+            )
+          }
+          showBackButton
+        />
+      </FadeUp>
       {loading ? (
-        <div className="flex justify-center py-16">
+        <FadeIn key="loading" className="flex justify-center py-16">
           <DataLoading variant="inline" size="lg" />
-        </div>
+        </FadeIn>
       ) : (
         user && (
-          <>
-            <div className="flex flex-col gap-6 items-start mb-10 w-full">
+          <FadeIn key="content" className="w-full">
+            <FadeUp delay={0.1}>
+              <div className="flex flex-col gap-6 items-start mb-10 w-full">
               <div className="flex flex-row gap-5 md:gap-8 items-center w-full">
                 <div 
                   className="relative h-24 w-24 md:h-40 md:w-40 shrink-0 cursor-pointer group"
@@ -266,7 +270,10 @@ export default function ProfileClient() {
                 ) : null}
               </div>
             </div>
-            <ProfileActivityTabs user={user} isMe={user.id === currentUser?.id} />
+            </FadeUp>
+            <FadeUp delay={0.2}>
+              <ProfileActivityTabs user={user} isMe={user.id === currentUser?.id} />
+            </FadeUp>
             
             <ImagePreviewDialog
               isOpen={isPreviewOpen}
@@ -275,9 +282,9 @@ export default function ProfileClient() {
               alt={t("avatarPreview")}
               showCloseButton={false}
             />
-          </>
+          </FadeIn>
         )
       )}
-    </div>
+    </StaggerContainer>
   );
 }

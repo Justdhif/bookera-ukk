@@ -2,18 +2,19 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import { Book } from "@/types/book";
-import BorrowRequestDialog from "@/components/custom-ui/content/public/book-detail/BorrowRequestDialog";
 import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid";
 import { useAuthStore } from "@/store/auth.store";
+import { useBorrowStore } from "@/store/borrow.store";
 
 export default function FavoritesPageClient() {
   const t = useTranslations("public.favorites");
   const user = useAuthStore((state) => state.user);
   const initialLoading = useAuthStore((state) => state.initialLoading);
+  const router = useRouter();
   const [selectedBookIds, setSelectedBookIds] = useState<number[]>([]);
-  const [showBorrowModal, setShowBorrowModal] = useState(false);
   const [visibleBooks, setVisibleBooks] = useState<Book[]>([]);
 
   if (initialLoading || !user || user.role === "user") {
@@ -36,6 +37,13 @@ export default function FavoritesPageClient() {
     }
   };
 
+  const setBorrowBookIds = useBorrowStore((s) => s.setSelectedBookIds);
+
+  const handleBorrowRequest = () => {
+    setBorrowBookIds(selectedBookIds);
+    router.push("/borrow-request");
+  };
+
   return (
     <div className="container space-y-6">
       <div className="space-y-6">
@@ -46,25 +54,12 @@ export default function FavoritesPageClient() {
         <PublicBookGrid
           fetchMode="favorites"
           onSelectAll={handleSelectAll}
-          onBorrowRequest={() => setShowBorrowModal(true)}
+          onBorrowRequest={handleBorrowRequest}
           selectedBookIds={selectedBookIds}
           onSelectionChange={handleSelectBook}
           onVisibleBooksChange={setVisibleBooks}
         />
       </div>
-
-      <BorrowRequestDialog
-        bookIds={selectedBookIds}
-        initialBooks={visibleBooks.filter((book) =>
-          selectedBookIds.includes(book.id),
-        )}
-        isOpen={showBorrowModal}
-        onClose={() => setShowBorrowModal(false)}
-        onSuccess={() => {
-          setShowBorrowModal(false);
-          setSelectedBookIds([]);
-        }}
-      />
     </div>
   );
 }

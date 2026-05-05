@@ -32,6 +32,8 @@ interface NotificationDetailProps {
   className?: string;
 }
 
+import { StaggerContainer, SlideIn, ScaleIn } from "@/components/custom-ui/motion";
+
 export default function NotificationDetail({
   notification,
   onClose,
@@ -43,27 +45,36 @@ export default function NotificationDetail({
 
   if (!notification) {
     return (
-      <div className={cn(
-        "flex flex-col items-center justify-center h-full rounded-xl border border-dashed border-border/70 bg-muted/20",
-        className
-      )}>
+      <SlideIn
+        direction="right"
+        className={cn(
+          "flex flex-col items-center justify-center h-full rounded-xl border border-dashed border-border/70 bg-muted/20",
+          className
+        )}
+      >
         <div className="text-center space-y-4 p-8 max-w-xs">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/60 mx-auto">
-            <Bell className="h-8 w-8 text-muted-foreground/50" />
-          </div>
-          <div>
-            <h3 className="text-base font-semibold text-foreground/80">
-              {t("selectNotification")}
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              {t("clickToView")}
+          <ScaleIn>
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/60 mx-auto">
+              <Bell className="h-8 w-8 text-muted-foreground/50" />
+            </div>
+          </ScaleIn>
+          <SlideIn direction="right" delay={0.1}>
+            <div>
+              <h3 className="text-base font-semibold text-foreground/80">
+                {t("selectNotification")}
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                {t("clickToView")}
+              </p>
+            </div>
+          </SlideIn>
+          <SlideIn direction="right" delay={0.2}>
+            <p className="text-xs text-muted-foreground/60 bg-muted/40 rounded-lg px-3 py-2">
+              {t("pressEsc")}
             </p>
-          </div>
-          <p className="text-xs text-muted-foreground/60 bg-muted/40 rounded-lg px-3 py-2">
-            {t("pressEsc")}
-          </p>
+          </SlideIn>
         </div>
-      </div>
+      </SlideIn>
     );
   }
 

@@ -12,6 +12,9 @@ import { toast } from "sonner";
 import { Shield } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import DataLoading from "@/components/custom-ui/DataLoading";
+import { StaggerContainer } from "@/components/custom-ui/motion/StaggerContainer";
+import { FadeUp } from "@/components/custom-ui/motion/FadeUp";
+import { SlideIn } from "@/components/custom-ui/motion/SlideIn";
 
 interface PrivacyPolicyModalProps {
   open: boolean;
@@ -49,60 +52,67 @@ export function PrivacyPolicyModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-brand-primary" />
-            Privacy Policy
-          </DialogTitle>
-        </DialogHeader>
-        <ScrollArea className="mt-4 h-[calc(90vh-8rem)]">
-          {loading ? (
-            <div className="flex justify-center py-10 pr-4">
-              <DataLoading variant="inline" size="lg" />
-            </div>
-          ) : contents.length > 0 ? (
-            <div className="space-y-6 pr-4">
-              <div className="p-4 bg-linear-to-r from-brand-primary/5 to-brand-primary/10 rounded-lg border border-brand-primary/20">
-                <p className="text-sm text-muted-foreground">
-                  Last updated:
-                  {new Date(
-                    contents[contents.length - 1].updated_at,
-                  ).toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {contents.length} sections
-                </p>
-              </div>
-              <div className="prose prose-sm dark:prose-invert max-w-none space-y-6">
-                {contents.map((item) => (
-                  <div
-                    key={item.id}
-                    className="border-l-4 border-brand-primary/30 dark:border-brand-primary/50 pl-4 py-2"
-                  >
-                    <h2 className="text-lg font-semibold text-brand-primary-dark dark:text-brand-primary mb-3">
-                      {item.title}
-                    </h2>
-                    <div
-                      className="text-gray-700 dark:text-gray-300 space-y-2 prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-gray-100"
-                      dangerouslySetInnerHTML={{ __html: item.content }}
-                    />
+        <StaggerContainer>
+          <FadeUp>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5 text-brand-primary" />
+                Privacy Policy
+              </DialogTitle>
+            </DialogHeader>
+          </FadeUp>
+          <ScrollArea className="mt-4 h-[calc(90vh-8rem)]">
+            <FadeUp>
+              {loading ? (
+                <div className="flex justify-center py-10 pr-4">
+                  <DataLoading variant="inline" size="lg" />
+                </div>
+              ) : contents.length > 0 ? (
+                <StaggerContainer className="space-y-6 pr-4">
+                  <FadeUp>
+                    <div className="p-4 bg-linear-to-r from-brand-primary/5 to-brand-primary/10 rounded-lg border border-brand-primary/20">
+                      <p className="text-sm text-muted-foreground">
+                        Last updated:
+                        {new Date(
+                          contents[contents.length - 1].updated_at,
+                        ).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {contents.length} sections
+                      </p>
+                    </div>
+                  </FadeUp>
+                  <div className="prose prose-sm dark:prose-invert max-w-none space-y-6">
+                    {contents.map((item) => (
+                      <SlideIn key={item.id}>
+                        <div className="border-l-4 border-brand-primary/30 dark:border-brand-primary/50 pl-4 py-2">
+                          <h2 className="text-lg font-semibold text-brand-primary-dark dark:text-brand-primary mb-3">
+                            {item.title}
+                          </h2>
+                          <div
+                            className="text-gray-700 dark:text-gray-300 space-y-2 prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-gray-100"
+                            dangerouslySetInnerHTML={{ __html: item.content }}
+                          />
+                        </div>
+                      </SlideIn>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-              <div className="mb-4 flex justify-center opacity-50">
-                <Shield className="w-12 h-12" />
-              </div>
-              <p>Content not available</p>
-            </div>
-          )}
-        </ScrollArea>
+                </StaggerContainer>
+              ) : (
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  <div className="mb-4 flex justify-center opacity-50">
+                    <Shield className="w-12 h-12" />
+                  </div>
+                  <p>Content not available</p>
+                </div>
+              )}
+            </FadeUp>
+          </ScrollArea>
+        </StaggerContainer>
       </DialogContent>
     </Dialog>
   );

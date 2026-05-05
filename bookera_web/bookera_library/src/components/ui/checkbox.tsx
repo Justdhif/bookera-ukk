@@ -13,7 +13,7 @@ const checkboxVariants = cva(
     variants: {
       variant: {
         default:
-          "size-4 rounded-sm border border-primary ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+          "size-4 rounded-sm border border-brand-primary ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=checked]:bg-brand-primary data-[state=checked]:text-primary-foreground",
         circle:
           "size-5 rounded-full border border-input bg-background text-white focus-visible:border-brand-primary focus-visible:ring-2 focus-visible:ring-brand-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:border-white/15 dark:bg-white/5 dark:focus-visible:ring-brand-primary/35 data-[state=checked]:border-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white dark:data-[state=checked]:border-brand-primary dark:data-[state=checked]:bg-brand-primary",
       },
@@ -45,7 +45,7 @@ function Checkbox({
       >
         <CheckIcon
           className={cn(
-            variant === "circle" ? "size-3.5 text-white" : "size-3",
+            variant === "circle" ? "size-3.5 text-white" : "size-3 text-white",
           )}
           strokeWidth={3}
         />

@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { BookText, Building2 } from "lucide-react";
 import { Publisher } from "@/types/publisher";
@@ -12,9 +13,9 @@ import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import BorrowRequestDialog from "@/components/custom-ui/content/public/book-detail/BorrowRequestDialog";
+import { useBorrowStore } from "@/store/borrow.store";
 import { WallpaperPattern } from "@/components/custom-ui/WallpaperPattern";
-
+import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion";
 
 interface PublisherDetailClientProps {
   slug: string;
@@ -26,11 +27,11 @@ export default function PublisherDetailClient({ slug }: PublisherDetailClientPro
   const tCommon = useTranslations("common");
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  const router = useRouter();
   const [publisher, setPublisher] = useState<Publisher | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [selectedBookIds, setSelectedBookIds] = useState<number[]>([]);
-  const [showBorrowModal, setShowBorrowModal] = useState(false);
   const [visibleBooks, setVisibleBooks] = useState<Book[]>([]);
 
   const publisherIdsArray = useMemo(() => publisher ? [publisher.id] : undefined, [publisher?.id]);
@@ -66,29 +67,32 @@ export default function PublisherDetailClient({ slug }: PublisherDetailClientPro
     }
   };
 
+  const setBorrowBookIds = useBorrowStore((s) => s.setSelectedBookIds);
+
   const renderContent = () => {
     if (loading) {
       return (
-        <div className="flex justify-center py-32">
+        <FadeIn key="loading" className="flex justify-center py-32">
           <DataLoading variant="inline" size="lg" />
-        </div>
+        </FadeIn>
       );
     }
 
     if (!publisher) {
       return (
-        <div className="py-20">
+        <FadeIn key="empty" className="py-20">
           <EmptyState
             icon={<Building2 className="h-12 w-12 text-muted-foreground/50" />}
             title={t("notFound")}
             description="The publisher you are looking for does not exist."
           />
-        </div>
+        </FadeIn>
       );
     }
 
     return (
-      <>
+      <FadeIn key="content" className="space-y-0">
+        <FadeUp delay={0.1}>
         <div className="bg-card rounded-3xl border border-border/40 overflow-hidden shadow-xs hover:shadow-md transition-shadow">
           <div className="relative h-32 sm:h-48 overflow-hidden">
             <WallpaperPattern 
@@ -140,42 +144,37 @@ export default function PublisherDetailClient({ slug }: PublisherDetailClientPro
             </div>
           </div>
         </div>
+        </FadeUp>
 
         {/* Books Section */}
-        <div className="space-y-6 pt-8">
+        <FadeUp delay={0.2} className="space-y-6 pt-8">
           <PublicBookGrid 
               publisherIds={publisherIdsArray} 
               onSelectAll={handleSelectAll}
-              onBorrowRequest={() => setShowBorrowModal(true)}
+              onBorrowRequest={() => {
+                setBorrowBookIds(selectedBookIds);
+                router.push("/borrow-request");
+              }}
               selectedBookIds={selectedBookIds} 
               onSelectionChange={handleSelectBook}
               onVisibleBooksChange={setVisibleBooks}
           />
-        </div>
-
-        <BorrowRequestDialog
-          bookIds={selectedBookIds}
-          initialBooks={visibleBooks.filter((book) => selectedBookIds.includes(book.id))}
-          isOpen={showBorrowModal}
-          onClose={() => setShowBorrowModal(false)}
-          onSuccess={() => {
-            setShowBorrowModal(false);
-            setSelectedBookIds([]);
-          }}
-        />
-      </>
+        </FadeUp>
+      </FadeIn>
     );
   };
 
   return (
-    <div className="container space-y-8 pb-12">
-      <ContentHeader 
-        title={t("title")}
-        description={t("description", { name: publisher?.name || "..." })}
-        showBackButton={true}
-      />
+    <StaggerContainer className="container space-y-8 pb-12">
+      <FadeUp>
+        <ContentHeader 
+          title={t("title")}
+          description={t("description", { name: publisher?.name || "..." })}
+          showBackButton={true}
+        />
+      </FadeUp>
 
       {renderContent()}
-    </div>
+    </StaggerContainer>
   );
 }

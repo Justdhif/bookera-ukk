@@ -21,6 +21,12 @@ import { Publisher } from "@/types/publisher";
 import BookCopyList from "@/components/custom-ui/content/admin/book/book-detail/BookCopyList";
 import BookSideCard from "@/components/custom-ui/content/admin/book/BookSideCard";
 import BookForm from "@/components/custom-ui/content/admin/book/BookForm";
+import {
+  StaggerContainer,
+  FadeUp,
+  FadeIn,
+  SlideIn,
+} from "@/components/custom-ui/motion";
 import AuthorFormDialog from "@/components/custom-ui/content/admin/author/AuthorFormDialog";
 import PublisherFormDialog from "@/components/custom-ui/content/admin/publisher/PublisherFormDialog";
 import FavoriteButton from "./FavoriteButton";
@@ -292,45 +298,49 @@ export default function BookDetailClient() {
   };
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={isAdmin ? tAdmin("bookDetail") : tPublic("bookDetailTitle")}
-        description={
-          isAdmin
-            ? isEditMode
-              ? tAdmin("editBookInfo")
-              : tAdmin("viewBookDetails")
-            : tPublic("completeBookDesc")
-        }
-        showBackButton
-        isAdmin={isAdmin}
-        rightActions={
-          isAdmin ? null : (
-            book && canUseMemberActions && (
-              <div className="flex flex-wrap items-center gap-3">
-                <FavoriteButton bookId={book.id} />
-                {/* Show AddToRequest only when stock is available OR user has a notified reservation */}
-                {((book.available_copies ?? 0) > 0 || book.user_has_available_copy) && (
-                  <AddToRequestButton book={book} />
-                )}
-                <ReservationButton book={book} onReservationChange={fetchBook} />
-              </div>
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={isAdmin ? tAdmin("bookDetail") : tPublic("bookDetailTitle")}
+          description={
+            isAdmin
+              ? isEditMode
+                ? tAdmin("editBookInfo")
+                : tAdmin("viewBookDetails")
+              : tPublic("completeBookDesc")
+          }
+          showBackButton
+          isAdmin={isAdmin}
+          rightActions={
+            isAdmin ? null : (
+              book && canUseMemberActions && (
+                <div className="flex flex-wrap items-center gap-3">
+                  <FavoriteButton bookId={book.id} />
+                  {/* Show AddToRequest only when stock is available OR user has a notified reservation */}
+                  {((book.available_copies ?? 0) > 0 || book.user_has_available_copy) && (
+                    <AddToRequestButton book={book} />
+                  )}
+                  <ReservationButton book={book} onReservationChange={fetchBook} />
+                </div>
+              )
             )
-          )
-        }
-      />
+          }
+        />
+      </FadeUp>
 
       {loading ? (
-        <div className="grid gap-6 lg:grid-cols-3">
-          <DataLoading className="lg:col-span-1" size="lg" />
-          <DataLoading className="lg:col-span-2" size="lg" />
-        </div>
+        <FadeIn key="loading">
+          <div className="grid gap-6 lg:grid-cols-3">
+            <DataLoading className="lg:col-span-1" size="lg" />
+            <DataLoading className="lg:col-span-2" size="lg" />
+          </div>
+        </FadeIn>
       ) : (
         book &&
         (isAdmin ? (
-          <>
+          <FadeIn key="admin-content" className="space-y-6">
             <div className="grid gap-6 lg:grid-cols-3">
-              <div className="lg:self-start lg:sticky lg:top-4">
+              <FadeUp delay={0.1} className="lg:self-start lg:sticky lg:top-4">
                 <BookSideCard
                   coverPreview={coverPreview}
                   isEditMode={isEditMode}
@@ -342,43 +352,47 @@ export default function BookDetailClient() {
                   coverError={coverError}
                   onCoverValidationChange={handleCoverValidationChange}
                 />
-              </div>
-              <BookForm
-                book={book}
-                isEditMode={isEditMode}
-                formData={formData}
-                setFormData={setFormData}
-                onInputChange={handleInputChange}
-                onYearChange={handleYearChange}
-                onCategoryChange={handleCategoryChange}
-                onGenreChange={handleGenreChange}
-                onAuthorChange={handleAuthorChange}
-                onPublisherChange={handlePublisherChange}
-                onAddAuthor={() => setAuthorDialogOpen(true)}
-                onAddPublisher={() => setPublisherDialogOpen(true)}
-                genres={genres}
-                categories={categories}
-                authors={authors}
-                publishers={publishers}
-                onValidationChange={handleFormValidationChange}
-                onSubmit={handleSubmit}
-                onCancel={handleCancelEdit}
-                onEdit={() => setIsEditMode(true)}
-                submitting={submitting}
-                isSubmitDisabled={isSubmitDisabled()}
-              />
+              </FadeUp>
+              <FadeUp delay={0.2} className="lg:col-span-2">
+                <BookForm
+                  book={book}
+                  isEditMode={isEditMode}
+                  formData={formData}
+                  setFormData={setFormData}
+                  onInputChange={handleInputChange}
+                  onYearChange={handleYearChange}
+                  onCategoryChange={handleCategoryChange}
+                  onGenreChange={handleGenreChange}
+                  onAuthorChange={handleAuthorChange}
+                  onPublisherChange={handlePublisherChange}
+                  onAddAuthor={() => setAuthorDialogOpen(true)}
+                  onAddPublisher={() => setPublisherDialogOpen(true)}
+                  genres={genres}
+                  categories={categories}
+                  authors={authors}
+                  publishers={publishers}
+                  onValidationChange={handleFormValidationChange}
+                  onSubmit={handleSubmit}
+                  onCancel={handleCancelEdit}
+                  onEdit={() => setIsEditMode(true)}
+                  submitting={submitting}
+                  isSubmitDisabled={isSubmitDisabled()}
+                />
+              </FadeUp>
             </div>
             {!isEditMode && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">
-                    {tAdmin("bookCopies")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <BookCopyList book={book} onChange={fetchBook} />
-                </CardContent>
-              </Card>
+              <FadeUp delay={0.3}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-xl">
+                      {tAdmin("bookCopies")}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <BookCopyList book={book} onChange={fetchBook} />
+                  </CardContent>
+                </Card>
+              </FadeUp>
             )}
             <AuthorFormDialog
               open={authorDialogOpen}
@@ -390,11 +404,11 @@ export default function BookDetailClient() {
               setOpen={setPublisherDialogOpen}
               onSuccess={() => fetchPublishers()}
             />
-          </>
+          </FadeIn>
         ) : (
-          <>
+          <FadeIn key="public-content" className="space-y-6">
             <div className="grid gap-6 lg:grid-cols-3">
-              <div className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
+              <FadeUp delay={0.1} className="lg:col-span-1 lg:self-start lg:sticky lg:top-4">
                 <Card className="flex flex-col">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
@@ -447,240 +461,244 @@ export default function BookDetailClient() {
                     </div>
                   </CardContent>
                 </Card>
-              </div>
+              </FadeUp>
 
               <div className="lg:col-span-2 flex flex-col gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{tPublic("bookInformationTitle")}</CardTitle>
-                    <CardDescription>
-                      {tPublic("completeBookDetails")}
-                    </CardDescription>
-                    {book.average_rating !== undefined && (
-                      <div
-                        className="flex items-center gap-1.5 mt-2 bg-yellow-50 dark:bg-yellow-900/20 px-3 py-1.5 rounded-full w-fit"
-                      >
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span className="font-semibold text-sm">
-                          {Number(book.average_rating).toFixed(1)}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          ({book.reviews_count || 0} {tPublic("reviewsTotal")})
-                        </span>
-                      </div>
-                    )}
-                    
-                    {book.user_has_available_copy && (
-                      <div className="flex items-center gap-3 p-3 mt-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm">
-                        <div className="bg-emerald-500 p-1.5 rounded-lg">
-                          <Bell className="h-4 w-4 text-white" />
+                <FadeUp delay={0.2}>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>{tPublic("bookInformationTitle")}</CardTitle>
+                      <CardDescription>
+                        {tPublic("completeBookDetails")}
+                      </CardDescription>
+                      {book.average_rating !== undefined && (
+                        <div
+                          className="flex items-center gap-1.5 mt-2 bg-yellow-50 dark:bg-yellow-900/20 px-3 py-1.5 rounded-full w-fit"
+                        >
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          <span className="font-semibold text-sm">
+                            {Number(book.average_rating).toFixed(1)}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            ({book.reviews_count || 0} {tPublic("reviewsTotal")})
+                          </span>
                         </div>
-                        <div className="space-y-0.5">
-                          <p className="font-bold text-emerald-600 dark:text-emerald-400">
-                            {tPublic("reservedCopyAvailable") || "Book Ready for You!"}
-                          </p>
-                          <p className="text-muted-foreground text-xs font-medium">
-                            {tPublic("reservedCopyAvailableDesc") || "A copy is reserved exclusively for you. Please borrow it within 24 hours."}
-                          </p>
+                      )}
+                      
+                      {book.user_has_available_copy && (
+                        <div className="flex items-center gap-3 p-3 mt-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm">
+                          <div className="bg-emerald-500 p-1.5 rounded-lg">
+                            <Bell className="h-4 w-4 text-white" />
+                          </div>
+                          <div className="space-y-0.5">
+                            <p className="font-bold text-emerald-600 dark:text-emerald-400">
+                              {tPublic("reservedCopyAvailable") || "Book Ready for You!"}
+                            </p>
+                            <p className="text-muted-foreground text-xs font-medium">
+                              {tPublic("reservedCopyAvailableDesc") || "A copy is reserved exclusively for you. Please borrow it within 24 hours."}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* Queue Status Notification */}
-                    {book.user_reservation && book.user_reservation.status === "waiting" && (
-                      <div className="flex items-center gap-3 p-3 mt-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm">
-                        <div className="bg-amber-500 p-1.5 rounded-lg">
-                          <Clock className="h-4 w-4 text-white" />
+                      {/* Queue Status Notification */}
+                      {book.user_reservation && book.user_reservation.status === "waiting" && (
+                        <div className="flex items-center gap-3 p-3 mt-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm">
+                          <div className="bg-amber-500 p-1.5 rounded-lg">
+                            <Clock className="h-4 w-4 text-white" />
+                          </div>
+                          <div className="space-y-0.5">
+                            <p className="font-bold text-amber-600 dark:text-amber-400">
+                              {tPublic("queuePositionTitle") || "In Reservation Queue"}
+                            </p>
+                            <p className="text-muted-foreground text-xs font-medium">
+                              {tPublic("queuePosition", { pos: book.user_reservation.queue_position })}
+                            </p>
+                          </div>
                         </div>
-                        <div className="space-y-0.5">
-                          <p className="font-bold text-amber-600 dark:text-amber-400">
-                            {tPublic("queuePositionTitle") || "In Reservation Queue"}
-                          </p>
-                          <p className="text-muted-foreground text-xs font-medium">
-                            {tPublic("queuePosition", { pos: book.user_reservation.queue_position })}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-lg">
-                        {tPublic("basicInformation")}
-                      </h3>
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="space-y-1">
-                          <Label className="text-muted-foreground">
-                            {tPublic("titleLabel")}
-                          </Label>
-                          <p className="font-medium">{book.title}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-muted-foreground">
-                            {tPublic("isbnLabel")}
-                          </Label>
-                          <p className="font-medium">{book.isbn || "-"}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-muted-foreground">
-                            {tPublic("publicationYear")}
-                          </Label>
-                          <p className="font-medium">
-                            {book.publication_year || "-"}
-                          </p>
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-muted-foreground">
-                            {tPublic("languageLabel")}
-                          </Label>
-                          <p className="font-medium">{book.language || "-"}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <Label className="text-muted-foreground">
-                            {tPublic("available")}
-                          </Label>
-                          <p className="font-medium">
-                            {book.copies?.length || 0}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {book.authors && book.authors.length > 0 && (
+                      )}
+                    </CardHeader>
+                    <CardContent className="space-y-6">
                       <div className="space-y-4">
-                        <h3 className="font-semibold text-lg flex items-center gap-2">
-                          <UserSquare className="h-5 w-5" />{" "}
-                          {tPublic("authorsSection")}
+                        <h3 className="font-semibold text-lg">
+                          {tPublic("basicInformation")}
                         </h3>
-                        <div className="flex flex-col gap-2">
-                          {book.authors.map((author) => (
-                            <Link
-                              key={author.id}
-                              href={`/authors/${author.slug}`}
-                              className="flex items-center gap-3 w-fit hover:bg-muted/50 p-1.5 -m-1.5 rounded-lg transition-colors group"
-                            >
-                              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-border group-hover:border-brand-primary transition-colors">
-                                <Image
-                                  src={author.photo}
-                                  alt={author.name}
-                                  className="w-full h-full object-cover"
-                                  width={300}
-                                  height={400}
-                                  unoptimized
-                                />
-                              </div>
-                              <span className="text-sm font-medium group-hover:text-brand-primary transition-colors underline-offset-4 group-hover:underline">
-                                {author.name}
-                              </span>
-                            </Link>
-                          ))}
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <div className="space-y-1">
+                            <Label className="text-muted-foreground">
+                              {tPublic("titleLabel")}
+                            </Label>
+                            <p className="font-medium">{book.title}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-muted-foreground">
+                              {tPublic("isbnLabel")}
+                            </Label>
+                            <p className="font-medium">{book.isbn || "-"}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-muted-foreground">
+                              {tPublic("publicationYear")}
+                            </Label>
+                            <p className="font-medium">
+                              {book.publication_year || "-"}
+                            </p>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-muted-foreground">
+                              {tPublic("languageLabel")}
+                            </Label>
+                            <p className="font-medium">{book.language || "-"}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-muted-foreground">
+                              {tPublic("available")}
+                            </Label>
+                            <p className="font-medium">
+                              {book.copies?.length || 0}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    )}
 
-                    {book.publishers && book.publishers.length > 0 && (
+                      {book.authors && book.authors.length > 0 && (
+                        <div className="space-y-4">
+                          <h3 className="font-semibold text-lg flex items-center gap-2">
+                            <UserSquare className="h-5 w-5" />{" "}
+                            {tPublic("authorsSection")}
+                          </h3>
+                          <div className="flex flex-col gap-2">
+                            {book.authors.map((author) => (
+                              <Link
+                                key={author.id}
+                                href={`/authors/${author.slug}`}
+                                className="flex items-center gap-3 w-fit hover:bg-muted/50 p-1.5 -m-1.5 rounded-lg transition-colors group"
+                              >
+                                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-border group-hover:border-brand-primary transition-colors">
+                                  <Image
+                                    src={author.photo}
+                                    alt={author.name}
+                                    className="w-full h-full object-cover"
+                                    width={300}
+                                    height={400}
+                                    unoptimized
+                                  />
+                                </div>
+                                <span className="text-sm font-medium group-hover:text-brand-primary transition-colors underline-offset-4 group-hover:underline">
+                                  {author.name}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {book.publishers && book.publishers.length > 0 && (
+                        <div className="space-y-4">
+                          <h3 className="font-semibold text-lg flex items-center gap-2">
+                            <Building2 className="h-5 w-5" />
+                            {tPublic("publishersSection")}
+                          </h3>
+                          <div className="flex flex-col gap-2">
+                            {book.publishers.map((publisher) => (
+                              <Link
+                                key={publisher.id}
+                                href={`/publishers/${publisher.slug}`}
+                                className="flex items-center gap-3 w-fit hover:bg-muted/50 p-1.5 -m-1.5 rounded-lg transition-colors group"
+                              >
+                                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-border group-hover:border-brand-primary transition-colors">
+                                  <Image
+                                    src={publisher.photo}
+                                    alt={publisher.name}
+                                    className="w-full h-full object-cover"
+                                    width={300}
+                                    height={400}
+                                    unoptimized
+                                  />
+                                </div>
+                                <span className="text-sm font-medium group-hover:text-brand-primary transition-colors underline-offset-4 group-hover:underline">
+                                  {publisher.name}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       <div className="space-y-4">
-                        <h3 className="font-semibold text-lg flex items-center gap-2">
-                          <Building2 className="h-5 w-5" />
-                          {tPublic("publishersSection")}
+                        <h3 className="font-semibold text-lg">
+                          {tPublic("categoriesSection")}
                         </h3>
-                        <div className="flex flex-col gap-2">
-                          {book.publishers.map((publisher) => (
-                            <Link
-                              key={publisher.id}
-                              href={`/publishers/${publisher.slug}`}
-                              className="flex items-center gap-3 w-fit hover:bg-muted/50 p-1.5 -m-1.5 rounded-lg transition-colors group"
-                            >
-                              <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-border group-hover:border-brand-primary transition-colors">
-                                <Image
-                                  src={publisher.photo}
-                                  alt={publisher.name}
-                                  className="w-full h-full object-cover"
-                                  width={300}
-                                  height={400}
-                                  unoptimized
-                                />
-                              </div>
-                              <span className="text-sm font-medium group-hover:text-brand-primary transition-colors underline-offset-4 group-hover:underline">
-                                {publisher.name}
-                              </span>
-                            </Link>
-                          ))}
-                        </div>
+                        {book.categories && book.categories.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {book.categories.map((category) => (
+                              <Badge key={category.id} variant="default">
+                                {category.name}
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-muted-foreground">
+                            {tPublic("noCategoryPublic")}
+                          </p>
+                        )}
                       </div>
-                    )}
 
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-lg">
-                        {tPublic("categoriesSection")}
-                      </h3>
-                      {book.categories && book.categories.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                          {book.categories.map((category) => (
-                            <Badge key={category.id} variant="default">
-                              {category.name}
-                            </Badge>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-muted-foreground">
-                          {tPublic("noCategoryPublic")}
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-lg">
+                          {tPublic("descriptionSection")}
+                        </h3>
+                        <p className="whitespace-pre-line text-muted-foreground leading-relaxed">
+                          {book.description || tPublic("noDescriptionAvailable")}
                         </p>
-                      )}
-                    </div>
+                      </div>
 
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-lg">
-                        {tPublic("descriptionSection")}
-                      </h3>
-                      <p className="whitespace-pre-line text-muted-foreground leading-relaxed">
-                        {book.description || tPublic("noDescriptionAvailable")}
-                      </p>
-                    </div>
-
-                    <div className="space-y-4 pt-4 border-t">
-                      <h3 className="font-semibold text-lg">
-                        {tPublic("availableCopiesTitle")}
-                      </h3>
-                      {book.copies && book.copies.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          {book.copies.map((copy) => (
-                            <div
-                              key={copy.id}
-                              className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-background border text-sm hover:shadow-sm transition-shadow"
-                            >
-                              <span className="font-medium text-xs">
-                                #{copy.copy_code}
-                              </span>
-                              <BookCopyStatusBadge status={copy.status} />
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center py-8 text-muted-foreground text-sm border-2 border-dashed rounded-xl">
-                          <BookOpen className="h-6 w-6 mb-2 opacity-30" />
-                          <p>{tPublic("noCopies") || "No copies"}</p>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div className="space-y-4 pt-4 border-t">
+                        <h3 className="font-semibold text-lg">
+                          {tPublic("availableCopiesTitle")}
+                        </h3>
+                        {book.copies && book.copies.length > 0 ? (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {book.copies.map((copy) => (
+                              <div
+                                key={copy.id}
+                                className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-background border text-sm hover:shadow-sm transition-shadow"
+                              >
+                                <span className="font-medium text-xs">
+                                  #{copy.copy_code}
+                                </span>
+                                <BookCopyStatusBadge status={copy.status} />
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-8 text-muted-foreground text-sm border-2 border-dashed rounded-xl">
+                            <BookOpen className="h-6 w-6 mb-2 opacity-30" />
+                            <p>{tPublic("noCopies") || "No copies"}</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </FadeUp>
               </div>
             </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl">
-                  {tPublic("reviewsTitle")}
-                </CardTitle>
-                <CardDescription>{tPublic("reviewsDesc")}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <BookReviewSection book={book} onReviewSubmit={fetchBook} />
-              </CardContent>
-            </Card>
+            <FadeUp delay={0.3}>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">
+                    {tPublic("reviewsTitle")}
+                  </CardTitle>
+                  <CardDescription>{tPublic("reviewsDesc")}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <BookReviewSection book={book} onReviewSubmit={fetchBook} />
+                </CardContent>
+              </Card>
+            </FadeUp>
 
-            <div className="pt-6 border-t">
+            <FadeUp delay={0.4} className="pt-6 border-t">
               <div className="mb-6">
                 <h2 className="text-2xl font-bold tracking-tight">
                   {tPublic("exploreOtherBooks") || "Explore Other Books"}
@@ -693,10 +711,10 @@ export default function BookDetailClient() {
                 showBorrowActions={false}
                 genreIds={relatedGenreIds.length > 0 ? relatedGenreIds : undefined}
               />
-            </div>
-          </>
+            </FadeUp>
+          </FadeIn>
         ))
       )}
-    </div>
+    </StaggerContainer>
   );
 }

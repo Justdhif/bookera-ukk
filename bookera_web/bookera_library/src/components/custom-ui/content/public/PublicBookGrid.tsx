@@ -30,6 +30,8 @@ interface PublicBookGridProps {
   refreshKey?: number;
 }
 
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
+
 export default function PublicBookGrid({
   fetchMode = "books",
   search,
@@ -251,40 +253,42 @@ export default function PublicBookGrid({
         {isLoadingInitial ? (
           <DataLoading size="lg" />
         ) : books.length === 0 ? (
-          <div className="space-y-4">
-            <EmptyState
-              icon={fetchMode === "favorites" ? <Heart /> : <Search />}
-              title={
-                fetchMode === "favorites"
-                  ? effectiveSearch || selectedCategoryId
-                    ? tFavorites("noResults")
-                    : tFavorites("noFavorites")
-                  : tPublic("notFound")
-              }
-              description={
-                fetchMode === "favorites"
-                  ? effectiveSearch || selectedCategoryId
-                    ? tFavorites("noResultsDesc")
-                    : tFavorites("noFavoritesDesc")
-                  : tPublic("notFoundDesc")
-              }
-              variant="compact"
-            />
+          <FadeUp>
+            <div className="space-y-4">
+              <EmptyState
+                icon={fetchMode === "favorites" ? <Heart /> : <Search />}
+                title={
+                  fetchMode === "favorites"
+                    ? effectiveSearch || selectedCategoryId
+                      ? tFavorites("noResults")
+                      : tFavorites("noFavorites")
+                    : tPublic("notFound")
+                }
+                description={
+                  fetchMode === "favorites"
+                    ? effectiveSearch || selectedCategoryId
+                      ? tFavorites("noResultsDesc")
+                      : tFavorites("noFavoritesDesc")
+                    : tPublic("notFoundDesc")
+                }
+                variant="compact"
+              />
 
-            {page < totalPages && (
-              <div className="flex justify-center pt-2">
-                <LoadMoreButton
-                  onClick={handleLoadMore}
-                  loading={loadingMore}
-                  variant="outline"
-                  type="button"
-                />
-              </div>
-            )}
-          </div>
+              {page < totalPages && (
+                <div className="flex justify-center pt-2">
+                  <LoadMoreButton
+                    onClick={handleLoadMore}
+                    loading={loadingMore}
+                    variant="outline"
+                    type="button"
+                  />
+                </div>
+              )}
+            </div>
+          </FadeUp>
         ) : (
           <div className="space-y-6">
-            <div
+            <StaggerContainer
               className={cn(
                 "grid grid-cols-2 gap-3 transition-opacity duration-300 sm:grid-cols-3 md:grid-cols-4",
               )}
@@ -300,17 +304,19 @@ export default function PublicBookGrid({
                   }
                 />
               ))}
-            </div>
+            </StaggerContainer>
 
             {page < totalPages && (
-              <div className="flex justify-center pt-4 pb-2">
-                <LoadMoreButton
-                  onClick={handleLoadMore}
-                  loading={loadingMore}
-                  variant="outline"
-                  type="button"
-                />
-              </div>
+              <FadeUp>
+                <div className="flex justify-center pt-4 pb-2">
+                  <LoadMoreButton
+                    onClick={handleLoadMore}
+                    loading={loadingMore}
+                    variant="outline"
+                    type="button"
+                  />
+                </div>
+              </FadeUp>
             )}
           </div>
         )}

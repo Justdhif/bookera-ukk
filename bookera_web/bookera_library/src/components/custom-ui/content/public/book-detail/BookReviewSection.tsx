@@ -23,6 +23,8 @@ interface BookReviewSectionProps {
   onReviewSubmit?: () => void;
 }
 
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
+
 export default function BookReviewSection({
   book,
   onReviewSubmit,
@@ -101,89 +103,94 @@ export default function BookReviewSection({
         {loading ? (
           <DataLoading size="md" className="py-12" />
         ) : !reviews?.data.length ? (
-          <div className="text-center py-12 px-4 border rounded-xl bg-gray-50/50 dark:bg-gray-800/20">
-            <Star className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-            <p className="text-muted-foreground">{t("noReviewsYet")}</p>
-          </div>
+          <FadeUp>
+            <div className="text-center py-12 px-4 border rounded-xl bg-gray-50/50 dark:bg-gray-800/20">
+              <Star className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+              <p className="text-muted-foreground">{t("noReviewsYet")}</p>
+            </div>
+          </FadeUp>
         ) : (
-          <div className="space-y-4">
-            {reviews.data.map((r) => (
-              <div
-                key={r.id}
-                className="flex gap-4 p-4 border rounded-xl bg-card hover:bg-muted/30 transition-colors"
-              >
-                <Link
-                  href={`/${r.user?.slug}/profile`}
-                  className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-primary/10 hover:opacity-80 transition-opacity"
+          <StaggerContainer className="space-y-4">
+            {reviews.data.map((r, idx) => (
+              <FadeUp key={r.id} delay={idx * 0.05}>
+                <div
+                  className="flex gap-4 p-4 border rounded-xl bg-card hover:bg-muted/30 transition-colors"
                 >
-                  <Image
-                    src={
-                      r.user?.profile?.avatar ||
-                      "/assets/images/default-avatar.png"
-                    }
-                    width={40}
-                    height={40}
-                    alt="User"
-                    className="object-cover w-full h-full"
-                    unoptimized
-                  />
-                </Link>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-start gap-2 mb-1">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <Link
-                        href={`/${r.user?.slug}/profile`}
-                        className="font-medium text-sm truncate hover:text-brand-primary transition-colors"
-                      >
-                        {r.user?.profile?.full_name || ""}
-                      </Link>
-                      <div className="flex items-center gap-1 shrink-0">
-                        {r.user?.role === "admin" && <AdminBadge />}
-                        {r.user?.role === "member" && <MemberBadge />}
-                        {r.user?.profile?.gender === "croissant" && (
-                          <CroissantBadge />
-                        )}
+                  <Link
+                    href={`/${r.user?.slug}/profile`}
+                    className="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-primary/10 hover:opacity-80 transition-opacity"
+                  >
+                    <Image
+                      src={
+                        r.user?.profile?.avatar ||
+                        "/assets/images/default-avatar.png"
+                      }
+                      width={40}
+                      height={40}
+                      alt="User"
+                      className="object-cover w-full h-full"
+                      unoptimized
+                    />
+                  </Link>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start gap-2 mb-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Link
+                          href={`/${r.user?.slug}/profile`}
+                          className="font-medium text-sm truncate hover:text-brand-primary transition-colors"
+                        >
+                          {r.user?.profile?.full_name || ""}
+                        </Link>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {r.user?.role === "admin" && <AdminBadge />}
+                          {r.user?.role === "member" && <MemberBadge />}
+                          {r.user?.profile?.gender === "croissant" && (
+                            <CroissantBadge />
+                          )}
+                        </div>
                       </div>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {formatDistanceToNow(new Date(r.created_at), {
+                          addSuffix: true,
+                          locale: dateLocale,
+                        })}
+                      </span>
                     </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDistanceToNow(new Date(r.created_at), {
-                        addSuffix: true,
-                        locale: dateLocale,
-                      })}
-                    </span>
+                    <div className="flex gap-0.5 mb-2">
+                      {renderStars(5, r.rating)}
+                    </div>
+                    {r.review && (
+                      <p
+                        className="text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed block overflow-hidden"
+                        style={{
+                          wordBreak: "break-word",
+                          whiteSpace: "pre-wrap",
+                        }}
+                      >
+                        "{r.review}"
+                      </p>
+                    )}
                   </div>
-                  <div className="flex gap-0.5 mb-2">
-                    {renderStars(5, r.rating)}
-                  </div>
-                  {r.review && (
-                    <p
-                      className="text-sm whitespace-pre-wrap text-foreground/90 leading-relaxed block overflow-hidden"
-                      style={{
-                        wordBreak: "break-word",
-                        whiteSpace: "pre-wrap",
-                      }}
-                    >
-                      "{r.review}"
-                    </p>
-                  )}
                 </div>
-              </div>
+              </FadeUp>
             ))}
 
             {hasMore && (
-              <div className="flex justify-center mt-6">
-                <LoadMoreButton
-                  variant="outline"
-                  onClick={() => {
-                    const nextPage = page + 1;
-                    setPage(nextPage);
-                    fetchReviews(nextPage);
-                  }}
-                  loading={loadingMore}
-                />
-              </div>
+              <FadeUp delay={reviews.data.length * 0.05}>
+                <div className="flex justify-center mt-6">
+                  <LoadMoreButton
+                    variant="outline"
+                    onClick={() => {
+                      const nextPage = page + 1;
+                      setPage(nextPage);
+                      fetchReviews(nextPage);
+                    }}
+                    loading={loadingMore}
+                  />
+                </div>
+              </FadeUp>
             )}
-          </div>
+          </StaggerContainer>
         )}
       </div>
     </div>
