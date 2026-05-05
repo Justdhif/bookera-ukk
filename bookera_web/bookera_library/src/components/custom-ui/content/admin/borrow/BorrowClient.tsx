@@ -25,18 +25,29 @@ import { getCurrentMonthRange } from "@/lib/month-range";
 import { downloadBlobFile } from "@/lib/download";
 import { StaggerContainer, FadeUp, SlideIn, FadeIn } from "@/components/custom-ui/motion";
 import ExportButton from "@/components/custom-ui/button/ExportButton";
+import RefreshButton from "@/components/custom-ui/button/RefreshButton";
 
 export default function BorrowClient() {
   const t = useTranslations("borrow");
-  const defaultMonthRange = getCurrentMonthRange();
+  const tc = useTranslations("common");
+  const monthRange = getCurrentMonthRange();
+  const defaultMonthRange = {
+    start_date: monthRange.startDate,
+    end_date: monthRange.endDate,
+  };
   const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
   const [loadingBorrows, setLoadingBorrows] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [search, setSearch] = useState("");
+  const [dateRange, setDateRange] = useState<{
+    start_date?: string;
+    end_date?: string;
+  }>(defaultMonthRange);
+
   const [borrowFilters, setBorrowFilters] = useState<BorrowFilterParams>({
     per_page: ITEMS_PER_PAGE_OPTIONS[1],
     ...defaultMonthRange,
   });
-  const [borrowSearch, setBorrowSearch] = useState("");
   const [borrowPagination, setBorrowPagination] = useState({
     current_page: 1,
     last_page: 1,
@@ -44,14 +55,19 @@ export default function BorrowClient() {
     from: 0,
     to: 0,
   });
+
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
   const [requestFilters, setRequestFilters] = useState<{
     search?: string;
     per_page?: number;
     page?: number;
-  }>({ per_page: ITEMS_PER_PAGE_OPTIONS[1] });
-  const [requestSearch, setRequestSearch] = useState("");
+    start_date?: string;
+    end_date?: string;
+  }>({ 
+    per_page: ITEMS_PER_PAGE_OPTIONS[1],
+    ...defaultMonthRange 
+  });
   const [requestPagination, setRequestPagination] = useState({
     current_page: 1,
     last_page: 1,
@@ -66,14 +82,20 @@ export default function BorrowClient() {
     setLoadingBorrows(true);
     try {
       const response = await borrowService.getAll(activeFilters);
-      const paginatedData = response.data.data;
-      setAllBorrows(paginatedData.data ?? paginatedData);
+      const apiResponse = response.data;
+      
+      const paginatedData = apiResponse.data;
+      const dataArray = Array.isArray(paginatedData) 
+        ? paginatedData 
+        : (paginatedData?.data || []);
+
+      setAllBorrows(dataArray);
       setBorrowPagination({
-        current_page: paginatedData.current_page ?? 1,
-        last_page: paginatedData.last_page ?? 1,
-        total: paginatedData.total ?? 0,
-        from: paginatedData.from ?? 0,
-        to: paginatedData.to ?? 0,
+        current_page: paginatedData?.current_page ?? 1,
+        last_page: paginatedData?.last_page ?? 1,
+        total: paginatedData?.total ?? 0,
+        from: paginatedData?.from ?? 0,
+        to: paginatedData?.to ?? 0,
       });
     } catch (error: any) {
       toast.error(error.response?.data?.message || t("loadError"));
@@ -86,18 +108,26 @@ export default function BorrowClient() {
     search?: string;
     per_page?: number;
     page?: number;
+    start_date?: string;
+    end_date?: string;
   }) => {
     setLoadingRequests(true);
     try {
       const response = await borrowRequestService.getAll(activeFilters);
-      const paginatedData = response.data.data;
-      setRequests(paginatedData.data ?? paginatedData);
+      const apiResponse = response.data;
+      const paginatedData = apiResponse.data;
+      
+      const dataArray = Array.isArray(paginatedData) 
+        ? paginatedData 
+        : (paginatedData?.data || []);
+
+      setRequests(dataArray);
       setRequestPagination({
-        current_page: paginatedData.current_page ?? 1,
-        last_page: paginatedData.last_page ?? 1,
-        total: paginatedData.total ?? 0,
-        from: paginatedData.from ?? 0,
-        to: paginatedData.to ?? 0,
+        current_page: paginatedData?.current_page ?? 1,
+        last_page: paginatedData?.last_page ?? 1,
+        total: paginatedData?.total ?? 0,
+        from: paginatedData?.from ?? 0,
+        to: paginatedData?.to ?? 0,
       });
     } catch (error: any) {
       toast.error(error.response?.data?.message || t("loadRequestsError"));
@@ -110,28 +140,20 @@ export default function BorrowClient() {
     const t = setTimeout(() => {
       setBorrowFilters((prev) => ({
         ...prev,
-        search: borrowSearch || undefined,
+        search: search || undefined,
         page: 1,
       }));
-    }, 500);
-    return () => clearTimeout(t);
-  }, [borrowSearch]);
-
-  useEffect(() => {
-    const t = setTimeout(() => {
       setRequestFilters((prev) => ({
         ...prev,
-        search: requestSearch || undefined,
+        search: search || undefined,
         page: 1,
       }));
     }, 500);
     return () => clearTimeout(t);
-  }, [requestSearch]);
+  }, [search]);
 
-  const handleBorrowSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setBorrowSearch(e.target.value);
-  const handleRequestSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setRequestSearch(e.target.value);
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setSearch(e.target.value);
 
   useEffect(() => {
     fetchBorrows(borrowFilters);
@@ -142,7 +164,16 @@ export default function BorrowClient() {
   }, [requestFilters]);
 
   const handleDateFilter = (start_date?: string, end_date?: string) => {
+    setDateRange({ start_date, end_date });
+    
     setBorrowFilters((prev) => ({
+      ...prev,
+      start_date,
+      end_date,
+      page: 1,
+    }));
+    
+    setRequestFilters((prev) => ({
       ...prev,
       start_date,
       end_date,
@@ -158,7 +189,9 @@ export default function BorrowClient() {
 
       if (activeTab === "requests") {
         response = await borrowRequestService.exportData({
-          search: requestSearch || undefined,
+          search: search || undefined,
+          start_date: requestFilters.start_date,
+          end_date: requestFilters.end_date,
         });
         fileName = `borrow_requests_data_${new Date().toISOString().split("T")[0]}.xlsx`;
       } else {
@@ -208,7 +241,7 @@ export default function BorrowClient() {
   const closedBorrows = allBorrows.filter((b) => b.status === "close");
 
   return (
-    <StaggerContainer key={activeTab} className="space-y-6">
+    <StaggerContainer className="space-y-6">
       <FadeUp>
         <ContentHeader
           title={t("managementTitle")}
@@ -216,6 +249,14 @@ export default function BorrowClient() {
           isAdmin
           rightActions={
             <div className="flex items-center gap-2">
+              <RefreshButton
+                onClick={() => {
+                  fetchBorrows(borrowFilters);
+                  fetchRequests(requestFilters);
+                }}
+                loading={loadingBorrows || loadingRequests}
+                label={tc("refresh")}
+              />
               <ExportButton
                 onClick={handleExport}
                 loading={exporting}
@@ -233,11 +274,31 @@ export default function BorrowClient() {
       </FadeUp>
 
       <FadeUp delay={0.1}>
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={activeTab === "requests" ? t("searchByNameOrTitle") : t("searchByUserOrTitle")}
+              value={search}
+              onChange={handleSearchChange}
+              className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
+            />
+          </div>
+          <DateRangeFilter
+            onFilter={handleDateFilter}
+            defaultStartDate={defaultMonthRange.start_date}
+            defaultEndDate={defaultMonthRange.end_date}
+            className="w-full lg:w-auto"
+          />
+        </div>
+      </FadeUp>
+
+      <FadeUp delay={0.2}>
         <Tabs 
           defaultValue="all" 
           value={activeTab} 
           onValueChange={setActiveTab} 
-          className="space-y-4"
+          className="space-y-6"
         >
           <TabsList>
             <TabsTrigger value="all">
@@ -284,27 +345,7 @@ export default function BorrowClient() {
                   </div>
                 </FadeUp>
                 
-                <FadeUp delay={0.2}>
-                  <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center mb-6">
-                    <div className="relative min-w-0 w-full">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder={t("searchByUserOrTitle")}
-                        value={borrowSearch}
-                        onChange={handleBorrowSearchChange}
-                        className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
-                      />
-                    </div>
-                    <DateRangeFilter
-                      onFilter={handleDateFilter}
-                      defaultStartDate={defaultMonthRange.startDate}
-                      defaultEndDate={defaultMonthRange.endDate}
-                      className="w-full lg:w-auto"
-                    />
-                  </div>
-                </FadeUp>
-
-                <FadeUp key={value + "-pagination"} delay={0.3}>
+                <FadeUp key={value + "-pagination"} delay={0.2}>
                   <PaginatedContent
                     currentPage={borrowPagination.current_page}
                     lastPage={borrowPagination.last_page}
@@ -317,16 +358,13 @@ export default function BorrowClient() {
                   >
                     {loadingBorrows ? (
                       <FadeIn
-                        key="loading-borrows"
-                        className="grid gap-4"
+                        key="loading"
                       >
-                        {Array.from({ length: 3 }).map((_, i) => (
-                          <DataLoading key={i} size="lg" />
-                        ))}
+                        <DataLoading size="lg" />
                       </FadeIn>
                     ) : (
                       <FadeIn
-                        key="content-borrows"
+                        key="content"
                       >
                         {renderBorrowCards(data)}
                       </FadeIn>
@@ -348,21 +386,7 @@ export default function BorrowClient() {
                 </div>
               </FadeUp>
 
-              <FadeUp delay={0.2}>
-                <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
-                  <div className="relative flex-1 w-full">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder={t("searchByNameOrTitle")}
-                      value={requestSearch}
-                      onChange={handleRequestSearchChange}
-                      className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
-                    />
-                  </div>
-                </div>
-              </FadeUp>
-
-              <FadeUp key="requests-pagination" delay={0.3}>
+              <FadeUp key="requests-pagination" delay={0.2}>
                 <PaginatedContent
                   currentPage={requestPagination.current_page}
                   lastPage={requestPagination.last_page}
@@ -375,16 +399,13 @@ export default function BorrowClient() {
                 >
                   {loadingRequests ? (
                     <FadeIn
-                      key="loading-requests"
-                      className="space-y-4"
+                      key="loading"
                     >
-                      {Array.from({ length: 3 }).map((_, i) => (
-                        <DataLoading key={i} size="lg" />
-                      ))}
+                      <DataLoading size="lg" />
                     </FadeIn>
                   ) : requests.length === 0 ? (
                     <FadeIn
-                      key="empty-requests"
+                      key="empty"
                     >
                       <EmptyState
                         icon={<ClipboardList />}
@@ -394,7 +415,7 @@ export default function BorrowClient() {
                     </FadeIn>
                   ) : (
                     <FadeIn
-                      key="content-requests"
+                      key="content"
                     >
                       <StaggerContainer className="space-y-4">
                         {requests.map((req, index) => (

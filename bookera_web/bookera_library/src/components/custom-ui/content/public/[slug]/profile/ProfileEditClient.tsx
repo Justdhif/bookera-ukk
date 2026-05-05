@@ -87,10 +87,6 @@ export default function ProfileEditClient() {
     }
   };
 
-  const handleCancelEdit = () => {
-    router.push(pathname.replace('/edit', ''));
-  };
-
   const handleAvatarChange = (avatar: string | File) => {
     if (typeof avatar === "string") {
       setAvatarPreview(avatar);
@@ -116,6 +112,7 @@ export default function ProfileEditClient() {
             })
           )
         }
+        showBackButton
       />
       {loading ? (
         <div className="flex justify-center py-16">
@@ -128,19 +125,16 @@ export default function ProfileEditClient() {
               <ProfileLeftCard
                 user={user}
                 avatarPreview={avatarPreview}
-                isEditMode={true}
                 onOpenAvatarModal={() => setAvatarModalOpen(true)}
                 onPhoneChanged={fetchUser}
                 onEmailChanged={fetchUser}
               />
             </div>
             <ProfileRightCard
-              isEditMode={true}
               formData={formData}
               setFormData={setFormData}
               setIsFullNameValid={setIsFullNameValid}
               onSubmit={handleSubmit}
-              onCancel={handleCancelEdit}
               submitting={submitting}
               isSubmitDisabled={
                 submitting || !formData.full_name?.trim() || !isFullNameValid

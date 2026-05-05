@@ -16,9 +16,11 @@ import { Plus, Search, Tag } from "lucide-react";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion";
+import RefreshButton from "@/components/custom-ui/button/RefreshButton";
 
 export default function CategoryClient() {
   const t = useTranslations("category");
+  const tCommon = useTranslations("common");
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -93,17 +95,24 @@ export default function CategoryClient() {
           description={t("managementDesc")}
           isAdmin
           rightActions={
-            <Button
-              onClick={() => {
-                setEditing(null);
-                setOpen(true);
-              }}
-              variant="submit"
-              className="h-8 gap-1"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              {t("addCategory")}
-            </Button>
+            <div className="flex items-center gap-2">
+              <RefreshButton
+                onClick={() => fetchCategories(filters)}
+                loading={loading}
+                label={tCommon("refresh")}
+              />
+              <Button
+                onClick={() => {
+                  setEditing(null);
+                  setOpen(true);
+                }}
+                variant="submit"
+                className="h-8 gap-1"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                {t("addCategory")}
+              </Button>
+            </div>
           }
         />
       </FadeUp>

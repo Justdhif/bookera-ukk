@@ -9,13 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Users } from "lucide-react";
+import DetailButton from "@/components/custom-ui/button/DetailButton";
+import DeleteButton from "@/components/custom-ui/button/DeleteButton";
 import { User } from "@/types/user";
-import EmptyState from "@/components/custom-ui/EmptyState";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import RoleBadge from "@/components/custom-ui/badge/RoleBadge";
 import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
-import { Users, Eye, Trash } from "lucide-react";
+import EmptyState from "@/components/custom-ui/EmptyState";
 import { formatOccupationLabel } from "@/constants/user-occupation";
 import { motion } from "framer-motion";
 import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
@@ -114,33 +115,15 @@ export default function UserTable({ data, onDelete }: Props) {
                 <div className="flex justify-end items-center gap-2">
                   {item.slug ? (
                     <Link href={`/admin/users/${item.slug}`}>
-                      <Button size="sm" variant="outline" className="h-8 gap-1">
-                        <Eye className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">
-                          {t("viewUser")}
-                        </span>
-                      </Button>
+                      <DetailButton label={t("viewUser")} />
                     </Link>
                   ) : (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-8 gap-1"
-                      disabled
-                    >
-                      <Eye className="h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">{t("viewUser")}</span>
-                    </Button>
+                    <DetailButton label={t("viewUser")} disabled />
                   )}
-                  <Button
-                    size="sm"
-                    variant="destructive"
+                  <DeleteButton
                     onClick={() => onDelete(item.id)}
-                    className="h-8 gap-1"
-                  >
-                    <Trash className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{t("delete")}</span>
-                  </Button>
+                    label={t("delete")}
+                  />
                 </div>
               </TableCell>
             </SlideIn>

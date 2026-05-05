@@ -35,10 +35,12 @@ import {
   Tag,
   User,
 } from "lucide-react";
+import DetailButton from "@/components/custom-ui/button/DetailButton";
 import { toast } from "sonner";
 
 import { StaggerContainer, FadeUp, SlideIn, FadeIn } from "@/components/custom-ui/motion";
 import ExportButton from "@/components/custom-ui/button/ExportButton";
+import RefreshButton from "@/components/custom-ui/button/RefreshButton";
 
 interface LostBookCardProps {
   borrow: LostBook["borrow"];
@@ -140,10 +142,7 @@ function LostBookCard({ borrow, items }: LostBookCardProps) {
 
             {detailLink && (
               <Link href={detailLink}>
-                <Button size="sm" variant="outline" className="h-8 gap-1">
-                  <Eye className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t("viewBtn")}</span>
-                </Button>
+                <DetailButton label={t("viewBtn")} />
               </Link>
             )}
           </div>
@@ -258,6 +257,7 @@ function LostBookCard({ borrow, items }: LostBookCardProps) {
 
 export default function LostBooksClient() {
   const t = useTranslations("lost-books");
+  const tCommon = useTranslations("common");
   const defaultMonthRange = getCurrentMonthRange();
   const [lostBooks, setLostBooks] = useState<LostBook[]>([]);
   const [loading, setLoading] = useState(false);
@@ -378,11 +378,18 @@ export default function LostBooksClient() {
           description={t("description")}
           isAdmin
           rightActions={
-            <ExportButton
-              onClick={handleExport}
-              loading={exporting}
-              label={t("exportData")}
-            />
+            <div className="flex items-center gap-2">
+              <RefreshButton
+                onClick={() => fetchLostBooks(filters)}
+                loading={loading}
+                label={tCommon("refresh")}
+              />
+              <ExportButton
+                onClick={handleExport}
+                loading={exporting}
+                label={t("exportData")}
+              />
+            </div>
           }
         />
       </FadeUp>

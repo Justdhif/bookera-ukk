@@ -16,6 +16,7 @@ import {
   Hash,
   ExternalLink,
 } from "lucide-react";
+import DetailButton from "@/components/custom-ui/button/DetailButton";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -31,15 +32,20 @@ const MAX_VISIBLE_BOOKS = 2;
 export function BorrowCard({ borrow }: BorrowCardProps) {
   const t = useTranslations("borrow");
   const tCommon = useTranslations("common");
-  const [showAll, setShowAll] = useState(false);
-
   const borrowDetails = borrow.borrow_details || [];
   const requestDetails = borrow.borrow_request?.borrow_request_details || [];
-  const hasBorrowDetails = borrowDetails.length > 0;
+  
+  // Try to use grouped_details from backend, fallback to manual grouping if missing
+  // or use empty array if both are missing
+  const groupedBooks = borrow.grouped_details || [];
+  
+  const totalItemsCount =
+    borrowDetails.length > 0 
+      ? borrowDetails.length 
+      : (requestDetails.length > 0 ? requestDetails.length : (groupedBooks.reduce((acc, curr) => acc + (curr.quantity || 1), 0)));
 
-  const books = hasBorrowDetails ? borrowDetails : requestDetails;
-  const visibleBooks = showAll ? books : books.slice(0, MAX_VISIBLE_BOOKS);
-  const hiddenCount = books.length - MAX_VISIBLE_BOOKS;
+  const visibleBooks = groupedBooks.slice(0, MAX_VISIBLE_BOOKS);
+  const hiddenCount = Math.max(0, groupedBooks.length - MAX_VISIBLE_BOOKS);
 
   const profile = borrow.user?.profile;
   const returnDate = new Date(borrow.return_date);
@@ -54,56 +60,50 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
             <p className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/60">
               {t("infoUser")}
             </p>
-            <div className="flex items-start gap-5">
+            <div className="flex items-start gap-4">
               {profile?.avatar ? (
                 <div className="relative group/avatar shrink-0">
                   <Image
                     src={profile.avatar}
                     alt={profile.full_name ?? ""}
-                    width={80}
-                    height={80}
-                    className="h-20 w-20 rounded-full object-cover ring-4 ring-primary/5 shadow-xl transition-transform duration-300 group-hover/avatar:scale-105"
+                    width={64}
+                    height={64}
+                    className="h-16 w-16 rounded-2xl object-cover ring-2 ring-primary/5 shadow-md transition-transform duration-300 group-hover/avatar:scale-105"
                     unoptimized
                   />
-                  <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/5" />
+                  <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/5" />
                 </div>
               ) : (
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/5 ring-4 ring-primary/5 shadow-inner">
-                  <User className="h-10 w-10 text-primary/30" />
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary/5 ring-2 ring-primary/5 shadow-inner">
+                  <User className="h-8 w-8 text-primary/30" />
                 </div>
               )}
 
-              <div className="min-w-0 space-y-2 flex-1">
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-extrabold text-lg leading-tight text-foreground truncate group-hover:text-primary transition-colors">
-                      {profile?.full_name || borrow.user?.email || "-"}
-                    </p>
-                  </div>
+              <div className="min-w-0 space-y-1.5 flex-1">
+                <div className="space-y-0.5">
+                  <p className="font-extrabold text-base leading-tight text-foreground truncate group-hover:text-primary transition-colors">
+                    {profile?.full_name || borrow.user?.email || "-"}
+                  </p>
 
                   {profile?.identification_number && (
-                    <div className="flex items-center gap-2 text-xs font-bold text-primary/80">
-                      <div className="p-0.5 rounded bg-primary/10">
-                        <Hash className="h-3 w-3 shrink-0" />
-                      </div>
-                      <span className="tracking-tight">
-                        {t("nimLabel")} {profile.identification_number}
-                      </span>
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-primary/80 uppercase tracking-wider">
+                      <Hash className="h-3 w-3 shrink-0" />
+                      <span>{profile.identification_number}</span>
                     </div>
                   )}
                 </div>
 
-                <div className="flex flex-col gap-1.5 pt-1">
+                <div className="flex flex-col gap-1 pt-0.5">
                   {borrow.user?.email && (
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground/90 font-medium">
-                      <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground/80 font-medium">
+                      <Mail className="h-3 w-3 shrink-0 text-muted-foreground/40" />
                       <span className="truncate">{borrow.user.email}</span>
                     </div>
                   )}
 
                   {profile?.phone_number && (
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground/90 font-medium">
-                      <Phone className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground/80 font-medium">
+                      <Phone className="h-3 w-3 shrink-0 text-muted-foreground/40" />
                       <span>{profile.phone_number}</span>
                     </div>
                   )}
@@ -123,7 +123,7 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
               {t("booksBorrowed")}
             </p>
 
-            {books.length === 0 ? (
+            {groupedBooks.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-4 text-center">
                 <BookOpen className="h-8 w-8 text-muted-foreground/20 mb-2" />
                 <p className="text-xs text-muted-foreground italic font-medium">
@@ -133,36 +133,41 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
             ) : (
               <>
                 <div className="space-y-3">
-                  {visibleBooks.map((detail: any) => {
-                    const book = hasBorrowDetails
-                      ? detail.book_copy?.book
-                      : detail.book;
+                  {visibleBooks.map((item: any) => {
+                    const { book, quantity } = item;
                     return (
                       <div
-                        key={detail.id}
-                        className="flex items-start gap-3 group/book"
+                        key={item.id}
+                        className="flex items-start gap-4 group/book"
                       >
                         {book?.cover_image ? (
-                          <div className="relative shrink-0 shadow-md group-hover/book:shadow-lg transition-all">
+                          <div className="relative shrink-0 shadow-sm group-hover/book:shadow-md transition-all">
                             <Image
                               src={book.cover_image}
                               alt={book.title}
-                              width={40}
-                              height={56}
-                              className="h-14 w-10 rounded-md object-cover transition-transform group-hover/book:scale-105"
+                              width={48}
+                              height={64}
+                              className="h-16 w-12 rounded-lg object-cover transition-transform group-hover/book:scale-105"
                               unoptimized
                             />
-                            <div className="absolute inset-0 rounded-md ring-1 ring-inset ring-black/5" />
+                            <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-black/5" />
                           </div>
                         ) : (
-                          <div className="flex h-14 w-10 shrink-0 items-center justify-center rounded-md bg-muted/50 border border-border/50 shadow-sm">
-                            <BookOpen className="h-5 w-5 text-muted-foreground/30" />
+                          <div className="flex h-16 w-12 shrink-0 items-center justify-center rounded-lg bg-muted/50 border border-border/50 shadow-sm">
+                            <BookOpen className="h-6 w-6 text-muted-foreground/30" />
                           </div>
                         )}
-                        <div className="min-w-0 space-y-0.5">
-                          <p className="font-bold leading-tight text-sm text-foreground line-clamp-1 group-hover/book:text-primary transition-colors">
-                            {book?.title || "-"}
-                          </p>
+                        <div className="min-w-0 flex-1 space-y-0.5">
+                          <div className="flex items-baseline gap-2">
+                            <p className="font-bold leading-tight text-sm text-foreground line-clamp-1 group-hover/book:text-primary transition-colors">
+                              {book?.title || "-"}
+                            </p>
+                            {quantity > 1 && (
+                              <span className="text-xs font-black text-primary bg-primary/10 px-1.5 py-0.5 rounded-md shrink-0">
+                                x{quantity}
+                              </span>
+                            )}
+                          </div>
                           <p className="text-[11px] font-bold text-muted-foreground/80 truncate uppercase tracking-tight">
                             {book?.author || "-"}
                           </p>
@@ -175,25 +180,16 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
                       </div>
                     );
                   })}
-                </div>
 
-                {hiddenCount > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowAll((prev) => !prev)}
-                    className="flex items-center gap-1.5 text-[11px] font-bold text-primary hover:text-primary/80 transition-colors mt-3 uppercase tracking-wider bg-primary/5 px-3 py-1.5 rounded-lg w-fit"
-                  >
-                    {showAll
-                      ? t("showLess")
-                      : t("viewAll", { count: books.length })}
-                    <ChevronDown
-                      className={cn(
-                        "h-3.5 w-3.5 transition-transform duration-300",
-                        showAll && "rotate-180"
-                      )}
-                    />
-                  </button>
-                )}
+                  {hiddenCount > 0 && (
+                    <div className="flex items-center gap-3 pl-[60px]">
+                      <div className="h-[2px] w-4 bg-border/40 rounded-full" />
+                      <p className="text-[11px] font-black text-muted-foreground/60 uppercase tracking-widest">
+                        +{hiddenCount} {t("otherBooks")}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </>
             )}
           </div>
@@ -216,14 +212,10 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
                 />
                 {borrow.borrow_code && (
                   <Link href={`/admin/borrows/${borrow.borrow_code}`}>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 px-3 text-[11px] font-bold border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all gap-1.5"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                      {t("detail")}
-                    </Button>
+                    <DetailButton
+                      label={t("detail")}
+                      className="h-7 px-3 text-[11px] font-bold"
+                    />
                   </Link>
                 )}
               </div>
@@ -273,7 +265,7 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
                 </p>
                 <div className="text-2xl font-black leading-none text-white flex items-baseline gap-1.5">
                   <span className="text-20 font-extrabold text-white uppercase tracking-wider">
-                    {t("bookUnit", { count: books.length })}
+                    {t("bookUnit", { count: totalItemsCount })}
                   </span>
                 </div>
               </div>

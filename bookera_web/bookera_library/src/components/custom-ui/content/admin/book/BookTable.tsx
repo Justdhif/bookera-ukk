@@ -11,12 +11,12 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { BookOpen } from "lucide-react";
+import DetailButton from "@/components/custom-ui/button/DetailButton";
+import DeleteButton from "@/components/custom-ui/button/DeleteButton";
 import { Book } from "@/types/book";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
-import { BookOpen, Eye, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
@@ -123,14 +123,14 @@ export function BookTable({ data, onDelete }: Props) {
               <TableCell>
                 <span className="text-muted-foreground">
                   {book.authors && book.authors.length > 0
-                    ? book.authors.map((a) => a.name).join(", ")
+                    ? book.authors.map((a: any) => a.name).join(", ")
                     : book.author || "-"}
                 </span>
               </TableCell>
               <TableCell>
                 <span className="text-muted-foreground">
                   {book.publishers && book.publishers.length > 0
-                    ? book.publishers.map((p) => p.name).join(", ")
+                    ? book.publishers.map((p: any) => p.name).join(", ")
                     : book.publisher || "-"}
                 </span>
               </TableCell>
@@ -140,20 +140,12 @@ export function BookTable({ data, onDelete }: Props) {
               <TableCell className="pr-6">
                 <div className="flex justify-end items-center gap-2">
                   <Link href={`/admin/books/${book.slug}`}>
-                    <Button size="sm" variant="outline" className="h-8 gap-1">
-                      <Eye className="h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">{t("view")}</span>
-                    </Button>
+                    <DetailButton label={t("view")} />
                   </Link>
-                  <Button
-                    size="sm"
-                    variant="destructive"
+                  <DeleteButton
                     onClick={() => onDelete(book.id)}
-                    className="h-8 gap-1"
-                  >
-                    <Trash className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{t("delete")}</span>
-                  </Button>
+                    label={t("delete")}
+                  />
                 </div>
               </TableCell>
             </SlideIn>

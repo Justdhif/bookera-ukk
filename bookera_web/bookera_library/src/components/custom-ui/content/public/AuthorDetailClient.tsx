@@ -172,6 +172,7 @@ export default function AuthorDetailClient({ slug }: AuthorDetailClientProps) {
       <ContentHeader 
         title={t("title")}
         description={t("description", { name: author?.name || "..." })}
+        showBackButton={true}
       />
 
       {renderContent()}

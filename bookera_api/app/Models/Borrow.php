@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\BorrowRequest;
 use App\Models\BookReturn;
 use App\Models\BorrowDetail;
+use App\Models\BorrowRequestDetail;
 use App\Models\FineBorrow;
 use App\Models\LostBook;
 use App\Models\User;
@@ -27,7 +28,45 @@ class Borrow extends Model
         'status',
     ];
 
-    protected $appends = ['qr_code_url', 'estimated_late_fine'];
+    protected $appends = ['qr_code_url', 'estimated_late_fine', 'grouped_details'];
+
+    public function getGroupedDetailsAttribute()
+    {
+        $details = $this->borrowDetails->count() > 0 
+            ? $this->borrowDetails 
+            : ($this->borrowRequest ? $this->borrowRequest->borrowRequestDetails : collect());
+
+        if ($details->isEmpty()) {
+            return [];
+        }
+
+        $grouped = [];
+        foreach ($details as $item) {
+            $book = null;
+            
+            if ($item instanceof BorrowDetail && $item->bookCopy) {
+                $book = $item->bookCopy->book;
+            } elseif ($item instanceof BorrowRequestDetail) {
+                $book = $item->book;
+            }
+
+            if (!$book) continue;
+
+            $bookId = $book->id;
+            if (isset($grouped[$bookId])) {
+                $grouped[$bookId]['quantity']++;
+            } else {
+                $grouped[$bookId] = [
+                    'id' => $item->id,
+                    'book' => $book,
+                    'quantity' => 1
+                ];
+            }
+        }
+
+        return array_values($grouped);
+    }
+
 
     public function getEstimatedLateFineAttribute(): array
     {

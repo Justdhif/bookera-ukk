@@ -16,10 +16,12 @@ import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import UserFilter from "./UserFilter";
 import AdminMembershipPricing from "./AdminMembershipPricing";
+import RefreshButton from "@/components/custom-ui/button/RefreshButton";
 import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 export default function UserClient() {
   const t = useTranslations("user");
+  const tCommon = useTranslations("common");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -70,12 +72,19 @@ export default function UserClient() {
           description={t("userManagementDesc")}
           isAdmin
           rightActions={
-            <Link href="/admin/users/add">
-              <Button variant="submit" className="h-8 gap-1">
-                <Plus className="w-3.5 h-3.5" />
-                {t("addUser")}
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <RefreshButton
+                onClick={() => fetchUsers(filters)}
+                loading={loading}
+                label={tCommon("refresh")}
+              />
+              <Link href="/admin/users/add">
+                <Button variant="submit" className="h-8 gap-1">
+                  <Plus className="w-3.5 h-3.5" />
+                  {t("addUser")}
+                </Button>
+              </Link>
+            </div>
           }
         />
       </FadeUp>

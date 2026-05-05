@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { PackageCheck, Search } from "lucide-react";
 import ExportButton from "@/components/custom-ui/button/ExportButton";
+import RefreshButton from "@/components/custom-ui/button/RefreshButton";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import PaginatedContent from "@/components/custom-ui/PaginatedContent";
@@ -23,6 +24,7 @@ import { StaggerContainer, FadeUp, SlideIn, FadeIn } from "@/components/custom-u
 
 export default function ReturnClient() {
   const t = useTranslations("return");
+  const tCommon = useTranslations("common");
   const defaultMonthRange = getCurrentMonthRange();
   const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -142,22 +144,24 @@ export default function ReturnClient() {
           description={t("managementDesc")}
           isAdmin
           rightActions={
-            <ExportButton
-              onClick={handleExport}
-              loading={exporting}
-              label={t("exportData")}
-            />
+            <div className="flex items-center gap-2">
+              <RefreshButton
+                onClick={() => fetchAllData(filters)}
+                loading={loading}
+                label={tCommon("refresh")}
+              />
+              <ExportButton
+                onClick={handleExport}
+                loading={exporting}
+                label={t("exportData")}
+              />
+            </div>
           }
         />
       </FadeUp>
 
       <div className="space-y-4">
-        <FadeUp delay={0.1}>
-          <div>
-            <h3 className="text-lg font-semibold">{t("title")}</h3>
-            <p className="text-sm text-muted-foreground">{t("returnedDesc")}</p>
-          </div>
-        </FadeUp>
+
 
         <FadeUp delay={0.2}>
           <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center mb-6">

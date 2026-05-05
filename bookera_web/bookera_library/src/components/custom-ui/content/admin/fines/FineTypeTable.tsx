@@ -10,12 +10,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { DollarSign } from "lucide-react";
+import DeleteButton from "@/components/custom-ui/button/DeleteButton";
 import { Badge } from "@/components/ui/badge";
 import { FineType } from "@/types/fine";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { DollarSign, Trash } from "lucide-react";
-const typeColors = {
+const typeColors: Record<string, string> = {
   lost: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
   damaged:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
@@ -29,7 +29,7 @@ export default function FineTypeTable({
   onDelete: (id: number) => void;
 }) {
   const t = useTranslations("fines");
-  const typeLabels = {
+  const typeLabels: Record<string, string> = {
     lost: t("lost"),
     damaged: t("damaged"),
     late: t("late"),
@@ -105,15 +105,10 @@ export default function FineTypeTable({
             </TableCell>
             <TableCell>
               <div className="flex justify-end items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="destructive"
+                <DeleteButton
                   onClick={() => onDelete(item.id)}
-                  className="h-8 gap-1"
-                >
-                  <Trash className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t("delete")}</span>
-                </Button>
+                  label={t("delete")}
+                />
               </div>
             </TableCell>
           </SlideIn>

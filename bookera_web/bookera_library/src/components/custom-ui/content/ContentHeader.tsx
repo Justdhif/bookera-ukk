@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BlurIn, FadeIn } from "@/components/custom-ui/motion";
+import { BlurIn, FadeIn, SlideIn } from "@/components/custom-ui/motion";
 
 interface ContentHeaderProps {
   title: ReactNode;
@@ -45,17 +45,19 @@ export default function ContentHeader({
     >
       <div className="flex items-center gap-4">
         {showBackButton && (
-          <Button
-            variant="brand"
-            size="icon"
-            className={cn(
-              "shrink-0 transition-transform hover:scale-105 active:scale-95",
-              isAdmin ? "h-8 w-8" : "h-10 w-10"
-            )}
-            onClick={handleBack}
-          >
-            <ArrowLeft className={isAdmin ? "h-4 w-4" : "h-5 w-5"} />
-          </Button>
+          <SlideIn direction="left" delay={0.2} distance={20}>
+            <Button
+              variant="brand"
+              size="icon"
+              className={cn(
+                "shrink-0 transition-transform hover:scale-105 active:scale-95",
+                isAdmin ? "h-8 w-8" : "h-10 w-10"
+              )}
+              onClick={handleBack}
+            >
+              <ArrowLeft className={isAdmin ? "h-4 w-4" : "h-5 w-5"} />
+            </Button>
+          </SlideIn>
         )}
         <div className={cn("flex flex-col", !isAdmin && "space-y-1")}>
           <BlurIn

@@ -19,6 +19,7 @@ import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/store/auth.store";
 import { AddBookReviewDialog } from "./AddBookReviewDialog";
+import DetailButton from "@/components/custom-ui/button/DetailButton";
 
 interface BorrowCardProps {
   borrow: Borrow;
@@ -59,10 +60,7 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
           <div className="flex gap-2 items-center self-end md:self-center">
             {borrow.borrow_code && (
               <Link href={detailLink}>
-                <Button size="sm" variant="outline" className="h-8 gap-1">
-                  <Eye className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{tCommon("view")}</span>
-                </Button>
+                <DetailButton label={tCommon("view")} />
               </Link>
             )}
           </div>

@@ -10,8 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Edit, Trash, ExternalLink, Calendar, MessageCircle, FileText } from "lucide-react";
+import { ExternalLink, Calendar, FileText } from "lucide-react";
+import EditButton from "@/components/custom-ui/button/EditButton";
+import DeleteButton from "@/components/custom-ui/button/DeleteButton";
+import DetailButton from "@/components/custom-ui/button/DetailButton";
 import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
@@ -110,33 +112,18 @@ export default function NewsTable({ data, onEdit, onDelete }: NewsTableProps) {
               <TableCell className="text-right">
                 <div className="flex justify-end items-center gap-2">
                   <Link href={`/news/${item.slug}`} target="_blank">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="h-8 gap-1"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">{tc("view")}</span>
-                    </Button>
+                    <DetailButton
+                      label={tc("view")}
+                    />
                   </Link>
-                  <Button
-                    variant="brand"
-                    size="sm"
-                    className="h-8 gap-1"
+                  <EditButton
                     onClick={() => onEdit(item)}
-                  >
-                    <Edit className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{tc("edit")}</span>
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="h-8 gap-1"
+                    label={tc("edit")}
+                  />
+                  <DeleteButton
                     onClick={() => onDelete(item.id)}
-                  >
-                    <Trash className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{tc("delete")}</span>
-                  </Button>
+                    label={tc("delete")}
+                  />
                 </div>
               </TableCell>
             </SlideIn>

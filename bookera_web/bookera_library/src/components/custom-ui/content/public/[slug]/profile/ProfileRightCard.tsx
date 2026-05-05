@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Edit, X } from "lucide-react";
+import { X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -29,24 +29,18 @@ import {
 } from "@/constants/user-occupation";
 import type { UserOccupation } from "@/types/user";
 interface ProfileRightCardProps {
-  isEditMode: boolean;
   formData: Partial<UpdateUserData>;
   setFormData: (data: Partial<UpdateUserData>) => void;
   setIsFullNameValid: (valid: boolean) => void;
   onSubmit?: (e: React.FormEvent) => void;
-  onCancel?: () => void;
-  onEdit?: () => void;
   submitting?: boolean;
   isSubmitDisabled?: boolean;
 }
 export default function ProfileRightCard({
-  isEditMode,
   formData,
   setFormData,
   setIsFullNameValid,
   onSubmit,
-  onCancel,
-  onEdit,
   submitting = false,
   isSubmitDisabled = false,
 }: ProfileRightCardProps) {
@@ -68,7 +62,7 @@ export default function ProfileRightCard({
       <CardHeader>
         <CardTitle>{t("profileInformation")}</CardTitle>
         <CardDescription>
-          {isEditMode ? t("editProfileDetails") : t("viewProfileDetails")}
+            {t("editProfileDetails")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -77,38 +71,36 @@ export default function ProfileRightCard({
             <div className="space-y-2">
               <Label
                 htmlFor="p-username"
-                variant={isEditMode ? "required" : "default"}
+                variant="required"
               >
                 {t("usernameLabel", { fallback: "Username" })}
               </Label>
               <Input
                 id="p-username"
                 name="username"
-                required={isEditMode}
+                required={true}
                 value={formData.username || ""}
                 onChange={handleInputChange}
                 placeholder={t("usernamePlaceholder", { fallback: "Enter username" })}
-                disabled={!isEditMode}
-                validationType={isEditMode ? "alphanumeric" : undefined}
+                validationType="alphanumeric"
               />
             </div>
             <div className="space-y-2">
               <Label
                 htmlFor="p-full-name"
-                variant={isEditMode ? "required" : "default"}
+                variant="required"
               >
                 {t("fullNameLabel")}
               </Label>
               <Input
                 id="p-full-name"
                 name="full_name"
-                required={isEditMode}
+                required={true}
                 value={formData.full_name || ""}
                 onChange={handleInputChange}
                 placeholder={t("fullNamePlaceholder")}
-                disabled={!isEditMode}
-                validationType={isEditMode ? "letters-only" : undefined}
-                onValidationChange={isEditMode ? setIsFullNameValid : undefined}
+                validationType="letters-only"
+                onValidationChange={setIsFullNameValid}
               />
             </div>
             <div className="space-y-2">
@@ -121,8 +113,7 @@ export default function ProfileRightCard({
                 value={formData.identification_number || ""}
                 onChange={handleInputChange}
                 placeholder={t("idNumberPlaceholder")}
-                disabled={!isEditMode}
-                validationType={!isEditMode ? undefined : "numbers-only"}
+                validationType="numbers-only"
               />
             </div>
             <div className="space-y-2">
@@ -132,7 +123,6 @@ export default function ProfileRightCard({
                 onValueChange={(value: any) =>
                   setFormData({ ...formData, gender: value })
                 }
-                disabled={!isEditMode}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t("selectGender")} />
@@ -157,7 +147,6 @@ export default function ProfileRightCard({
                 }
                 onChange={handleBirthDateChange}
                 placeholder={t("selectBirthDate")}
-                disabled={!isEditMode}
                 dateMode="past"
               />
             </div>
@@ -171,7 +160,6 @@ export default function ProfileRightCard({
                     occupation: value as UserOccupation,
                   })
                 }
-                disabled={!isEditMode}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t("occupationPlaceholder")} />
@@ -193,8 +181,7 @@ export default function ProfileRightCard({
                 value={formData.institution || ""}
                 onChange={handleInputChange}
                 placeholder={t("institutionPlaceholder")}
-                disabled={!isEditMode}
-                validationType={!isEditMode ? undefined : "alphanumeric"}
+                validationType="alphanumeric"
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
@@ -206,7 +193,6 @@ export default function ProfileRightCard({
                 onChange={handleInputChange}
                 placeholder={t("addressPlaceholder")}
                 rows={2}
-                disabled={!isEditMode}
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
@@ -218,27 +204,13 @@ export default function ProfileRightCard({
                 onChange={handleInputChange}
                 placeholder={t("bioPlaceholder")}
                 rows={3}
-                disabled={!isEditMode}
               />
             </div>
           </div>
         </div>
 
-        {isEditMode ? (
-          onSubmit && (
-            <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
-              {onCancel && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onCancel}
-                  disabled={submitting}
-                  className="h-8"
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  {t("cancelEdit")}
-                </Button>
-              )}
+        {onSubmit && (
+            <div className="flex justify-end mt-6 pt-6 border-t">
               <Button 
                 onClick={onSubmit} 
                 variant="submit" 
@@ -249,22 +221,7 @@ export default function ProfileRightCard({
                 {submitting ? t("saving") : t("saveChanges")}
               </Button>
             </div>
-          )
-        ) : (
-          onEdit && (
-            <div className="flex justify-end gap-3 mt-6 pt-6 border-t">
-              <Button
-                type="button"
-                variant="brand"
-                onClick={onEdit}
-                className="h-8 gap-1"
-              >
-                <Edit className="h-3.5 w-3.5" />
-                {t("editProfile")}
-              </Button>
-            </div>
-          )
-        )}
+          )}
       </CardContent>
     </Card>
   );

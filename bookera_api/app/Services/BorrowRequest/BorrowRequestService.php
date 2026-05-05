@@ -57,6 +57,14 @@ class BorrowRequestService
             $query->where('approval_status', $filters['approval_status']);
         }
 
+        if (!empty($filters['start_date'])) {
+            $query->whereDate('borrow_date', '>=', $filters['start_date']);
+        }
+
+        if (!empty($filters['end_date'])) {
+            $query->whereDate('borrow_date', '<=', $filters['end_date']);
+        }
+
         return $query->latest()->orderByDesc('id');
     }
 

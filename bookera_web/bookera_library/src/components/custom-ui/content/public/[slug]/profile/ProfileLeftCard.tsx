@@ -24,7 +24,6 @@ import ChangePasswordModal from "@/components/custom-ui/modal/ChangePasswordModa
 interface ProfileLeftCardProps {
   user: User;
   avatarPreview: string;
-  isEditMode: boolean;
   onOpenAvatarModal: () => void;
   onPhoneChanged?: (newPhone: string) => void;
   onEmailChanged?: (newEmail: string) => void;
@@ -32,7 +31,6 @@ interface ProfileLeftCardProps {
 export default function ProfileLeftCard({
   user,
   avatarPreview,
-  isEditMode,
   onOpenAvatarModal,
   onPhoneChanged,
   onEmailChanged,
@@ -47,7 +45,7 @@ export default function ProfileLeftCard({
         <CardHeader>
           <CardTitle>{t("profilePhoto")}</CardTitle>
           <CardDescription>
-            {isEditMode ? t("uploadYourPicture") : t("yourProfilePhoto")}
+            {t("uploadYourPicture")}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
@@ -56,7 +54,7 @@ export default function ProfileLeftCard({
               {avatarPreview ? (
                 <Image
                   src={avatarPreview}
-                  alt={user.profile.full_name}
+                  alt={user.profile?.full_name || "User"}
                   fill
                   sizes="128px"
                   className="object-cover"
@@ -64,7 +62,7 @@ export default function ProfileLeftCard({
               ) : (
                 <div className="h-full w-full bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
                   <span className="text-4xl font-medium text-gray-600 dark:text-gray-400">
-                    {user.profile.full_name?.[0]?.toUpperCase() ?? "U"}
+                    {user.profile?.full_name?.[0]?.toUpperCase() ?? "U"}
                   </span>
                 </div>
               )}
@@ -75,7 +73,6 @@ export default function ProfileLeftCard({
             variant="brand"
             onClick={onOpenAvatarModal}
             className="w-full"
-            disabled={!isEditMode}
           >
             <Upload className="h-4 w-4 mr-2" />
             {t("uploadAvatar")}
@@ -109,17 +106,15 @@ export default function ProfileLeftCard({
                 <Label htmlFor="lc-email" className="text-sm">
                   {t("emailLabel")}
                 </Label>
-                {isEditMode && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setChangeEmailOpen(true)}
-                    className="h-8 border-brand-primary/20 hover:border-brand-primary/50 text-brand-primary hover:bg-brand-primary/5 font-semibold text-xs rounded-lg transition-all"
-                  >
-                    {t("changeEmail")}
-                  </Button>
-                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setChangeEmailOpen(true)}
+                  className="h-8 border-brand-primary/20 hover:border-brand-primary/50 text-brand-primary hover:bg-brand-primary/5 font-semibold text-xs rounded-lg transition-all"
+                >
+                  {t("changeEmail")}
+                </Button>
               </div>
               <Input
                 id="lc-email"
@@ -134,21 +129,19 @@ export default function ProfileLeftCard({
                 <Label htmlFor="lc-phone" className="text-sm">
                   {t("phoneNumberLabel")}
                 </Label>
-                {isEditMode && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setChangePhoneOpen(true)}
-                    className="h-8 border-brand-primary/20 hover:border-brand-primary/50 text-brand-primary hover:bg-brand-primary/5 font-semibold text-xs rounded-lg transition-all"
-                  >
-                    {t("changePhone")}
-                  </Button>
-                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setChangePhoneOpen(true)}
+                  className="h-8 border-brand-primary/20 hover:border-brand-primary/50 text-brand-primary hover:bg-brand-primary/5 font-semibold text-xs rounded-lg transition-all"
+                >
+                  {t("changePhone")}
+                </Button>
               </div>
               <PhoneInput
                 id="lc-phone"
-                value={user.profile.phone_number ?? ""}
+                value={user.profile?.phone_number ?? ""}
                 disabled
                 className="opacity-70"
               />
@@ -159,7 +152,7 @@ export default function ProfileLeftCard({
       <ChangePhoneModal
         open={changePhoneOpen}
         onOpenChange={setChangePhoneOpen}
-        currentPhone={user.profile.phone_number || ""}
+        currentPhone={user.profile?.phone_number || ""}
         onSuccess={onPhoneChanged || (() => {})}
       />
       <ChangeEmailModal

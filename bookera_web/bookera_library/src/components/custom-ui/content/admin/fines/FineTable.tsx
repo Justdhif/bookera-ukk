@@ -9,12 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { DollarSign, BookOpen, Hash } from "lucide-react";
+import DetailButton from "@/components/custom-ui/button/DetailButton";
 import FineStatusBadge from "@/components/custom-ui/badge/FineStatusBadge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Fine } from "@/types/fine";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { DollarSign, Eye, BookOpen, Hash } from "lucide-react";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
@@ -200,14 +200,7 @@ export default function FineTable({
                             <Link
                               href={`/admin/borrows/${borrowCode ?? item.borrow_id}`}
                             >
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-8 gap-1"
-                              >
-                                <Eye className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">Details</span>
-                              </Button>
+                              <DetailButton label="Details" />
                             </Link>
                           </div>
                         </TableCell>

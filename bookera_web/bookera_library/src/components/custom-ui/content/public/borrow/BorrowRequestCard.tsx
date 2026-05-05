@@ -26,6 +26,7 @@ import {
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import DeleteButton from "@/components/custom-ui/button/DeleteButton";
 
 interface BorrowRequestCardProps {
   request: BorrowRequest;
@@ -100,20 +101,12 @@ export function BorrowRequestCard({
           </div>
           <div className="flex gap-2 items-center self-end md:self-center">
             {request.approval_status === "processing" && onDelete && (
-              <Button
-                variant="destructive"
-                size="sm"
+              <DeleteButton
+                label={t("detail.editDialog.cancel")}
                 onClick={() => onDelete(request.id)}
                 disabled={isDeleting}
                 className="rounded-full px-4 h-9 shadow-sm"
-              >
-                {isDeleting ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Trash className="h-4 w-4 mr-2" />
-                )}
-                {t("detail.editDialog.cancel")}
-              </Button>
+              />
             )}
           </div>
         </div>

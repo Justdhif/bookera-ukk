@@ -23,6 +23,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { AddBookReviewDialog } from "../AddBookReviewDialog";
 import { ReportLostDialog } from "../ReportLostDialog";
+import DetailButton from "@/components/custom-ui/button/DetailButton";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -177,14 +178,10 @@ export function BorrowBooksCard({ borrow, onUpdate }: BorrowBooksCardProps) {
                       )}
 
                       <Link href={`/books/${book?.slug}`} target="_blank">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full sm:w-auto gap-2 font-bold"
-                        >
-                          <Eye className="h-4 w-4" />
-                          {tPublic("detailsBtn")}
-                        </Button>
+                        <DetailButton
+                          label={tPublic("detailsBtn")}
+                          className="w-full sm:w-auto font-bold h-9"
+                        />
                       </Link>
                     </div>
                   </div>

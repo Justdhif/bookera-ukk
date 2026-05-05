@@ -1028,7 +1028,7 @@
     "queuePosition": "Anda berada di posisi ke-{pos} dalam daftar tunggu.",
     "exploreOtherBooks": "Jelajahi Buku Lainnya",
     "exploreOtherBooksDesc": "Temukan lebih banyak buku dari koleksi kami",
-    "searchAuthorPublisher": "Cari author atau publisher...",
+    "searchAuthorPublisher": "Cari author, publisher, atau user...",
     "favorite": "Favorit",
     "unfavorite": "Hapus Favorit",
     "reservedCopyAvailable": "Salinan buku tersedia khusus untuk Anda!",
@@ -1891,7 +1891,8 @@
     "showLess": "Sembunyikan",
     "borrowDate": "Tgl Pinjam",
     "returnDate": "Tgl Jatuh Tempo",
-    "detail": "Detail"
+    "detail": "Detail",
+    "otherBooks": "buku lainnya"
   },
   "borrow-request": {
     "title": "Permintaan Peminjaman",
@@ -2210,7 +2211,7 @@
   },
   "lost-books": {
     "title": "Buku Hilang",
-    "description": "Kelola laporan buku yang hilang. Pastikan denda telah dibayarkan sebelum menyelesaikan proses.",
+    "description": "Kelola data buku yang hilang.",
     "loadError": "Gagal memuat data buku hilang",
     "deleteSuccess": "Data buku hilang berhasil dihapus",
     "deleteError": "Gagal menghapus data buku hilang",

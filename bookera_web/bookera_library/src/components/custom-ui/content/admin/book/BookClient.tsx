@@ -21,9 +21,11 @@ import { BookOpen, Plus } from "lucide-react";
 import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 import ExportButton from "@/components/custom-ui/button/ExportButton";
 import ImportButton from "@/components/custom-ui/button/ImportButton";
+import RefreshButton from "@/components/custom-ui/button/RefreshButton";
 
 export default function BookClient() {
   const t = useTranslations("book");
+  const tCommon = useTranslations("common");
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -126,6 +128,14 @@ export default function BookClient() {
           isAdmin
           rightActions={
             <div className="flex items-center gap-2">
+              <RefreshButton
+                onClick={() => {
+                  fetchBooks(filters);
+                  fetchCategories();
+                }}
+                loading={loading || categoriesLoading}
+                label={tCommon("refresh")}
+              />
               <ImportButton
                 onClick={() => setIsImportDialogOpen(true)}
                 label={t("importData")}

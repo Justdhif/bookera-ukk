@@ -7,11 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
+import { Building2 } from "lucide-react";
+import EditButton from "@/components/custom-ui/button/EditButton";
+import DeleteButton from "@/components/custom-ui/button/DeleteButton";
 import { Publisher } from "@/types/publisher";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { Building2, Edit, Trash } from "lucide-react";
+import ActiveStatusBadge from "@/components/custom-ui/badge/ActiveStatusBadge";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
@@ -101,24 +102,14 @@ export default function PublisherTable({
             </TableCell>
             <TableCell>
               <div className="flex justify-end items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="brand"
+                <EditButton
                   onClick={() => onEdit(item)}
-                  className="h-8 gap-1"
-                >
-                  <Edit className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t("edit")}</span>
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
+                  label={t("edit")}
+                />
+                <DeleteButton
                   onClick={() => onDelete(item.id)}
-                  className="h-8 gap-1"
-                >
-                  <Trash className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t("delete")}</span>
-                </Button>
+                  label={t("delete")}
+                />
               </div>
             </TableCell>
           </SlideIn>

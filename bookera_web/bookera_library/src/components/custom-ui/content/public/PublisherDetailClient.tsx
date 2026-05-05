@@ -172,6 +172,7 @@ export default function PublisherDetailClient({ slug }: PublisherDetailClientPro
       <ContentHeader 
         title={t("title")}
         description={t("description", { name: publisher?.name || "..." })}
+        showBackButton={true}
       />
 
       {renderContent()}

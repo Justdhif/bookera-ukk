@@ -215,7 +215,7 @@ export function AdminSidebar() {
                   ) {
                     return null;
                   }
-                  const isActive = pathname === item.href;
+                  const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href + "/"));
                   return (
                     <SlideIn
                       key={item.href}
@@ -234,7 +234,7 @@ export function AdminSidebar() {
                         isActive={isActive}
                         tooltip={{ content: item.title }}
                         className={cn(
-                          "rounded-xl transition-all",
+                          "rounded-xl transition-all h-10 px-3",
                           isActive
                             ? "bg-brand-primary/10 dark:bg-brand-primary/15 text-brand-primary border border-brand-primary/20 dark:border-brand-primary/30"
                             : "text-muted-foreground hover:text-foreground hover:bg-accent",

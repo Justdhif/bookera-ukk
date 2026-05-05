@@ -241,7 +241,18 @@ class BorrowService
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where('borrow_code', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('borrow_code', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('email', 'like', "%{$search}%")
+                            ->orWhereHas('profile', function ($profileQuery) use ($search) {
+                                $profileQuery->where('full_name', 'like', "%{$search}%");
+                            });
+                    })
+                    ->orWhereHas('borrowDetails.bookCopy.book', function ($bookQuery) use ($search) {
+                        $bookQuery->where('title', 'like', "%{$search}%");
+                    });
+            });
         }
 
         if (!empty($filters['status'])) {

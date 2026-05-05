@@ -25,9 +25,11 @@ import { StaggerContainer, FadeUp, FadeIn } from "@/components/custom-ui/motion"
 export default function FineManagement({
   filters,
   setFilters,
+  refreshKey = 0,
 }: {
   filters: FineFilterParams;
   setFilters: React.Dispatch<React.SetStateAction<FineFilterParams>>;
+  refreshKey?: number;
 }) {
   const t = useTranslations("fines");
   const defaultMonthRange = getCurrentMonthRange();
@@ -94,7 +96,7 @@ export default function FineManagement({
 
   useEffect(() => {
     fetchFines(filters);
-  }, [filters]);
+  }, [filters, refreshKey]);
 
   return (
     <StaggerContainer className="space-y-6">
@@ -109,12 +111,6 @@ export default function FineManagement({
               className="pl-9 h-11! w-full shadow-sm transition-all duration-300"
             />
           </div>
-          <DateRangeFilter
-            onFilter={handleDateFilter}
-            defaultStartDate={defaultMonthRange.startDate}
-            defaultEndDate={defaultMonthRange.endDate}
-            className="w-full xl:w-auto"
-          />
           <Select value={statusValue} onValueChange={handleStatusChange}>
             <SelectTrigger className="w-full xl:w-44 h-11! shadow-sm transition-all duration-300">
               <SelectValue placeholder={t("filterStatus")} />
@@ -126,6 +122,12 @@ export default function FineManagement({
               <SelectItem value="waived">{t("waived")}</SelectItem>
             </SelectContent>
           </Select>
+          <DateRangeFilter
+            onFilter={handleDateFilter}
+            defaultStartDate={defaultMonthRange.startDate}
+            defaultEndDate={defaultMonthRange.endDate}
+            className="w-full xl:w-auto"
+          />
         </div>
       </FadeUp>
 

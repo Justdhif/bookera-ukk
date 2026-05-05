@@ -59,6 +59,11 @@ export interface Borrow {
     fine_name?: string;
     fine_description?: string;
   };
+  grouped_details?: {
+    id: number;
+    book: Book;
+    quantity: number;
+  }[];
 }
 
 export type BorrowListResponse = PaginatedResponse<Borrow>;

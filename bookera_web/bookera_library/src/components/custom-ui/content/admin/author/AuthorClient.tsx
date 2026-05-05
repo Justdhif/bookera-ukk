@@ -23,9 +23,11 @@ import { useTranslations } from "next-intl";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
+import RefreshButton from "@/components/custom-ui/button/RefreshButton";
 
 export default function AuthorClient() {
   const t = useTranslations("author");
+  const tCommon = useTranslations("common");
   const [authors, setAuthors] = useState<Author[]>([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<AuthorFilterParams>({ per_page: ITEMS_PER_PAGE_OPTIONS[1] });
@@ -119,17 +121,24 @@ export default function AuthorClient() {
           description={t("description")}
           isAdmin
           rightActions={
-            <Button
-              onClick={() => {
-                setSelectedAuthor(null);
-                setAddOpen(true);
-              }}
-              variant="submit"
-              className="h-8 gap-1"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              {t("addAuthor")}
-            </Button>
+            <div className="flex items-center gap-2">
+              <RefreshButton
+                onClick={() => fetchAuthors(filters)}
+                loading={loading}
+                label={tCommon("refresh")}
+              />
+              <Button
+                onClick={() => {
+                  setSelectedAuthor(null);
+                  setAddOpen(true);
+                }}
+                variant="submit"
+                className="h-8 gap-1"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                {t("addAuthor")}
+              </Button>
+            </div>
           }
         />
       </FadeUp>

@@ -17,9 +17,11 @@ import { getCurrentMonthRange } from "@/lib/month-range";
 import { FineFilterParams } from "@/types/fine";
 import FineTypeFormDialog from "./FineTypeFormDialog";
 import ExportButton from "@/components/custom-ui/button/ExportButton";
+import RefreshButton from "@/components/custom-ui/button/RefreshButton";
 
 export default function FinesClient() {
   const t = useTranslations("fines");
+  const tc = useTranslations("common");
   const [activeTab, setActiveTab] = useState("fines");
 
   // Fine Management State
@@ -29,10 +31,9 @@ export default function FinesClient() {
     ...defaultMonthRange,
   });
   const [exporting, setExporting] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Fine Type Management State
   const [isTypeDialogOpen, setIsTypeDialogOpen] = useState(false);
-  const [refreshTypesKey, setRefreshTypesKey] = useState(0);
 
   const handleExport = async () => {
     setExporting(true);
@@ -59,6 +60,10 @@ export default function FinesClient() {
           isAdmin
           rightActions={
             <div className="flex items-center gap-2">
+              <RefreshButton
+                onClick={() => setRefreshKey(prev => prev + 1)}
+                label={tc("refresh")}
+              />
               <ExportButton
                 onClick={handleExport}
                 loading={exporting}
@@ -93,11 +98,12 @@ export default function FinesClient() {
             <FineManagement 
               filters={filters} 
               setFilters={setFilters} 
+              refreshKey={refreshKey}
             />
           </TabsContent>
           <TabsContent value="fine-types" className="mt-6">
             <FineTypeManagement 
-              refreshKey={refreshTypesKey} 
+              refreshKey={refreshKey} 
             />
           </TabsContent>
         </Tabs>
@@ -106,7 +112,7 @@ export default function FinesClient() {
       <FineTypeFormDialog
         open={isTypeDialogOpen}
         setOpen={setIsTypeDialogOpen}
-        onSuccess={() => setRefreshTypesKey(prev => prev + 1)}
+        onSuccess={() => setRefreshKey(prev => prev + 1)}
       />
     </StaggerContainer>
   );

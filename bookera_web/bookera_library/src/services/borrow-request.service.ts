@@ -27,12 +27,19 @@ export const borrowRequestService = {
     approval_status?: string;
     per_page?: number;
     page?: number;
+    start_date?: string;
+    end_date?: string;
   }) =>
     api.get<ApiResponse<BorrowRequestListResponse>>("/admin/borrow-requests", {
       params: filters,
     }),
 
-  exportData: (filters?: { search?: string; approval_status?: string }) =>
+  exportData: (filters?: {
+    search?: string;
+    approval_status?: string;
+    start_date?: string;
+    end_date?: string;
+  }) =>
     api.get("/admin/borrow-requests/export", {
       params: filters,
       responseType: "blob",

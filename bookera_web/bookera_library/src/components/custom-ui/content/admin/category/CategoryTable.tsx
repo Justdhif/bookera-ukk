@@ -15,12 +15,12 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { FolderOpen } from "lucide-react";
+import EditButton from "@/components/custom-ui/button/EditButton";
+import DeleteButton from "@/components/custom-ui/button/DeleteButton";
 import { Badge } from "@/components/ui/badge";
-import { Category } from "@/types/category";
 import EmptyState from "@/components/custom-ui/EmptyState";
-import { FolderOpen, Edit, Trash } from "lucide-react";
+import { Category } from "@/types/category";
 import { motion } from "framer-motion";
 import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 export default function CategoryTable({
@@ -90,24 +90,14 @@ export default function CategoryTable({
               </TableCell>
               <TableCell>
                 <div className="flex justify-end items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="brand"
+                  <EditButton
                     onClick={() => onEdit(item)}
-                    className="h-8 gap-1"
-                  >
-                    <Edit className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{t("edit")}</span>
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
+                    label={t("edit")}
+                  />
+                  <DeleteButton
                     onClick={() => onDelete(item.id)}
-                    className="h-8 gap-1"
-                  >
-                    <Trash className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{t("delete")}</span>
-                  </Button>
+                    label={t("delete")}
+                  />
                 </div>
               </TableCell>
             </SlideIn>

@@ -22,8 +22,10 @@ import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import { useTranslations } from "next-intl";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
+import RefreshButton from "@/components/custom-ui/button/RefreshButton";
 export default function PublisherClient() {
   const t = useTranslations("publisher");
+  const tCommon = useTranslations("common");
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<PublisherFilterParams>({
@@ -117,17 +119,24 @@ export default function PublisherClient() {
           description={t("description")}
           isAdmin
           rightActions={
-            <Button
-              onClick={() => {
-                setSelectedPublisher(null);
-                setAddOpen(true);
-              }}
-              variant="submit"
-              className="h-8 gap-1"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              {t("addPublisher")}
-            </Button>
+            <div className="flex items-center gap-2">
+              <RefreshButton
+                onClick={() => fetchPublishers(filters)}
+                loading={loading}
+                label={tCommon("refresh")}
+              />
+              <Button
+                onClick={() => {
+                  setSelectedPublisher(null);
+                  setAddOpen(true);
+                }}
+                variant="submit"
+                className="h-8 gap-1"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                {t("addPublisher")}
+              </Button>
+            </div>
           }
         />
       </FadeUp>

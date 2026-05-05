@@ -6,10 +6,18 @@ import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import LoadMoreButton from "@/components/custom-ui/button/LoadMoreButton";
-import { Search, Loader2, UserSquare, Building2, BookText } from "lucide-react";
+import {
+  Search,
+  Loader2,
+  UserSquare,
+  Building2,
+  BookText,
+  Users,
+} from "lucide-react";
 import { publicService } from "@/services/public.service";
 import { Author } from "@/types/author";
 import { Publisher } from "@/types/publisher";
+import { User } from "@/types/user";
 import Link from "next/link";
 import {
   useSidebar,
@@ -21,30 +29,36 @@ import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { cn } from "@/lib/utils";
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
-
-type TabAction = "author" | "publisher";
-
+import { useAuthStore } from "@/store/auth.store";
 import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
-import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
+
+type TabAction = "author" | "publisher" | "user";
 
 export default function AuthorPublisherSidebarSearch() {
+  const pathname = usePathname();
   const t = useTranslations("public");
+  const tNavbar = useTranslations("navbar");
+  const { user: currentUser } = useAuthStore();
   const { open, setOpen } = useSidebar();
-  const [activeTab, setActiveTab] = useState<TabAction>("author");
+  const [activeTab, setActiveTab] = useState<TabAction>("user");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [authors, setAuthors] = useState<Author[]>([]);
   const [publishers, setPublishers] = useState<Publisher[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
     }, 500);
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
   const fetchData = useCallback(
     async (isLoadMore = false) => {
       const currentPage = isLoadMore ? page + 1 : 1;
@@ -52,6 +66,7 @@ export default function AuthorPublisherSidebarSearch() {
         setLoading(true);
         if (activeTab === "author") setAuthors([]);
         if (activeTab === "publisher") setPublishers([]);
+        if (activeTab === "user") setUsers([]);
       } else {
         setLoadingMore(true);
       }
@@ -69,7 +84,7 @@ export default function AuthorPublisherSidebarSearch() {
             setAuthors(data.data);
           }
           setLastPage(data.last_page);
-        } else {
+        } else if (activeTab === "publisher") {
           const res = await publicService.getPublishers({
             search: debouncedSearchTerm,
             per_page: ITEMS_PER_PAGE_OPTIONS[1],
@@ -82,6 +97,23 @@ export default function AuthorPublisherSidebarSearch() {
             setPublishers(data.data);
           }
           setLastPage(data.last_page);
+        } else {
+          const res = await publicService.getUsers({
+            search: debouncedSearchTerm,
+            per_page: ITEMS_PER_PAGE_OPTIONS[1],
+            page: currentPage,
+          });
+          const response = res.data.data;
+          const data = response.data.filter(
+            (u: User) => u.id !== currentUser?.id,
+          );
+
+          if (isLoadMore) {
+            setUsers((prev) => [...prev, ...data]);
+          } else {
+            setUsers(data);
+          }
+          setLastPage(response.last_page);
         }
         setPage(currentPage);
       } catch (error) {
@@ -91,8 +123,9 @@ export default function AuthorPublisherSidebarSearch() {
         setLoadingMore(false);
       }
     },
-    [debouncedSearchTerm, activeTab, page],
+    [debouncedSearchTerm, activeTab, page, currentUser?.id],
   );
+
   useEffect(() => {
     fetchData(false);
   }, [debouncedSearchTerm, activeTab]);
@@ -117,10 +150,22 @@ export default function AuthorPublisherSidebarSearch() {
                   className="pl-9 h-9 bg-muted/50 text-sm"
                 />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                <Badge
+                  variant={activeTab === "user" ? "default" : "secondary"}
+                  className="cursor-pointer whitespace-nowrap"
+                  onClick={() => {
+                    if (activeTab !== "user") {
+                      setLoading(true);
+                      setActiveTab("user");
+                    }
+                  }}
+                >
+                  {tNavbar("users")}
+                </Badge>
                 <Badge
                   variant={activeTab === "author" ? "default" : "secondary"}
-                  className="cursor-pointer"
+                  className="cursor-pointer whitespace-nowrap"
                   onClick={() => {
                     if (activeTab !== "author") {
                       setLoading(true);
@@ -132,7 +177,7 @@ export default function AuthorPublisherSidebarSearch() {
                 </Badge>
                 <Badge
                   variant={activeTab === "publisher" ? "default" : "secondary"}
-                  className="cursor-pointer"
+                  className="cursor-pointer whitespace-nowrap"
                   onClick={() => {
                     if (activeTab !== "publisher") {
                       setLoading(true);
@@ -186,6 +231,16 @@ export default function AuthorPublisherSidebarSearch() {
                 />
               </SlideIn>
             )}
+            {activeTab === "user" && users.length === 0 && (
+              <SlideIn direction="up">
+                <EmptyState
+                  variant="compact"
+                  icon={<Users className="h-5 w-5" />}
+                  title="Tidak ada user ditemukan"
+                  description="Coba gunakan kata kunci lain."
+                />
+              </SlideIn>
+            )}
             {activeTab === "author" &&
               authors.map((author, index) => (
                 <SlideIn key={author.id} direction="left" delay={index * 0.02}>
@@ -194,38 +249,49 @@ export default function AuthorPublisherSidebarSearch() {
                   >
                     <SidebarMenuButton
                       asChild
+                      isActive={pathname === `/authors/${author.slug}`}
                       className={cn(
-                        "h-auto py-2 flex items-center gap-3",
+                        "h-auto py-2 px-3 flex items-center gap-2 transition-all duration-300 rounded-xl",
+                        pathname === `/authors/${author.slug}`
+                          ? "bg-brand-primary/10 dark:bg-brand-primary/15 text-brand-primary border border-brand-primary/20 dark:border-brand-primary/30"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent",
                         !open && "justify-center px-0 mx-auto",
                       )}
                       tooltip={!open ? author.name : undefined}
                     >
-                      <Link href={`/authors/${author.slug}`}>
-                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
-                          {author.photo ? (
-                            <Image
-                              src={author.photo}
-                              alt={author.name}
-                              className="w-full h-full object-cover"
-                              width={300}
-                              height={400}
-                              unoptimized
-                            />
-                          ) : (
-                            <UserSquare className="h-4 w-4 text-muted-foreground" />
+                      <Link href={`/authors/${author.slug}`} className="w-full">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
+                            {author.photo ? (
+                              <Image
+                                src={author.photo}
+                                alt={author.name}
+                                className="w-full h-full object-cover"
+                                width={300}
+                                height={400}
+                                unoptimized
+                              />
+                            ) : (
+                              <UserSquare className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </div>
+                          {open && (
+                            <>
+                              <div className="flex flex-col overflow-hidden">
+                                <span className="text-sm font-medium truncate">
+                                  {author.name}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5 leading-none">
+                                  <BookText className="w-3 h-3" />
+                                  {author.books_count || 0} Buku
+                                </span>
+                              </div>
+                              {pathname === `/authors/${author.slug}` && (
+                                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-primary animate-pulse" />
+                              )}
+                            </>
                           )}
                         </div>
-                        {open && (
-                          <div className="flex flex-col overflow-hidden">
-                            <span className="text-sm font-medium truncate">
-                              {author.name}
-                            </span>
-                            <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                              <BookText className="w-3 h-3" />
-                              {author.books_count || 0} Buku
-                            </span>
-                          </div>
-                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -243,38 +309,109 @@ export default function AuthorPublisherSidebarSearch() {
                   >
                     <SidebarMenuButton
                       asChild
+                      isActive={pathname === `/publishers/${publisher.slug}`}
                       className={cn(
-                        "h-auto py-2 flex items-center gap-3",
+                        "h-auto py-2 px-3 flex items-center gap-2 transition-all duration-300 rounded-xl",
+                        pathname === `/publishers/${publisher.slug}`
+                          ? "bg-brand-primary/10 dark:bg-brand-primary/15 text-brand-primary border border-brand-primary/20 dark:border-brand-primary/30"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent",
                         !open && "justify-center px-0 mx-auto",
                       )}
                       tooltip={!open ? publisher.name : undefined}
                     >
-                      <Link href={`/publishers/${publisher.slug}`}>
-                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
-                          {publisher.photo ? (
-                            <Image
-                              src={publisher.photo}
-                              alt={publisher.name}
-                              className="w-full h-full object-cover"
-                              width={300}
-                              height={400}
-                              unoptimized
-                            />
-                          ) : (
-                            <Building2 className="h-4 w-4 text-muted-foreground" />
+                      <Link href={`/publishers/${publisher.slug}`} className="w-full">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
+                            {publisher.photo ? (
+                              <Image
+                                src={publisher.photo}
+                                alt={publisher.name}
+                                className="w-full h-full object-cover"
+                                width={300}
+                                height={400}
+                                unoptimized
+                              />
+                            ) : (
+                              <Building2 className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </div>
+                          {open && (
+                            <>
+                              <div className="flex flex-col overflow-hidden">
+                                <span className="text-sm font-medium truncate">
+                                  {publisher.name}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5 leading-none">
+                                  <BookText className="w-3 h-3" />
+                                  {publisher.books_count || 0} Buku
+                                </span>
+                              </div>
+                              {pathname === `/publishers/${publisher.slug}` && (
+                                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-primary animate-pulse" />
+                              )}
+                            </>
                           )}
                         </div>
-                        {open && (
-                          <div className="flex flex-col overflow-hidden">
-                            <span className="text-sm font-medium truncate">
-                              {publisher.name}
-                            </span>
-                            <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                              <BookText className="w-3 h-3" />
-                              {publisher.books_count || 0} Buku
-                            </span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SlideIn>
+              ))}
+            {activeTab === "user" &&
+              users.map((item, index) => (
+                <SlideIn key={item.id} direction="left" delay={index * 0.02}>
+                  <SidebarMenuItem
+                    className={!open ? "w-full flex justify-center" : ""}
+                  >
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === `/${item.slug}/profile`}
+                      className={cn(
+                        "h-auto py-2 px-3 flex items-center gap-2 transition-all duration-300 rounded-xl",
+                        pathname === `/${item.slug}/profile`
+                          ? "bg-brand-primary/10 dark:bg-brand-primary/15 text-brand-primary border border-brand-primary/20 dark:border-brand-primary/30"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent",
+                        !open && "justify-center px-0 mx-auto",
+                      )}
+                      tooltip={
+                        !open
+                          ? item.profile?.full_name || item.email
+                          : undefined
+                      }
+                    >
+                      <Link href={`/${item.slug}/profile`} className="w-full">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-muted flex items-center justify-center">
+                            {item.profile?.avatar ? (
+                              <Image
+                                src={item.profile.avatar}
+                                alt={item.profile.full_name || item.email}
+                                className="w-full h-full object-cover"
+                                width={300}
+                                height={400}
+                                unoptimized
+                              />
+                            ) : (
+                              <Users className="h-4 w-4 text-muted-foreground" />
+                            )}
                           </div>
-                        )}
+                          {open && (
+                            <>
+                              <div className="flex flex-col overflow-hidden">
+                                <span className="text-sm font-medium truncate">
+                                  {item.profile?.full_name ||
+                                    item.email.split("@")[0]}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5 leading-none">
+                                  @{item.email.split("@")[0]}
+                                </span>
+                              </div>
+                              {pathname === `/${item.slug}/profile` && (
+                                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-primary animate-pulse" />
+                              )}
+                            </>
+                          )}
+                        </div>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

@@ -8,9 +8,10 @@ import { Book } from "@/types/book";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { BookOpen, Bookmark, CalendarDays, Building2, Eye, Star, Heart } from "lucide-react";
+import { BookOpen, Bookmark, CalendarDays, Building2, Star, Heart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage, AvatarGroup, AvatarGroupCount } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import DetailButton from "@/components/custom-ui/button/DetailButton";
 
 export interface BookCardProps {
   book: Book;
@@ -252,10 +253,10 @@ export default function BookCard({
           </div>
         </div>
         <Link href={`/books/${book.slug}`} onClick={(e) => e.stopPropagation()}>
-          <Button size="sm" variant="outline" className={cn("w-full gap-1", isSmall ? "h-7 text-[10px]" : "h-8")}>
-            <Eye className={cn(isSmall ? "h-3 w-3" : "h-3.5 w-3.5")} />
-            {t("detail.detail")}
-          </Button>
+          <DetailButton 
+            label={t("detail.detail")} 
+            className={cn("w-full gap-1", isSmall ? "h-7 text-[10px]" : "h-8")} 
+          />
         </Link>
       </div>
     </div>

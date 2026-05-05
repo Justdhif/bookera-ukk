@@ -1028,7 +1028,7 @@
     "queuePosition": "You are at position {pos} in the waiting list.",
     "exploreOtherBooks": "Explore Other Books",
     "exploreOtherBooksDesc": "Discover more books from our collection",
-    "searchAuthorPublisher": "Search author or publisher...",
+    "searchAuthorPublisher": "Search author, publisher, or user...",
     "favorite": "Favorite",
     "unfavorite": "Unfavorite",
     "reservedCopyAvailable": "A copy is available exclusively for you!",
@@ -1891,7 +1891,8 @@
     "showLess": "Show less",
     "borrowDate": "Borrow Date",
     "returnDate": "Return Date",
-    "detail": "Detail"
+    "detail": "Detail",
+    "otherBooks": "other books"
   },
   "borrow-request": {
     "title": "Borrow Requests",
@@ -2210,7 +2211,7 @@
   },
   "lost-books": {
     "title": "Lost Books",
-    "description": "Manage lost book reports. Make sure the fine has been paid before completing the process.",
+    "description": "Manage lost book data.",
     "loadError": "Failed to load lost books",
     "deleteSuccess": "Lost book record deleted successfully",
     "deleteError": "Failed to delete lost book record",

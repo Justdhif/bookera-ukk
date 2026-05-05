@@ -4,6 +4,8 @@ import { useTranslations, useFormatter } from "next-intl";
 import { Notification } from "@/types/notification";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import DetailButton from "@/components/custom-ui/button/DetailButton";
+import DeleteButton from "@/components/custom-ui/button/DeleteButton";
 import {
   Bell,
   CheckCheck,
@@ -94,14 +96,10 @@ export default function NotificationDetail({
         <div className="flex items-center gap-1.5">
           {detailHref && (
             <Link href={detailHref}>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 text-xs gap-1.5 border-border/60"
-              >
-                <ExternalLink className="h-3 w-3" />
-                {t("viewFullDetail")}
-              </Button>
+              <DetailButton
+                label={t("viewFullDetail")}
+                className="h-7 text-xs border-border/60 px-2.5"
+              />
             </Link>
           )}
           <Button
@@ -306,15 +304,11 @@ export default function NotificationDetail({
         </div>
       </div>
       <div className="px-5 py-3.5 border-t border-border bg-muted/20">
-        <Button
-          variant="destructive"
-          size="sm"
+        <DeleteButton
+          label={t("deleteNotification")}
           onClick={() => onDelete(notification.id)}
-          className="gap-1.5 h-8 text-xs"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-          {t("deleteNotification")}
-        </Button>
+          className="h-8 text-xs"
+        />
       </div>
     </div>
   );

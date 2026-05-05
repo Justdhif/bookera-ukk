@@ -29,6 +29,8 @@ class BorrowRequestController extends Controller
         $filters = [
             'search'          => $request->search,
             'approval_status' => $request->approval_status,
+            'start_date'      => $request->start_date,
+            'end_date'        => $request->end_date,
             'per_page'        => $request->per_page,
         ];
 
@@ -42,6 +44,8 @@ class BorrowRequestController extends Controller
         $filters = [
             'search'          => $request->search,
             'approval_status' => $request->approval_status,
+            'start_date'      => $request->start_date,
+            'end_date'        => $request->end_date,
         ];
 
         return Excel::download(

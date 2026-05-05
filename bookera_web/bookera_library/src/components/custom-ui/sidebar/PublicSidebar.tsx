@@ -99,25 +99,32 @@ export default function PublicSidebar() {
               >
                 <SidebarMenuButton
                   asChild
+                  isActive={pathname.startsWith("/explore") || pathname.startsWith("/books")}
                   tooltip={t("explore")}
                   className={cn(
                     "rounded-xl transition-all h-10 px-3",
+                    (pathname.startsWith("/explore") || pathname.startsWith("/books"))
+                      ? "bg-brand-primary/10 dark:bg-brand-primary/15 text-brand-primary border border-brand-primary/20 dark:border-brand-primary/30"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent",
                     !open && "justify-center px-0 mx-auto",
                   )}
                 >
                   <Link href="/explore">
-                    <div
+                    <LucideSearch
                       className={cn(
-                        "p-1.5 rounded-lg bg-primary/10 text-primary shrink-0",
-                        !open && "p-2",
+                        "h-5 w-5 shrink-0 transition-colors duration-300",
+                        (pathname.startsWith("/explore"))
+                          ? "text-brand-primary"
+                          : "text-muted-foreground group-hover:text-foreground",
                       )}
-                    >
-                      <LucideSearch className="h-4 w-4" />
-                    </div>
+                    />
                     {open && (
-                      <span className="font-semibold text-sm ml-1">
+                      <span className="font-medium text-sm">
                         {t("explore")}
                       </span>
+                    )}
+                    {(pathname.startsWith("/explore")) && open && (
+                      <div className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-primary animate-pulse" />
                     )}
                   </Link>
                 </SidebarMenuButton>
@@ -131,20 +138,26 @@ export default function PublicSidebar() {
                 >
                   <SidebarMenuButton
                     asChild
+                    isActive={pathname.startsWith("/chat")}
                     tooltip="Messages"
                     className={cn(
                       "rounded-xl transition-all h-10 px-3",
+                      pathname.startsWith("/chat")
+                        ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent",
                       !open && "justify-center px-0 mx-auto",
                     )}
                   >
                     <Link href={chatHref}>
-                      <div
-                        className={cn(
-                          "p-1.5 rounded-lg bg-blue-500/10 text-blue-500 shrink-0 relative",
-                          !open && "p-2",
-                        )}
-                      >
-                        <MessageSquareText className="h-4 w-4" />
+                      <div className="relative flex items-center justify-center h-5 w-5 shrink-0">
+                        <MessageSquare
+                          className={cn(
+                            "h-5 w-5 transition-colors duration-300",
+                            pathname.startsWith("/chat")
+                              ? "text-blue-500"
+                              : "text-muted-foreground group-hover:text-foreground",
+                          )}
+                        />
                         {!open && user && unreadCount > 0 && (
                           <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold rounded-full h-4.5 min-w-4.5 px-1 flex items-center justify-center border-2 border-background shadow-sm">
                             {displayUnread}
@@ -152,14 +165,18 @@ export default function PublicSidebar() {
                         )}
                       </div>
                       {open && (
-                        <div className="flex items-center justify-between flex-1 ml-1">
-                          <span className="font-semibold text-sm">
+                        <div className="flex items-center justify-between flex-1">
+                          <span className="font-medium text-sm">
                             Messages
                           </span>
-                          {user && unreadCount > 0 && (
+                          {user && unreadCount > 0 ? (
                             <span className="bg-red-500 text-white text-[10px] font-bold rounded-full h-5 px-1.5 min-w-5 flex items-center justify-center shrink-0 ml-2 shadow-sm">
                               {displayUnread}
                             </span>
+                          ) : (
+                            pathname.startsWith("/chat") && (
+                              <div className="ml-auto h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
+                            )
                           )}
                         </div>
                       )}
