@@ -40,7 +40,8 @@ class FineController extends Controller
 
     public function myFines(Request $request): JsonResponse
     {
-        $fines = $this->fineService->getMyFines($request->user()->id);
+        $filters = $this->getFilters($request);
+        $fines = $this->fineService->getMyFines($request->user()->id, $filters);
 
         return ApiResponse::successResponse('Data denda saya', $fines);
     }

@@ -115,4 +115,9 @@ class User extends Authenticatable
             ->whereDate('return_date', '<', now()->toDateString())
             ->exists();
     }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }

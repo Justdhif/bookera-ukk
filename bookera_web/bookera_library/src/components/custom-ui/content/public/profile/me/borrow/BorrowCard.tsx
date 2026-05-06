@@ -247,7 +247,7 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
               {t("fineInfo")}
             </p>
 
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {!hasFineData ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center rounded-2xl border border-dashed border-border/40 bg-muted/5">
                   <CheckCircle2 className="h-6 w-6 text-emerald-500/30 mb-2" />
@@ -257,37 +257,78 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
                 </div>
               ) : (
                 <>
-                  <div className={cn(
-                    "flex flex-col gap-3 p-3 rounded-2xl border transition-all duration-300",
-                    (hasUnpaidFine || isLate) 
-                      ? "bg-destructive/5 border-destructive/10" 
-                      : "bg-emerald-500/5 border-emerald-500/10"
-                  )}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <AlertCircle className={cn(
-                          "h-3.5 w-3.5",
-                          (hasUnpaidFine || isLate) ? "text-destructive" : "text-emerald-600"
-                        )} />
-                        <p className="text-[10px] font-black uppercase tracking-[0.15em]">
-                          {(hasUnpaidFine || isLate) ? (isLate ? t("overdue") : tCommon("unpaid")) : tCommon("total")}
-                        </p>
-                      </div>
-                      {isLate && estimatedFine?.days_late && (
-                        <span className="text-[9px] font-bold text-destructive/70 bg-destructive/10 px-1.5 py-0.5 rounded-md">
-                          {estimatedFine.days_late} {t("days")}
+                  <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
+                    {fines.map((f) => (
+                      <div
+                        key={f.id}
+                        className="flex justify-between items-center p-2 rounded-xl bg-muted/20 border border-border/5 group/fine transition-all hover:bg-muted/30"
+                      >
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[11px] font-bold text-foreground truncate">
+                            {f.fine_type?.name || t("fine")}
+                          </span>
+                          <span
+                            className={cn(
+                              "text-[9px] uppercase font-black tracking-wider",
+                              f.status === "paid"
+                                ? "text-emerald-500"
+                                : "text-destructive"
+                            )}
+                          >
+                            {f.status === "paid" ? tCommon("paid") : tCommon("unpaid")}
+                          </span>
+                        </div>
+                        <span className="text-[11px] font-black text-foreground shrink-0 ml-2">
+                          Rp {new Intl.NumberFormat("id-ID").format(f.amount)}
                         </span>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-baseline gap-1">
-                      <span className={cn(
-                        "text-lg font-black tracking-tight",
-                        (hasUnpaidFine || isLate) ? "text-destructive dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"
-                      )}>
-                        Rp {new Intl.NumberFormat("id-ID").format(displayFineAmount)}
+                      </div>
+                    ))}
+
+                    {isLate && estimatedFine && (
+                      <div className="flex justify-between items-center p-2 rounded-xl bg-destructive/5 border border-destructive/10 animate-pulse">
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[11px] font-bold text-destructive truncate">
+                            {t("estimatedLateFine")}
+                          </span>
+                          <span className="text-[9px] uppercase font-black text-destructive/70 tracking-wider">
+                            {estimatedFine.days_late} {t("days")}
+                          </span>
+                        </div>
+                        <span className="text-[11px] font-black text-destructive shrink-0 ml-2">
+                          Rp{" "}
+                          {new Intl.NumberFormat("id-ID").format(
+                            estimatedFine.total_fine
+                          )}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-dashed border-border/40 mt-1 px-1">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle
+                        className={cn(
+                          "h-3 w-3",
+                          hasUnpaidFine || isLate
+                            ? "text-destructive"
+                            : "text-emerald-600"
+                        )}
+                      />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+                        {tCommon("total")}
                       </span>
                     </div>
+                    <span
+                      className={cn(
+                        "text-sm font-black tracking-tight",
+                        hasUnpaidFine || isLate
+                          ? "text-destructive"
+                          : "text-emerald-600"
+                      )}
+                    >
+                      Rp{" "}
+                      {new Intl.NumberFormat("id-ID").format(displayFineAmount)}
+                    </span>
                   </div>
                 </>
               )}

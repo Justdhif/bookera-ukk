@@ -27,6 +27,12 @@ export interface Fine {
   borrow?: Borrow;
 }
 
+export interface FineBorrowGroup {
+  borrowId: number;
+  borrow?: Borrow;
+  fines: Fine[];
+}
+
 export interface CreateFineTypePayload {
   name: string;
   type: "lost" | "damaged" | "late";

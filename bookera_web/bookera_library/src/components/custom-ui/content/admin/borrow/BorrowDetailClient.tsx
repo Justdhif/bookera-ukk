@@ -305,7 +305,7 @@ export default function BorrowDetailClient() {
                       <Loader2 className="h-7 w-7 animate-spin" />
                     ) : (
                       <>
-                        {t("completeBorrowBorrowBtn")}
+                        {t("completeBorrowBtn")}
                         <ArrowRight className="h-7 w-7 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Fine, FineFilterParams } from "@/types/fine";
 import { fineService } from "@/services/fine.service";
-import FineTable from "./FineTable";
+import FineList from "./FineList";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -150,7 +150,7 @@ export default function FineManagement({
             <FadeIn
               key="content"
             >
-              <FineTable data={fines} />
+              <FineList data={fines} />
             </FadeIn>
           )}
         </PaginatedContent>

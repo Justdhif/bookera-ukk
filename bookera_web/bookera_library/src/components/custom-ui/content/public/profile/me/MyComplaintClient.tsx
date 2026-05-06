@@ -10,7 +10,11 @@ import PublicComplaintCard from "../../complaints/PublicComplaintCard";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { FileText } from "lucide-react";
-import { StaggerContainer, FadeIn, BounceIn } from "@/components/custom-ui/motion";
+import {
+  StaggerContainer,
+  FadeIn,
+  BounceIn,
+} from "@/components/custom-ui/motion";
 
 export default function MyComplaintClient() {
   const t = useTranslations("public");

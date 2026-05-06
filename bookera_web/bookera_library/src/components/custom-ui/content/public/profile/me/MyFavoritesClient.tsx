@@ -8,20 +8,18 @@ import { Book } from "@/types/book";
 import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid";
 import { useAuthStore } from "@/store/auth.store";
 import { useBorrowStore } from "@/store/borrow.store";
-import { StaggerContainer, FadeUp, SlideIn } from "@/components/custom-ui/motion";
+import {
+  StaggerContainer,
+  FadeUp,
+  SlideIn,
+} from "@/components/custom-ui/motion";
 
 export default function MyFavoritesClient() {
   const t = useTranslations("public.favorites");
   const tProfile = useTranslations("profile");
   const { user: currentUser, initialLoading } = useAuthStore();
   const isMe = true;
-
   const router = useRouter();
-
-  useEffect(() => {
-    // No redirect needed since this is for me
-  }, []);
-
   const [selectedBookIds, setSelectedBookIds] = useState<number[]>([]);
   const [visibleBooks, setVisibleBooks] = useState<Book[]>([]);
 
@@ -76,5 +74,3 @@ export default function MyFavoritesClient() {
     </StaggerContainer>
   );
 }
-
-

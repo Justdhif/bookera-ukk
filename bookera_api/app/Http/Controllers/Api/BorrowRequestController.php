@@ -108,7 +108,14 @@ class BorrowRequestController extends Controller
 
     public function getMyRequests(Request $request): JsonResponse
     {
-        $requests = $this->borrowRequestService->getByUser($request->user());
+        $filters = [
+            'search'     => $request->search,
+            'start_date' => $request->start_date,
+            'end_date'   => $request->end_date,
+            'per_page'   => $request->per_page,
+            'page'       => $request->page,
+        ];
+        $requests = $this->borrowRequestService->getByUser($request->user(), $filters);
 
         return ApiResponse::successResponse('User borrow request data', $requests);
     }

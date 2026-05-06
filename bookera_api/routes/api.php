@@ -107,9 +107,6 @@ Route::get('users/{userSlug}/following', [FollowController::class, 'userFollowin
 Route::get('users/{userSlug}/follow-counts', [FollowController::class, 'userFollowCounts']);
 Route::get('users/{userSlug}/profile', [FollowController::class, 'userPublicProfile']);
 
-
-
-// AI Chatbot
 Route::prefix('ai')->group(function () {
     Route::post('/chat', [AIChatController::class, 'chat']);
     Route::get('/history', [AIChatController::class, 'getHistory']);
@@ -129,7 +126,6 @@ Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::post('/setup-profile', [AuthController::class, 'setupProfile']);
         Route::post('/change-password', [AuthController::class, 'changePassword']);
-
     });
 });
 
@@ -188,8 +184,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::delete('book-copies/{bookCopy}', [BookCopyController::class, 'destroy']);
 
-    Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
-    Route::apiResource('genres', GenreController::class)->except(['index', 'show']);
+        Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
+        Route::apiResource('genres', GenreController::class)->except(['index', 'show']);
 
         Route::prefix('authors')->group(function () {
             Route::get('/', [AuthorController::class, 'index']);
@@ -218,7 +214,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/slug/{slug}', [UserController::class, 'showBySlug']);
             Route::get('/identification/{identificationNumber}', [UserController::class, 'showByIdentification']);
 
-            Route::delete('/{user}', [UserController::class, 'destroy']);
+            Route::delete('/{user:id}', [UserController::class, 'destroy']);
         });
 
         Route::prefix('borrows')->group(function () {
@@ -237,7 +233,6 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{borrowRequest}/assign', [BorrowRequestController::class, 'assignBorrow']);
             Route::patch('/{borrowRequest}/approve', [BorrowRequestController::class, 'approve']);
             Route::patch('/{borrowRequest}/reject', [BorrowRequestController::class, 'reject']);
-
         });
 
         Route::apiResource('fine-types', FineTypeController::class)->only(['index', 'store', 'destroy']);
@@ -407,5 +402,4 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/transaction', [MembershipController::class, 'createTransaction']);
         Route::get('/status', [MembershipController::class, 'checkStatus']);
     });
-
 });

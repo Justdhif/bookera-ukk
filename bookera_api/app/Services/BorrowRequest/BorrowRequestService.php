@@ -175,15 +175,36 @@ class BorrowRequestService
         ]);
     }
 
-    public function getByUser(User $user): Collection
+    public function getByUser(User $user, array $filters = []): LengthAwarePaginator|Collection
     {
-        return BorrowRequest::with([
+        $query = BorrowRequest::with([
             'borrowRequestDetails.book',
             'borrowRequestDetails.bookCopy',
         ])
-            ->where('user_id', $user->id)
-            ->latest()
-            ->get();
+            ->where('user_id', $user->id);
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->whereHas('borrowRequestDetails.book', function ($bookQuery) use ($search) {
+                $bookQuery->where('title', 'like', "%{$search}%");
+            });
+        }
+
+        if (!empty($filters['start_date'])) {
+            $query->whereDate('borrow_date', '>=', $filters['start_date']);
+        }
+
+        if (!empty($filters['end_date'])) {
+            $query->whereDate('borrow_date', '<=', $filters['end_date']);
+        }
+
+        $query->oldest();
+
+        if (isset($filters['per_page'])) {
+            return $query->paginate($filters['per_page']);
+        }
+
+        return $query->get();
     }
 
     public function cancel(BorrowRequest $request, User $user): BorrowRequest

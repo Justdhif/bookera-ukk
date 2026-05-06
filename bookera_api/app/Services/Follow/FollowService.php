@@ -79,7 +79,7 @@ class FollowService
 
     public function getUserFollowers(string $userSlug, int $perPage = 20): LengthAwarePaginator
     {
-        $targetUser = User::where('slug', $userSlug)->firstOrFail();
+        $targetUser = $this->resolveUser($userSlug);
 
         return Follow::with('user.profile')
             ->where('followable_id', $targetUser->id)
@@ -96,7 +96,7 @@ class FollowService
 
     public function getUserFollowing(string $userSlug, int $perPage = 20): LengthAwarePaginator
     {
-        $targetUser = User::where('slug', $userSlug)->firstOrFail();
+        $targetUser = $this->resolveUser($userSlug);
 
         return Follow::with('followable.profile')
             ->where('user_id', $targetUser->id)
@@ -113,7 +113,7 @@ class FollowService
 
     public function getUserFollowCounts(string $userSlug): array
     {
-        $targetUser = User::where('slug', $userSlug)->firstOrFail();
+        $targetUser = $this->resolveUser($userSlug);
 
         return [
             'followers_count' => Follow::where('followable_id', $targetUser->id)
@@ -123,5 +123,22 @@ class FollowService
                 ->where('followable_type', User::class)
                 ->count(),
         ];
+    }
+
+    private function resolveUser(string $identifier): User
+    {
+        if ($identifier === 'me' && auth('sanctum')->check()) {
+            return auth('sanctum')->user();
+        }
+
+        if (is_numeric($identifier)) {
+            return User::findOrFail($identifier);
+        }
+
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            return User::where('email', $identifier)->firstOrFail();
+        }
+
+        return User::where('slug', $identifier)->firstOrFail();
     }
 }

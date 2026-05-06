@@ -6,7 +6,7 @@ use App\Helpers\ActivityLogger;
 use App\Models\Borrow;
 use App\Models\FineBorrow;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 class FineService
 {
@@ -64,15 +64,77 @@ class FineService
         return $query->orderBy('borrow_id')->orderBy('id');
     }
 
-    public function getMyFines(int $userId): Collection
+    public function getMyFines(int $userId, array $filters = []): LengthAwarePaginator|Collection
     {
-        return FineBorrow::with(['fineType', 'borrow.borrowDetails.bookCopy.book'])
-            ->whereHas('borrow', function ($query) use ($userId) {
-                $query->where('user_id', $userId);
-            })
-            ->orderBy('borrow_id')
-            ->orderBy('id')
-            ->get();
+        $query = Borrow::with(['fines.fineType', 'borrowDetails.bookCopy.book', 'fines.borrow'])
+            ->where('user_id', $userId)
+            ->whereHas('fines', function ($q) use ($filters) {
+                if (!empty($filters['status'])) {
+                    $q->where('status', $filters['status']);
+                }
+                
+                if (!empty($filters['search'])) {
+                    $search = $filters['search'];
+                    $q->where(function ($sub) use ($search) {
+                        $sub->where('id', 'like', "%{$search}%")
+                            ->orWhereHas('fineType', function ($fineTypeQuery) use ($search) {
+                                $fineTypeQuery->where('name', 'like', "%{$search}%");
+                            });
+                    });
+                }
+            });
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('borrow_code', 'like', "%{$search}%")
+                    ->orWhereHas('borrowDetails.bookCopy.book', function ($bookQuery) use ($search) {
+                        $bookQuery->where('title', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if (!empty($filters['start_date'])) {
+            $query->whereDate('created_at', '>=', $filters['start_date']);
+        }
+
+        if (!empty($filters['end_date'])) {
+            $query->whereDate('created_at', '<=', $filters['end_date']);
+        }
+
+        $query->orderBy('id', 'asc');
+
+        if (isset($filters['per_page'])) {
+            $paginator = $query->paginate($filters['per_page']);
+            
+            $paginator->getCollection()->transform(function ($borrow) use ($filters) {
+                $fines = $borrow->fines;
+                if (!empty($filters['status'])) {
+                    $fines = $fines->where('status', $filters['status']);
+                }
+
+                return [
+                    'borrowId' => $borrow->id,
+                    'borrow' => $borrow,
+                    'fines' => $fines->values()
+                ];
+            });
+
+            return $paginator;
+        }
+
+        return $query->get()->map(function ($borrow) use ($filters) {
+            $fines = $borrow->fines;
+            if (!empty($filters['status'])) {
+                $fines = $fines->where('status', $filters['status']);
+            }
+
+            return [
+                'borrowId' => $borrow->id,
+                'borrow' => $borrow,
+                'fines' => $fines->values()
+            ];
+        });
     }
 
     public function markAsPaid(FineBorrow $fine): FineBorrow

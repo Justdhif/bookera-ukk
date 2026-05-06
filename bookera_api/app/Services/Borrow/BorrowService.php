@@ -402,7 +402,7 @@ class BorrowService
         });
     }
 
-    public function getByUser(User $user, array $filters = []): Collection
+    public function getByUser(User $user, array $filters = []): LengthAwarePaginator|Collection
     {
         $query = Borrow::query()->with([
             'borrowDetails.bookCopy.book.authors',
@@ -426,6 +426,10 @@ class BorrowService
             $query->where('borrow_code', 'like', "%{$search}%");
         }
 
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
         if (!empty($filters['start_date'])) {
             $query->whereDate('borrow_date', '>=', $filters['start_date']);
         }
@@ -434,7 +438,13 @@ class BorrowService
             $query->whereDate('borrow_date', '<=', $filters['end_date']);
         }
 
-        return $query->orderBy('id', 'desc')->get();
+        $query->orderBy('id', 'asc');
+
+        if (isset($filters['per_page'])) {
+            return $query->paginate($filters['per_page']);
+        }
+
+        return $query->get();
     }
 
     private function generateBorrowCode(): string

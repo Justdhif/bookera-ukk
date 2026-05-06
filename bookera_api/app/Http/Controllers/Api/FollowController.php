@@ -101,15 +101,33 @@ class FollowController extends Controller
 
     public function userPublicProfile(string $userSlug): JsonResponse
     {
-        $user = User::with('profile')
-            ->withCount(['followers', 'following', 'complaints'])
-            ->where('slug', $userSlug)
-            ->firstOrFail();
+        try {
+            $query = User::with('profile')
+                ->withCount(['followers', 'following', 'complaints']);
 
-        if (\Illuminate\Support\Facades\Auth::check()) {
-            $user->is_following = $this->followService->isFollowing($user->id);
+            $currentUser = auth('sanctum')->user();
+
+            if (empty($userSlug)) {
+                return ApiResponse::errorResponse('Parameter user tidak valid', null, 400);
+            }
+
+            if ($userSlug === 'me' && $currentUser) {
+                $user = $query->findOrFail($currentUser->id);
+            } elseif (is_numeric($userSlug)) {
+                $user = $query->findOrFail($userSlug);
+            } elseif (filter_var($userSlug, FILTER_VALIDATE_EMAIL)) {
+                $user = $query->where('email', $userSlug)->firstOrFail();
+            } else {
+                $user = $query->where('slug', $userSlug)->firstOrFail();
+            }
+
+            if ($currentUser) {
+                $user->is_following = $this->followService->isFollowing($user->id);
+            }
+
+            return ApiResponse::successResponse('Profil pengguna berhasil diambil', $user);
+        } catch (ModelNotFoundException) {
+            return ApiResponse::notFoundResponse('Pengguna tidak ditemukan');
         }
-
-        return ApiResponse::successResponse('Profil pengguna berhasil diambil', $user);
     }
 }

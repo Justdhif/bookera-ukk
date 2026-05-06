@@ -18,7 +18,19 @@ export const borrowRequestService = {
       isAdmin ? `/admin/borrow-requests/${id}` : `/borrow-requests/${id}`,
     ),
 
-  getByUser: () => api.get<ApiResponse<BorrowRequest[]>>("/my-borrow-requests"),
+  getByUser: (filters?: {
+    search?: string;
+    per_page?: number;
+    page?: number;
+    start_date?: string;
+    end_date?: string;
+  }) =>
+    api.get<ApiResponse<BorrowRequestListResponse | BorrowRequest[]>>(
+      "/my-borrow-requests",
+      {
+        params: filters,
+      },
+    ),
   
   cancel: (id: number) => api.patch(`/borrow-requests/${id}/cancel`),
 

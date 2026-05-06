@@ -84,6 +84,9 @@ class BorrowController extends Controller
             'search'     => $request->search,
             'start_date' => $request->start_date,
             'end_date'   => $request->end_date,
+            'per_page'   => $request->per_page,
+            'page'       => $request->page,
+            'status'     => $request->status,
         ];
         $borrows = $this->borrowService->getByUser($request->user(), $filters);
 

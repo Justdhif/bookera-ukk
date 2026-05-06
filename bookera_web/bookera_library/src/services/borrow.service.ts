@@ -36,7 +36,7 @@ export const borrowService = {
     }),
 
   getByUser: (filters?: BorrowFilterParams) =>
-    api.get<ApiResponse<Borrow[]>>("/my-borrows", {
+    api.get<ApiResponse<BorrowListResponse | Borrow[]>>("/my-borrows", {
       params: filters,
     }),
 

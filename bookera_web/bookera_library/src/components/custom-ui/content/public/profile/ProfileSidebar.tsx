@@ -463,7 +463,7 @@ export default function ProfileSidebar({ slug }: ProfileSidebarProps) {
               <PhoneInput
                 value={user.profile?.phone_number || ""}
                 disabled
-                className="opacity-70 scale-90 origin-left"
+                className="opacity-70 w-full"
               />
             </div>
           </div>
