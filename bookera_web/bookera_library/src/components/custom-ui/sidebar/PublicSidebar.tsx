@@ -14,7 +14,7 @@ import { useTranslations } from "next-intl";
 import AuthorPublisherSidebarSearch from "./AuthorPublisherSidebarSearch";
 import Link from "next/link";
 import {
-  Search as LucideSearch,
+  Globe,
   MessageSquareText,
   MessageSquare,
 } from "lucide-react";
@@ -99,21 +99,25 @@ export default function PublicSidebar() {
               >
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname.startsWith("/explore") || pathname.startsWith("/books")}
+                  isActive={
+                    pathname.startsWith("/explore") ||
+                    pathname.startsWith("/books")
+                  }
                   tooltip={t("explore")}
                   className={cn(
                     "rounded-xl transition-all h-10 px-3",
-                    (pathname.startsWith("/explore") || pathname.startsWith("/books"))
+                    pathname.startsWith("/explore") ||
+                      pathname.startsWith("/books")
                       ? "bg-brand-primary/10 dark:bg-brand-primary/15 text-brand-primary border border-brand-primary/20 dark:border-brand-primary/30"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent",
                     !open && "justify-center px-0 mx-auto",
                   )}
                 >
                   <Link href="/explore">
-                    <LucideSearch
+                    <Globe
                       className={cn(
                         "h-5 w-5 shrink-0 transition-colors duration-300",
-                        (pathname.startsWith("/explore"))
+                        pathname.startsWith("/explore")
                           ? "text-brand-primary"
                           : "text-muted-foreground group-hover:text-foreground",
                       )}
@@ -123,7 +127,7 @@ export default function PublicSidebar() {
                         {t("explore")}
                       </span>
                     )}
-                    {(pathname.startsWith("/explore")) && open && (
+                    {pathname.startsWith("/explore") && open && (
                       <div className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-primary animate-pulse" />
                     )}
                   </Link>
@@ -166,9 +170,7 @@ export default function PublicSidebar() {
                       </div>
                       {open && (
                         <div className="flex items-center justify-between flex-1">
-                          <span className="font-medium text-sm">
-                            Messages
-                          </span>
+                          <span className="font-medium text-sm">Messages</span>
                           {user && unreadCount > 0 ? (
                             <span className="bg-red-500 text-white text-[10px] font-bold rounded-full h-5 px-1.5 min-w-5 flex items-center justify-center shrink-0 ml-2 shadow-sm">
                               {displayUnread}

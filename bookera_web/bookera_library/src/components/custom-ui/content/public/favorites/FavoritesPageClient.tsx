@@ -8,6 +8,7 @@ import { Book } from "@/types/book";
 import PublicBookGrid from "@/components/custom-ui/content/public/PublicBookGrid";
 import { useAuthStore } from "@/store/auth.store";
 import { useBorrowStore } from "@/store/borrow.store";
+import { StaggerContainer, FadeUp, SlideIn } from "@/components/custom-ui/motion";
 
 export default function FavoritesPageClient() {
   const t = useTranslations("public.favorites");
@@ -45,21 +46,25 @@ export default function FavoritesPageClient() {
   };
 
   return (
-    <div className="container space-y-6">
-      <div className="space-y-6">
+    <StaggerContainer className="container space-y-6">
+      <FadeUp>
         <ContentHeader title={t("title")} description={t("description")} />
-      </div>
+      </FadeUp>
 
-      <div className="space-y-3">
-        <PublicBookGrid
-          fetchMode="favorites"
-          onSelectAll={handleSelectAll}
-          onBorrowRequest={handleBorrowRequest}
-          selectedBookIds={selectedBookIds}
-          onSelectionChange={handleSelectBook}
-          onVisibleBooksChange={setVisibleBooks}
-        />
-      </div>
-    </div>
+      <SlideIn direction="up" delay={0.1}>
+        <div className="space-y-3">
+          <PublicBookGrid
+            fetchMode="favorites"
+            onSelectAll={handleSelectAll}
+            onBorrowRequest={handleBorrowRequest}
+            selectedBookIds={selectedBookIds}
+            onSelectionChange={handleSelectBook}
+            onVisibleBooksChange={setVisibleBooks}
+          />
+        </div>
+      </SlideIn>
+    </StaggerContainer>
   );
 }
+
+

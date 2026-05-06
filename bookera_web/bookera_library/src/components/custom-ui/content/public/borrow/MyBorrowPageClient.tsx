@@ -17,6 +17,7 @@ import { BorrowFilterParams } from "@/types/borrow";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
+import { StaggerContainer, FadeUp, FadeIn, BlurIn, SlideIn, BounceIn } from "@/components/custom-ui/motion";
 import { BorrowCard } from "./BorrowCard";
 import { BorrowRequestCard } from "./BorrowRequestCard";
 
@@ -99,9 +100,9 @@ export default function MyBorrowPageClient() {
   };
 
   const loadingState = (
-    <div className="flex justify-center py-12">
+    <FadeIn key="loading" className="flex justify-center py-12">
       <DataLoading variant="inline" size="lg" />
-    </div>
+    </FadeIn>
   );
 
   const sortedBorrows = [...borrows].sort((left, right) => left.id - right.id);
@@ -137,97 +138,110 @@ export default function MyBorrowPageClient() {
   ];
 
   return (
-    <div className="space-y-6">
-      <ContentHeader
-        title={t("myBorrows")}
-        description={t("myBorrowsDesc")}
-        isAdmin
-      />
+    <StaggerContainer className="space-y-6">
+      <FadeUp>
+        <ContentHeader
+          title={t("myBorrows")}
+          description={t("myBorrowsDesc")}
+          isAdmin
+        />
+      </FadeUp>
 
-      <Tabs defaultValue="all" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="all">
-            {tBorrow("all")} ({sortedBorrows.length})
-          </TabsTrigger>
-          <TabsTrigger value="open">
-            {tBorrow("open")} ({openBorrows.length})
-          </TabsTrigger>
-          <TabsTrigger value="closed">
-            {tBorrow("closed")} ({closedBorrows.length})
-          </TabsTrigger>
-          <TabsTrigger value="requests" className="flex items-center gap-1">
-            <ClipboardList className="h-3.5 w-3.5" />
-            {tBorrow("requests")} ({sortedRequests.length})
-          </TabsTrigger>
-        </TabsList>
+      <SlideIn direction="up" delay={0.1}>
+        <Tabs defaultValue="all" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="all">
+              {tBorrow("all")} ({sortedBorrows.length})
+            </TabsTrigger>
+            <TabsTrigger value="open">
+              {tBorrow("open")} ({openBorrows.length})
+            </TabsTrigger>
+            <TabsTrigger value="closed">
+              {tBorrow("closed")} ({closedBorrows.length})
+            </TabsTrigger>
+            <TabsTrigger value="requests" className="flex items-center gap-1">
+              <ClipboardList className="h-3.5 w-3.5" />
+              {tBorrow("requests")} ({sortedRequests.length})
+            </TabsTrigger>
+          </TabsList>
 
-        {borrowTabs.map(({ value, label, desc, data, emptyTitle, emptyDesc }) => (
-          <TabsContent key={value} value={value} className="space-y-4">
+          {borrowTabs.map(({ value, label, desc, data, emptyTitle, emptyDesc }) => (
+            <TabsContent key={value} value={value} className="space-y-4">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold">{label}</h3>
+                  <p className="text-sm text-muted-foreground">{desc}</p>
+                </div>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <div className="relative flex-1 w-full">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder={tBorrow("searchByNameOrTitle")}
+                      value={borrowSearch}
+                      onChange={handleBorrowSearchChange}
+                      className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
+                    />
+                  </div>
+                  <DateRangeFilter onFilter={handleDateFilter} />
+                </div>
+                {loadingBorrows ? (
+                  loadingState
+                ) : data.length === 0 ? (
+                  <FadeIn key="empty">
+                    <EmptyState
+                      icon={<Package />}
+                      title={emptyTitle}
+                      description={emptyDesc}
+                    />
+                  </FadeIn>
+                ) : (
+                  <div className="grid gap-4">
+                    {data.map((borrow) => (
+                      <BounceIn key={borrow.id}>
+                        <BorrowCard borrow={borrow} />
+                      </BounceIn>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          ))}
+
+          <TabsContent value="requests" className="space-y-4">
             <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-semibold">{label}</h3>
-                <p className="text-sm text-muted-foreground">{desc}</p>
+                <h3 className="text-lg font-semibold">{t("myRequests")}</h3>
+                <p className="text-sm text-muted-foreground">{t("myRequestsDesc")}</p>
               </div>
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-                <div className="relative flex-1 w-full">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder={tBorrow("searchByNameOrTitle")}
-                    value={borrowSearch}
-                    onChange={handleBorrowSearchChange}
-                    className="pl-10 h-11! w-full shadow-sm transition-all duration-300"
-                  />
-                </div>
-                <DateRangeFilter onFilter={handleDateFilter} />
-              </div>
-              {loadingBorrows ? (
+              {loadingRequests ? (
                 loadingState
-              ) : data.length === 0 ? (
-                <EmptyState
-                  icon={<Package />}
-                  title={emptyTitle}
-                  description={emptyDesc}
-                />
+              ) : sortedRequests.length === 0 ? (
+                <FadeIn key="empty-requests">
+                  <EmptyState
+                    icon={<ClipboardList />}
+                    title={t("noRequestsYet")}
+                    description={t("noRequestsYetDesc")}
+                  />
+                </FadeIn>
               ) : (
-                <div className="grid gap-4">
-                  {data.map((borrow) => (
-                    <BorrowCard key={borrow.id} borrow={borrow} />
+                <div className="space-y-4">
+                  {sortedRequests.map((req) => (
+                    <BounceIn key={req.id}>
+                      <BorrowRequestCard
+                        request={req}
+                        onDelete={handleDeleteRequest}
+                        isDeleting={deleteId === req.id}
+                      />
+                    </BounceIn>
                   ))}
                 </div>
               )}
             </div>
           </TabsContent>
-        ))}
-
-        <TabsContent value="requests" className="space-y-4">
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold">{t("myRequests")}</h3>
-              <p className="text-sm text-muted-foreground">{t("myRequestsDesc")}</p>
-            </div>
-            {loadingRequests ? (
-              loadingState
-            ) : sortedRequests.length === 0 ? (
-              <EmptyState
-                icon={<ClipboardList />}
-                title={t("noRequestsYet")}
-                description={t("noRequestsYetDesc")}
-              />
-            ) : (
-              <div className="space-y-4">
-                {sortedRequests.map((req) => (
-                  <BorrowRequestCard
-                    key={req.id}
-                    request={req}
-                    onDelete={handleDeleteRequest}
-                    isDeleting={deleteId === req.id}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+        </Tabs>
+      </SlideIn>
+    </StaggerContainer>
   );
 }
+
+
