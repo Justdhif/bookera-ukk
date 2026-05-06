@@ -166,6 +166,9 @@ function CommentItem({
     }
   };
 
+  const isMe = currentUserId === comment.user_id;
+  const profileHref = isMe ? "/my-profile" : `/${comment.user?.slug}`;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
@@ -176,7 +179,7 @@ function CommentItem({
     >
       <div className="flex gap-2.5 group">
         <Link
-          href={`/${comment.user?.slug}/profile`}
+          href={profileHref}
           className="shrink-0 mt-0.5"
         >
           <Avatar className="h-7 w-7 border border-border hover:ring-2 hover:ring-brand-primary/30 transition-all">
@@ -198,7 +201,7 @@ function CommentItem({
               <>
                 <div className="flex items-center gap-1.5 mb-1.5">
                   <Link
-                    href={`/${comment.user?.slug}/profile`}
+                    href={profileHref}
                     className="font-bold hover:text-brand-primary transition-colors inline-flex items-center gap-1.5"
                   >
                     {displayName}
@@ -224,7 +227,7 @@ function CommentItem({
               // Reply Layout: Inline name, mention, and content
               <div className="text-sm leading-relaxed">
                 <Link
-                  href={`/${comment.user?.slug}/profile`}
+                  href={profileHref}
                   className="font-bold hover:text-brand-primary transition-colors inline-flex items-center gap-1 mr-1.5"
                 >
                   {displayName}

@@ -59,7 +59,7 @@ export default function SettingsNotificationCard() {
   }
 
   const userSlug = user?.slug;
-  const profileHref = userSlug ? `/${userSlug}/profile` : "/profile";
+  const profileHref = "/my-profile";
 
   const hasPhone = Boolean(phoneNumber);
   const handleMasterToggle = (checked: boolean) => {

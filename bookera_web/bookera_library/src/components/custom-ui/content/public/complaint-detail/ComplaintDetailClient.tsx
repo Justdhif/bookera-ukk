@@ -62,14 +62,15 @@ export default function ComplaintDetailClient() {
   const dateLocale = currentLocale === "id" ? idLocale : enUS;
 
   const { user } = useAuthStore();
-  const isAdmin = user?.role === "admin" || user?.role?.startsWith("officer");
-
   const [complaint, setComplaint] = useState<Complaint | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [voted, setVoted] = useState(false);
   const [votesCount, setVotesCount] = useState(0);
   const [votePending, setVotePending] = useState(false);
+
+  const isAdmin = user?.role === "admin" || user?.role?.startsWith("officer");
+  const isMe = user?.id === complaint?.user?.id;
 
   useEffect(() => {
     if (!slug) return;
@@ -193,7 +194,7 @@ export default function ComplaintDetailClient() {
             <CardHeader className="p-8 pb-4 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-muted/30">
                 <div className="flex items-center gap-3">
-                  <Link href={`/${complaint.user.slug}/profile`}>
+                  <Link href={isMe ? "/my-profile" : `/${complaint.user.slug}`}>
                     <Avatar className="h-10 w-10 border-2 border-background shadow-md">
                       <AvatarImage
                         src={complaint.user.profile?.avatar}
@@ -207,7 +208,7 @@ export default function ComplaintDetailClient() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 min-w-0">
                       <Link
-                        href={`/${complaint.user.slug}/profile`}
+                        href={isMe ? "/my-profile" : `/${complaint.user.slug}`}
                         className="hover:text-brand-primary transition-colors"
                       >
                         <p className="text-sm font-black truncate leading-tight">

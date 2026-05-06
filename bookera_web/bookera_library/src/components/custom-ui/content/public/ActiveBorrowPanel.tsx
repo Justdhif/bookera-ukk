@@ -127,8 +127,8 @@ export function ActiveBorrowPanel({
                 const isOverdue = daysLeft < 0;
                 const isDueSoon = daysLeft <= dueSoonThresholdDays;
                 const detailLink = userSlug
-                  ? `/${userSlug}/my-borrows/${borrow.borrow_code}`
-                  : `/my-borrows/${borrow.borrow_code}`;
+                  ? `/borrow/${borrow.borrow_code}`
+                  : `/home`;
 
                 const dueLabel = hasLost
                   ? t("reminder_lost_title")

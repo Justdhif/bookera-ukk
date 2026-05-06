@@ -84,10 +84,10 @@ export default function NotificationDropdown({
       }
     } else {
       if (notif.module === "borrow" && notif.data?.borrow_id) {
-        const borrowHref = `/my-borrows/${notif.data.borrow_id}`;
+        const borrowHref = `/borrow/${notif.data.borrow_id}`;
         router.push(borrowHref);
       } else if (notif.module === "return" && notif.data?.borrow_id) {
-        const borrowHref = `/my-borrows/${notif.data.borrow_id}`;
+        const borrowHref = `/borrow/${notif.data.borrow_id}`;
         router.push(borrowHref);
       } else {
         router.push(notificationsHref);

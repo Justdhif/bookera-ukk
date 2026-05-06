@@ -1,9 +1,5 @@
-import { redirect } from "next/navigation";
+import OtherProfileClient from "@/components/custom-ui/content/public/profile/others/OtherProfileClient";
 
-export default function AccountSlugPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  redirect(`/${params.slug}/profile`);
+export default function AccountSlugPage() {
+  return <OtherProfileClient />;
 }

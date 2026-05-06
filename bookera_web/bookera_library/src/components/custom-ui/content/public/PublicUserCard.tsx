@@ -29,6 +29,9 @@ export default function PublicUserCard({ user, className }: PublicUserCardProps)
   const fullName = profile?.full_name || "User";
   const username = user.email.split("@")[0];
 
+  const isMe = currentUser?.id === user.id;
+  const profileHref = isMe ? "/my-profile" : `/${user.slug}`;
+
   return (
     <Card className={cn(
       "group overflow-hidden border-muted/50 bg-card/40 backdrop-blur-md transition-all hover:border-brand-primary/40 hover:bg-card hover:shadow-lg pt-0",
@@ -41,7 +44,7 @@ export default function PublicUserCard({ user, className }: PublicUserCardProps)
         
         <div className="px-5 pb-6">
           <div className="relative -mt-10 mb-3">
-            <Link href={`/${user.slug}/profile`}>
+            <Link href={profileHref}>
               <Avatar className="h-20 w-20 border-4 border-background shadow-md group-hover:scale-105 transition-transform">
                 <AvatarImage src={avatarUrl} alt={fullName} className="object-cover" />
                 <AvatarFallback className="bg-brand-primary/10 text-brand-primary text-xl font-bold">
@@ -52,7 +55,7 @@ export default function PublicUserCard({ user, className }: PublicUserCardProps)
           </div>
 
           <div className="space-y-1">
-            <Link href={`/${user.slug}/profile`}>
+            <Link href={profileHref}>
               <h3 className="font-bold text-lg group-hover:text-brand-primary transition-colors truncate">
                 {fullName}
               </h3>

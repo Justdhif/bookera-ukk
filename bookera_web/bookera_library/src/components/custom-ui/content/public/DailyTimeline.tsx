@@ -209,8 +209,8 @@ export default function DailyTimeline() {
   );
 
   const activeBorrowsHref = userSlug
-    ? `/${userSlug}/my-borrows`
-    : "/my-borrows";
+    ? `/${userSlug}/borrow`
+    : "/login?redirect=/borrow";
   const sunday = days[6];
   const weekLabel = (() => {
     const code = locale === "id" ? "id-ID" : "en-US";

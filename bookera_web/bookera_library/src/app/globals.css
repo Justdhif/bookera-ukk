@@ -301,3 +301,5 @@
   mask-image: linear-gradient(to right, black 85%, transparent 100%);
   -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
 }
+
+@keyframes scan-line { 0% { top: 0%; } 100% { top: 100%; } } .animate-scan-line { animation: scan-line 2s linear infinite; }

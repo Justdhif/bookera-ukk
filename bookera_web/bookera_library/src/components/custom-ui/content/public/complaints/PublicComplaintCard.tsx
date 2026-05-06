@@ -30,6 +30,8 @@ import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
 import { FadeUp } from "@/components/custom-ui/motion";
 
+import { useAuthStore } from "@/store/auth.store";
+
 interface ComplaintCardProps {
   complaint: Complaint;
   delay?: number;
@@ -42,6 +44,10 @@ export default function PublicComplaintCard({
   const t = useTranslations("complaint");
   const currentLocale = useLocale();
   const dateLocale = currentLocale === "id" ? id : enUS;
+  const currentUser = useAuthStore((s) => s.user);
+
+  const isMe = currentUser?.id === complaint.user.id;
+  const profileHref = isMe ? "/my-profile" : `/${complaint.user.slug}`;
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -144,7 +150,7 @@ export default function PublicComplaintCard({
 
         <CardContent className="px-5 pt-0 pb-5">
           <div className="flex items-center gap-3">
-            <Link href={`/${complaint.user.slug}/profile`}>
+            <Link href={profileHref}>
               <Avatar className="h-9 w-9 ring-2 ring-background shadow-sm hover:ring-primary/50 transition-all">
                 <AvatarImage src={complaint.user.profile?.avatar} />
                 <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold uppercase">
@@ -155,7 +161,7 @@ export default function PublicComplaintCard({
             </Link>
             <div className="overflow-hidden">
               <div className="flex items-center gap-1.5 min-w-0">
-                <Link href={`/${complaint.user.slug}/profile`} className="hover:text-primary transition-colors">
+                <Link href={profileHref} className="hover:text-primary transition-colors">
                   <p className="text-sm font-bold truncate">
                     {complaint.user.profile?.full_name ||
                       complaint.user.email.split("@")[0]}

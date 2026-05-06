@@ -31,11 +31,7 @@ export default function ForgotPasswordClient() {
   const t = useTranslations("forgot-password");
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const userSlug = useAuthStore((s) => s.user?.slug);
-  const backPath = isAuthenticated
-    ? userSlug
-      ? `/${userSlug}/profile`
-      : "/profile"
-    : "/login";
+  const backPath = isAuthenticated ? "/my-profile" : "/login";
 
   const FORGOT_STEPS = [
     { key: "method" as ForgotStep, label: t("method"), icon: Mail },

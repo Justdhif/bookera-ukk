@@ -10,8 +10,8 @@ import { Download, QrCode } from "lucide-react";
 import { QrCodeImage } from "@/components/custom-ui/QrCodeImage";
 import { useTranslations } from "next-intl";
 import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
-import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 import { Button } from "@/components/ui/button";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
 import { downloadQrCode } from "@/lib/download";
 

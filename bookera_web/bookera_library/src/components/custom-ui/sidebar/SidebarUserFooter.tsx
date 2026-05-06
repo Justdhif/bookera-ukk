@@ -44,7 +44,7 @@ export function SidebarUserFooter() {
 
   const isHomePage = pathname === "/home" || pathname === "/";
   const showHomeButton = !isHomePage;
-  const profileHref = user?.slug ? `/${user.slug}/profile` : "/profile";
+  const profileHref = "/my-profile";
 
   const homeLabel = tNavbar("goToHome");
 

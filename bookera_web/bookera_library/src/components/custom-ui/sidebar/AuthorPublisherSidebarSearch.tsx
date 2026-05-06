@@ -55,7 +55,7 @@ export default function AuthorPublisherSidebarSearch() {
   useEffect(() => {
     if (pathname.includes("/authors/")) setActiveTab("author");
     else if (pathname.includes("/publishers/")) setActiveTab("publisher");
-    else if (pathname.includes("/profile")) setActiveTab("user");
+    else if (pathname.includes("/my-profile")) setActiveTab("user");
   }, [pathname]);
 
   useEffect(() => {
@@ -158,7 +158,7 @@ export default function AuthorPublisherSidebarSearch() {
             (u: User) => Number(u.id) !== Number(currentUser?.id),
           );
 
-          if (!isLoadMore && pathname.includes("/profile")) {
+          if (!isLoadMore && !pathname.startsWith("/authors") && !pathname.startsWith("/publishers") && pathname !== "/home" && pathname !== "/explore") {
             const activeSlug = pathname.split("/")[1];
             if (
               activeSlug &&
@@ -532,7 +532,7 @@ export default function AuthorPublisherSidebarSearch() {
               {/* ── USER LIST ── */}
               {activeTab === "user" &&
                 users.map((item, index) => {
-                  const isActive = pathname === `/${item.slug}/profile`;
+                  const isActive = pathname === `/${item.slug}`;
                   const displayName =
                     item.profile?.full_name || item.email.split("@")[0];
                   return (
@@ -554,7 +554,7 @@ export default function AuthorPublisherSidebarSearch() {
                             )}
                           >
                             <Link
-                              href={`/${item.slug}/profile`}
+                              href={`/${item.slug}`}
                               className="w-full"
                             >
                               <div className="flex items-center gap-2 w-full">
@@ -602,7 +602,7 @@ export default function AuthorPublisherSidebarSearch() {
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Link
-                                href={`/${item.slug}/profile`}
+                                href={`/${item.slug}`}
                                 className="flex justify-center"
                               >
                                 <div className="relative">

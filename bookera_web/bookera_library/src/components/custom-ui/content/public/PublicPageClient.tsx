@@ -15,9 +15,9 @@ export default function PublicPageClient() {
   const t = useTranslations("navbar");
   const user = useAuthStore((state) => state.user);
   const canUseFavoriteAction = Boolean(user && user.role !== "user");
-  const favoriteHref = "/favorites";
-  const myBorrowsHref = user ? "/my-borrows" : "/login?redirect=/my-borrows";
-  const myFinesHref = user ? "/my-fines" : "/login?redirect=/my-fines";
+  const favoriteHref = user ? `/${user.slug}/favorite` : "/login?redirect=/favorite";
+  const myBorrowsHref = user ? `/${user.slug}/borrow` : "/login?redirect=/borrow";
+  const myFinesHref = user ? `/${user.slug}/fine` : "/login?redirect=/fine";
 
   return (
     <StaggerContainer className="space-y-8 pb-10">
