@@ -26,7 +26,7 @@ class User extends Authenticatable
         'last_login_at',
     ];
 
-    protected $appends = ['has_pending_borrow_request', 'has_overdue_borrow'];
+    protected $appends = ['has_pending_borrow_request', 'has_overdue_borrow', 'active_membership'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -114,6 +114,22 @@ class User extends Authenticatable
             ->where('status', 'open')
             ->whereDate('return_date', '<', now()->toDateString())
             ->exists();
+    }
+
+    public function membership()
+    {
+        return $this->hasOne(Membership::class);
+    }
+
+    public function getActiveMembershipAttribute()
+    {
+        return $this->membership()
+            ->where('status', 'active')
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->first();
     }
 
     public function getRouteKeyName()

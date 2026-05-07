@@ -21,6 +21,9 @@ export interface Fine {
   status: "unpaid" | "paid" | "waived";
   notes?: string;
   waive_reason?: string;
+  payment_method?: "cash" | "midtrans";
+  order_id?: string;
+  snap_token?: string;
   created_at: string;
   updated_at: string;
   fine_type?: FineType;

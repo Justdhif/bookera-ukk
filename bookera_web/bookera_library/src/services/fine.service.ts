@@ -1,35 +1,25 @@
 import api from "@/lib/axios";
-import { ApiResponse, PaginatedResponse } from "@/types/api";
-import {
-  Fine,
-  FineListResponse,
-  FineFilterParams,
-  FineBorrowGroup,
-} from "@/types/fine";
+import { ApiResponse } from "@/types/api";
 
 export const fineService = {
-  getAll: (filters?: FineFilterParams) =>
-    api.get<ApiResponse<FineListResponse>>("/admin/fines", {
-      params: filters,
-    }),
+  getAll: (params?: any) => 
+    api.get<ApiResponse<any>>("/admin/fines", { params }),
 
-  exportData: (filters?: FineFilterParams) =>
-    api.get("/admin/fines/export", {
-      params: filters,
-      responseType: "blob",
-    }),
+  getMyFines: (params?: any) => 
+    api.get<ApiResponse<any>>("/my-fines", { params }),
 
-  getByBorrow: (borrowId: number) =>
-    api.get<ApiResponse<Fine[]>>(`/borrows/${borrowId}/fines`),
+  getByUser: (params?: any) => 
+    api.get<ApiResponse<any>>("/my-fines", { params }),
 
-  getByUser: (filters?: FineFilterParams) =>
-    api.get<ApiResponse<PaginatedResponse<FineBorrowGroup> | FineBorrowGroup[]>>(
-      "/my-fines",
-      {
-        params: filters,
-      },
-    ),
+  payMidtrans: (fineId: number) => 
+    api.post<ApiResponse<{ snap_token: string; order_id: string; client_key: string }>>(`/fines/${fineId}/pay-midtrans`),
 
-  markAsPaid: (id: number) =>
-    api.post<ApiResponse<Fine>>(`/admin/fines/${id}/mark-paid`),
+  payCash: (fineId: number) => 
+    api.post<ApiResponse<any>>(`/fines/${fineId}/pay-cash`),
+
+  checkStatus: (fineId: number) => 
+    api.get<ApiResponse<{ fine: any; is_paid: boolean }>>(`/fines/${fineId}/status`),
+
+  markAsPaid: (fineId: number) => 
+    api.post<ApiResponse<any>>(`/admin/fines/${fineId}/mark-paid`),
 };

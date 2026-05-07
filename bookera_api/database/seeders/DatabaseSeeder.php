@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             MembershipPlanSeeder::class,
             ComplaintSeeder::class,
             NewsSeeder::class,
+            MembershipDiscountSeeder::class,
         ]);
 
         Schema::enableForeignKeyConstraints();

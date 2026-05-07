@@ -9,6 +9,7 @@ use App\Models\UserProfile;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
@@ -17,7 +18,13 @@ class UserSeeder extends Seeder
     {
         $count = (int) $this->command->ask('Berapa banyak User yang ingin dibuat?', 10);
 
+        Schema::disableForeignKeyConstraints();
+        UserProfile::truncate();
+        User::truncate();
+        Schema::enableForeignKeyConstraints();
+
         DB::transaction(function () use ($count) {
+            // 1. Admin
             $this->createCustomUser(
                 email: 'noob1234five@gmail.com',
                 slug: 'noob1234five',
@@ -32,6 +39,7 @@ class UserSeeder extends Seeder
                 institution: 'Bookera Academy',
             );
 
+            // 2. Standard User
             $this->createCustomUser(
                 email: 'justdhif418@gmail.com',
                 slug: 'justdhif418',
@@ -46,17 +54,33 @@ class UserSeeder extends Seeder
                 institution: 'Bookera Community',
             );
 
+            // 3. Officer (Catalog)
             $this->createCustomUser(
-                email: 'member@gmail.com',
-                slug: 'member-test',
-                role: 'member',
-                fullName: 'Member Tester',
+                email: 'officer_catalog@gmail.com',
+                slug: 'officer-catalog',
+                role: 'officer:catalog',
+                fullName: 'Officer Catalog',
+                gender: 'male',
+                phoneNumber: '628123456790',
+                address: 'Jl. Bookera No. 4, Surabaya',
+                bio: 'Akun petugas katalog khusus untuk pengujian Bookera.',
+                identificationPrefix: 'OC',
+                occupation: UserOccupation::Staff,
+                institution: 'Bookera Academy',
+            );
+
+            // 4. Officer (Management)
+            $this->createCustomUser(
+                email: 'officer_mgmt@gmail.com',
+                slug: 'officer-mgmt',
+                role: 'officer:management',
+                fullName: 'Officer Management',
                 gender: 'female',
-                phoneNumber: '628123456789',
-                address: 'Jl. Bookera No. 3, Yogyakarta',
-                bio: 'Akun member khusus untuk pengujian fitur reservasi dan WhatsApp.',
-                identificationPrefix: 'MB',
-                occupation: UserOccupation::Student,
+                phoneNumber: '628123456791',
+                address: 'Jl. Bookera No. 5, Malang',
+                bio: 'Akun petugas manajemen khusus untuk pengujian Bookera.',
+                identificationPrefix: 'OM',
+                occupation: UserOccupation::Staff,
                 institution: 'Bookera Academy',
             );
 
@@ -72,7 +96,7 @@ class UserSeeder extends Seeder
                 'notification_whatsapp' => true,
             ]);
 
-            $this->command->info("✅ Berhasil membuat " . ($count + 2) . " data User (termasuk 2 User Khusus).");
+            $this->command->info("✅ Berhasil membuat " . ($count + 4) . " data User (Admin, User, Officer).");
         });
     }
 

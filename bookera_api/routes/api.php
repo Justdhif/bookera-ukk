@@ -33,6 +33,7 @@ use App\Http\Controllers\Api\NotificationSettingsController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\MembershipController;
 use App\Http\Controllers\Api\Admin\MembershipPlanController;
+use App\Http\Controllers\Api\Admin\MembershipDiscountController;
 
 use App\Http\Controllers\Api\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Api\NewsController;
@@ -268,6 +269,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Membership Plans
         Route::get('membership-plans', [MembershipPlanController::class, 'index']);
         Route::put('membership-plans/{id}', [MembershipPlanController::class, 'update']);
+        Route::apiResource('membership-discounts', MembershipDiscountController::class);
 
         // Reservation management
         Route::prefix('reservations')->group(function () {
@@ -329,6 +331,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('my-borrow-requests', [BorrowRequestController::class, 'getMyRequests']);
 
     Route::get('my-fines', [FineController::class, 'myFines']);
+    Route::post('fines/{fine}/pay-midtrans', [FineController::class, 'payFineMidtrans']);
+    Route::post('fines/{fine}/pay-cash', [FineController::class, 'payFineCash'])->middleware('role:admin,officer:management');
+    Route::get('fines/{fine}/status', [FineController::class, 'checkPaymentStatus']);
     Route::get('fine-types', [FineTypeController::class, 'index']);
     Route::get('book-returns/{bookReturn}', [BookReturnController::class, 'show'])->middleware('role:admin,officer:management');
 

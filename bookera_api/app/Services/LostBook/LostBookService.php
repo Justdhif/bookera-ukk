@@ -137,7 +137,25 @@ class LostBookService
                 if ($lostFineType) {
                     $bookPrice = (float) ($copy->book->price ?? 0);
                     $amount = $bookPrice > 0 ? $bookPrice : (float) ($lostFineType->amount ?? 0);
+
+                    $activeMembership = $borrow->user->active_membership;
+                    $discountPercentage = 0;
+                    if ($activeMembership) {
+                        $discount = \App\Models\MembershipDiscount::where('discount_key', 'fine_lost')
+                            ->first();
+                        
+                        if ($discount && $discount->discount_percentage > 0) {
+                            $discountPercentage = (float) $discount->discount_percentage;
+                            $amount = $amount * (1 - ($discountPercentage / 100));
+                        }
+                    }
+
+                    $amount = round($amount, 2);
                     $fineNotes = 'Denda buku hilang (' . $lostFineType->name . '): ' . $copy->book->title . ' (Copy: ' . $copy->copy_code . ')';
+
+                    if ($discountPercentage > 0) {
+                        $fineNotes .= ' [Member Discount ' . $discountPercentage . '% applied]';
+                    }
 
                     $existingFine = $borrow->fines()
                         ->where('fine_type_id', $lostFineType->id)
@@ -148,7 +166,7 @@ class LostBookService
                         $fine = FineBorrow::create([
                             'borrow_id' => $borrow->id,
                             'fine_type_id' => $lostFineType->id,
-                            'amount' => round($amount, 2),
+                            'amount' => $amount,
                             'status' => 'unpaid',
                             'notes' => $fineNotes,
                         ]);

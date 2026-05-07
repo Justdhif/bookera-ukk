@@ -5,11 +5,24 @@ namespace App\Services\Fine;
 use App\Helpers\ActivityLogger;
 use App\Models\Borrow;
 use App\Models\FineBorrow;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use Midtrans\Config;
+use Midtrans\Snap;
+use Midtrans\Notification;
 
 class FineService
 {
+    public function __construct()
+    {
+        Config::$serverKey    = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized  = config('midtrans.is_sanitized');
+        Config::$is3ds        = config('midtrans.is_3ds');
+    }
+
     public function getAll(array $filters): LengthAwarePaginator
     {
         return $this->buildQuery($filters)->paginate($filters['per_page'] ?? 15);
@@ -135,6 +148,112 @@ class FineService
                 'fines' => $fines->values()
             ];
         });
+    }
+
+    public function createMidtransTransaction(FineBorrow $fine): array
+    {
+        $borrow = $fine->borrow;
+        $user = $borrow->user;
+        
+        $orderId = 'FINE-' . $fine->id . '-' . time();
+        $amount = (int) $fine->amount;
+
+        $params = [
+            'transaction_details' => [
+                'order_id'     => $orderId,
+                'gross_amount' => $amount,
+            ],
+            'customer_details' => [
+                'first_name' => $user->profile?->full_name ?? 'User',
+                'email'      => $user->email,
+                'phone'      => $user->profile?->phone_number ?? '',
+            ],
+            'item_details' => [
+                [
+                    'id'       => 'FINE-' . $fine->id,
+                    'price'    => $amount,
+                    'quantity' => 1,
+                    'name'     => 'Fine Payment for Borrow #' . $borrow->id,
+                ],
+            ],
+        ];
+
+        try {
+            $snapToken = Snap::getSnapToken($params);
+            
+            $fine->update([
+                'snap_token' => $snapToken,
+                'order_id' => $orderId,
+                'payment_method' => 'midtrans'
+            ]);
+
+            return [
+                'snap_token' => $snapToken,
+                'order_id'   => $orderId,
+                'client_key' => config('midtrans.client_key'),
+            ];
+        } catch (\Exception $e) {
+            Log::error('Midtrans Fine Error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function payCash(FineBorrow $fine): FineBorrow
+    {
+        $fine->update([
+            'status' => 'paid',
+            'paid_at' => now(),
+            'payment_method' => 'cash'
+        ]);
+
+        ActivityLogger::log(
+            'update',
+            'fine',
+            "Fine #{$fine->id} paid via Cash",
+            [
+                'fine_id' => $fine->id,
+                'payment_method' => 'cash',
+                'amount' => $fine->amount
+            ],
+            null,
+            $fine
+        );
+
+        return $fine->load(['borrow.user.profile', 'fineType']);
+    }
+
+    public function handlePaymentNotification(array $payload): void
+    {
+        $orderId = $payload['order_id'];
+        $transactionStatus = $payload['transaction_status'];
+        $paymentType = $payload['payment_type'] ?? null;
+
+        $fine = FineBorrow::where('order_id', $orderId)->first();
+
+        if ($fine) {
+            if ($transactionStatus == 'settlement' || $transactionStatus == 'capture') {
+                $fine->update([
+                    'status' => 'paid',
+                    'paid_at' => now(),
+                    'payment_method' => 'midtrans'
+                ]);
+
+                ActivityLogger::log(
+                    'update',
+                    'fine',
+                    "Fine #{$fine->id} paid via Midtrans",
+                    [
+                        'fine_id' => $fine->id,
+                        'order_id' => $orderId,
+                        'payment_type' => $paymentType
+                    ],
+                    null,
+                    $fine
+                );
+            } elseif (in_array($transactionStatus, ['cancel', 'deny', 'expire'])) {
+                $fine->update(['status' => 'unpaid']);
+            }
+        }
     }
 
     public function markAsPaid(FineBorrow $fine): FineBorrow

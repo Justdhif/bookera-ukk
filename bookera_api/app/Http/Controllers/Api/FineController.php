@@ -57,6 +57,49 @@ class FineController extends Controller
         return ApiResponse::successResponse('Denda berhasil ditandai sebagai sudah dibayar', $fine);
     }
 
+    public function payFineMidtrans(FineBorrow $fine): JsonResponse
+    {
+        if (!$this->fineService->canMarkAsPaid($fine)) {
+            return ApiResponse::errorResponse('Denda ini sudah dibayar', null, 400);
+        }
+
+        try {
+            $transactionData = $this->fineService->createMidtransTransaction($fine);
+            return ApiResponse::successResponse('Transaksi Midtrans berhasil dibuat', $transactionData);
+        } catch (\Exception $e) {
+            return ApiResponse::errorResponse('Gagal membuat transaksi Midtrans: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function payFineCash(FineBorrow $fine): JsonResponse
+    {
+        if (!$this->fineService->canMarkAsPaid($fine)) {
+            return ApiResponse::errorResponse('Denda ini sudah dibayar', null, 400);
+        }
+
+        $fine = $this->fineService->payCash($fine);
+
+        return ApiResponse::successResponse('Denda berhasil dibayar tunai', $fine);
+    }
+
+    public function checkPaymentStatus(Request $request, FineBorrow $fine): JsonResponse
+    {
+        if ($fine->order_id) {
+            try {
+                $status = \Midtrans\Transaction::status($fine->order_id);
+                $this->fineService->handlePaymentNotification($status);
+                $fine->refresh();
+            } catch (\Exception $e) {
+                // Ignore status check errors
+            }
+        }
+
+        return ApiResponse::successResponse('Status pembayaran denda', [
+            'fine' => $fine->load(['borrow.user.profile', 'fineType']),
+            'is_paid' => $fine->status === 'paid'
+        ]);
+    }
+
     public function export(Request $request): BinaryFileResponse
     {
         $filters = $this->getFilters($request);

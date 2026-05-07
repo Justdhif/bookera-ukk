@@ -19,6 +19,9 @@ class FineBorrow extends Model
         'paid_at',
         'status',
         'notes',
+        'payment_method',
+        'order_id',
+        'snap_token',
     ];
 
     protected $casts = [

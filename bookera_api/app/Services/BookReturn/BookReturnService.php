@@ -150,8 +150,27 @@ class BookReturnService
                     if ($condition === 'damaged' && $damagedFineType) {
                         $percentage = (float) ($damagedFineType->percentage ?? 0);
                         $bookPrice = (float) ($bookCopy->book->price ?? 0);
-                        $amount = round(($bookPrice * $percentage) / 100, 2);
+                        $amount = ($bookPrice * $percentage) / 100;
+
+                        // Apply membership discount
+                        $activeMembership = $borrow->user->active_membership;
+                        $discountPercentage = 0;
+                        if ($activeMembership) {
+                            $discount = \App\Models\MembershipDiscount::where('discount_key', 'fine_damaged')
+                                ->first();
+                            
+                            if ($discount && $discount->discount_percentage > 0) {
+                                $discountPercentage = (float) $discount->discount_percentage;
+                                $amount = $amount * (1 - ($discountPercentage / 100));
+                            }
+                        }
+
+                        $amount = round($amount, 2);
                         $fineNotes = 'Denda buku rusak (' . $damagedFineType->name . ', ' . $percentage . '%): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
+                        
+                        if ($discountPercentage > 0) {
+                            $fineNotes .= ' [Member Discount ' . $discountPercentage . '% applied]';
+                        }
 
                         $existingFine = $borrow->fines()
                             ->where('fine_type_id', $damagedFineType->id)
@@ -248,7 +267,22 @@ class BookReturnService
                     if ($lostFineType) {
                         $bookPrice = (float) ($bookCopy->book->price ?? 0);
                         $amount = $bookPrice > 0 ? $bookPrice : (float) ($lostFineType->amount ?? 0);
+
+                        // Apply membership discount
+                        $activeMembership = $borrow->user->active_membership;
+                        if ($activeMembership && $activeMembership->plan) {
+                            $discountPercentage = (float) ($activeMembership->plan->lost_fine_discount ?? 0);
+                            if ($discountPercentage > 0) {
+                                $amount = $amount * (1 - ($discountPercentage / 100));
+                            }
+                        }
+
+                        $amount = round($amount, 2);
                         $fineNotes = 'Denda buku hilang (' . $lostFineType->name . '): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
+
+                        if ($activeMembership && isset($discountPercentage) && $discountPercentage > 0) {
+                            $fineNotes .= ' [Member Discount ' . $discountPercentage . '% applied]';
+                        }
 
                         $existingFine = $borrow->fines()
                             ->where('fine_type_id', $lostFineType->id)
@@ -259,7 +293,7 @@ class BookReturnService
                             $fine = FineBorrow::create([
                                 'borrow_id' => $borrow->id,
                                 'fine_type_id' => $lostFineType->id,
-                                'amount' => round($amount, 2),
+                                'amount' => $amount,
                                 'status' => 'unpaid',
                                 'notes' => $fineNotes,
                             ]);

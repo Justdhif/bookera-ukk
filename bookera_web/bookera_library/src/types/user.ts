@@ -40,8 +40,28 @@ export interface User {
   following_count?: number;
 
   complaints_count?: number;
+  active_membership?: Membership | null;
 
   profile: UserProfile | null;
+}
+
+export interface Membership {
+  id: number;
+  user_id: number;
+  membership_plan_id: number;
+  member_code: string;
+  qr_code: string | null;
+  qr_code_path: string | null;
+  qr_code_url: string | null;
+  joined_at: string;
+  expires_at: string | null;
+  status: "active" | "expired" | "cancelled";
+  plan?: {
+    id: number;
+    name: string;
+    damaged_fine_discount: number;
+    lost_fine_discount: number;
+  };
 }
 
 export type UserListResponse = PaginatedResponse<User>;

@@ -178,6 +178,7 @@ export default function MyFinesClient() {
                   key={`${group.borrowId}-${index}`}
                   group={group}
                   index={index}
+                  onRefresh={() => fetchFines(filters)}
                 />
               ))}
             </div>

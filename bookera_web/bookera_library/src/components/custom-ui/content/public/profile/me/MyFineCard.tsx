@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { BookOpen, Calendar, Receipt } from "lucide-react";
+import { BookOpen, Calendar, Receipt, CreditCard, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { ScaleIn } from "@/components/custom-ui/motion";
 import FineStatusBadge from "@/components/custom-ui/badge/FineStatusBadge";
@@ -15,17 +16,66 @@ import {
 import { FineBorrowGroup } from "@/types/fine";
 import DetailButton from "@/components/custom-ui/button/DetailButton";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { fineService } from "@/services/fine.service";
+import { toast } from "sonner";
 
 interface MyFineCardProps {
   group: FineBorrowGroup;
   index: number;
+  onRefresh?: () => void;
 }
 
-export default function MyFineCard({ group, index }: MyFineCardProps) {
+export default function MyFineCard({ group, index, onRefresh }: MyFineCardProps) {
   const t = useTranslations("public");
   const borrow = group.borrow;
   const fines = group.fines || [];
   const borrowId = group.borrowId || (group as any).borrow_id;
+  const [payingFineId, setPayingFineId] = useState<number | null>(null);
+
+  useEffect(() => {
+    // Load Midtrans Snap script
+    const script = document.createElement("script");
+    script.src = "https://app.sandbox.midtrans.com/snap/snap.js"; // Use sandbox URL
+    script.setAttribute("data-client-key", process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "");
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const handlePayment = async (fineId: number) => {
+    try {
+      setPayingFineId(fineId);
+      const res = await fineService.payMidtrans(fineId);
+      const { snap_token } = res.data.data;
+
+      if (window.snap) {
+        window.snap.pay(snap_token, {
+          onSuccess: (result: any) => {
+            toast.success("Payment successful!");
+            onRefresh?.();
+          },
+          onPending: (result: any) => {
+            toast.info("Payment is pending...");
+            onRefresh?.();
+          },
+          onError: (result: any) => {
+            toast.error("Payment failed!");
+          },
+          onClose: () => {
+            toast.info("Payment window closed.");
+          },
+        });
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to initiate payment");
+    } finally {
+      setPayingFineId(null);
+    }
+  };
 
   const totalAmount = fines.reduce(
     (sum, f) => sum + Number(f.amount),
@@ -106,18 +156,19 @@ export default function MyFineCard({ group, index }: MyFineCardProps) {
             <div className="mx-5 h-px bg-border/60" />
             <div className="p-5">
               <div className="rounded-xl border border-border/60 overflow-hidden">
-                <div className="grid grid-cols-[40px_1fr_140px_120px] bg-muted/40 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground gap-2">
+                <div className="grid grid-cols-[40px_1fr_120px_100px_100px] bg-muted/40 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground gap-2">
                   <span>No.</span>
                   <span>{t("fineTypeLabel") ?? "Jenis Denda"}</span>
                   <span className="text-center">Tanggal Denda</span>
-                  <span className="text-right">Harga Denda</span>
+                  <span className="text-right">Harga</span>
+                  <span className="text-right">Aksi</span>
                 </div>
 
                 <div className="divide-y divide-border/40">
                   {fines.map((fine, idx) => (
                     <div
                       key={fine.id}
-                      className="grid grid-cols-[40px_1fr_140px_120px] items-center px-4 py-3.5 gap-2 hover:bg-muted/20 transition-colors"
+                      className="grid grid-cols-[40px_1fr_120px_100px_100px] items-center px-4 py-3.5 gap-2 hover:bg-muted/20 transition-colors"
                     >
                       <span className="text-sm text-muted-foreground font-medium">
                         {idx + 1}
@@ -156,6 +207,36 @@ export default function MyFineCard({ group, index }: MyFineCardProps) {
                       >
                         {formatCurrency(Number(fine.amount))}
                       </span>
+
+                      <div className="flex justify-end">
+                        {fine.status === "unpaid" && (
+                          <Button
+                            size="sm"
+                            variant="brand"
+                            className="h-7 px-2 text-[10px] font-bold uppercase"
+                            onClick={() => handlePayment(fine.id)}
+                            disabled={payingFineId === fine.id}
+                          >
+                            {payingFineId === fine.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <>
+                                <CreditCard className="h-3 w-3 mr-1" />
+                                Pay
+                              </>
+                            )}
+                          </Button>
+                        )}
+                        {fine.status === "paid" && (
+                          <Button
+                             size="sm"
+                             variant="outline"
+                             className="h-7 px-2 text-[10px] font-bold uppercase border-brand-primary/20 text-brand-primary pointer-events-none"
+                          >
+                             Invoice
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

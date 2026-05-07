@@ -18,22 +18,6 @@ import { PricingCommonFeatures, PricingAICard } from "./PricingFeatures";
 import PricingProfilePreview from "./PricingProfilePreview";
 import PricingCard from "./PricingCard";
 
-declare global {
-  interface Window {
-    snap?: {
-      pay: (
-        token: string,
-        options: {
-          onSuccess?: () => void;
-          onPending?: () => void;
-          onError?: () => void;
-          onClose?: () => void;
-        },
-      ) => void;
-    };
-  }
-}
-
 export default function PricingClient() {
   const router = useRouter();
   const { user, initialLoading } = useAuthStore();

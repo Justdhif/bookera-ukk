@@ -10,12 +10,19 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { CreditCard, AlertCircle, CheckCircle2, Loader2, Banknote, QrCode } from "lucide-react";
 import { fineService } from "@/services/fine.service";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 interface BorrowFinesCardProps {
   fines: Fine[];
@@ -27,14 +34,58 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
   const tPublic = useTranslations("public");
   const [loadingId, setLoadingId] = useState<number | null>(null);
 
-  const handleMarkAsPaid = async (fineId: number) => {
+  useEffect(() => {
+    // Load Midtrans Snap script
+    const script = document.createElement("script");
+    script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+    script.setAttribute("data-client-key", process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "");
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const handlePayCash = async (fineId: number) => {
     try {
       setLoadingId(fineId);
-      await fineService.markAsPaid(fineId);
-      toast.success(t("markAsPaidSuccess"));
+      await fineService.payCash(fineId);
+      toast.success("Fine paid via Cash!");
       onUpdate();
     } catch (error: any) {
       toast.error(error.response?.data?.message || t("markAsPaidError"));
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  const handlePayMidtrans = async (fineId: number) => {
+    try {
+      setLoadingId(fineId);
+      const res = await fineService.payMidtrans(fineId);
+      const { snap_token } = res.data.data;
+
+      if (window.snap) {
+        window.snap.pay(snap_token, {
+          onSuccess: (result: any) => {
+            toast.success("Payment successful!");
+            onUpdate();
+          },
+          onPending: (result: any) => {
+            toast.info("Payment is pending...");
+            onUpdate();
+          },
+          onError: (result: any) => {
+            toast.error("Payment failed!");
+          },
+          onClose: () => {
+            toast.info("Payment window closed.");
+          },
+        });
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to initiate Midtrans payment");
     } finally {
       setLoadingId(null);
     }
@@ -82,20 +133,15 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
                     {fine.fine_type?.name || t("fine")}
                   </p>
                   <p className="text-2xl font-black tracking-tight text-foreground">
-                    {formatCurrency(fine.amount)}
+                    {formatCurrency(Number(fine.amount))}
                   </p>
                   {fine.fine_type?.description && (
                     <p className="text-sm font-medium text-muted-foreground/80 mt-1 max-w-md">
                       {fine.fine_type.description}
                     </p>
                   )}
-                  {fine.fine_type?.type === "lost" && (
-                    <p className="text-xs font-medium text-muted-foreground/70 mt-1 max-w-md">
-                      {t("lostFineValueNote")}
-                    </p>
-                  )}
                   {fine.notes && (
-                    <p className="text-sm font-medium text-muted-foreground/80 mt-1 max-w-md">
+                    <p className="text-sm font-medium text-muted-foreground/80 mt-1 max-w-md italic">
                       {fine.notes}
                     </p>
                   )}
@@ -103,34 +149,62 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
               </div>
 
               <div className="flex items-center gap-4">
-                <Badge
-                  className={
-                    fine.status === "paid"
-                      ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 px-3 py-1 font-bold"
-                      : fine.status === "waived"
-                        ? "bg-sky-500/10 text-sky-600 border-sky-500/20 px-3 py-1 font-bold"
-                        : "bg-rose-500/10 text-rose-600 border-rose-500/20 px-3 py-1 font-bold animate-pulse"
-                  }
-                  variant="outline"
-                >
-                  {tPublic(`fineStatus.${fine.status}`)}
-                </Badge>
+                <div className="flex flex-col items-end gap-2">
+                  <Badge
+                    className={cn(
+                      "px-3 py-1 font-bold",
+                      fine.status === "paid"
+                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                        : fine.status === "waived"
+                          ? "bg-sky-500/10 text-sky-600 border-sky-500/20"
+                          : "bg-rose-500/10 text-rose-600 border-rose-500/20 animate-pulse"
+                    )}
+                    variant="outline"
+                  >
+                    {tPublic(`fineStatus.${fine.status}`)}
+                  </Badge>
+                  {fine.payment_method && (
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground flex items-center gap-1">
+                      {fine.payment_method === 'cash' ? <Banknote className="h-2.5 w-2.5" /> : <QrCode className="h-2.5 w-2.5" />}
+                      Via {fine.payment_method}
+                    </span>
+                  )}
+                </div>
 
                 {fine.status === "unpaid" && (
-                  <Button
-                    size="sm"
-                    variant="brand"
-                    className="h-10 px-5 gap-2 font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
-                    onClick={() => handleMarkAsPaid(fine.id)}
-                    disabled={loadingId === fine.id}
-                  >
-                    {loadingId === fine.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <CheckCircle2 className="h-4 w-4" />
-                    )}
-                    {t("payBtn")}
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="brand"
+                        className="h-10 px-5 gap-2 font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+                        disabled={loadingId === fine.id}
+                      >
+                        {loadingId === fine.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="h-4 w-4" />
+                        )}
+                        {t("payBtn")}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="rounded-xl p-2 min-w-[160px]">
+                      <DropdownMenuItem 
+                        onClick={() => handlePayCash(fine.id)}
+                        className="rounded-lg gap-2 font-bold p-3 cursor-pointer"
+                      >
+                        <Banknote className="h-4 w-4 text-emerald-500" />
+                        Pay via Cash
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handlePayMidtrans(fine.id)}
+                        className="rounded-lg gap-2 font-bold p-3 cursor-pointer"
+                      >
+                        <QrCode className="h-4 w-4 text-brand-primary" />
+                        Pay via Midtrans
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 )}
               </div>
             </SlideIn>
