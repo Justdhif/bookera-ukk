@@ -393,7 +393,19 @@ export default function ProfileSidebar({ slug }: ProfileSidebarProps) {
       {isMe && (
         <FadeUp className="p-4 border-b border-border/50 space-y-4" delay={0.2}>
           <div className="flex items-center justify-between gap-2">
-            {user.role === "user" ? (
+            {user.role === "member" ? (
+              <Link href="/payment/success?type=membership">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 border-brand-primary/20 hover:border-brand-primary/50 text-brand-primary hover:bg-brand-primary/5 font-bold rounded-lg px-2 group relative overflow-hidden text-[9px] uppercase tracking-wider"
+                >
+                  <div className="absolute inset-0 bg-linear-to-r from-transparent via-brand-primary/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  <FileText className="w-3 h-3 mr-1.5" />
+                  {t("viewInvoice", { defaultValue: "Invoice" })}
+                </Button>
+              </Link>
+            ) : user.role === "user" ? (
               <Link href="/pricing">
                 <Button
                   variant="brand"

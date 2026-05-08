@@ -32,6 +32,7 @@ import {
   FileText,
   Shield,
   Newspaper,
+  Percent,
 } from "lucide-react";
 import { SidebarUserFooter } from "@/components/custom-ui/sidebar/SidebarUserFooter";
 import { cn } from "@/lib/utils";
@@ -129,6 +130,11 @@ const getMenuGroups = (t: any, role: string | undefined): MenuGroup[] => [
         title: t("lostBooks"),
         href: "/admin/lost-books",
         icon: AlertCircle,
+      },
+      {
+        title: t("membershipDiscounts"),
+        href: "/admin/membership-discounts",
+        icon: Percent,
       },
     ],
   },

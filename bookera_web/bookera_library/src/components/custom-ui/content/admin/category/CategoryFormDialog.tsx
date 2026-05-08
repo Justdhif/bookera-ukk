@@ -15,6 +15,8 @@ import { categoryService } from "@/services/category.service";
 import { toast } from "sonner";
 import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
 
+import { Textarea } from "@/components/ui/textarea";
+
 interface FormData {
   name: string;
   description: string;
@@ -130,12 +132,14 @@ export default function CategoryFormDialog({
             <FadeUp delay={0.2}>
               <div className="space-y-2">
                 <Label htmlFor="description">{t("descriptionLabel")}</Label>
-                <Input
+                <Textarea
                   id="description"
                   name="description"
                   placeholder={t("descriptionPlaceholder")}
                   value={formData.description}
                   onChange={handleInputChange}
+                  rows={4}
+                  className="resize-none"
                 />
               </div>
             </FadeUp>

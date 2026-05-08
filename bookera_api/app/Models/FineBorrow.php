@@ -22,11 +22,15 @@ class FineBorrow extends Model
         'payment_method',
         'order_id',
         'snap_token',
+        'va_number',
+        'bank',
+        'payment_payload',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'paid_at' => 'datetime',
+        'payment_payload' => 'array',
     ];
 
     public function borrow(): BelongsTo

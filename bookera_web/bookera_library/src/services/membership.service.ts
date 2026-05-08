@@ -24,18 +24,21 @@ export interface MembershipTransaction {
 }
 
 export interface CreateTransactionResponse {
-  snap_token: string;
+  va_number: string;
+  bank: string;
+  amount: number;
   order_id: string;
-  client_key: string;
+  expiry_time?: string;
 }
 
 export const membershipService = {
   getPlans: () =>
     api.get<ApiResponse<{ plans: MembershipPlan[] }>>("/membership/plans"),
 
-  createTransaction: (plan: string) =>
+  createTransaction: (plan: string, bank: string) =>
     api.post<ApiResponse<CreateTransactionResponse>>("/membership/transaction", {
       plan,
+      bank,
     }),
 
   checkStatus: () =>

@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import AvatarUploadModal from "@/components/custom-ui/content/admin/user/AvatarUploadModal";
 import ProfileLeftCard from "./ProfileLeftCard";
 import ProfileRightCard from "./ProfileRightCard";
-import MemberProfileCard from "./MemberProfileCard";
 import { normalizeOccupationValue } from "@/constants/user-occupation";
 
 import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
@@ -98,10 +97,8 @@ export default function MyProfileClient() {
         user && (
           <FadeUp delay={0.1}>
             <div className="w-full max-w-4xl mx-auto space-y-6">
-              {user.active_membership && (
-                <MemberProfileCard user={user} />
-              )}
               <ProfileRightCard
+                user={user}
                 formData={formData}
                 setFormData={setFormData}
                 setIsFullNameValid={setIsFullNameValid}

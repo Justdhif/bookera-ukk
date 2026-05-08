@@ -43,7 +43,6 @@ export function formatDividerDate(dateString: string, t?: any) {
     date.getMonth() === yesterday.getMonth() &&
     date.getFullYear() === yesterday.getFullYear();
 
-  // Check if it's within the last 7 days to show day name
   const diffTime = Math.abs(now.getTime() - date.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -56,4 +55,11 @@ export function formatDividerDate(dateString: string, t?: any) {
   } else {
     return date.toLocaleDateString([], { day: 'numeric', month: 'long', year: 'numeric' });
   }
+}
+export function formatCurrency(amount: number) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(amount);
 }

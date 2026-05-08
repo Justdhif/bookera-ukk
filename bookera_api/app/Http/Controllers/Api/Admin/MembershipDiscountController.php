@@ -4,51 +4,52 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MembershipDiscount\StoreMembershipDiscountRequest;
+use App\Http\Requests\MembershipDiscount\UpdateMembershipDiscountRequest;
 use App\Models\MembershipDiscount;
+use App\Services\MembershipDiscount\MembershipDiscountService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MembershipDiscountController extends Controller
 {
-    public function index(): JsonResponse
+    private MembershipDiscountService $discountService;
+
+    public function __construct(MembershipDiscountService $discountService)
     {
-        $discounts = MembershipDiscount::all();
+        $this->discountService = $discountService;
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        $filters = [
+            'search'   => $request->search,
+            'per_page' => $request->per_page,
+        ];
+
+        $discounts = $this->discountService->getAll($filters);
+
         return ApiResponse::successResponse('Membership discounts retrieved successfully.', $discounts);
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function store(StoreMembershipDiscountRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'discount_percentage' => 'required|numeric|min:0|max:100',
-            'description' => 'nullable|string',
-        ]);
+        $discount = $this->discountService->create($request->validated());
 
-        $discount = MembershipDiscount::findOrFail($id);
-        $discount->update($request->only(['name', 'discount_percentage', 'description']));
+        return ApiResponse::successResponse('Membership discount created successfully.', $discount, 201);
+    }
+
+    public function update(UpdateMembershipDiscountRequest $request, MembershipDiscount $membership_discount): JsonResponse
+    {
+        $discount = $this->discountService->update($membership_discount, $request->validated());
 
         return ApiResponse::successResponse('Membership discount updated successfully.', $discount);
     }
 
-    public function store(Request $request): JsonResponse
+    public function destroy(MembershipDiscount $membership_discount): JsonResponse
     {
-        $request->validate([
-            'discount_key' => 'required|string|unique:membership_discounts,discount_key',
-            'name' => 'required|string|max:255',
-            'discount_percentage' => 'required|numeric|min:0|max:100',
-            'description' => 'nullable|string',
-        ]);
+        $this->discountService->delete($membership_discount);
 
-        $discount = MembershipDiscount::create($request->all());
-
-        return ApiResponse::successResponse('Membership discount created successfully.', $discount);
-    }
-
-    public function destroy($id): JsonResponse
-    {
-        $discount = MembershipDiscount::findOrFail($id);
-        $discount->delete();
-
-        return ApiResponse::successResponse('Membership discount deleted successfully.', null);
+        return ApiResponse::successResponse('Membership discount deleted successfully.');
     }
 }

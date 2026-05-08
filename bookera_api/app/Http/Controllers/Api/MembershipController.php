@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Midtrans\Config;
-use Midtrans\Snap;
+use Midtrans\CoreApi;
 use Midtrans\Notification;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Storage;
@@ -46,12 +46,13 @@ class MembershipController extends Controller
     }
 
     /**
-     * Create a Midtrans Snap transaction and return the token
+     * Create a Midtrans Core API transaction for Bank Transfer (VA)
      */
     public function createTransaction(Request $request): JsonResponse
     {
         $request->validate([
             'plan' => 'required|exists:membership_plans,plan_id',
+            'bank' => 'required|in:bca,bni,bri,cimb',
         ]);
 
         /** @var User $user */
@@ -68,7 +69,7 @@ class MembershipController extends Controller
             return ApiResponse::errorResponse('Plan tidak ditemukan.', 404);
         }
 
-        $amount = $planModel->price;
+        $amount = (int) $planModel->price;
         $orderId = 'MEMBER-' . $user->id . '-' . time();
 
         $transaction = MembershipTransaction::create([
@@ -77,9 +78,11 @@ class MembershipController extends Controller
             'plan'     => $planType,
             'amount'   => $amount,
             'status'   => 'pending',
+            'bank'     => $request->bank,
         ]);
 
         $params = [
+            'payment_type' => 'bank_transfer',
             'transaction_details' => [
                 'order_id'     => $orderId,
                 'gross_amount' => $amount,
@@ -97,16 +100,33 @@ class MembershipController extends Controller
                     'name'     => $planModel->name,
                 ],
             ],
+            'bank_transfer' => [
+                'bank' => $request->bank,
+            ],
         ];
 
         try {
-            $snapToken = Snap::getSnapToken($params);
-            $transaction->update(['snap_token' => $snapToken]);
+            $response = CoreApi::charge($params);
+            
+            $vaNumber = null;
+            if (isset($response->va_numbers[0])) {
+                $vaNumber = $response->va_numbers[0]->va_number;
+            } elseif (isset($response->permata_va_number)) {
+                $vaNumber = $response->permata_va_number;
+            }
 
-            return ApiResponse::successResponse('Transaksi berhasil dibuat', [
-                'snap_token' => $snapToken,
-                'order_id'   => $orderId,
-                'client_key' => config('midtrans.client_key'),
+            $transaction->update([
+                'payment_type' => 'bank_transfer',
+                'va_number' => $vaNumber,
+                'payment_payload' => (array) $response,
+            ]);
+
+            return ApiResponse::successResponse('Transaksi VA berhasil dibuat', [
+                'va_number' => $vaNumber,
+                'bank'      => $request->bank,
+                'amount'    => $amount,
+                'order_id'  => $orderId,
+                'expiry_time' => $response->expiry_time ?? null,
             ]);
         } catch (\Exception $e) {
             $transaction->update(['status' => 'failed']);
@@ -219,13 +239,13 @@ class MembershipController extends Controller
         if ($latestTransaction && $latestTransaction->status === 'pending') {
             try {
                 Log::info("Manual check for Order ID: " . $latestTransaction->order_id);
-                $status = \Midtrans\Transaction::status($latestTransaction->order_id);
-                $transactionStatus = $status['transaction_status'];
-                $paymentType = $status['payment_type'];
+                $status = (object) \Midtrans\Transaction::status($latestTransaction->order_id);
+                $transactionStatus = $status->transaction_status;
+                $paymentType = $status->payment_type;
                 
                 Log::info("Midtrans Status for " . $latestTransaction->order_id . ": " . $transactionStatus);
 
-                if ($transactionStatus == 'settlement' || ($transactionStatus == 'capture' && $status['fraud_status'] == 'accept')) {
+                if ($transactionStatus == 'settlement' || ($transactionStatus == 'capture' && $status->fraud_status == 'accept')) {
                     $this->activateMembership($latestTransaction, $paymentType);
                     $latestTransaction->refresh();
                     Log::info("Membership activated via checkStatus for user: " . $user->id);

@@ -13,7 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { CreditCard, AlertCircle, CheckCircle2, Loader2, Banknote, QrCode } from "lucide-react";
 import { fineService } from "@/services/fine.service";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 import {
@@ -30,22 +31,10 @@ interface BorrowFinesCardProps {
 }
 
 export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
+  const router = useRouter();
   const t = useTranslations("borrow");
   const tPublic = useTranslations("public");
   const [loadingId, setLoadingId] = useState<number | null>(null);
-
-  useEffect(() => {
-    // Load Midtrans Snap script
-    const script = document.createElement("script");
-    script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
-    script.setAttribute("data-client-key", process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "");
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
 
   const handlePayCash = async (fineId: number) => {
     try {
@@ -60,35 +49,12 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
     }
   };
 
-  const handlePayMidtrans = async (fineId: number) => {
-    try {
-      setLoadingId(fineId);
-      const res = await fineService.payMidtrans(fineId);
-      const { snap_token } = res.data.data;
+  const handleStartPayment = (fineId: number) => {
+    router.push(`/admin/payment?type=fine&id=${fineId}`);
+  };
 
-      if (window.snap) {
-        window.snap.pay(snap_token, {
-          onSuccess: (result: any) => {
-            toast.success("Payment successful!");
-            onUpdate();
-          },
-          onPending: (result: any) => {
-            toast.info("Payment is pending...");
-            onUpdate();
-          },
-          onError: (result: any) => {
-            toast.error("Payment failed!");
-          },
-          onClose: () => {
-            toast.info("Payment window closed.");
-          },
-        });
-      }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to initiate Midtrans payment");
-    } finally {
-      setLoadingId(null);
-    }
+  const handlePayMidtrans = async (fineId: number) => {
+    handleStartPayment(fineId);
   };
 
   const formatCurrency = (amount: number) => {

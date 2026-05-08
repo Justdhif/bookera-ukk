@@ -10,7 +10,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Midtrans\Config;
-use Midtrans\Snap;
+use Midtrans\CoreApi;
 use Midtrans\Notification;
 
 class FineService
@@ -150,7 +150,7 @@ class FineService
         });
     }
 
-    public function createMidtransTransaction(FineBorrow $fine): array
+    public function createMidtransTransaction(FineBorrow $fine, string $bank): array
     {
         $borrow = $fine->borrow;
         $user = $borrow->user;
@@ -159,6 +159,7 @@ class FineService
         $amount = (int) $fine->amount;
 
         $params = [
+            'payment_type' => 'bank_transfer',
             'transaction_details' => [
                 'order_id'     => $orderId,
                 'gross_amount' => $amount,
@@ -176,21 +177,35 @@ class FineService
                     'name'     => 'Fine Payment for Borrow #' . $borrow->id,
                 ],
             ],
+            'bank_transfer' => [
+                'bank' => $bank,
+            ],
         ];
 
         try {
-            $snapToken = Snap::getSnapToken($params);
+            $response = CoreApi::charge($params);
             
+            $vaNumber = null;
+            if (isset($response->va_numbers[0])) {
+                $vaNumber = $response->va_numbers[0]->va_number;
+            } elseif (isset($response->permata_va_number)) {
+                $vaNumber = $response->permata_va_number;
+            }
+
             $fine->update([
-                'snap_token' => $snapToken,
+                'payment_method' => 'midtrans',
                 'order_id' => $orderId,
-                'payment_method' => 'midtrans'
+                'va_number' => $vaNumber,
+                'bank' => $bank,
+                'payment_payload' => (array) $response,
             ]);
 
             return [
-                'snap_token' => $snapToken,
-                'order_id'   => $orderId,
-                'client_key' => config('midtrans.client_key'),
+                'va_number' => $vaNumber,
+                'bank'      => $bank,
+                'amount'    => $amount,
+                'order_id'  => $orderId,
+                'expiry_time' => $response->expiry_time ?? null,
             ];
         } catch (\Exception $e) {
             Log::error('Midtrans Fine Error: ' . $e->getMessage());
@@ -222,11 +237,12 @@ class FineService
         return $fine->load(['borrow.user.profile', 'fineType']);
     }
 
-    public function handlePaymentNotification(array $payload): void
+    public function handlePaymentNotification($payload): void
     {
-        $orderId = $payload['order_id'];
-        $transactionStatus = $payload['transaction_status'];
-        $paymentType = $payload['payment_type'] ?? null;
+        $payload = (object) $payload;
+        $orderId = $payload->order_id;
+        $transactionStatus = $payload->transaction_status;
+        $paymentType = $payload->payment_type ?? null;
 
         $fine = FineBorrow::where('order_id', $orderId)->first();
 

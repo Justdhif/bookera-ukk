@@ -14,7 +14,6 @@ interface PricingCardProps {
   isLoggedIn: boolean;
   isAuthLoading: boolean;
   isLoading: boolean;
-  snapLoaded: boolean;
   onPay: (planId: string) => void;
 }
 
@@ -24,7 +23,6 @@ export default function PricingCard({
   isLoggedIn,
   isAuthLoading,
   isLoading,
-  snapLoaded,
   onPay,
 }: PricingCardProps) {
   const tp = useTranslations("pricing");
@@ -152,7 +150,7 @@ export default function PricingCard({
                   variant="brand"
                   size="lg"
                   className="w-full sm:w-auto min-w-60 h-16 rounded-2xl text-xl font-black shadow-2xl shadow-brand-primary/30 hover:shadow-brand-primary/40 hover:-translate-y-1 active:scale-95 transition-all duration-300"
-                  disabled={isLoading || !snapLoaded}
+                  disabled={isLoading}
                   onClick={() => onPay(String(plan.id))}
                 >
                   {isLoading ? (

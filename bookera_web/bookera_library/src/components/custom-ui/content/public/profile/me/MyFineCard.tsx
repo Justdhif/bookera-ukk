@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { BookOpen, Calendar, Receipt, CreditCard, Loader2 } from "lucide-react";
 import { format } from "date-fns";
@@ -27,54 +28,19 @@ interface MyFineCardProps {
 }
 
 export default function MyFineCard({ group, index, onRefresh }: MyFineCardProps) {
+  const router = useRouter();
   const t = useTranslations("public");
   const borrow = group.borrow;
   const fines = group.fines || [];
   const borrowId = group.borrowId || (group as any).borrow_id;
   const [payingFineId, setPayingFineId] = useState<number | null>(null);
 
-  useEffect(() => {
-    // Load Midtrans Snap script
-    const script = document.createElement("script");
-    script.src = "https://app.sandbox.midtrans.com/snap/snap.js"; // Use sandbox URL
-    script.setAttribute("data-client-key", process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "");
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+  const handleStartPayment = (fineId: number) => {
+    router.push(`/payment?type=fine&id=${fineId}`);
+  };
 
   const handlePayment = async (fineId: number) => {
-    try {
-      setPayingFineId(fineId);
-      const res = await fineService.payMidtrans(fineId);
-      const { snap_token } = res.data.data;
-
-      if (window.snap) {
-        window.snap.pay(snap_token, {
-          onSuccess: (result: any) => {
-            toast.success("Payment successful!");
-            onRefresh?.();
-          },
-          onPending: (result: any) => {
-            toast.info("Payment is pending...");
-            onRefresh?.();
-          },
-          onError: (result: any) => {
-            toast.error("Payment failed!");
-          },
-          onClose: () => {
-            toast.info("Payment window closed.");
-          },
-        });
-      }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to initiate payment");
-    } finally {
-      setPayingFineId(null);
-    }
+    handleStartPayment(fineId);
   };
 
   const totalAmount = fines.reduce(

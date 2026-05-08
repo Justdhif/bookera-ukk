@@ -11,8 +11,11 @@ export const fineService = {
   getByUser: (params?: any) => 
     api.get<ApiResponse<any>>("/my-fines", { params }),
 
-  payMidtrans: (fineId: number) => 
-    api.post<ApiResponse<{ snap_token: string; order_id: string; client_key: string }>>(`/fines/${fineId}/pay-midtrans`),
+  payMidtrans: (fineId: number, bank: string) => 
+    api.post<ApiResponse<{ va_number: string; bank: string; amount: number; order_id: string; expiry_time?: string }>>(
+      `/fines/${fineId}/pay-midtrans`, 
+      { bank }
+    ),
 
   payCash: (fineId: number) => 
     api.post<ApiResponse<any>>(`/fines/${fineId}/pay-cash`),

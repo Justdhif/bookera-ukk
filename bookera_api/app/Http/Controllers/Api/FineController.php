@@ -57,15 +57,19 @@ class FineController extends Controller
         return ApiResponse::successResponse('Denda berhasil ditandai sebagai sudah dibayar', $fine);
     }
 
-    public function payFineMidtrans(FineBorrow $fine): JsonResponse
+    public function payFineMidtrans(Request $request, FineBorrow $fine): JsonResponse
     {
+        $request->validate([
+            'bank' => 'required|in:bca,bni,bri,cimb',
+        ]);
+
         if (!$this->fineService->canMarkAsPaid($fine)) {
             return ApiResponse::errorResponse('Denda ini sudah dibayar', null, 400);
         }
 
         try {
-            $transactionData = $this->fineService->createMidtransTransaction($fine);
-            return ApiResponse::successResponse('Transaksi Midtrans berhasil dibuat', $transactionData);
+            $transactionData = $this->fineService->createMidtransTransaction($fine, $request->bank);
+            return ApiResponse::successResponse('Transaksi Midtrans VA berhasil dibuat', $transactionData);
         } catch (\Exception $e) {
             return ApiResponse::errorResponse('Gagal membuat transaksi Midtrans: ' . $e->getMessage(), null, 500);
         }
@@ -86,7 +90,7 @@ class FineController extends Controller
     {
         if ($fine->order_id) {
             try {
-                $status = \Midtrans\Transaction::status($fine->order_id);
+                $status = (object) \Midtrans\Transaction::status($fine->order_id);
                 $this->fineService->handlePaymentNotification($status);
                 $fine->refresh();
             } catch (\Exception $e) {

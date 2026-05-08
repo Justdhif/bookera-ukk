@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -27,8 +27,7 @@ export default function PricingClient() {
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
   const [loading, setLoading] = useState(true);
-  const [paying, setPaying] = useState<string | null>(null);
-  const [snapLoaded, setSnapLoaded] = useState(false);
+  const [payingPlan, setPayingPlan] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchFullUser = async () => {
@@ -47,20 +46,6 @@ export default function PricingClient() {
   }, [user]);
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
-    script.setAttribute(
-      "data-client-key",
-      process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "",
-    );
-    script.onload = () => setSnapLoaded(true);
-    document.head.appendChild(script);
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
-
-  useEffect(() => {
     membershipService
       .getPlans()
       .then((res) => setPlans(res.data.data.plans))
@@ -68,7 +53,7 @@ export default function PricingClient() {
       .finally(() => setLoading(false));
   }, [tp]);
 
-  const handlePay = async (planId: string) => {
+  const handleStartPayment = (planId: string) => {
     if (!user) {
       toast.error(tp("loginFirst"));
       return;
@@ -79,36 +64,7 @@ export default function PricingClient() {
       return;
     }
 
-    setPaying(planId);
-    try {
-      const res = await membershipService.createTransaction(planId);
-      const { snap_token, order_id } = res.data.data;
-
-      window.snap?.pay(snap_token, {
-        onSuccess: () => {
-          router.push(`/payment/success?order_id=${order_id}`);
-        },
-        onPending: () => {
-          router.push(`/payment/success?order_id=${order_id}&status=pending`);
-        },
-        onError: () => {
-          router.push(`/payment/error?order_id=${order_id}`);
-        },
-        onClose: () => {
-          toast.info(tp("paymentCancelled"));
-          setPaying(null);
-        },
-      });
-    } catch (err: unknown) {
-      const paymentError = err as {
-        response?: { data?: { message?: string } };
-      };
-      toast.error(
-        paymentError.response?.data?.message || tp("paymentStartError"),
-      );
-    } finally {
-      setPaying(null);
-    }
+    router.push(`/payment?type=membership&id=${planId}`);
   };
 
   return (
@@ -149,9 +105,8 @@ export default function PricingClient() {
             isCurrentPlan={user?.role === "member"}
             isLoggedIn={Boolean(user)}
             isAuthLoading={initialLoading}
-            isLoading={paying === String(plan.id)}
-            snapLoaded={snapLoaded}
-            onPay={handlePay}
+            isLoading={payingPlan === String(plan.id)}
+            onPay={handleStartPayment}
           />
         ))
       )}

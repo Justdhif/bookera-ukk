@@ -70,13 +70,8 @@ class FineTypeService
 
     private function normalizeCreateData(array $data): array
     {
-        if (($data['type'] ?? null) === 'damaged') {
-            $data['amount'] = 0;
-            $data['percentage'] = (float) ($data['percentage'] ?? 0);
-        } else {
-            $data['percentage'] = null;
-            $data['amount'] = (float) ($data['amount'] ?? 0);
-        }
+        $data['amount'] = (float) ($data['amount'] ?? 0);
+        $data['percentage'] = isset($data['percentage']) ? (float) $data['percentage'] : null;
 
         return $data;
     }
