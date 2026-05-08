@@ -1,3 +1,4 @@
+import { MembershipDiscount } from "./membership-discount";
 import { PaginatedResponse } from "./api";
 import { Borrow } from "./borrow";
 
@@ -17,6 +18,8 @@ export interface Fine {
   borrow_id: number;
   fine_type_id: number;
   amount: number;
+  original_amount?: number;
+  discount_amount?: number;
   paid_at?: string;
   status: "unpaid" | "paid" | "waived";
   notes?: string;
@@ -28,6 +31,7 @@ export interface Fine {
   updated_at: string;
   fine_type?: FineType;
   borrow?: Borrow;
+  membership_discount?: MembershipDiscount;
 }
 
 export interface FineBorrowGroup {

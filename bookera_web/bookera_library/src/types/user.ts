@@ -36,6 +36,7 @@ export interface User {
   updated_at: string;
   is_following?: boolean;
   has_pending_borrow_request?: boolean;
+  unpaid_fines_count?: number;
   followers_count?: number;
   following_count?: number;
 

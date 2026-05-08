@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { format, addDays } from "date-fns";
 import { toast } from "sonner";
 import { borrowRequestService } from "@/services/borrow-request.service";
+import { fineService } from "@/services/fine.service";
 import { publicService } from "@/services/public.service";
 import { Book } from "@/types/book";
 import {
@@ -135,6 +136,8 @@ export default function BorrowRequestPageClient() {
     !borrowDate ||
     selectedBooks.some((book) => (book.available_copies ?? 0) === 0);
 
+  const [unpaidFinesCount, setUnpaidFinesCount] = useState<number>(0);
+
   useEffect(() => {
     if (initialLoading) return;
 
@@ -152,9 +155,24 @@ export default function BorrowRequestPageClient() {
       }
 
       setCheckingUser(true);
-      await fetchUser();
-      if (cancelled) return;
-      setCheckingUser(false);
+      try {
+        const [userRes, finesRes] = await Promise.all([
+          fetchUser(),
+          fineService.getMyFines({ status: "unpaid", per_page: 1 })
+        ]);
+        
+        if (!cancelled) {
+          const unpaidFines = finesRes.data.data;
+          const count = Array.isArray(unpaidFines) ? unpaidFines.length : (unpaidFines.total || 0);
+          setUnpaidFinesCount(count);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user or fines:", error);
+      } finally {
+        if (!cancelled) {
+          setCheckingUser(false);
+        }
+      }
 
       setLoadingBooks(true);
       try {
@@ -261,9 +279,34 @@ export default function BorrowRequestPageClient() {
         />
       </FadeUp>
 
+      {unpaidFinesCount > 0 && (
+        <FadeUp>
+          <div className="flex items-start gap-4 rounded-2xl bg-rose-500/10 p-5 border-2 border-rose-500/20 mb-6">
+            <div className="p-2.5 rounded-full bg-rose-500/20 text-rose-600 shrink-0">
+              <AlertCircle className="h-5 w-5" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-bold text-rose-700 dark:text-rose-400">
+                {t("unpaidFinesTitle")}
+              </p>
+              <p className="text-xs text-rose-600/90 dark:text-rose-400/70 leading-relaxed">
+                {t("unpaidFinesDesc")}
+              </p>
+              <Button 
+                variant="link" 
+                className="p-0 h-auto text-xs font-black uppercase tracking-widest text-rose-600 hover:text-rose-700 underline decoration-2 underline-offset-4 mt-2"
+                onClick={() => router.push('/my-borrow')}
+              >
+                Bayar Sekarang
+              </Button>
+            </div>
+          </div>
+        </FadeUp>
+      )}
+
       {hasPendingRequest && (
         <FadeUp>
-          <div className="flex items-start gap-4 rounded-2xl bg-amber-500/10 p-5 border-2 border-amber-500/20">
+          <div className="flex items-start gap-4 rounded-2xl bg-amber-500/10 p-5 border-2 border-amber-500/20 mb-6">
             <div className="p-2.5 rounded-full bg-amber-500/20 text-amber-600 shrink-0">
               <AlertCircle className="h-5 w-5" />
             </div>

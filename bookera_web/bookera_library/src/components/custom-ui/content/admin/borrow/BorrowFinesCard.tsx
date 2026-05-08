@@ -10,20 +10,15 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, AlertCircle, CheckCircle2, Loader2, Banknote, QrCode } from "lucide-react";
+import { CreditCard, AlertCircle, Loader2, Banknote, QrCode } from "lucide-react";
 import { fineService } from "@/services/fine.service";
 import { toast } from "sonner";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { PaymentMethodDialog } from "./PaymentMethodDialog";
 
 interface BorrowFinesCardProps {
   fines: Fine[];
@@ -35,6 +30,7 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
   const t = useTranslations("borrow");
   const tPublic = useTranslations("public");
   const [loadingId, setLoadingId] = useState<number | null>(null);
+  const [isMethodDialogOpen, setIsMethodDialogOpen] = useState(false);
 
   const handlePayCash = async (fineId: number) => {
     try {
@@ -65,6 +61,42 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
     }).format(amount);
   };
 
+  const unpaidFines = fines.filter((fine) => fine.status === "unpaid");
+  const totalUnpaid = unpaidFines.reduce((sum, fine) => sum + Number(fine.amount), 0);
+
+  const handlePayAllCash = async () => {
+    try {
+      setLoadingId(-1);
+      let lastFineId: number | null = null;
+      
+      for (const fine of unpaidFines) {
+        await fineService.payCash(fine.id);
+        lastFineId = fine.id;
+      }
+      
+      toast.success("All fines paid via Cash!");
+      onUpdate();
+      setIsMethodDialogOpen(false);
+      
+      // Redirect to invoice page for the last fine (or generic success)
+      if (lastFineId) {
+        router.push(`/admin/payment/success?type=fine&id=${lastFineId}`);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t("markAsPaidError"));
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  const handlePayAllMidtrans = () => {
+    // For Midtrans, since it's individual, we'll pick the first one
+    if (unpaidFines.length > 0) {
+      setIsMethodDialogOpen(false);
+      router.push(`/admin/payment?type=fine&id=${unpaidFines[0].id}`);
+    }
+  };
+
   if (fines.length === 0) return null;
 
   return (
@@ -72,14 +104,35 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
       <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
         <CreditCard className="h-24 w-24 text-amber-500" />
       </div>
-      <CardHeader className="pb-3 relative">
-        <CardTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-wider text-sm">
-          <CreditCard className="h-4 w-4" />
-          {t("finesTitle")}
-        </CardTitle>
-        <CardDescription className="font-medium">
-          {t("finesDesc")}
-        </CardDescription>
+      <CardHeader className="pb-4 border-b border-amber-500/10 relative">
+        <div className="flex items-center justify-between gap-4">
+          <div className="space-y-1">
+            <CardTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-wider text-sm">
+              <CreditCard className="h-4 w-4" />
+              {t("finesTitle")}
+            </CardTitle>
+            <CardDescription className="font-medium">
+              {t("finesDesc")}
+            </CardDescription>
+          </div>
+          
+          {unpaidFines.length > 0 && (
+            <Button
+              size="sm"
+              variant="brand"
+              className="h-10 px-6 font-black gap-2 shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all shrink-0"
+              onClick={() => setIsMethodDialogOpen(true)}
+              disabled={loadingId !== null}
+            >
+              {loadingId === -1 ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Banknote className="h-4 w-4" />
+              )}
+              {t("payAllBtn") || `Pay All (${formatCurrency(totalUnpaid)})`}
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="relative">
         <StaggerContainer className="grid gap-4">
@@ -98,11 +151,28 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
                   <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-1">
                     {fine.fine_type?.name || t("fine")}
                   </p>
-                  <p className="text-2xl font-black tracking-tight text-foreground">
-                    {formatCurrency(Number(fine.amount))}
-                  </p>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-2xl font-black tracking-tight text-foreground">
+                      {formatCurrency(Number(fine.amount))}
+                    </p>
+                    {fine.original_amount && Number(fine.original_amount) > Number(fine.amount) && (
+                      <div className="flex items-center gap-2">
+                        <p className="text-[10px] font-bold text-muted-foreground line-through decoration-rose-500/50">
+                          {formatCurrency(Number(fine.original_amount))}
+                        </p>
+                        {fine.membership_discount && (
+                          <Badge 
+                            variant="outline" 
+                            className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/5 text-emerald-600 border-emerald-500/20 tracking-tighter"
+                          >
+                            {fine.membership_discount.name} -{fine.membership_discount.discount_percentage}%
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
                   {fine.fine_type?.description && (
-                    <p className="text-sm font-medium text-muted-foreground/80 mt-1 max-w-md">
+                    <p className="text-[11px] font-medium text-muted-foreground/80 mt-1.5 max-w-md leading-relaxed">
                       {fine.fine_type.description}
                     </p>
                   )}
@@ -137,46 +207,20 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
                   )}
                 </div>
 
-                {fine.status === "unpaid" && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="brand"
-                        className="h-10 px-5 gap-2 font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
-                        disabled={loadingId === fine.id}
-                      >
-                        {loadingId === fine.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <CheckCircle2 className="h-4 w-4" />
-                        )}
-                        {t("payBtn")}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="rounded-xl p-2 min-w-[160px]">
-                      <DropdownMenuItem 
-                        onClick={() => handlePayCash(fine.id)}
-                        className="rounded-lg gap-2 font-bold p-3 cursor-pointer"
-                      >
-                        <Banknote className="h-4 w-4 text-emerald-500" />
-                        Pay via Cash
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handlePayMidtrans(fine.id)}
-                        className="rounded-lg gap-2 font-bold p-3 cursor-pointer"
-                      >
-                        <QrCode className="h-4 w-4 text-brand-primary" />
-                        Pay via Midtrans
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
               </div>
             </SlideIn>
           ))}
         </StaggerContainer>
       </CardContent>
+
+      <PaymentMethodDialog
+        isOpen={isMethodDialogOpen}
+        onOpenChange={setIsMethodDialogOpen}
+        onPayCash={handlePayAllCash}
+        onPayMidtrans={handlePayAllMidtrans}
+        totalAmount={totalUnpaid}
+        loading={loadingId === -1}
+      />
     </Card>
   );
 }

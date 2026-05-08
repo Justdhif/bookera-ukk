@@ -255,20 +255,16 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
               </div>
             </div>
 
-            <div className="mt-1 flex items-center gap-4 rounded-2xl bg-brand-primary/30 px-5 py-4 border-2 border-brand-primary shadow-lg shadow-brand-primary/10">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-inner ring-1 ring-white/30">
-                <BookOpen className="h-6 w-6 text-white" />
-              </div>
-              <div className="space-y-0.5">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 leading-none">
+            <div className="flex items-center justify-between pt-4 border-t border-dashed border-border/40 mt-2 px-1">
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-3 w-3 text-brand-primary" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
                   {t("totalBooks")}
-                </p>
-                <div className="text-2xl font-black leading-none text-white flex items-baseline gap-1.5">
-                  <span className="text-20 font-extrabold text-white uppercase tracking-wider">
-                    {t("bookUnit", { count: totalItemsCount })}
-                  </span>
-                </div>
+                </span>
               </div>
+              <span className="text-sm font-black tracking-tight text-brand-primary">
+                {t("bookUnit", { count: totalItemsCount })}
+              </span>
             </div>
           </div>
         </div>

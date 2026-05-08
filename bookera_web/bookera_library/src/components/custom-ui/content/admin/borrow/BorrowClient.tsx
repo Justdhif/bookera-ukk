@@ -19,7 +19,6 @@ import PaginatedContent from "@/components/custom-ui/PaginatedContent";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { ITEMS_PER_PAGE_OPTIONS } from "@/constants/pagination";
 import DateRangeFilter from "@/components/custom-ui/DateRangeFilter";
-import { getCurrentMonthRange } from "@/lib/month-range";
 import { StaggerContainer, FadeUp, SlideIn, FadeIn } from "@/components/custom-ui/motion";
 import QrScannerModal from "@/components/custom-ui/modal/QrScannerModal";
 import { useRouter } from "next/navigation";
@@ -27,11 +26,6 @@ import { useRouter } from "next/navigation";
 export default function BorrowClient() {
   const t = useTranslations("borrow");
   const router = useRouter();
-  const monthRange = getCurrentMonthRange();
-  const defaultMonthRange = {
-    start_date: monthRange.startDate,
-    end_date: monthRange.endDate,
-  };
   const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
   const [loadingBorrows, setLoadingBorrows] = useState(false);
   const [search, setSearch] = useState("");
@@ -39,11 +33,10 @@ export default function BorrowClient() {
   const [dateRange, setDateRange] = useState<{
     start_date?: string;
     end_date?: string;
-  }>(defaultMonthRange);
+  }>({});
 
   const [borrowFilters, setBorrowFilters] = useState<BorrowFilterParams>({
     per_page: ITEMS_PER_PAGE_OPTIONS[1],
-    ...defaultMonthRange,
   });
   const [borrowPagination, setBorrowPagination] = useState({
     current_page: 1,
@@ -63,7 +56,6 @@ export default function BorrowClient() {
     end_date?: string;
   }>({ 
     per_page: ITEMS_PER_PAGE_OPTIONS[1],
-    ...defaultMonthRange 
   });
   const [requestPagination, setRequestPagination] = useState({
     current_page: 1,
@@ -217,8 +209,6 @@ export default function BorrowClient() {
             </Button>
             <DateRangeFilter 
               onFilter={handleDateFilter} 
-              defaultStartDate={defaultMonthRange.start_date}
-              defaultEndDate={defaultMonthRange.end_date}
             />
           </div>
         </div>
