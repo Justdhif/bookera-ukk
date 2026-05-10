@@ -9,6 +9,8 @@ use App\Models\BorrowDetail;
 use App\Models\LostBook;
 use App\Models\FineBorrow;
 use App\Models\FineType;
+use App\Models\MembershipDiscount;
+use App\Models\DiscountKey;
 use App\Services\BookReturn\BookReturnNotificationService;
 use App\Services\Reservation\ReservationService;
 use Illuminate\Database\Eloquent\Collection;
@@ -99,232 +101,18 @@ class BookReturnService
                 ->first();
 
             foreach ($data['items'] as $item) {
-                $borrowDetail = BorrowDetail::with(['bookCopy.book'])
-                    ->where('id', $item['borrow_detail_id'])
-                    ->where('borrow_id', $borrow->id)
-                    ->first();
+                $itemResult = $this->processItemReturn($borrow, $item, $damagedFineTypes, $lateFineType);
 
-                if (!$borrowDetail || $borrowDetail->status !== 'borrowed') {
-                    continue;
+                if (isset($itemResult['book_return'])) {
+                    $bookReturn ??= $itemResult['book_return'];
                 }
 
-                $bookCopy = $borrowDetail->bookCopy;
-
-                if (!$bookCopy) {
-                    continue;
+                if (isset($itemResult['returned'])) {
+                    $results['returned'][] = $itemResult['returned'];
                 }
 
-                $requestedStatus = $item['status'];
-
-                if ($requestedStatus === 'returned') {
-                    $condition = $item['condition'] ?? 'good';
-                    $selectedFineTypeId = isset($item['fine_type_id']) ? (int) $item['fine_type_id'] : null;
-                    $selectedDamagedFineType = $selectedFineTypeId
-                        ? $damagedFineTypes->firstWhere('id', $selectedFineTypeId)
-                        : null;
-                    $damagedFineType = $selectedDamagedFineType ?? $damagedFineTypes->first();
-
-                    $createdBookReturn = BookReturn::create([
-                        'borrow_id' => $borrow->id,
-                        'book_copy_id' => $bookCopy->id,
-                        'return_date' => now(),
-                        'condition' => $condition,
-                    ]);
-
-                    $bookReturn ??= $createdBookReturn;
-
-                    $borrowDetail->update(['status' => 'returned']);
-                    $bookCopy->update(['status' => 'available']);
-
-                    // Notify next user in reservation queue only when book is returned in good condition
-                    if ($condition === 'good') {
-                        app(ReservationService::class)->notifyAvailableWaiters($bookCopy->book_id);
-                    }
-
-                    $results['returned'][] = [
-                        'copy_id' => $bookCopy->id,
-                        'book_title' => $bookCopy->book->title,
-                        'condition' => $condition,
-                    ];
-
-                    if ($condition === 'damaged' && $damagedFineType) {
-                        $percentage = (float) ($damagedFineType->percentage ?? 0);
-                        $bookPrice = (float) ($bookCopy->book->price ?? 0);
-                        $amount = ($bookPrice * $percentage) / 100;
-
-                        // Apply membership discount
-                        $activeMembership = $borrow->user->active_membership;
-                        $discountPercentage = 0;
-                        if ($activeMembership) {
-                            $discount = \App\Models\MembershipDiscount::where('discount_key', 'fine_damaged')
-                                ->first();
-                            
-                            if ($discount && $discount->discount_percentage > 0) {
-                                $discountPercentage = (float) $discount->discount_percentage;
-                                $amount = $amount * (1 - ($discountPercentage / 100));
-                            }
-                        }
-
-                        $amount = round($amount, 2);
-                        $fineNotes = 'Denda buku rusak (' . $damagedFineType->name . ', ' . $percentage . '%): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
-                        
-                        if ($discountPercentage > 0) {
-                            $fineNotes .= ' [Member Discount ' . $discountPercentage . '% applied]';
-                        }
-
-                        $existingFine = $borrow->fines()
-                            ->where('fine_type_id', $damagedFineType->id)
-                            ->where('notes', 'like', '%' . $bookCopy->copy_code . '%')
-                            ->first();
-
-                        if (!$existingFine) {
-                            $fine = FineBorrow::create([
-                                'borrow_id' => $borrow->id,
-                                'fine_type_id' => $damagedFineType->id,
-                                'amount' => $amount,
-                                'status' => 'unpaid',
-                                'notes' => $fineNotes,
-                            ]);
-
-                            ActivityLogger::log(
-                                'create',
-                                'fine',
-                                "Fine auto-created for damaged book in borrow #{$borrow->id} ({$damagedFineType->name})",
-                                ['fine_id' => $fine->id, 'amount' => $fine->amount, 'book_copy_id' => $bookCopy->id],
-                                null,
-                                $fine
-                            );
-
-                            $fine->load('fineType', 'borrow.user', 'borrow.borrowDetails.bookCopy.book');
-                        }
-                    }
-
-                    if ($lateFineType && $borrow->return_date) {
-                        $expectedReturnDate = Carbon::parse($borrow->return_date)->startOfDay();
-                        $actualReturnDate = now()->startOfDay();
-
-                        if ($actualReturnDate->greaterThan($expectedReturnDate)) {
-                            $daysLate = (int) $expectedReturnDate->diffInDays($actualReturnDate);
-
-                            if ($daysLate > 0) {
-                                $totalAmount = $lateFineType->amount * $daysLate;
-                                $fineNotes = 'Denda keterlambatan (' . $lateFineType->name . ', ' . $daysLate . ' hari): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
-
-                                $existingFine = $borrow->fines()
-                                    ->where('fine_type_id', $lateFineType->id)
-                                    ->where('notes', 'like', '%' . $bookCopy->copy_code . '%')
-                                    ->first();
-
-                                if (!$existingFine) {
-                                    $fine = FineBorrow::create([
-                                        'borrow_id' => $borrow->id,
-                                        'fine_type_id' => $lateFineType->id,
-                                        'amount' => $totalAmount,
-                                        'status' => 'unpaid',
-                                        'notes' => $fineNotes,
-                                    ]);
-
-                                    ActivityLogger::log(
-                                        'create',
-                                        'fine',
-                                        "Fine auto-created for late return in borrow #{$borrow->id} ({$lateFineType->name})",
-                                        ['fine_id' => $fine->id, 'amount' => $fine->amount, 'days_late' => $daysLate, 'book_copy_id' => $bookCopy->id],
-                                        null,
-                                        $fine
-                                    );
-                                }
-                            }
-                        }
-                    }
-
-                    ActivityLogger::log(
-                        'update',
-                        'book_return_detail',
-                        "Book copy #{$bookCopy->id} ({$bookCopy->book->title}) processed as returned (condition: {$condition})",
-                        ['copy_id' => $bookCopy->id, 'condition' => $condition],
-                        null,
-                        $bookCopy
-                    );
-                } elseif ($requestedStatus === 'lost') {
-                    $lostDate = $item['lost_date'] ?? now()->toDateString();
-                    $notes = $item['notes'] ?? null;
-
-                    $lostBook = LostBook::create([
-                        'borrow_id' => $borrow->id,
-                        'book_copy_id' => $bookCopy->id,
-                        'lost_date' => $lostDate,
-                        'notes' => $notes,
-                    ]);
-
-                    $borrowDetail->update(['status' => 'lost']);
-                    $bookCopy->update(['status' => 'lost']);
-
-                    $lostFineType = FineType::where('type', 'lost')
-                        ->orderBy('amount')
-                        ->orderBy('id')
-                        ->first();
-
-                    if ($lostFineType) {
-                        $bookPrice = (float) ($bookCopy->book->price ?? 0);
-                        $amount = $bookPrice > 0 ? $bookPrice : (float) ($lostFineType->amount ?? 0);
-
-                        // Apply membership discount
-                        $activeMembership = $borrow->user->active_membership;
-                        if ($activeMembership && $activeMembership->plan) {
-                            $discountPercentage = (float) ($activeMembership->plan->lost_fine_discount ?? 0);
-                            if ($discountPercentage > 0) {
-                                $amount = $amount * (1 - ($discountPercentage / 100));
-                            }
-                        }
-
-                        $amount = round($amount, 2);
-                        $fineNotes = 'Denda buku hilang (' . $lostFineType->name . '): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
-
-                        if ($activeMembership && isset($discountPercentage) && $discountPercentage > 0) {
-                            $fineNotes .= ' [Member Discount ' . $discountPercentage . '% applied]';
-                        }
-
-                        $existingFine = $borrow->fines()
-                            ->where('fine_type_id', $lostFineType->id)
-                            ->where('notes', 'like', '%' . $bookCopy->copy_code . '%')
-                            ->first();
-
-                        if (!$existingFine) {
-                            $fine = FineBorrow::create([
-                                'borrow_id' => $borrow->id,
-                                'fine_type_id' => $lostFineType->id,
-                                'amount' => $amount,
-                                'status' => 'unpaid',
-                                'notes' => $fineNotes,
-                            ]);
-
-                            ActivityLogger::log(
-                                'create',
-                                'fine',
-                                "Fine auto-created for lost book in borrow #{$borrow->id} ({$lostFineType->name})",
-                                ['fine_id' => $fine->id, 'amount' => $fine->amount, 'book_copy_id' => $bookCopy->id],
-                                null,
-                                $fine
-                            );
-
-                            $fine->load('fineType', 'borrow.user', 'borrow.borrowDetails.bookCopy.book');
-                        }
-                    }
-
-                    $results['lost'][] = [
-                        'copy_id' => $bookCopy->id,
-                        'book_title' => $bookCopy->book->title,
-                        'lost_date' => $lostDate,
-                    ];
-
-                    ActivityLogger::log(
-                        'update',
-                        'lost_book',
-                        "Book copy #{$bookCopy->id} ({$bookCopy->book->title}) processed as lost",
-                        ['copy_id' => $bookCopy->id, 'lost_date' => $lostDate],
-                        null,
-                        $lostBook
-                    );
+                if (isset($itemResult['lost'])) {
+                    $results['lost'][] = $itemResult['lost'];
                 }
             }
 
@@ -338,5 +126,224 @@ class BookReturnService
                 'summary' => $results,
             ];
         });
+    }
+
+    private function processItemReturn(Borrow $borrow, array $item, $damagedFineTypes, $lateFineType): array
+    {
+        $result = [];
+        $borrowDetail = BorrowDetail::with(['bookCopy.book'])
+            ->where('id', $item['borrow_detail_id'])
+            ->where('borrow_id', $borrow->id)
+            ->first();
+
+        if (!$borrowDetail || $borrowDetail->status !== 'borrowed') {
+            return $result;
+        }
+
+        $bookCopy = $borrowDetail->bookCopy;
+        if (!$bookCopy) {
+            return $result;
+        }
+
+        $requestedStatus = $item['status'];
+
+        if ($requestedStatus === 'returned') {
+            $condition = $item['condition'] ?? 'good';
+            $selectedFineTypeId = isset($item['fine_type_id']) ? (int) $item['fine_type_id'] : null;
+            $selectedDamagedFineType = $selectedFineTypeId
+                ? $damagedFineTypes->firstWhere('id', $selectedFineTypeId)
+                : null;
+            $damagedFineType = $selectedDamagedFineType ?? $damagedFineTypes->first();
+
+            $createdBookReturn = BookReturn::create([
+                'borrow_id' => $borrow->id,
+                'book_copy_id' => $bookCopy->id,
+                'return_date' => now(),
+                'condition' => $condition,
+            ]);
+
+            $result['book_return'] = $createdBookReturn;
+
+            $borrowDetail->update(['status' => 'returned']);
+            $bookCopy->update(['status' => 'available']);
+
+            if ($condition === 'good') {
+                app(ReservationService::class)->notifyAvailableWaiters($bookCopy->book_id);
+            }
+
+            $result['returned'] = [
+                'copy_id' => $bookCopy->id,
+                'book_title' => $bookCopy->book->title,
+                'condition' => $condition,
+            ];
+
+            if ($condition === 'damaged' && $damagedFineType) {
+                $percentage = (float) ($damagedFineType->percentage ?? 0);
+                $bookPrice = (float) ($bookCopy->book->price ?? 0);
+                $amount = ($bookPrice * $percentage) / 100;
+                $originalAmount = $amount;
+
+                $activeMembership = $borrow->user->active_membership;
+                $discountPercentage = 0;
+
+                if ($activeMembership) {
+                    $discount = MembershipDiscount::whereHas('discountKey', function ($query) {
+                        $query->where('key', 'fine_damaged');
+                    })->first();
+
+                    if ($discount && $discount->discount_percentage > 0) {
+                        $discountPercentage = (float) $discount->discount_percentage;
+                        $amount = $amount * (1 - ($discountPercentage / 100));
+                    }
+                }
+
+                $amount = round($amount, 2);
+                $fineNotes = 'Denda buku rusak (' . $damagedFineType->name . ', ' . $percentage . '%): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
+
+                if ($discountPercentage > 0) {
+                    $fineNotes .= ' [Member Discount ' . $discountPercentage . '% applied]';
+                }
+
+                $existingFine = $borrow->fines()
+                    ->where('fine_type_id', $damagedFineType->id)
+                    ->where('notes', 'like', '%' . $bookCopy->copy_code . '%')
+                    ->first();
+
+                if (!$existingFine) {
+                    $fine = FineBorrow::create([
+                        'borrow_id' => $borrow->id,
+                        'fine_type_id' => $damagedFineType->id,
+                        'amount' => $amount,
+                        'original_amount' => $originalAmount,
+                        'discount_percentage' => $discountPercentage,
+                        'status' => 'unpaid',
+                        'notes' => $fineNotes,
+                    ]);
+
+                    ActivityLogger::log(
+                        'create',
+                        'fine',
+                        "Fine auto-created for damaged book in borrow #{$borrow->id}",
+                        ['fine_id' => $fine->id, 'amount' => $fine->amount, 'book_copy_id' => $bookCopy->id],
+                        null,
+                        $fine
+                    );
+                }
+            }
+
+            if ($lateFineType && $borrow->return_date) {
+                $expectedReturnDate = Carbon::parse($borrow->return_date)->startOfDay();
+                $actualReturnDate = now()->startOfDay();
+
+                if ($actualReturnDate->greaterThan($expectedReturnDate)) {
+                    $daysLate = (int) $expectedReturnDate->diffInDays($actualReturnDate);
+
+                    if ($daysLate > 0) {
+                        $totalAmount = $lateFineType->amount * $daysLate;
+                        $fineNotes = 'Denda keterlambatan (' . $lateFineType->name . ', ' . $daysLate . ' hari): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
+
+                        $existingFine = $borrow->fines()
+                            ->where('fine_type_id', $lateFineType->id)
+                            ->where('notes', 'like', '%' . $bookCopy->copy_code . '%')
+                            ->first();
+
+                        if (!$existingFine) {
+                            FineBorrow::create([
+                                'borrow_id' => $borrow->id,
+                                'fine_type_id' => $lateFineType->id,
+                                'amount' => $totalAmount,
+                                'status' => 'unpaid',
+                                'notes' => $fineNotes,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            ActivityLogger::log(
+                'update',
+                'book_return_detail',
+                "Book copy #{$bookCopy->id} ({$bookCopy->book->title}) processed as returned",
+                ['copy_id' => $bookCopy->id, 'condition' => $condition],
+                null,
+                $bookCopy
+            );
+        } elseif ($requestedStatus === 'lost') {
+            $lostDate = $item['lost_date'] ?? now()->toDateString();
+            $notes = $item['notes'] ?? null;
+
+            $lostBook = LostBook::create([
+                'borrow_id' => $borrow->id,
+                'book_copy_id' => $bookCopy->id,
+                'lost_date' => $lostDate,
+                'notes' => $notes,
+            ]);
+
+            $borrowDetail->update(['status' => 'lost']);
+            $bookCopy->update(['status' => 'lost']);
+
+            $lostFineType = FineType::where('type', 'lost')->orderBy('amount')->orderBy('id')->first();
+
+            if ($lostFineType) {
+                $bookPrice = (float) ($bookCopy->book->price ?? 0);
+                $amount = $bookPrice > 0 ? $bookPrice : (float) ($lostFineType->amount ?? 0);
+                $originalAmount = $amount;
+
+                $activeMembership = $borrow->user->active_membership;
+                $discountPercentage = 0;
+
+                if ($activeMembership) {
+                    $discount = MembershipDiscount::whereHas('discountKey', function ($query) {
+                        $query->where('key', 'fine_lost');
+                    })->first();
+
+                    if ($discount && $discount->discount_percentage > 0) {
+                        $discountPercentage = (float) $discount->discount_percentage;
+                        $amount = $amount * (1 - ($discountPercentage / 100));
+                    }
+                }
+
+                $amount = round($amount, 2);
+                $fineNotes = 'Denda buku hilang (' . $lostFineType->name . '): ' . $bookCopy->book->title . ' (Copy: ' . $bookCopy->copy_code . ')';
+
+                if ($discountPercentage > 0) {
+                    $fineNotes .= ' [Member Discount ' . $discountPercentage . '% applied]';
+                }
+
+                $existingFine = $borrow->fines()
+                    ->where('fine_type_id', $lostFineType->id)
+                    ->where('notes', 'like', '%' . $bookCopy->copy_code . '%')
+                    ->first();
+
+                if (!$existingFine) {
+                    FineBorrow::create([
+                        'borrow_id' => $borrow->id,
+                        'fine_type_id' => $lostFineType->id,
+                        'amount' => $amount,
+                        'original_amount' => $originalAmount,
+                        'discount_percentage' => $discountPercentage,
+                        'status' => 'unpaid',
+                        'notes' => $fineNotes,
+                    ]);
+                }
+            }
+
+            $result['lost'] = [
+                'copy_id' => $bookCopy->id,
+                'book_title' => $bookCopy->book->title,
+                'lost_date' => $lostDate,
+            ];
+
+            ActivityLogger::log(
+                'update',
+                'lost_book',
+                "Book copy #{$bookCopy->id} ({$bookCopy->book->title}) processed as lost",
+                ['copy_id' => $bookCopy->id, 'lost_date' => $lostDate],
+                null,
+                $lostBook
+            );
+        }
+
+        return $result;
     }
 }

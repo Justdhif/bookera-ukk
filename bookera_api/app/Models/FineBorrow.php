@@ -16,6 +16,8 @@ class FineBorrow extends Model
         'borrow_id',
         'fine_type_id',
         'amount',
+        'original_amount',
+        'discount_percentage',
         'paid_at',
         'status',
         'notes',
@@ -29,6 +31,7 @@ class FineBorrow extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'original_amount' => 'decimal:2',
         'paid_at' => 'datetime',
         'payment_payload' => 'array',
     ];

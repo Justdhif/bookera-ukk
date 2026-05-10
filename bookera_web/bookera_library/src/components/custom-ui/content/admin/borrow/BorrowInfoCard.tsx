@@ -29,7 +29,7 @@ export function BorrowInfoCard({ borrow }: BorrowInfoCardProps) {
   );
 
   return (
-    <Card className="lg:col-span-2">
+    <Card>
       <CardHeader>
         <CardTitle>{t("detailTitle")}</CardTitle>
         <CardDescription>
@@ -42,29 +42,29 @@ export function BorrowInfoCard({ borrow }: BorrowInfoCardProps) {
             <User className="h-4 w-4" />
             {t("borrowerTitle")}
           </h3>
-          <div className="grid gap-3 sm:grid-cols-2 rounded-lg border p-4 bg-muted/20">
-            <div>
-              <p className="text-sm text-muted-foreground">{t("fullName")}</p>
-              <p className="font-medium">
+          <div className="grid grid-cols-1 gap-4 rounded-2xl border border-border/50 p-5 bg-muted/20 backdrop-blur-sm">
+            <div className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">{t("fullName")}</p>
+              <p className="font-bold text-foreground truncate">
                 {borrow.user?.profile?.full_name || "-"}
               </p>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">{t("email")}</p>
-              <p className="font-medium">{borrow.user?.email || "-"}</p>
+            <div className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">{t("email")}</p>
+              <p className="font-bold text-foreground truncate">{borrow.user?.email || "-"}</p>
             </div>
             {borrow.user?.profile?.identification_number && (
-              <div>
-                <p className="text-sm text-muted-foreground">{t("identificationNo")}</p>
-                <p className="font-medium font-mono">
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">{t("identificationNo")}</p>
+                <p className="font-bold font-mono text-foreground">
                   {borrow.user.profile.identification_number}
                 </p>
               </div>
             )}
             {borrow.user?.profile?.phone_number && (
-              <div>
-                <p className="text-sm text-muted-foreground">{t("phoneNumber")}</p>
-                <p className="font-medium">
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">{t("phoneNumber")}</p>
+                <p className="font-bold text-foreground">
                   {borrow.user.profile.phone_number}
                 </p>
               </div>
@@ -77,22 +77,22 @@ export function BorrowInfoCard({ borrow }: BorrowInfoCardProps) {
             <Calendar className="h-4 w-4" />
             {t("datesTitle")}
           </h3>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg border p-3 bg-muted/20">
-              <p className="text-sm text-muted-foreground">{tRequest("borrowDate")}</p>
-              <p className="font-medium">
+          <div className="grid grid-cols-1 gap-3">
+            <div className="rounded-2xl border border-border/50 p-4 bg-muted/20 backdrop-blur-sm flex items-center justify-between">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">{tRequest("borrowDate")}</p>
+              <p className="font-bold text-foreground">
                 {format(new Date(borrow.borrow_date), "dd MMM yyyy")}
               </p>
             </div>
-            <div className="rounded-lg border p-3 bg-muted/20">
-              <p className="text-sm text-muted-foreground">{tRequest("returnDate")}</p>
-              <p className="font-medium text-destructive">
+            <div className="rounded-2xl border border-destructive/20 p-4 bg-destructive/5 flex items-center justify-between">
+              <p className="text-[10px] font-black uppercase tracking-widest text-destructive/70">{tRequest("returnDate")}</p>
+              <p className="font-bold text-destructive">
                 {format(new Date(borrow.return_date), "dd MMM yyyy")}
               </p>
             </div>
-            <div className="rounded-lg border p-3 bg-muted/20">
-              <p className="text-sm text-muted-foreground">{t("createdAt")}</p>
-              <p className="font-medium">
+            <div className="rounded-2xl border border-border/50 p-4 bg-muted/20 backdrop-blur-sm flex items-center justify-between">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">{t("createdAt")}</p>
+              <p className="font-bold text-foreground">
                 {format(new Date(borrow.created_at), "dd MMM yyyy")}
               </p>
             </div>

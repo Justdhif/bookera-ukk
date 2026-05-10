@@ -16,8 +16,8 @@ import {
   Clock,
   Info,
   MessageCircle,
-  Eye,
   AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import { ReportLostDialog } from "@/components/custom-ui/content/public/profile/
 import DetailButton from "@/components/custom-ui/button/DetailButton";
 import Link from "next/link";
 import { useState } from "react";
+import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
 interface BorrowBooksCardProps {
   borrow: Borrow;
@@ -45,17 +46,25 @@ export function BorrowBooksCard({ borrow, onUpdate }: BorrowBooksCardProps) {
     ? borrow.borrow_details.length
     : requestedBooks.length;
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
+
   return (
-    <Card className="shadow-lg border-2">
-      <CardHeader className="bg-muted/30 pb-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
+    <Card className="overflow-hidden border-border/60 shadow-sm">
+      <CardHeader className="border-b border-border/60">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-1.5">
             <CardTitle className="flex items-center gap-2 text-xl">
-              <BookOpen className="h-6 w-6 text-primary" />
+              <BookOpen className="h-5 w-5 text-primary" />
               {showRequested ? t("requestedBooks") : t("borrowedBooks")} (
               {bookCount})
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="max-w-2xl font-medium">
               {showRequested
                 ? t("requestedBooksDesc")
                 : t("manageReturnStatus")}
@@ -66,7 +75,7 @@ export function BorrowBooksCard({ borrow, onUpdate }: BorrowBooksCardProps) {
               <Button
                 variant="destructive"
                 onClick={() => setReportDialogOpen(true)}
-                className="rounded-full px-6 font-bold gap-2 shadow-sm hover:scale-105 transition-all"
+                className="h-10 px-6 font-black gap-2 shadow-lg shadow-destructive/20 hover:scale-105 active:scale-95 transition-all shrink-0"
               >
                 <AlertCircle className="h-4 w-4" />
                 {tPublic("reportLostBook")}
@@ -75,7 +84,7 @@ export function BorrowBooksCard({ borrow, onUpdate }: BorrowBooksCardProps) {
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="divide-y">
+        <StaggerContainer className="divide-y divide-border/60">
           {hasAssignedCopies &&
             borrow.borrow_details.map((detail) => {
               const book = detail.book_copy?.book;
@@ -83,18 +92,25 @@ export function BorrowBooksCard({ borrow, onUpdate }: BorrowBooksCardProps) {
                 book?.authors?.map((a) => a.name).join(", ") ||
                 book?.author ||
                 tCommon("noAuthors");
+              const publisher =
+                book?.publishers?.[0]?.name ||
+                book?.publisher ||
+                tCommon("noData");
+              const categories = book?.categories ?? [];
 
               return (
-                <div
+                <SlideIn
                   key={detail.id}
-                  className="p-6 transition-colors hover:bg-muted/5"
+                  direction="up"
+                  distance={20}
+                  className="p-6 lg:p-8 transition-colors hover:bg-muted/30"
                 >
-                  <div className="flex flex-col md:flex-row md:items-start gap-6">
-                    <div className="flex-1 flex gap-5">
-                      <div className="relative group shrink-0">
-                        <div className="relative w-24 h-36 rounded-xl overflow-hidden shadow-lg border border-primary/20 bg-muted">
+                  <div className="space-y-6">
+                    <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+                      <div className="relative group shrink-0 self-start">
+                        <div className="relative h-36 w-24 overflow-hidden rounded-2xl border border-primary/20 bg-muted shadow-md">
                           <Image
-                            src={book?.cover_image || "/placeholder.png"}
+                            src={book?.cover_image || "/placeholder-book.png"}
                             alt={book?.title || tCommon("bookCover")}
                             fill
                             sizes="96px"
@@ -102,169 +118,176 @@ export function BorrowBooksCard({ borrow, onUpdate }: BorrowBooksCardProps) {
                             unoptimized
                           />
                         </div>
-                        <Badge className="absolute -top-2 -right-2 shadow-md px-2 py-0.5 bg-background text-foreground border-2">
+                        <Badge className="absolute -right-3 top-3 border-2 border-background bg-background px-2.5 py-0.5 font-semibold text-foreground shadow-md">
                           #{detail.book_copy?.copy_code}
                         </Badge>
                       </div>
 
-                      <div className="flex-1 space-y-3">
-                        <div className="space-y-1">
-                          <h4 className="font-black text-xl leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                      <div className="min-w-0 flex-1 space-y-4">
+                        <div className="space-y-1.5">
+                          <h4 className="line-clamp-2 text-xl font-black leading-tight text-foreground group-hover:text-primary transition-colors">
                             {book?.title || tCommon("noData")}
                           </h4>
                           <div className="flex flex-wrap items-center gap-2 text-sm">
-                            <span className="text-muted-foreground font-medium">
+                            <span className="font-medium text-muted-foreground">
                               {tCommon("from")}
                             </span>
-                            <span className="text-foreground font-bold underline decoration-primary/30 decoration-2 underline-offset-4">
+                            <span className="font-semibold text-foreground underline decoration-primary/30 decoration-2 underline-offset-4">
                               {authors}
                             </span>
-                            {book?.publishers && book.publishers.length > 0 && (
-                              <>
-                                <span className="text-muted-foreground">•</span>
-                                <span className="text-muted-foreground italic">
-                                  {book.publishers[0].name}
-                                </span>
-                              </>
-                            )}
+                            <span className="text-muted-foreground">•</span>
+                            <span className="italic text-muted-foreground">
+                              {publisher}
+                            </span>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-2.5">
                           <BorrowDetailStatusBadge status={detail.status} />
-                          {book?.categories && book.categories.length > 0 && (
-                            <div className="flex gap-1.5 overflow-hidden">
-                              {book.categories.slice(0, 2).map((cat: any) => (
-                                <Badge
-                                  key={cat.id}
-                                  variant="secondary"
-                                  className="text-[10px] uppercase font-bold tracking-tight py-0"
-                                >
-                                  {cat.name}
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
+                          {categories.slice(0, 2).map((cat: any) => (
+                            <Badge
+                              key={cat.id}
+                              variant="secondary"
+                              className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
+                            >
+                              {cat.name}
+                            </Badge>
+                          ))}
                         </div>
 
                         {detail.note && (
-                          <div className="flex items-start gap-2.5 text-xs text-destructive bg-destructive/5 p-3 rounded-xl border border-destructive/20 max-w-sm">
-                            <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                            <p className="font-semibold italic leading-relaxed">
-                              {tCommon("note")}: {detail.note}
+                          <div className="flex max-w-xl items-start gap-2.5 rounded-2xl border border-destructive/20 bg-destructive/5 p-3.5 text-sm text-destructive">
+                            <Info className="mt-0.5 h-4 w-4 shrink-0" />
+                            <p className="font-medium leading-relaxed italic">
+                              <span className="font-bold">
+                                {tCommon("note")}:
+                              </span>{" "}
+                              {detail.note}
                             </p>
                           </div>
                         )}
                       </div>
+
+                      <div className="flex flex-row sm:flex-col items-center gap-3 shrink-0 self-end sm:self-start border-t sm:border-t-0 pt-4 sm:pt-0 w-full sm:w-auto justify-end">
+                        {borrow.status === "close" && book && (
+                          <AddBookReviewDialog
+                            bookId={book.id}
+                            bookTitle={book.title}
+                            onSuccess={onUpdate}
+                            trigger={
+                              <Button
+                                variant="brand"
+                                size="sm"
+                                className="h-9 px-4 font-bold gap-2 shadow-lg shadow-primary/20"
+                              >
+                                <MessageCircle className="h-4 w-4" />
+                                {tPublic("addReview")}
+                              </Button>
+                            }
+                          />
+                        )}
+
+                        <Link
+                          href={`/books/${book?.slug}`}
+                          target="_blank"
+                          className="w-full sm:w-auto"
+                        >
+                          <DetailButton
+                            label={tPublic("detailsBtn")}
+                            className="w-full sm:w-auto font-black h-9 text-[10px] uppercase tracking-widest"
+                          />
+                        </Link>
+                      </div>
                     </div>
 
-                    <div className="flex flex-col gap-2 shrink-0 md:pt-2">
-                      {borrow.status === "close" && book && (
-                        <AddBookReviewDialog
-                          bookId={book.id}
-                          bookTitle={book.title}
-                          onSuccess={onUpdate}
-                          trigger={
-                            <Button
-                              variant="brand"
-                              size="sm"
-                              className="w-full sm:w-auto gap-2 font-bold shadow-sm"
-                            >
-                              <MessageCircle className="h-4 w-4" />
-                              {tPublic("addReview")}
-                            </Button>
-                          }
-                        />
+                    {/* Status Processed (Returned/Lost) */}
+                    {detail.status !== "borrowed" && (
+                      <SlideIn
+                        direction="up"
+                        distance={10}
+                        className="rounded-3xl border border-border/60 bg-background/80 px-4 py-4 shadow-sm"
+                      >
+                        <div className="flex items-center gap-3">
+                          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                          <div className="space-y-0.5">
+                            <p className="font-bold text-foreground">
+                              {t("processedAs", {
+                                status: tCommon(detail.status),
+                              })}
+                            </p>
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                              {tCommon(detail.status)}
+                            </p>
+                          </div>
+                        </div>
+                      </SlideIn>
+                    )}
+
+                    {/* Denda Per Buku (Late - only for active borrowed) */}
+                    {borrow.status === "open" &&
+                      detail.status === "borrowed" &&
+                      borrow.estimated_late_fine?.is_late && (
+                        <SlideIn
+                          direction="up"
+                          distance={10}
+                          className="rounded-3xl border border-border/60 bg-muted/20 p-5 shadow-sm"
+                        >
+                          <div className="space-y-2.5">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="space-y-1">
+                                <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-rose-600">
+                                  <Clock className="h-4 w-4" />
+                                  {borrow.estimated_late_fine.fine_name ||
+                                    t("overdueAlertTitle")}
+                                </p>
+                                <p className="font-bold text-foreground">
+                                  {t("lateFineInfo", {
+                                    days: borrow.estimated_late_fine.days_late,
+                                  })}
+                                </p>
+                              </div>
+                              <span className="text-xl font-black text-rose-600">
+                                {formatCurrency(
+                                  borrow.estimated_late_fine.fine_per_book *
+                                    borrow.estimated_late_fine.days_late,
+                                )}
+                              </span>
+                            </div>
+                            <p className="text-xs leading-relaxed text-muted-foreground font-medium">
+                              {borrow.estimated_late_fine.fine_description ||
+                                t("overdueWarningNote")}
+                            </p>
+                          </div>
+                        </SlideIn>
                       )}
-
-                      <Link href={`/books/${book?.slug}`} target="_blank">
-                        <DetailButton
-                          label={tPublic("detailsBtn")}
-                          className="w-full sm:w-auto font-bold h-9"
-                        />
-                      </Link>
-                    </div>
                   </div>
-
-                  {/* Per-book Late Fine Info */}
-                  {borrow.status === "open" && detail.status === "borrowed" && borrow.estimated_late_fine?.is_late && (
-                    <div className="mt-6 rounded-3xl border border-border/60 bg-muted/20 p-4 sm:p-5 shadow-sm">
-                      <div className="space-y-2">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="space-y-1">
-                            <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-rose-600">
-                              <Clock className="h-4 w-4" />
-                              {borrow.estimated_late_fine.fine_name ?? t("overdueAlertTitle")}
-                            </p>
-                            <p className="font-semibold text-foreground">
-                              {t("lateFineInfo", { days: borrow.estimated_late_fine.days_late })}
-                            </p>
-                          </div>
-                          <span className="text-lg font-black text-rose-600">
-                            {new Intl.NumberFormat("id-ID", {
-                              style: "currency",
-                              currency: "IDR",
-                              minimumFractionDigits: 0,
-                            }).format(borrow.estimated_late_fine.fine_per_book * borrow.estimated_late_fine.days_late)}
-                          </span>
-                        </div>
-                        {(borrow.estimated_late_fine.fine_description || t("overdueWarningNote")) && (
-                          <p className="text-sm leading-relaxed text-muted-foreground">
-                            {borrow.estimated_late_fine.fine_description || t("overdueWarningNote")}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Per-book Lost Fine Info */}
-                  {detail.status === "lost" && (
-                    <div className="mt-6 rounded-3xl border border-border/60 bg-rose-50/20 p-4 sm:p-5 shadow-sm">
-                      <div className="space-y-2">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="space-y-1">
-                            <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-rose-600">
-                              <AlertCircle className="h-4 w-4" />
-                              {t("lostFineInfo")}
-                            </p>
-                            <p className="font-semibold text-foreground">
-                              {t("lostFineValueNote")}
-                            </p>
-                          </div>
-                          <span className="text-lg font-black text-rose-600">
-                            {new Intl.NumberFormat("id-ID", {
-                              style: "currency",
-                              currency: "IDR",
-                              minimumFractionDigits: 0,
-                            }).format(Number(book?.price ?? 0))}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                </SlideIn>
               );
             })}
 
           {showRequested &&
             requestedBooks.map((detail) => (
-              <div
+              <SlideIn
                 key={detail.id}
-                className="flex items-start gap-3 rounded-lg border bg-card p-4 mx-6 my-3 hover:shadow-md transition-shadow"
+                direction="up"
+                distance={20}
+                className="p-6 flex items-start gap-5 hover:bg-muted/30 transition-colors"
               >
-                <BookOpen className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                <div className="flex-1 min-w-0 space-y-1">
-                  <p className="font-medium text-sm truncate">
+                <div className="p-3 bg-primary/10 rounded-2xl text-primary shrink-0">
+                  <BookOpen className="h-6 w-6" />
+                </div>
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <p className="text-lg font-black text-foreground truncate">
                     {detail.book?.title || tCommon("noData")}
                   </p>
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Clock className="h-3 w-3" />
+                  <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                    <Clock className="h-3.5 w-3.5" />
                     <span>{t("pendingCopyAssignment")}</span>
                   </div>
                 </div>
-              </div>
+              </SlideIn>
             ))}
-        </div>
+        </StaggerContainer>
       </CardContent>
       <ReportLostDialog
         open={reportDialogOpen}

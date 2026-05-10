@@ -29,9 +29,16 @@ export default function PaymentSummary({
         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
           {t("totalPayment")}
         </p>
-        <p className="text-3xl md:text-4xl font-black text-emerald-500 tracking-tight">
-          {formatCurrency(totalAmount)}
-        </p>
+        <div className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-3">
+          <p className="text-3xl md:text-4xl font-black text-emerald-500 tracking-tight">
+            {formatCurrency(totalAmount)}
+          </p>
+          {itemDetails?.original_amount && Number(itemDetails.original_amount) > Number(totalAmount) && (
+            <p className="text-sm md:text-lg font-bold text-muted-foreground line-through decoration-rose-500 decoration-2">
+              {formatCurrency(Number(itemDetails.original_amount))}
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-4 w-full md:w-auto">

@@ -10,18 +10,19 @@ interface MemberBadgeProps {
   showIcon?: boolean;
 }
 
-export function MemberBadgeIcon({ className }: { className?: string }) {
+export function MemberBadgeIcon({ className, size = 16 }: { className?: string; size?: number }) {
   return (
     <Badge
       variant="outline"
       className={cn(
-        "relative overflow-hidden group h-4 w-4 p-0 flex items-center justify-center shrink-0 border-amber-400/20 dark:border-amber-400/30 bg-amber-400/5 dark:bg-amber-400/10 backdrop-blur-sm text-amber-500 transition-all duration-300 hover:shadow-lg hover:shadow-amber-400/30",
+        "relative overflow-hidden group p-0 flex items-center justify-center shrink-0 border-amber-400/20 dark:border-amber-400/30 bg-amber-400/5 dark:bg-amber-400/10 backdrop-blur-sm text-amber-500 transition-all duration-300 hover:shadow-lg hover:shadow-amber-400/30",
         className
       )}
+      style={{ width: size, height: size }}
     >
       <div className="absolute inset-0 bg-linear-to-r from-amber-400/0 via-amber-400/10 to-amber-400/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
       <div className="flex items-center justify-center relative z-10">
-        <Crown className="w-3 h-3 animate-pulse" />
+        <Crown style={{ width: size * 0.75, height: size * 0.75 }} className="animate-pulse" />
       </div>
     </Badge>
   );

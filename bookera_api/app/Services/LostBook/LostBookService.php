@@ -141,8 +141,9 @@ class LostBookService
                     $activeMembership = $borrow->user->active_membership;
                     $discountPercentage = 0;
                     if ($activeMembership) {
-                        $discount = \App\Models\MembershipDiscount::where('discount_key', 'fine_lost')
-                            ->first();
+                        $discount = \App\Models\MembershipDiscount::whereHas('discountKey', function ($query) {
+                            $query->where('key', 'fine_lost');
+                        })->first();
                         
                         if ($discount && $discount->discount_percentage > 0) {
                             $discountPercentage = (float) $discount->discount_percentage;
@@ -191,18 +192,20 @@ class LostBookService
                 );
             });
 
-            ActivityLogger::log(
-                'create',
-                'lost_book',
-                "Lost book reported for borrow #{$borrow->id}",
-                [
-                    'borrow_id' => $borrow->id,
-                    'lost_book_id' => $lostBook->id,
-                    'detail_ids' => $details->pluck('id')->values()->all(),
-                ],
-                null,
-                $lostBook
-            );
+            if ($lostBook) {
+                ActivityLogger::log(
+                    'create',
+                    'lost_book',
+                    "Lost book reported for borrow #{$borrow->id}",
+                    [
+                        'borrow_id' => $borrow->id,
+                        'lost_book_id' => $lostBook->id,
+                        'detail_ids' => $details->pluck('id')->values()->all(),
+                    ],
+                    null,
+                    $lostBook
+                );
+            }
 
             return $borrow->load([
                 'borrowDetails.bookCopy.book.authors',

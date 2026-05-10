@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\MembershipController;
 use App\Http\Controllers\Api\Admin\MembershipPlanController;
 use App\Http\Controllers\Api\Admin\MembershipDiscountController;
+use App\Http\Controllers\Api\Admin\DiscountKeyController;
 
 use App\Http\Controllers\Api\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Api\NewsController;
@@ -270,6 +271,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('membership-plans', [MembershipPlanController::class, 'index']);
         Route::put('membership-plans/{id}', [MembershipPlanController::class, 'update']);
         Route::apiResource('membership-discounts', MembershipDiscountController::class);
+        Route::apiResource('discount-keys', DiscountKeyController::class)->only(['index', 'store', 'destroy']);
 
         // Reservation management
         Route::prefix('reservations')->group(function () {

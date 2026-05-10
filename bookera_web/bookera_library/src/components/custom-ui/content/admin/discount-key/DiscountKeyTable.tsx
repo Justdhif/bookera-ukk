@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { MembershipDiscount } from "@/types/membership-discount";
+import { DiscountKey } from "@/types/membership-discount";
 import {
   Table,
   TableBody,
@@ -10,29 +10,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tag, Percent, Key } from "lucide-react";
+import { Tag, Key, Info } from "lucide-react";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Badge } from "@/components/ui/badge";
 import DeleteButton from "@/components/custom-ui/button/DeleteButton";
 import { motion } from "framer-motion";
 import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 
-interface MembershipDiscountTableProps {
-  data: MembershipDiscount[];
+interface DiscountKeyTableProps {
+  data: DiscountKey[];
   onDelete: (id: number) => void;
 }
 
-export default function MembershipDiscountTable({
+export default function DiscountKeyTable({
   data,
   onDelete,
-}: MembershipDiscountTableProps) {
-  const t = useTranslations("membershipDiscount");
+}: DiscountKeyTableProps) {
+  const t = useTranslations("discountKey");
   const tCommon = useTranslations("common");
 
   if (data.length === 0) {
     return (
       <EmptyState
-        icon={<Tag />}
+        icon={<Key />}
         title={t("noData")}
         description={t("noDataDesc")}
       />
@@ -47,7 +47,7 @@ export default function MembershipDiscountTable({
             <TableHead className="w-16 text-center font-semibold">{t("noCol")}</TableHead>
             <TableHead className="font-semibold">{t("name")}</TableHead>
             <TableHead className="font-semibold">{t("key")}</TableHead>
-            <TableHead className="font-semibold">{t("percentage")}</TableHead>
+            <TableHead className="font-semibold">{t("description")}</TableHead>
             <TableHead className="text-right font-semibold pr-6">{t("actionsCol")}</TableHead>
           </TableRow>
         </TableHeader>
@@ -57,9 +57,9 @@ export default function MembershipDiscountTable({
           data-slot="table-body"
           className="[&_tr:last-child]:border-0"
         >
-          {data.map((discount, index) => (
+          {data.map((item, index) => (
             <SlideIn
-              key={discount.id}
+              key={item.id}
               as={motion.tr}
               direction="up"
               distance={20}
@@ -75,26 +75,27 @@ export default function MembershipDiscountTable({
                   <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
                     <Tag className="w-4 h-4 text-primary" />
                   </div>
-                  <span className="font-semibold text-foreground">{discount.discount_key?.name}</span>
+                  <span className="font-semibold text-foreground">{item.name}</span>
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant="outline" className="font-mono text-[10px] uppercase bg-muted/30">
+                <Badge variant="outline" className="font-mono text-[10px] uppercase bg-muted/30 text-primary border-primary/20">
                   <Key className="w-3 h-3 mr-1 opacity-50" />
-                  {discount.discount_key?.key}
+                  {item.key}
                 </Badge>
               </TableCell>
               <TableCell>
-                <span className="font-semibold text-foreground">
-                  {new Intl.NumberFormat("id-ID", {
-                    maximumFractionDigits: 2,
-                  }).format(Number(discount.discount_percentage))}%
-                </span>
+                <div className="flex items-center gap-2 max-w-md">
+                   <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                   <p className="text-sm text-muted-foreground line-clamp-1 italic">
+                    {item.description || "-"}
+                   </p>
+                </div>
               </TableCell>
               <TableCell className="pr-6">
                 <div className="flex justify-end items-center gap-2">
                   <DeleteButton
-                    onClick={() => onDelete(discount.id)}
+                    onClick={() => onDelete(item.id)}
                     label={tCommon("delete")}
                   />
                 </div>

@@ -19,6 +19,7 @@ export interface Fine {
   fine_type_id: number;
   amount: number;
   original_amount?: number;
+  discount_percentage?: number;
   discount_amount?: number;
   paid_at?: string;
   status: "unpaid" | "paid" | "waived";

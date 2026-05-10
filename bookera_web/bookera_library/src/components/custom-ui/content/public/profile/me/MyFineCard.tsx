@@ -161,18 +161,30 @@ export default function MyFineCard({ group, index, onRefresh }: MyFineCardProps)
                         {format(new Date(fine.created_at), "dd MMM yyyy")}
                       </span>
 
-                      <span
-                        className={cn(
-                          "text-sm font-bold text-right",
-                          fine.status === "unpaid"
-                            ? "text-destructive dark:text-red-400"
-                            : fine.status === "paid"
-                            ? "text-brand-primary"
-                            : "text-muted-foreground line-through"
+                      <div className="flex flex-col items-end">
+                        <span
+                          className={cn(
+                            "text-sm font-bold",
+                            fine.status === "unpaid"
+                              ? "text-destructive dark:text-red-400"
+                              : fine.status === "paid"
+                              ? "text-brand-primary"
+                              : "text-muted-foreground line-through"
+                          )}
+                        >
+                          {formatCurrency(Number(fine.amount))}
+                        </span>
+                        {fine.original_amount && Number(fine.original_amount) > Number(fine.amount) && (
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[10px] text-muted-foreground line-through decoration-rose-500 decoration-2">
+                              {formatCurrency(Number(fine.original_amount))}
+                            </span>
+                            <span className="text-[9px] font-black text-emerald-600 bg-emerald-500/10 px-1 rounded uppercase tracking-tighter">
+                              -{fine.discount_percentage}%
+                            </span>
+                          </div>
                         )}
-                      >
-                        {formatCurrency(Number(fine.amount))}
-                      </span>
+                      </div>
 
                       <div className="flex justify-end">
                         {fine.status === "unpaid" && (
@@ -197,7 +209,8 @@ export default function MyFineCard({ group, index, onRefresh }: MyFineCardProps)
                           <Button
                              size="sm"
                              variant="outline"
-                             className="h-7 px-2 text-[10px] font-bold uppercase border-brand-primary/20 text-brand-primary pointer-events-none"
+                             className="h-7 px-2 text-[10px] font-bold uppercase border-brand-primary/20 text-brand-primary"
+                             onClick={() => router.push(`/payment/success?type=fine&id=${fine.id}`)}
                           >
                              Invoice
                           </Button>

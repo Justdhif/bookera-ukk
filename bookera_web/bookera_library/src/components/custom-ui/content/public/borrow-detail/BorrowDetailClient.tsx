@@ -68,46 +68,52 @@ export default function BorrowDetailClient() {
           {t("detailNotFound")}
         </FadeIn>
       ) : (
-        <div className="space-y-6">
-          <FadeUp delay={0.1}>
-            <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          {/* Sticky Sidebar */}
+          <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-6">
+            <FadeUp delay={0.1}>
               <BorrowQrCard borrow={borrow} />
+            </FadeUp>
+            <FadeUp delay={0.15}>
               <BorrowInfoCard borrow={borrow} />
-            </div>
-          </FadeUp>
-
-          <FadeUp delay={0.2}>
-            <BorrowBooksCard borrow={borrow} onUpdate={fetchBorrow} />
-          </FadeUp>
-
-          {borrow.fines && borrow.fines.length > 0 && (
-            <FadeUp delay={0.3}>
-              <BorrowFinesCard fines={borrow.fines} />
             </FadeUp>
-          )}
+          </div>
 
-          {borrow.status === "close" && (
-            <FadeUp delay={0.4}>
-              <Card className="border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-500/10 shadow-sm border-2 overflow-hidden relative">
-                <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-                  <CheckCircle2 className="h-32 w-32 text-emerald-500" />
-                </div>
-                <CardContent className="p-10 flex flex-col items-center justify-center text-center space-y-6 relative">
-                  <div className="p-5 bg-background dark:bg-slate-900 rounded-3xl shadow-2xl text-emerald-500 border border-emerald-500/20">
-                    <CheckCircle2 className="h-16 w-16" />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-4xl font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter">
-                      {t("borrowFinishedTitle")}
-                    </h3>
-                    <p className="text-muted-foreground font-medium text-xl italic max-w-2xl">
-                      {closedDescription}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            <FadeUp delay={0.2}>
+              <BorrowBooksCard borrow={borrow} onUpdate={fetchBorrow} />
             </FadeUp>
-          )}
+
+            {borrow.fines && borrow.fines.length > 0 && (
+              <FadeUp delay={0.3}>
+                <BorrowFinesCard fines={borrow.fines} />
+              </FadeUp>
+            )}
+
+            {borrow.status === "close" && (
+              <FadeUp delay={0.4}>
+                <Card className="border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-500/10 shadow-sm border-2 overflow-hidden relative">
+                  <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                    <CheckCircle2 className="h-32 w-32 text-emerald-500" />
+                  </div>
+                  <CardContent className="p-10 flex flex-col items-center justify-center text-center space-y-6 relative">
+                    <div className="p-5 bg-background dark:bg-slate-900 rounded-3xl shadow-2xl text-emerald-500 border border-emerald-500/20">
+                      <CheckCircle2 className="h-16 w-16" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-4xl font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter">
+                        {t("borrowFinishedTitle")}
+                      </h3>
+                      <p className="text-muted-foreground font-medium text-xl italic max-w-2xl">
+                        {closedDescription}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </FadeUp>
+            )}
+          </div>
         </div>
       )}
     </StaggerContainer>

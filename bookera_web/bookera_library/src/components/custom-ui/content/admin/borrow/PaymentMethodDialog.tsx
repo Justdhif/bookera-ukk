@@ -34,7 +34,7 @@ export function PaymentMethodDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[400px] rounded-[2.5rem] p-0 overflow-hidden border-0 shadow-2xl">
+      <DialogContent className="sm:max-w-[400px] rounded-[2.5rem] p-0 overflow-hidden border-0 shadow-2xl gap-0">
         <div className="bg-brand-primary p-8 text-white relative overflow-hidden">
           <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
             <Banknote className="h-24 w-24" />
@@ -48,7 +48,6 @@ export function PaymentMethodDialog({
             </DialogDescription>
           </DialogHeader>
         </div>
-        
         <div className="p-6 space-y-4 bg-card">
           <Button
             variant="outline"

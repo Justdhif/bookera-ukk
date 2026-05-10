@@ -33,6 +33,7 @@ import {
   Shield,
   Newspaper,
   Percent,
+  Key,
 } from "lucide-react";
 import { SidebarUserFooter } from "@/components/custom-ui/sidebar/SidebarUserFooter";
 import { cn } from "@/lib/utils";
@@ -131,10 +132,21 @@ const getMenuGroups = (t: any, role: string | undefined): MenuGroup[] => [
         href: "/admin/lost-books",
         icon: AlertCircle,
       },
+    ],
+  },
+  {
+    title: t("promotions"),
+    roles: ["admin"],
+    items: [
       {
         title: t("membershipDiscounts"),
         href: "/admin/membership-discounts",
         icon: Percent,
+      },
+      {
+        title: t("discountKeys"),
+        href: "/admin/discount-keys",
+        icon: Key,
       },
     ],
   },

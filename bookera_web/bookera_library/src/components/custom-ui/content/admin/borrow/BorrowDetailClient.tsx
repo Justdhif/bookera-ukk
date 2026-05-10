@@ -249,94 +249,98 @@ export default function BorrowDetailClient() {
           {t("noBorrowFound")}
         </div>
       ) : (
-        <div className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-3">
-            <FadeUp delay={0.1} className="lg:col-span-1">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          {/* Sticky Sidebar */}
+          <div className="lg:col-span-1 space-y-4 lg:sticky lg:top-2">
+            <FadeUp delay={0.1}>
               <BorrowQrCard borrow={borrow} />
             </FadeUp>
-            <FadeUp delay={0.15} className="lg:col-span-2">
+            <FadeUp delay={0.15}>
               <BorrowInfoCard borrow={borrow} />
             </FadeUp>
           </div>
 
-          <FadeUp delay={0.2}>
-            <BorrowBooksCard
-              borrow={borrow}
-              returnStates={returnStates}
-              onUpdateReturnState={handleUpdateReturnState}
-              fineTypes={fineTypes}
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
-            />
-          </FadeUp>
-
-          {borrow.fines && borrow.fines.length > 0 && (
-            <FadeUp delay={0.25}>
-              <BorrowFinesCard fines={borrow.fines} onUpdate={() => fetchBorrow(fineTypes)} />
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            <FadeUp delay={0.2}>
+              <BorrowBooksCard
+                borrow={borrow}
+                returnStates={returnStates}
+                onUpdateReturnState={handleUpdateReturnState}
+                fineTypes={fineTypes}
+                onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+              />
             </FadeUp>
-          )}
 
-          {canComplete && (
-            <SlideIn direction="up" distance={30} delay={0.3}>
-              <Card className="border-primary/20 bg-primary/5 dark:bg-primary/10 shadow-xl overflow-hidden relative">
-                <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-                  <CheckCircle2 className="h-32 w-32 text-primary" />
-                </div>
-                <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-8 relative">
-                  <div className="space-y-2 text-center md:text-left">
-                    <h3 className="text-3xl font-black text-primary flex items-center justify-center md:justify-start gap-3 tracking-tighter uppercase">
-                      <div className="p-2 bg-primary/20 rounded-xl">
-                        <CheckCircle2 className="h-7 w-7" />
-                      </div>
-                      {t("readyToCompleteTitle")}
-                    </h3>
-                    <p className="text-muted-foreground font-medium text-lg max-w-md">
-                      {t("readyToCompleteDesc")}
-                    </p>
-                  </div>
-                  <Button
-                    size="lg"
-                    className="h-16 px-10 text-xl font-black gap-4 shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all group"
-                    variant="brand"
-                    onClick={handleComplete}
-                    disabled={isCompleting}
-                  >
-                    {isCompleting ? (
-                      <Loader2 className="h-7 w-7 animate-spin" />
-                    ) : (
-                      <>
-                        {t("completeBorrowBtn")}
-                        <ArrowRight className="h-7 w-7 group-hover:translate-x-1 transition-transform" />
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
-            </SlideIn>
-          )}
+            {borrow.fines && borrow.fines.length > 0 && (
+              <FadeUp delay={0.25}>
+                <BorrowFinesCard fines={borrow.fines} onUpdate={() => fetchBorrow(fineTypes)} />
+              </FadeUp>
+            )}
 
-          {borrow.status === "close" && (
-            <FadeUp delay={0.3}>
-              <Card className="border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-500/10 shadow-sm border-2 overflow-hidden relative">
-                <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-                  <CheckCircle2 className="h-32 w-32 text-emerald-500" />
-                </div>
-                <CardContent className="p-10 flex flex-col items-center justify-center text-center space-y-6 relative">
-                  <div className="p-5 bg-background dark:bg-slate-900 rounded-3xl shadow-2xl text-emerald-500 border border-emerald-500/20">
-                    <CheckCircle2 className="h-16 w-16" />
+            {canComplete && (
+              <SlideIn direction="up" distance={30} delay={0.3}>
+                <Card className="border-primary/20 bg-primary/5 dark:bg-primary/10 shadow-xl overflow-hidden relative">
+                  <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                    <CheckCircle2 className="h-32 w-32 text-primary" />
                   </div>
-                  <div className="space-y-2">
-                    <h3 className="text-4xl font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter">
-                      {t("borrowFinishedTitle")}
-                    </h3>
-                    <p className="text-muted-foreground font-medium text-xl italic max-w-2xl">
-                      {closedDescription}
-                    </p>
+                  <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-8 relative">
+                    <div className="space-y-2 text-center md:text-left">
+                      <h3 className="text-3xl font-black text-primary flex items-center justify-center md:justify-start gap-3 tracking-tighter uppercase">
+                        <div className="p-2 bg-primary/20 rounded-xl">
+                          <CheckCircle2 className="h-7 w-7" />
+                        </div>
+                        {t("readyToCompleteTitle")}
+                      </h3>
+                      <p className="text-muted-foreground font-medium text-lg max-w-md">
+                        {t("readyToCompleteDesc")}
+                      </p>
+                    </div>
+                    <Button
+                      size="lg"
+                      className="h-16 px-10 text-xl font-black gap-4 shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all group"
+                      variant="brand"
+                      onClick={handleComplete}
+                      disabled={isCompleting}
+                    >
+                      {isCompleting ? (
+                        <Loader2 className="h-7 w-7 animate-spin" />
+                      ) : (
+                        <>
+                          {t("completeBorrowBtn")}
+                          <ArrowRight className="h-7 w-7 group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </SlideIn>
+            )}
+
+            {borrow.status === "close" && (
+              <FadeUp delay={0.3}>
+                <Card className="border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-500/10 shadow-sm border-2 overflow-hidden relative">
+                  <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                    <CheckCircle2 className="h-32 w-32 text-emerald-500" />
                   </div>
-                </CardContent>
-              </Card>
-            </FadeUp>
-          )}
+                  <CardContent className="p-10 flex flex-col items-center justify-center text-center space-y-6 relative">
+                    <div className="p-5 bg-background dark:bg-slate-900 rounded-3xl shadow-2xl text-emerald-500 border border-emerald-500/20">
+                      <CheckCircle2 className="h-16 w-16" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-4xl font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter">
+                        {t("borrowFinishedTitle")}
+                      </h3>
+                      <p className="text-muted-foreground font-medium text-xl italic max-w-2xl">
+                        {closedDescription}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </FadeUp>
+            )}
+          </div>
         </div>
       )}
     </StaggerContainer>

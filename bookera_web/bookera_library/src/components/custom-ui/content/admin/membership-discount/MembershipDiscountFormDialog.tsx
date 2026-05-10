@@ -11,17 +11,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { membershipDiscountService } from "@/services/membership-discount.service";
 import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DiscountKey } from "@/types/membership-discount";
 
 interface FormData {
-  discount_key: string;
-  name: string;
+  discount_key_id: string;
   discount_percentage: string;
-  description: string;
 }
 
 export default function MembershipDiscountFormDialog({
@@ -36,23 +41,38 @@ export default function MembershipDiscountFormDialog({
   const t = useTranslations("membershipDiscount");
   const tCommon = useTranslations("common");
   const [formData, setFormData] = useState<FormData>({
-    discount_key: "",
-    name: "",
+    discount_key_id: "",
     discount_percentage: "0",
-    description: "",
   });
+  const [discountKeys, setDiscountKeys] = useState<DiscountKey[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [isFetchingKeys, setIsFetchingKeys] = useState(false);
 
   useEffect(() => {
+    const fetchKeys = async () => {
+      setIsFetchingKeys(true);
+      try {
+        const response = await membershipDiscountService.getDiscountKeys();
+        const resData = response.data.data;
+        // Handle both direct array and paginated response
+        if (Array.isArray(resData)) {
+          setDiscountKeys(resData);
+        } else if (resData && typeof resData === 'object' && 'data' in resData) {
+          setDiscountKeys(resData.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch discount keys", err);
+      } finally {
+        setIsFetchingKeys(false);
+      }
+    };
+
     if (open) {
       setFormData({
-        discount_key: "",
-        name: "",
+        discount_key_id: "",
         discount_percentage: "0",
-        description: "",
       });
-      setErrors({});
+      fetchKeys();
     }
   }, [open]);
 
@@ -68,19 +88,13 @@ export default function MembershipDiscountFormDialog({
 
   const isFormValid = (): boolean => {
     const requiredFieldsFilled = 
-      formData.discount_key.trim() !== "" && 
-      formData.name.trim() !== "" && 
+      formData.discount_key_id !== "" && 
       formData.discount_percentage.trim() !== "";
     
     if (!requiredFieldsFilled) return false;
 
     const percentage = Number(formData.discount_percentage);
     if (isNaN(percentage) || percentage < 0 || percentage > 100) return false;
-
-    const hasValidationErrors = Object.values(errors).some(
-      (error) => error === true,
-    );
-    if (hasValidationErrors) return false;
 
     return true;
   };
@@ -93,17 +107,13 @@ export default function MembershipDiscountFormDialog({
     setIsLoading(true);
     try {
       await membershipDiscountService.create({
-        discount_key: formData.discount_key,
-        name: formData.name,
+        discount_key_id: Number(formData.discount_key_id),
         discount_percentage: Number(formData.discount_percentage),
-        description: formData.description || undefined,
       });
       toast.success(t("successAdd"));
       setFormData({
-        discount_key: "",
-        name: "",
+        discount_key_id: "",
         discount_percentage: "0",
-        description: "",
       });
       setOpen(false);
       onSuccess();
@@ -116,7 +126,7 @@ export default function MembershipDiscountFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-xl">
         <DialogHeader>
           <DialogTitle>
             {t("add")}
@@ -126,39 +136,36 @@ export default function MembershipDiscountFormDialog({
           <div className="space-y-4">
             <FadeUp delay={0.1}>
               <div className="space-y-2">
-                <Label htmlFor="discount_key" variant="required">
+                <Label htmlFor="discount_key_id" variant="required">
                   {t("key")}
                 </Label>
-                <Input
-                  id="discount_key"
-                  name="discount_key"
-                  placeholder="e.g., student_discount"
-                  value={formData.discount_key}
-                  onChange={handleInputChange}
-                />
+                <Select
+                  value={formData.discount_key_id}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, discount_key_id: value }))
+                  }
+                  disabled={isFetchingKeys}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={isFetchingKeys ? "Loading..." : t("selectKey") || "Select Discount Type"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {discountKeys.map((key) => (
+                      <SelectItem key={key.id} value={key.id.toString()}>
+                        {key.name} ({key.key})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formData.discount_key_id && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {discountKeys.find(k => k.id.toString() === formData.discount_key_id)?.description}
+                  </p>
+                )}
               </div>
             </FadeUp>
 
             <FadeUp delay={0.2}>
-              <div className="space-y-2">
-                <Label htmlFor="name" variant="required">
-                  {t("name")}
-                </Label>
-                <Input
-                  id="name"
-                  name="name"
-                  placeholder={t("namePlaceholder") || t("name")}
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  validationType="letters-only"
-                  onValidationChange={(isValid: boolean) =>
-                    setErrors((prev) => ({ ...prev, name: !isValid }))
-                  }
-                />
-              </div>
-            </FadeUp>
-
-            <FadeUp delay={0.3}>
               <div className="space-y-4">
                 <Label htmlFor="discount_percentage" variant="required">
                   {t("percentage")}
@@ -199,24 +206,9 @@ export default function MembershipDiscountFormDialog({
                 </div>
               </div>
             </FadeUp>
-
-            <FadeUp delay={0.4}>
-              <div className="space-y-2">
-                <Label htmlFor="description">{tCommon("description")}</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder={t("desc")}
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows={4}
-                  className="resize-none"
-                />
-              </div>
-            </FadeUp>
           </div>
 
-          <FadeUp delay={0.5}>
+          <FadeUp delay={0.3}>
             <Button
               onClick={handleSubmit}
               variant="submit"

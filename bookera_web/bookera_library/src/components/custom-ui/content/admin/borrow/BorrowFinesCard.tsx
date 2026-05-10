@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, AlertCircle, Loader2, Banknote, QrCode } from "lucide-react";
+import { CreditCard, AlertCircle, Loader2, Banknote, QrCode, ReceiptText } from "lucide-react";
 import { fineService } from "@/services/fine.service";
 import { toast } from "sonner";
 import { useState, useEffect, useCallback } from "react";
@@ -19,6 +19,7 @@ import { useTranslations } from "next-intl";
 import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 import { cn } from "@/lib/utils";
 import { PaymentMethodDialog } from "./PaymentMethodDialog";
+import PaymentSuccessDialog from "@/components/custom-ui/content/public/payment/PaymentSuccessDialog";
 
 interface BorrowFinesCardProps {
   fines: Fine[];
@@ -31,6 +32,8 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
   const tPublic = useTranslations("public");
   const [loadingId, setLoadingId] = useState<number | null>(null);
   const [isMethodDialogOpen, setIsMethodDialogOpen] = useState(false);
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [successId, setSuccessId] = useState<number | null>(null);
 
   const handlePayCash = async (fineId: number) => {
     try {
@@ -38,6 +41,9 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
       await fineService.payCash(fineId);
       toast.success("Fine paid via Cash!");
       onUpdate();
+
+      setSuccessId(fineId);
+      setIsSuccessDialogOpen(true);
     } catch (error: any) {
       toast.error(error.response?.data?.message || t("markAsPaidError"));
     } finally {
@@ -78,9 +84,10 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
       onUpdate();
       setIsMethodDialogOpen(false);
       
-      // Redirect to invoice page for the last fine (or generic success)
+      // Show success dialog instead of immediate redirect
       if (lastFineId) {
-        router.push(`/admin/payment/success?type=fine&id=${lastFineId}`);
+        setSuccessId(lastFineId);
+        setIsSuccessDialogOpen(true);
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || t("markAsPaidError"));
@@ -116,22 +123,41 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
             </CardDescription>
           </div>
           
-          {unpaidFines.length > 0 && (
-            <Button
-              size="sm"
-              variant="brand"
-              className="h-10 px-6 font-black gap-2 shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all shrink-0"
-              onClick={() => setIsMethodDialogOpen(true)}
-              disabled={loadingId !== null}
-            >
-              {loadingId === -1 ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Banknote className="h-4 w-4" />
-              )}
-              {t("payAllBtn") || `Pay All (${formatCurrency(totalUnpaid)})`}
-            </Button>
-          )}
+          <div className="flex items-center gap-3">
+            {fines.some(f => f.status === "paid") && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-10 px-6 font-black gap-2 border-brand-primary/20 text-brand-primary hover:bg-brand-primary/5 transition-all shrink-0 shadow-sm"
+                onClick={() => {
+                  const paidFine = fines.find(f => f.status === "paid");
+                  if (paidFine) {
+                    router.push(`/admin/payment/success?type=fine&id=${paidFine.id}`);
+                  }
+                }}
+              >
+                <ReceiptText className="h-4 w-4" />
+                Invoice
+              </Button>
+            )}
+
+            {unpaidFines.length > 0 && (
+              <Button
+                size="sm"
+                variant="brand"
+                className="h-10 px-6 font-black gap-2 shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all shrink-0"
+                onClick={() => setIsMethodDialogOpen(true)}
+                disabled={loadingId !== null}
+              >
+                {loadingId === -1 ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Banknote className="h-4 w-4" />
+                )}
+                {t("payAllBtn") || `Pay All (${formatCurrency(totalUnpaid)})`}
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="relative">
@@ -152,22 +178,28 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
                     {fine.fine_type?.name || t("fine")}
                   </p>
                   <div className="flex flex-col gap-1">
-                    <p className="text-2xl font-black tracking-tight text-foreground">
-                      {formatCurrency(Number(fine.amount))}
-                    </p>
-                    {fine.original_amount && Number(fine.original_amount) > Number(fine.amount) && (
-                      <div className="flex items-center gap-2">
-                        <p className="text-[10px] font-bold text-muted-foreground line-through decoration-rose-500/50">
+                    <div className="flex items-baseline gap-2.5">
+                      <p className="text-2xl font-black tracking-tight text-foreground">
+                        {formatCurrency(Number(fine.amount))}
+                      </p>
+                      {fine.original_amount && Number(fine.original_amount) > Number(fine.amount) && (
+                        <p className="text-xs font-bold text-muted-foreground line-through decoration-rose-500 decoration-2">
                           {formatCurrency(Number(fine.original_amount))}
                         </p>
-                        {fine.membership_discount && (
-                          <Badge 
-                            variant="outline" 
-                            className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/5 text-emerald-600 border-emerald-500/20 tracking-tighter"
-                          >
-                            {fine.membership_discount.name} -{fine.membership_discount.discount_percentage}%
-                          </Badge>
-                        )}
+                      )}
+                    </div>
+                    {fine.original_amount && Number(fine.original_amount) > Number(fine.amount) && (
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <Badge 
+                          variant="outline" 
+                          className="h-5 px-2 text-[9px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-emerald-500/20 tracking-wide flex items-center gap-1"
+                        >
+                          <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                          Member Discount -{fine.discount_percentage}%
+                        </Badge>
+                        <span className="text-[10px] font-bold text-emerald-600/80 italic">
+                          (Saved {formatCurrency(Number(fine.original_amount) - Number(fine.amount))})
+                        </span>
                       </div>
                     )}
                   </div>
@@ -220,6 +252,14 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
         onPayMidtrans={handlePayAllMidtrans}
         totalAmount={totalUnpaid}
         loading={loadingId === -1}
+      />
+      <PaymentSuccessDialog
+        isOpen={isSuccessDialogOpen}
+        onOpenChange={setIsSuccessDialogOpen}
+        onConfirm={() => {
+          setIsSuccessDialogOpen(false);
+          router.push(`/admin/payment/success?type=fine&id=${successId}`);
+        }}
       />
     </Card>
   );

@@ -13,18 +13,14 @@ export const membershipDiscountService = {
     }),
 
   create: (payload: {
-    discount_key: string;
-    name: string;
+    discount_key_id: number;
     discount_percentage: number;
-    description?: string;
   }) => api.post<ApiResponse<MembershipDiscount>>("/admin/membership-discounts", payload),
 
   update: (
     id: number,
     payload: {
-      name: string;
       discount_percentage: number;
-      description?: string;
     },
   ) =>
     api.put<ApiResponse<MembershipDiscount>>(
@@ -34,4 +30,7 @@ export const membershipDiscountService = {
 
   delete: (id: number) =>
     api.delete<ApiResponse<null>>(`/admin/membership-discounts/${id}`),
+
+  getDiscountKeys: () =>
+    api.get<ApiResponse<import("@/types/membership-discount").DiscountKeyListResponse>>("/admin/discount-keys"),
 };

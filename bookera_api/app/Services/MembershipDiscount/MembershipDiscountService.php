@@ -10,13 +10,13 @@ class MembershipDiscountService
 {
     public function getAll(array $filters): LengthAwarePaginator
     {
-        $query = MembershipDiscount::query();
+        $query = MembershipDiscount::with('discountKey');
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
+            $query->whereHas('discountKey', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('discount_key', 'like', "%{$search}%");
+                    ->orWhere('key', 'like', "%{$search}%");
             });
         }
 
@@ -26,11 +26,12 @@ class MembershipDiscountService
     public function create(array $data): MembershipDiscount
     {
         $discount = MembershipDiscount::create($data);
+        $discount->load('discountKey');
 
         ActivityLogger::log(
             'create',
             'membership_discount',
-            "Created membership discount: {$discount->name}",
+            "Created membership discount for: {$discount->discountKey->name}",
             $discount->toArray(),
             null,
             $discount
@@ -44,11 +45,12 @@ class MembershipDiscountService
         $oldData = $discount->toArray();
 
         $discount->update($data);
+        $discount->load('discountKey');
 
         ActivityLogger::log(
             'update',
             'membership_discount',
-            "Updated membership discount: {$discount->name}",
+            "Updated membership discount for: {$discount->discountKey->name}",
             $discount->toArray(),
             $oldData,
             $discount
@@ -61,14 +63,15 @@ class MembershipDiscountService
     {
         $deletedId = $discount->id;
         $discountData = $discount->toArray();
-        $discountName = $discount->name;
+        $discount->load('discountKey');
+        $discountName = $discount->discountKey->name;
 
         $discount->delete();
 
         ActivityLogger::log(
             'delete',
             'membership_discount',
-            "Deleted membership discount: {$discountName}",
+            "Deleted membership discount for: {$discountName}",
             null,
             $discountData,
             null

@@ -58,20 +58,20 @@ export default function PaymentInstructions({
               {paymentData.va_number.split("").map((char, idx) => (
                 <span
                   key={idx}
-                  className="text-xl sm:text-2xl md:text-4xl font-black text-white font-mono leading-none shrink-0"
+                  className="text-xl sm:text-2xl md:text-4xl font-black text-foreground font-mono leading-none shrink-0"
                 >
                   {char}
                 </span>
               ))}
             </div>
           </div>
-
+ 
           {/* Deadline Section */}
-          <div className="flex items-center gap-3 p-3 bg-amber-500/5 border border-amber-500/10 rounded-xl w-fit">
-            <Clock className="w-3.5 h-3.5 text-amber-500" />
-            <p className="text-[10px] font-bold text-amber-200/80">
+          <div className="flex items-center gap-3 p-3 bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/20 dark:border-amber-500/10 rounded-xl w-fit">
+            <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-500" />
+            <p className="text-[10px] font-bold text-amber-800 dark:text-amber-200/80">
               {t("deadline")}:{" "}
-              <span className="text-amber-400">
+              <span className="text-amber-600 dark:text-amber-400 font-black">
                 {paymentData.expiry_time
                   ? new Date(paymentData.expiry_time).toLocaleString("id-ID", {
                       dateStyle: "medium",
@@ -121,9 +121,21 @@ export default function PaymentInstructions({
                     {t("borrowId", { defaultValue: "Pinjaman" })} #{itemDetails.borrow_id || itemDetails.id}
                   </p>
                 </div>
-                <span className="text-sm font-black text-foreground">
-                  {formatCurrency(Number(itemDetails.amount))}
-                </span>
+                <div className="flex flex-col items-end gap-0.5">
+                  <span className="text-sm font-black text-foreground">
+                    {formatCurrency(Number(itemDetails.amount))}
+                  </span>
+                  {itemDetails.original_amount && Number(itemDetails.original_amount) > Number(itemDetails.amount) && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-bold text-muted-foreground line-through decoration-rose-500 decoration-2">
+                        {formatCurrency(Number(itemDetails.original_amount))}
+                      </span>
+                      <span className="text-[9px] font-black text-emerald-600 bg-emerald-500/10 px-1 rounded">
+                        -{itemDetails.discount_percentage}%
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

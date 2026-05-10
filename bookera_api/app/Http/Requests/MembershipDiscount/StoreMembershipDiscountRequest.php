@@ -14,10 +14,8 @@ class StoreMembershipDiscountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'discount_key'        => 'required|string|unique:membership_discounts,discount_key',
-            'name'                => 'required|string|max:255',
+            'discount_key_id'     => 'required|exists:discount_keys,id|unique:membership_discounts,discount_key_id',
             'discount_percentage' => 'required|integer|min:0|max:100',
-            'description'         => 'nullable|string',
         ];
     }
 }

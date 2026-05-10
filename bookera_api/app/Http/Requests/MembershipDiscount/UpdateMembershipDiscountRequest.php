@@ -14,9 +14,7 @@ class UpdateMembershipDiscountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'                => 'required|string|max:255',
             'discount_percentage' => 'required|integer|min:0|max:100',
-            'description'         => 'nullable|string',
         ];
     }
 }
