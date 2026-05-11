@@ -105,6 +105,8 @@ class ComplaintService
 
             $complaint->load(['user.profile', 'images']);
 
+            (new ComplaintNotificationService())->notifyComplaintCreated($complaint);
+
             ActivityLogger::log(
                 'create',
                 'Complaint',
@@ -133,6 +135,8 @@ class ComplaintService
             null,
             $complaint
         );
+
+        (new ComplaintNotificationService())->notifyComplaintStatusUpdated($complaint);
 
         return $complaint;
     }

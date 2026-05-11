@@ -5,8 +5,8 @@ namespace App\Services\BookReturn;
 use App\Mail\BorrowNotificationMail;
 use App\Models\Borrow;
 use App\Services\BaseNotificationService;
+use App\Notifications\GeneralNotification;
 use App\Services\FonnteService;
-use App\Services\NotificationService as DatabaseNotificationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -63,8 +63,7 @@ class BookReturnNotificationService extends BaseNotificationService
                 'amount' => $fineAmountFormatted,
             ]);
 
-        DatabaseNotificationService::send(
-            $borrow->user_id,
+        $borrow->user->notify(new GeneralNotification(
             $title,
             $message,
             'return_processed',
@@ -75,7 +74,7 @@ class BookReturnNotificationService extends BaseNotificationService
                 'returned' => $returned,
                 'lost' => $lost,
             ]
-        );
+        ));
 
         if (! $profile || ! $profile->notification_enabled) {
             return;

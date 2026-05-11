@@ -2,15 +2,15 @@
 
 namespace App\Services\Notification;
 
-use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Notifications\DatabaseNotification as Notification;
 
 class NotificationService
 {
     public function getAll(User $user, ?string $filter = null, int $perPage = 15, ?string $module = null): LengthAwarePaginator
     {
-        $query = Notification::where('user_id', $user->id)->latest()->orderByDesc('id');
+        $query = $user->notifications()->latest();
 
         if ($filter === 'unread') {
             $query->whereNull('read_at');
@@ -19,41 +19,53 @@ class NotificationService
         }
 
         if ($module !== null) {
-            $query->where('module', $module);
+            $query->where('data->module', $module);
         }
 
-        return $query->paginate($perPage);
+        return $query->paginate($perPage)->through(fn($n) => $this->formatNotification($n));
     }
 
-    public function getById(User $user, Notification $notification): Notification
+    public function getById(User $user, Notification $notification): array
     {
-        if ($notification->user_id !== $user->id) {
+        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== get_class($user)) {
             throw new \Exception('Unauthorized access to notification');
         }
 
-        return $notification;
+        return $this->formatNotification($notification);
     }
 
-    public function markAsRead(User $user, Notification $notification): Notification
+    public function markAsRead(User $user, Notification $notification): array
     {
-        if ($notification->user_id !== $user->id) {
+        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== get_class($user)) {
             throw new \Exception('Unauthorized access to notification');
         }
 
-        if ($notification->read_at === null) {
-            $notification->update(['read_at' => now()]);
-        }
+        $notification->markAsRead();
 
-        return $notification;
+        return $this->formatNotification($notification);
+    }
+
+    private function formatNotification(Notification $notification): array
+    {
+        $data = $notification->data;
+        return [
+            'id' => $notification->id,
+            'title' => $data['title'] ?? null,
+            'message' => $data['message'] ?? null,
+            'type' => $data['type'] ?? null,
+            'module' => $data['module'] ?? null,
+            'data' => $data['extra_data'] ?? [],
+            'read_at' => $notification->read_at,
+            'created_at' => $notification->created_at,
+        ];
     }
 
     public function markAllAsRead(User $user, ?string $module = null): int
     {
-        $query = Notification::where('user_id', $user->id)
-            ->whereNull('read_at');
+        $query = $user->unreadNotifications();
 
         if ($module !== null) {
-            $query->where('module', $module);
+            $query->where('data->module', $module);
         }
 
         return $query->update(['read_at' => now()]);
@@ -61,11 +73,10 @@ class NotificationService
 
     public function getUnreadCount(User $user, ?string $module = null): int
     {
-        $query = Notification::where('user_id', $user->id)
-            ->whereNull('read_at');
+        $query = $user->unreadNotifications();
 
         if ($module !== null) {
-            $query->where('module', $module);
+            $query->where('data->module', $module);
         }
 
         return $query->count();
@@ -73,7 +84,7 @@ class NotificationService
 
     public function delete(User $user, Notification $notification): void
     {
-        if ($notification->user_id !== $user->id) {
+        if ($notification->notifiable_id !== $user->id || $notification->notifiable_type !== get_class($user)) {
             throw new \Exception('Unauthorized access to notification');
         }
 
@@ -82,11 +93,10 @@ class NotificationService
 
     public function deleteAllRead(User $user, ?string $module = null): int
     {
-        $query = Notification::where('user_id', $user->id)
-            ->whereNotNull('read_at');
+        $query = $user->notifications()->whereNotNull('read_at');
 
         if ($module !== null) {
-            $query->where('module', $module);
+            $query->where('data->module', $module);
         }
 
         return $query->delete();

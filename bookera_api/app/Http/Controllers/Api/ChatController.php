@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Events\MessageSent;
 use App\Events\MessagesRead;
-use App\Services\NotificationService;
+use App\Notifications\GeneralNotification;
 use App\Services\AI\ChatModerationService;
 use Illuminate\Support\Facades\DB;
 
@@ -65,7 +65,7 @@ class ChatController extends Controller
     /**
      * Get chat messages with a specific user.
      */
-    public function getMessages(Request $request, $userSlug)
+    public function getMessages(Request $request, string $userSlug)
     {
         $otherUser = User::where('slug', $userSlug)->with('profile')->firstOrFail();
         $authUserId = $request->user()->id;
@@ -121,7 +121,7 @@ class ChatController extends Controller
     /**
      * Send a new message to a specific user.
      */
-    public function sendMessage(Request $request, $userSlug)
+    public function sendMessage(Request $request, string $userSlug)
     {
         $request->validate([
             'message' => 'required_without_all:image,images|string|max:5000|nullable',
@@ -184,8 +184,7 @@ class ChatController extends Controller
         broadcast(new MessageSent($message));
 
         // Create web notification
-        NotificationService::send(
-            $receiver->id,
+        $receiver->notify(new GeneralNotification(
             __('New Message'),
             __('You have a new message from :name', ['name' => ($sender->profile->full_name ?? $sender->username ?? __('Someone'))]),
             'info',
@@ -194,7 +193,7 @@ class ChatController extends Controller
                 'url' => '/chat?user=' . $sender->slug,
                 'sender_slug' => $sender->slug
             ]
-        );
+        ));
 
         return response()->json([
             'id' => $message->id,
@@ -209,7 +208,7 @@ class ChatController extends Controller
     /**
      * Mark messages from a specific user as read.
      */
-    public function markAsRead(Request $request, $userSlug)
+    public function markAsRead(Request $request, string $userSlug)
     {
         $sender = User::where('slug', $userSlug)->firstOrFail();
         $receiverId = $request->user()->id;
@@ -228,7 +227,7 @@ class ChatController extends Controller
     /**
      * Delete all messages between the authenticated user and a specific user.
      */
-    public function deleteConversation(Request $request, $userSlug)
+    public function deleteConversation(Request $request, string $userSlug)
     {
         $otherUser = User::where('slug', $userSlug)->firstOrFail();
         $authUserId = $request->user()->id;
@@ -249,7 +248,7 @@ class ChatController extends Controller
     /**
      * Clear messages between the authenticated user and a specific user.
      */
-    public function clearMessages(Request $request, $userSlug)
+    public function clearMessages(Request $request, string $userSlug)
     {
         return $this->deleteConversation($request, $userSlug);
     }

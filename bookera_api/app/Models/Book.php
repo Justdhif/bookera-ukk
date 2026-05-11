@@ -81,13 +81,13 @@ class Book extends Model
             ? (int) $this->available_copies_count
             : $this->available_copies()->count();
 
-        // 2. Get notified reservations count for this book
-        $notifiedCount = $this->reservations()
-            ->where('status', 'notified')
+        // 2. Get active reservations count (notified + waiting) for this book
+        $activeReservationsCount = $this->reservations()
+            ->whereIn('status', ['notified', 'waiting'])
             ->count();
 
-        // 3. Public available count
-        $publicAvailable = max(0, $rawCount - $notifiedCount);
+        // 3. Public available count (available for people NOT in the queue)
+        $publicAvailable = max(0, $rawCount - $activeReservationsCount);
 
         // 4. If user is logged in, check if they have a 'notified' reservation for THIS book
         $user = auth('sanctum')->user();
@@ -98,6 +98,7 @@ class Book extends Model
                 ->exists();
 
             if ($hasNotified) {
+                // Notified user gets to see their reserved copy
                 return $publicAvailable + 1;
             }
         }

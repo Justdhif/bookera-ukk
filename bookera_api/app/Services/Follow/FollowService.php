@@ -3,7 +3,7 @@
 namespace App\Services\Follow;
 
 use App\Models\Follow;
-use App\Models\Notification;
+use App\Notifications\GeneralNotification;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -48,14 +48,13 @@ class FollowService
             $follower  = Auth::user();
             $actorName = $follower->profile?->full_name ?? $follower->email;
 
-            Notification::create([
-                'user_id' => $model->id,
-                'title'   => __('New follower'),
-                'message' => __(':name started following you.', ['name' => $actorName]),
-                'type'    => 'new_follower',
-                'module'  => 'discussion',
-                'data'    => ['actor_id' => Auth::id()],
-            ]);
+            $model->notify(new GeneralNotification(
+                __('New follower'),
+                __(':name started following you.', ['name' => $actorName]),
+                'new_follower',
+                'discussion',
+                ['actor_id' => Auth::id()]
+            ));
         }
 
         return $follow;

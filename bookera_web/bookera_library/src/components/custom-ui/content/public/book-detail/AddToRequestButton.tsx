@@ -27,7 +27,7 @@ export default function AddToRequestButton({
   const pathname = usePathname();
 
   const user = useAuthStore((state) => state.user);
-  if (!isAuthenticated || !user || user.role === 'user') return null;
+  if (!isAuthenticated || !user) return null;
 
   const setSelectedBookIds = useBorrowStore((s) => s.setSelectedBookIds);
 

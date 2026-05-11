@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Models\Book;
 use App\Models\Reservation;
 use App\Services\Public\PublicService;
 use Illuminate\Http\JsonResponse;
@@ -152,7 +153,7 @@ class PublicController extends Controller
         return ApiResponse::successResponse('Public stats retrieved successfully', $stats);
     }
 
-    private function injectReservationData(Request $request, $book)
+    private function injectReservationData(Request $request, Book $book): Book
     {
         $user = auth('sanctum')->user();
 
@@ -172,9 +173,11 @@ class PublicController extends Controller
         // Eksklusivitas Salinan: Filter daftar copies yang dikirim ke frontend
         // Jika buku memiliki relasi 'copies' yang dimuat
         if ($book->relationLoaded('copies')) {
-            $notifiedCount = Reservation::where('book_id', $book->id)->where('status', 'notified')->count();
+            $activeReservationsCount = Reservation::where('book_id', $book->id)
+                ->whereIn('status', ['waiting', 'notified'])
+                ->count();
             $rawAvailableCount = $book->copies->where('status', 'available')->count();
-            $publicAvailableCount = max(0, $rawAvailableCount - $notifiedCount);
+            $publicAvailableCount = max(0, $rawAvailableCount - $activeReservationsCount);
             
             $hasNotified = $book->user_has_available_copy ?? false;
             $reservedShown = false;

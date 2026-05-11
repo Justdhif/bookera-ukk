@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Notifications\GeneralNotification;
 use App\Services\FonnteService;
-use App\Services\NotificationService as DatabaseNotificationService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
@@ -27,14 +27,13 @@ abstract class BaseNotificationService
         bool $sendMail = true,
         bool $sendWhatsApp = true
     ): void {
-        DatabaseNotificationService::send(
-            $recipient->id,
+        $recipient->notify(new GeneralNotification(
             $title,
             $message,
             $type,
             $module,
             $data
-        );
+        ));
 
         $profile = $recipient?->profile;
 
@@ -89,7 +88,7 @@ abstract class BaseNotificationService
     /**
      * @return array{0:string,1:string,2:array<int, string>}
      */
-    protected function summarizeBooks($details, callable $titleResolver): array
+    protected function summarizeBooks(mixed $details, callable $titleResolver): array
     {
         $details = collect($details);
 

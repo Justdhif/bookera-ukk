@@ -60,7 +60,7 @@ export function BorrowRequestCard({ req }: BorrowRequestCardProps) {
 
           <div className="flex gap-2 items-center self-end md:self-center">
 
-            <Link href={`/admin/borrow-requests/${req.id}`}>
+            <Link href={`/admin/borrows/requests/${req.id}`}>
               <Button
                 size="sm"
                 variant="outline"

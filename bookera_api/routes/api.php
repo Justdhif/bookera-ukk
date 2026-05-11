@@ -228,7 +228,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{borrow}/complete', [BorrowController::class, 'complete']);
         });
 
-        Route::prefix('borrow-requests')->group(function () {
+        Route::prefix('borrows/requests')->group(function () {
             Route::get('/', [BorrowRequestController::class, 'index']);
             Route::get('/export', [BorrowRequestController::class, 'export']);
             Route::get('/{borrowRequest}', [BorrowRequestController::class, 'show']);

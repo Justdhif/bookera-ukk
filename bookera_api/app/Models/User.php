@@ -56,10 +56,7 @@ class User extends Authenticatable
         return $this->hasOne(UserProfile::class);
     }
 
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class);
-    }
+
 
     public function complaints()
     {

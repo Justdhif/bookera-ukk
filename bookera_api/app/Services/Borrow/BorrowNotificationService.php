@@ -8,11 +8,11 @@ use App\Mail\BorrowRequestRejectedMail;
 use App\Models\Borrow;
 use App\Models\BorrowRequest;
 use App\Models\User;
-use App\Services\FonnteService;
-use App\Services\NotificationService as DatabaseNotificationService;
+use App\Notifications\GeneralNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Services\FonnteService;
 use App\Services\BaseNotificationService;
 use Throwable;
 
@@ -106,8 +106,7 @@ class BorrowNotificationService extends BaseNotificationService
             $this->t('Status') => ucfirst($borrow->status),
         ];
 
-        DatabaseNotificationService::send(
-            $user->id,
+        $user->notify(new GeneralNotification(
             $this->t('New Borrow'),
             $message,
             'borrow_created',
@@ -121,7 +120,7 @@ class BorrowNotificationService extends BaseNotificationService
                     'author' => $d->bookCopy?->book?->author
                 ])->toArray()
             ]
-        );
+        ));
 
         if (! $profile || ! $profile->notification_enabled) {
             return;
@@ -176,63 +175,7 @@ class BorrowNotificationService extends BaseNotificationService
 
     public function notifyBorrowRequestCreated(BorrowRequest $borrowRequest): void
     {
-        $borrowRequest->loadMissing(['user.profile', 'borrowRequestDetails.book']);
-
-        [$bookTitles, $moreText, $books] = $this->summarizeBooks(
-            $borrowRequest->borrowRequestDetails,
-            fn ($detail) => $detail->book->title ?? $this->t('Unknown')
-        );
-
-        $userName = $borrowRequest->user?->profile?->full_name ?? $borrowRequest->user?->email ?? $this->t('User');
-        $message = $this->t('Borrow request from :name: :books', [
-            'name' => $userName,
-            'books' => $bookTitles.$moreText,
-        ]);
-        $details = [
-            $this->t('Request ID') => '#'.$borrowRequest->id,
-            $this->t('Borrower') => $userName,
-            $this->t('Borrow Date') => Carbon::parse($borrowRequest->borrow_date)->format('d M Y'),
-            $this->t('Return Date') => Carbon::parse($borrowRequest->return_date)->format('d M Y'),
-            $this->t('Status') => $this->t('Processing'),
-        ];
-
-        $admins = User::with('profile')->where('role', 'admin')->get();
-
-        foreach ($admins as $admin) {
-            $this->dispatchNotification(
-                $admin,
-                $this->t('New Borrow Request'),
-                $message,
-                'borrow_request',
-                'borrow',
-                [
-                    'request_id' => $borrowRequest->id,
-                    'user' => [
-                        'name' => $userName,
-                        'avatar' => $borrowRequest->user?->profile?->avatar,
-                    ],
-                    'books' => $borrowRequest->borrowRequestDetails->map(fn($d) => [
-                        'title' => $d->book?->title,
-                        'cover' => $d->book?->cover_image,
-                        'author' => $d->book?->author
-                    ])->toArray()
-                ],
-                fn () => new BorrowNotificationMail(
-                    subjectLine: $this->t('New Borrow Request - Bookera'),
-                    title: $this->t('New Borrow Request'),
-                    bodyMessage: $message,
-                    details: $details,
-                    books: $books,
-                    footerNote: $this->t('Review the request from the admin dashboard.'),
-                ),
-                $this->t('Borrow request from :name: :books', [
-                    'name' => $userName,
-                    'books' => $bookTitles.$moreText,
-                ]),
-                false,
-                false
-            );
-        }
+        // Notification to admin removed as per user request
     }
 
     public function notifyBorrowRequestApproved(BorrowRequest $borrowRequest, Borrow $borrow): void
@@ -243,8 +186,7 @@ class BorrowNotificationService extends BaseNotificationService
         $user = $borrowRequest->user;
         $profile = $user?->profile;
 
-        DatabaseNotificationService::send(
-            $borrowRequest->user_id,
+        $borrowRequest->user->notify(new GeneralNotification(
             $this->t('Borrow Request Approved'),
             $this->t('Your borrow request #:id has been approved. Borrow code: :code. Please come to the library on :date.', [
                 'id' => $borrowRequest->id,
@@ -262,7 +204,7 @@ class BorrowNotificationService extends BaseNotificationService
                     'author' => $d->bookCopy?->book?->author
                 ])->toArray()
             ]
-        );
+        ));
 
         if (! $profile || ! $profile->notification_enabled) {
             return;
@@ -316,8 +258,7 @@ class BorrowNotificationService extends BaseNotificationService
             ? ' '.$this->t('Reason: :reason', ['reason' => $borrowRequest->reject_reason])
             : '';
 
-        DatabaseNotificationService::send(
-            $borrowRequest->user_id,
+        $borrowRequest->user->notify(new GeneralNotification(
             $this->t('Borrow Request Rejected'),
             $this->t('Your borrow request #:id has been rejected.:reason', [
                 'id' => $borrowRequest->id,
@@ -334,7 +275,7 @@ class BorrowNotificationService extends BaseNotificationService
                     'author' => $d->book?->author
                 ])->toArray()
             ]
-        );
+        ));
 
         if (! $profile || ! $profile->notification_enabled) {
             return;

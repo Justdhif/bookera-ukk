@@ -67,7 +67,7 @@ export default function BorrowRequestListItem({
           </div>
 
           <div className="flex shrink-0 gap-2">
-            <Link href={`/admin/borrow-requests/${request.id}`}>
+            <Link href={`/admin/borrows/requests/${request.id}`}>
               <Button size="sm" variant="outline" className="h-8 gap-1">
                 <Eye className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">{t("detail")}</span>

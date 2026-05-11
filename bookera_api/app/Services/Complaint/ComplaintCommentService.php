@@ -36,7 +36,13 @@ class ComplaintCommentService
                 'image'        => $imagePath,
             ]);
 
-            return $comment->load('user.profile');
+            $comment->load('user.profile');
+
+            if ($user->role === 'admin' && $complaint->user_id !== $user->id) {
+                (new ComplaintNotificationService())->notifyComplaintCommentedByAdmin($complaint, $comment);
+            }
+
+            return $comment;
         });
     }
 

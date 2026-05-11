@@ -34,11 +34,6 @@ export default function ReservationButton({
     return null;
   }
 
-  // Only members and staff can reserve
-  if (!user || user.role === 'user') {
-    return null;
-  }
-
   // Tampilkan tombol jika stok habis ATAU user sudah punya reservasi (untuk pembatalan/cek status)
   const hasActiveReservation = !!book.user_reservation;
   if ((book.available_copies ?? 0) > 0 && !hasActiveReservation) {
