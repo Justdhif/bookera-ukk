@@ -512,7 +512,9 @@
     "showingResultsRange": "Menampilkan <bold>{from}</bold> - <bold>{to}</bold> dari <bold>{total}</bold> hasil",
     "showingPageNumber": "Halaman <bold>{current}</bold> dari <bold>{total}</bold>",
     "summary": "Ringkasan",
-    "total": "Total"
+    "total": "Total",
+    "totalFine": "Total Denda",
+    "books": "Buku"
   },
   "complaint": {
     "title": "Pengaduan",
@@ -2304,7 +2306,9 @@
     "fine": "Denda",
     "paidAt": "Dibayar pada",
     "totalFinesLabel": "Total denda",
-    "outstandingLabel": "Belum dibayar"
+    "outstandingLabel": "Belum dibayar",
+    "lost": "HILANG",
+    "bookUnit": "{count} Buku"
   },
   "privacy-policy": {
     "title": "Kebijakan Privasi",
@@ -2425,7 +2429,9 @@
     "outstandingLabel": "Belum dibayar",
     "scheduledCheckout": "Jadwal peminjaman",
     "plannedReturn": "Rencana pengembalian",
-    "actualReturnRecord": "Catatan pengembalian aktual"
+    "actualReturnRecord": "Catatan pengembalian aktual",
+    "totalBooks": "Total Buku",
+    "bookUnit": "{count} Buku"
   },
   "terms-of-service": {
     "title": "Ketentuan Layanan",

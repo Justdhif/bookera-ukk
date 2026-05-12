@@ -32,6 +32,7 @@ export default function BookClient() {
   const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [pagination, setPagination] = useState({
     current_page: 1,
     last_page: 1,
@@ -96,7 +97,7 @@ export default function BookClient() {
 
   const handleExport = async () => {
     try {
-      setLoading(true);
+      setExporting(true);
       const response = await bookService.export(filters);
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
@@ -113,7 +114,7 @@ export default function BookClient() {
       console.error("Export error:", error);
       toast.error(t("exportError"));
     } finally {
-      setLoading(false);
+      setExporting(false);
     }
   };
   
@@ -142,7 +143,7 @@ export default function BookClient() {
               />
               <ExportButton
                 onClick={handleExport}
-                loading={loading}
+                loading={exporting}
                 label={t("exportData")}
               />
               <Link href="/admin/books/add">

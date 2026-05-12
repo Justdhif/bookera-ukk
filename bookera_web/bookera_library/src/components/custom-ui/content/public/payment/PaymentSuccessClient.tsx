@@ -308,9 +308,9 @@ function PaymentSuccessContent() {
                   <div
                     id="print-area"
                     ref={invoiceRef}
-                    className="bg-white text-slate-900 border rounded-[2rem] overflow-hidden shadow-2xl relative print:border-0 print:shadow-none print:rounded-none print:m-0 w-full"
+                    className="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 border dark:border-slate-800 rounded-[2rem] overflow-hidden shadow-2xl relative print:border-0 print:shadow-none print:rounded-none print:m-0 w-full"
                   >
-                    <WallpaperPattern className="opacity-[0.05] pointer-events-none" />
+                    <WallpaperPattern className="opacity-[0.05] dark:opacity-[0.02] pointer-events-none" />
 
                     <div className="bg-slate-900 p-8 md:p-10 text-white relative">
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
@@ -352,40 +352,40 @@ function PaymentSuccessContent() {
                       </div>
                     </div>
 
-                    <div className="p-8 md:p-10 space-y-8 bg-white">
+                    <div className="p-8 md:p-10 space-y-8 bg-white dark:bg-slate-950">
                       <div className="grid grid-cols-2 gap-8">
                         <div className="space-y-4">
-                          <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">
+                          <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
                             {t("billingFrom")}
                           </h3>
                           <div className="space-y-1">
-                            <p className="font-bold text-lg text-slate-900">
+                            <p className="font-bold text-lg text-slate-900 dark:text-slate-100">
                               Bookera Library
                             </p>
-                            <p className="text-sm text-slate-500 flex items-center gap-2">
+                            <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
                               <Mail className="w-3.5 h-3.5" />{" "}
                               support@bookera.id
                             </p>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
                               Malang, Jawa Timur, Indonesia
                             </p>
                           </div>
                         </div>
                         <div className="space-y-4 text-right">
-                          <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">
+                          <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
                             {t("billingTo")}
                           </h3>
                           <div className="space-y-1">
-                            <p className="font-bold text-lg flex items-center justify-end gap-2 text-slate-900">
+                            <p className="font-bold text-lg flex items-center justify-end gap-2 text-slate-900 dark:text-slate-100">
                               <User className="w-4 h-4" />{" "}
                               {user?.profile?.full_name || user?.email}
                             </p>
-                            <p className="text-sm text-slate-500 flex items-center justify-end gap-2">
+                            <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center justify-end gap-2">
                               <Mail className="w-3.5 h-3.5" /> {user?.email}
                             </p>
                             {type === "membership" && (
                               <div className="flex items-center justify-end gap-2 mt-2">
-                                <span className="text-xs bg-slate-100 text-slate-900 px-2 py-0.5 rounded-full font-bold">
+                                <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-200 px-2 py-0.5 rounded-full font-bold">
                                   PRO MEMBER
                                 </span>
                               </div>
@@ -394,15 +394,15 @@ function PaymentSuccessContent() {
                         </div>
                       </div>
 
-                      <div className="h-px bg-slate-100" />
-
+                      <div className="h-px bg-slate-100 dark:bg-slate-800" />
+ 
                       <div className="grid grid-cols-4 gap-4">
                         <div className="space-y-1">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 flex items-center gap-1">
                             <Calendar className="w-3 h-3" />{" "}
                             {t("paymentDate")}
                           </p>
-                          <p className="font-bold text-sm text-slate-900">
+                          <p className="font-bold text-sm text-slate-900 dark:text-slate-100">
                             {transactionData?.paid_at
                               ? new Date(
                                   transactionData.paid_at,
@@ -411,37 +411,37 @@ function PaymentSuccessContent() {
                           </p>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 flex items-center gap-1">
                             <Hash className="w-3 h-3" />{" "}
                             {t("orderId")}
                           </p>
-                          <p className="font-bold text-sm text-slate-900">
+                          <p className="font-bold text-sm text-slate-900 dark:text-slate-100">
                             #{displayOrderId}
                           </p>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 flex items-center gap-1">
                             <Receipt className="w-3 h-3" />{" "}
                             {t("method")}
                           </p>
-                          <p className="font-bold text-sm uppercase text-slate-900">
+                          <p className="font-bold text-sm uppercase text-slate-900 dark:text-slate-100">
                             {transactionData?.payment_type || "Midtrans"}
                           </p>
                         </div>
                         <div className="space-y-1 text-right">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
                             {t("status")}
                           </p>
-                          <p className="font-bold text-sm text-green-600 uppercase">
+                          <p className="font-bold text-sm text-green-600 dark:text-green-400 uppercase">
                             {t("success")}
                           </p>
                         </div>
                       </div>
 
-                      <div className="rounded-2xl border border-slate-100 bg-slate-50/50 overflow-hidden">
+                      <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 overflow-hidden">
                         <table className="w-full text-sm">
                           <thead>
-                            <tr className="bg-slate-100/50 text-slate-500 font-black text-[10px] uppercase tracking-widest border-b border-slate-100">
+                            <tr className="bg-slate-100/50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-black text-[10px] uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">
                               <th className="px-6 py-4 text-left">
                                 {t("description")}
                               </th>
@@ -450,31 +450,31 @@ function PaymentSuccessContent() {
                               </th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-100">
+                          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             <tr>
                               <td className="px-6 py-5">
-                                <div className="font-bold text-slate-900">
+                                <div className="font-bold text-slate-900 dark:text-slate-100">
                                   {type === "membership"
                                     ? `${t("membershipUpgrade")} - ${transactionData?.plan || "Premium"}`
                                     : `${t("finePayment")} - #${id}`}
                                 </div>
-                                <div className="text-xs text-slate-500 mt-1">
+                                <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                                   {type === "membership"
                                     ? t("membershipDesc")
                                     : t("fineDesc")}
                                 </div>
                               </td>
-                              <td className="px-6 py-5 text-right font-bold text-slate-900">
+                              <td className="px-6 py-5 text-right font-bold text-slate-900 dark:text-slate-100">
                                 {formatCurrency(transactionData?.amount || 0)}
                               </td>
                             </tr>
                           </tbody>
                           <tfoot>
-                            <tr className="bg-slate-900/5">
-                              <td className="px-6 py-4 font-black text-slate-900 text-right uppercase tracking-widest">
+                            <tr className="bg-slate-900/5 dark:bg-white/5">
+                              <td className="px-6 py-4 font-black text-slate-900 dark:text-slate-100 text-right uppercase tracking-widest">
                                 {t("total")}
                               </td>
-                              <td className="px-6 py-4 text-right font-black text-xl text-slate-900">
+                              <td className="px-6 py-4 text-right font-black text-xl text-slate-900 dark:text-slate-100">
                                 {formatCurrency(transactionData?.amount || 0)}
                               </td>
                             </tr>
@@ -483,10 +483,10 @@ function PaymentSuccessContent() {
                       </div>
 
                       <div className="text-center space-y-2 pt-4">
-                        <p className="text-sm font-bold text-slate-900">
+                        <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
                           {t("thankYou")}
                         </p>
-                        <p className="text-xs text-slate-500 max-w-md mx-auto">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                           {t("invoiceAutoGenerated")}
                         </p>
                       </div>

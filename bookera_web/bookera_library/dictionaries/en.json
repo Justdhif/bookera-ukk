@@ -512,7 +512,9 @@
     "showingResultsRange": "Showing <bold>{from}</bold> - <bold>{to}</bold> of <bold>{total}</bold> results",
     "showingPageNumber": "Page <bold>{current}</bold> of <bold>{total}</bold>",
     "summary": "Summary",
-    "total": "Total"
+    "total": "Total",
+    "totalFine": "Total Fine",
+    "books": "Books"
   },
   "complaint": {
     "title": "Complaints",
@@ -2304,7 +2306,9 @@
     "fine": "Fine",
     "paidAt": "Paid at",
     "totalFinesLabel": "Total fines",
-    "outstandingLabel": "Outstanding"
+    "outstandingLabel": "Outstanding",
+    "lost": "LOST",
+    "bookUnit": "{count, plural, one {# Book} other {# Books}}"
   },
   "privacy-policy": {
     "title": "Privacy Policy",
@@ -2425,7 +2429,9 @@
     "outstandingLabel": "Outstanding",
     "scheduledCheckout": "Scheduled checkout",
     "plannedReturn": "Planned return",
-    "actualReturnRecord": "Actual return record"
+    "actualReturnRecord": "Actual return record",
+    "totalBooks": "Total Books",
+    "bookUnit": "{count, plural, one {# Book} other {# Books}}"
   },
   "terms-of-service": {
     "title": "Terms of Service",

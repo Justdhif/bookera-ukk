@@ -1,37 +1,35 @@
 "use client";
-
 import { Borrow } from "@/types/borrow";
 import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
+import { BookOpen, Calendar } from "lucide-react";
 import {
-  BookOpen,
-  Calendar,
-  MessageCircle,
-  AlertCircle,
-  CheckCircle2,
-} from "lucide-react";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { ScaleIn } from "@/components/custom-ui/motion";
+import { useRouter } from "next/navigation";
 import DetailButton from "@/components/custom-ui/button/DetailButton";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { Separator } from "@/components/ui/separator";
-import { useAuthStore } from "@/store/auth.store";
 import { AddBookReviewDialog } from "./AddBookReviewDialog";
 
 interface BorrowCardProps {
   borrow: Borrow;
+  index?: number;
 }
 
-const MAX_VISIBLE_BOOKS = 2;
+const MAX_VISIBLE_BOOKS = 3;
 
-export function BorrowCard({ borrow }: BorrowCardProps) {
+export function BorrowCard({ borrow, index = 0 }: BorrowCardProps) {
   const t = useTranslations("borrow");
   const tp = useTranslations("public");
   const tCommon = useTranslations("common");
-  const userSlug = useAuthStore((state) => state.user?.slug);
+  const router = useRouter();
 
   const borrowDetails = borrow.borrow_details || [];
   
@@ -45,9 +43,6 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
   }));
   
   const totalItemsCount = borrowDetails.length;
-
-  const visibleBooks = groupedBooks.slice(0, MAX_VISIBLE_BOOKS);
-  const hiddenCount = Math.max(0, groupedBooks.length - MAX_VISIBLE_BOOKS);
 
   const returnDate = new Date(borrow.return_date);
   const isOverdue = borrow.status === "open" && returnDate < new Date();
@@ -68,271 +63,210 @@ export function BorrowCard({ borrow }: BorrowCardProps) {
   const displayFineAmount = isLate ? estimatedFine.total_fine : (hasUnpaidFine ? unpaidFineAmount : actualFineAmount);
   const hasFineData = fines.length > 0 || isLate;
 
-  return (
-    <Card className="transition-all duration-200 overflow-hidden relative group border-border/40 p-0 shadow-sm hover:shadow-md">
-      <CardContent className="p-0">
-        <div className="flex flex-col md:flex-row md:items-stretch min-h-[160px]">
-          {/* ── Col 1: BUKU YANG DIPINJAM ── */}
-          <div className="flex-1 p-5 space-y-4">
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/60">
-              {t("booksBorrowed")}
-            </p>
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(amount);
 
-            {groupedBooks.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-4 text-center">
-                <BookOpen className="h-8 w-8 text-muted-foreground/20 mb-2" />
-                <p className="text-xs text-muted-foreground italic font-medium">
-                  {tCommon("noData")}
-                </p>
+  return (
+    <ScaleIn delay={index * 0.06}>
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem
+          value={`borrow-${borrow.id}-${index}`}
+          className="rounded-2xl border bg-card shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md mb-4 px-0 border-b-0"
+        >
+          <AccordionTrigger className="w-full text-left p-5 hover:no-underline [&>svg]:mr-0 [&>svg]:h-5 [&>svg]:w-5 cursor-pointer">
+            <div className="flex items-start gap-4 text-left">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-primary/10 text-brand-primary">
+                <BookOpen className="h-6 w-6" />
               </div>
-            ) : (
-              <>
-                <div className="space-y-3">
-                  {visibleBooks.map((item: any) => {
+
+              <div className="flex-1 min-w-0 space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="font-bold text-base text-foreground">
+                    {tp("borrowHash")}
+                    {borrow.borrow_code}
+                  </p>
+                  <div className="shrink-0">
+                    <BorrowStatusBadge
+                      status={borrow.status}
+                      className="h-5 px-2 text-[9px] font-black uppercase tracking-wider"
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-1">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Calendar className="h-3.5 w-3.5 shrink-0" />
+                    <span>
+                      {t("borrowDate")}:{" "}
+                      <span className="text-foreground font-medium">
+                        {format(new Date(borrow.borrow_date), "dd MMM yyyy")}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Calendar className="h-3.5 w-3.5 shrink-0" />
+                    <span>
+                      {t("returnDate")}:{" "}
+                      <span
+                        className={cn(
+                          "font-medium",
+                          isOverdue ? "text-destructive" : "text-foreground"
+                        )}
+                      >
+                        {format(returnDate, "dd MMM yyyy")}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </AccordionTrigger>
+
+          <AccordionContent className="p-0">
+            <div className="mx-5 h-px bg-border/60" />
+            <div className="p-5 space-y-6">
+              {/* Section 1: Books */}
+              <div className="space-y-3">
+                <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-1">
+                  {t("booksBorrowed")}
+                </h4>
+                <div className="rounded-xl border border-border/60 overflow-hidden divide-y divide-border/40">
+                  {groupedBooks.map((item: any) => {
                     const { book, quantity } = item;
                     return (
                       <div
                         key={item.id}
-                        className="flex items-start gap-4 group/book"
+                        className="flex items-center gap-4 p-3 hover:bg-muted/20 transition-colors"
                       >
                         {book?.cover_image ? (
-                          <div className="relative shrink-0 shadow-sm group-hover/book:shadow-md transition-all">
+                          <div className="relative shrink-0 shadow-sm">
                             <Image
                               src={book.cover_image}
                               alt={book.title}
-                              width={48}
-                              height={64}
-                              className="h-16 w-12 rounded-lg object-cover transition-transform group-hover/book:scale-105"
+                              width={40}
+                              height={56}
+                              className="h-14 w-10 rounded-md object-cover"
                               unoptimized
                             />
-                            <div className="absolute inset-0 rounded-lg ring-1 ring-inset ring-black/5" />
                           </div>
                         ) : (
-                          <div className="flex h-16 w-12 shrink-0 items-center justify-center rounded-lg bg-muted/50 border border-border/50 shadow-sm">
-                            <BookOpen className="h-6 w-6 text-muted-foreground/30" />
+                          <div className="flex h-14 w-10 shrink-0 items-center justify-center rounded-md bg-muted/50 border border-border/50">
+                            <BookOpen className="h-5 w-5 text-muted-foreground/30" />
                           </div>
                         )}
-                        <div className="min-w-0 flex-1 space-y-0.5">
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-baseline gap-2">
-                              <p className="font-bold leading-tight text-sm text-foreground line-clamp-1 group-hover/book:text-primary transition-colors">
-                                {book?.title || "-"}
-                              </p>
-                              {quantity > 1 && (
-                                <span className="text-xs font-black text-primary bg-primary/10 px-1.5 py-0.5 rounded-md shrink-0">
-                                  x{quantity}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[11px] font-bold text-muted-foreground/80 truncate uppercase tracking-tight">
-                              {book?.author || "-"}
-                            </p>
-                            
-                            {borrow.status === "close" && book && (
-                              <AddBookReviewDialog 
-                                bookId={book.id} 
-                                bookTitle={book.title}
-                                trigger={
-                                  <button className="text-[10px] font-bold text-primary hover:text-primary/80 underline underline-offset-2 transition-colors mt-1">
-                                    {tp("addReview")}
-                                  </button>
-                                }
-                              />
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bold text-sm text-foreground line-clamp-1">
+                            {book?.title || "-"}
+                            {quantity > 1 && (
+                              <span className="ml-2 text-[10px] font-black text-brand-primary bg-brand-primary/10 px-1.5 py-0.5 rounded">
+                                x{quantity}
+                              </span>
                             )}
-                          </div>
+                          </p>
+                          <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight truncate">
+                            {book?.author || "-"}
+                          </p>
+                          {borrow.status === "close" && book && (
+                            <AddBookReviewDialog 
+                              bookId={book.id} 
+                              bookTitle={book.title}
+                              trigger={
+                                <button className="text-[10px] font-bold text-brand-primary hover:underline mt-1">
+                                  {tp("addReview")}
+                                </button>
+                              }
+                            />
+                          )}
                         </div>
                       </div>
                     );
                   })}
-
-                  {hiddenCount > 0 && (
-                    <div className="flex items-center gap-3 pl-[60px]">
-                      <div className="h-[2px] w-4 bg-border/40 rounded-full" />
-                      <p className="text-[11px] font-black text-muted-foreground/60 uppercase tracking-widest">
-                        +{hiddenCount} {t("otherBooks")}
-                      </p>
-                    </div>
-                  )}
                 </div>
-              </>
-            )}
-          </div>
-
-          <div className="hidden md:flex py-5">
-            <Separator orientation="vertical" className="h-full bg-border/60" />
-          </div>
-          <Separator orientation="horizontal" className="md:hidden mx-5 w-auto" />
-
-          {/* ── Col 2: INFO PEMINJAMAN ── */}
-          <div className="flex-1 p-5 space-y-4">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/60">
-                {t("borrowInfo")}
-              </p>
-              <div className="flex items-center gap-2 shrink-0">
-                <BorrowStatusBadge
-                  status={borrow.status}
-                  className="h-6 px-2.5 text-[10px] font-black uppercase tracking-wider shadow-xs"
-                />
-                {borrow.borrow_code && (
-                  <Link href={detailLink}>
-                    <DetailButton
-                      label={tCommon("view")}
-                      className="h-7 px-3 text-[11px] font-bold"
-                    />
-                  </Link>
-                )}
               </div>
-            </div>
 
-            <div className="space-y-2.5 text-sm">
-              <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-muted/20 border border-border/5">
-                <div className="flex items-center gap-2 text-muted-foreground font-medium">
-                  <div className="p-1 rounded-lg bg-background shadow-xs">
-                    <Calendar className="h-3.5 w-3.5 shrink-0" />
-                  </div>
-                  <span className="text-[11px] uppercase tracking-wider">
-                    {t("borrowDate")}
-                  </span>
-                </div>
-                <span className="font-bold text-foreground tracking-tight">
-                  {format(new Date(borrow.borrow_date), "dd MMM yyyy")}
-                </span>
-              </div>
-              <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-muted/20 border border-border/5">
-                <div className="flex items-center gap-2 text-muted-foreground font-medium">
-                  <div className="p-1 rounded-lg bg-background shadow-xs">
-                    <Calendar className="h-3.5 w-3.5 shrink-0" />
-                  </div>
-                  <span className="text-[11px] uppercase tracking-wider">
-                    {t("returnDate")}
-                  </span>
-                </div>
-                <span
-                  className={cn(
-                    "font-bold tracking-tight",
-                    isOverdue ? "text-red-500 animate-pulse" : "text-foreground"
-                  )}
-                >
-                  {format(returnDate, "dd MMM yyyy")}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-4 border-t border-dashed border-border/40 mt-2 px-1">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-3 w-3 text-brand-primary" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-                  {t("totalBooks")}
-                </span>
-              </div>
-              <span className="text-sm font-black tracking-tight text-brand-primary">
-                {t("bookUnit", { count: totalItemsCount })}
-              </span>
-            </div>
-          </div>
-
-          <div className="hidden md:flex py-5">
-            <Separator orientation="vertical" className="h-full bg-border/60" />
-          </div>
-          <Separator orientation="horizontal" className="md:hidden mx-5 w-auto" />
-
-          {/* ── Col 3: INFO DENDA ── */}
-          <div className="flex-1 p-5 space-y-4">
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/60">
-              {t("fineInfo")}
-            </p>
-
-            <div className="space-y-3">
-              {!hasFineData ? (
-                <div className="flex flex-col items-center justify-center py-8 text-center rounded-2xl border border-dashed border-border/40 bg-muted/5">
-                  <CheckCircle2 className="h-6 w-6 text-emerald-500/30 mb-2" />
-                  <p className="text-[11px] text-muted-foreground/60 font-medium uppercase tracking-wider">
-                    {tCommon("noFines")}
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
+              {/* Section 2: Fine Info if exists */}
+              {hasFineData && (
+                <div className="space-y-3">
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-1">
+                    {t("fineInfo")}
+                  </h4>
+                  <div className="rounded-xl border border-border/60 overflow-hidden divide-y divide-border/40">
                     {fines.map((f) => (
                       <div
                         key={f.id}
-                        className="flex justify-between items-center p-2 rounded-xl bg-muted/20 border border-border/5 group/fine transition-all hover:bg-muted/30"
+                        className="flex justify-between items-center p-3 hover:bg-muted/20 transition-colors"
                       >
                         <div className="flex flex-col min-w-0">
-                          <span className="text-[11px] font-bold text-foreground truncate">
+                          <span className="text-sm font-bold text-foreground truncate">
                             {f.fine_type?.name || t("fine")}
                           </span>
                           <span
                             className={cn(
-                              "text-[9px] uppercase font-black tracking-wider",
+                              "text-[9px] uppercase font-black tracking-widest",
                               f.status === "paid"
-                                ? "text-emerald-500"
+                                ? "text-emerald-600"
                                 : "text-destructive"
                             )}
                           >
                             {f.status === "paid" ? tCommon("paid") : tCommon("unpaid")}
                           </span>
                         </div>
-                        <span className="text-[11px] font-black text-foreground shrink-0 ml-2">
-                          Rp {new Intl.NumberFormat("id-ID").format(f.amount)}
+                        <span className="text-sm font-black text-foreground">
+                          {formatCurrency(Number(f.amount))}
                         </span>
                       </div>
                     ))}
 
                     {isLate && estimatedFine && (
-                      <div className="flex justify-between items-center p-2 rounded-xl bg-destructive/5 border border-destructive/10 animate-pulse">
+                      <div className="flex justify-between items-center p-3 bg-destructive/5">
                         <div className="flex flex-col min-w-0">
-                          <span className="text-[11px] font-bold text-destructive truncate">
+                          <span className="text-sm font-bold text-destructive truncate">
                             {t("estimatedLateFine")}
                           </span>
-                          <span className="text-[9px] uppercase font-black text-destructive/70 tracking-wider">
+                          <span className="text-[9px] uppercase font-black text-destructive/70 tracking-widest">
                             {estimatedFine.days_late} {t("days")}
                           </span>
                         </div>
-                        <span className="text-[11px] font-black text-destructive shrink-0 ml-2">
-                          Rp{" "}
-                          {new Intl.NumberFormat("id-ID").format(
-                            estimatedFine.total_fine
-                          )}
+                        <span className="text-sm font-black text-destructive">
+                          {formatCurrency(estimatedFine.total_fine)}
                         </span>
                       </div>
                     )}
                   </div>
-
-                  <div className="flex items-center justify-between pt-3 border-t border-dashed border-border/40 mt-1 px-1">
-                    <div className="flex items-center gap-2">
-                      <AlertCircle
-                        className={cn(
-                          "h-3 w-3",
-                          hasUnpaidFine || isLate
-                            ? "text-destructive"
-                            : "text-emerald-600"
-                        )}
-                      />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-                        {tCommon("total")}
-                      </span>
-                    </div>
-                    <span
-                      className={cn(
-                        "text-sm font-black tracking-tight",
-                        hasUnpaidFine || isLate
-                          ? "text-destructive"
-                          : "text-emerald-600"
-                      )}
-                    >
-                      Rp{" "}
-                      {new Intl.NumberFormat("id-ID").format(displayFineAmount)}
-                    </span>
-                  </div>
-                </>
+                </div>
               )}
             </div>
+          </AccordionContent>
+
+          <div className="mx-5 h-px bg-border/60" />
+
+          <div className="flex items-center justify-between gap-4 px-5 py-4">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-brand-primary" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  {t("totalBooks")}
+                </span>
+              </div>
+              <p className="text-2xl font-black tracking-tight text-brand-primary">
+                {t("bookUnit", { count: totalItemsCount })}
+              </p>
+            </div>
+
+            {borrow.borrow_code && (
+              <Link href={detailLink}>
+                <DetailButton label={tCommon("view")} />
+              </Link>
+            )}
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </AccordionItem>
+      </Accordion>
+    </ScaleIn>
   );
 }
+
 

@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface BorrowFinesCardProps {
   fines: Fine[];
@@ -63,17 +64,16 @@ export function BorrowFinesCard({ fines }: BorrowFinesCardProps) {
           </div>
 
           {paidFines.length > 0 && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-10 px-6 font-black gap-2 border-brand-primary/20 text-brand-primary hover:bg-brand-primary/5 transition-all shrink-0 shadow-sm"
-              onClick={() => {
-                router.push(`/payment/success?type=fine&id=${paidFines[0].id}`);
-              }}
-            >
-              <ReceiptText className="h-4 w-4" />
-              Invoice
-            </Button>
+            <Link href={`/payment/success?type=fine&id=${paidFines[0].id}`}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-10 px-6 font-black gap-2 border-brand-primary/20 text-brand-primary hover:bg-brand-primary/5 transition-all shrink-0 shadow-sm"
+              >
+                <ReceiptText className="h-4 w-4" />
+                Invoice
+              </Button>
+            </Link>
           )}
         </div>
       </CardHeader>

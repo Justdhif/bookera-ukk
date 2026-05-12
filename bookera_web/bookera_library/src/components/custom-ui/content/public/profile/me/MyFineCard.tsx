@@ -75,7 +75,7 @@ export default function MyFineCard({ group, index, onRefresh }: MyFineCardProps)
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="font-bold text-base text-foreground">
                     {t("borrowHash")}
-                    {borrowId}
+                    {borrow?.borrow_code || borrowId}
                   </p>
                   <div className="shrink-0">
                     {allPaid ? (
@@ -230,7 +230,7 @@ export default function MyFineCard({ group, index, onRefresh }: MyFineCardProps)
               <div className="flex items-center gap-2">
                 <Receipt className="h-4 w-4 text-brand-primary" />
                 <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Total {t("fineAmountLabel") ?? "Denda"} #{borrowId}
+                  Total {t("fineAmountLabel")}
                 </span>
               </div>
               <p

@@ -10,7 +10,10 @@ import { BorrowRequest } from "@/types/borrow-request";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Search, ClipboardList, QrCode } from "lucide-react";
+import { Package, Search, ClipboardList, QrCode, Plus, Download } from "lucide-react";
+import Link from "next/link";
+import RefreshButton from "@/components/custom-ui/button/RefreshButton";
+import ExportButton from "@/components/custom-ui/button/ExportButton";
 import EmptyState from "@/components/custom-ui/EmptyState";
 import { Input } from "@/components/ui/input";
 import { BorrowCard } from "./BorrowCard";
@@ -25,9 +28,11 @@ import { useRouter } from "next/navigation";
 
 export default function BorrowClient() {
   const t = useTranslations("borrow");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
   const [loadingBorrows, setLoadingBorrows] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [search, setSearch] = useState("");
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [dateRange, setDateRange] = useState<{
@@ -143,6 +148,27 @@ export default function BorrowClient() {
   const handleScanSuccess = (decodedText: string) => {
     router.push(`/admin/borrows/${decodedText}`);
   };
+  
+  const handleExport = async () => {
+    try {
+      setExporting(true);
+      const response = await borrowService.exportData(borrowFilters);
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `borrows_export_${new Date().getTime()}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      
+      toast.success(t("exportSuccess"));
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t("exportError"));
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const openBorrows = allBorrows.filter((b) => b.status === "open");
   const closedBorrows = allBorrows.filter((b) => b.status === "close");
@@ -160,9 +186,7 @@ export default function BorrowClient() {
     return (
       <StaggerContainer className="grid gap-4">
         {borrows.map((borrow, index) => (
-          <SlideIn key={borrow.id} direction="up" distance={20} delay={index * 0.05}>
-            <BorrowCard borrow={borrow} />
-          </SlideIn>
+          <BorrowCard key={borrow.id} borrow={borrow} index={index} />
         ))}
       </StaggerContainer>
     );
@@ -175,6 +199,26 @@ export default function BorrowClient() {
         description={t("managementDesc")}
         isAdmin
         className="mb-6"
+        rightActions={
+          <div className="flex items-center gap-2">
+            <RefreshButton
+              onClick={() => fetchBorrows(borrowFilters)}
+              loading={loadingBorrows}
+              label={tCommon("refresh")}
+            />
+            <ExportButton
+              onClick={handleExport}
+              loading={exporting}
+              label={t("exportData")}
+            />
+            <Link href="/admin/borrows/create">
+              <Button variant="submit" className="h-8 gap-1">
+                <Plus className="w-3.5 h-3.5" />
+                {t("createBorrow")}
+              </Button>
+            </Link>
+          </div>
+        }
       />
 
       <FadeUp delay={0.1}>
@@ -232,8 +276,7 @@ export default function BorrowClient() {
             <TabsTrigger value="closed">
               {t("closed")} ({closedBorrows.length})
             </TabsTrigger>
-            <TabsTrigger value="requests" className="flex items-center gap-1">
-              <ClipboardList className="h-3.5 w-3.5" />
+            <TabsTrigger value="requests">
               {t("requests")} ({requests.length})
             </TabsTrigger>
           </TabsList>
@@ -289,9 +332,7 @@ export default function BorrowClient() {
                   <FadeIn key="content">
                     <StaggerContainer className="space-y-4">
                       {requests.map((req, index) => (
-                        <SlideIn key={req.id} direction="up" distance={20} delay={index * 0.05}>
-                          <BorrowRequestCard req={req} />
-                        </SlideIn>
+                        <BorrowRequestCard key={req.id} req={req} index={index} />
                       ))}
                     </StaggerContainer>
                   </FadeIn>

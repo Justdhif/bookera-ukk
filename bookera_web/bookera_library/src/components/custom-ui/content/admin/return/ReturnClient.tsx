@@ -25,13 +25,11 @@ import { StaggerContainer, FadeUp, SlideIn, FadeIn } from "@/components/custom-u
 export default function ReturnClient() {
   const t = useTranslations("return");
   const tCommon = useTranslations("common");
-  const defaultMonthRange = getCurrentMonthRange();
   const [allBorrows, setAllBorrows] = useState<Borrow[]>([]);
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [filters, setFilters] = useState<ReturnFilterParams>({
     per_page: ITEMS_PER_PAGE_OPTIONS[1],
-    ...defaultMonthRange,
   });
   const [searchInput, setSearchInput] = useState("");
   const [pagination, setPagination] = useState({
@@ -123,14 +121,7 @@ export default function ReturnClient() {
     return (
       <StaggerContainer className="grid gap-4">
         {borrows.map((borrow, index) => (
-          <SlideIn
-            key={borrow.id}
-            direction="up"
-            distance={20}
-            delay={index * 0.05}
-          >
-            <ReturnCard borrow={borrow} />
-          </SlideIn>
+          <ReturnCard key={borrow.id} borrow={borrow} index={index} />
         ))}
       </StaggerContainer>
     );
@@ -176,8 +167,6 @@ export default function ReturnClient() {
             </div>
             <DateRangeFilter
               onFilter={handleDateFilter}
-              defaultStartDate={defaultMonthRange.startDate}
-              defaultEndDate={defaultMonthRange.endDate}
               className="w-full lg:w-auto"
             />
           </div>
@@ -193,13 +182,8 @@ export default function ReturnClient() {
             onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
           >
             {loading ? (
-              <FadeIn
-                key="loading"
-                className="grid gap-4"
-              >
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <DataLoading key={index} size="lg" />
-                ))}
+              <FadeIn key="loading">
+                <DataLoading size="lg" className="min-h-[400px]" />
               </FadeIn>
             ) : (
               <FadeIn

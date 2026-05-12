@@ -1,8 +1,6 @@
 "use client";
 
-import { Borrow } from "@/types/borrow";
-import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
-import FineStatusBadge from "@/components/custom-ui/badge/FineStatusBadge";
+import { LostBook } from "@/types/lost-book";
 import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
@@ -10,24 +8,26 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { BookOpen, Building2, Calendar, DollarSign, Hash, Mail, Phone, Receipt, Tag, User } from "lucide-react";
+import { AlertCircle, BookOpen, Building2, Calendar, Hash, Mail, Phone, Tag, User } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
-import { ScaleIn, StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
+import { ScaleIn } from "@/components/custom-ui/motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DetailButton from "@/components/custom-ui/button/DetailButton";
-import { cn } from "@/lib/utils";
+import BorrowStatusBadge from "@/components/custom-ui/badge/BorrowStatusBadge";
 
-interface ReturnCardProps {
-  borrow: Borrow;
+interface LostBookCardProps {
+  borrow: LostBook["borrow"];
+  items: LostBook[];
   index?: number;
 }
 
-type ReturnEntry = {
+type LostEntry = {
   key: string;
-  return_date: string;
+  lost_date?: string;
+  notes?: string;
   bookTitle?: string;
   authors: string;
   publishers: string[];
@@ -36,7 +36,6 @@ type ReturnEntry = {
   publicationYear?: number;
   coverImage?: string;
   copyCode?: string;
-  condition?: "good" | "damaged";
 };
 
 function UserAvatar({ name, avatar }: { name: string; avatar?: string }) {
@@ -56,64 +55,46 @@ function UserAvatar({ name, avatar }: { name: string; avatar?: string }) {
   );
 }
 
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  }).format(amount);
-}
-
-export function ReturnCard({ borrow, index = 0 }: ReturnCardProps) {
-  const t = useTranslations("return");
+export function LostBookCard({ borrow, items, index = 0 }: LostBookCardProps) {
+  const t = useTranslations("lost-books");
   const tCommon = useTranslations("common");
-  const tp = useTranslations("public");
 
-  const returnRecords = [...(borrow.book_returns ?? [])].sort(
-    (left, right) =>
-      new Date(right.return_date).getTime() - new Date(left.return_date).getTime(),
-  );
-  
-  const returnEntries: ReturnEntry[] = returnRecords.map((bookReturn) => {
-    const book = bookReturn.book_copy?.book;
+  const borrowId = items[0]?.borrow_id;
+  const detailLink = borrow?.borrow_code
+    ? `/admin/borrows/${borrow.borrow_code}`
+    : borrowId
+      ? `/admin/borrows/${borrowId}`
+      : null;
+
+  const lostEntries: LostEntry[] = items.map((item) => {
+    const book = item.book_copy?.book;
+
     return {
-      key: `${bookReturn.id}`,
-      return_date: bookReturn.return_date,
+      key: `${item.id}`,
+      lost_date: item.lost_date,
+      notes: item.notes,
       bookTitle: book?.title,
       authors:
-        book?.authors?.map((author) => author.name).join(", ") ||
+        book?.authors?.map((author: any) => author.name).join(", ") ||
         book?.author ||
         tCommon("noData"),
-      publishers: book?.publishers?.map((publisher) => publisher.name) || [],
+      publishers: book?.publishers?.map((publisher: any) => publisher.name) || [],
       categories: book?.categories ?? [],
       isbn: book?.isbn,
       publicationYear: book?.publication_year,
       coverImage: book?.cover_image,
-      copyCode: bookReturn.book_copy?.copy_code,
-      condition: bookReturn.condition,
+      copyCode: item.book_copy?.copy_code,
     };
   });
 
-  const fines = borrow.fines ?? [];
-  const totalFineAmount = fines.reduce((sum, fine) => sum + Number(fine.amount), 0);
-  const outstandingFineAmount = fines
-    .filter((fine) => fine.status === "unpaid")
-    .reduce((sum, fine) => sum + Number(fine.amount), 0);
-
-  const profile = borrow.user?.profile;
-  const borrowerName = profile?.full_name || borrow.user?.email || "-";
-  
-  const detailLink = borrow.borrow_code
-    ? `/admin/borrows/${borrow.borrow_code}`
-    : borrow.id
-      ? `/admin/borrows/${borrow.id}`
-      : null;
+  const profile = borrow?.user?.profile;
+  const borrowerName = profile?.full_name || borrow?.user?.email || "-";
 
   return (
     <ScaleIn delay={index * 0.06}>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem
-          value={`return-${borrow.id}-${index}`}
+          value={`lost-${borrowId}-${index}`}
           className="rounded-2xl border bg-card shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md mb-4 px-0 border-b-0"
         >
           <AccordionTrigger className="w-full text-left p-5 hover:no-underline [&>svg]:mr-0 [&>svg]:h-5 [&>svg]:w-5 cursor-pointer">
@@ -130,12 +111,14 @@ export function ReturnCard({ borrow, index = 0 }: ReturnCardProps) {
                   </p>
                   <div className="shrink-0 flex items-center gap-2">
                     <span className="text-xs text-muted-foreground font-medium px-2 py-0.5 bg-muted rounded-full">
-                      #{borrow.borrow_code}
+                      #{borrow?.borrow_code || borrowId}
                     </span>
-                    <BorrowStatusBadge
-                      status={borrow.status}
-                      className="h-5 px-2 text-[9px] font-black uppercase tracking-wider"
-                    />
+                    {borrow?.status && (
+                        <BorrowStatusBadge
+                            status={borrow.status}
+                            className="h-5 px-2 text-[9px] font-black uppercase tracking-wider"
+                        />
+                    )}
                   </div>
                 </div>
                 
@@ -145,7 +128,7 @@ export function ReturnCard({ borrow, index = 0 }: ReturnCardProps) {
                     <span>
                       {t("borrowDateLabel")}:{" "}
                       <span className="text-foreground font-medium">
-                        {borrow.borrow_date ? format(new Date(borrow.borrow_date), "dd MMM yyyy") : "-"}
+                        {borrow?.borrow_date ? format(new Date(borrow.borrow_date), "dd MMM yyyy") : "-"}
                       </span>
                     </span>
                   </div>
@@ -154,7 +137,7 @@ export function ReturnCard({ borrow, index = 0 }: ReturnCardProps) {
                     <span>
                       {t("dueDateLabel")}:{" "}
                       <span className="text-foreground font-medium">
-                        {borrow.return_date ? format(new Date(borrow.return_date), "dd MMM yyyy") : "-"}
+                        {borrow?.return_date ? format(new Date(borrow.return_date), "dd MMM yyyy") : "-"}
                       </span>
                     </span>
                   </div>
@@ -168,7 +151,7 @@ export function ReturnCard({ borrow, index = 0 }: ReturnCardProps) {
             <div className="p-5 space-y-6">
               {/* Section 1: User Info */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                 {borrow.user?.email && (
+                 {borrow?.user?.email && (
                     <div className="p-3 rounded-xl bg-muted/20 border border-border/50 flex flex-col gap-0.5">
                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Email</span>
                        <div className="flex items-center gap-2 text-sm font-medium">
@@ -197,13 +180,13 @@ export function ReturnCard({ borrow, index = 0 }: ReturnCardProps) {
                  )}
               </div>
 
-              {/* Section 2: Returned Books */}
+              {/* Section 2: Lost Books */}
               <div className="space-y-3">
                 <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-1">
-                  {t("returnedBooks")}
+                  {t("lostBooksSection")}
                 </h4>
                 <div className="rounded-xl border border-border/60 overflow-hidden divide-y divide-border/40">
-                  {returnEntries.map((entry) => (
+                  {lostEntries.map((entry) => (
                     <div
                       key={entry.key}
                       className="flex items-center gap-4 p-3 hover:bg-muted/20 transition-colors"
@@ -241,86 +224,40 @@ export function ReturnCard({ borrow, index = 0 }: ReturnCardProps) {
                         </p>
                         <div className="flex items-center gap-2 mt-1">
                            <Badge
-                              className={cn(
-                                "h-4 px-1.5 text-[8px] font-black uppercase tracking-tighter",
-                                entry.condition === "damaged"
-                                  ? "bg-destructive/10 text-destructive border-destructive/20"
-                                  : "bg-brand-primary/10 text-brand-primary border-brand-primary/20"
-                              )}
+                              className="h-4 px-1.5 text-[8px] font-black uppercase tracking-tighter bg-destructive/10 text-destructive border-destructive/20"
                            >
-                              {entry.condition || "-"}
+                              {t("lost") || "LOST"}
                            </Badge>
                            <span className="text-[10px] text-muted-foreground font-medium">
-                              {format(new Date(entry.return_date), "dd MMM yyyy")}
+                              {entry.lost_date ? format(new Date(entry.lost_date), "dd MMM yyyy") : "-"}
                            </span>
                         </div>
+                        {entry.notes && (
+                            <p className="mt-2 border-l-2 border-destructive/30 pl-2 text-xs italic text-muted-foreground">
+                                {entry.notes}
+                            </p>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-
-              {/* Section 3: Fines */}
-              {fines.length > 0 && (
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-1">
-                    {t("finesTitle")}
-                  </h4>
-                  <div className="grid gap-3">
-                    {fines.map((fine) => (
-                      <div
-                        key={fine.id}
-                        className="flex items-center justify-between p-3 rounded-xl border border-border/50 bg-muted/10"
-                      >
-                        <div className="space-y-0.5">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                            {fine.fine_type?.name || t("fine")}
-                          </p>
-                          <p className="text-sm font-bold text-foreground">
-                            {formatCurrency(Number(fine.amount))}
-                          </p>
-                        </div>
-                        <FineStatusBadge status={fine.status} className="h-5 text-[9px]" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </AccordionContent>
 
           <div className="mx-5 h-px bg-border/60" />
 
           <div className="flex items-center justify-between gap-4 px-5 py-4">
-            <div className="flex items-center gap-8">
-               <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                     <BookOpen className="h-4 w-4 text-brand-primary" />
-                     <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                        {t("totalBooks")}
-                     </span>
-                  </div>
-                  <p className="text-2xl font-black tracking-tight text-brand-primary">
-                     {t("bookUnit", { count: returnEntries.length })}
-                  </p>
-               </div>
-               
-               {totalFineAmount > 0 && (
-                  <div className="space-y-0.5">
-                     <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-amber-500" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                           {tCommon("totalFine") || "Total Fine"}
-                        </span>
-                     </div>
-                     <p className={cn(
-                        "text-2xl font-black tracking-tight",
-                        outstandingFineAmount > 0 ? "text-destructive" : "text-amber-500"
-                     )}>
-                        {formatCurrency(totalFineAmount)}
-                     </p>
-                  </div>
-               )}
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  {t("lostBooksCount")}
+                </span>
+              </div>
+              <p className="text-2xl font-black tracking-tight text-destructive">
+                {t("bookUnit", { count: lostEntries.length })}
+              </p>
             </div>
 
             {detailLink && (

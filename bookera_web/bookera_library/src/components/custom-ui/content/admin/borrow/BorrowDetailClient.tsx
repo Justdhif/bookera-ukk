@@ -261,7 +261,7 @@ export default function BorrowDetailClient() {
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 lg:sticky lg:top-2 lg:self-start">
             <FadeUp delay={0.2}>
               <BorrowBooksCard
                 borrow={borrow}

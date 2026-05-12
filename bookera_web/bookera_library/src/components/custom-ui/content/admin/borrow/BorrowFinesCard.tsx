@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { StaggerContainer, SlideIn } from "@/components/custom-ui/motion";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import { PaymentMethodDialog } from "./PaymentMethodDialog";
 import PaymentSuccessDialog from "@/components/custom-ui/content/public/payment/PaymentSuccessDialog";
 
@@ -125,20 +126,16 @@ export function BorrowFinesCard({ fines, onUpdate }: BorrowFinesCardProps) {
           
           <div className="flex items-center gap-3">
             {fines.some(f => f.status === "paid") && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-10 px-6 font-black gap-2 border-brand-primary/20 text-brand-primary hover:bg-brand-primary/5 transition-all shrink-0 shadow-sm"
-                onClick={() => {
-                  const paidFine = fines.find(f => f.status === "paid");
-                  if (paidFine) {
-                    router.push(`/admin/payment/success?type=fine&id=${paidFine.id}`);
-                  }
-                }}
-              >
-                <ReceiptText className="h-4 w-4" />
-                Invoice
-              </Button>
+              <Link href={`/admin/payment/success?type=fine&id=${fines.find(f => f.status === "paid")?.id}`}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-10 px-6 font-black gap-2 border-brand-primary/20 text-brand-primary hover:bg-brand-primary/5 transition-all shrink-0 shadow-sm"
+                >
+                  <ReceiptText className="h-4 w-4" />
+                  Invoice
+                </Button>
+              </Link>
             )}
 
             {unpaidFines.length > 0 && (

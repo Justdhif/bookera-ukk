@@ -108,7 +108,7 @@ export default function FineList({
                           </p>
                           <div className="shrink-0 flex items-center gap-2">
                              <span className="text-xs text-muted-foreground font-medium px-2 py-0.5 bg-muted rounded-full">
-                               #{borrowId}
+                               #{borrowCode || borrowId}
                              </span>
                              {allPaid ? (
                                 <FineStatusBadge status="paid" />
@@ -203,7 +203,7 @@ export default function FineList({
                       <div className="flex items-center gap-2">
                         <Receipt className="h-4 w-4 text-brand-primary" />
                         <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                          Total {tp("fineAmountLabel") ?? "Denda"} #{borrowId}
+                          Total {tp("fineAmountLabel")}
                         </span>
                       </div>
                       <p className={cn(
