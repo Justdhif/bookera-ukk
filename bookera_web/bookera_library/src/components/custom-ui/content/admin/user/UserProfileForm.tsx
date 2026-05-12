@@ -146,12 +146,16 @@ export default function UserProfileForm({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="identification_number">
+              <Label 
+                htmlFor="identification_number"
+                variant={isEditMode ? "required" : "default"}
+              >
                 {t("identificationNumber")}
               </Label>
               <Input
                 id="identification_number"
                 name="identification_number"
+                required={isEditMode}
                 value={formData.identification_number || ""}
                 onChange={handleInputChange}
                 placeholder={t("enterIdNumber")}

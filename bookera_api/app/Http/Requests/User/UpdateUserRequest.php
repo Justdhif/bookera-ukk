@@ -43,7 +43,7 @@ class UpdateUserRequest extends FormRequest
             'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'bio' => 'nullable|string',
-            'identification_number' => ['nullable', 'string', Rule::unique('user_profiles', 'identification_number')->ignore($this->user->profile->id ?? null)],
+            'identification_number' => ['required', 'string', Rule::unique('user_profiles', 'identification_number')->ignore($this->user->profile->id ?? null)],
             'occupation' => ['nullable', Rule::enum(UserOccupation::class)],
             'institution' => 'nullable|string|max:255',
         ];

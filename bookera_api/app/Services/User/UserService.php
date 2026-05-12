@@ -9,10 +9,19 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Services\Membership\MembershipService;
+use App\Models\MembershipTransaction;
 use Illuminate\Support\Facades\Storage;
 
 class UserService
 {
+    private MembershipService $membershipService;
+
+    public function __construct(MembershipService $membershipService)
+    {
+        $this->membershipService = $membershipService;
+    }
+
     public function getAll(array $filters): LengthAwarePaginator
     {
         $query = User::with('profile');
@@ -101,6 +110,25 @@ class UserService
                 null,
                 $user
             );
+
+            if ($user->role === 'member' && isset($data['payment_method'])) {
+                $planId = $data['plan_id'] ?? 'lifetime';
+                if ($data['payment_method'] === 'cash') {
+                    $this->membershipService->activateMembership($user, $planId, 'cash');
+                } else {
+                    $planModel = \App\Models\MembershipPlan::where('plan_id', $planId)->first();
+                    $amount = $planModel ? $planModel->price : 0;
+                    $orderId = 'MEMBER-ADMIN-' . $user->id . '-' . time();
+                    $transaction = MembershipTransaction::create([
+                        'user_id'  => $user->id,
+                        'order_id' => $orderId,
+                        'plan'     => $planId,
+                        'amount'   => $amount,
+                        'status'   => 'pending',
+                    ]);
+                    $user->pending_transaction = $transaction;
+                }
+            }
 
             return $user;
         });
@@ -195,7 +223,7 @@ class UserService
         );
     }
 
-    private function handleAvatar($avatar, ?string $oldAvatarPath = null): ?string
+    private function handleAvatar(mixed $avatar, ?string $oldAvatarPath = null): ?string
     {
         if ($avatar instanceof UploadedFile) {
             if ($oldAvatarPath && !filter_var($oldAvatarPath, FILTER_VALIDATE_URL)) {

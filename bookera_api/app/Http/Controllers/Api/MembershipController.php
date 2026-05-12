@@ -18,8 +18,11 @@ use Illuminate\Support\Facades\Storage;
 
 class MembershipController extends Controller
 {
-    public function __construct()
+    private \App\Services\Membership\MembershipService $membershipService;
+
+    public function __construct(\App\Services\Membership\MembershipService $membershipService)
     {
+        $this->membershipService = $membershipService;
         Config::$serverKey    = config('midtrans.server_key');
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized  = config('midtrans.is_sanitized');
@@ -158,10 +161,10 @@ class MembershipController extends Controller
                 if ($fraudStatus == 'challenge') {
                     $transaction->update(['status' => 'pending', 'payment_type' => $paymentType]);
                 } elseif ($fraudStatus == 'accept') {
-                    $this->activateMembership($transaction, $paymentType);
+                    $this->membershipService->activateMembership($transaction->user, $transaction->plan, $paymentType, $transaction);
                 }
             } elseif ($transactionStatus == 'settlement') {
-                $this->activateMembership($transaction, $paymentType);
+                $this->membershipService->activateMembership($transaction->user, $transaction->plan, $paymentType, $transaction);
             } elseif (in_array($transactionStatus, ['cancel', 'deny', 'expire'])) {
                 $transaction->update(['status' => 'failed', 'payment_type' => $paymentType]);
             } elseif ($transactionStatus == 'pending') {
@@ -177,35 +180,7 @@ class MembershipController extends Controller
 
     private function activateMembership(MembershipTransaction $transaction, string $paymentType): void
     {
-        $expiresAt = null; // Lifetime access
-
-        $transaction->update([
-            'status'      => 'paid',
-            'payment_type' => $paymentType,
-            'paid_at'     => now(),
-            'expires_at'  => $expiresAt,
-        ]);
-
-        $user = User::find($transaction->user_id);
-        $user->update(['role' => 'member']);
-
-        $planModel = MembershipPlan::where('plan_id', $transaction->plan)->first();
-
-        $memberCode = 'MBR-' . str_pad($user->id, 5, '0', STR_PAD_LEFT) . '-' . strtoupper(bin2hex(random_bytes(3)));
-
-        // Create or update membership record
-        $membership = \App\Models\Membership::updateOrCreate(
-            ['user_id' => $user->id],
-            [
-                'membership_plan_id' => $planModel ? $planModel->id : 1,
-                'member_code' => $memberCode,
-                'joined_at' => now(),
-                'expires_at' => $expiresAt,
-                'status' => 'active',
-            ]
-        );
-
-        $membership->update(['qr_code_path' => $this->generateQrCode($memberCode, $membership->id)]);
+        $this->membershipService->activateMembership($transaction->user, $transaction->plan, $paymentType, $transaction);
     }
 
     private function generateQrCode(string $memberCode, int $membershipId): string
@@ -246,7 +221,7 @@ class MembershipController extends Controller
                 Log::info("Midtrans Status for " . $latestTransaction->order_id . ": " . $transactionStatus);
 
                 if ($transactionStatus == 'settlement' || ($transactionStatus == 'capture' && $status->fraud_status == 'accept')) {
-                    $this->activateMembership($latestTransaction, $paymentType);
+                    $this->membershipService->activateMembership($user, $latestTransaction->plan, $paymentType, $latestTransaction);
                     $latestTransaction->refresh();
                     Log::info("Membership activated via checkStatus for user: " . $user->id);
                 } elseif (in_array($transactionStatus, ['cancel', 'deny', 'expire'])) {

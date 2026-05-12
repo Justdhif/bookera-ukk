@@ -74,6 +74,7 @@ export default function UserDetailClient() {
     if (
       !formData.email?.trim() ||
       !formData.full_name?.trim() ||
+      !formData.identification_number?.trim() ||
       !formData.role
     ) {
       toast.error(t("requiredFields"));
@@ -156,9 +157,9 @@ export default function UserDetailClient() {
                 onEdit={() => setIsEditMode(true)}
                 submitting={submitting}
                 isSubmitDisabled={
-                  submitting ||
                   !formData.email?.trim() ||
                   !formData.full_name?.trim() ||
+                  !formData.identification_number?.trim() ||
                   !formData.role ||
                   !isFullNameValid
                 }

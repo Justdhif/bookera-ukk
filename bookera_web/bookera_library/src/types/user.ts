@@ -42,8 +42,8 @@ export interface User {
 
   complaints_count?: number;
   active_membership?: Membership | null;
-
   profile: UserProfile | null;
+  pending_transaction?: any;
 }
 
 export interface Membership {

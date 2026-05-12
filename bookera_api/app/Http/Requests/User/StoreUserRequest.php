@@ -43,7 +43,7 @@ class StoreUserRequest extends FormRequest
             'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'bio' => 'nullable|string',
-            'identification_number' => 'nullable|string|unique:user_profiles,identification_number',
+            'identification_number' => 'required|string|unique:user_profiles,identification_number',
             'occupation' => ['nullable', Rule::enum(UserOccupation::class)],
             'institution' => 'nullable|string|max:255',
         ];

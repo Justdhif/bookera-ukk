@@ -46,8 +46,8 @@ export default function UserTable({ data, onDelete }: Props) {
             </TableHead>
             <TableHead className="font-semibold">{t("user")}</TableHead>
             <TableHead className="font-semibold">{t("email")}</TableHead>
+            <TableHead className="font-semibold">{t("identificationNumber")}</TableHead>
             <TableHead className="font-semibold">{t("role")}</TableHead>
-            <TableHead className="font-semibold">{t("occupation")}</TableHead>
             <TableHead className="font-semibold">{t("status")}</TableHead>
             <TableHead className="font-semibold text-right pr-6">
               {t("actions")}
@@ -101,12 +101,12 @@ export default function UserTable({ data, onDelete }: Props) {
                 </span>
               </TableCell>
               <TableCell>
-                <RoleBadge role={item.role} />
+                <span className="text-muted-foreground">
+                  {item.profile?.identification_number || "-"}
+                </span>
               </TableCell>
               <TableCell>
-                <span className="text-muted-foreground">
-                  {formatOccupationLabel(item.profile?.occupation, common)}
-                </span>
+                <RoleBadge role={item.role} />
               </TableCell>
               <TableCell>
                 <ActiveStatusBadge isActive={item.is_active} />

@@ -2547,6 +2547,7 @@
     "updateSuccess": "User updated successfully",
     "updateError": "Failed to update user",
     "addSuccess": "User added successfully",
+    "addSuccessRedirecting": "User added! Redirecting to payment page...",
     "addError": "Failed to add user",
     "requiredFields": "Please complete all required fields",
     "bookCount": "{count} {count, plural, one {book} other {books}}",

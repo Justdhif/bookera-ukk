@@ -2546,6 +2546,7 @@
     "updateSuccess": "Pengguna berhasil diperbarui",
     "updateError": "Gagal mengupdate pengguna",
     "addSuccess": "Pengguna berhasil ditambahkan",
+    "addSuccessRedirecting": "Pengguna berhasil ditambahkan! Mengalihkan ke halaman pembayaran...",
     "addError": "Gagal menambahkan pengguna",
     "requiredFields": "Harap lengkapi semua kolom yang wajib diisi",
     "bookCount": "{count} buku",
