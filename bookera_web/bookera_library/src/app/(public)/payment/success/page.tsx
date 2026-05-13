@@ -1,5 +1,0 @@
-import PaymentSuccessClient from "@/components/custom-ui/content/public/payment/PaymentSuccessClient";
-
-export default function PaymentSuccessPage() {
-  return <PaymentSuccessClient />;
-}

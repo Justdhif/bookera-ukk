@@ -1,12 +1,8 @@
-import type { Metadata } from "next";
+import React from "react";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import PublicHeader from "@/components/custom-ui/navbar/PublicHeader";
 import PublicSidebar from "@/components/custom-ui/sidebar/PublicSidebar";
 import GlobalChatSheet from "@/components/custom-ui/content/public/chat/GlobalChatSheet";
-
-export const metadata: Metadata = {
-  title: "Bookera | Library",
-};
 
 export default function PublicLayout({
   children,
@@ -16,10 +12,8 @@ export default function PublicLayout({
   return (
     <SidebarProvider>
       <PublicSidebar />
-
       <SidebarInset className="h-screen flex flex-col overflow-hidden min-w-0">
         <PublicHeader />
-
         <main className="flex-1 overflow-y-auto overflow-x-hidden bg-linear-to-b from-background to-muted/20">
           <div className="p-4 md:p-6">{children}</div>
         </main>

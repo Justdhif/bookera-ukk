@@ -5,7 +5,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import Providers from "./providers";
-import { AudioProvider } from "@/contexts/AudioContext";
 import "./globals.css";
 import TopLoader from "@/components/custom-ui/TopLoader";
 import { getUserLocale } from "@/services/locale";
@@ -46,9 +45,9 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages}>
-            <AudioProvider>
-              <Providers>{children}</Providers>
-            </AudioProvider>
+            <Providers>
+              {children}
+            </Providers>
           </NextIntlClientProvider>
         </ThemeProvider>
         <Toaster richColors position="bottom-right" />

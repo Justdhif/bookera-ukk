@@ -1,0 +1,32 @@
+import { Book } from "./book";
+import { BookCopy } from "./book-copy";
+import { User } from "./user";
+import { PaginatedResponse } from "./api";
+
+export interface BorrowRequestDetail {
+  id: number;
+  borrow_request_id: number;
+  book_id: number;
+  book: Book;
+  approval_status: "processing" | "approved" | "rejected";
+  reject_reason?: string | null;
+  book_copy_id?: number | null;
+  book_copy?: BookCopy | null;
+}
+
+export interface BorrowRequest {
+  id: number;
+  user_id: number;
+  borrow_date: string;
+  return_date: string;
+  approval_status: "processing" | "canceled" | "approved" | "rejected";
+  reject_reason?: string | null;
+
+  user?: User;
+  borrow_request_details: BorrowRequestDetail[];
+
+  created_at: string;
+  updated_at: string;
+}
+
+export type BorrowRequestListResponse = PaginatedResponse<BorrowRequest>;

@@ -1,8 +1,4 @@
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Bookera | Auth",
-};
+import React from "react";
 
 export default function AuthLayout({
   children,

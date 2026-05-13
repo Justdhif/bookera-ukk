@@ -1,0 +1,128 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { TermsOfService } from "@/types/terms-of-service";
+import { termsOfServiceService } from "@/services/terms-of-service.service";
+import { toast } from "sonner";
+import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
+
+export default function TermsOfServiceFormDialog({
+  open,
+  setOpen,
+  item,
+  onSuccess,
+}: {
+  open: boolean;
+  setOpen: (v: boolean) => void;
+  item: TermsOfService | null;
+  onSuccess: () => void;
+}) {
+  const t = useTranslations("terms-of-service");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    if (open) {
+      setTitle(item?.title ?? "");
+      setContent(item?.content ?? "");
+    }
+  }, [item, open]);
+  const handleSubmit = async () => {
+    if (!title.trim() || !content.trim()) {
+      toast.error(t("pleaseCompleteRequiredFields"));
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const payload = {
+        title: title.trim(),
+        content: content.trim(),
+      };
+      if (item) {
+        await termsOfServiceService.update(item.id, payload);
+        toast.success(t("termsOfServiceUpdated"));
+      } else {
+        await termsOfServiceService.create(payload);
+        toast.success(t("termsOfServiceAdded"));
+      }
+      setTitle("");
+      setContent("");
+      setOpen(false);
+      onSuccess();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t("errorOccurred"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {item ? t("editTerms") : t("addTerms")}
+          </DialogTitle>
+        </DialogHeader>
+        <StaggerContainer className="space-y-4">
+          <FadeUp delay={0.1}>
+            <div className="space-y-2">
+              <Label htmlFor="title" variant="required">
+                {t("titleLabel")}
+              </Label>
+              <Input
+                id="title"
+                placeholder={t("titlePlaceholder")}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+          </FadeUp>
+          <FadeUp delay={0.2}>
+            <div className="space-y-2">
+              <Label htmlFor="content" variant="required">
+                {t("contentHTML")}
+              </Label>
+              <Textarea
+                id="content"
+                placeholder={t.raw("contentPlaceholder")}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={16}
+                className="font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">{t("useHTMLTags")}</p>
+            </div>
+          </FadeUp>
+          <FadeUp delay={0.3}>
+            <Button
+              onClick={handleSubmit}
+              variant="submit"
+              disabled={isLoading || !title.trim() || !content.trim()}
+              loading={isLoading}
+              className="w-full"
+            >
+              {isLoading
+                ? item
+                  ? t("saving")
+                  : t("adding")
+                : item
+                  ? t("saveChanges")
+                  : t("add")}
+            </Button>
+          </FadeUp>
+        </StaggerContainer>
+      </DialogContent>
+    </Dialog>
+  );
+}

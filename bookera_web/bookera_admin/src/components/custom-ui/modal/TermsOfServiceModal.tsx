@@ -1,0 +1,120 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { termsOfServiceService } from "@/services/terms-of-service.service";
+import { TermsOfService } from "@/types/terms-of-service";
+import { toast } from "sonner";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { FileText } from "lucide-react";
+import DataLoading from "@/components/custom-ui/DataLoading";
+import { StaggerContainer } from "@/components/custom-ui/motion/StaggerContainer";
+import { FadeUp } from "@/components/custom-ui/motion/FadeUp";
+import { SlideIn } from "@/components/custom-ui/motion/SlideIn";
+
+interface TermsOfServiceModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function TermsOfServiceModal({
+  open,
+  onOpenChange,
+}: TermsOfServiceModalProps) {
+  const [contents, setContents] = useState<TermsOfService[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      fetchContent();
+    }
+  }, [open]);
+
+  const fetchContent = async () => {
+    setLoading(true);
+    try {
+      const response = await termsOfServiceService.getAll();
+      const items = response.data.data;
+      setContents(items);
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Failed to load Terms of Service",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl max-h-[90vh]">
+        <StaggerContainer>
+          <FadeUp>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-brand-primary" />
+                Terms of Service
+              </DialogTitle>
+            </DialogHeader>
+          </FadeUp>
+          <ScrollArea className="mt-4 h-[calc(90vh-8rem)]">
+            <FadeUp>
+              {loading ? (
+                <div className="flex justify-center py-10 pr-4">
+                  <DataLoading variant="inline" size="lg" />
+                </div>
+              ) : contents.length > 0 ? (
+                <StaggerContainer className="space-y-6 pr-4">
+                  <FadeUp>
+                    <div className="p-4 bg-linear-to-r from-brand-primary/5 to-brand-primary/10 rounded-lg border border-brand-primary/20">
+                      <p className="text-sm text-muted-foreground">
+                        Last updated:
+                        {new Date(
+                          contents[contents.length - 1].updated_at,
+                        ).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {contents.length} sections
+                      </p>
+                    </div>
+                  </FadeUp>
+                  <div className="prose prose-sm dark:prose-invert max-w-none space-y-6">
+                    {contents.map((item) => (
+                      <SlideIn key={item.id}>
+                        <div className="border-l-4 border-brand-primary/30 dark:border-brand-primary/50 pl-4 py-2">
+                          <h2 className="text-lg font-semibold text-brand-primary-dark dark:text-brand-primary mb-3">
+                            {item.title}
+                          </h2>
+                          <div
+                            className="text-gray-700 dark:text-gray-300 space-y-2 prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-li:text-gray-700 dark:prose-li:text-gray-300 prose-strong:text-gray-900 dark:prose-strong:text-gray-100"
+                            dangerouslySetInnerHTML={{ __html: item.content }}
+                          />
+                        </div>
+                      </SlideIn>
+                    ))}
+                  </div>
+                </StaggerContainer>
+              ) : (
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  <div className="mb-4 flex justify-center opacity-50">
+                    <FileText className="w-12 h-12" />
+                  </div>
+                  <p>Content not available</p>
+                </div>
+              )}
+            </FadeUp>
+          </ScrollArea>
+        </StaggerContainer>
+      </DialogContent>
+    </Dialog>
+  );
+}
