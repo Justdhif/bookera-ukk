@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Lock, ArrowRight, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import PasswordRequirements, {
   isPasswordValid,
-} from "@/components/custom-ui/content/admin/auth/PasswordRequirements";
+} from "@/components/custom-ui/PasswordRequirements";
 const iconPopTransition = {
   type: "spring" as const,
   stiffness: 400,

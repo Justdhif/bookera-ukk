@@ -65,7 +65,7 @@ export default function NewsDetailClient() {
     : "";
 
   return (
-    <StaggerContainer className="space-y-8 pb-12">
+    <StaggerContainer className="space-y-8">
       <FadeUp>
         <ContentHeader
           title={t("title")}
@@ -161,7 +161,7 @@ export default function NewsDetailClient() {
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-brand-primary" />
                         <span className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-widest">
-                          Dipublikasikan pada {formattedDate}
+                          {t("publishedAt", { date: formattedDate })}
                         </span>
                       </div>
                       <Button
@@ -170,7 +170,7 @@ export default function NewsDetailClient() {
                         className="h-9 px-4 rounded-xl font-bold text-brand-primary hover:bg-brand-primary/10"
                       >
                         <Share2 className="w-4 h-4 mr-2" />
-                        Share
+                        {t("share")}
                       </Button>
                     </div>
                   </CardContent>
@@ -199,11 +199,10 @@ export default function NewsDetailClient() {
             <div className="pt-12 mt-8 border-t border-muted/30">
               <div className="mb-10">
                 <h2 className="text-3xl font-black tracking-tight">
-                  Berita Lainnya
+                  {t("otherNews")}
                 </h2>
                 <p className="text-muted-foreground font-medium mt-2">
-                  Jelajahi berita dan pengumuman terbaru lainnya dari
-                  perpustakaan kami
+                  {t("exploreMoreNews")}
                 </p>
               </div>
               <PublicNewsGrid

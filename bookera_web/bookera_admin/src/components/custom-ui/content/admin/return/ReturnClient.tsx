@@ -139,12 +139,10 @@ export default function ReturnClient() {
               <RefreshButton
                 onClick={() => fetchAllData(filters)}
                 loading={loading}
-                label={tCommon("refresh")}
               />
               <ExportButton
                 onClick={handleExport}
                 loading={exporting}
-                label={t("exportData")}
               />
             </div>
           }

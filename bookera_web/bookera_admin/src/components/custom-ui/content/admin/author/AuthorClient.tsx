@@ -125,7 +125,6 @@ export default function AuthorClient() {
               <RefreshButton
                 onClick={() => fetchAuthors(filters)}
                 loading={loading}
-                label={tCommon("refresh")}
               />
               <Button
                 onClick={() => {

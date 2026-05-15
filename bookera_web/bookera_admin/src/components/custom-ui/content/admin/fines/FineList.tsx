@@ -215,7 +215,7 @@ export default function FineList({
                     </div>
 
                     <Link href={`/admin/borrows/${borrowCode ?? borrowId}`}>
-                      <DetailButton label={tc("detail")} />
+                      <DetailButton />
                     </Link>
                   </div>
                 </AccordionItem>

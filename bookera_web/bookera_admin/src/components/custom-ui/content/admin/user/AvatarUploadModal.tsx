@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import Image from "next/image";
 import { FadeUp } from "@/components/custom-ui/motion";
+import AvatarCropModal from "@/components/custom-ui/AvatarCropModal";
 
 interface AvatarUploadModalProps {
   open: boolean;
@@ -59,6 +60,9 @@ export default function AvatarUploadModal({
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Crop modal state
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+
   useEffect(() => {
     if (open) {
       setSelectedAvatar(currentAvatar);
@@ -87,13 +91,28 @@ export default function AvatarUploadModal({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && validateFile(file)) {
-      setSelectedAvatar(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
+        setCropSrc(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
+    // Reset input so the same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleCropConfirm = (croppedFile: File) => {
+    setCropSrc(null);
+    setSelectedAvatar(croppedFile);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+    };
+    reader.readAsDataURL(croppedFile);
+  };
+
+  const handleCropCancel = () => {
+    setCropSrc(null);
   };
 
   const handleDefaultAvatarClick = (avatarUrl: string) => {
@@ -144,10 +163,9 @@ export default function AvatarUploadModal({
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file && validateFile(file)) {
-      setSelectedAvatar(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
+        setCropSrc(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -161,6 +179,13 @@ export default function AvatarUploadModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
+        {cropSrc && (
+          <AvatarCropModal
+            imageSrc={cropSrc}
+            onConfirm={handleCropConfirm}
+            onCancel={handleCropCancel}
+          />
+        )}
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {commonT("uploadAvatar")}

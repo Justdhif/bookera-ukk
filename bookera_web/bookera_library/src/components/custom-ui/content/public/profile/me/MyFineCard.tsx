@@ -247,7 +247,7 @@ export default function MyFineCard({ group, index, onRefresh }: MyFineCardProps)
 
             {borrow?.borrow_code && (
               <Link href={`/borrow/${borrow.borrow_code}`}>
-                <DetailButton label={t("detailsBtn") || "Details"} />
+                <DetailButton />
               </Link>
             )}
           </div>

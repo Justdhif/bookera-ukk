@@ -76,7 +76,6 @@ export default function UserClient() {
               <RefreshButton
                 onClick={() => fetchUsers(filters)}
                 loading={loading}
-                label={tCommon("refresh")}
               />
               <Link href="/users/add">
                 <Button variant="submit" className="h-8 gap-1">

@@ -75,7 +75,7 @@ export default function NewsManagementClient() {
       setDeleteId(null);
       fetchNews(pagination.current_page);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Gagal menghapus berita");
+      toast.error(error.response?.data?.message || t("somethingWentWrong"));
     }
   };
 
@@ -92,7 +92,6 @@ export default function NewsManagementClient() {
               <RefreshButton
                 onClick={() => fetchNews(pagination.current_page)}
                 loading={loading}
-                label={tc("refresh")}
               />
               <Button
                 onClick={() => {

@@ -96,7 +96,6 @@ export default function DiscountKeyTable({
                 <div className="flex justify-end items-center gap-2">
                   <DeleteButton
                     onClick={() => onDelete(item.id)}
-                    label={tCommon("delete")}
                   />
                 </div>
               </TableCell>

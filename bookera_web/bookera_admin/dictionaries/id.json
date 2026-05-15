@@ -27,6 +27,8 @@
     "detail": "Detail",
     "author": "Penulis",
     "date": "Tanggal",
+    "export": "Ekspor",
+    "import": "Impor",
     "add": "Tambah",
     "search": "Cari",
     "filter": "Filter",
@@ -3014,7 +3016,33 @@
     "uploadImage": "Unggah Gambar",
     "changeImage": "Ganti Gambar",
     "uploadHint": "PNG, JPG atau WEBP (Maks. 2MB)",
-    "cancel": "Batal"
+    "cancel": "Batal",
+    "reply": "Balas",
+    "send": "Kirim",
+    "commentPlaceholder": "Tulis komentar...",
+    "replyPlaceholder": "Balas {name}...",
+    "noCommentsDesc": "Jadilah yang pertama untuk membagikan pemikiran Anda tentang berita ini.",
+    "toSubmit": "untuk mengirim",
+    "replySuccess": "Balasan berhasil dikirim",
+    "commentSuccess": "Komentar berhasil ditambahkan",
+    "commentError": "Gagal mengirim komentar",
+    "replyingTo": "Membalas",
+    "loadCommentsError": "Gagal memuat komentar",
+    "loadRepliesError": "Gagal memuat balasan",
+    "commentDeleted": "Komentar dihapus",
+    "commentDeleteError": "Gagal menghapus komentar",
+    "hideReplies": "Sembunyikan balasan",
+    "showReplies": "Lihat balasan",
+    "deleting": "Menghapus...",
+    "deleteComment": "Hapus",
+    "moderationAlertTitle": "Konten Tidak Pantas",
+    "imageTooLarge": "Ukuran gambar terlalu besar (maks 5MB)",
+    "publishedAt": "Dipublikasikan pada {date}",
+    "share": "Bagikan",
+    "otherNews": "Berita Lainnya",
+    "exploreMoreNews": "Jelajahi berita dan pengumuman terbaru lainnya dari perpustakaan kami",
+    "fillRequiredFields": "Mohon lengkapi semua kolom yang wajib diisi",
+    "somethingWentWrong": "Terjadi kesalahan"
   },
   "membershipDiscount": {
     "title": "Diskon Membership",
@@ -3070,5 +3098,13 @@
     "actionsCol": "Aksi",
     "selectKey": "Pilih Tipe Diskon",
     "searchPlaceholder": "Cari nama kunci atau kunci unik..."
+  },
+  "avatarCrop": {
+    "title": "Sesuaikan Foto Anda",
+    "hint": "Seret untuk mengatur posisi · Scroll untuk zoom",
+    "dragHint": "Seret gambar untuk menyesuaikan posisi",
+    "reset": "Kembalikan ke semula",
+    "cancel": "Batal",
+    "confirm": "Gunakan Foto Ini"
   }
 }

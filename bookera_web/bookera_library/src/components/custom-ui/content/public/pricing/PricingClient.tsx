@@ -14,7 +14,7 @@ import { User } from "@/types/user";
 import { Crown } from "lucide-react";
 import ContentHeader from "@/components/custom-ui/content/ContentHeader";
 import PricingHeader from "./PricingHeader";
-import { PricingCommonFeatures, PricingAICard } from "./PricingFeatures";
+import { PricingCommonFeatures } from "./PricingFeatures";
 import PricingProfilePreview from "./PricingProfilePreview";
 import PricingCard from "./PricingCard";
 
@@ -85,9 +85,9 @@ export default function PricingClient() {
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-stretch">
           <PricingCommonFeatures />
-          <PricingAICard />
+
           <PricingProfilePreview
             fullUser={fullUser}
             isUserLoading={isUserLoading}

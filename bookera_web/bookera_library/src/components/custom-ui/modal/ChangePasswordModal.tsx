@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { authService } from "@/services/auth.service";
 import PasswordRequirements, {
   isPasswordValid,
-} from "@/components/custom-ui/content/admin/auth/PasswordRequirements";
+} from "@/components/custom-ui/PasswordRequirements";
 import { StaggerContainer } from "@/components/custom-ui/motion/StaggerContainer";
 import { SlideIn } from "@/components/custom-ui/motion/SlideIn";
 import { FadeUp } from "@/components/custom-ui/motion/FadeUp";
@@ -257,4 +257,3 @@ export default function ChangePasswordModal({
     </Dialog>
   );
 }
-

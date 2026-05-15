@@ -115,14 +115,13 @@ export default function UserTable({ data, onDelete }: Props) {
                 <div className="flex justify-end items-center gap-2">
                   {item.slug ? (
                     <Link href={`/admin/users/${item.slug}`}>
-                      <DetailButton label={t("viewUser")} />
+                      <DetailButton />
                     </Link>
                   ) : (
-                    <DetailButton label={t("viewUser")} disabled />
+                    <DetailButton disabled />
                   )}
                   <DeleteButton
                     onClick={() => onDelete(item.id)}
-                    label={t("delete")}
                   />
                 </div>
               </TableCell>

@@ -108,7 +108,6 @@ export default function NotificationDetail({
           {detailHref && (
             <Link href={detailHref}>
               <DetailButton
-                label={t("viewFullDetail")}
                 className="h-7 text-xs border-border/60 px-2.5"
               />
             </Link>
@@ -316,7 +315,6 @@ export default function NotificationDetail({
       </div>
       <div className="px-5 py-3.5 border-t border-border bg-muted/20">
         <DeleteButton
-          label={t("deleteNotification")}
           onClick={() => onDelete(notification.id)}
           className="h-8 text-xs"
         />

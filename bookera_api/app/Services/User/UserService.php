@@ -89,6 +89,7 @@ class UserService
 
             $user->profile()->create([
                 'full_name' => $data['full_name'],
+                'username' => $data['username'] ?? null,
                 'gender' => $data['gender'] ?? null,
                 'birth_date' => $data['birth_date'] ?? null,
                 'phone_number' => $data['phone_number'] ?? null,
@@ -163,6 +164,7 @@ class UserService
 
             $profileData = [
                 'full_name' => $data['full_name'],
+                'username' => $data['username'] ?? null,
                 'gender' => $data['gender'] ?? null,
                 'birth_date' => $data['birth_date'] ?? null,
                 'phone_number' => $data['phone_number'] ?? null,

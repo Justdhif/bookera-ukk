@@ -103,11 +103,9 @@ export default function AuthorTable({
               <div className="flex justify-end items-center gap-2">
                 <EditButton
                   onClick={() => onEdit(item)}
-                  label={t("edit")}
                 />
                 <DeleteButton
                   onClick={() => onDelete(item.id)}
-                  label={t("delete")}
                 />
               </div>
             </TableCell>

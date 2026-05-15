@@ -262,7 +262,7 @@ export function LostBookCard({ borrow, items, index = 0 }: LostBookCardProps) {
 
             {detailLink && (
                <Link href={detailLink}>
-                  <DetailButton label={t("viewBtn")} />
+                  <DetailButton />
                </Link>
             )}
           </div>

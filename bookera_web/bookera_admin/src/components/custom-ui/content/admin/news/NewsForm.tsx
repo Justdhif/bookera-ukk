@@ -60,7 +60,7 @@ export default function NewsForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) {
-      toast.error("Please fill in all required fields");
+      toast.error(t("fillRequiredFields"));
       return;
     }
 
@@ -77,7 +77,7 @@ export default function NewsForm({
       }
       onSuccess();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Something went wrong");
+      toast.error(error.response?.data?.message || t("somethingWentWrong"));
     } finally {
       setLoading(false);
     }

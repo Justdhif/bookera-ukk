@@ -9,5 +9,5 @@ export default async function RootPage() {
     redirect("/home");
   }
 
-  redirect("/login");
+  redirect("/landing");
 }

@@ -27,6 +27,8 @@
     "detail": "Detail",
     "author": "Penulis",
     "date": "Tanggal",
+    "export": "Ekspor",
+    "import": "Impor",
     "add": "Tambah",
     "search": "Cari",
     "filter": "Filter",
@@ -3067,5 +3069,13 @@
     "actionsCol": "Aksi",
     "selectKey": "Pilih Tipe Diskon",
     "searchPlaceholder": "Cari nama kunci atau kunci unik..."
+  },
+  "avatarCrop": {
+    "title": "Sesuaikan Foto Anda",
+    "hint": "Seret untuk mengatur posisi · Scroll untuk zoom",
+    "dragHint": "Seret gambar untuk menyesuaikan posisi",
+    "reset": "Kembalikan ke semula",
+    "cancel": "Batal",
+    "confirm": "Gunakan Foto Ini"
   }
 }

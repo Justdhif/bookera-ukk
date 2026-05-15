@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { User } from "@/types/user";
 import { chatService, Conversation, Message } from "@/services/chat.service";
-import { chatbotService } from "@/services/chatbot.service";
 import { useAuthStore } from "@/store/auth.store";
 import { echo } from "@/lib/echo";
 import { followService } from "@/services/follow.service";
@@ -191,11 +190,7 @@ export default function ChatClient() {
 
     if (!messageText.trim() && (!imageFiles || imageFiles.length === 0)) return;
 
-    // Don't encrypt if it's an AI trigger to avoid server moderation false positives on ciphertext
-    const isMemberOrStaff = user.role !== 'user';
-    const encryptedText = (messageText.includes("@boteraAI") && isMemberOrStaff)
-      ? messageText.trim()
-      : (messageText.trim() ? encryptMessage(messageText.trim(), user.id, activeUser.id) : "");
+    const encryptedText = messageText.trim() ? encryptMessage(messageText.trim(), user.id, activeUser.id) : "";
 
     const optimisticId = Date.now();
 
@@ -212,19 +207,8 @@ export default function ChatClient() {
       ]);
     }
 
+    setIsModerating(true);
     try {
-      setIsModerating(true);
-
-      // AI moderation check on raw text before encryption
-      if (messageText.trim()) {
-        const moderation = await chatService.moderateMessage(messageText.trim());
-        if (moderation.is_inappropriate) {
-          setModerationAlert(moderation.reason);
-          setMessages((prev) => prev.filter((msg) => msg.id !== optimisticId));
-          return;
-        }
-      }
-
       if (imageFiles && imageFiles.length > 0) {
         const formData = new FormData();
         if (messageText.trim()) {
@@ -268,26 +252,7 @@ export default function ChatClient() {
       setIsModerating(false);
     }
 
-    // AI Intervention logic - Only for members and staff
-    if (messageText.includes("@boteraAI") && user.role !== 'user') {
-      try {
-        const aiResponse = await chatbotService.sendMessage(messageText.replace("@boteraAI", "").trim());
-        const aiMessage = aiResponse.data.data.response;
-        
-        try {
-          const aiFormData = new FormData();
-          aiFormData.append("message", aiMessage);
-          aiFormData.append("is_ai", "1");
-          aiFormData.append("is_encrypted", "0");
-          await chatService.sendMessage(activeUser.slug, aiFormData);
-          fetchConversations(true);
-        } catch (saveError) {
-          console.error("Failed to save AI response to DB", saveError);
-        }
-      } catch (error) {
-        console.error("AI intervention failed", error);
-      }
-    }
+
   };
 
   if (initialLoading || !isAuthenticated) {

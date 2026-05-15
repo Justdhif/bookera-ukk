@@ -95,7 +95,6 @@ export default function MembershipDiscountTable({
                 <div className="flex justify-end items-center gap-2">
                   <DeleteButton
                     onClick={() => onDelete(discount.id)}
-                    label={tCommon("delete")}
                   />
                 </div>
               </TableCell>

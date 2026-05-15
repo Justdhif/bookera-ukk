@@ -27,6 +27,8 @@
     "detail": "Detail",
     "author": "Author",
     "date": "Date",
+    "export": "Export",
+    "import": "Import",
     "add": "Add",
     "search": "Search",
     "filter": "Filter",
@@ -3067,5 +3069,13 @@
     "actionsCol": "Actions",
     "selectKey": "Select Discount Type",
     "searchPlaceholder": "Search key name or unique key..."
+  },
+  "avatarCrop": {
+    "title": "Crop Your Photo",
+    "hint": "Drag to reposition · Scroll to zoom",
+    "dragHint": "Drag the image to adjust the position",
+    "reset": "Reset to original",
+    "cancel": "Cancel",
+    "confirm": "Use This Photo"
   }
 }

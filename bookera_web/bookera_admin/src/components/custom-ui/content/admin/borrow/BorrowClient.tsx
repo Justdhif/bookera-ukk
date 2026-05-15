@@ -204,12 +204,10 @@ export default function BorrowClient() {
             <RefreshButton
               onClick={() => fetchBorrows(borrowFilters)}
               loading={loadingBorrows}
-              label={tCommon("refresh")}
             />
             <ExportButton
               onClick={handleExport}
               loading={exporting}
-              label={t("exportData")}
             />
             <Link href="/borrows/create">
               <Button variant="submit" className="h-8 gap-1">

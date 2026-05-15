@@ -35,7 +35,7 @@ export default function NewsTable({ data, onEdit, onDelete }: NewsTableProps) {
     return (
       <EmptyState
         title={tc("emptyData")}
-        description={t("noNewsDesc") || "Belum ada berita yang diterbitkan."}
+        description={t("noNewsDesc") || t("somethingWentWrong")}
         icon={<FileText className="w-12 h-12 text-muted-foreground/50" />}
       />
     );
@@ -111,18 +111,14 @@ export default function NewsTable({ data, onEdit, onDelete }: NewsTableProps) {
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end items-center gap-2">
-                  <Link href={`/news/${item.slug}`} target="_blank">
-                    <DetailButton
-                      label={tc("view")}
-                    />
+                  <Link href={`/news/${item.slug}`}>
+                    <DetailButton />
                   </Link>
                   <EditButton
                     onClick={() => onEdit(item)}
-                    label={tc("edit")}
                   />
                   <DeleteButton
                     onClick={() => onDelete(item.id)}
-                    label={tc("delete")}
                   />
                 </div>
               </TableCell>

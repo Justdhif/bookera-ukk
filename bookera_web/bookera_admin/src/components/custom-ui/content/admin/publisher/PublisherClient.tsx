@@ -123,7 +123,6 @@ export default function PublisherClient() {
               <RefreshButton
                 onClick={() => fetchPublishers(filters)}
                 loading={loading}
-                label={tCommon("refresh")}
               />
               <Button
                 onClick={() => {

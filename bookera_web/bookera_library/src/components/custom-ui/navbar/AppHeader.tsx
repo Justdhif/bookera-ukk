@@ -94,18 +94,31 @@ export default function AppHeader({
             
             {/* Desktop Settings & Notifications */}
             <div className="hidden md:flex items-center gap-2 md:gap-3">
-              <Link href={settingsHref} aria-label={t("goToSettings")}>
-                <Button
-                  variant="outline"
-                  className="text-muted-foreground hover:text-foreground flex h-9 items-center gap-2 px-3 md:h-10"
-                >
-                  <Settings className="h-4 w-4 md:h-5 md:w-5" />
-                  <span className="hidden text-sm font-medium md:inline">
-                    {t("settings")}
-                  </span>
-                </Button>
-              </Link>
-              <NotificationDropdown isAuthenticated={isAuthenticated} />
+              {isAuthenticated ? (
+                <>
+                  <Link href={settingsHref} aria-label={t("goToSettings")}>
+                    <Button
+                      variant="outline"
+                      className="text-muted-foreground hover:text-foreground flex h-9 items-center gap-2 px-3 md:h-10"
+                    >
+                      <Settings className="h-4 w-4 md:h-5 md:w-5" />
+                      <span className="hidden text-sm font-medium md:inline">
+                        {t("settings")}
+                      </span>
+                    </Button>
+                  </Link>
+                  <NotificationDropdown isAuthenticated={isAuthenticated} />
+                </>
+              ) : (
+                <Link href="/login">
+                  <Button
+                    variant="brand"
+                    className="flex h-9 items-center gap-2 px-6 md:h-10 rounded-full font-bold shadow-lg shadow-brand-primary/20"
+                  >
+                    {t("login")}
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Mobile More Menu */}

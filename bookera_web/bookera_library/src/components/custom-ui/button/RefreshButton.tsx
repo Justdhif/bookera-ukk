@@ -3,11 +3,11 @@
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface RefreshButtonProps {
   onClick: () => void;
   loading?: boolean;
-  label: string;
   className?: string;
   disabled?: boolean;
 }
@@ -15,10 +15,11 @@ interface RefreshButtonProps {
 export default function RefreshButton({
   onClick,
   loading = false,
-  label,
   className,
   disabled,
 }: RefreshButtonProps) {
+  const t = useTranslations("common");
+
   return (
     <Button
       variant="outline"
@@ -27,7 +28,7 @@ export default function RefreshButton({
       disabled={disabled || loading}
     >
       <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
-      {label}
+      {t("refresh")}
     </Button>
   );
 }

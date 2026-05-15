@@ -34,6 +34,8 @@ import {
   FadeIn,
 } from "@/components/custom-ui/motion";
 
+import { useAuthStore } from "@/store/auth.store";
+
 export default function OtherProfileClient() {
   const router = useRouter();
   const pathname = usePathname();
@@ -41,6 +43,7 @@ export default function OtherProfileClient() {
   const slug = params.slug as string;
   const t = useTranslations("profile");
   const { openChat } = useChatStore();
+  const { user: currentUser } = useAuthStore();
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,6 +58,11 @@ export default function OtherProfileClient() {
 
       const response = await followService.getUserPublicProfile(slug);
       const userData = response.data.data;
+
+      if (currentUser && userData.id === currentUser.id) {
+        router.replace("/my-profile");
+        return null;
+      }
 
       setUser(userData);
       setIsFollowing(userData.is_following ?? false);

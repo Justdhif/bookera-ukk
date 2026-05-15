@@ -2,6 +2,7 @@
 
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface ImagePreviewDialogProps {
   isOpen: boolean;
@@ -36,10 +37,13 @@ export default function ImagePreviewDialog({
         <DialogTitle className="sr-only">{alt}</DialogTitle>
         {imageUrl && (
           <div className="relative w-full h-full flex items-center justify-center">
-            <img
+            <Image
               src={imageUrl}
               alt={alt}
-              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-in zoom-in-95 duration-200"
+              width={1920}
+              height={1080}
+              unoptimized={true}
+              className="max-w-full max-h-[90vh] h-auto w-auto object-contain rounded-lg shadow-2xl animate-in zoom-in-95 duration-200"
             />
           </div>
         )}

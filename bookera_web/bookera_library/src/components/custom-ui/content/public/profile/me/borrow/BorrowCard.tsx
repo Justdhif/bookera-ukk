@@ -259,7 +259,7 @@ export function BorrowCard({ borrow, index = 0 }: BorrowCardProps) {
 
             {borrow.borrow_code && (
               <Link href={detailLink}>
-                <DetailButton label={tCommon("view")} />
+                <DetailButton />
               </Link>
             )}
           </div>

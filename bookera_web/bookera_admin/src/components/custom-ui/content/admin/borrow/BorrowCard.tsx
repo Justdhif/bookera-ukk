@@ -224,7 +224,7 @@ export function BorrowCard({ borrow, index = 0 }: BorrowCardProps) {
             </div>
 
             <Link href={`/admin/borrows/${borrow.borrow_code}`}>
-              <DetailButton label={t("detail")} />
+              <DetailButton />
             </Link>
           </div>
         </AccordionItem>

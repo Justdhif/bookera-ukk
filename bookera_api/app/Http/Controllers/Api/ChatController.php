@@ -109,12 +109,9 @@ class ChatController extends Controller
             'message' => 'required|string|max:1000',
         ]);
 
-        $moderationService = new ChatModerationService();
-        $result = $moderationService->moderate($request->message, app()->getLocale());
-
         return response()->json([
-            'is_inappropriate' => $result['is_inappropriate'],
-            'reason'           => $result['reason'],
+            'is_inappropriate' => false,
+            'reason'           => '',
         ]);
     }
 
@@ -133,8 +130,8 @@ class ChatController extends Controller
         $receiver = User::where('slug', $userSlug)->firstOrFail();
         $sender = $request->user();
 
-        // AI moderation check for text
-        // Note: If message is encrypted, moderation might be limited or bypassed
+        // AI moderation check for text - DISABLED
+        /*
         if ($request->filled('message')) {
             $moderationService = new ChatModerationService();
             $moderation = $moderationService->moderate($request->message, app()->getLocale());
@@ -147,6 +144,7 @@ class ChatController extends Controller
                 ], 422);
             }
         }
+        */
 
         $imagePaths = [];
         

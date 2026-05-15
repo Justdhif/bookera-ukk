@@ -140,11 +140,10 @@ export function BookTable({ data, onDelete }: Props) {
               <TableCell className="pr-6">
                 <div className="flex justify-end items-center gap-2">
                   <Link href={`/admin/books/${book.slug}`}>
-                    <DetailButton label={t("view")} />
+                    <DetailButton />
                   </Link>
                   <DeleteButton
                     onClick={() => onDelete(book.id)}
-                    label={t("delete")}
                   />
                 </div>
               </TableCell>

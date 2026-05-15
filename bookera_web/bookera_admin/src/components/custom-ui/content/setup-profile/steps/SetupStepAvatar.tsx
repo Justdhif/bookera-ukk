@@ -32,6 +32,7 @@ import {
   ALLOWED_FILE_EXTENSIONS,
 } from "@/constants/file";
 import { DEFAULT_AVATARS } from "@/constants/avatar";
+import AvatarCropModal from "@/components/custom-ui/AvatarCropModal";
 
 const iconPopTransition = {
   type: "spring" as const,
@@ -64,6 +65,9 @@ export default function SetupStepAvatar({
   const [localError, setLocalError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Crop modal state
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+
   const hasError = !!localError;
 
   const validateFile = (file: File): boolean => {
@@ -83,14 +87,20 @@ export default function SetupStepAvatar({
     return true;
   };
 
+  /** Open the crop modal with a raw file */
+  const openCropModal = (file: File) => {
+    const reader = new FileReader();
+    reader.onloadend = () => setCropSrc(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && validateFile(file)) {
-      setAvatarFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setPreviewUrl(reader.result as string);
-      reader.readAsDataURL(file);
+      openCropModal(file);
     }
+    // Reset input so the same file can be re-selected after cancel
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -108,11 +118,21 @@ export default function SetupStepAvatar({
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file && validateFile(file)) {
-      setAvatarFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setPreviewUrl(reader.result as string);
-      reader.readAsDataURL(file);
+      openCropModal(file);
     }
+  };
+
+  /** Called when user confirms crop – apply the cropped file as the avatar */
+  const handleCropConfirm = (croppedFile: File) => {
+    setCropSrc(null);
+    setAvatarFile(croppedFile);
+    const reader = new FileReader();
+    reader.onloadend = () => setPreviewUrl(reader.result as string);
+    reader.readAsDataURL(croppedFile);
+  };
+
+  const handleCropCancel = () => {
+    setCropSrc(null);
   };
 
   const handleDefaultAvatarClick = (url: string) => {
@@ -130,7 +150,15 @@ export default function SetupStepAvatar({
 
   return (
     <>
-      <CardHeader className="space-y-4 text-center pb-4">
+      {cropSrc && (
+        <AvatarCropModal
+          imageSrc={cropSrc}
+          onConfirm={handleCropConfirm}
+          onCancel={handleCropCancel}
+        />
+      )}
+      <>
+        <CardHeader className="space-y-4 text-center pb-4">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -359,6 +387,7 @@ export default function SetupStepAvatar({
           </Button>
         </div>
       </CardContent>
+      </>
     </>
   );
 }

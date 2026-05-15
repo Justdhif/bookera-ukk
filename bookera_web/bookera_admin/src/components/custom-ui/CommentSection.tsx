@@ -21,6 +21,7 @@ import {
   Loader2,
   Image as ImageIcon,
 } from "lucide-react";
+import Image from "next/image";
 import AdminBadge from "@/components/custom-ui/badge/AdminBadge";
 import CroissantBadge from "@/components/custom-ui/badge/CroissantBadge";
 import MemberBadge from "@/components/custom-ui/badge/MemberBadge";
@@ -225,10 +226,10 @@ function CommentItem({
               </>
             ) : (
               // Reply Layout: Inline name, mention, and content
-              <div className="text-sm leading-relaxed">
+              <div className="flex flex-col gap-0.5">
                 <Link
                   href={profileHref}
-                  className="font-bold hover:text-brand-primary transition-colors inline-flex items-center gap-1 mr-1.5"
+                  className="font-bold hover:text-brand-primary transition-colors inline-flex items-center gap-1 w-fit"
                 >
                   {displayName}
                   <div className="inline-flex items-center gap-1">
@@ -243,25 +244,29 @@ function CommentItem({
                   </div>
                 </Link>
 
-                {replyingToName && (
-                  <span className="text-brand-primary font-semibold mr-1.5">
-                    @{replyingToName.toLowerCase().replace(/\s+/g, "")}
+                <div className="text-sm leading-relaxed">
+                  {replyingToName && (
+                    <span className="text-brand-primary font-bold mr-1.5">
+                      @{replyingToName.toLowerCase().replace(/\s+/g, "")}
+                    </span>
+                  )}
+                  <span className="text-foreground/90 whitespace-pre-line">
+                    {comment.content}
                   </span>
-                )}
-
-                <span className="text-foreground/90 whitespace-pre-line">
-                  {comment.content}
-                </span>
+                </div>
               </div>
             )}
 
             {comment.image && (
               <>
-                <div className="mt-2 rounded-xl overflow-hidden border border-muted/50 bg-muted/20">
-                  <img
+                <div className="mt-2 rounded-xl overflow-hidden border border-muted/50 bg-muted/20 w-fit max-w-full">
+                  <Image
                     src={comment.image}
                     alt="Comment image"
-                    className="max-h-[300px] w-auto object-contain cursor-pointer hover:opacity-95 transition-opacity"
+                    width={800}
+                    height={600}
+                    unoptimized={true}
+                    className="max-h-[150px] w-auto max-w-full object-contain cursor-pointer hover:opacity-95 transition-opacity"
                     onClick={() => setIsImagePreviewOpen(true)}
                   />
                 </div>
@@ -667,15 +672,18 @@ export default function CommentSection({
                 </div>
 
                 {imagePreview && (
-                  <div className="relative group w-24 h-24 rounded-2xl overflow-hidden border-2 border-brand-primary/30 shadow-lg ring-4 ring-brand-primary/5 ml-1">
-                    <img
+                  <div className="relative group w-fit max-w-[280px] min-w-[80px] rounded-2xl overflow-hidden border-2 border-brand-primary/30 shadow-lg ring-4 ring-brand-primary/5 ml-1 bg-muted/20">
+                    <Image
                       src={imagePreview}
                       alt="Preview"
-                      className="w-full h-full object-cover"
+                      width={400}
+                      height={300}
+                      unoptimized={true}
+                      className="w-full h-auto max-h-[180px] object-contain"
                     />
                     <button
                       onClick={removeImage}
-                      className="absolute top-1.5 right-1.5 h-6 w-6 bg-black/70 text-white rounded-full flex items-center justify-center opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:scale-110"
+                      className="absolute top-1.5 right-1.5 h-6 w-6 bg-black/70 text-white rounded-full flex items-center justify-center opacity-100 transition-all hover:bg-red-500 hover:scale-110 z-10"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>

@@ -186,7 +186,6 @@ export function BorrowRequestCard({
             <div className="flex items-center gap-2">
               {request.approval_status === "processing" && onDelete && (
                 <DeleteButton
-                  label={t("detail.editDialog.cancel")}
                   onClick={() => onDelete(request.id)}
                   disabled={isDeleting}
                 />

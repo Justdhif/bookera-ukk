@@ -10,7 +10,7 @@ import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { userService } from "@/services/user.service";
-import AvatarUploadModal from "@/components/custom-ui/content/admin/user/AvatarUploadModal";
+import AvatarUploadModal from "@/components/custom-ui/content/public/profile/AvatarUploadModal";
 import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";

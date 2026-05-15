@@ -135,16 +135,13 @@ export default function BookClient() {
                   fetchCategories();
                 }}
                 loading={loading || categoriesLoading}
-                label={tCommon("refresh")}
               />
               <ImportButton
                 onClick={() => setIsImportDialogOpen(true)}
-                label={t("importData")}
               />
               <ExportButton
                 onClick={handleExport}
                 loading={exporting}
-                label={t("exportData")}
               />
               <Link href="/books/add">
                 <Button variant="submit" className="h-8 gap-1">

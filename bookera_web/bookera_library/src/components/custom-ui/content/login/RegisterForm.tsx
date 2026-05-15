@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import PasswordRequirements, {
   isPasswordValid,
-} from "@/components/custom-ui/content/admin/auth/PasswordRequirements";
+} from "@/components/custom-ui/PasswordRequirements";
 
 interface RegisterFormProps {
   loading: boolean;

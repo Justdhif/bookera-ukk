@@ -107,7 +107,6 @@ export default function FineTypeTable({
               <div className="flex justify-end items-center gap-2">
                 <DeleteButton
                   onClick={() => onDelete(item.id)}
-                  label={t("delete")}
                 />
               </div>
             </TableCell>

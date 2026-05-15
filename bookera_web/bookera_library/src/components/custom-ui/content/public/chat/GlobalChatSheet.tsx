@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useChatStore } from "@/store/chat.store";
 import { chatService, Message } from "@/services/chat.service";
-import { chatbotService } from "@/services/chatbot.service";
+
 import { useAuthStore } from "@/store/auth.store";
 import { echo } from "@/lib/echo";
 import { useTranslations } from "next-intl";
@@ -144,31 +144,7 @@ export default function GlobalChatSheet() {
       setIsModerating(false);
     }
 
-    // AI Intervention logic - Only for members
-    if (messageText.includes("@boteraAI") && user.role === 'member') {
-      try {
-        const aiResponse = await chatbotService.sendMessage(messageText.replace("@boteraAI", "").trim());
-        const aiMessage = aiResponse.data.data.response;
-        
-        // Add AI response as an opponent message
-        const aiOptimisticId = Date.now() + 1;
-        const encryptedAI = encryptMessage(aiMessage, activeUser.id, user.id);
 
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: aiOptimisticId,
-            message: encryptedAI,
-            is_read: true,
-            created_at: new Date().toISOString(),
-            is_sender: false,
-            is_ai: true,
-          },
-        ]);
-      } catch (error) {
-        console.error("AI intervention failed", error);
-      }
-    }
   };
 
   if (!user || user.role !== "member") return null;

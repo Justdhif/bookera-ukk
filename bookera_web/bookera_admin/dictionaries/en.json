@@ -27,6 +27,8 @@
     "detail": "Detail",
     "author": "Author",
     "date": "Date",
+    "export": "Export",
+    "import": "Import",
     "add": "Add",
     "search": "Search",
     "filter": "Filter",
@@ -3014,7 +3016,33 @@
     "uploadImage": "Upload Image",
     "changeImage": "Change Image",
     "uploadHint": "PNG, JPG or WEBP (Max 2MB)",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "reply": "Reply",
+    "send": "Send",
+    "commentPlaceholder": "Write a comment...",
+    "replyPlaceholder": "Reply to {name}...",
+    "noCommentsDesc": "Be the first to share your thoughts on this news.",
+    "toSubmit": "to submit",
+    "replySuccess": "Reply sent successfully",
+    "commentSuccess": "Comment added successfully",
+    "commentError": "Failed to submit comment",
+    "replyingTo": "Replying to",
+    "loadCommentsError": "Failed to load comments",
+    "loadRepliesError": "Failed to load replies",
+    "commentDeleted": "Comment deleted",
+    "commentDeleteError": "Failed to delete comment",
+    "hideReplies": "Hide replies",
+    "showReplies": "Show replies",
+    "deleting": "Deleting...",
+    "deleteComment": "Delete",
+    "moderationAlertTitle": "Inappropriate Content",
+    "imageTooLarge": "Image is too large (max 5MB)",
+    "publishedAt": "Published on {date}",
+    "share": "Share",
+    "otherNews": "Other News",
+    "exploreMoreNews": "Explore the latest news and announcements from our library",
+    "fillRequiredFields": "Please fill in all required fields",
+    "somethingWentWrong": "Something went wrong"
   },
   "membershipDiscount": {
     "title": "Membership Discounts",
@@ -3070,5 +3098,13 @@
     "actionsCol": "Actions",
     "selectKey": "Select Discount Type",
     "searchPlaceholder": "Search key name or unique key..."
+  },
+  "avatarCrop": {
+    "title": "Crop Your Photo",
+    "hint": "Drag to reposition · Scroll to zoom",
+    "dragHint": "Drag the image to adjust the position",
+    "reset": "Reset to original",
+    "cancel": "Cancel",
+    "confirm": "Use This Photo"
   }
 }

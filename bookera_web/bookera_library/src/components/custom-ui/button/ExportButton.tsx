@@ -3,11 +3,11 @@
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface ExportButtonProps {
   onClick: () => void;
   loading?: boolean;
-  label: string;
   className?: string;
   disabled?: boolean;
 }
@@ -15,10 +15,11 @@ interface ExportButtonProps {
 export default function ExportButton({
   onClick,
   loading = false,
-  label,
   className,
   disabled,
 }: ExportButtonProps) {
+  const t = useTranslations("common");
+
   return (
     <Button
       variant="outline"
@@ -27,7 +28,7 @@ export default function ExportButton({
       disabled={disabled || loading}
     >
       <Download className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
-      {label}
+      {t("export")}
     </Button>
   );
 }

@@ -8,7 +8,7 @@ import { userService } from "@/services/user.service";
 import { User, UpdateUserData } from "@/types/user";
 import DataLoading from "@/components/custom-ui/DataLoading";
 import { toast } from "sonner";
-import AvatarUploadModal from "@/components/custom-ui/content/admin/user/AvatarUploadModal";
+import AvatarUploadModal from "@/components/custom-ui/content/public/profile/AvatarUploadModal";
 import ProfileLeftCard from "./ProfileLeftCard";
 import ProfileRightCard from "./ProfileRightCard";
 import { normalizeOccupationValue } from "@/constants/user-occupation";

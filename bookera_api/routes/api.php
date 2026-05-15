@@ -133,8 +133,8 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::put('users/{user}', [UserController::class, 'update']);
-    Route::patch('users/{user}', [UserController::class, 'update']);
+    Route::put('users/{user:id}', [UserController::class, 'update']);
+    Route::patch('users/{user:id}', [UserController::class, 'update']);
 
     Route::prefix('phone')->group(function () {
         Route::post('/request-change', [PhoneController::class, 'requestChange']);

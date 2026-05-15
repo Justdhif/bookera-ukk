@@ -31,7 +31,6 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { format } from "date-fns";
 import type { UserOccupation } from "@/types/user";
 import { StaggerContainer, FadeUp } from "@/components/custom-ui/motion";
-import { useState } from "react";
 
 interface UserProfileFormProps {
   user?: User;

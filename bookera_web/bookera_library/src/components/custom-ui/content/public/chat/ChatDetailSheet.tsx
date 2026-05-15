@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ImagePreviewDialog from "@/components/custom-ui/ImagePreviewDialog";
 import Image from "next/image";
-import boteraLogo from "@/assets/logo/botera.png";
+
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -69,9 +69,6 @@ export default function ChatDetailSheet({
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string>("");
 
-  const [showMentionSuggestions, setShowMentionSuggestions] = useState(false);
-  const [mentionFilter, setMentionFilter] = useState("");
-
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
@@ -103,26 +100,7 @@ export default function ChatDetailSheet({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setNewMessage(value);
-
-    // Detect @ for mentions
-    const words = value.split(" ");
-    const lastWord = words[words.length - 1];
-
-    if (lastWord.startsWith("@")) {
-      setMentionFilter(lastWord.slice(1).toLowerCase());
-      setShowMentionSuggestions(true);
-    } else {
-      setShowMentionSuggestions(false);
-    }
   };
-
-  const insertMention = (mention: string) => {
-    const words = newMessage.split(" ");
-    words[words.length - 1] = mention + " ";
-    setNewMessage(words.join(" "));
-    setShowMentionSuggestions(false);
-  };
-
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -280,8 +258,9 @@ export default function ChatDetailSheet({
                       </FadeUp>
                     </div>
                   ) : (
-                    groupedMessages.map((group) => (
-                      <div key={group.date} className="flex flex-col space-y-4">
+                    groupedMessages.map((group) => {
+                      return (
+                        <div key={group.date} className="flex flex-col space-y-4">
                         <div className="flex justify-center my-4 sticky top-5 z-20">
                           <span className="bg-brand-primary/10 dark:bg-brand-primary/20 backdrop-blur-xl px-5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] text-brand-primary dark:text-brand-primary-light border border-brand-primary/20 dark:border-brand-primary/30 shadow-xs ring-1 ring-brand-primary/10">
                             {formatMessageDate(group.messages[0].created_at)}
@@ -298,29 +277,20 @@ export default function ChatDetailSheet({
                               key={msg.id || i}
                               className={cn(
                                 "flex w-full mb-3 last:mb-0 gap-3 items-end",
-                                msg.is_sender && !msg.is_ai
+                                msg.is_sender
                                   ? "self-end flex-row-reverse text-right"
                                   : "self-start flex-row text-left",
                               )}
                             >
                               {!msg.is_sender && (
                                 <div className="flex flex-col items-center mb-1 shrink-0">
-                                  <Avatar className={cn(
-                                    "h-7 w-7 border",
-                                    msg.is_ai ? "border-brand-primary/50 shadow-sm" : "border-border"
-                                  )}>
-                                    {msg.is_ai ? (
-                                      <div className="w-full h-full bg-linear-to-br from-brand-primary to-brand-primary-dark flex items-center justify-center p-0.5">
-                                        <Image src={boteraLogo} alt="Botera" className="w-full h-full object-contain" />
-                                      </div>
-                                    ) : (
+                                  <Avatar className="h-7 w-7 border border-border">
                                       <>
                                         <AvatarImage src={activeUser.profile?.avatar || ""} className="object-cover" />
                                         <AvatarFallback>
                                           <UserIcon className="h-3.5 w-3.5 opacity-50" />
                                         </AvatarFallback>
                                       </>
-                                    )}
                                   </Avatar>
                                 </div>
                               )}
@@ -352,9 +322,6 @@ export default function ChatDetailSheet({
                                 >
                                   {msg.is_ai && !msg.image_path && (
                                     <div className="absolute top-0 right-0 p-1.5">
-                                      <Badge className="bg-brand-primary text-[8px] font-black text-white uppercase tracking-tighter shadow-sm border border-white/10">
-                                        AI
-                                      </Badge>
                                     </div>
                                   )}
                                   {msg.image_path && (
@@ -413,18 +380,7 @@ export default function ChatDetailSheet({
                                   )}
                                   <div className={cn(msg.image_path ? "px-2.5 pb-1 pt-0.5 flex flex-col" : "flex flex-col", msg.is_ai && "pr-6")}>
                                     <span className="wrap-break-word">
-                                      {decryptedText?.split(/(@boteraAI)/g).map((part, index) => 
-                                        part === "@boteraAI" ? (
-                                          <span key={index} className={cn(
-                                            "font-bold mx-0.5",
-                                            msg.is_sender ? "text-white underline decoration-white/30" : "text-brand-primary"
-                                          )}>
-                                            {part}
-                                          </span>
-                                        ) : (
-                                          part
-                                        )
-                                      )}
+                                      {decryptedText}
                                     </span>
                                     <div className="flex items-center gap-1 self-end mt-1">
                                       <span
@@ -457,7 +413,8 @@ export default function ChatDetailSheet({
                           );
                         })}
                       </div>
-                    ))
+                      );
+                    })
                   )}
                   <div ref={messagesEndRef} className="h-2" />
                 </>
@@ -492,37 +449,7 @@ export default function ChatDetailSheet({
                <input type="file" ref={fileInputRef} hidden accept="image/*" multiple onChange={handleImageChange} />
             </Button>
             <div className="flex-1 relative">
-              <AnimatePresence>
-                {showMentionSuggestions &&
-                  currentUser?.role === "member" &&
-                  "boteraAI".startsWith(mentionFilter) && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute bottom-full mb-2 left-0 w-64 bg-card border border-border shadow-2xl rounded-2xl overflow-hidden z-50"
-                  >
-                    <div className="p-2 border-b border-border/50 bg-muted/30">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-2">
-                        {t("mentionsSuggestions") || "Suggestions"}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => insertMention("@boteraAI")}
-                      className="w-full flex items-center gap-3 p-3 hover:bg-brand-primary/5 transition-colors text-left group"
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-primary to-brand-primary-dark flex items-center justify-center shadow-md shrink-0 overflow-hidden p-1">
-                        <Image src={boteraLogo} alt="Botera" className="w-full h-full object-contain" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-semibold group-hover:text-brand-primary transition-colors">BoteraAI</span>
-                        <span className="text-[11px] text-muted-foreground italic">{t("aiMentionHint")}</span>
-                      </div>
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+
 
               <Input
                 value={newMessage}

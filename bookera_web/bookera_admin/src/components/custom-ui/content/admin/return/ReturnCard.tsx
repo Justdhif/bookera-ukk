@@ -325,7 +325,7 @@ export function ReturnCard({ borrow, index = 0 }: ReturnCardProps) {
 
             {detailLink && (
                <Link href={detailLink}>
-                  <DetailButton label={t("viewBtn")} />
+                  <DetailButton />
                </Link>
             )}
           </div>

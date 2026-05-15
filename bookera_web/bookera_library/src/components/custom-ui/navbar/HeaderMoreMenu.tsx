@@ -70,39 +70,55 @@ export default function HeaderMoreMenu({
         align="end"
         className="w-56 p-2 rounded-xl shadow-xl border-border/50 backdrop-blur-sm"
       >
-        <DropdownMenuItem asChild>
-          <Link
-            href={settingsHref}
-            className="flex items-center gap-3 px-3 py-2.5 cursor-pointer rounded-lg transition-colors focus:bg-accent"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Settings className="h-4 w-4" />
-            </div>
-            <span className="font-medium text-sm">{t("settings")}</span>
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem asChild>
-          <Link
-            href="/notifications"
-            className="flex items-center justify-between px-3 py-2.5 cursor-pointer rounded-lg transition-colors focus:bg-accent"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
-                <Bell className="h-4 w-4" />
-              </div>
-              <span className="font-medium text-sm">{t("notifications")}</span>
-            </div>
-            {isAuthenticated && unreadCount > 0 && (
-              <Badge
-                variant="destructive"
-                className="h-5 min-w-5 flex items-center justify-center rounded-full px-1 text-[10px] font-bold shadow-sm shadow-destructive/20"
+        {isAuthenticated ? (
+          <>
+            <DropdownMenuItem asChild>
+              <Link
+                href={settingsHref}
+                className="flex items-center gap-3 px-3 py-2.5 cursor-pointer rounded-lg transition-colors focus:bg-accent"
               >
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </Badge>
-            )}
-          </Link>
-        </DropdownMenuItem>
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <Settings className="h-4 w-4" />
+                </div>
+                <span className="font-medium text-sm">{t("settings")}</span>
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem asChild>
+              <Link
+                href="/notifications"
+                className="flex items-center justify-between px-3 py-2.5 cursor-pointer rounded-lg transition-colors focus:bg-accent"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
+                    <Bell className="h-4 w-4" />
+                  </div>
+                  <span className="font-medium text-sm">{t("notifications")}</span>
+                </div>
+                {unreadCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="h-5 min-w-5 flex items-center justify-center rounded-full px-1 text-[10px] font-bold shadow-sm shadow-destructive/20"
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </Badge>
+                )}
+              </Link>
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <DropdownMenuItem asChild>
+            <Link
+              href="/login"
+              className="flex items-center gap-3 px-3 py-2.5 cursor-pointer rounded-lg transition-colors focus:bg-accent"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary font-bold">
+                L
+              </div>
+              <span className="font-medium text-sm">{t("login")}</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

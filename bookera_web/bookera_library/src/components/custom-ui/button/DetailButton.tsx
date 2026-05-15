@@ -4,18 +4,19 @@ import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import React from "react";
+import { useTranslations } from "next-intl";
 
 export interface DetailButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  label?: string;
   iconOnly?: boolean;
 }
 
 export default function DetailButton({
-  label,
   iconOnly = false,
   className,
   ...props
 }: DetailButtonProps) {
+  const t = useTranslations("common");
+
   return (
     <Button
       variant="outline"
@@ -28,7 +29,7 @@ export default function DetailButton({
       {...props}
     >
       <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
-      {!iconOnly && label && <span>{label}</span>}
+      {!iconOnly && <span>{t("detail")}</span>}
     </Button>
   );
 }
